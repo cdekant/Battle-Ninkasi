@@ -1,6 +1,6 @@
 # Battle Ninkasi - Grundlagen
 
-Stand: 2026-11-12
+Stand: 2026-11-16
 
 ## Spiel
 
@@ -9,6 +9,26 @@ Stand: 2026-11-12
 + Gesteuert wird nur Ninkasi
 + Zufällig erzeugte Dungeons
 + Zielgruppe: zunächst nur privat, Steam als spätere Option
+
+## Spielkern
+
++ Ninkasi ist die Inkarnation der mesopotamischen Göttin des Bieres, alkoholaffin
++ Alkohol ist Ressource: Bier, eventuell auch Wein und Spirituosen
++ Vier Werte: Lebenspunkte (LP), Magiepunkte (MP), Psipunkte (PP), Rauschpunkte (RP)
++ RP sind das Maß des Rauschpegels
++ Erstes Konzept: Bier füllt LP, Wein füllt MP, Spirituosen füllen PP, alle heben den Rauschpegel
++ Rauschpegel bringt Risiko, manche Aktionen brauchen aber einen Mindestpegel (noch nicht bestätigt)
++ Vorschlag, noch nicht bestätigt: Rauschpegel sinkt mit der Zeit, über einer Schwelle drohen Torkeln, Fehlschläge, Filmriss
+
+## Gegner
+
++ Mikroorganismen verschiedener Art
++ Betriebskontrolleure
++ Abstinenzler
++ Endboss: Gott der Nüchternheit
++ Vorschlag, noch nicht bestätigt: Sobrietas als Endboss (römische Personifikation der Nüchternheit, erschlägt in der "Psychomachia" des Prudentius die Luxuria)
++ Vorschlag, noch nicht bestätigt: Lykurg von Thrakien, Pentheus von Theben und eine Figur nach Carrie Nation als Bosse davor
++ Vorschlag, noch nicht bestätigt: Hefen ambivalent, Milchsäurebakterien, Essigbakterien und Schimmel als Verderber
 
 ## Technik
 
@@ -33,13 +53,17 @@ Stand: 2026-11-12
 
 ## Design
 
-+ Tonfall: humorvoll, sarkastisch, düster, blutig, sexualisiert soweit möglich
++ Tonfall: bis ins Mark sarkastisch, schwarzer Humor, düster, blutig, mit einer guten Portion Sex/Pornographie
 + Farbwelt: Biertöne, Edelstahl, Kupfer, Stein
 + Dazu eine eigene Palette Signalfarben
 
 ## Offen
 
-+ Kern der Idee (Rolle des Biers, was die "Bierschlächterin" ausmacht)
++ Abgrenzung von MP und PP (wofür Magie, wofür Psi)
++ Rauschpegel im Detail: Schwellen, Risiken, Aktionen mit Mindestpegel
++ Wein und Spirituosen ja oder nein
++ Endboss: Sobrietas oder erfundener Gott der Nüchternheit
++ Ziel eines Laufs und was zwei Läufe unterscheidet
 + Welt und Schauplatz
 + Genaue Farbpalette
 + Bestätigung der Tileset-Regeln
