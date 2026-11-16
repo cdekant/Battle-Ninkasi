@@ -10,3 +10,9 @@
 ## Projektbeschreibung
 
 + Roguelike-Spiel
+
+## Repository und Umgebung
+
++ Öffentliches Repo: https://github.com/cdekant/Battle-Ninkasi (Hauptbranch `main`)
++ Entwicklung hauptsächlich auf Debian-Linux, gelegentlich Windows.
++ Zeilenenden im Repo durchgängig LF, festgelegt in `.gitattributes`.
