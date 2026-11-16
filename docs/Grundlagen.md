@@ -14,11 +14,18 @@ Stand: 2026-11-16
 
 + Ninkasi ist die Inkarnation der mesopotamischen Göttin des Bieres, alkoholaffin
 + Alkohol ist Ressource: Bier, eventuell auch Wein und Spirituosen
-+ Vier Werte: Lebenspunkte (LP), Magiepunkte (MP), Psipunkte (PP), Rauschpunkte (RP)
-+ RP sind das Maß des Rauschpegels
-+ Erstes Konzept: Bier füllt LP, Wein füllt MP, Spirituosen füllen PP, alle heben den Rauschpegel
-+ Rauschpegel bringt Risiko, manche Aktionen brauchen aber einen Mindestpegel (noch nicht bestätigt)
-+ Vorschlag, noch nicht bestätigt: Rauschpegel sinkt mit der Zeit, über einer Schwelle drohen Torkeln, Fehlschläge, Filmriss
++ Drei Werte: Lebenspunkte (LP), Magiepunkte (MP), Pegelpunkte (PP)
++ PP sind das Maß des Rauschpegels, Psi hat keinen eigenen Vorrat
++ Erstes Konzept: Bier füllt LP, Wein füllt MP, alle Getränke füllen PP
++ LP und MP regenerieren über die Zeit, aber nur mit Pegel: nüchtern keine Regeneration
++ Psi: hohes Risiko, hoher Ertrag; wirkt sofort auf Einzelziele (Gedanken, Furcht, Kontrolle, Teleport)
++ Magie: langsamer, wirkt über die Zeit
++ Spirituosen heben den Rauschpegel schneller als Wein und Bier
++ Rauschpegel klingt über die Zeit ab
++ Bestimmte Aktionen sind nur mit einem bestimmten Pegel durchführbar
++ Rauschpegel bringt Risiko
++ Idee, noch nicht bestätigt: häufige Anwendung von Psi lässt Gegner erscheinen (Vorbild: Glimmer in Caves of Qud)
++ Vorschlag, noch nicht bestätigt: über einer Schwelle drohen Torkeln, Fehlschläge, Filmriss
 
 ## Gegner
 
@@ -59,7 +66,10 @@ Stand: 2026-11-16
 
 ## Offen
 
-+ Abgrenzung von MP und PP (wofür Magie, wofür Psi)
++ Regeneration im Detail: ab welchem Pegel, wie schnell, ob sie mit dem Pegel steigt
++ Wie Psi mit dem Pegel zusammenhängt: Mindestpegel, Pegel verbrauchen oder Pegel weiter erhöhen
++ Worin das Risiko von Psi besteht (Fehlschlag, Kontrollverlust, Rückschlag)
++ Magie im Detail: welche Wirkungen über die Zeit (Schaden, Flächen, Segen und Fluch, Beschwörung)
 + Rauschpegel im Detail: Schwellen, Risiken, Aktionen mit Mindestpegel
 + Wein und Spirituosen ja oder nein
 + Endboss: Sobrietas oder erfundener Gott der Nüchternheit
