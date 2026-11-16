@@ -9,10 +9,10 @@
 
 ## Projektbeschreibung
 
-+ Roguelike-Spiel
++ Roguelike-Spiel, Details in [docs/Grundlagen.md](docs/Grundlagen.md)
++ Weitere Dokumentation liegt in `docs/`.
 
 ## Repository und Umgebung
 
-+ Öffentliches Repo: https://github.com/cdekant/Battle-Ninkasi (Hauptbranch `main`)
-+ Entwicklung hauptsächlich auf Debian-Linux, gelegentlich Windows.
++ Öffentliches Repo: https://github.com/cdekant/Battle-Ninkasi, grundsätzlich auf Hauptbranch `main` arbeiten
 + Zeilenenden im Repo durchgängig LF, festgelegt in `.gitattributes`.
