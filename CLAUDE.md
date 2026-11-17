@@ -6,6 +6,7 @@
 + CLAUDE.md unter 6000 Zeichen Länge halten, wird sie länger: Dokumentation auslagern und darauf verweisen.
 + Keine Änderung ist vollständig bevor nicht CLAUDE.md und die weitere Dokumentation in `docs/` hinsichtlich der Änderungen geprüft und nachgeführt ist.
 + Code grundsätzlich einfach halten aber immer prüfen, ob Wartbarkeit, Modularität und Erweiterbarkeit gegeben ist.
++ Änderungen an der Spiellogik bringen Tests mit (`node:test`, ohne Abhängigkeiten) oder begründen, warum keine nötig sind; vor jedem Commit laufen Tests und Bot fehlerfrei. Details in [docs/Architektur.md](docs/Architektur.md).
 
 ## Projektbeschreibung
 
@@ -19,7 +20,7 @@
 ## Repository und Umgebung
 
 + Öffentliches Repo: https://github.com/cdekant/Battle-Ninkasi, grundsätzlich auf Hauptbranch `main` arbeiten
-+ Starten: `python -m http.server` im Hauptverzeichnis, dann `http://localhost:8000/`; Test der Logik: `node werkzeuge/bot.js`
++ Starten: `python -m http.server` im Hauptverzeichnis, dann `http://localhost:8000/`; Test der Logik: `node --test` (Unittests in `tests/`) und `node werkzeuge/bot.js`
 + Zeilenenden im Repo durchgängig LF, festgelegt in `.gitattributes`.
 + Versionen nach Schema Ära.Feature.Fix, Nummer in `src/version.js`, jede Version mit annotiertem Git-Tag; Details in [docs/Architektur.md](docs/Architektur.md).
 + `Artwork/` enthält Konzeptbilder als JPG (Qualität 85), in Unterordnern nach Thema (`kampf/`, `titel/`, `tempel/`, `brauerei/`, `ninkasi/`); Dateinamen klein, mit Bindestrichen, ohne Umlaute und Leerzeichen, Varianten nummeriert (`-01`).
