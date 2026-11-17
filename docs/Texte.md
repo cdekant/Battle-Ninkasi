@@ -9,6 +9,8 @@ Grobskizze, auszuarbeiten.
 + Alle Texte im Spiel stehen in Sprachdateien, Code und Daten verweisen nur über Schlüssel darauf
 + Sprachen: Deutsch zuerst, Englisch vorgesehen
 + Fehlende Schlüssel werden beim Laden gemeldet (Prüfung wie bei den Daten, siehe [Architektur.md](Architektur.md))
++ Format vorläufig (Prototyp): `sprache/de/texte.js` mit `export default { schluessel: text }`; Texte enthalten Platzhalter wie `{menge}`; Wesen und Gegenstände haben statt eines Textes Formen nach Fall (`name`, `nom`, `akk`, `dat`, bei Bedarf weitere wie `ein`), eingesetzt mit `{ziel.akk}`; der Satzanfang wird groß geschrieben
++ Die Datenprüfung meldet Textschlüssel aus den Daten, die in der Sprachdatei fehlen; fehlende Schlüssel aus dem Code erscheinen als `[schluessel]` und als Warnung in der Konsole
 + Vorschlag, noch nicht bestätigt: Platzhalter und Grammatik im Text (Geschlecht, Mehrzahl, Fälle), damit z.B. "der Essigbakterie" und "dem Betriebskontrolleur" richtig gebildet werden
 
 ## Erzeugte Texte
@@ -33,4 +35,4 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 
 + Liste der Korpustexte mit Quelle und Rechtsgrundlage
 + Wo erzeugte Texte vorkommen: Bücher, Schriftrollen, Inschriften, HACCP-Aushänge, Händlergerede
-+ Format der Sprachdateien
++ Endgültiges Format der Sprachdateien und Grammatik (Geschlecht, Mehrzahl, unbestimmter Artikel)

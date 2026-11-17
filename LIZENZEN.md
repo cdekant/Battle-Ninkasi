@@ -28,4 +28,4 @@ Battle Ninkasi besteht aus Teilen unter verschiedenen Lizenzen.
 ## Bibliotheken
 
 + Jede Bibliothek in `lib/` behält ihre eigene Lizenz, die Lizenzdatei liegt im Ordner der Bibliothek
-+ Bisher keine Bibliotheken im Repo; vorgesehen: rot.js (BSD-3-Clause)
++ rot.js 2.2.1 in `lib/rot/`, Copyright Ondřej Žára, Lizenz BSD-3-Clause, Lizenztext in [lib/rot/LICENSE.txt](lib/rot/LICENSE.txt)

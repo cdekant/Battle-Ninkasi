@@ -15,7 +15,7 @@ Stand: 2026-11-17
 + Vorläufig, Grundlage fürs Balancing: 100 LP, 100 MP, 0 PP
 + 100 als Grundwert, damit Boni in Prozent vom Grundwert glatte ganze Zahlen ergeben
 + Mit 0 PP startet Ninkasi nüchtern und regeneriert erst nach dem ersten Getränk
-+ Höchstwert der PP noch offen
++ Höchstwert der PP noch offen, im Prototyp vorläufig 100
 
 ## Eigenschaften
 
