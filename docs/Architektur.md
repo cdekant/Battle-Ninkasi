@@ -79,7 +79,7 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Ein neuer Grundbaustein ist nur für eine wirklich neue Mechanik nötig
 + Benannte Verhaltensmodule (Code) für alles, was sich nicht aus Bausteinen zusammensetzen lässt: KI-Muster wie Zweiteilung, Sprossung, Myzelwachstum, Phagen-Befall, Bossphasen; die Daten verweisen nur darauf, z.B. `ki: "sprossung"` mit Parametern
 + Grundbausteine, Verhaltensmodule und Zielmuster werden in Registern angemeldet; auch Mods können dort eigene anmelden
-+ Erweiterbar ist grundsätzlich alles über Register (`src/kern/register.js`): Befehlsarten, Grundbausteine, Verhaltensmodule, Zielmuster, Handler der Weltuhr, Zeitereignisse und interne Haken; Systeme und Verhaltensmodule melden sich beim Import an, die Reihenfolge der Anmeldung ist fest
++ Erweiterbar ist grundsätzlich alles über Register (`src/kern/register.js`): Befehlsarten, Grundbausteine, Verhaltensmodule, Zielmuster, Handler der Weltuhr, Zeitereignisse, interne Haken und Gefahrenprüfungen; Systeme und Verhaltensmodule melden sich beim Import an, die Reihenfolge der Anmeldung ist fest
 + Eine Befehlsart besteht aus `pruefen` (Grund der Ablehnung oder nichts) und `ausfuehren` (gibt die Aktionsart für die Zeitkosten zurück); Gegner benutzen dieselben Befehlsarten, ihre Befehle werden aber nicht aufgezeichnet
 
 ## Inhalte als Daten
@@ -167,7 +167,30 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 ## Eingabe
 
 + Vorgabe für die Bewegung: Ziffernblock, acht Richtungen, 5 für Warten
-+ Die Belegung ist frei änderbar, siehe Datenfluss
++ Die Belegung ist frei änderbar, siehe Datenfluss; sie umfasst Tasten, Maustasten und das Mausrad (`src/eingabe/belegung.js`)
++ Einstellungen (Zoom, Reise) haben Vorgaben in `src/eingabe/einstellungen.js`; der Browser speichert nur Abweichungen davon
+
+## Maus und Reise
+
++ Die Maus erzeugt nur gewöhnliche Befehle; die Logik kennt weder Maus noch Reise
++ Ein Klick wird über eine geordnete Liste von Klickregeln gedeutet (`src/eingabe/maus.js`), die erste passende greift: eigenes Feld mit Gegenstand hebt auf, angrenzender sichtbarer Feind wird angegriffen, sonst Reise zum Feld; weitere Regeln (Kessel, Händler) kommen in die Liste
++ Eine Reise ist eine Folge von Befehlen "bewegen"; der Kern (`src/eingabe/reise.js`) liefert Schritt für Schritt den nächsten Befehl oder einen Grund zum Anhalten und kommt ohne Timer und DOM aus, Browser und Bot benutzen ihn gleich; den Takt gibt im Browser `src/main.js` vor (Einstellung `reisePause`)
++ Gereist wird nur über erkundete Felder, der Weg wird bei jedem Schritt neu berechnet; beim Darüberfahren zeigt die Anzeige den Weg als Vorschau
++ Solange Feinde in Sicht sind, beginnt keine Reise (Einstellung `reiseTrotzFeinden`, Vorgabe aus); ist sie an, hält die Reise nur bei neu auftauchenden Feinden
++ Eine Reise hält an bei: neuem Feind in Sicht, Schaden, Gegenstand auf dem Feld (Liste `reiseHalt` in den Einstellungen), außerdem bei Ankunft, fehlendem Weg, versperrtem Feld, Tod und jeder Taste oder jedem Klick
++ Das Mausrad zoomt
++ Später auf derselben Grundlage: automatisches Erkunden (andere Zielwahl), Tooltips und Umschauen am Feld unter dem Zeiger
+
+## Gefahrenprüfung
+
++ Reine Lesefunktionen in `src/systeme/gefahr.js`: Eine Lage ist ein Schnappschuss (sichtbare Feinde, LP), zwei Lagen werden verglichen
++ Prüfungen sind im Register "gefahren" angemeldet (`gegner_in_sicht`, `schaden`); die Reise nutzt sie, später auch lange Aktionen wie das Brauen
+
+## Wegfindung
+
++ Ein gemeinsames Modul `src/welt/wege.js` für KI und Reise, AStar aus rot.js mit acht Richtungen
++ Optionen: nur erkundete Felder (Spielerin, keine Hellseherei), Wesen meiden
++ Später: Kosten je Gelände (Fallen meiden), dann für KI und Spielerin zugleich
 
 ## Erster Prototyp
 
@@ -184,6 +207,7 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Pegel je Welttick: PP -1, mit PP > 0 Regeneration 0,5 LP und 0,5 MP; Schwellen 25, 50, 75 werden angezeigt und gemeldet, haben aber noch keine Wirkung
 + Alle Aktionen kosten 100
 + Tasten: Ziffernblock zum Bewegen, 5 Warten, +/- Zoom (16, 32, 48, 64 px), Tab klappt das Log auf, Eingabe startet nach dem Tod einen neuen Lauf
++ Maus (ab 0.1.0): Klick reist, greift an oder hebt auf, Rad zoomt, siehe Maus und Reise
 + Nicht enthalten: Vollbild, ganzzahlige Skalierung für 4K, Übersichtskarte, Umschauen, Markierungen für Gegner außerhalb des Ausschnitts, Spielstand speichern und laden (Nachspielen ist vorhanden), Prüfsumme der Daten, Englisch
 + Vereinfachung: Ein Gegner sieht Ninkasi, wenn sie ihn sieht und er innerhalb seiner Sichtweite steht
 
@@ -206,11 +230,11 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + `package.json`: nur `"type": "module"` und `"private": true`, damit Node alle `.js`-Dateien als ES-Module liest; keine Abhängigkeiten, kein Build
 + `src/version.js`: Versionsnummer
 + `src/kern/`: Spiel und Eingangstür für Befehle (`spiel.js`), Zustand und Entitäten, Zeit, Zufall, Ereignisse, Werte und Modifikatoren, Effekte, Grundbausteine, Register, Datenprüfung
-+ `src/systeme/`: Bewegung, Kampf, Sicht, Pegel, Brauen, Handel u.a.
++ `src/systeme/`: Bewegung, Kampf, Sicht, Pegel, Inventar, Gefahrenprüfung, später Brauen, Handel u.a.
 + `src/ki/`: Verhaltensmodule
-+ `src/welt/`: Dungeon-Erzeugung
++ `src/welt/`: Dungeon-Erzeugung, Zugriff auf die Karte, Wegfindung
 + `src/anzeige/`: Renderer, Kamera, Oberfläche, Log, Effekte, Textzugriff und Grammatik
-+ `src/eingabe/`: Tastenbelegung, Übersetzung in Befehle
++ `src/eingabe/`: Belegung, Übersetzung in Befehle, Maus und Klickregeln, Reise, Vorgaben der Einstellungen
 + `daten/`: Inhalte als JS-Datendateien, gesammelt in `daten/index.js`; `daten/zeichen.js` ist das Tileset aus Zeichen
 + `sprache/de/`, `sprache/en/`: Texte (`texte.js`) und Grammatikregeln (`grammatik.js`) als Daten
 + `lib/`: Bibliotheken (rot.js) samt ihrer Lizenzdateien
