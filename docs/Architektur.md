@@ -135,6 +135,7 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Gezeichnet wird zuerst der größte Satz (64 px), die kleineren entstehen daraus durch Generalisieren von Hand, nicht durch Verkleinern
 + Begonnen wird mit einem Satz; fehlende Sätze und fehlende Tiles ersetzt der Renderer durch Skalieren eines vorhandenen Satzes oder durch ein Zeichen
 + Ein Tileset ist eine Datendatei mit Einträgen je Auflösung; der Renderer wählt zur Zoomstufe den passenden Satz und einen ganzzahligen Faktor
++ Tiles sind Pixeldaten (Palette plus Pixelmatrix als JS-Datendatei in `grafik/`), der Renderer baut daraus beim Start die Bilder; Einzelheiten in [Tileset.md](Tileset.md)
 + Zoom ist eine Einstellung mit frei festlegbaren Stufen, nicht an bestimmte Tile-Größen gebunden; scharf bleibt Pixelart nur in ganzzahligen Vielfachen ihrer Auflösung (16 als 16, 32, 48, 64 px; 32 als 32, 64, 96 px)
 + Bis zu den ersten Tiles Zeichen als Platzhalter in allen Zoomstufen
 + Standard-Zoomstufe vorerst 16 px, jederzeit änderbar
@@ -241,6 +242,7 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + `src/anzeige/`: Renderer, Kamera, Oberfläche, Log, Effekte, Textzugriff und Grammatik
 + `src/eingabe/`: Belegung, Übersetzung in Befehle, Maus und Klickregeln, Reise, Vorgaben der Einstellungen
 + `daten/`: Inhalte als JS-Datendateien, gesammelt in `daten/index.js`; `daten/zeichen.js` ist das Tileset aus Zeichen
++ `grafik/`: Palette und Tiles als Pixeldaten, unter der Grafiklizenz, siehe [Tileset.md](Tileset.md) (noch nicht angelegt)
 + `sprache/de/`, `sprache/en/`: Texte (`texte.js`) und Grammatikregeln (`grammatik.js`) als Daten
 + `lib/`: Bibliotheken (rot.js) samt ihrer Lizenzdateien
 + `werkzeuge/`: Arena, Statistiken, Bots

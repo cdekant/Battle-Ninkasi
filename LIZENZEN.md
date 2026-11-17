@@ -10,7 +10,7 @@ Battle Ninkasi besteht aus Teilen unter verschiedenen Lizenzen.
 
 ## Texte und Grafik
 
-+ Gilt für: Texte in `sprache/`, Tiles, Grafiken und weitere Medien, soweit nicht gemeinfrei und nicht anders angegeben
++ Gilt für: Texte in `sprache/`, Tiles und Palette in `grafik/` (auch wenn sie als JS-Datendateien vorliegen), Grafiken und weitere Medien, soweit nicht gemeinfrei und nicht anders angegeben
 + Lizenz: Creative Commons Namensnennung - Nicht kommerziell - Weitergabe unter gleichen Bedingungen 4.0 International (CC BY-NC-SA 4.0)
 + Volltext: [LICENSES/CC-BY-NC-SA-4.0.txt](LICENSES/CC-BY-NC-SA-4.0.txt)
 

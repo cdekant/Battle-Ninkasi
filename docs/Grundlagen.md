@@ -76,10 +76,11 @@ Stand: 2026-11-17
 + Zuerst Zeichen als Platzhalter, danach Tile für Tile ersetzen
 + Claude zeichnet die Tiles
 + Pixelart in vier Sätzen (16, 32, 48, 64 px), zuerst der größte, die kleineren von Hand generalisiert; Einzelheiten in [Architektur.md](Architektur.md)
-+ Vorschlag, noch nicht bestätigt: Draufsicht, Figuren und Wände leicht von vorn
-+ Vorschlag, noch nicht bestätigt: Licht von links oben, Figuren mit dunklem Rand, Umgebung gedämpft
-+ Vorschlag, noch nicht bestätigt: zunächst keine Animation der Tiles
++ Vorläufig festgelegt, Bestätigung nach der Stilprobe: Draufsicht, Figuren und Wände leicht von vorn
++ Vorläufig festgelegt, Bestätigung nach der Stilprobe: Licht von links oben, Figuren mit dunklem Rand, Umgebung gedämpft
++ Vorläufig festgelegt, Bestätigung nach der Stilprobe: zunächst keine Animation der Tiles
 + Erstliste: Boden, Wand, Tür, Treppe, Ninkasi, zwei Gegner, Trank, Truhe, Falle
++ Arbeitsweise, Pixeldaten, Vorschau und Ablauf: [Tileset.md](Tileset.md)
 
 ## Design
 
@@ -102,6 +103,6 @@ Stand: 2026-11-17
 + Dienste des Hubs im Detail
 + Ziel eines Laufs und was zwei Läufe unterscheidet
 + Welt und Schauplatz
-+ Genaue Farbpalette
-+ Bestätigung der Tileset-Regeln
++ Genaue Farbpalette, wird im ersten Schritt des Tilesets festgelegt, siehe [Tileset.md](Tileset.md)
++ Endgültige Bestätigung der Tileset-Regeln nach der Stilprobe
 + Bestenliste der eigenen Läufe ja oder nein
