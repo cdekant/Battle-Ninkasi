@@ -10,7 +10,9 @@
 ## Projektbeschreibung
 
 + Roguelike-Spiel, Details in [docs/Grundlagen.md](docs/Grundlagen.md)
++ Charakter, Eigenschaften, Skills und EP in [docs/Charakter.md](docs/Charakter.md)
 + Weitere Dokumentation liegt in `docs/`.
++ CLAUDE.md verweist direkt auf jedes Dokument in `docs/`, nicht nur über Verweise in anderen Dokumenten.
 
 ## Repository und Umgebung
 

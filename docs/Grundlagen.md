@@ -1,6 +1,6 @@
 # Battle Ninkasi - Grundlagen
 
-Stand: 2026-11-16
+Stand: 2026-11-17
 
 ## Spiel
 
@@ -8,6 +8,7 @@ Stand: 2026-11-16
 + Permadeath, kein dauerhafter Fortschritt zwischen den Läufen
 + Gesteuert wird nur Ninkasi
 + Zufällig erzeugte Dungeons
++ Hub: fester Ort zwischen den Ebenen mit Diensten (Händler u.a.), ähnliche Dienste unterwegs durch wandernde Händler und Nebengottheiten
 + Zielgruppe: zunächst nur privat, Steam als spätere Option
 
 ## Spielkern
@@ -19,13 +20,21 @@ Stand: 2026-11-16
 + Erstes Konzept: Bier füllt LP, Wein füllt MP, alle Getränke füllen PP
 + LP und MP regenerieren über die Zeit, aber nur mit Pegel: nüchtern keine Regeneration
 + Psi: hohes Risiko, hoher Ertrag; wirkt sofort auf Einzelziele (Gedanken, Furcht, Kontrolle, Teleport)
-+ Magie: langsamer, wirkt über die Zeit
++ Magie: langsamer, wirkt über die Zeit, etwas mehr in Richtung Crowd Control
 + Spirituosen heben den Rauschpegel schneller als Wein und Bier
 + Rauschpegel klingt über die Zeit ab
 + Bestimmte Aktionen sind nur mit einem bestimmten Pegel durchführbar
 + Rauschpegel bringt Risiko
++ Brausystem mit Zutaten und Rezepten
++ Gebraut wird an festen Altären (Braukessel) oder in mobilen Kesseln
++ Kessel in Tiers nach Material: Kupfer, Eisen, Edelstahl, Silber, Gold
++ Vorschlag, noch nicht bestätigt: weitere Materialien wie Ton (sumerische Brautradition), Holz (Fass), Bronze
 + Idee, noch nicht bestätigt: häufige Anwendung von Psi lässt Gegner erscheinen (Vorbild: Glimmer in Caves of Qud)
 + Vorschlag, noch nicht bestätigt: über einer Schwelle drohen Torkeln, Fehlschläge, Filmriss
+
+## Charakter
+
++ Charaktererstellung, Eigenschaften, Skills und EP: siehe [Charakter.md](Charakter.md)
 
 ## Gegner
 
@@ -36,6 +45,15 @@ Stand: 2026-11-16
 + Vorschlag, noch nicht bestätigt: Sobrietas als Endboss (römische Personifikation der Nüchternheit, erschlägt in der "Psychomachia" des Prudentius die Luxuria)
 + Vorschlag, noch nicht bestätigt: Lykurg von Thrakien, Pentheus von Theben und eine Figur nach Carrie Nation als Bosse davor
 + Vorschlag, noch nicht bestätigt: Hefen ambivalent, Milchsäurebakterien, Essigbakterien und Schimmel als Verderber
++ Idee, noch nicht bestätigt: Mikroorganismen teilen sich, ausgehend von einer Mutterzelle
++ Ideen, auszuarbeiten: jede Gruppe der Mikroorganismen mit eigener Mechanik
++ Bakterien: Zweiteilung in zwei gleiche Zellen, schnelles Wachstum (Milchsäure, Essig, Fäulnis)
++ Hefen: Sprossung, die Mutterzelle bleibt und sprosst weiter; Kulturhefe als möglicher Verbündeter, wilde Hefe (Brettanomyces) als Verderber
++ Schimmel: kaum beweglich, Myzel wächst Feld für Feld, setzt beim Tod Sporen frei (Vorbild: Flechte in Brogue)
++ Bakteriophagen: befallen Bakterien und machen sie zu neuen Phagen, Gegner, der Gegner frisst
++ Biofilm: Kolonie, die sich gemeinsam panzert, einzeln schwach, im Verbund zäh
++ Endosporen: ruhende Bakterien, erwachen später (Wärme, Feuer)
++ Protozoen und Amöben: einzelne Jäger, die andere Mikroorganismen fressen
 
 ## Technik
 
@@ -73,6 +91,9 @@ Stand: 2026-11-16
 + Rauschpegel im Detail: Schwellen, Risiken, Aktionen mit Mindestpegel
 + Wein und Spirituosen ja oder nein
 + Endboss: Sobrietas oder erfundener Gott der Nüchternheit
++ Unterschiede der Mikroorganismen ausarbeiten (Hefen, Bakterien, Schimmel, weitere Gruppen)
++ Brausystem im Detail: Zutaten, Rezepte, Wirkung der Kessel-Tiers, Reihenfolge der Materialien
++ Dienste des Hubs im Detail
 + Ziel eines Laufs und was zwei Läufe unterscheidet
 + Welt und Schauplatz
 + Genaue Farbpalette
