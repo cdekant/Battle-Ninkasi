@@ -3,20 +3,13 @@
 // Zustand in der Komponente: ki: { modul: "jagen", ziel: { x, y } | null }
 // Sicht vereinfacht: Der Gegner sieht Ninkasi, wenn sie ihn sieht und er nah genug ist.
 
-import AStar from "../../lib/rot/path/astar.js";
 import { anmelden } from "../kern/register.js";
 import { spieler, an } from "../kern/zustand.js";
-import { passierbar, abstand } from "../welt/karte.js";
+import { abstand } from "../welt/karte.js";
+import { naechsterSchritt } from "../welt/wege.js";
 import { istSichtbar, sichtweite } from "../systeme/sicht.js";
 import { istWesen } from "../systeme/kampf.js";
 import { abwarten } from "./abwarten.js";
-
-function naechsterSchritt(spiel, von, nach) {
-  const weg = [];
-  const astar = new AStar(nach.x, nach.y, (x, y) => passierbar(spiel, x, y), { topology: 8 });
-  astar.compute(von.x, von.y, (x, y) => weg.push({ x, y }));
-  return weg.length > 1 ? weg[1] : null;
-}
 
 anmelden("ki", "jagen", (spiel, ent) => {
   const z = spiel.zustand;
