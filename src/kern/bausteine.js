@@ -4,44 +4,46 @@
 
 import { anmelden } from "./register.js";
 import { wuerfeln } from "./zufall.js";
-import { haken, melden, bezug } from "./ereignisse.js";
+import { hakenAusloesen, melden, bezugAuf } from "./ereignisse.js";
 import { wertAendern, toeten } from "./effekte.js";
 
-function menge(spiel, p) {
-  return p.wuerfel !== undefined ? wuerfeln(spiel.zustand.rng, p.wuerfel) : p.menge;
+function mengeBestimmen(spiel, parameter) {
+  return parameter.wuerfel !== undefined ? wuerfeln(spiel.zustand.zufallszustand, parameter.wuerfel) : parameter.menge;
 }
 
-function baustein(name, parameter, funktion) {
-  funktion.parameter = parameter;
+function bausteinAnmelden(name, parameterBeschreibung, funktion) {
+  funktion.parameter = parameterBeschreibung;
   anmelden("bausteine", name, funktion);
 }
 
 // Schaden an den LP des Ziels; Parameter: wuerfel oder menge
-baustein("schaden", { wuerfel: "wuerfel|menge" }, (spiel, k, p) => {
-  const z = spiel.zustand;
-  const ziel = z.entitaeten[k.ziel];
+bausteinAnmelden("schaden", { wuerfel: "wuerfel|menge" }, (spiel, kontext, parameter) => {
+  const zustand = spiel.zustand;
+  const ziel = zustand.entitaeten[kontext.zielId];
   if (!ziel || !ziel.werte || !ziel.werte.lp) return;
-  const ctx = haken(spiel, "vor_schaden", { quelle: k.quelle, ziel: k.ziel, art: k.art, menge: menge(spiel, p) });
-  const betrag = Math.max(0, ctx.menge);
-  const quelle = z.entitaeten[k.quelle];
-  wertAendern(spiel, ziel, "lp", -betrag);
-  melden(spiel, "schaden", { quelle: quelle ? bezug(quelle) : null, ziel: bezug(ziel), menge: betrag, angriffsart: k.art });
-  if (ziel.werte.lp.aktuell <= 0) toeten(spiel, ziel, k.quelle);
+  const hakenKontext = hakenAusloesen(spiel, "vor_schaden", {
+    quelleId: kontext.quelleId, zielId: kontext.zielId, ursache: kontext.ursache, menge: mengeBestimmen(spiel, parameter),
+  });
+  const schadenspunkte = Math.max(0, hakenKontext.menge);
+  const quelle = zustand.entitaeten[kontext.quelleId];
+  wertAendern(spiel, ziel, "lp", -schadenspunkte);
+  melden(spiel, "schaden", { quelle: quelle ? bezugAuf(quelle) : null, ziel: bezugAuf(ziel), menge: schadenspunkte, ursache: kontext.ursache });
+  if (ziel.werte.lp.aktuell <= 0) toeten(spiel, ziel, kontext.quelleId);
 });
 
-// Heilt einen Wert (Standard LP); Parameter: wert, wuerfel oder menge
-baustein("heilen", { wert: "text?", wuerfel: "wuerfel|menge" }, (spiel, k, p) => {
-  const ziel = spiel.zustand.entitaeten[k.ziel];
-  const wert = p.wert || "lp";
-  if (!ziel || !ziel.werte || !ziel.werte[wert]) return;
-  const geheilt = wertAendern(spiel, ziel, wert, menge(spiel, p));
-  melden(spiel, "geheilt", { ziel: bezug(ziel), wert, menge: geheilt });
+// Heilt einen Wert (Standard LP); Parameter: wertName, wuerfel oder menge
+bausteinAnmelden("heilen", { wertName: "text?", wuerfel: "wuerfel|menge" }, (spiel, kontext, parameter) => {
+  const ziel = spiel.zustand.entitaeten[kontext.zielId];
+  const wertName = parameter.wertName || "lp";
+  if (!ziel || !ziel.werte || !ziel.werte[wertName]) return;
+  const geheilt = wertAendern(spiel, ziel, wertName, mengeBestimmen(spiel, parameter));
+  melden(spiel, "geheilt", { ziel: bezugAuf(ziel), wertName, menge: geheilt });
 });
 
-// Ändert einen beliebigen Wert um eine Menge (auch negativ); Parameter: wert, wuerfel oder menge
-baustein("wert_aendern", { wert: "text", wuerfel: "wuerfel|menge" }, (spiel, k, p) => {
-  const ziel = spiel.zustand.entitaeten[k.ziel];
-  if (!ziel || !ziel.werte || !ziel.werte[p.wert]) return;
-  const geaendert = wertAendern(spiel, ziel, p.wert, menge(spiel, p));
-  melden(spiel, "wert_geaendert", { ziel: bezug(ziel), wert: p.wert, menge: geaendert });
+// Ändert einen beliebigen Wert um eine Menge (auch negativ); Parameter: wertName, wuerfel oder menge
+bausteinAnmelden("wert_aendern", { wertName: "text", wuerfel: "wuerfel|menge" }, (spiel, kontext, parameter) => {
+  const ziel = spiel.zustand.entitaeten[kontext.zielId];
+  if (!ziel || !ziel.werte || !ziel.werte[parameter.wertName]) return;
+  const geaendert = wertAendern(spiel, ziel, parameter.wertName, mengeBestimmen(spiel, parameter));
+  melden(spiel, "wert_geaendert", { ziel: bezugAuf(ziel), wertName: parameter.wertName, menge: geaendert });
 });

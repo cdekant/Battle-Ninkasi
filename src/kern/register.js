@@ -16,34 +16,34 @@ const ARTEN = [
 const register = {};
 for (const art of ARTEN) register[art] = new Map();
 
-function art_(art) {
-  const r = register[art];
-  if (!r) throw new Error(`Unbekannte Registerart "${art}"`);
-  return r;
+function registerDerArt(art) {
+  const eintraege = register[art];
+  if (!eintraege) throw new Error(`Unbekannte Registerart "${art}"`);
+  return eintraege;
 }
 
 export function anmelden(art, name, wert) {
-  const r = art_(art);
+  const eintraege = registerDerArt(art);
   if (art === "haken") {
-    if (!r.has(name)) r.set(name, []);
-    r.get(name).push(wert);
+    if (!eintraege.has(name)) eintraege.set(name, []);
+    eintraege.get(name).push(wert);
     return;
   }
-  if (r.has(name)) throw new Error(`Register ${art}: "${name}" ist schon angemeldet`);
-  r.set(name, wert);
+  if (eintraege.has(name)) throw new Error(`Register ${art}: "${name}" ist schon angemeldet`);
+  eintraege.set(name, wert);
 }
 
 export function hat(art, name) {
-  return art_(art).has(name);
+  return registerDerArt(art).has(name);
 }
 
 export function holen(art, name) {
-  const r = art_(art);
-  if (!r.has(name)) throw new Error(`Register ${art}: "${name}" ist nicht angemeldet`);
-  return r.get(name);
+  const eintraege = registerDerArt(art);
+  if (!eintraege.has(name)) throw new Error(`Register ${art}: "${name}" ist nicht angemeldet`);
+  return eintraege.get(name);
 }
 
 // Alle Einträge einer Art in Anmeldereihenfolge
 export function alle(art) {
-  return [...art_(art).entries()];
+  return [...registerDerArt(art).entries()];
 }

@@ -8,8 +8,8 @@ export default {
   },
   bier_trinken: {
     schritte: [
-      { baustein: "heilen", wert: "lp", menge: 20 },
-      { baustein: "wert_aendern", wert: "pp", menge: 20 },
+      { baustein: "heilen", wertName: "lp", menge: 20 },
+      { baustein: "wert_aendern", wertName: "pp", menge: 20 },
     ],
   },
 };

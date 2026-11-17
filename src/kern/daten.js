@@ -5,14 +5,16 @@
 import { hat, holen } from "./register.js";
 import { istWuerfelausdruck } from "./zufall.js";
 
+const istObjekt = (wert) => wert && typeof wert === "object" && !Array.isArray(wert);
+
 // Tiefes Zusammenführen: Objekte werden gemischt, alles andere (auch Arrays) ersetzt
 function mischen(basis, abweichung) {
   const ergebnis = structuredClone(basis);
-  for (const [k, v] of Object.entries(abweichung)) {
-    if (v && typeof v === "object" && !Array.isArray(v) && ergebnis[k] && typeof ergebnis[k] === "object" && !Array.isArray(ergebnis[k])) {
-      ergebnis[k] = mischen(ergebnis[k], v);
+  for (const [schluessel, wert] of Object.entries(abweichung)) {
+    if (istObjekt(wert) && istObjekt(ergebnis[schluessel])) {
+      ergebnis[schluessel] = mischen(ergebnis[schluessel], wert);
     } else {
-      ergebnis[k] = structuredClone(v);
+      ergebnis[schluessel] = structuredClone(wert);
     }
   }
   return ergebnis;
@@ -53,91 +55,101 @@ function pruefeNomen(sprache, schluessel, fehler) {
   fehler.push(...sprache.nomenPruefen(sprache.texte[schluessel], `Text "${schluessel}"`));
 }
 
-function pruefeEffekt(daten, name, ort, fehler) {
-  if (!daten.effekte[name]) fehler.push(`${ort}: Effekt "${name}" gibt es nicht`);
+function pruefeEffektVerweis(daten, effektName, ort, fehler) {
+  if (!daten.effekte[effektName]) fehler.push(`${ort}: Effekt "${effektName}" gibt es nicht`);
 }
 
-function pruefeWesen(daten, sprache, name, w, fehler) {
+function pruefeWesen(daten, sprache, name, wesen, fehler) {
   const ort = `wesen.${name}`;
-  if (w.abstrakt) return;
-  pruefeText(sprache.texte, w.text, ort, fehler);
-  pruefeNomen(sprache, w.text, fehler);
-  if (typeof w.fraktion !== "string") fehler.push(`${ort}: fraktion fehlt`);
-  if (!w.werte || !w.werte.lp) fehler.push(`${ort}: werte.lp fehlt`);
-  for (const [wn, wd] of Object.entries(w.werte || {})) {
-    if (!istGanzzahl(wd.grund) || wd.grund < 0) fehler.push(`${ort}: werte.${wn}.grund muss eine ganze Zahl >= 0 sein`);
-    if (wd.start !== undefined && !istGanzzahl(wd.start)) fehler.push(`${ort}: werte.${wn}.start muss eine ganze Zahl sein`);
+  if (wesen.abstrakt) return;
+  pruefeText(sprache.texte, wesen.text, ort, fehler);
+  pruefeNomen(sprache, wesen.text, fehler);
+  if (typeof wesen.fraktion !== "string") fehler.push(`${ort}: fraktion fehlt`);
+  if (!wesen.werte || !wesen.werte.lp) fehler.push(`${ort}: werte.lp fehlt`);
+  for (const [wertName, wertDaten] of Object.entries(wesen.werte || {})) {
+    if (!istGanzzahl(wertDaten.grundwert) || wertDaten.grundwert < 0) fehler.push(`${ort}: werte.${wertName}.grundwert muss eine ganze Zahl >= 0 sein`);
+    if (wertDaten.anfangswert !== undefined && !istGanzzahl(wertDaten.anfangswert)) fehler.push(`${ort}: werte.${wertName}.anfangswert muss eine ganze Zahl sein`);
   }
-  if (w.angriff) {
-    if (!istGanzzahl(w.angriff.trefferchance)) fehler.push(`${ort}: angriff.trefferchance muss eine ganze Zahl sein`);
-    pruefeEffekt(daten, w.angriff.effekt, `${ort}.angriff`, fehler);
-    if (w.angriff.muster && !hat("zielmuster", w.angriff.muster)) fehler.push(`${ort}: Zielmuster "${w.angriff.muster}" ist nicht angemeldet`);
+  if (wesen.angriff) {
+    if (!istGanzzahl(wesen.angriff.trefferchance)) fehler.push(`${ort}: angriff.trefferchance muss eine ganze Zahl sein`);
+    pruefeEffektVerweis(daten, wesen.angriff.effekt, `${ort}.angriff`, fehler);
+    if (wesen.angriff.muster && !hat("zielmuster", wesen.angriff.muster)) fehler.push(`${ort}: Zielmuster "${wesen.angriff.muster}" ist nicht angemeldet`);
   }
-  if (w.ki && !hat("ki", w.ki.modul)) fehler.push(`${ort}: Verhaltensmodul "${w.ki.modul}" ist nicht angemeldet`);
-  if (w.sicht && !istGanzzahl(w.sicht.weite)) fehler.push(`${ort}: sicht.weite muss eine ganze Zahl sein`);
+  if (wesen.ki && !hat("ki", wesen.ki.modul)) fehler.push(`${ort}: Verhaltensmodul "${wesen.ki.modul}" ist nicht angemeldet`);
+  if (wesen.sicht && !istGanzzahl(wesen.sicht.reichweite)) fehler.push(`${ort}: sicht.reichweite muss eine ganze Zahl sein`);
   if (!daten.zeichen.wesen[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js`);
 }
 
-function pruefeGegenstand(daten, sprache, name, g, fehler) {
+function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
   const ort = `gegenstaende.${name}`;
-  if (g.abstrakt) return;
-  pruefeText(sprache.texte, g.text, ort, fehler);
-  pruefeNomen(sprache, g.text, fehler);
-  if (g.trinkbar) pruefeEffekt(daten, g.trinkbar.effekt, `${ort}.trinkbar`, fehler);
+  if (gegenstand.abstrakt) return;
+  pruefeText(sprache.texte, gegenstand.text, ort, fehler);
+  pruefeNomen(sprache, gegenstand.text, fehler);
+  if (gegenstand.trinkbar) pruefeEffektVerweis(daten, gegenstand.trinkbar.effekt, `${ort}.trinkbar`, fehler);
   if (!daten.zeichen.gegenstaende[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js`);
 }
 
-function pruefeEffektdaten(name, e, fehler) {
+function pruefeEffekt(name, effekt, fehler) {
   const ort = `effekte.${name}`;
-  if (!Array.isArray(e.schritte) || e.schritte.length === 0) return fehler.push(`${ort}: schritte fehlen`);
-  e.schritte.forEach((s, i) => {
-    const o = `${ort}.schritte[${i}]`;
-    if (!hat("bausteine", s.baustein)) return fehler.push(`${o}: Baustein "${s.baustein}" ist nicht angemeldet`);
-    const spec = holen("bausteine", s.baustein).parameter || {};
-    for (const [feld, typ] of Object.entries(spec)) {
+  if (!Array.isArray(effekt.schritte) || effekt.schritte.length === 0) return fehler.push(`${ort}: schritte fehlen`);
+  effekt.schritte.forEach((schritt, nummer) => {
+    const schrittOrt = `${ort}.schritte[${nummer}]`;
+    if (!hat("bausteine", schritt.baustein)) return fehler.push(`${schrittOrt}: Baustein "${schritt.baustein}" ist nicht angemeldet`);
+    const parameterBeschreibung = holen("bausteine", schritt.baustein).parameter || {};
+    for (const [feld, typ] of Object.entries(parameterBeschreibung)) {
       if (typ === "wuerfel|menge") {
-        if (s.wuerfel === undefined && s.menge === undefined) fehler.push(`${o}: wuerfel oder menge fehlt`);
-        if (s.wuerfel !== undefined && !istWuerfelausdruck(s.wuerfel)) fehler.push(`${o}: ungültiger Würfelausdruck "${s.wuerfel}"`);
-        if (s.menge !== undefined && !istGanzzahl(s.menge)) fehler.push(`${o}: menge muss eine ganze Zahl sein`);
-      } else if (typ === "text" && typeof s[feld] !== "string") {
-        fehler.push(`${o}: ${feld} fehlt`);
+        if (schritt.wuerfel === undefined && schritt.menge === undefined) fehler.push(`${schrittOrt}: wuerfel oder menge fehlt`);
+        if (schritt.wuerfel !== undefined && !istWuerfelausdruck(schritt.wuerfel)) fehler.push(`${schrittOrt}: ungültiger Würfelausdruck "${schritt.wuerfel}"`);
+        if (schritt.menge !== undefined && !istGanzzahl(schritt.menge)) fehler.push(`${schrittOrt}: menge muss eine ganze Zahl sein`);
+      } else if (typ === "text" && typeof schritt[feld] !== "string") {
+        fehler.push(`${schrittOrt}: ${feld} fehlt`);
       }
     }
   });
 }
 
-function pruefeEbene(daten, name, e, fehler) {
+function pruefeEbene(daten, name, ebene, fehler) {
   const ort = `ebenen.${name}`;
-  for (const f of ["breite", "hoehe"]) if (!istGanzzahl(e[f]) || e[f] < 10) fehler.push(`${ort}: ${f} muss eine ganze Zahl >= 10 sein`);
-  for (const g of e.gegner || []) if (!daten.wesen[g.typ] || daten.wesen[g.typ].abstrakt) fehler.push(`${ort}: Gegner "${g.typ}" gibt es nicht`);
-  for (const g of e.gegenstaende || []) if (!daten.gegenstaende[g.typ]) fehler.push(`${ort}: Gegenstand "${g.typ}" gibt es nicht`);
-  for (const t of ["wand", "boden"]) if (!daten.gelaende[e.gelaende?.[t]]) fehler.push(`${ort}: gelaende.${t} verweist auf unbekanntes Gelände`);
+  for (const masz of ["breite", "hoehe"]) {
+    if (!istGanzzahl(ebene[masz]) || ebene[masz] < 10) fehler.push(`${ort}: ${masz} muss eine ganze Zahl >= 10 sein`);
+  }
+  for (const gegner of ebene.gegner || []) {
+    if (!daten.wesen[gegner.typ] || daten.wesen[gegner.typ].abstrakt) fehler.push(`${ort}: Gegner "${gegner.typ}" gibt es nicht`);
+  }
+  for (const gegenstand of ebene.gegenstaende || []) {
+    if (!daten.gegenstaende[gegenstand.typ]) fehler.push(`${ort}: Gegenstand "${gegenstand.typ}" gibt es nicht`);
+  }
+  for (const rolle of ["wand", "boden"]) {
+    if (!daten.gelaende[ebene.gelaende?.[rolle]]) fehler.push(`${ort}: gelaende.${rolle} verweist auf unbekanntes Gelände`);
+  }
 }
 
 // Gibt { daten, fehler } zurück; daten mit aufgelösten Vorlagen.
 // sprache: { texte, nomenPruefen? }, nomenPruefen(eintrag, ort) gibt eine Liste von Fehlern zurück
-export function vorbereiten(roh, sprache = {}) {
+export function vorbereiten(rohdaten, sprache = {}) {
   const fehler = [];
-  const daten = { ...roh };
-  daten.wesen = vorlagenAufloesen(roh.wesen, "wesen", fehler);
-  daten.gegenstaende = vorlagenAufloesen(roh.gegenstaende, "gegenstaende", fehler);
+  const daten = { ...rohdaten };
+  daten.wesen = vorlagenAufloesen(rohdaten.wesen, "wesen", fehler);
+  daten.gegenstaende = vorlagenAufloesen(rohdaten.gegenstaende, "gegenstaende", fehler);
 
-  for (const [n, e] of Object.entries(daten.effekte)) pruefeEffektdaten(n, e, fehler);
-  for (const [n, w] of Object.entries(daten.wesen)) pruefeWesen(daten, sprache, n, w, fehler);
-  for (const [n, g] of Object.entries(daten.gegenstaende)) pruefeGegenstand(daten, sprache, n, g, fehler);
-  for (const [n, e] of Object.entries(daten.ebenen)) pruefeEbene(daten, n, e, fehler);
-  for (const [n, g] of Object.entries(daten.gelaende)) {
-    if (typeof g.kennung !== "string" || g.kennung.length !== 1) fehler.push(`gelaende.${n}: kennung muss genau ein Zeichen sein`);
-    if (!daten.zeichen.gelaende[n]) fehler.push(`gelaende.${n}: kein Zeichen in daten/zeichen.js`);
+  for (const [name, effekt] of Object.entries(daten.effekte)) pruefeEffekt(name, effekt, fehler);
+  for (const [name, wesen] of Object.entries(daten.wesen)) pruefeWesen(daten, sprache, name, wesen, fehler);
+  for (const [name, gegenstand] of Object.entries(daten.gegenstaende)) pruefeGegenstand(daten, sprache, name, gegenstand, fehler);
+  for (const [name, ebene] of Object.entries(daten.ebenen)) pruefeEbene(daten, name, ebene, fehler);
+  for (const [name, gelaende] of Object.entries(daten.gelaende)) {
+    if (typeof gelaende.kennung !== "string" || gelaende.kennung.length !== 1) fehler.push(`gelaende.${name}: kennung muss genau ein Zeichen sein`);
+    if (!daten.zeichen.gelaende[name]) fehler.push(`gelaende.${name}: kein Zeichen in daten/zeichen.js`);
   }
-  for (const [n, k] of Object.entries(daten.aktionen)) if (!istGanzzahl(k) || k <= 0) fehler.push(`aktionen.${n}: Kosten müssen eine ganze Zahl > 0 sein`);
+  for (const [aktion, kosten] of Object.entries(daten.aktionen)) {
+    if (!istGanzzahl(kosten) || kosten <= 0) fehler.push(`aktionen.${aktion}: Kosten müssen eine ganze Zahl > 0 sein`);
+  }
   if (!daten.wesen.ninkasi) fehler.push("wesen.ninkasi fehlt");
   return { daten, fehler };
 }
 
 export class Datenfehler extends Error {
   constructor(fehler) {
-    super(`Fehler in den Daten:\n${fehler.map((f) => "  " + f).join("\n")}`);
+    super(`Fehler in den Daten:\n${fehler.map((meldung) => "  " + meldung).join("\n")}`);
     this.fehler = fehler;
   }
 }

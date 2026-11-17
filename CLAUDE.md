@@ -6,6 +6,8 @@
 + CLAUDE.md unter 6000 Zeichen Länge halten, wird sie länger: Dokumentation auslagern und darauf verweisen.
 + Keine Änderung ist vollständig bevor nicht CLAUDE.md und die weitere Dokumentation in `docs/` hinsichtlich der Änderungen geprüft und nachgeführt ist.
 + Code grundsätzlich einfach halten aber immer prüfen, ob Wartbarkeit, Modularität und Erweiterbarkeit gegeben ist.
++ Kommunikation im Chat auf Deutsch.
++ Namen von Funktionen, Variablen, Parametern und Datenfeldern sind ausdrücklich und menschenlesbar statt knapp: deutsch, camelCase, der Name sagt, was drinsteht (z. B. `reichweiteSicht` statt `weite`, `entitaet` statt `e`, `spielerin` statt `p`). Ausnahmen nur für Koordinaten (`x`, `y`, `dx`, `dy`), reine Schleifenzähler (`i`) und nachgebaute Fremdverfahren, die die Namen ihrer Referenz behalten (z. B. sfc32 in `src/kern/zufall.js`).
 + Änderungen an der Spiellogik bringen Tests mit (`node:test`, ohne Abhängigkeiten) oder begründen, warum keine nötig sind; vor jedem Commit laufen Tests und Bot fehlerfrei. Details in [docs/Architektur.md](docs/Architektur.md).
 
 ## Projektbeschreibung

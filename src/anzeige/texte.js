@@ -5,7 +5,7 @@
 //   {wer.gen.ohne}   Fall ohne Artikel
 
 export function erstelleTexte(texte, grammatik) {
-  function roh(schluessel) {
+  function rohtext(schluessel) {
     if (!(schluessel in texte)) {
       console.warn(`Text fehlt: ${schluessel}`);
       return `[${schluessel}]`;
@@ -13,23 +13,25 @@ export function erstelleTexte(texte, grammatik) {
     return texte[schluessel];
   }
 
-  function form(bezug, fall = "nom", artikel = "bestimmt") {
-    const eintrag = roh(bezug.text);
+  // Hauptwort einer Entität im gewünschten Fall und mit gewünschtem Artikel
+  function nomenForm(bezug, fall = "nom", artikel = "bestimmt") {
+    const eintrag = rohtext(bezug.text);
     if (typeof eintrag === "string") return eintrag;
     return grammatik.nomen(eintrag, fall, artikel);
   }
 
-  function t(schluessel, werte = {}) {
-    const vorlage = roh(schluessel);
+  // Text zu einem Schlüssel, Platzhalter aus platzhalterWerte gefüllt
+  function text(schluessel, platzhalterWerte = {}) {
+    const vorlage = rohtext(schluessel);
     return String(vorlage).replace(/\{(\w+)(?:\.(\w+))?(?:\.(\w+))?\}/g, (_, name, fall, artikel) => {
-      const w = werte[name];
-      if (w === undefined || w === null) return "";
-      if (typeof w === "object" && w.text) return form(w, fall, artikel);
-      return String(w);
+      const wert = platzhalterWerte[name];
+      if (wert === undefined || wert === null) return "";
+      if (typeof wert === "object" && wert.text) return nomenForm(wert, fall, artikel);
+      return String(wert);
     });
   }
 
-  return { t, form, hat: (s) => s in texte };
+  return { text, nomenForm, hatSchluessel: (schluessel) => schluessel in texte };
 }
 
 export function satzanfang(text) {

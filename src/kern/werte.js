@@ -1,6 +1,6 @@
 // Werte (LP, MP, PP und weitere) als erweiterbarer Satz, berechnet aus Grundwert und Modifikatoren.
-// Wert in der Entität:   werte: { lp: { grund: 100, aktuell: 100, speicher: 0 } }
-//   speicher: Bruchteile in Hundertsteln, ein voller Punkt wird gutgeschrieben
+// Wert in der Entität:   werte: { lp: { grundwert: 100, aktuell: 100, hundertstelRest: 0 } }
+//   hundertstelRest: Bruchteile in Hundertsteln, ein voller Punkt wird gutgeschrieben
 // Modifikator:           { ziel: "lp" | "kosten.bewegen" | "kosten.alle" | ..., art: "plus" | "prozent", betrag, quelle }
 // Verrechnung vorläufig: alle Plus-Werte und alle Prozente addieren, Prozente vom Grundwert.
 
@@ -10,64 +10,63 @@ export function prozentVon(wert, prozent) {
 }
 
 // Wendet alle Modifikatoren mit einem der Ziele auf einen Basiswert an
-export function modifiziert(ent, ziele, basis) {
-  const liste = Array.isArray(ziele) ? ziele : [ziele];
-  let plus = 0, prozent = 0;
-  for (const m of ent.modifikatoren || []) {
-    if (!liste.includes(m.ziel)) continue;
-    if (m.art === "plus") plus += m.betrag;
-    else if (m.art === "prozent") prozent += m.betrag;
+export function modifiziert(entitaet, ziele, basiswert) {
+  const zielListe = Array.isArray(ziele) ? ziele : [ziele];
+  let summePlus = 0, summeProzent = 0;
+  for (const modifikator of entitaet.modifikatoren || []) {
+    if (!zielListe.includes(modifikator.ziel)) continue;
+    if (modifikator.art === "plus") summePlus += modifikator.betrag;
+    else if (modifikator.art === "prozent") summeProzent += modifikator.betrag;
   }
-  return basis + plus + prozentVon(basis, prozent);
+  return basiswert + summePlus + prozentVon(basiswert, summeProzent);
 }
 
-export function hatWert(ent, name) {
-  return Boolean(ent.werte && ent.werte[name]);
+export function hatWert(entitaet, wertName) {
+  return Boolean(entitaet.werte && entitaet.werte[wertName]);
 }
 
-export function maximum(ent, name) {
-  return modifiziert(ent, name, ent.werte[name].grund);
+export function hoechstwert(entitaet, wertName) {
+  return modifiziert(entitaet, wertName, entitaet.werte[wertName].grundwert);
 }
 
-export function aktuell(ent, name) {
-  return ent.werte[name].aktuell;
+// Ändert einen Wert innerhalb 0 bis Höchstwert, gibt die tatsächliche Änderung zurück.
+// Ohne Haken; im Spiel läuft jede Änderung über wertAendern in kern/effekte.js.
+export function wertBegrenztAendern(entitaet, wertName, aenderung) {
+  const wert = entitaet.werte[wertName];
+  const vorher = wert.aktuell;
+  wert.aktuell = Math.max(0, Math.min(hoechstwert(entitaet, wertName), vorher + aenderung));
+  return wert.aktuell - vorher;
 }
 
-// Ändert einen Wert innerhalb 0 bis Maximum, gibt die tatsächliche Änderung zurück
-export function aendern(ent, name, delta) {
-  const w = ent.werte[name];
-  const vorher = w.aktuell;
-  w.aktuell = Math.max(0, Math.min(maximum(ent, name), vorher + delta));
-  return w.aktuell - vorher;
-}
-
-// Änderung in Hundertsteln über den Speicher; gibt die Änderung in vollen Punkten zurück
-export function aendernHundertstel(ent, name, hundertstel) {
-  const w = ent.werte[name];
-  w.speicher = (w.speicher || 0) + hundertstel;
-  const voll = Math.trunc(w.speicher / 100);
-  w.speicher -= voll * 100;
-  const geaendert = voll !== 0 ? aendern(ent, name, voll) : 0;
+// Änderung in Hundertsteln über den Rest; gibt die Änderung in vollen Punkten zurück
+export function wertBegrenztAendernInHundertsteln(entitaet, wertName, hundertstel) {
+  const wert = entitaet.werte[wertName];
+  wert.hundertstelRest = (wert.hundertstelRest || 0) + hundertstel;
+  const vollePunkte = Math.trunc(wert.hundertstelRest / 100);
+  wert.hundertstelRest -= vollePunkte * 100;
+  const geaendert = vollePunkte !== 0 ? wertBegrenztAendern(entitaet, wertName, vollePunkte) : 0;
   // am Anschlag keinen Rest ansammeln
-  if ((w.aktuell >= maximum(ent, name) && w.speicher > 0) || (w.aktuell <= 0 && w.speicher < 0)) w.speicher = 0;
+  const amHoechstwert = wert.aktuell >= hoechstwert(entitaet, wertName) && wert.hundertstelRest > 0;
+  const amNullpunkt = wert.aktuell <= 0 && wert.hundertstelRest < 0;
+  if (amHoechstwert || amNullpunkt) wert.hundertstelRest = 0;
   return geaendert;
 }
 
-export function modifikatorHinzufuegen(ent, modifikator) {
-  if (!ent.modifikatoren) ent.modifikatoren = [];
-  ent.modifikatoren.push(modifikator);
+export function modifikatorHinzufuegen(entitaet, modifikator) {
+  if (!entitaet.modifikatoren) entitaet.modifikatoren = [];
+  entitaet.modifikatoren.push(modifikator);
 }
 
 // Entfällt eine Quelle, entfallen genau ihre Modifikatoren
-export function modifikatorenEntfernen(ent, quelle) {
-  if (ent.modifikatoren) ent.modifikatoren = ent.modifikatoren.filter((m) => m.quelle !== quelle);
+export function modifikatorenEntfernen(entitaet, quelle) {
+  if (entitaet.modifikatoren) entitaet.modifikatoren = entitaet.modifikatoren.filter((modifikator) => modifikator.quelle !== quelle);
 }
 
-// Erzeugt den Wertesatz einer Entität aus Daten: { lp: { grund: 100, start?: 100 } }
-export function ausDaten(wertedaten) {
+// Erzeugt den Wertesatz einer Entität aus Daten: { lp: { grundwert: 100, anfangswert?: 100 } }
+export function werteAusDaten(wertedaten) {
   const werte = {};
-  for (const [name, d] of Object.entries(wertedaten || {})) {
-    werte[name] = { grund: d.grund, aktuell: d.start ?? d.grund, speicher: 0 };
+  for (const [wertName, daten] of Object.entries(wertedaten || {})) {
+    werte[wertName] = { grundwert: daten.grundwert, aktuell: daten.anfangswert ?? daten.grundwert, hundertstelRest: 0 };
   }
   return werte;
 }

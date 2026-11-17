@@ -1,28 +1,30 @@
 // Sichtfeld von Ninkasi: PreciseShadowcasting aus rot.js.
-// Ergebnis im Zustand: zustand.sichtbar (Feldindizes) und zustand.ebene.erkundet.
+// Ergebnis im Zustand: zustand.sichtbareFelder (Feldindizes) und zustand.ebene.erkundet.
+// Komponente in den Daten: sicht: { reichweite: 8 }
 
 import PreciseShadowcasting from "../../lib/rot/fov/precise-shadowcasting.js";
-import { durchsichtig, index, imLevel } from "../welt/karte.js";
+import { durchsichtig, feldIndex, aufDerKarte } from "../welt/karte.js";
 import { modifiziert } from "../kern/werte.js";
-import { spieler } from "../kern/zustand.js";
+import { spielerin } from "../kern/zustand.js";
 
-export function sichtweite(ent) {
-  return modifiziert(ent, "sichtweite", ent.sicht ? ent.sicht.weite : 0);
+export function reichweiteSicht(entitaet) {
+  return modifiziert(entitaet, "reichweiteSicht", entitaet.sicht ? entitaet.sicht.reichweite : 0);
 }
 
-export function aktualisieren(spiel) {
-  const z = spiel.zustand;
-  const e = z.ebene;
-  const p = spieler(z);
-  const felder = new Set();
-  const fov = new PreciseShadowcasting((x, y) => imLevel(e, x, y) && durchsichtig(spiel, x, y), { topology: 8 });
-  fov.compute(p.position.x, p.position.y, sichtweite(p), (x, y) => {
-    if (imLevel(e, x, y)) felder.add(index(e, x, y));
+export function sichtfeldAktualisieren(spiel) {
+  const zustand = spiel.zustand;
+  const ebene = zustand.ebene;
+  const ninkasi = spielerin(zustand);
+  const sichtbareFelder = new Set();
+  const lichtDurchlaessig = (x, y) => aufDerKarte(ebene, x, y) && durchsichtig(spiel, x, y);
+  const schattenwurf = new PreciseShadowcasting(lichtDurchlaessig, { topology: 8 });
+  schattenwurf.compute(ninkasi.position.x, ninkasi.position.y, reichweiteSicht(ninkasi), (x, y) => {
+    if (aufDerKarte(ebene, x, y)) sichtbareFelder.add(feldIndex(ebene, x, y));
   });
-  z.sichtbar = [...felder].sort((a, b) => a - b);
-  for (const i of z.sichtbar) e.erkundet[i] = 1;
+  zustand.sichtbareFelder = [...sichtbareFelder].sort((indexA, indexB) => indexA - indexB);
+  for (const index of zustand.sichtbareFelder) ebene.erkundet[index] = 1;
 }
 
 export function istSichtbar(zustand, x, y) {
-  return zustand.sichtbar.includes(index(zustand.ebene, x, y));
+  return zustand.sichtbareFelder.includes(feldIndex(zustand.ebene, x, y));
 }

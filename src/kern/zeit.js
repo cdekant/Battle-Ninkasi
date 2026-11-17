@@ -1,56 +1,56 @@
 // Zeitstrahl und Warteschlange (siehe docs/Architektur.md, Zeitmodell).
-// Einträge: { zeit, art: "weltuhr" | "ereignis" | "akteur", id?, nr, ... }
+// Einträge: { zeit, art: "weltuhr" | "ereignis" | "akteur", akteurId?, ereignistyp?, daten?, einreihungsnummer }
 // Gleichstand: zuerst Weltuhr, dann Zeitereignisse (nach Einreihung),
 // dann Akteure nach Erzeugungsreihenfolge (Entitäts-ID).
 
 export const WELTTICK = 100;
 
-const RANG = { weltuhr: 0, ereignis: 1, akteur: 2 };
+const RANG_NACH_ART = { weltuhr: 0, ereignis: 1, akteur: 2 };
 
-function vergleichen(a, b) {
-  if (a.zeit !== b.zeit) return a.zeit - b.zeit;
-  if (RANG[a.art] !== RANG[b.art]) return RANG[a.art] - RANG[b.art];
-  if (a.art === "akteur") return a.id - b.id;
-  return a.nr - b.nr;
+function vergleichen(eintragA, eintragB) {
+  if (eintragA.zeit !== eintragB.zeit) return eintragA.zeit - eintragB.zeit;
+  if (RANG_NACH_ART[eintragA.art] !== RANG_NACH_ART[eintragB.art]) return RANG_NACH_ART[eintragA.art] - RANG_NACH_ART[eintragB.art];
+  if (eintragA.art === "akteur") return eintragA.akteurId - eintragB.akteurId;
+  return eintragA.einreihungsnummer - eintragB.einreihungsnummer;
 }
 
 export function einreihen(zustand, eintrag) {
-  eintrag.nr = zustand.zeitzaehler++;
+  eintrag.einreihungsnummer = zustand.einreihungszaehler++;
   zustand.warteschlange.push(eintrag);
 }
 
-export function akteurEinreihen(zustand, id, verzoegerung) {
-  einreihen(zustand, { zeit: zustand.zeit + verzoegerung, art: "akteur", id });
+export function akteurEinreihen(zustand, akteurId, verzoegerung) {
+  einreihen(zustand, { zeit: zustand.zeit + verzoegerung, art: "akteur", akteurId });
 }
 
-// Zeitereignis: typ ist ein Name im Register "zeitereignisse"
-export function ereignisEinreihen(zustand, zeitpunkt, typ, daten = {}) {
-  einreihen(zustand, { zeit: zeitpunkt, art: "ereignis", typ, daten });
+// Zeitereignis: ereignistyp ist ein Name im Register "zeitereignisse"
+export function ereignisEinreihen(zustand, zeitpunkt, ereignistyp, daten = {}) {
+  einreihen(zustand, { zeit: zeitpunkt, art: "ereignis", ereignistyp, daten });
 }
 
-function indexDesErsten(zustand) {
-  const q = zustand.warteschlange;
-  let best = -1;
-  for (let i = 0; i < q.length; i++) {
-    if (best < 0 || vergleichen(q[i], q[best]) < 0) best = i;
+function indexDesErstenEintrags(zustand) {
+  const warteschlange = zustand.warteschlange;
+  let bester = -1;
+  for (let i = 0; i < warteschlange.length; i++) {
+    if (bester < 0 || vergleichen(warteschlange[i], warteschlange[bester]) < 0) bester = i;
   }
-  return best;
+  return bester;
 }
 
-export function erster(zustand) {
-  const i = indexDesErsten(zustand);
-  return i < 0 ? null : zustand.warteschlange[i];
+export function ersterEintrag(zustand) {
+  const position = indexDesErstenEintrags(zustand);
+  return position < 0 ? null : zustand.warteschlange[position];
 }
 
 // Nimmt den ersten Eintrag heraus und stellt die Uhr auf seinen Zeitpunkt
-export function entnehmen(zustand) {
-  const i = indexDesErsten(zustand);
-  if (i < 0) return null;
-  const [eintrag] = zustand.warteschlange.splice(i, 1);
+export function ersterEintragEntnehmen(zustand) {
+  const position = indexDesErstenEintrags(zustand);
+  if (position < 0) return null;
+  const [eintrag] = zustand.warteschlange.splice(position, 1);
   zustand.zeit = eintrag.zeit;
   return eintrag;
 }
 
-export function akteurEntfernen(zustand, id) {
-  zustand.warteschlange = zustand.warteschlange.filter((e) => !(e.art === "akteur" && e.id === id));
+export function akteurEntfernen(zustand, akteurId) {
+  zustand.warteschlange = zustand.warteschlange.filter((eintrag) => !(eintrag.art === "akteur" && eintrag.akteurId === akteurId));
 }

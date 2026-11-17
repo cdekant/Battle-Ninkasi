@@ -3,73 +3,74 @@
 
 import { satzanfang } from "./texte.js";
 
-const SICHTBAR = 5;
-const MAX = 500;
+const SICHTBARE_ZEILEN = 5;
+const HOECHSTE_ZEILENZAHL = 500;
 
 export class Log {
   constructor(element, texte) {
-    this.el = element;
+    this.element = element;
     this.texte = texte;
     this.zeilen = [];
-    this.offen = false;
-    this.spielerId = null;
+    this.aufgeklappt = false;
+    this.spielerinId = null;
   }
 
-  leeren(spielerId) {
+  leeren(spielerinId) {
     this.zeilen = [];
-    this.spielerId = spielerId;
+    this.spielerinId = spielerinId;
     this.anzeigen();
   }
 
-  zeile(text, klasse = "") {
-    this.zeilen.push({ text: satzanfang(text), klasse });
-    if (this.zeilen.length > MAX) this.zeilen.shift();
+  zeile(text, cssKlasse = "") {
+    this.zeilen.push({ text: satzanfang(text), cssKlasse });
+    if (this.zeilen.length > HOECHSTE_ZEILENZAHL) this.zeilen.shift();
     this.anzeigen();
   }
 
   umschalten() {
-    this.offen = !this.offen;
+    this.aufgeklappt = !this.aufgeklappt;
     this.anzeigen();
   }
 
   // Hörer für Spielmeldungen
-  melden = (m) => {
-    const { t } = this.texte;
-    switch (m.art) {
+  melden = (meldung) => {
+    const { text, hatSchluessel } = this.texte;
+    switch (meldung.art) {
       case "tod":
-        if (m.opfer.id === this.spielerId) return this.zeile(t("log.tod_ninkasi"), "schlimm");
-        return this.zeile(t("log.tod", m), "gut");
+        if (meldung.opfer.id === this.spielerinId) return this.zeile(text("log.tod_ninkasi"), "schlimm");
+        return this.zeile(text("log.tod", meldung), "gut");
       case "schaden":
-        return this.zeile(t("log.schaden", m), m.ziel.id === this.spielerId ? "schlimm" : "");
+        return this.zeile(text("log.schaden", meldung), meldung.ziel.id === this.spielerinId ? "schlimm" : "");
       case "geheilt":
       case "wert_geaendert": {
-        if (m.menge === 0) return;
-        const vorzeichen = m.menge > 0 ? "+" : "";
-        return this.zeile(t(`log.${m.art}`, { ...m, menge: vorzeichen + m.menge, wert: t(`ui.${m.wert}`) }), "gut");
+        if (meldung.menge === 0) return;
+        const vorzeichen = meldung.menge > 0 ? "+" : "";
+        const platzhalter = { ...meldung, menge: vorzeichen + meldung.menge, wertName: text(`ui.${meldung.wertName}`) };
+        return this.zeile(text(`log.${meldung.art}`, platzhalter), "gut");
       }
       case "abgelehnt": {
-        const schluessel = `log.abgelehnt.${m.grund}`;
-        if (this.texte.hat(schluessel)) this.zeile(t(schluessel), "leise");
+        const schluessel = `log.abgelehnt.${meldung.grund}`;
+        if (hatSchluessel(schluessel)) this.zeile(text(schluessel), "leise");
         return;
       }
       default: {
-        const schluessel = `log.${m.art}`;
-        if (this.texte.hat(schluessel)) this.zeile(t(schluessel, m));
+        const schluessel = `log.${meldung.art}`;
+        if (hatSchluessel(schluessel)) this.zeile(text(schluessel, meldung));
       }
     }
   };
 
   anzeigen() {
-    const liste = this.offen ? this.zeilen : this.zeilen.slice(-SICHTBAR);
-    this.el.classList.toggle("offen", this.offen);
-    this.el.replaceChildren(
-      ...liste.map((z) => {
+    const angezeigteZeilen = this.aufgeklappt ? this.zeilen : this.zeilen.slice(-SICHTBARE_ZEILEN);
+    this.element.classList.toggle("offen", this.aufgeklappt);
+    this.element.replaceChildren(
+      ...angezeigteZeilen.map((zeile) => {
         const div = document.createElement("div");
-        div.textContent = z.text;
-        if (z.klasse) div.className = z.klasse;
+        div.textContent = zeile.text;
+        if (zeile.cssKlasse) div.className = zeile.cssKlasse;
         return div;
       })
     );
-    this.el.scrollTop = this.el.scrollHeight;
+    this.element.scrollTop = this.element.scrollHeight;
   }
 }

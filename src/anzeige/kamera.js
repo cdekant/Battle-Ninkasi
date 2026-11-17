@@ -7,18 +7,19 @@ export function neueKamera() {
   return { x: 0, y: 0, gesetzt: false };
 }
 
-function achse(alt, gesetzt, pos, ansicht, level) {
-  if (level <= ansicht) return -Math.floor((ansicht - level) / 2);
-  const rand = Math.floor(ansicht / 4);
-  let k = gesetzt ? alt : pos - Math.floor(ansicht / 2);
-  if (pos < k + rand) k = pos - rand;
-  if (pos > k + ansicht - 1 - rand) k = pos - (ansicht - 1 - rand);
-  return Math.max(0, Math.min(level - ansicht, k));
+// Kameraposition auf einer Achse (x oder y)
+function kameraAufAchse(bisherigeKamera, gesetzt, zielKoordinate, ausschnittGroesse, ebenenGroesse) {
+  if (ebenenGroesse <= ausschnittGroesse) return -Math.floor((ausschnittGroesse - ebenenGroesse) / 2);
+  const randabstand = Math.floor(ausschnittGroesse / 4);
+  let kamera = gesetzt ? bisherigeKamera : zielKoordinate - Math.floor(ausschnittGroesse / 2);
+  if (zielKoordinate < kamera + randabstand) kamera = zielKoordinate - randabstand;
+  if (zielKoordinate > kamera + ausschnittGroesse - 1 - randabstand) kamera = zielKoordinate - (ausschnittGroesse - 1 - randabstand);
+  return Math.max(0, Math.min(ebenenGroesse - ausschnittGroesse, kamera));
 }
 
 // ansicht: { breite, hoehe } in Feldern; ebene: { breite, hoehe }
 export function folgen(kamera, ziel, ansicht, ebene) {
-  kamera.x = achse(kamera.x, kamera.gesetzt, ziel.x, ansicht.breite, ebene.breite);
-  kamera.y = achse(kamera.y, kamera.gesetzt, ziel.y, ansicht.hoehe, ebene.hoehe);
+  kamera.x = kameraAufAchse(kamera.x, kamera.gesetzt, ziel.x, ansicht.breite, ebene.breite);
+  kamera.y = kameraAufAchse(kamera.y, kamera.gesetzt, ziel.y, ansicht.hoehe, ebene.hoehe);
   kamera.gesetzt = true;
 }

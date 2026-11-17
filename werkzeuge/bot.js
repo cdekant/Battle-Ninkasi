@@ -6,99 +6,103 @@ import rohdaten from "../daten/index.js";
 import texte from "../sprache/de/texte.js";
 import grammatikDe from "../sprache/de/grammatik.js";
 import { erstelleGrammatik } from "../src/anzeige/grammatik.js";
-import { datenLaden, neuesSpiel, befehl, spielstand, nachspielen } from "../src/kern/spiel.js";
-import { erzeugen, ganzzahl } from "../src/kern/zufall.js";
-import { alle, spieler } from "../src/kern/zustand.js";
+import { datenLaden, neuesSpiel, befehlGeben, spielstand, nachspielen } from "../src/kern/spiel.js";
+import { zufallErzeugen, zufallsGanzzahl } from "../src/kern/zufall.js";
+import { alleEntitaeten, spielerin } from "../src/kern/zustand.js";
 import { passierbar } from "../src/welt/karte.js";
 import { erstesGetraenk } from "../src/systeme/inventar.js";
-import { hoeren } from "../src/kern/ereignisse.js";
-import { reiseBeginnen, naechsterSchritt } from "../src/eingabe/reise.js";
+import { hoererAnmelden } from "../src/kern/ereignisse.js";
+import { reiseBeginnen, naechsterReiseschritt } from "../src/eingabe/reise.js";
 import einstellungen from "../src/eingabe/einstellungen.js";
 
-const [laeufe = 20, maxBefehle = 3000, erster = 1] = process.argv.slice(2).map(Number);
+const [anzahlLaeufe = 20, hoechsteBefehlszahl = 3000, ersterStartwert = 1] = process.argv.slice(2).map(Number);
 const daten = datenLaden(rohdaten, { texte, nomenPruefen: erstelleGrammatik(grammatikDe).pruefen });
 
-function invarianten(spiel) {
-  const z = spiel.zustand;
-  const belegt = new Set();
-  for (const e of alle(z)) {
-    for (const [n, w] of Object.entries(e.werte || {})) {
-      if (!Number.isInteger(w.aktuell) || w.aktuell < 0) throw new Error(`#${e.id} ${n} ungültig: ${w.aktuell}`);
+function invariantenPruefen(spiel) {
+  const zustand = spiel.zustand;
+  const belegteFelder = new Set();
+  for (const entitaet of alleEntitaeten(zustand)) {
+    for (const [wertName, wert] of Object.entries(entitaet.werte || {})) {
+      if (!Number.isInteger(wert.aktuell) || wert.aktuell < 0) throw new Error(`#${entitaet.id} ${wertName} ungültig: ${wert.aktuell}`);
     }
-    if (e.position) {
-      if (!passierbar(spiel, e.position.x, e.position.y)) throw new Error(`#${e.id} steht in der Wand`);
-      if (e.fraktion !== undefined) {
-        const k = `${e.position.x},${e.position.y}`;
-        if (belegt.has(k)) throw new Error(`Zwei Wesen auf ${k}`);
-        belegt.add(k);
+    if (entitaet.position) {
+      if (!passierbar(spiel, entitaet.position.x, entitaet.position.y)) throw new Error(`#${entitaet.id} steht in der Wand`);
+      if (entitaet.fraktion !== undefined) {
+        const feldSchluessel = `${entitaet.position.x},${entitaet.position.y}`;
+        if (belegteFelder.has(feldSchluessel)) throw new Error(`Zwei Wesen auf ${feldSchluessel}`);
+        belegteFelder.add(feldSchluessel);
       }
     }
   }
-  if (!z.vorbei && spieler(z).werte.lp.aktuell <= 0) throw new Error("Ninkasi tot, Spiel nicht vorbei");
+  if (!zustand.vorbei && spielerin(zustand).werte.lp.aktuell <= 0) throw new Error("Ninkasi tot, Spiel nicht vorbei");
 }
 
-function zufallsbefehl(rng, spiel) {
-  const p = spieler(spiel.zustand);
-  const w = ganzzahl(rng, 1, 100);
-  if (w <= 5) return { art: "warten" };
-  if (w <= 10) return { art: "aufheben" };
-  if (w <= 13 && p.werte.lp.aktuell < 70) return { art: "trinken", item: erstesGetraenk(spiel.zustand, p) };
-  return { art: "bewegen", dx: ganzzahl(rng, -1, 1), dy: ganzzahl(rng, -1, 1) };
+function zufallsbefehl(botZufall, spiel) {
+  const ninkasi = spielerin(spiel.zustand);
+  const wurf = zufallsGanzzahl(botZufall, 1, 100);
+  if (wurf <= 5) return { art: "warten" };
+  if (wurf <= 10) return { art: "aufheben" };
+  if (wurf <= 13 && ninkasi.werte.lp.aktuell < 70) return { art: "trinken", gegenstandId: erstesGetraenk(spiel.zustand, ninkasi) };
+  return { art: "bewegen", dx: zufallsGanzzahl(botZufall, -1, 1), dy: zufallsGanzzahl(botZufall, -1, 1) };
 }
 
 // Reise zu einem zufälligen erkundeten Feld, wie per Mausklick; gibt den Haltegrund zurück
-function reisen(rng, spiel) {
-  const e = spiel.zustand.ebene;
-  const erkundet = [];
-  e.erkundet.forEach((v, i) => { if (v && passierbar(spiel, i % e.breite, Math.floor(i / e.breite))) erkundet.push(i); });
-  const i = erkundet[ganzzahl(rng, 0, erkundet.length - 1)];
-  const start = reiseBeginnen(spiel, { x: i % e.breite, y: Math.floor(i / e.breite) }, einstellungen);
-  if (start.grund) return start.grund;
-  for (let n = 0; n < 500; n++) {
-    const s = naechsterSchritt(spiel, start.reise, einstellungen);
-    if (s.halt) return s.halt;
-    if (!befehl(spiel, s.befehl).ok) return "abgelehnt";
-    invarianten(spiel);
+function reisen(botZufall, spiel) {
+  const ebene = spiel.zustand.ebene;
+  const erkundeteFelder = [];
+  ebene.erkundet.forEach((erkundet, feldIndex) => {
+    const x = feldIndex % ebene.breite, y = Math.floor(feldIndex / ebene.breite);
+    if (erkundet && passierbar(spiel, x, y)) erkundeteFelder.push({ x, y });
+  });
+  const ziel = erkundeteFelder[zufallsGanzzahl(botZufall, 0, erkundeteFelder.length - 1)];
+  const beginn = reiseBeginnen(spiel, ziel, einstellungen);
+  if (beginn.grund) return beginn.grund;
+  for (let schritt = 0; schritt < 500; schritt++) {
+    const reiseschritt = naechsterReiseschritt(spiel, beginn.reise, einstellungen);
+    if (reiseschritt.halt) return reiseschritt.halt;
+    if (!befehlGeben(spiel, reiseschritt.befehl).ok) return "abgelehnt";
+    invariantenPruefen(spiel);
   }
   return "zu_lang";
 }
 
-let tode = 0, fehler = 0;
-const halte = {};
+let anzahlTode = 0, anzahlFehler = 0;
+const reisenNachHaltegrund = {};
 console.log("Startwert  Befehle  Zeit     LP   PP  Getötet  Biere  Ergebnis");
-for (let s = erster; s < erster + laeufe; s++) {
+for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe; startwert++) {
   try {
-    const spiel = neuesSpiel(daten, s);
-    let getoetet = 0, biere = 0;
-    hoeren(spiel, (m) => {
-      if (m.art === "tod" && m.opfer.id !== spiel.zustand.spielerId) getoetet++;
-      if (m.art === "getrunken") biere++;
+    const spiel = neuesSpiel(daten, startwert);
+    let getoetet = 0, getrunkeneBiere = 0;
+    hoererAnmelden(spiel, (meldung) => {
+      if (meldung.art === "tod" && meldung.opfer.id !== spiel.zustand.spielerinId) getoetet++;
+      if (meldung.art === "getrunken") getrunkeneBiere++;
     });
-    const rng = erzeugen(s);
-    while (spiel.befehle.length < maxBefehle && !spiel.zustand.vorbei) {
-      if (ganzzahl(rng, 1, 100) <= 3) {
-        const grund = reisen(rng, spiel);
-        halte[grund] = (halte[grund] || 0) + 1;
+    const botZufall = zufallErzeugen(startwert);
+    while (spiel.befehle.length < hoechsteBefehlszahl && !spiel.zustand.vorbei) {
+      if (zufallsGanzzahl(botZufall, 1, 100) <= 3) {
+        const haltegrund = reisen(botZufall, spiel);
+        reisenNachHaltegrund[haltegrund] = (reisenNachHaltegrund[haltegrund] || 0) + 1;
         continue;
       }
-      befehl(spiel, zufallsbefehl(rng, spiel));
-      invarianten(spiel);
+      befehlGeben(spiel, zufallsbefehl(botZufall, spiel));
+      invariantenPruefen(spiel);
     }
-    const nach = nachspielen(daten, JSON.parse(JSON.stringify(spielstand(spiel))));
-    const gleich = JSON.stringify(nach.zustand) === JSON.stringify(spiel.zustand);
-    if (!gleich) throw new Error("Nachspielen ergibt anderen Zustand");
-    const p = spieler(spiel.zustand);
-    if (spiel.zustand.vorbei) tode++;
+    const nachgespielt = nachspielen(daten, JSON.parse(JSON.stringify(spielstand(spiel))));
+    const zustaendeGleich = JSON.stringify(nachgespielt.zustand) === JSON.stringify(spiel.zustand);
+    if (!zustaendeGleich) throw new Error("Nachspielen ergibt anderen Zustand");
+    const ninkasi = spielerin(spiel.zustand);
+    if (spiel.zustand.vorbei) anzahlTode++;
     console.log(
-      `${String(s).padStart(9)}  ${String(spiel.befehle.length).padStart(7)}  ${String(spiel.zustand.zeit).padStart(7)}  ` +
-      `${String(p.werte.lp.aktuell).padStart(3)}  ${String(p.werte.pp.aktuell).padStart(3)}  ${String(getoetet).padStart(7)}  ` +
-      `${String(biere).padStart(5)}  ${spiel.zustand.vorbei ? "tot" : "lebt"}, nachgespielt ok`
+      `${String(startwert).padStart(9)}  ${String(spiel.befehle.length).padStart(7)}  ${String(spiel.zustand.zeit).padStart(7)}  ` +
+      `${String(ninkasi.werte.lp.aktuell).padStart(3)}  ${String(ninkasi.werte.pp.aktuell).padStart(3)}  ${String(getoetet).padStart(7)}  ` +
+      `${String(getrunkeneBiere).padStart(5)}  ${spiel.zustand.vorbei ? "tot" : "lebt"}, nachgespielt ok`
     );
-  } catch (e) {
-    fehler++;
-    console.log(`${String(s).padStart(9)}  FEHLER: ${e.stack}`);
+  } catch (fehler) {
+    anzahlFehler++;
+    console.log(`${String(startwert).padStart(9)}  FEHLER: ${fehler.stack}`);
   }
 }
-console.log(`\nReisen nach Haltegrund: ${Object.entries(halte).map(([g, n]) => `${g} ${n}`).join(", ")}`);
-console.log(`${laeufe} Läufe, ${tode} tot, ${fehler} Fehler`);
-process.exitCode = fehler ? 1 : 0;
+const haltegruende = Object.entries(reisenNachHaltegrund).map(([grund, anzahl]) => `${grund} ${anzahl}`).join(", ");
+console.log(`\nReisen nach Haltegrund: ${haltegruende}`);
+console.log(`${anzahlLaeufe} Läufe, ${anzahlTode} tot, ${anzahlFehler} Fehler`);
+process.exitCode = anzahlFehler ? 1 : 0;

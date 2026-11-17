@@ -1,67 +1,69 @@
 // Erzeugung einer Ebene aus Levelparametern (daten/ebenen.js).
-// Grundriss: Digger von rot.js mit abgeleitetem Startwert, Inhalte mit eigenem abgeleiteten RNG,
+// Grundriss: Digger von rot.js mit abgeleitetem Startwert, Inhalte mit eigenem abgeleiteten Zufall,
 // damit die Ebene nicht vom Spielverlauf abhängt.
 
 import RNG from "../../lib/rot/rng.js";
 import Digger from "../../lib/rot/map/digger.js";
-import { ableiten, erzeugen as rngErzeugen, ganzzahl } from "../kern/zufall.js";
-import { ausDatensatz } from "../kern/zustand.js";
+import { startwertAbleiten, zufallErzeugen, zufallsGanzzahl } from "../kern/zufall.js";
+import { entitaetAusDatensatz } from "../kern/zustand.js";
 
-export function erzeugen(spiel, name) {
-  const z = spiel.zustand;
-  const p = spiel.daten.ebenen[name];
-  const wand = spiel.daten.gelaende[p.gelaende.wand].kennung;
-  const boden = spiel.daten.gelaende[p.gelaende.boden].kennung;
+export function ebeneErzeugen(spiel, ebenenName) {
+  const zustand = spiel.zustand;
+  const ebenendaten = spiel.daten.ebenen[ebenenName];
+  const kennungWand = spiel.daten.gelaende[ebenendaten.gelaende.wand].kennung;
+  const kennungBoden = spiel.daten.gelaende[ebenendaten.gelaende.boden].kennung;
+  const { breite, hoehe } = ebenendaten;
 
-  // rot.js nutzt einen globalen RNG; Startwert 0 ist dort ungültig
-  RNG.setSeed(ableiten(z.startwert, `ebene.${name}`) || 1);
+  // rot.js nutzt einen globalen Zufall; Startwert 0 ist dort ungültig
+  RNG.setSeed(startwertAbleiten(zustand.startwert, `ebene.${ebenenName}`) || 1);
   // timeLimit: Infinity, sonst bricht der Digger nach Uhrzeit ab und die Ebene ist nicht wiederholbar
-  const digger = new Digger(p.breite, p.hoehe, { ...p.digger, timeLimit: Infinity });
-  const zeilen = Array.from({ length: p.hoehe }, () => new Array(p.breite).fill(wand));
-  digger.create((x, y, wert) => { if (wert === 0) zeilen[y][x] = boden; });
+  const digger = new Digger(breite, hoehe, { ...ebenendaten.digger, timeLimit: Infinity });
+  const zeilen = Array.from({ length: hoehe }, () => new Array(breite).fill(kennungWand));
+  // rot.js meldet je Feld 0 für Boden, 1 für Wand
+  digger.create((x, y, feldart) => { if (feldart === 0) zeilen[y][x] = kennungBoden; });
 
-  z.ebene = {
-    name,
-    breite: p.breite,
-    hoehe: p.hoehe,
-    felder: zeilen.map((r) => r.join("")),
-    erkundet: new Array(p.breite * p.hoehe).fill(0),
+  zustand.ebene = {
+    name: ebenenName,
+    breite,
+    hoehe,
+    felder: zeilen.map((zeile) => zeile.join("")),
+    erkundet: new Array(breite * hoehe).fill(0),
   };
 
   // Ninkasi in die Mitte des ersten Raums
-  const raeume = digger.getRooms();
-  const erster = raeume[0];
-  const [sx, sy] = erster.getCenter();
-  const ninkasi = ausDatensatz(z, "ninkasi", spiel.daten.wesen.ninkasi, { x: sx, y: sy });
-  z.spielerId = ninkasi.id;
+  const startraum = digger.getRooms()[0];
+  const [startX, startY] = startraum.getCenter();
+  const ninkasi = entitaetAusDatensatz(zustand, "ninkasi", spiel.daten.wesen.ninkasi, { x: startX, y: startY });
+  zustand.spielerinId = ninkasi.id;
 
   // freie Bodenfelder außerhalb des Startraums, in fester Reihenfolge
-  const frei = [];
-  for (let y = 0; y < p.hoehe; y++) {
-    for (let x = 0; x < p.breite; x++) {
-      if (zeilen[y][x] !== boden) continue;
-      const imStartraum = x >= erster.getLeft() - 1 && x <= erster.getRight() + 1 && y >= erster.getTop() - 1 && y <= erster.getBottom() + 1;
-      if (!imStartraum) frei.push({ x, y });
+  const freieFelder = [];
+  for (let y = 0; y < hoehe; y++) {
+    for (let x = 0; x < breite; x++) {
+      if (zeilen[y][x] !== kennungBoden) continue;
+      const imStartraum = x >= startraum.getLeft() - 1 && x <= startraum.getRight() + 1
+        && y >= startraum.getTop() - 1 && y <= startraum.getBottom() + 1;
+      if (!imStartraum) freieFelder.push({ x, y });
     }
   }
 
-  const rng = rngErzeugen(ableiten(z.startwert, `ebene.${name}.inhalt`));
-  const ziehen = () => {
-    if (frei.length === 0) return null;
-    const i = ganzzahl(rng, 0, frei.length - 1);
-    return frei.splice(i, 1)[0];
+  const inhaltsZufall = zufallErzeugen(startwertAbleiten(zustand.startwert, `ebene.${ebenenName}.inhalt`));
+  const freiesFeldZiehen = () => {
+    if (freieFelder.length === 0) return null;
+    const gezogen = zufallsGanzzahl(inhaltsZufall, 0, freieFelder.length - 1);
+    return freieFelder.splice(gezogen, 1)[0];
   };
 
-  for (const g of p.gegner || []) {
-    for (let i = 0; i < g.anzahl; i++) {
-      const pos = ziehen();
-      if (pos) ausDatensatz(z, g.typ, spiel.daten.wesen[g.typ], pos);
+  for (const gegnerEintrag of ebenendaten.gegner || []) {
+    for (let i = 0; i < gegnerEintrag.anzahl; i++) {
+      const feld = freiesFeldZiehen();
+      if (feld) entitaetAusDatensatz(zustand, gegnerEintrag.typ, spiel.daten.wesen[gegnerEintrag.typ], feld);
     }
   }
-  for (const g of p.gegenstaende || []) {
-    for (let i = 0; i < g.anzahl; i++) {
-      const pos = ziehen();
-      if (pos) ausDatensatz(z, g.typ, spiel.daten.gegenstaende[g.typ], pos);
+  for (const gegenstandEintrag of ebenendaten.gegenstaende || []) {
+    for (let i = 0; i < gegenstandEintrag.anzahl; i++) {
+      const feld = freiesFeldZiehen();
+      if (feld) entitaetAusDatensatz(zustand, gegenstandEintrag.typ, spiel.daten.gegenstaende[gegenstandEintrag.typ], feld);
     }
   }
 }

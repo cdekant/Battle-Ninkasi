@@ -3,38 +3,41 @@
 // Weitere Regeln (Kessel benutzen, mit Händlern reden) kommen einfach in die Liste.
 // Ergebnis einer Regel: { befehl } oder { reise: feld }.
 
-import { spieler, an } from "../kern/zustand.js";
-import { abstand, imLevel } from "../welt/karte.js";
+import { spielerin, entitaetenAuf } from "../kern/zustand.js";
+import { abstand, aufDerKarte } from "../welt/karte.js";
 import { feindlich } from "../systeme/kampf.js";
 import { istSichtbar } from "../systeme/sicht.js";
 
-export function feldAnPixel(px, py, kamera, zoom) {
-  return { x: kamera.x + Math.floor(px / zoom), y: kamera.y + Math.floor(py / zoom) };
+export function feldAnPixel(pixelX, pixelY, kamera, zoom) {
+  return { x: kamera.x + Math.floor(pixelX / zoom), y: kamera.y + Math.floor(pixelY / zoom) };
 }
 
 export const KLICKREGELN = [
   {
     name: "aufheben",
-    passt: (spiel, feld, p) => feld.x === p.position.x && feld.y === p.position.y && an(spiel.zustand, feld.x, feld.y).some((g) => g.aufhebbar),
+    passt: (spiel, feld, ninkasi) =>
+      feld.x === ninkasi.position.x && feld.y === ninkasi.position.y
+      && entitaetenAuf(spiel.zustand, feld.x, feld.y).some((entitaet) => entitaet.aufhebbar),
     aktion: () => ({ befehl: { art: "aufheben" } }),
   },
   {
     name: "angreifen",
-    passt: (spiel, feld, p) =>
-      abstand(feld, p.position) === 1 && istSichtbar(spiel.zustand, feld.x, feld.y) && an(spiel.zustand, feld.x, feld.y).some((e) => feindlich(p, e)),
-    aktion: (spiel, feld, p) => ({ befehl: { art: "bewegen", dx: feld.x - p.position.x, dy: feld.y - p.position.y } }),
+    passt: (spiel, feld, ninkasi) =>
+      abstand(feld, ninkasi.position) === 1 && istSichtbar(spiel.zustand, feld.x, feld.y)
+      && entitaetenAuf(spiel.zustand, feld.x, feld.y).some((entitaet) => feindlich(ninkasi, entitaet)),
+    aktion: (spiel, feld, ninkasi) => ({ befehl: { art: "bewegen", dx: feld.x - ninkasi.position.x, dy: feld.y - ninkasi.position.y } }),
   },
   {
     name: "reisen",
-    passt: (spiel, feld) => imLevel(spiel.zustand.ebene, feld.x, feld.y),
+    passt: (spiel, feld) => aufDerKarte(spiel.zustand.ebene, feld.x, feld.y),
     aktion: (spiel, feld) => ({ reise: feld }),
   },
 ];
 
 export function klickDeuten(spiel, feld, regeln = KLICKREGELN) {
-  const p = spieler(spiel.zustand);
-  for (const r of regeln) {
-    if (r.passt(spiel, feld, p)) return r.aktion(spiel, feld, p);
+  const ninkasi = spielerin(spiel.zustand);
+  for (const regel of regeln) {
+    if (regel.passt(spiel, feld, ninkasi)) return regel.aktion(spiel, feld, ninkasi);
   }
   return null;
 }

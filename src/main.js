@@ -7,10 +7,10 @@ import texteDe from "../sprache/de/texte.js";
 import grammatikDe from "../sprache/de/grammatik.js";
 import belegung from "./eingabe/belegung.js";
 import vorgaben from "./eingabe/einstellungen.js";
-import { datenLaden, neuesSpiel, befehl } from "./kern/spiel.js";
-import { hoeren } from "./kern/ereignisse.js";
-import { ableiten } from "./kern/zufall.js";
-import { spieler } from "./kern/zustand.js";
+import { datenLaden, neuesSpiel, befehlGeben } from "./kern/spiel.js";
+import { hoererAnmelden } from "./kern/ereignisse.js";
+import { startwertAbleiten } from "./kern/zufall.js";
+import { spielerin } from "./kern/zustand.js";
 import { weg } from "./welt/wege.js";
 import { erstelleTexte } from "./anzeige/texte.js";
 import { erstelleGrammatik } from "./anzeige/grammatik.js";
@@ -20,40 +20,40 @@ import { Oberflaeche } from "./anzeige/oberflaeche.js";
 import { Log } from "./anzeige/log.js";
 import { uebersetzen } from "./eingabe/eingabe.js";
 import { feldAnPixel, klickDeuten } from "./eingabe/maus.js";
-import { reiseBeginnen, naechsterSchritt } from "./eingabe/reise.js";
+import { reiseBeginnen, naechsterReiseschritt } from "./eingabe/reise.js";
 
-const SPEICHER = "battle-ninkasi.einstellungen";
-const RAD_PAUSE = 150; // ms zwischen zwei Zoomschritten per Rad
+const SPEICHERSCHLUESSEL_EINSTELLUNGEN = "battle-ninkasi.einstellungen";
+const RAD_PAUSE_MS = 150; // zwischen zwei Zoomschritten per Rad
 
 const grammatik = erstelleGrammatik(grammatikDe);
 const texte = erstelleTexte(texteDe, grammatik);
 
-function fehlerZeigen(titel, text) {
-  const el = document.getElementById("fehler");
-  el.hidden = false;
-  el.textContent = `${titel}\n\n${text}`;
+function fehlerZeigen(titel, meldung) {
+  const fehlerElement = document.getElementById("fehler");
+  fehlerElement.hidden = false;
+  fehlerElement.textContent = `${titel}\n\n${meldung}`;
 }
 
 // Einstellungen sind keine Befehle; gespeichert werden nur Abweichungen von den Vorgaben
 function einstellungenLaden() {
   try {
-    return { ...structuredClone(vorgaben), ...JSON.parse(localStorage.getItem(SPEICHER) || "{}") };
+    return { ...structuredClone(vorgaben), ...JSON.parse(localStorage.getItem(SPEICHERSCHLUESSEL_EINSTELLUNGEN) || "{}") };
   } catch {
     return structuredClone(vorgaben);
   }
 }
-function einstellungenSpeichern(e) {
-  const abweichend = {};
-  for (const [k, v] of Object.entries(e)) {
-    if (JSON.stringify(v) !== JSON.stringify(vorgaben[k])) abweichend[k] = v;
+function einstellungenSpeichern(aktuelleEinstellungen) {
+  const abweichungen = {};
+  for (const [name, wert] of Object.entries(aktuelleEinstellungen)) {
+    if (JSON.stringify(wert) !== JSON.stringify(vorgaben[name])) abweichungen[name] = wert;
   }
-  try { localStorage.setItem(SPEICHER, JSON.stringify(abweichend)); } catch { /* ohne Speicher weiter */ }
+  try { localStorage.setItem(SPEICHERSCHLUESSEL_EINSTELLUNGEN, JSON.stringify(abweichungen)); } catch { /* ohne Speicher weiter */ }
 }
 
 function startwertAusUrl() {
-  const s = new URLSearchParams(location.search).get("seed");
-  if (s === null || s === "") return null;
-  return /^\d+$/.test(s) ? Number(s) >>> 0 : ableiten(0, s);
+  const startwertText = new URLSearchParams(location.search).get("seed");
+  if (startwertText === null || startwertText === "") return null;
+  return /^\d+$/.test(startwertText) ? Number(startwertText) >>> 0 : startwertAbleiten(0, startwertText);
 }
 
 function zufaelligerStartwert() {
@@ -63,144 +63,145 @@ function zufaelligerStartwert() {
 let daten;
 try {
   daten = datenLaden(rohdaten, { texte: texteDe, nomenPruefen: grammatik.pruefen });
-} catch (e) {
-  fehlerZeigen(texte.t("ui.datenfehler"), e.message);
-  throw e;
+} catch (fehler) {
+  fehlerZeigen(texte.text("ui.datenfehler"), fehler.message);
+  throw fehler;
 }
 
 const einstellungen = einstellungenLaden();
 if (!einstellungen.zoomstufen.includes(einstellungen.zoom)) einstellungen.zoom = einstellungen.zoomstufen[0];
 
-const canvas = document.getElementById("karte-canvas");
-const renderer = new Renderer(canvas, daten.zeichen);
+const kartenCanvas = document.getElementById("karte-canvas");
+const renderer = new Renderer(kartenCanvas, daten.zeichen);
 const oberflaeche = new Oberflaeche(document.getElementById("seitenleiste"), texte, VERSION);
 const log = new Log(document.getElementById("log"), texte);
 
 // Anzeige-Zustand, gehört nicht zum Spielzustand
 let kamera = neueKamera();
 let spiel;
-let zeiger = null;      // Feld unter dem Mauszeiger
-let reise = null;       // laufende Reise
-let reiseTimer = null;
+let feldUnterZeiger = null;
+let laufendeReise = null;
+let reiseZeitgeber = null;
 let letzterRadZoom = 0;
 
 function zeichnen() {
   const ansicht = renderer.ansicht(einstellungen.zoom);
-  const p = spieler(spiel.zustand);
-  folgen(kamera, p.position, ansicht, spiel.zustand.ebene);
+  const ninkasi = spielerin(spiel.zustand);
+  folgen(kamera, ninkasi.position, ansicht, spiel.zustand.ebene);
   // Wegvorschau zum Feld unter dem Zeiger, nur über erkundete Felder
-  const vorschau = zeiger && !reise && !spiel.zustand.vorbei ? weg(spiel, p.position, zeiger, { nurErkundet: true }) || [] : [];
-  renderer.zeichnen(spiel, kamera, ansicht, einstellungen.zoom, { zeiger, weg: vorschau });
+  const vorschauZeigen = feldUnterZeiger && !laufendeReise && !spiel.zustand.vorbei;
+  const wegvorschau = vorschauZeigen ? weg(spiel, ninkasi.position, feldUnterZeiger, { nurErkundet: true }) || [] : [];
+  renderer.zeichnen(spiel, kamera, ansicht, einstellungen.zoom, { zeiger: feldUnterZeiger, weg: wegvorschau });
   oberflaeche.anzeigen(spiel);
 }
 
 function reiseMelden(grund) {
   const schluessel = `reise.${grund}`;
-  if (texte.hat(schluessel)) log.zeile(texte.t(schluessel), "leise");
+  if (texte.hatSchluessel(schluessel)) log.zeile(texte.text(schluessel), "leise");
 }
 
 function reiseBeenden(grund) {
-  clearTimeout(reiseTimer);
-  reiseTimer = null;
-  reise = null;
+  clearTimeout(reiseZeitgeber);
+  reiseZeitgeber = null;
+  laufendeReise = null;
   if (grund) reiseMelden(grund);
   zeichnen();
 }
 
 function reiseTakt() {
-  reiseTimer = null;
-  if (!reise) return;
-  const s = naechsterSchritt(spiel, reise, einstellungen);
-  if (s.halt) return reiseBeenden(s.halt);
-  if (!befehl(spiel, s.befehl).ok) return reiseBeenden("abgelehnt");
+  reiseZeitgeber = null;
+  if (!laufendeReise) return;
+  const schritt = naechsterReiseschritt(spiel, laufendeReise, einstellungen);
+  if (schritt.halt) return reiseBeenden(schritt.halt);
+  if (!befehlGeben(spiel, schritt.befehl).ok) return reiseBeenden("abgelehnt");
   zeichnen();
-  reiseTimer = setTimeout(reiseTakt, einstellungen.reisePause);
+  reiseZeitgeber = setTimeout(reiseTakt, einstellungen.reisePause);
 }
 
 function reiseStarten(ziel) {
-  const r = reiseBeginnen(spiel, ziel, einstellungen);
-  if (r.grund) return reiseMelden(r.grund);
-  reise = r.reise;
+  const ergebnis = reiseBeginnen(spiel, ziel, einstellungen);
+  if (ergebnis.grund) return reiseMelden(ergebnis.grund);
+  laufendeReise = ergebnis.reise;
   reiseTakt();
 }
 
 function starten(startwert) {
-  if (reise) reiseBeenden(null);
+  if (laufendeReise) reiseBeenden(null);
   spiel = neuesSpiel(daten, startwert);
   window.spiel = spiel; // zum Nachsehen in der Konsole
   kamera = neueKamera();
-  log.leeren(spiel.zustand.spielerId);
-  hoeren(spiel, log.melden);
-  log.zeile(texte.t("log.willkommen"));
-  const url = new URL(location.href);
-  url.searchParams.set("seed", String(spiel.zustand.startwert));
-  history.replaceState(null, "", url);
+  log.leeren(spiel.zustand.spielerinId);
+  hoererAnmelden(spiel, log.melden);
+  log.zeile(texte.text("log.willkommen"));
+  const adresse = new URL(location.href);
+  adresse.searchParams.set("seed", String(spiel.zustand.startwert));
+  history.replaceState(null, "", adresse);
   zeichnen();
 }
 
 function zoomen(richtung) {
-  const stufen = einstellungen.zoomstufen;
-  const i = stufen.indexOf(einstellungen.zoom) + richtung;
-  if (i < 0 || i >= stufen.length) return;
-  einstellungen.zoom = stufen[i];
+  const zoomstufen = einstellungen.zoomstufen;
+  const neueStufe = zoomstufen.indexOf(einstellungen.zoom) + richtung;
+  if (neueStufe < 0 || neueStufe >= zoomstufen.length) return;
+  einstellungen.zoom = zoomstufen[neueStufe];
   einstellungenSpeichern(einstellungen);
   kamera.gesetzt = false;
   zeichnen();
 }
 
-function befehlGeben(b) {
-  befehl(spiel, b);
+function befehlGebenUndZeichnen(befehl) {
+  befehlGeben(spiel, befehl);
   zeichnen();
 }
 
-window.addEventListener("keydown", (e) => {
+window.addEventListener("keydown", (tastenereignis) => {
   // Während einer Reise bricht jede Taste ab und wird dabei geschluckt
-  if (reise) {
-    e.preventDefault();
+  if (laufendeReise) {
+    tastenereignis.preventDefault();
     return reiseBeenden("abgebrochen");
   }
-  const r = uebersetzen(e, belegung, spiel);
-  if (!r) return;
-  e.preventDefault();
-  if (r.anzeige === "zoom_rein") return zoomen(1);
-  if (r.anzeige === "zoom_raus") return zoomen(-1);
-  if (r.anzeige === "log_umschalten") return log.umschalten();
-  if (r.anzeige === "neustart") {
+  const ergebnis = uebersetzen(tastenereignis, belegung, spiel);
+  if (!ergebnis) return;
+  tastenereignis.preventDefault();
+  if (ergebnis.anzeige === "zoom_rein") return zoomen(1);
+  if (ergebnis.anzeige === "zoom_raus") return zoomen(-1);
+  if (ergebnis.anzeige === "log_umschalten") return log.umschalten();
+  if (ergebnis.anzeige === "neustart") {
     if (spiel.zustand.vorbei) starten(zufaelligerStartwert());
     return;
   }
-  if (r.befehl) befehlGeben(r.befehl);
+  if (ergebnis.befehl) befehlGebenUndZeichnen(ergebnis.befehl);
 });
 
-canvas.addEventListener("mousemove", (e) => {
-  const f = feldAnPixel(e.offsetX, e.offsetY, kamera, einstellungen.zoom);
-  if (zeiger && zeiger.x === f.x && zeiger.y === f.y) return;
-  zeiger = f;
+kartenCanvas.addEventListener("mousemove", (mausereignis) => {
+  const feld = feldAnPixel(mausereignis.offsetX, mausereignis.offsetY, kamera, einstellungen.zoom);
+  if (feldUnterZeiger && feldUnterZeiger.x === feld.x && feldUnterZeiger.y === feld.y) return;
+  feldUnterZeiger = feld;
   zeichnen();
 });
 
-canvas.addEventListener("mouseleave", () => {
-  zeiger = null;
+kartenCanvas.addEventListener("mouseleave", () => {
+  feldUnterZeiger = null;
   zeichnen();
 });
 
-canvas.addEventListener("mousedown", (e) => {
-  if (reise) return reiseBeenden("abgebrochen");
-  if (belegung.maus[e.button] !== "handeln" || spiel.zustand.vorbei) return;
-  e.preventDefault();
-  const r = klickDeuten(spiel, feldAnPixel(e.offsetX, e.offsetY, kamera, einstellungen.zoom));
-  if (!r) return;
-  if (r.befehl) befehlGeben(r.befehl);
-  else if (r.reise) reiseStarten(r.reise);
+kartenCanvas.addEventListener("mousedown", (mausereignis) => {
+  if (laufendeReise) return reiseBeenden("abgebrochen");
+  if (belegung.maus[mausereignis.button] !== "handeln" || spiel.zustand.vorbei) return;
+  mausereignis.preventDefault();
+  const ergebnis = klickDeuten(spiel, feldAnPixel(mausereignis.offsetX, mausereignis.offsetY, kamera, einstellungen.zoom));
+  if (!ergebnis) return;
+  if (ergebnis.befehl) befehlGebenUndZeichnen(ergebnis.befehl);
+  else if (ergebnis.reise) reiseStarten(ergebnis.reise);
 });
 
-canvas.addEventListener("wheel", (e) => {
+kartenCanvas.addEventListener("wheel", (radereignis) => {
   if (belegung.rad !== "zoom") return;
-  e.preventDefault();
+  radereignis.preventDefault();
   const jetzt = performance.now();
-  if (jetzt - letzterRadZoom < RAD_PAUSE) return;
+  if (jetzt - letzterRadZoom < RAD_PAUSE_MS) return;
   letzterRadZoom = jetzt;
-  zoomen(e.deltaY < 0 ? 1 : -1);
+  zoomen(radereignis.deltaY < 0 ? 1 : -1);
 }, { passive: false });
 
 window.addEventListener("resize", () => zeichnen());

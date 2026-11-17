@@ -21,7 +21,7 @@ Stand: 2026-11-17
 
 ## Befehle
 
-+ Ein Befehl ist ein reines Datenobjekt, z.B. `{ art: "trinken", item: 4711 }`
++ Ein Befehl ist ein reines Datenobjekt, z.B. `{ art: "trinken", gegenstandId: 4711 }`
 + Alles, was die Spielerin entscheidet, ist ein Befehl: Bewegen, Angreifen, Trinken, Brauen, aber auch Menüentscheidungen wie Skillwahl, Handel, Rezeptwahl, Weiterbrauen oder Abbrechen
 + Die Anzeige verändert den Spielzustand nie direkt, sie erzeugt nur Befehle
 + Keine Befehle sind reine Anzeige-Zustände: Fenster öffnen, im Log blättern, Tooltips, Karte verschieben, Zoom; sie kosten keine Zeit und kommen nicht in den Spielstand

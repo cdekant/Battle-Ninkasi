@@ -3,14 +3,14 @@ export default {
   bakterium: {
     abstrakt: true,
     fraktion: "verderber",
-    ki: { modul: "jagen", ziel: null },
-    sicht: { weite: 7 },
+    ki: { modul: "jagen", letzteBekanntePosition: null },
+    sicht: { reichweite: 7 },
   },
 
   essigbakterium: {
     vorlage: "bakterium",
     text: "wesen.essigbakterium",
-    werte: { lp: { grund: 15 } },
+    werte: { lp: { grundwert: 15 } },
     angriff: { trefferchance: 70, effekt: "biss_klein" },
   },
 };

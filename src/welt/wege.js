@@ -5,28 +5,30 @@
 // Später: Kosten je Gelände (Fallen meiden) gelten dann für KI und Spielerin zugleich.
 
 import AStar from "../../lib/rot/path/astar.js";
-import { passierbar, index } from "./karte.js";
-import { an } from "../kern/zustand.js";
+import { passierbar, feldIndex } from "./karte.js";
+import { entitaetenAuf } from "../kern/zustand.js";
 import { istWesen } from "../systeme/kampf.js";
 
-// Gibt die Felder des Weges ohne Startfeld zurück, [] wenn von = nach, null wenn kein Weg
-export function weg(spiel, von, nach, { nurErkundet = false, wesenMeiden = false } = {}) {
-  if (von.x === nach.x && von.y === nach.y) return [];
-  const e = spiel.zustand.ebene;
-  const frei = (x, y) => {
-    if (x === von.x && y === von.y) return true;
+// Gibt die Felder des Weges ohne Startfeld zurück, [] wenn start = ziel, null wenn kein Weg
+export function weg(spiel, start, ziel, { nurErkundet = false, wesenMeiden = false } = {}) {
+  if (start.x === ziel.x && start.y === ziel.y) return [];
+  const ebene = spiel.zustand.ebene;
+  const feldBegehbar = (x, y) => {
+    if (x === start.x && y === start.y) return true;
     if (!passierbar(spiel, x, y)) return false;
-    if (nurErkundet && !e.erkundet[index(e, x, y)]) return false;
-    if (wesenMeiden && !(x === nach.x && y === nach.y) && an(spiel.zustand, x, y).some(istWesen)) return false;
+    if (nurErkundet && !ebene.erkundet[feldIndex(ebene, x, y)]) return false;
+    const istZiel = x === ziel.x && y === ziel.y;
+    if (wesenMeiden && !istZiel && entitaetenAuf(spiel.zustand, x, y).some(istWesen)) return false;
     return true;
   };
-  if (!frei(nach.x, nach.y)) return null;
-  const felder = [];
-  new AStar(nach.x, nach.y, frei, { topology: 8 }).compute(von.x, von.y, (x, y) => felder.push({ x, y }));
-  return felder.length ? felder.slice(1) : null;
+  if (!feldBegehbar(ziel.x, ziel.y)) return null;
+  const wegfelder = [];
+  new AStar(ziel.x, ziel.y, feldBegehbar, { topology: 8 }).compute(start.x, start.y, (x, y) => wegfelder.push({ x, y }));
+  return wegfelder.length ? wegfelder.slice(1) : null;
 }
 
-export function naechsterSchritt(spiel, von, nach, optionen) {
-  const w = weg(spiel, von, nach, optionen);
-  return w && w.length ? w[0] : null;
+// Erstes Feld des Weges, null wenn kein Weg oder schon am Ziel
+export function naechstesWegfeld(spiel, start, ziel, optionen) {
+  const wegfelder = weg(spiel, start, ziel, optionen);
+  return wegfelder && wegfelder.length ? wegfelder[0] : null;
 }

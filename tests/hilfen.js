@@ -2,25 +2,25 @@
 // Keine Testdatei (Endung nicht .test.js), wird von node --test nicht ausgeführt.
 
 import gelaende from "../daten/gelaende.js";
-import { neuerZustand, erzeugen } from "../src/kern/zustand.js";
-import { ausDaten } from "../src/kern/werte.js";
+import { neuerZustand, entitaetErzeugen } from "../src/kern/zustand.js";
+import { werteAusDaten } from "../src/kern/werte.js";
 
 // Spiel mit einer Karte aus Zeilen ("#" Wand, "." Boden), alles erkundet
-export function miniSpiel(zeilen) {
+export function miniSpiel(kartenzeilen) {
   const zustand = neuerZustand(1);
-  const breite = zeilen[0].length, hoehe = zeilen.length;
-  zustand.ebene = { name: "test", breite, hoehe, felder: zeilen, erkundet: new Array(breite * hoehe).fill(1) };
-  return { zustand, daten: { gelaende }, cache: {} };
+  const breite = kartenzeilen[0].length, hoehe = kartenzeilen.length;
+  zustand.ebene = { name: "test", breite, hoehe, felder: kartenzeilen, erkundet: new Array(breite * hoehe).fill(1) };
+  return { zustand, daten: { gelaende }, zwischenspeicher: {} };
 }
 
 // Wesen mit Position, Fraktion und LP
 export function wesen(spiel, x, y, fraktion = "feinde", lp = 10) {
-  return erzeugen(spiel.zustand, { fraktion, position: { x, y }, werte: ausDaten({ lp: { grund: lp } }) });
+  return entitaetErzeugen(spiel.zustand, { fraktion, position: { x, y }, werte: werteAusDaten({ lp: { grundwert: lp } }) });
 }
 
 // Ninkasi als Spielerin
-export function spielerin(spiel, x, y, lp = 100) {
-  const p = wesen(spiel, x, y, "ninkasi", lp);
-  spiel.zustand.spielerId = p.id;
-  return p;
+export function spielerinSetzen(spiel, x, y, lp = 100) {
+  const ninkasi = wesen(spiel, x, y, "ninkasi", lp);
+  spiel.zustand.spielerinId = ninkasi.id;
+  return ninkasi;
 }

@@ -1,10 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { miniSpiel, wesen } from "./hilfen.js";
-import { weg, naechsterSchritt } from "../src/welt/wege.js";
-import { passierbar, abstand, index } from "../src/welt/karte.js";
+import { weg, naechstesWegfeld } from "../src/welt/wege.js";
+import { passierbar, abstand, feldIndex } from "../src/welt/karte.js";
 
-const KARTE = [
+const KARTE_MIT_MITTELWAND = [
   "#########",
   "#.......#",
   "#.#####.#",
@@ -13,35 +13,35 @@ const KARTE = [
 ];
 
 // Weg ist gültig: endet am Ziel, jeder Schritt ein Nachbarfeld und begehbar
-function pruefeWeg(spiel, von, nach, w) {
-  assert.ok(w && w.length > 0);
-  assert.deepEqual(w.at(-1), nach);
-  let vorher = von;
-  for (const f of w) {
-    assert.equal(abstand(vorher, f), 1);
-    assert.ok(passierbar(spiel, f.x, f.y));
-    vorher = f;
+function wegPruefen(spiel, start, ziel, wegfelder) {
+  assert.ok(wegfelder && wegfelder.length > 0);
+  assert.deepEqual(wegfelder.at(-1), ziel);
+  let vorigesFeld = start;
+  for (const feld of wegfelder) {
+    assert.equal(abstand(vorigesFeld, feld), 1);
+    assert.ok(passierbar(spiel, feld.x, feld.y));
+    vorigesFeld = feld;
   }
 }
 
-test("von = nach ergibt leeren Weg", () => {
-  assert.deepEqual(weg(miniSpiel(KARTE), { x: 1, y: 1 }, { x: 1, y: 1 }), []);
+test("start = ziel ergibt leeren Weg", () => {
+  assert.deepEqual(weg(miniSpiel(KARTE_MIT_MITTELWAND), { x: 1, y: 1 }, { x: 1, y: 1 }), []);
 });
 
 test("Weg ohne Startfeld, mit acht Richtungen so kurz wie der Schachbrett-Abstand", () => {
   const spiel = miniSpiel(["#######", "#.....#", "#.....#", "#.....#", "#######"]);
-  const von = { x: 1, y: 1 }, nach = { x: 5, y: 3 };
-  const w = weg(spiel, von, nach);
-  pruefeWeg(spiel, von, nach, w);
-  assert.equal(w.length, abstand(von, nach));
+  const start = { x: 1, y: 1 }, ziel = { x: 5, y: 3 };
+  const wegfelder = weg(spiel, start, ziel);
+  wegPruefen(spiel, start, ziel, wegfelder);
+  assert.equal(wegfelder.length, abstand(start, ziel));
 });
 
 test("Weg führt um Wände herum", () => {
-  const spiel = miniSpiel(KARTE);
-  const von = { x: 4, y: 1 }, nach = { x: 4, y: 3 };
-  const w = weg(spiel, von, nach);
-  pruefeWeg(spiel, von, nach, w);
-  assert.equal(w.length, 6);
+  const spiel = miniSpiel(KARTE_MIT_MITTELWAND);
+  const start = { x: 4, y: 1 }, ziel = { x: 4, y: 3 };
+  const wegfelder = weg(spiel, start, ziel);
+  wegPruefen(spiel, start, ziel, wegfelder);
+  assert.equal(wegfelder.length, 6);
 });
 
 test("Ziel in der Wand oder unerreichbar ergibt null", () => {
@@ -52,8 +52,8 @@ test("Ziel in der Wand oder unerreichbar ergibt null", () => {
 
 test("nurErkundet: unerkundete Felder sperren den Weg", () => {
   const spiel = miniSpiel(["#####", "#...#", "#####"]);
-  const e = spiel.zustand.ebene;
-  e.erkundet[index(e, 2, 1)] = 0;
+  const ebene = spiel.zustand.ebene;
+  ebene.erkundet[feldIndex(ebene, 2, 1)] = 0;
   assert.equal(weg(spiel, { x: 1, y: 1 }, { x: 3, y: 1 }, { nurErkundet: true }), null);
   assert.equal(weg(spiel, { x: 1, y: 1 }, { x: 3, y: 1 }).length, 2);
 });
@@ -67,9 +67,9 @@ test("wesenMeiden: Wesen sperren den Weg, außer auf dem Ziel", () => {
   assert.equal(weg(spiel, { x: 1, y: 1 }, { x: 4, y: 1 }).length, 3);
 });
 
-test("naechsterSchritt ist das erste Feld des Weges, sonst null", () => {
-  const spiel = miniSpiel(KARTE);
-  assert.deepEqual(naechsterSchritt(spiel, { x: 1, y: 1 }, { x: 3, y: 1 }), { x: 2, y: 1 });
-  assert.equal(naechsterSchritt(spiel, { x: 1, y: 1 }, { x: 1, y: 1 }), null);
-  assert.equal(naechsterSchritt(spiel, { x: 1, y: 1 }, { x: 0, y: 0 }), null);
+test("naechstesWegfeld ist das erste Feld des Weges, sonst null", () => {
+  const spiel = miniSpiel(KARTE_MIT_MITTELWAND);
+  assert.deepEqual(naechstesWegfeld(spiel, { x: 1, y: 1 }, { x: 3, y: 1 }), { x: 2, y: 1 });
+  assert.equal(naechstesWegfeld(spiel, { x: 1, y: 1 }, { x: 1, y: 1 }), null);
+  assert.equal(naechstesWegfeld(spiel, { x: 1, y: 1 }, { x: 0, y: 0 }), null);
 });
