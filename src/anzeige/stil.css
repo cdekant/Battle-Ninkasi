@@ -1,0 +1,104 @@
+/* Oberfläche: Karte links, Seitenleiste rechts (etwa 400 px), Log unten (5 Zeilen, aufklappbar).
+   Farben vorläufig: Biertöne, Kupfer, Stein, dazu Signalfarben. */
+
+:root {
+  --grund: #0d0b09;
+  --flaeche: #1a1510;
+  --linie: #3a2f24;
+  --text: #e8dcc6;
+  --leise: #8c7a63;
+  --kupfer: #c87533;
+  --bier: #e0a83a;
+  --lp: #c0392b;
+  --mp: #3a7bd5;
+  --pegel: #e0a83a;
+  --gut: #8fbf4a;
+  --schlimm: #e5533d;
+  --log-zeile: 1.35em;
+  font-family: "Segoe UI", "DejaVu Sans", system-ui, sans-serif;
+  font-size: 15px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--grund);
+  color: var(--text);
+  overflow: hidden;
+}
+
+#spiel {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  grid-template-rows: 1fr auto;
+  height: 100vh;
+}
+
+#karte {
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+  overflow: hidden;
+  background: #000;
+  min-height: 0;
+}
+
+#karte-canvas { display: block; position: absolute; inset: 0; }
+
+#seitenleiste {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  background: var(--flaeche);
+  border-left: 1px solid var(--linie);
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+#seitenleiste h1 { margin: 0 0 12px; font-size: 1.5em; color: var(--bier); letter-spacing: 0.04em; }
+#seitenleiste h2 { margin: 18px 0 6px; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--leise); }
+#seitenleiste ul { list-style: none; margin: 0; padding: 0; }
+#seitenleiste li { margin: 2px 0; }
+
+.wert { margin: 6px 0; }
+.wert-kopf { display: flex; justify-content: space-between; font-size: 0.9em; }
+.balken { position: relative; height: 10px; background: #000; border: 1px solid var(--linie); margin-top: 2px; }
+.fuellung { height: 100%; }
+.lp .fuellung { background: var(--lp); }
+.mp .fuellung { background: var(--mp); }
+.pegel .balken { height: 18px; border-color: var(--kupfer); }
+.pegel .fuellung { background: linear-gradient(90deg, #8a5a1c, var(--pegel)); }
+.schwelle { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--text); opacity: 0.7; }
+.wert.klein .balken { height: 6px; }
+
+.fuss { margin-top: 24px; font-size: 0.8em; color: var(--leise); line-height: 1.5; }
+.tasten { margin-top: 8px; }
+.leise { color: var(--leise); }
+
+#log {
+  grid-column: 1;
+  grid-row: 2;
+  background: var(--flaeche);
+  border-top: 1px solid var(--linie);
+  padding: 6px 12px;
+  height: calc(5 * var(--log-zeile) + 12px);
+  line-height: var(--log-zeile);
+  overflow: hidden;
+}
+#log.offen { height: 40vh; overflow-y: auto; }
+#log .gut { color: var(--gut); }
+#log .schlimm { color: var(--schlimm); }
+
+#fehler {
+  position: fixed;
+  inset: 40px;
+  margin: 0;
+  padding: 20px;
+  background: #2a0d0a;
+  border: 2px solid var(--schlimm);
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow: auto;
+  z-index: 10;
+}
