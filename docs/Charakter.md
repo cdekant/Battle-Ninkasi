@@ -43,6 +43,7 @@ Stand: 2026-11-17
 + Vorschlag, noch nicht bestätigt: Boni innerhalb eines Skill-Sets addieren, zwischen Quellen multiplizieren
 + Vorschlag, noch nicht bestätigt: Querlernen auf verwandte Skills (Vorbild: Dungeon Crawl Stone Soup)
 + Vorschlag, noch nicht bestätigt: fortgeschrittene Skills über Fundstücke freischalten (Braubücher, Rezepturen)
++ Vorläufige Idee: Nachtsicht (Sehen bei weniger Licht) und Fernsicht (größere Sichtweite) als Skills; Licht und Wahrnehmung siehe [Architektur.md](Architektur.md)
 
 ## Erfahrungspunkte (EP)
 

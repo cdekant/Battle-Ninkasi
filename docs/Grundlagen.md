@@ -78,7 +78,7 @@ Stand: 2026-11-17
 + Pixelart in vier Sätzen (16, 32, 48, 64 px), zuerst der größte, die kleineren von Hand generalisiert; Einzelheiten in [Architektur.md](Architektur.md)
 + Vorläufig festgelegt, Bestätigung nach der Stilprobe: Draufsicht, Figuren und Wände leicht von vorn
 + Vorläufig festgelegt, Bestätigung nach der Stilprobe: Licht von links oben, Figuren mit dunklem Rand, Umgebung gedämpft
-+ Vorläufig festgelegt, Bestätigung nach der Stilprobe: zunächst keine Animation der Tiles
++ Vorläufig festgelegt, Bestätigung nach der Stilprobe: zunächst keine Animation der Tiles; ausgenommen ist das Flackern von Licht, siehe Licht in [Architektur.md](Architektur.md)
 + Erstliste: Boden, Wand, Tür, Treppe, Ninkasi, zwei Gegner, Trank, Truhe, Falle
 + Arbeitsweise, Pixeldaten, Vorschau und Ablauf: [Tileset.md](Tileset.md)
 
@@ -106,3 +106,8 @@ Stand: 2026-11-17
 + Genaue Farbpalette, wird im ersten Schritt des Tilesets festgelegt, siehe [Tileset.md](Tileset.md)
 + Endgültige Bestätigung der Tileset-Regeln nach der Stilprobe
 + Bestenliste der eigenen Läufe ja oder nein
++ Licht und Wahrnehmung (vorläufige Ideen in [Architektur.md](Architektur.md)): wie Ninkasi ohne Nachtsicht im Dunkeln sieht (gar nicht, geringe Reichweite, abhängig vom Pegel)
++ Ob Mikroorganismen durch Wände spüren oder nur entlang von Wegen, wie ein Geruch
++ Ob Kontrolleure Taschenlampen tragen (bewegliche Lichtquelle, später vielleicht als Lichtkegel in Blickrichtung)
++ Wertebereich und Stufenzahl der Helligkeit in der Logik, Reichweiten und Stärken der Lichtquellen
++ Ob getragenes Licht für Ninkasi vorgesehen ist (Laterne, Fackel) und wie es ihre Sichtbarkeit für Gegner beeinflusst

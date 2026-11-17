@@ -165,6 +165,31 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Die Sichtweite von Ninkasi ergibt sich aus Skills und Hindernissen
 + Ist sie größer als der Ausschnitt, wird nicht herausgezoomt; stattdessen zeigen Markierungen am Kartenrand Gegner außerhalb des Ausschnitts, die Gegnerliste der Seitenleiste nennt alle sichtbaren Gegner
 
+## Licht
+
+Vorläufige Ideen, noch nicht umgesetzt. Licht ist hauptsächlich Spielmechanik, Stimmung ein Nebeneffekt.
+
++ Die Logik rechnet je Feld eine Helligkeit als ganze Zahl (z. B. 0 bis 100); sie ist Teil des Zustands oder wird daraus deterministisch berechnet
++ Lichtquellen sind eine Komponente mit Reichweite und Stärke, die Farbe ist nur für die Anzeige; Beispiele: Fackel an der Wand mit Reichweite 10, glühender Kessel, getragene Laterne
++ Ausbreitung je Quelle über dasselbe Verfahren wie das Sichtfeld (rot.js PreciseShadowcasting), Stärke nimmt mit der Entfernung ganzzahlig ab; mehrere Quellen addieren sich bis zu einer Obergrenze
++ Feste Quellen werden nur neu berechnet, wenn sich etwas ändert (Tür, gelöschte Fackel, bewegte Quelle)
++ Anzeige: Eine Lichtkarte mit einem Pixel je Feld wird geglättet auf Kartengröße skaliert und per Mischmodus "multiply" über die Karte gelegt; Schwarz ist dunkel, Weiß unverändert, Farben tönen (Fackel warm, Psi cyan); so entstehen weiche Übergänge statt Stufen
++ Leuchtende Pixel (Augen, Leuchtfarben, Glut) zeichnet der Renderer nach der Abdunklung erneut, sie bleiben im Dunkeln sichtbar; dafür trägt ein Tile eine Maske seiner leuchtenden Pixel
++ Flackern ist reine Anzeige über den kosmetischen Zufall, die Logik rechnet mit festen Werten
++ Dieselbe Abdunklung kann auch erkundete, aber gerade nicht sichtbare Felder darstellen
+
+## Wahrnehmung
+
+Vorläufige Ideen, noch nicht umgesetzt.
+
++ Wahrnehmung ist eine Komponente mit kombinierbaren Arten
++ Sehen braucht Licht: Ein Wesen sieht ein Ziel nur in Sichtlinie, innerhalb seiner Sichtweite und wenn das Feld des Ziels hell genug ist; z. B. Lebensmittelkontrolleure
++ Spüren braucht kein Licht: Wahrnehmung im Umkreis, unabhängig von der Helligkeit; z. B. Mikroorganismen
++ Später weitere Arten, z. B. Hören (Lärm beim Kampf)
++ Nachtsicht und Fernsicht werden Skills: Nachtsicht senkt die nötige Helligkeit zum Sehen, Fernsicht erhöht die Sichtweite; siehe [Charakter.md](Charakter.md)
++ Wer Licht trägt, sieht mehr und wird selbst gesehen
++ Die bisherige Vereinfachung des Prototyps (ein Gegner sieht Ninkasi, wenn sie ihn sieht) wird dadurch ersetzt
+
 ## Eingabe
 
 + Vorgabe für die Bewegung: Ziffernblock, acht Richtungen, 5 für Warten

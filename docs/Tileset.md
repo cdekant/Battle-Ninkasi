@@ -11,7 +11,8 @@ Vorläufig festgelegt, wird nach der Stilprobe bestätigt oder geändert:
 + Draufsicht, Figuren und Wände leicht von vorn
 + Licht von links oben
 + Figuren mit dunklem Rand, Umgebung gedämpft, damit Figuren und Gegenstände sich abheben
-+ Zunächst keine Animation
++ Zunächst keine Animation; Flackern von Licht ist ausgenommen, es entsteht in der Lichtkarte, nicht im Tile
++ Dynamisches Licht kommt zur eingezeichneten Beleuchtung hinzu (Lichtkarte über der Karte, siehe Licht in [Architektur.md](Architektur.md)); Tiles mit leuchtenden Pixeln (Augen, Glut) bekommen dafür später eine Maske
 + Farbwelt: Biertöne, Edelstahl, Kupfer, Stein, dazu Signalfarben (siehe Design in [Grundlagen.md](Grundlagen.md))
 
 ## Werkzeuge
