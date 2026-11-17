@@ -1,17 +1,17 @@
 // Tileset: Palette und Tiles je Satz (Kantenlänge in Pixeln).
-// Schlüssel der Tiles folgen daten/zeichen.js; Wände haben zwei Ansichten (Oberseite, Vorderseite).
+// Schlüssel der Tiles folgen daten/zeichen.js.
 import palette from "./palette.js";
 import boden64 from "./tiles/64/boden.js";
-import wandOben64 from "./tiles/64/wand-oben.js";
-import wandVorn64 from "./tiles/64/wand-vorn.js";
+import wand64 from "./tiles/64/wand.js";
+import ninkasi64 from "./tiles/64/ninkasi.js";
 
 export default {
   palette,
   saetze: {
     64: {
       boden: boden64,
-      wandOben: wandOben64,
-      wandVorn: wandVorn64,
+      wand: wand64,
+      ninkasi: ninkasi64,
     },
   },
 };

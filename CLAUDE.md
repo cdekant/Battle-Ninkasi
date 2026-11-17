@@ -16,7 +16,7 @@
 + Charakter, Eigenschaften, Skills und EP in [docs/Charakter.md](docs/Charakter.md)
 + Technische Architektur (Datenfluss, Befehle, Zeitmodell, Wirkungsarten, Effekte, Wiederholbarkeit, Anzeige, Licht, Wahrnehmung) in [docs/Architektur.md](docs/Architektur.md)
 + Sprachdateien und Textkorpus in [docs/Texte.md](docs/Texte.md)
-+ Tileset: Stil, Pixeldaten, Vorschau und Ablauf in [docs/Tileset.md](docs/Tileset.md)
++ Tileset: Artstyle-Fibel, Pixeldaten, Vorschau und Ablauf in [docs/Tileset.md](docs/Tileset.md); neue Tiles folgen der Fibel
 + Weitere Dokumentation liegt in `docs/`.
 + CLAUDE.md verweist direkt auf jedes Dokument in `docs/`, nicht nur über Verweise in anderen Dokumenten.
 

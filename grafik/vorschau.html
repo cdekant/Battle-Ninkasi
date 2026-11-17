@@ -68,9 +68,9 @@
 
 <main>
   <header>
-    <span class="etikett">Battle Ninkasi · Tileset · Schritt 1</span>
+    <span class="etikett">Battle Ninkasi · Tileset · Schritt 2</span>
     <h1>Tilewerkstatt</h1>
-    <p>Palette und erste Probetiles in 64 px, gelesen aus denselben Datendateien wie das Spiel. Entwurf zum Abstimmen: Kommentare direkt an Farben, Tiles oder Szene hängen.</p>
+    <p>Palette und Stilprobe in 64 px, gelesen aus denselben Datendateien wie das Spiel. Entwurf zum Abstimmen: Kommentare direkt an Farben, Tiles oder Szene hängen.</p>
     <p id="fehler" hidden></p>
   </header>
 
@@ -88,7 +88,7 @@
 
   <section aria-labelledby="titel-szene">
     <h2 id="titel-szene">Testszene</h2>
-    <p>Ein kleiner Raum. Wände mit begehbarem Feld darunter zeigen die Vorderseite. Ninkasi, ein Essigbakterium und ein Bier sind noch Zeichen, um den Kontrast zu prüfen.</p>
+    <p>Ein kleiner Raum mit Ninkasi. Essigbakterium und Bier sind noch Zeichen, um den Kontrast zu prüfen.</p>
     <div class="werkzeugleiste" id="zoomwahl" role="group" aria-label="Zoomstufe"></div>
     <div class="buehne"><canvas id="szene"></canvas></div>
     <p class="hinweis">16, 32 und 48 px sind hier nur verkleinert, nicht von Hand generalisiert; sie zeigen, warum eigene kleine Sätze nötig sind.</p>
@@ -189,14 +189,12 @@
     "e": farbeNachZeichen.get("Q"),
     "!": farbeNachZeichen.get("e"),
   };
+  // Figuren mit eigenem Tile; die übrigen bleiben Zeichen
+  const figurTiles = { "@": "ninkasi" };
   const szene = document.getElementById("szene");
   const zoomStufen = [16, 32, 48, 64, 128];
   let zoom = 64;
 
-  function istBegehbar(spalte, reihe) {
-    const zeile = karte[reihe];
-    return zeile !== undefined && zeile[spalte] !== undefined && zeile[spalte] !== "#";
-  }
 
   function szeneZeichnen() {
     szene.width = karte[0].length * zoom;
@@ -205,8 +203,13 @@
     kontext.imageSmoothingEnabled = false;
     karte.forEach((zeile, reihe) => {
       [...zeile].forEach((zeichen, spalte) => {
-        const tileName = zeichen === "#" ? (istBegehbar(spalte, reihe + 1) ? "wandVorn" : "wandOben") : "boden";
+        const tileName = zeichen === "#" ? "wand" : "boden";
         kontext.drawImage(bilder[tileName], spalte * zoom, reihe * zoom, zoom, zoom);
+        const figurTile = bilder[figurTiles[zeichen]];
+        if (figurTile) {
+          kontext.drawImage(figurTile, spalte * zoom, reihe * zoom, zoom, zoom);
+          return;
+        }
         const figurFarbe = zeichenFiguren[zeichen];
         if (figurFarbe) {
           kontext.font = `600 ${Math.round(zoom * 0.72)}px ${getComputedStyle(document.body).getPropertyValue("--schrift-daten")}`;

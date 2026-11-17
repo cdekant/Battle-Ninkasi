@@ -4,16 +4,65 @@ Stand: 2026-11-17
 
 Plan für das Zeichnen der Tiles; wird nach Bedarf umgebaut. Regeln zur Anzeige (Sätze, Zoom, Ersatz fehlender Tiles) stehen in [Architektur.md](Architektur.md), Grundsätze in [Grundlagen.md](Grundlagen.md).
 
-## Stil
+## Artstyle-Fibel
 
-Vorläufig festgelegt, wird nach der Stilprobe bestätigt oder geändert:
+Verbindliche Regeln für jedes Tile, damit das Tileset wie aus einem Guss wirkt; jedes neue Tile wird gegen sie geprüft. Vorläufig festgelegt, wird nach der Stilprobe bestätigt oder geändert. Referenztiles: `boden`, `wand`, `ninkasi`.
 
-+ Draufsicht, Figuren und Wände leicht von vorn
-+ Licht von links oben
+### Grundsätze
+
++ Draufsicht für den Boden, Figuren und Wände frontal bis leicht von vorn
++ Licht von links oben: Höhen oben links in der hellsten, Schatten unten rechts in der dunkelsten Stufe der eigenen Rampe; kein Licht von rechts, keine Glanzpunkte unten
 + Figuren mit dunklem Rand, Umgebung gedämpft, damit Figuren und Gegenstände sich abheben
 + Zunächst keine Animation; Flackern von Licht ist ausgenommen, es entsteht in der Lichtkarte, nicht im Tile
 + Dynamisches Licht kommt zur eingezeichneten Beleuchtung hinzu (Lichtkarte über der Karte, siehe Licht in [Architektur.md](Architektur.md)); Tiles mit leuchtenden Pixeln (Augen, Glut) bekommen dafür später eine Maske
 + Farbwelt: Biertöne, Edelstahl, Kupfer, Stein, dazu Signalfarben (siehe Design in [Grundlagen.md](Grundlagen.md))
+
+### Raster und Maße
+
++ Figuren stehen auf einer gemeinsamen Fußlinie etwa 4 px über dem unteren Rand und sind waagerecht mittig
++ Ninkasi ist das Maß: etwa 50 px hoch in 64 px; andere Wesen werden relativ zu ihr festgelegt (Bakterium klein, Kontrolleur gleich groß, Bosse dürfen das Tile sprengen)
++ Gegenstände bleiben im inneren Bereich von etwa 32 px
+
+### Umriss
+
++ Figuren und Gegenstände tragen einen geschlossenen Rand in Schwarz `0`, einen Pixel breit, außen um die Form
++ Gelände trägt keinen Rand
+
+### Kontrast nach Ebenen
+
++ Boden dunkel und ruhig (Stein `1` bis `2`, wenig Körnung)
++ Wand hell (Stein `3` bis `5`), klar vom Boden getrennt
++ Figuren und Gegenstände satt und kräftig
++ Signal- und Leuchtfarben nur als Akzente
++ Ziel: auch in 16 px sofort lesbar, wo man gehen kann, wo nicht und was sich bewegt
+
+### Farbbudget
+
++ Je Figur höchstens etwa drei Rampen, je Geländetile höchstens zwei, Schwarz nicht mitgezählt
++ Jede Farbe kommt in einem Tile in mindestens zwei Pixeln vor, damit kein Rauschen entsteht
+
+### Detaildichte
+
++ In 64 px Formen statt Linien; keine Linien schmaler als 2 px außer Umriss, Fugen und angedeuteten Körperlinien
++ Gesichter knapp: Augen als zwei Pixel mit Lichtpunkt, Brauen, Mund als kurzer Strich
++ Für 48, 32 und 16 px gilt je eine eigene, gröbere Regel, festgelegt beim Generalisieren
+
+### Prüfungen
+
++ Silhouettentest: Jede Figur ist als reine Schwarzfläche erkennbar
++ Gelände ist nahtlos kachelbar, geprüft in der 3x3-Ansicht, ohne auffällige Wiederholung
++ Später in der Tilewerkstatt: Prüfansichten für Silhouette, Graustufen und Verkleinerung; automatisch prüfbar sind erlaubte Zeichen, geschlossener Umriss und Zahl der Rampen je Tile
+
+### Formensprache
+
++ Ninkasi und Verbündete: warm, rund, Biertöne und Haut
++ Mikroorganismen: grell und organisch, unregelmäßige Formen, Signalfarben
++ Kontrolleure und Abstinenzler: grau, kühl und eckig, Stahl und Stein
++ So zeigt schon die Form, wer Freund und wer Feind ist
+
+### Nacktheit
+
++ Ninkasi startet nackt ohne Ausrüstung; der Körper wird mit Umriss und Schattierung gezeichnet, Brust mit angedeuteten Brustwarzen, Scham als angedeutetes Y mit Haar, ohne weitere Einzelheiten
 
 ## Werkzeuge
 
@@ -33,7 +82,8 @@ Vorläufig festgelegt, wird nach der Stilprobe bestätigt oder geändert:
 + Signalfarben mit je drei Stufen: `J` `K` `L` Blut, `M` `N` `O` Säure, `P` `Q` `R` Gift, `S` `T` `U` Lauge, `V` `W` `X` Psi, `Y` `Z` `z` Magie; Säure, Gift, Psi und Magie enden in einer Leuchtfarbe, dazu `9` Leuchtrot einzeln
 + Innerhalb einer Rampe von dunkel nach hell; `.` ist durchsichtig
 + Signalfarben tragen eine Bedeutung im Spiel und stehen nicht großflächig für neutrales Material (Hopfen hat deshalb eine eigene Rampe); kleine Akzente wie rote Augen sind erlaubt
-+ Die Namen der Tiles folgen den Schlüsseln in `daten/zeichen.js` (`boden`, `ninkasi`, `essigbakterium`, `bier` usw.); Wände haben zwei Ansichten, `wandOben` und `wandVorn`
++ Die Namen der Tiles folgen den Schlüsseln in `daten/zeichen.js` (`boden`, `wand`, `ninkasi`, `essigbakterium`, `bier` usw.)
++ Ninkasi ist frontal nach dem Burney-Relief gezeichnet (gemeinfreies altbabylonisches Relief, nur als Vorlage benutzt), nackt, da sie ohne Ausrüstung startet; Ausrüstung kommt später als eigene Tiles oder Varianten
 + Erste Entwürfe darf Claude mit einem Hilfsskript vorzeichnen (Fugen, Rauschen) und dann von Hand nacharbeiten; maßgeblich ist allein die Datendatei, das Hilfsskript kommt nicht ins Repo
 + Der Renderer baut die Bilder beim Start aus den Pixeldaten (Offscreen-Canvas); kein Build-Schritt, keine PNG-Dateien im Repo
 + Vorteile: Änderungen sind im Git-Diff lesbar, Claude kann jedes Pixel gezielt ändern, Palettenwechsel färbt alle Tiles zugleich um
@@ -41,9 +91,8 @@ Vorläufig festgelegt, wird nach der Stilprobe bestätigt oder geändert:
 
 ## Wände von vorn
 
-+ Wände leicht von vorn brauchen zwei Ansichten: Oberseite und Vorderseite
-+ Der Renderer wählt die Vorderseite, wenn unter der Wand ein begehbares Feld liegt, sonst die Oberseite
-+ Das ist reine Anzeige und berührt die Logik nicht; weitere Nachbarschaftsregeln (Ecken, Übergänge) erst bei Bedarf
++ Vorerst ein einziges Wand-Tile: helle Quader mit Mauerkrone, deutlich heller als der dunkle Boden
++ Später möglich: zwei Ansichten (Oberseite, Vorderseite), der Renderer wählt die Vorderseite, wenn unter der Wand ein begehbares Feld liegt; reine Anzeige, weitere Nachbarschaftsregeln (Ecken, Übergänge) erst bei Bedarf
 
 ## Vorschau und Abstimmung
 
@@ -55,7 +104,7 @@ Vorläufig festgelegt, wird nach der Stilprobe bestätigt oder geändert:
 ## Ablauf
 
 1. Palette: Farbfelder und eine Probe aus Boden und Wand, abstimmen, danach "Genaue Farbpalette" in [Grundlagen.md](Grundlagen.md) schließen
-2. Stilprobe in 64 px: Boden, Wand (Oberseite und Vorderseite), Ninkasi, Essigbakterium, Bier; danach Stilregeln bestätigen oder ändern
+2. Stilprobe in 64 px: zuerst Boden, Wand und Ninkasi, danach Essigbakterium und Bier; danach Stilregeln bestätigen oder ändern
 3. Einbau in den Renderer: Tiles aus Pixeldaten, Ersatz fehlender Tiles durch Zeichen
 4. Erstliste in 64 px vervollständigen: Tür, Treppe, zweiter Gegner, Truhe, Falle
 5. Generalisieren von Hand auf 48, 32 und 16 px, kleinster Satz zuletzt
@@ -65,6 +114,6 @@ Vorläufig festgelegt, wird nach der Stilprobe bestätigt oder geändert:
 
 + Tiles und Palette liegen in `grafik/`, getrennt von `daten/`, weil für sie die Grafiklizenz gilt (CC BY-NC-SA 4.0) und nicht die Codelizenz; siehe [LIZENZEN.md](../LIZENZEN.md)
 + `grafik/palette.js`: Palette
-+ `grafik/tileset.js`: Palette und Tiles je Satz (`saetze: { 64: { boden, wandOben, wandVorn } }`), Einstieg für Renderer und Vorschau
-+ `grafik/tiles/<Satz>/<name>.js`: ein Tile je Datei, Dateinamen klein mit Bindestrichen (`wand-vorn.js`)
++ `grafik/tileset.js`: Palette und Tiles je Satz (`saetze: { 64: { boden, wand, ninkasi } }`), Einstieg für Renderer und Vorschau
++ `grafik/tiles/<Satz>/<name>.js`: ein Tile je Datei, Dateinamen klein mit Bindestrichen (z. B. `ninkasi.js`)
 + `grafik/vorschau.html`: Vorschauseite; sie ist Code und steht unter der Codelizenz
