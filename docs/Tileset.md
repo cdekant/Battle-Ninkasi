@@ -6,7 +6,7 @@ Plan für das Zeichnen der Tiles; wird nach Bedarf umgebaut. Regeln zur Anzeige 
 
 ## Artstyle-Fibel
 
-Verbindliche Regeln für jedes Tile, damit das Tileset wie aus einem Guss wirkt; jedes neue Tile wird gegen sie geprüft. Vorläufig festgelegt, wird nach der Stilprobe bestätigt oder geändert. Referenztiles: `boden`, `wand`, `ninkasi`.
+Verbindliche Regeln für jedes Tile, damit das Tileset wie aus einem Guss wirkt; jedes neue Tile wird gegen sie geprüft. Vorläufig festgelegt, wird nach der Stilprobe bestätigt oder geändert. Referenztiles: `boden`, `wand`, `ninkasi`, `essigbakterium`, `bier`.
 
 ### Grundsätze
 
@@ -56,7 +56,7 @@ Verbindliche Regeln für jedes Tile, damit das Tileset wie aus einem Guss wirkt;
 ### Formensprache
 
 + Ninkasi und Verbündete: warm, rund, Biertöne und Haut
-+ Mikroorganismen: grell und organisch, unregelmäßige Formen, Signalfarben
++ Mikroorganismen: organisch, Form und Farbe nach mikroskopischem Vorbild (z. B. Essigbakterium als pralles, blassgrünes, körniges Stäbchen), die Bedrohung zeigen Signalakzente wie leuchtend rote Augen
 + Kontrolleure und Abstinenzler: grau, kühl und eckig, Stahl und Stein
 + So zeigt schon die Form, wer Freund und wer Feind ist
 
@@ -114,6 +114,6 @@ Verbindliche Regeln für jedes Tile, damit das Tileset wie aus einem Guss wirkt;
 
 + Tiles und Palette liegen in `grafik/`, getrennt von `daten/`, weil für sie die Grafiklizenz gilt (CC BY-NC-SA 4.0) und nicht die Codelizenz; siehe [LIZENZEN.md](../LIZENZEN.md)
 + `grafik/palette.js`: Palette
-+ `grafik/tileset.js`: Palette und Tiles je Satz (`saetze: { 64: { boden, wand, ninkasi } }`), Einstieg für Renderer und Vorschau
++ `grafik/tileset.js`: Palette und Tiles je Satz (`saetze: { 64: { boden, wand, ninkasi, essigbakterium, bier } }`), Einstieg für Renderer und Vorschau
 + `grafik/tiles/<Satz>/<name>.js`: ein Tile je Datei, Dateinamen klein mit Bindestrichen (z. B. `ninkasi.js`)
 + `grafik/vorschau.html`: Vorschauseite; sie ist Code und steht unter der Codelizenz

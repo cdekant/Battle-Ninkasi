@@ -88,7 +88,7 @@
 
   <section aria-labelledby="titel-szene">
     <h2 id="titel-szene">Testszene</h2>
-    <p>Ein kleiner Raum mit Ninkasi. Essigbakterium und Bier sind noch Zeichen, um den Kontrast zu prüfen.</p>
+    <p>Ein kleiner Raum mit Ninkasi, einem Essigbakterium und einem Bier.</p>
     <div class="werkzeugleiste" id="zoomwahl" role="group" aria-label="Zoomstufe"></div>
     <div class="buehne"><canvas id="szene"></canvas></div>
     <p class="hinweis">16, 32 und 48 px sind hier nur verkleinert, nicht von Hand generalisiert; sie zeigen, warum eigene kleine Sätze nötig sind.</p>
@@ -190,7 +190,7 @@
     "!": farbeNachZeichen.get("e"),
   };
   // Figuren mit eigenem Tile; die übrigen bleiben Zeichen
-  const figurTiles = { "@": "ninkasi" };
+  const figurTiles = { "@": "ninkasi", "e": "essigbakterium", "!": "bier" };
   const szene = document.getElementById("szene");
   const zoomStufen = [16, 32, 48, 64, 128];
   let zoom = 64;
