@@ -3,3 +3,4 @@
 import "./bewegung.js";
 import "./inventar.js";
 import "./pegel.js";
+import "./gefahr.js";

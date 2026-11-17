@@ -12,6 +12,8 @@ import { alle, spieler } from "../src/kern/zustand.js";
 import { passierbar } from "../src/welt/karte.js";
 import { erstesGetraenk } from "../src/systeme/inventar.js";
 import { hoeren } from "../src/kern/ereignisse.js";
+import { reiseBeginnen, naechsterSchritt } from "../src/eingabe/reise.js";
+import einstellungen from "../src/eingabe/einstellungen.js";
 
 const [laeufe = 20, maxBefehle = 3000, erster = 1] = process.argv.slice(2).map(Number);
 const daten = datenLaden(rohdaten, { texte, nomenPruefen: erstelleGrammatik(grammatikDe).pruefen });
@@ -44,7 +46,25 @@ function zufallsbefehl(rng, spiel) {
   return { art: "bewegen", dx: ganzzahl(rng, -1, 1), dy: ganzzahl(rng, -1, 1) };
 }
 
+// Reise zu einem zufälligen erkundeten Feld, wie per Mausklick; gibt den Haltegrund zurück
+function reisen(rng, spiel) {
+  const e = spiel.zustand.ebene;
+  const erkundet = [];
+  e.erkundet.forEach((v, i) => { if (v && passierbar(spiel, i % e.breite, Math.floor(i / e.breite))) erkundet.push(i); });
+  const i = erkundet[ganzzahl(rng, 0, erkundet.length - 1)];
+  const start = reiseBeginnen(spiel, { x: i % e.breite, y: Math.floor(i / e.breite) }, einstellungen);
+  if (start.grund) return start.grund;
+  for (let n = 0; n < 500; n++) {
+    const s = naechsterSchritt(spiel, start.reise, einstellungen);
+    if (s.halt) return s.halt;
+    if (!befehl(spiel, s.befehl).ok) return "abgelehnt";
+    invarianten(spiel);
+  }
+  return "zu_lang";
+}
+
 let tode = 0, fehler = 0;
+const halte = {};
 console.log("Startwert  Befehle  Zeit     LP   PP  Getötet  Biere  Ergebnis");
 for (let s = erster; s < erster + laeufe; s++) {
   try {
@@ -55,7 +75,12 @@ for (let s = erster; s < erster + laeufe; s++) {
       if (m.art === "getrunken") biere++;
     });
     const rng = erzeugen(s);
-    for (let i = 0; i < maxBefehle && !spiel.zustand.vorbei; i++) {
+    while (spiel.befehle.length < maxBefehle && !spiel.zustand.vorbei) {
+      if (ganzzahl(rng, 1, 100) <= 3) {
+        const grund = reisen(rng, spiel);
+        halte[grund] = (halte[grund] || 0) + 1;
+        continue;
+      }
       befehl(spiel, zufallsbefehl(rng, spiel));
       invarianten(spiel);
     }
@@ -74,5 +99,6 @@ for (let s = erster; s < erster + laeufe; s++) {
     console.log(`${String(s).padStart(9)}  FEHLER: ${e.stack}`);
   }
 }
-console.log(`\n${laeufe} Läufe, ${tode} tot, ${fehler} Fehler`);
+console.log(`\nReisen nach Haltegrund: ${Object.entries(halte).map(([g, n]) => `${g} ${n}`).join(", ")}`);
+console.log(`${laeufe} Läufe, ${tode} tot, ${fehler} Fehler`);
 process.exitCode = fehler ? 1 : 0;

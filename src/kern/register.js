@@ -10,6 +10,7 @@ const ARTEN = [
   "welttick",       // Handler der Weltuhr: (spiel) => void
   "zeitereignisse", // Handler für Zeitereignisse: (spiel, daten) => void
   "haken",          // interne Haken, Listen je Name: (spiel, kontext) => void
+  "gefahren",       // Gefahrenprüfungen: (vorher, nachher) => true bei neuer Gefahr; Lage aus systeme/gefahr.js
 ];
 
 const register = {};
