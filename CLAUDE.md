@@ -18,4 +18,4 @@
 
 + Öffentliches Repo: https://github.com/cdekant/Battle-Ninkasi, grundsätzlich auf Hauptbranch `main` arbeiten
 + Zeilenenden im Repo durchgängig LF, festgelegt in `.gitattributes`.
-+ `Artwork/` ist vorerst per `.gitignore` vom Repo ausgenommen.
++ `Artwork/` enthält Konzeptbilder als JPG (Qualität 85), in Unterordnern nach Thema (`kampf/`, `titel/`, `tempel/`, `brauerei/`); Dateinamen klein, mit Bindestrichen, ohne Umlaute und Leerzeichen, Varianten nummeriert (`-01`).
