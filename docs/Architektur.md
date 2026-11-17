@@ -242,7 +242,7 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + `src/anzeige/`: Renderer, Kamera, Oberfläche, Log, Effekte, Textzugriff und Grammatik
 + `src/eingabe/`: Belegung, Übersetzung in Befehle, Maus und Klickregeln, Reise, Vorgaben der Einstellungen
 + `daten/`: Inhalte als JS-Datendateien, gesammelt in `daten/index.js`; `daten/zeichen.js` ist das Tileset aus Zeichen
-+ `grafik/`: Palette und Tiles als Pixeldaten, unter der Grafiklizenz, siehe [Tileset.md](Tileset.md) (noch nicht angelegt)
++ `grafik/`: Palette und Tiles als Pixeldaten, unter der Grafiklizenz, dazu die Vorschauseite `vorschau.html`; siehe [Tileset.md](Tileset.md)
 + `sprache/de/`, `sprache/en/`: Texte (`texte.js`) und Grammatikregeln (`grammatik.js`) als Daten
 + `lib/`: Bibliotheken (rot.js) samt ihrer Lizenzdateien
 + `werkzeuge/`: Arena, Statistiken, Bots

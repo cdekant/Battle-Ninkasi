@@ -1,0 +1,249 @@
+<title>Ninkasi Tilewerkstatt</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+  /* Werkbank im Keller: dunkle Fläche wie das Spiel, Abschnitte untereinander, Pixel immer ungeglättet */
+  :root {
+    --grund: #0f0b0c;
+    --flaeche: #1a1415;
+    --linie: #3a2f2c;
+    --text: #e8dcc8;
+    --leise: #a8988a;
+    --akzent: #f0b84a;
+    --warnung: #c0262a;
+    --schrift-titel: "Marcellus", "Palatino Linotype", Georgia, serif;
+    --schrift-text: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --schrift-daten: "IBM Plex Mono", Consolas, ui-monospace, monospace;
+    color-scheme: dark;
+  }
+  html { background: var(--grund); }
+  body {
+    background: var(--grund);
+    color: var(--text);
+    font: 15px/1.55 var(--schrift-text);
+    margin: 0;
+    padding-block: 32px 64px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  main { max-width: 1100px; margin: 0 auto; display: grid; gap: 48px; }
+  header { display: grid; gap: 6px; }
+  h1, h2 { font-family: var(--schrift-titel); font-weight: 400; text-wrap: balance; margin: 0; }
+  h1 { font-size: 2.2rem; color: var(--akzent); letter-spacing: 0.01em; }
+  h2 { font-size: 1.5rem; }
+  section { display: grid; gap: 16px; min-width: 0; }
+  p { margin: 0; max-width: 65ch; color: var(--leise); }
+  .etikett { font: 600 0.72rem/1 var(--schrift-daten); letter-spacing: 0.08em; text-transform: uppercase; color: var(--leise); }
+  canvas { image-rendering: pixelated; image-rendering: crisp-edges; display: block; max-width: none; }
+
+  .rampen { display: grid; gap: 10px; }
+  .rampe { display: grid; grid-template-columns: 6.5rem 1fr; gap: 12px; align-items: center; }
+  .felder { display: flex; flex-wrap: wrap; gap: 6px; }
+  .feld { width: 64px; display: grid; gap: 4px; }
+  .feld .farbe { height: 40px; border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06); }
+  .feld .schluessel { font: 600 0.95rem/1 var(--schrift-daten); }
+  .feld .hex { font: 0.68rem/1 var(--schrift-daten); color: var(--leise); font-variant-numeric: tabular-nums; }
+
+  .tiles { display: flex; flex-wrap: wrap; gap: 32px; }
+  .tile { display: grid; gap: 8px; align-content: start; }
+  .tile .ansichten { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+  .tile .name { font: 600 0.95rem/1.2 var(--schrift-daten); }
+
+  .werkzeugleiste { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .werkzeugleiste button {
+    font: 600 0.85rem/1 var(--schrift-daten);
+    background: var(--flaeche); color: var(--text);
+    border: 1px solid var(--linie); border-radius: 4px; padding: 8px 12px; cursor: pointer;
+  }
+  .werkzeugleiste button[aria-pressed="true"] { border-color: var(--akzent); color: var(--akzent); }
+  .werkzeugleiste button:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
+  .buehne { overflow-x: auto; background: #000; border: 1px solid var(--linie); border-radius: 4px; padding: 12px; }
+  .hinweis { font-size: 0.85rem; }
+  #fehler { color: var(--warnung); font-family: var(--schrift-daten); font-size: 0.85rem; }
+  @media (max-width: 520px) { .rampe { grid-template-columns: 1fr; gap: 6px; } }
+</style>
+
+<main>
+  <header>
+    <span class="etikett">Battle Ninkasi · Tileset · Schritt 1</span>
+    <h1>Tilewerkstatt</h1>
+    <p>Palette und erste Probetiles in 64 px, gelesen aus denselben Datendateien wie das Spiel. Entwurf zum Abstimmen: Kommentare direkt an Farben, Tiles oder Szene hängen.</p>
+    <p id="fehler" hidden></p>
+  </header>
+
+  <section aria-labelledby="titel-palette">
+    <h2 id="titel-palette">Palette</h2>
+    <p>Jede Farbe mit ihrem Zeichen, so wie es in den Pixelmatrizen steht. Rampen von dunkel nach hell.</p>
+    <div class="rampen" id="rampen"></div>
+  </section>
+
+  <section aria-labelledby="titel-tiles">
+    <h2 id="titel-tiles">Probetiles</h2>
+    <p>Jedes Tile einfach, doppelt und als 3x3-Kachelung, um Nahtstellen zu prüfen.</p>
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <section aria-labelledby="titel-szene">
+    <h2 id="titel-szene">Testszene</h2>
+    <p>Ein kleiner Raum. Wände mit begehbarem Feld darunter zeigen die Vorderseite. Ninkasi, ein Essigbakterium und ein Bier sind noch Zeichen, um den Kontrast zu prüfen.</p>
+    <div class="werkzeugleiste" id="zoomwahl" role="group" aria-label="Zoomstufe"></div>
+    <div class="buehne"><canvas id="szene"></canvas></div>
+    <p class="hinweis">16, 32 und 48 px sind hier nur verkleinert, nicht von Hand generalisiert; sie zeigen, warum eigene kleine Sätze nötig sind.</p>
+  </section>
+</main>
+
+<script type="module">
+  import tileset from "./tileset.js";
+
+  const palette = tileset.palette;
+  const farbeNachZeichen = new Map(palette.farben.map((farbe) => [farbe.zeichen, farbe.hex]));
+  const fehlermeldungen = [];
+
+  function hexZuRgb(hex) {
+    const zahl = parseInt(hex.slice(1), 16);
+    return [(zahl >> 16) & 255, (zahl >> 8) & 255, zahl & 255];
+  }
+
+  function tileZuCanvas(tileName, tile) {
+    const leinwand = document.createElement("canvas");
+    leinwand.width = tile.groesse;
+    leinwand.height = tile.groesse;
+    const kontext = leinwand.getContext("2d");
+    const bild = kontext.createImageData(tile.groesse, tile.groesse);
+    tile.pixel.forEach((zeile, y) => {
+      if (zeile.length !== tile.groesse) fehlermeldungen.push(`${tileName}: Zeile ${y} hat ${zeile.length} statt ${tile.groesse} Zeichen`);
+      [...zeile].forEach((zeichen, x) => {
+        if (zeichen === palette.durchsichtig) return;
+        const hex = farbeNachZeichen.get(zeichen);
+        if (!hex) fehlermeldungen.push(`${tileName}: unbekanntes Zeichen "${zeichen}" bei ${x},${y}`);
+        const [rot, gruen, blau] = hexZuRgb(hex ?? "#ff00ff");
+        const stelle = (y * tile.groesse + x) * 4;
+        bild.data.set([rot, gruen, blau, 255], stelle);
+      });
+    });
+    if (tile.pixel.length !== tile.groesse) fehlermeldungen.push(`${tileName}: ${tile.pixel.length} statt ${tile.groesse} Zeilen`);
+    kontext.putImageData(bild, 0, 0);
+    return leinwand;
+  }
+
+  function skaliert(quelle, kantenlaenge, wiederholungen = 1) {
+    const leinwand = document.createElement("canvas");
+    leinwand.width = kantenlaenge * wiederholungen;
+    leinwand.height = kantenlaenge * wiederholungen;
+    const kontext = leinwand.getContext("2d");
+    kontext.imageSmoothingEnabled = false;
+    for (let reihe = 0; reihe < wiederholungen; reihe++) {
+      for (let spalte = 0; spalte < wiederholungen; spalte++) {
+        kontext.drawImage(quelle, spalte * kantenlaenge, reihe * kantenlaenge, kantenlaenge, kantenlaenge);
+      }
+    }
+    return leinwand;
+  }
+
+  // Palette
+  const rampenListe = document.getElementById("rampen");
+  const rampenNamen = [...new Set(palette.farben.map((farbe) => farbe.rampe))];
+  for (const rampenName of rampenNamen) {
+    const zeile = document.createElement("div");
+    zeile.className = "rampe";
+    zeile.innerHTML = `<span class="etikett">${rampenName}</span><div class="felder"></div>`;
+    for (const farbe of palette.farben.filter((eintrag) => eintrag.rampe === rampenName)) {
+      const feld = document.createElement("div");
+      feld.className = "feld";
+      feld.innerHTML = `<div class="farbe" style="background:${farbe.hex}"></div><span class="schluessel">${farbe.zeichen}</span><span class="hex">${farbe.hex}</span>`;
+      zeile.querySelector(".felder").append(feld);
+    }
+    rampenListe.append(zeile);
+  }
+
+  // Tiles
+  const satz = tileset.saetze[64];
+  const bilder = Object.fromEntries(Object.entries(satz).map(([name, tile]) => [name, tileZuCanvas(name, tile)]));
+  const tileListe = document.getElementById("tiles");
+  for (const [name, bild] of Object.entries(bilder)) {
+    const karte = document.createElement("figure");
+    karte.className = "tile";
+    karte.style.margin = "0";
+    karte.innerHTML = `<figcaption class="name">${name}</figcaption><div class="ansichten"></div>`;
+    const ansichten = karte.querySelector(".ansichten");
+    ansichten.append(skaliert(bild, 64), skaliert(bild, 128), skaliert(bild, 64, 3));
+    tileListe.append(karte);
+  }
+
+  // Testszene
+  const karte = [
+    "##############",
+    "#............#",
+    "#..####......#",
+    "#..#..#...e..#",
+    "#............#",
+    "#.....@......#",
+    "#..!.........#",
+    "##############",
+  ];
+  const zeichenFiguren = {
+    "@": farbeNachZeichen.get("f"),
+    "e": farbeNachZeichen.get("Q"),
+    "!": farbeNachZeichen.get("e"),
+  };
+  const szene = document.getElementById("szene");
+  const zoomStufen = [16, 32, 48, 64, 128];
+  let zoom = 64;
+
+  function istBegehbar(spalte, reihe) {
+    const zeile = karte[reihe];
+    return zeile !== undefined && zeile[spalte] !== undefined && zeile[spalte] !== "#";
+  }
+
+  function szeneZeichnen() {
+    szene.width = karte[0].length * zoom;
+    szene.height = karte.length * zoom;
+    const kontext = szene.getContext("2d");
+    kontext.imageSmoothingEnabled = false;
+    karte.forEach((zeile, reihe) => {
+      [...zeile].forEach((zeichen, spalte) => {
+        const tileName = zeichen === "#" ? (istBegehbar(spalte, reihe + 1) ? "wandVorn" : "wandOben") : "boden";
+        kontext.drawImage(bilder[tileName], spalte * zoom, reihe * zoom, zoom, zoom);
+        const figurFarbe = zeichenFiguren[zeichen];
+        if (figurFarbe) {
+          kontext.font = `600 ${Math.round(zoom * 0.72)}px ${getComputedStyle(document.body).getPropertyValue("--schrift-daten")}`;
+          kontext.textAlign = "center";
+          kontext.textBaseline = "middle";
+          kontext.lineWidth = Math.max(2, zoom / 12);
+          kontext.strokeStyle = farbeNachZeichen.get("0");
+          const mitteX = spalte * zoom + zoom / 2;
+          const mitteY = reihe * zoom + zoom / 2;
+          kontext.strokeText(zeichen, mitteX, mitteY);
+          kontext.fillStyle = figurFarbe;
+          kontext.fillText(zeichen, mitteX, mitteY);
+        }
+      });
+    });
+  }
+
+  const zoomwahl = document.getElementById("zoomwahl");
+  for (const stufe of zoomStufen) {
+    const knopf = document.createElement("button");
+    knopf.type = "button";
+    knopf.id = `zoom-${stufe}`;
+    knopf.textContent = `${stufe} px`;
+    knopf.setAttribute("aria-pressed", String(stufe === zoom));
+    knopf.addEventListener("click", () => {
+      zoom = stufe;
+      zoomwahl.querySelectorAll("button").forEach((anderer) => anderer.setAttribute("aria-pressed", String(anderer === knopf)));
+      szeneZeichnen();
+    });
+    zoomwahl.append(knopf);
+  }
+  document.fonts.ready.then(szeneZeichnen);
+  szeneZeichnen();
+
+  if (fehlermeldungen.length) {
+    const fehler = document.getElementById("fehler");
+    fehler.textContent = fehlermeldungen.slice(0, 10).join(" · ");
+    fehler.hidden = false;
+  }
+</script>
