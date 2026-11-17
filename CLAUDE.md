@@ -20,5 +20,6 @@
 
 + Öffentliches Repo: https://github.com/cdekant/Battle-Ninkasi, grundsätzlich auf Hauptbranch `main` arbeiten
 + Zeilenenden im Repo durchgängig LF, festgelegt in `.gitattributes`.
++ Versionen nach Schema Ära.Feature.Fix, Nummer in `src/version.js`, jede Version mit annotiertem Git-Tag; Details in [docs/Architektur.md](docs/Architektur.md).
 + `Artwork/` enthält Konzeptbilder als JPG (Qualität 85), in Unterordnern nach Thema (`kampf/`, `titel/`, `tempel/`, `brauerei/`, `ninkasi/`); Dateinamen klein, mit Bindestrichen, ohne Umlaute und Leerzeichen, Varianten nummeriert (`-01`).
 + Lizenzen: Code GPL-3.0-or-later (`LICENSE`), Texte und Grafik CC BY-NC-SA 4.0, Konzeptbilder CC0; Übersicht in `LIZENZEN.md`, Volltexte in `LICENSES/`. Neue Bibliotheken bringen ihre Lizenzdatei mit, neue Bilder und Korpustexte werden in `LIZENZEN.md` eingeordnet.

@@ -113,6 +113,10 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Steigt eine Zahl, beginnen die Zahlen rechts davon wieder bei 0
 + 0.0.0 ist die erste Version des Prototyps
 + Die Version ist Teil jedes Spielstands, siehe Zufall und Wiederholbarkeit
++ Einzige Quelle der Versionsnummer ist das Modul `src/version.js` (`export default "0.0.0"`), von Browser und Node gleich importiert
++ Jede Version bekommt einen annotierten Git-Tag (`v0.3.1`), auch Fehlerbehebungen
++ Ablauf: Nummer in `src/version.js` erhöhen, committen, taggen, pushen
++ Commits zwischen zwei Versionen tragen dieselbe Nummer wie die vorige Version; verbindlich nachspielbar sind nur Spielstände getaggter Versionen
 
 ## Anzeige
 
@@ -179,6 +183,7 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 ## Verzeichnisse
 
 + `index.html` als Einstieg
++ `src/version.js`: Versionsnummer
 + `src/kern/`: Zustand, Entitäten, Zeit, Zufall, Befehle, Ereignisse, Modifikatoren, Effekte, Register
 + `src/systeme/`: Bewegung, Kampf, Sicht, Pegel, Brauen, Handel u.a.
 + `src/ki/`: Verhaltensmodule
