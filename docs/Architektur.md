@@ -104,6 +104,16 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Jede Änderung an Code oder Daten macht alte Spielstände ungültig; passen Version oder Prüfsumme nicht, gibt es eine klare Meldung
 + Nebennutzen: Spielstand als Fehlerbericht, Aufzeichnungen zum Anschauen, "Seed des Tages", automatische Tests
 
+## Versionen
+
++ Schema Ära.Feature.Fix, z.B. 0.3.1
++ Erste Zahl: Ära, ein großer Entwicklungsabschnitt
++ Zweite Zahl: Feature, eine neue Funktion
++ Dritte Zahl: kleines Feature oder Fehlerbehebung
++ Steigt eine Zahl, beginnen die Zahlen rechts davon wieder bei 0
++ 0.0.0 ist die erste Version des Prototyps
++ Die Version ist Teil jedes Spielstands, siehe Zufall und Wiederholbarkeit
+
 ## Anzeige
 
 + Karte auf Canvas, Oberfläche und Effekte als HTML/CSS darüber
