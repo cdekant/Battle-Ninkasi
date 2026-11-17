@@ -9,7 +9,8 @@ Stand: 2026-11-17
 + Gesteuert wird nur Ninkasi
 + Zufällig erzeugte Dungeons
 + Hub: fester Ort zwischen den Ebenen mit Diensten (Händler u.a.), ähnliche Dienste unterwegs durch wandernde Händler und Nebengottheiten
-+ Zielgruppe: zunächst nur privat, Steam als spätere Option
++ Zielgruppe: zunächst nur privat, Steam als spätere Option, Steam Deck kein Ziel
++ Open Source: Code unter GPL-3.0-or-later, Texte und Grafik unter CC BY-NC-SA 4.0, siehe [LIZENZEN.md](../LIZENZEN.md)
 
 ## Spielkern
 
@@ -65,12 +66,16 @@ Stand: 2026-11-17
 + Keine Spiele-Engine, kein Build-Schritt
 + Spiellogik getrennt von der Anzeige
 + Ergebnis zählt mehr als Lesbarkeit des Codes für den Autor
++ Läufe aus Startwert und Befehlsliste reproduzierbar, Inhalte als Daten, Zeitmodell mit Aktionskosten
++ Bezugsgröße 1920x1080, Kamera mit Scrollen, Tile-Größe einstellbar
++ Texte zweisprachig über Sprachdateien, Textkorpus für erzeugte Texte
++ Details: [Architektur.md](Architektur.md), [Texte.md](Texte.md)
 
 ## Tileset
 
 + Zuerst Zeichen als Platzhalter, danach Tile für Tile ersetzen
 + Claude zeichnet die Tiles
-+ Vorschlag, noch nicht bestätigt: 16x16 Pixel, vierfach vergrößert
++ Auflösung der Pixelart offen: 16x16 doppelt oder 32x32 einfach dargestellt (32 px auf dem Bildschirm), Entscheidung bei den ersten Tiles nach Vergleich
 + Vorschlag, noch nicht bestätigt: Draufsicht, Figuren und Wände leicht von vorn
 + Vorschlag, noch nicht bestätigt: Licht von links oben, Figuren mit dunklem Rand, Umgebung gedämpft
 + Vorschlag, noch nicht bestätigt: zunächst keine Animation der Tiles
@@ -97,5 +102,6 @@ Stand: 2026-11-17
 + Ziel eines Laufs und was zwei Läufe unterscheidet
 + Welt und Schauplatz
 + Genaue Farbpalette
-+ Bestätigung der Tileset-Regeln
++ Bestätigung der Tileset-Regeln, Auflösung der Pixelart
++ Elemente der Oberfläche, siehe [Architektur.md](Architektur.md)
 + Bestenliste der eigenen Läufe ja oder nein

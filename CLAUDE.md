@@ -11,6 +11,8 @@
 
 + Roguelike-Spiel, Details in [docs/Grundlagen.md](docs/Grundlagen.md)
 + Charakter, Eigenschaften, Skills und EP in [docs/Charakter.md](docs/Charakter.md)
++ Technische Architektur (Datenfluss, Befehle, Zeitmodell, Wirkungsarten, Effekte, Wiederholbarkeit, Anzeige) in [docs/Architektur.md](docs/Architektur.md)
++ Sprachdateien und Textkorpus in [docs/Texte.md](docs/Texte.md)
 + Weitere Dokumentation liegt in `docs/`.
 + CLAUDE.md verweist direkt auf jedes Dokument in `docs/`, nicht nur über Verweise in anderen Dokumenten.
 
@@ -18,4 +20,5 @@
 
 + Öffentliches Repo: https://github.com/cdekant/Battle-Ninkasi, grundsätzlich auf Hauptbranch `main` arbeiten
 + Zeilenenden im Repo durchgängig LF, festgelegt in `.gitattributes`.
-+ `Artwork/` enthält Konzeptbilder als JPG (Qualität 85), in Unterordnern nach Thema (`kampf/`, `titel/`, `tempel/`, `brauerei/`); Dateinamen klein, mit Bindestrichen, ohne Umlaute und Leerzeichen, Varianten nummeriert (`-01`).
++ `Artwork/` enthält Konzeptbilder als JPG (Qualität 85), in Unterordnern nach Thema (`kampf/`, `titel/`, `tempel/`, `brauerei/`, `ninkasi/`); Dateinamen klein, mit Bindestrichen, ohne Umlaute und Leerzeichen, Varianten nummeriert (`-01`).
++ Lizenzen: Code GPL-3.0-or-later (`LICENSE`), Texte und Grafik CC BY-NC-SA 4.0, Konzeptbilder CC0; Übersicht in `LIZENZEN.md`, Volltexte in `LICENSES/`. Neue Bibliotheken bringen ihre Lizenzdatei mit, neue Bilder und Korpustexte werden in `LIZENZEN.md` eingeordnet.
