@@ -10,6 +10,13 @@ Stand: 2026-11-17
 + Weitere Makel, auszuarbeiten: Aldehyd-Dehydrogenase-Mangel (Acetaldehyd, Flush, Katerschaden), Zöliakie (Gerste und Weizen schaden), Gicht (Purine im Bier lösen Anfälle aus)
 + Vorschlag, noch nicht bestätigt: Makel dürfen zweischneidig sein, Nachteil mit verstecktem Vorteil
 
+## Startwerte
+
++ Vorläufig, Grundlage fürs Balancing: 100 LP, 100 MP, 0 PP
++ 100 als Grundwert, damit Boni in Prozent vom Grundwert glatte ganze Zahlen ergeben
++ Mit 0 PP startet Ninkasi nüchtern und regeneriert erst nach dem ersten Getränk
++ Höchstwert der PP noch offen
+
 ## Eigenschaften
 
 + Eigenschaften sind reine Lernwerte: Sie senken die EP-Kosten von Skills
