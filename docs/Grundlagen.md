@@ -75,7 +75,7 @@ Stand: 2026-11-17
 
 + Zuerst Zeichen als Platzhalter, danach Tile für Tile ersetzen
 + Claude zeichnet die Tiles
-+ Auflösung der Pixelart offen: 16x16 doppelt oder 32x32 einfach dargestellt (32 px auf dem Bildschirm), Entscheidung bei den ersten Tiles nach Vergleich
++ Pixelart in vier Sätzen (16, 32, 48, 64 px), zuerst der größte, die kleineren von Hand generalisiert; Einzelheiten in [Architektur.md](Architektur.md)
 + Vorschlag, noch nicht bestätigt: Draufsicht, Figuren und Wände leicht von vorn
 + Vorschlag, noch nicht bestätigt: Licht von links oben, Figuren mit dunklem Rand, Umgebung gedämpft
 + Vorschlag, noch nicht bestätigt: zunächst keine Animation der Tiles
@@ -98,10 +98,10 @@ Stand: 2026-11-17
 + Endboss: Sobrietas oder erfundener Gott der Nüchternheit
 + Unterschiede der Mikroorganismen ausarbeiten (Hefen, Bakterien, Schimmel, weitere Gruppen)
 + Brausystem im Detail: Zutaten, Rezepte, Wirkung der Kessel-Tiers, Reihenfolge der Materialien
++ Folgen eines abgebrochenen Brauvorgangs: verdorben, minderwertig oder wieder aufnehmbar (Unterbrechung und Entscheidung per Befehl regelt [Architektur.md](Architektur.md))
 + Dienste des Hubs im Detail
 + Ziel eines Laufs und was zwei Läufe unterscheidet
 + Welt und Schauplatz
 + Genaue Farbpalette
-+ Bestätigung der Tileset-Regeln, Auflösung der Pixelart
-+ Elemente der Oberfläche, siehe [Architektur.md](Architektur.md)
++ Bestätigung der Tileset-Regeln
 + Bestenliste der eigenen Läufe ja oder nein

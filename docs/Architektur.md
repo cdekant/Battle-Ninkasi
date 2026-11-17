@@ -51,7 +51,7 @@ Stand: 2026-11-17
 + Dauern werden in Zeiteinheiten angegeben, nicht in Ticks
 + Bruchteile (z.B. 0,3 LP pro Tick) laufen über ganzzahlige Speicher in Hundertsteln, ein voller Punkt wird gutgeschrieben, der Rest bleibt stehen
 + Lange Aktionen (z.B. Brauen mit 2000 Einheiten) laufen in Schritten und werden unterbrochen, sobald eine Gefahr auftaucht (Gegner im Sichtfeld, Schaden)
-+ Nach einer Unterbrechung entscheidet die Spielerin per Befehl: weitermachen (und z.B. Treffer kassieren, um den Sud nicht zu verderben) oder abbrechen; Folgen eines Abbruchs (verdorben, minderwertig, wieder aufnehmbar) sind Spieldesign und noch offen
++ Nach einer Unterbrechung entscheidet die Spielerin per Befehl: weitermachen (und z.B. Treffer kassieren, um den Sud nicht zu verderben) oder abbrechen; die Folgen eines Abbruchs sind Spieldesign, siehe [Grundlagen.md](Grundlagen.md)
 
 ## Wirkungsarten
 
@@ -109,13 +109,48 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Karte auf Canvas, Oberfläche und Effekte als HTML/CSS darüber
 + Bezugsgröße 1920x1080, bevorzugt im Vollbild; Vollbild erst nach einer Nutzeraktion (Browser-Regel)
 + Ganzzahlige Skalierung, damit Pixelart scharf bleibt: 1080p 1:1, 4K doppelt, dazwischen 1:1 mit Rand
-+ Tile-Größe ist eine Einstellung; Kandidaten 16 und 32 px; die Auflösung der Pixelart (16x16 doppelt oder 32x32 1:1) wird erst bei den ersten Tiles entschieden, bis dahin Zeichen als Platzhalter in beiden Größen testen
++ Pixelart in vier Sätzen: 16, 32, 48 und 64 px, jeder Satz eigens gezeichnet, größere Sätze mit mehr Details
++ Gezeichnet wird zuerst der größte Satz (64 px), die kleineren entstehen daraus durch Generalisieren von Hand, nicht durch Verkleinern
++ Begonnen wird mit einem Satz; fehlende Sätze und fehlende Tiles ersetzt der Renderer durch Skalieren eines vorhandenen Satzes oder durch ein Zeichen
++ Ein Tileset ist eine Datendatei mit Einträgen je Auflösung; der Renderer wählt zur Zoomstufe den passenden Satz und einen ganzzahligen Faktor
++ Zoom ist eine Einstellung mit frei festlegbaren Stufen, nicht an bestimmte Tile-Größen gebunden; scharf bleibt Pixelart nur in ganzzahligen Vielfachen ihrer Auflösung (16 als 16, 32, 48, 64 px; 32 als 32, 64, 96 px)
++ Bis zu den ersten Tiles Zeichen als Platzhalter in allen Zoomstufen
 + Eine Kamera ist immer eingebaut: Ist der Ausschnitt größer als das Level, ist das ganze Level sichtbar, sonst scrollt die Karte; Zoomstufen sind nur Kameraeinstellungen
-+ Bei 32 px sind auf 1080p etwa 48x28 Felder sichtbar, bei 16 px etwa 96x56
-+ Kameraverhalten (Folgen mit Randabstand, Zentrieren, Springen) ist austauschbar und einstellbar
 + Die Levelgröße ist ein Datenwert, Levels dürfen unterschiedlich groß sein; Ziel: größer als Brogue (79x29)
-+ Die Sichtweite von Ninkasi ergibt sich aus Skills und Hindernissen; wie mit einer Sichtweite umgegangen wird, die größer ist als der Ausschnitt, ist offen (Kamera zoomt heraus, Begrenzung, Markierungen am Rand)
 + Texte der Oberfläche sind HTML/CSS mit eigenen Schriftgrößen, unabhängig vom Tile-Raster
+
+## Oberfläche
+
++ Karte auf dem größten Teil des Bildschirms, rechts eine Seitenleiste (etwa 400 px), unten ein Log (4 bis 5 Zeilen, aufklappbar)
++ Sichtbar bei 1080p neben Seitenleiste und Log: bei 16 px etwa 95x57 Felder, bei 32 px etwa 47x28, bei 48 px etwa 31x19, bei 64 px etwa 23x14
++ Seitenleiste: LP und MP als Balken, Pegel als eigene, auffällige Anzeige mit eingezeichneten Schwellen, aktive Zustände, Liste der sichtbaren Gegner (Vorbild: Brogue)
++ Inventar, Skillübersicht, Handel und Brauen als Fenster über der Karte; Öffnen und Schließen sind keine Befehle
++ Übersichtskarte per Umschalttaste, gezeichnet vom selben Renderer mit kleinen Feldern (4 bis 8 px); eine Minimap in der Seitenleiste ist später mit demselben Renderer möglich
++ Alle Elemente sind Anzeige und lassen sich ändern, ohne die Logik zu berühren
+
+## Kamera
+
++ Folgen mit Randabstand: Die Kamera bewegt sich erst, wenn Ninkasi näher als etwa ein Viertel des Ausschnitts an den Rand kommt
++ Am Levelrand bleibt die Kamera stehen, jenseits des Levels ist nichts zu sehen; kleinere Levels stehen mittig
++ Zunächst feldweises Springen, weiches Scrollen später als reine Anzeige
++ Umschauen: Karte frei verschieben per Maus oder Taste, ein Anzeige-Zustand
++ Weitere Verhaltensweisen (Zentrieren, Springen) bleiben austauschbar und einstellbar
+
+## Sichtweite
+
++ Die Sichtweite von Ninkasi ergibt sich aus Skills und Hindernissen
++ Ist sie größer als der Ausschnitt, wird nicht herausgezoomt; stattdessen zeigen Markierungen am Kartenrand Gegner außerhalb des Ausschnitts, die Gegnerliste der Seitenleiste nennt alle sichtbaren Gegner
+
+## Eingabe
+
++ Vorgabe für die Bewegung: Ziffernblock, acht Richtungen, 5 für Warten
++ Die Belegung ist frei änderbar, siehe Datenfluss
+
+## Erster Prototyp
+
++ Umfang: eine Ebene, Bewegen, Sichtfeld, ein Gegnertyp, Nahkampf, ein Getränk, Pegel, Log
++ Zeichen als Platzhalter statt Tiles
++ rot.js 2.2.1 (aktuell auf npm, Lizenz BSD-3-Clause), noch nicht im Repo; kommt mit Lizenzdatei nach `lib/`
 
 ## Tests und Balancing
 
@@ -146,9 +181,4 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 
 ## Offen
 
-+ Elemente der Oberfläche: Seitenleiste, Log, Inventar, Skillübersicht
-+ Übersichtskarte als Minimap, per Umschalttaste oder beides
-+ Kameraverhalten im Detail
-+ Sichtweite größer als der Ausschnitt
-+ Auflösung der Pixelart (16x16 oder 32x32)
-+ Folgen eines abgebrochenen Brauvorgangs
++ Standard-Zoomstufe für 1080p, Entscheidung bei den ersten Tiles
