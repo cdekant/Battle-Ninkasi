@@ -1,5 +1,5 @@
-// Tileset aus Zeichen, Platzhalter bis zu den ersten Tiles.
-// Farben vorläufig: Biertöne, Stein, Kupfer; Signalfarben für Gegner.
+// Tileset aus Zeichen: Ersatz, wo kein Tile aus grafik/ zur Zoomstufe passt.
+// Farben nach den Tiles und der Palette in grafik/palette.js.
 export default {
   gelaende: {
     wand: { zeichen: "#", farbe: "#8c7a63", hintergrund: "#2a221b" },
@@ -7,7 +7,7 @@ export default {
   },
   wesen: {
     ninkasi: { zeichen: "@", farbe: "#f2c14e" },
-    essigbakterium: { zeichen: "e", farbe: "#a8d13b" },
+    essigbakterium: { zeichen: "e", farbe: "#b4bd62" },
   },
   gegenstaende: {
     bier: { zeichen: "!", farbe: "#e0952b" },

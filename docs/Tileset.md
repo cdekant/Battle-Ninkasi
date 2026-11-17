@@ -6,7 +6,7 @@ Plan für das Zeichnen der Tiles; wird nach Bedarf umgebaut. Regeln zur Anzeige 
 
 ## Artstyle-Fibel
 
-Verbindliche Regeln für jedes Tile, damit das Tileset wie aus einem Guss wirkt; jedes neue Tile wird gegen sie geprüft. Vorläufig festgelegt, wird nach der Stilprobe bestätigt oder geändert. Referenztiles: `boden`, `wand`, `ninkasi`, `essigbakterium`, `bier`.
+Verbindliche Regeln für jedes Tile, damit das Tileset wie aus einem Guss wirkt; jedes neue Tile wird gegen sie geprüft. Nach der Stilprobe bestätigt (2026-11-17); Änderungen nur mit Absprache. Referenztiles: `boden`, `wand`, `ninkasi`, `essigbakterium`, `bier`.
 
 ### Grundsätze
 
@@ -45,7 +45,10 @@ Verbindliche Regeln für jedes Tile, damit das Tileset wie aus einem Guss wirkt;
 
 + In 64 px Formen statt Linien; keine Linien schmaler als 2 px außer Umriss, Fugen und angedeuteten Körperlinien
 + Gesichter knapp: Augen als zwei Pixel mit Lichtpunkt, Brauen, Mund als kurzer Strich
-+ Für 48, 32 und 16 px gilt je eine eigene, gröbere Regel, festgelegt beim Generalisieren
++ Kleinere Sätze (48, 32, 16 px) haben dieselben Formen wie 64 px, weil sie daraus abgeleitet werden (siehe Werkzeuge)
++ Signalakzente wie rote Augen bleiben in jeder Größe sichtbar (in 16 px als einzelne Pixel), Gelände behält erkennbare Fugen und Quader; das Werkzeug sorgt dafür und warnt, wo es nicht gelingt
++ Ableitungsfreundlich zeichnen: wichtige Details in 64 px mindestens 4x4 px groß, getrennte Details (z. B. zwei Augen) mindestens 8 px voneinander entfernt (Mitte zu Mitte), damit sie in 16 px nicht verschmelzen; Fugen als durchgehende Linien
++ 16 px: Silhouette, Hauptfarben und ein Akzent genügen; Gesichter außer leuchtenden Augen dürfen verschwinden
 
 ### Prüfungen
 
@@ -70,6 +73,19 @@ Verbindliche Regeln für jedes Tile, damit das Tileset wie aus einem Guss wirkt;
 + Claude Design (Artifact-Typ "Design") arbeitet mit HTML, CSS und SVG statt mit einem Pixelraster und taugt deshalb nicht für die Tiles selbst; höchstens für Stimmungsentwürfe vorab
 + Das Werkzeug DesignSync gleicht nur UI-Komponenten eines Design-Systems ab und kommt nicht in Frage
 + Eine direkte Verbindung zwischen Repo und Claude Design gibt es nicht; Claude überträgt Dateien bei Bedarf von Hand
++ `werkzeuge/tiles-ableiten.js` leitet aus dem Satz 64 die Sätze 48, 32 und 16 ab und schreibt `grafik/tileset.js` neu; Aufruf `node werkzeuge/tiles-ableiten.js [--ueberschreiben] [tilename ...]`
++ Verfahren je Zielpixel über die Fläche der Vorlage (auch beim krummen Faktor 64 zu 48):
+  + Umriss der Vorlage ausblenden; zu wenig Deckung ergibt Durchsichtigkeit
+  + Vorrangfarben: Kommt eine Signalfarbe (Blut, Säure, Gift, Lauge, Psi, Magie, Leuchtrot) in der Fläche vor, gewinnt sie; Augen, Wunden und Glut bleiben so in jeder Größe sichtbar
+  + Fugen: Bei Gelände (ohne Durchsichtigkeit) gewinnt die dunkelste Farbe, wenn sie etwa eine durchgehende Linie von 1 px über die Fläche bildet; einzelne dunkle Körner zählen nicht
+  + sonst Flächenmittel, gesetzt auf die nächste Farbe aus den Farben der Vorlage
+  + Umriss in Schwarz neu setzen, wenn die Vorlage einen hatte
++ Prüfung: Das Werkzeug vergleicht jedes abgeleitete Tile (auch vorhandene, nachgearbeitete) mit der Vorlage und warnt bei verschwundenen Signalfarben, zerfallenen Figuren (mehr zusammenhängende Teile als die Vorlage) und ausgedünnten Fugen (dunkelste Farbe auf weniger als die Hälfte ihres Anteils gesunken)
++ Ohne Warnung genügt ein kurzer Blick in die Tilewerkstatt; was kein Werkzeug beurteilen kann, ist die Wirkung, etwa ob ein Gesicht klein noch stimmt
++ Ohne `--ueberschreiben` bleiben vorhandene Dateien unberührt, damit Handnacharbeit erhalten bleibt; nachgearbeitete Dateien tragen im Kopfkommentar "nicht überschreiben"
++ Bisher von Hand: nur die Augen des Essigbakteriums in 48, 32 und 16 px getrennt (die Vorrangregel ließ die eng stehenden Augen zu einem Fleck verschmelzen); Gelände braucht seit der Fugenregel keine Nacharbeit mehr
++ Ablauf für ein neues Tile: in 64 px zeichnen, `node werkzeuge/tiles-ableiten.js <tilename>` aufrufen, Warnungen nacharbeiten, in der Tilewerkstatt ansehen
++ Warum nicht zur Laufzeit verkleinern: ohne Glättung verschwinden einzelne Pixel (Umriss, Augen) und bei 48 px werden Pixel ungleich breit; mit Glättung wird alles weich und verlässt die Palette
 
 ## Pixeldaten
 
@@ -96,24 +112,29 @@ Verbindliche Regeln für jedes Tile, damit das Tileset wie aus einem Guss wirkt;
 
 ## Vorschau und Abstimmung
 
-+ Die Vorschauseite `grafik/vorschau.html` zeigt Palette, alle Tiles einfach, doppelt und als 3x3-Kachelung (Nahtstellen) und eine Testszene mit Zoomwahl, gelesen aus denselben Datendateien wie das Spiel; lokal unter `http://localhost:8000/grafik/vorschau.html`
++ Die Vorschauseite `grafik/vorschau.html` zeigt Palette, alle Tiles in allen Sätzen in Originalgröße und vergrößert, den Satz 64 als 3x3-Kachelung (Nahtstellen) und eine Testszene mit Zoomwahl, gelesen aus denselben Datendateien wie das Spiel; lokal unter `http://localhost:8000/grafik/vorschau.html`
 + Zum Abstimmen veröffentlicht Claude die Vorschauseite als Artifact auf claude.ai (Tilewerkstatt: https://claude.ai/artifact/97GFDzcvppAWoM23EPijm5, privat); die Datendateien gehen mit denselben relativen Pfaden mit, deshalb liegt die Seite in `grafik/`
 + Dort lassen sich Kommentare an einzelne Stellen hängen, Claude liest sie und überarbeitet die Pixeldaten im Repo
 + Maßgeblich sind immer die Dateien im Repo, das Artifact ist nur Ansicht
 
 ## Ablauf
 
-1. Palette: Farbfelder und eine Probe aus Boden und Wand, abstimmen, danach "Genaue Farbpalette" in [Grundlagen.md](Grundlagen.md) schließen
-2. Stilprobe in 64 px: zuerst Boden, Wand und Ninkasi, danach Essigbakterium und Bier; danach Stilregeln bestätigen oder ändern
-3. Einbau in den Renderer: Tiles aus Pixeldaten, Ersatz fehlender Tiles durch Zeichen
-4. Erstliste in 64 px vervollständigen: Tür, Treppe, zweiter Gegner, Truhe, Falle
-5. Generalisieren von Hand auf 48, 32 und 16 px, kleinster Satz zuletzt
+1. Palette: Farbfelder und eine Probe aus Boden und Wand (erledigt, 62 Farben)
+2. Stilprobe in 64 px: Boden, Wand, Ninkasi, Essigbakterium, Bier; Artstyle-Fibel bestätigt (erledigt)
+3. Einbau in den Renderer: Tiles aus Pixeldaten, Ersatz fehlender Tiles durch Zeichen (erledigt, `src/anzeige/tilebilder.js`, Tests in `tests/tilebilder.test.js`)
+4. Kleine Sätze 48, 32 und 16 px für die fünf Tiles der Stilprobe: zunächst von Hand generalisiert, wegen abweichender Formen ersetzt durch Ableiten per Werkzeug mit Nacharbeit (erledigt)
+5. Erstliste in 64 px vervollständigen: Tür, Treppe, zweiter Gegner, Truhe, Falle; kleine Sätze per Werkzeug
 6. Danach Tile für Tile nach Bedarf neuer Inhalte
+
+## Offene Fragen
+
++ Laden bei vielen Tiles: Ein Tile in 64 px ist als Datei etwa 4,7 KB groß; bei einigen hundert Tiles in vier Sätzen wären es Megabytes in tausenden Dateien, je eine Anfrage beim Laden. Lokal und in Electron/Tauri unkritisch, über das Netz bremsend. Möglich: Tiles je Satz und Kategorie in einer Datei bündeln oder Pixelzeilen kompakter speichern (ohne Build-Schritt). Entscheiden, sobald es etwa hundert Tiles sind
++ Bauen und Zeichnen sind dagegen unkritisch: einige Millionen Pixel beim Start, Gelände nur bei Änderungen neu zeichnen; falls nötig Atlas je Satz oder zwischengespeichertes Gelände
 
 ## Ablage und Lizenz
 
 + Tiles und Palette liegen in `grafik/`, getrennt von `daten/`, weil für sie die Grafiklizenz gilt (CC BY-NC-SA 4.0) und nicht die Codelizenz; siehe [LIZENZEN.md](../LIZENZEN.md)
 + `grafik/palette.js`: Palette
-+ `grafik/tileset.js`: Palette und Tiles je Satz (`saetze: { 64: { boden, wand, ninkasi, essigbakterium, bier } }`), Einstieg für Renderer und Vorschau
++ `grafik/tileset.js`: Palette und Tiles je Satz (`saetze: { 64: { bier, boden, ... }, 48: { ... }, 32: { ... }, 16: { ... } }`), Einstieg für Renderer und Vorschau; erzeugt vom Werkzeug, nicht von Hand ändern
 + `grafik/tiles/<Satz>/<name>.js`: ein Tile je Datei, Dateinamen klein mit Bindestrichen (z. B. `ninkasi.js`)
 + `grafik/vorschau.html`: Vorschauseite; sie ist Code und steht unter der Codelizenz

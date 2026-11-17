@@ -75,10 +75,11 @@ Stand: 2026-11-17
 
 + Zuerst Zeichen als Platzhalter, danach Tile für Tile ersetzen
 + Claude zeichnet die Tiles
-+ Pixelart in vier Sätzen (16, 32, 48, 64 px), zuerst der größte, die kleineren von Hand generalisiert; Einzelheiten in [Architektur.md](Architektur.md)
-+ Vorläufig festgelegt, Bestätigung nach der Stilprobe: Draufsicht, Figuren und Wände leicht von vorn
-+ Vorläufig festgelegt, Bestätigung nach der Stilprobe: Licht von links oben, Figuren mit dunklem Rand, Umgebung gedämpft
-+ Vorläufig festgelegt, Bestätigung nach der Stilprobe: zunächst keine Animation der Tiles; ausgenommen ist das Flackern von Licht, siehe Licht in [Architektur.md](Architektur.md)
++ Pixelart in vier Sätzen (16, 32, 48, 64 px); gezeichnet wird der größte, die kleineren werden per Werkzeug abgeleitet und von Hand nachgearbeitet; Einzelheiten in [Architektur.md](Architektur.md)
++ Draufsicht, Figuren und Wände leicht von vorn
++ Licht von links oben, Figuren mit dunklem Rand, Umgebung gedämpft
++ Zunächst keine Animation der Tiles; ausgenommen ist das Flackern von Licht, siehe Licht in [Architektur.md](Architektur.md)
++ Palette mit 62 Farben und verbindliche Artstyle-Fibel in [Tileset.md](Tileset.md)
 + Erstliste: Boden, Wand, Tür, Treppe, Ninkasi, zwei Gegner, Trank, Truhe, Falle
 + Arbeitsweise, Pixeldaten, Vorschau und Ablauf: [Tileset.md](Tileset.md)
 
@@ -87,6 +88,7 @@ Stand: 2026-11-17
 + Tonfall: bis ins Mark sarkastisch, schwarzer Humor, düster, blutig, mit einer guten Portion Sex/Pornographie
 + Farbwelt: Biertöne, Edelstahl, Kupfer, Stein
 + Dazu eine eigene Palette Signalfarben
++ Palette der Tiles festgelegt: `grafik/palette.js`, siehe [Tileset.md](Tileset.md)
 
 ## Offen
 
@@ -103,8 +105,6 @@ Stand: 2026-11-17
 + Dienste des Hubs im Detail
 + Ziel eines Laufs und was zwei Läufe unterscheidet
 + Welt und Schauplatz
-+ Genaue Farbpalette, wird im ersten Schritt des Tilesets festgelegt, siehe [Tileset.md](Tileset.md)
-+ Endgültige Bestätigung der Tileset-Regeln nach der Stilprobe
 + Bestenliste der eigenen Läufe ja oder nein
 + Licht und Wahrnehmung (vorläufige Ideen in [Architektur.md](Architektur.md)): wie Ninkasi ohne Nachtsicht im Dunkeln sieht (gar nicht, geringe Reichweite, abhängig vom Pegel)
 + Ob Mikroorganismen durch Wände spüren oder nur entlang von Wegen, wie ein Geruch

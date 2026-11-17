@@ -1,16 +1,22 @@
-// Renderer: zeichnet die Karte auf ein Canvas, vorerst mit Zeichen statt Tiles.
-// Liest den Zustand nur. Tileset aus daten/zeichen.js; fehlt ein Eintrag, erscheint "?".
-// Später: Tilesets je Auflösung, Wahl des passenden Satzes zur Zoomstufe.
+// Renderer: zeichnet die Karte auf ein Canvas. Liest den Zustand nur.
+// Gezeichnet wird ein Tile aus grafik/ (über tilebilder.js), wenn ein Satz scharf zur Zoomstufe passt;
+// sonst das Zeichen aus daten/zeichen.js; fehlt auch das, erscheint "?".
 // Bildschirmfelder (bildX, bildY) zählen ab der linken oberen Ecke des Ausschnitts.
 
 const SCHRIFT = '"DejaVu Sans Mono", "Cascadia Mono", Consolas, monospace';
 const DECKKRAFT_ERINNERT = 0.35; // erkundete, aber gerade nicht sichtbare Felder
 
 export class Renderer {
-  constructor(canvas, tileset) {
+  // zeichensatz: daten/zeichen.js; tilebilder: aus tilebilderErstellen oder null (nur Zeichen)
+  constructor(canvas, zeichensatz, tilebilder = null) {
     this.canvas = canvas;
     this.pinsel = canvas.getContext("2d");
-    this.tileset = tileset;
+    this.zeichensatz = zeichensatz;
+    this.tilebilder = tilebilder;
+  }
+
+  tilebild(name, zoom) {
+    return this.tilebilder ? this.tilebilder.bild(name, zoom) : null;
   }
 
   // Passt das Canvas an seinen Container an und gibt die Ansicht in Feldern zurück
@@ -29,16 +35,22 @@ export class Renderer {
     return { breite: Math.floor(breite / zoom), hoehe: Math.floor(hoehe / zoom) };
   }
 
-  feldZeichnen(bildX, bildY, zoom, tilesetEintrag, deckkraft) {
+  // Zeichnet ein Feld als Tile, wenn eines passt, sonst als Zeichen mit Hintergrund
+  feldZeichnen(bildX, bildY, zoom, name, zeichenEintrag, deckkraft) {
     const pinsel = this.pinsel;
     const pixelX = bildX * zoom, pixelY = bildY * zoom;
     pinsel.globalAlpha = deckkraft;
-    if (tilesetEintrag && tilesetEintrag.hintergrund) {
-      pinsel.fillStyle = tilesetEintrag.hintergrund;
-      pinsel.fillRect(pixelX, pixelY, zoom, zoom);
+    const bild = this.tilebild(name, zoom);
+    if (bild) {
+      pinsel.drawImage(bild, pixelX, pixelY, zoom, zoom);
+    } else {
+      if (zeichenEintrag && zeichenEintrag.hintergrund) {
+        pinsel.fillStyle = zeichenEintrag.hintergrund;
+        pinsel.fillRect(pixelX, pixelY, zoom, zoom);
+      }
+      pinsel.fillStyle = zeichenEintrag?.farbe ?? "#ff00ff";
+      pinsel.fillText(zeichenEintrag?.zeichen ?? "?", pixelX + zoom / 2, pixelY + zoom / 2 + 1);
     }
-    pinsel.fillStyle = tilesetEintrag?.farbe ?? "#ff00ff";
-    pinsel.fillText(tilesetEintrag?.zeichen ?? "?", pixelX + zoom / 2, pixelY + zoom / 2 + 1);
     pinsel.globalAlpha = 1;
   }
 
@@ -47,10 +59,11 @@ export class Renderer {
     const pinsel = this.pinsel;
     const zustand = spiel.zustand;
     const ebene = zustand.ebene;
-    const tileset = this.tileset;
+    const zeichensatz = this.zeichensatz;
     const gelaendeNameNachKennung = {};
     for (const [name, gelaende] of Object.entries(spiel.daten.gelaende)) gelaendeNameNachKennung[gelaende.kennung] = name;
 
+    pinsel.imageSmoothingEnabled = false; // Pixelart scharf; nach jeder Größenänderung des Canvas neu setzen
     pinsel.fillStyle = "#000";
     pinsel.fillRect(0, 0, this.groesseInPixeln.breite, this.groesseInPixeln.hoehe);
     pinsel.font = `${Math.max(8, Math.floor(zoom * 0.9))}px ${SCHRIFT}`;
@@ -66,8 +79,9 @@ export class Renderer {
         if (x < 0 || x >= ebene.breite) continue;
         const feldIndex = y * ebene.breite + x;
         if (!ebene.erkundet[feldIndex]) continue;
-        const gelaendeEintrag = tileset.gelaende[gelaendeNameNachKennung[ebene.felder[y][x]]];
-        this.feldZeichnen(bildX, bildY, zoom, gelaendeEintrag, sichtbareFelder.has(feldIndex) ? 1 : DECKKRAFT_ERINNERT);
+        const gelaendeName = gelaendeNameNachKennung[ebene.felder[y][x]];
+        const deckkraft = sichtbareFelder.has(feldIndex) ? 1 : DECKKRAFT_ERINNERT;
+        this.feldZeichnen(bildX, bildY, zoom, gelaendeName, zeichensatz.gelaende[gelaendeName], deckkraft);
       }
     }
 
@@ -80,9 +94,13 @@ export class Renderer {
     for (const entitaet of zeichenreihenfolge) {
       const bildX = entitaet.position.x - kamera.x, bildY = entitaet.position.y - kamera.y;
       if (bildX < 0 || bildY < 0 || bildX >= ansicht.breite || bildY >= ansicht.hoehe) continue;
-      const tilesetEintrag = istWesen(entitaet) ? tileset.wesen[entitaet.typ] : tileset.gegenstaende[entitaet.typ];
-      const bodenEintrag = tileset.gelaende[gelaendeNameNachKennung[ebene.felder[entitaet.position.y][entitaet.position.x]]];
-      this.feldZeichnen(bildX, bildY, zoom, { ...tilesetEintrag, hintergrund: bodenEintrag && bodenEintrag.hintergrund }, 1);
+      const zeichenEintrag = istWesen(entitaet) ? zeichensatz.wesen[entitaet.typ] : zeichensatz.gegenstaende[entitaet.typ];
+      // Tiles sind durchsichtig und liegen auf dem schon gezeichneten Boden; ein Zeichen braucht den Hintergrund
+      // des Bodens nur, wenn der Boden selbst als Zeichen gezeichnet wurde
+      const bodenName = gelaendeNameNachKennung[ebene.felder[entitaet.position.y][entitaet.position.x]];
+      const bodenAlsZeichen = !this.tilebild(bodenName, zoom);
+      const hintergrund = bodenAlsZeichen ? zeichensatz.gelaende[bodenName]?.hintergrund : undefined;
+      this.feldZeichnen(bildX, bildY, zoom, entitaet.typ, { ...zeichenEintrag, hintergrund }, 1);
     }
 
     this.markierungenZeichnen(kamera, ansicht, zoom, markierungen);

@@ -3,6 +3,7 @@
 
 import VERSION from "./version.js";
 import rohdaten from "../daten/index.js";
+import tileset from "../grafik/tileset.js";
 import texteDe from "../sprache/de/texte.js";
 import grammatikDe from "../sprache/de/grammatik.js";
 import belegung from "./eingabe/belegung.js";
@@ -15,6 +16,7 @@ import { weg } from "./welt/wege.js";
 import { erstelleTexte } from "./anzeige/texte.js";
 import { erstelleGrammatik } from "./anzeige/grammatik.js";
 import { Renderer } from "./anzeige/renderer.js";
+import { tilebilderErstellen } from "./anzeige/tilebilder.js";
 import { neueKamera, folgen } from "./anzeige/kamera.js";
 import { Oberflaeche } from "./anzeige/oberflaeche.js";
 import { Log } from "./anzeige/log.js";
@@ -60,9 +62,10 @@ function zufaelligerStartwert() {
   return crypto.getRandomValues(new Uint32Array(1))[0];
 }
 
-let daten;
+let daten, tilebilder;
 try {
   daten = datenLaden(rohdaten, { texte: texteDe, nomenPruefen: grammatik.pruefen });
+  tilebilder = tilebilderErstellen(tileset);
 } catch (fehler) {
   fehlerZeigen(texte.text("ui.datenfehler"), fehler.message);
   throw fehler;
@@ -72,7 +75,7 @@ const einstellungen = einstellungenLaden();
 if (!einstellungen.zoomstufen.includes(einstellungen.zoom)) einstellungen.zoom = einstellungen.zoomstufen[0];
 
 const kartenCanvas = document.getElementById("karte-canvas");
-const renderer = new Renderer(kartenCanvas, daten.zeichen);
+const renderer = new Renderer(kartenCanvas, daten.zeichen, tilebilder);
 const oberflaeche = new Oberflaeche(document.getElementById("seitenleiste"), texte, VERSION);
 const log = new Log(document.getElementById("log"), texte);
 

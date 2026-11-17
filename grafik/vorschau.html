@@ -68,9 +68,9 @@
 
 <main>
   <header>
-    <span class="etikett">Battle Ninkasi · Tileset · Schritt 2</span>
+    <span class="etikett">Battle Ninkasi · Tileset · Sätze 64, 48, 32, 16</span>
     <h1>Tilewerkstatt</h1>
-    <p>Palette und Stilprobe in 64 px, gelesen aus denselben Datendateien wie das Spiel. Entwurf zum Abstimmen: Kommentare direkt an Farben, Tiles oder Szene hängen.</p>
+    <p>Palette und Tiles in 64, 48, 32 und 16 px, gelesen aus denselben Datendateien wie das Spiel. Entwurf zum Abstimmen: Kommentare direkt an Farben, Tiles oder Szene hängen.</p>
     <p id="fehler" hidden></p>
   </header>
 
@@ -81,8 +81,8 @@
   </section>
 
   <section aria-labelledby="titel-tiles">
-    <h2 id="titel-tiles">Probetiles</h2>
-    <p>Jedes Tile einfach, doppelt und als 3x3-Kachelung, um Nahtstellen zu prüfen.</p>
+    <h2 id="titel-tiles">Tiles</h2>
+    <p>Jedes Tile in den Sätzen 64, 48, 32 und 16 px, jeweils in Originalgröße und auf 128 px vergrößert, dazu der Satz 64 als 3x3-Kachelung, um Nahtstellen zu prüfen.</p>
     <div class="tiles" id="tiles"></div>
   </section>
 
@@ -91,7 +91,7 @@
     <p>Ein kleiner Raum mit Ninkasi, einem Essigbakterium und einem Bier.</p>
     <div class="werkzeugleiste" id="zoomwahl" role="group" aria-label="Zoomstufe"></div>
     <div class="buehne"><canvas id="szene"></canvas></div>
-    <p class="hinweis">16, 32 und 48 px sind hier nur verkleinert, nicht von Hand generalisiert; sie zeigen, warum eigene kleine Sätze nötig sind.</p>
+    <p class="hinweis">Wie im Spiel: Jede Zoomstufe zeigt ihren eigenen Satz, 128 px den Satz 64 doppelt. Die Sätze 48, 32 und 16 sind aus 64 abgeleitet und von Hand nachgearbeitet.</p>
   </section>
 </main>
 
@@ -159,18 +159,34 @@
     rampenListe.append(zeile);
   }
 
-  // Tiles
-  const satz = tileset.saetze[64];
-  const bilder = Object.fromEntries(Object.entries(satz).map(([name, tile]) => [name, tileZuCanvas(name, tile)]));
+  // Tiles: je Satz und Tile ein Bild in Originalgröße
+  const bilderNachSatz = new Map(
+    Object.entries(tileset.saetze).map(([satzGroesse, satz]) => [
+      Number(satzGroesse),
+      Object.fromEntries(Object.entries(satz).map(([name, tile]) => [name, tileZuCanvas(`${satzGroesse}/${name}`, tile)])),
+    ])
+  );
+  const satzGroessen = [...bilderNachSatz.keys()].sort((erste, zweite) => zweite - erste);
   const tileListe = document.getElementById("tiles");
-  for (const [name, bild] of Object.entries(bilder)) {
+  for (const name of Object.keys(bilderNachSatz.get(satzGroessen[0]))) {
     const karte = document.createElement("figure");
     karte.className = "tile";
     karte.style.margin = "0";
     karte.innerHTML = `<figcaption class="name">${name}</figcaption><div class="ansichten"></div>`;
     const ansichten = karte.querySelector(".ansichten");
-    ansichten.append(skaliert(bild, 64), skaliert(bild, 128), skaliert(bild, 64, 3));
+    // jeder Satz in Originalgröße, dazu auf 128 px vergrößert zum Vergleich; der größte Satz zusätzlich als 3x3-Kachelung
+    for (const satzGroesse of satzGroessen) {
+      const bild = bilderNachSatz.get(satzGroesse)[name];
+      if (bild) ansichten.append(skaliert(bild, satzGroesse), skaliert(bild, 128));
+    }
+    ansichten.append(skaliert(bilderNachSatz.get(satzGroessen[0])[name], satzGroessen[0], 3));
     tileListe.append(karte);
+  }
+
+  // wie im Spiel: größter Satz, dessen ganzzahliges Vielfaches der Zoom ist; sonst der größte Satz, verkleinert
+  function bilderFuerZoom(zoom) {
+    const passend = satzGroessen.find((satzGroesse) => satzGroesse <= zoom && zoom % satzGroesse === 0);
+    return bilderNachSatz.get(passend ?? satzGroessen[0]);
   }
 
   // Testszene
@@ -201,6 +217,7 @@
     szene.height = karte.length * zoom;
     const kontext = szene.getContext("2d");
     kontext.imageSmoothingEnabled = false;
+    const bilder = bilderFuerZoom(zoom);
     karte.forEach((zeile, reihe) => {
       [...zeile].forEach((zeichen, spalte) => {
         const tileName = zeichen === "#" ? "wand" : "boden";
