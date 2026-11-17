@@ -132,8 +132,6 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 
 ## Verzeichnisse
 
-Vorschlag, noch nicht bestätigt:
-
 + `index.html` als Einstieg
 + `src/kern/`: Zustand, Entitäten, Zeit, Zufall, Befehle, Ereignisse, Modifikatoren, Effekte, Register
 + `src/systeme/`: Bewegung, Kampf, Sicht, Pegel, Brauen, Handel u.a.
@@ -154,4 +152,3 @@ Vorschlag, noch nicht bestätigt:
 + Sichtweite größer als der Ausschnitt
 + Auflösung der Pixelart (16x16 oder 32x32)
 + Folgen eines abgebrochenen Brauvorgangs
-+ Verzeichnisstruktur bestätigen
