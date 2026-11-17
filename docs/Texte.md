@@ -9,9 +9,13 @@ Grobskizze, auszuarbeiten.
 + Alle Texte im Spiel stehen in Sprachdateien, Code und Daten verweisen nur über Schlüssel darauf
 + Sprachen: Deutsch zuerst, Englisch vorgesehen
 + Fehlende Schlüssel werden beim Laden gemeldet (Prüfung wie bei den Daten, siehe [Architektur.md](Architektur.md))
-+ Format vorläufig (Prototyp): `sprache/de/texte.js` mit `export default { schluessel: text }`; Texte enthalten Platzhalter wie `{menge}`; Wesen und Gegenstände haben statt eines Textes Formen nach Fall (`name`, `nom`, `akk`, `dat`, bei Bedarf weitere wie `ein`), eingesetzt mit `{ziel.akk}`; der Satzanfang wird groß geschrieben
-+ Die Datenprüfung meldet Textschlüssel aus den Daten, die in der Sprachdatei fehlen; fehlende Schlüssel aus dem Code erscheinen als `[schluessel]` und als Warnung in der Konsole
-+ Vorschlag, noch nicht bestätigt: Platzhalter und Grammatik im Text (Geschlecht, Mehrzahl, Fälle), damit z.B. "der Essigbakterie" und "dem Betriebskontrolleur" richtig gebildet werden
++ Format: `sprache/de/texte.js` mit `export default { schluessel: text }`; Texte enthalten Platzhalter wie `{menge}`; der Satzanfang wird groß geschrieben
++ Wesen und Gegenstände sind Hauptwörter: Geschlecht (`m`, `f`, `n`), bei Eigennamen `eigenname: true`, und alle vier Fälle der Einzahl ohne Artikel, z.B. `{ geschlecht: "n", einzahl: { nom: "Essigbakterium", gen: "Essigbakteriums", dat: "Essigbakterium", akk: "Essigbakterium" } }`; unregelmäßige Beugung (des Bären) steht so ausgeschrieben in den Fällen
++ Die Artikel kommen als Tabelle nach Art, Geschlecht und Fall aus `sprache/de/grammatik.js`; den Code dazu liefert `src/anzeige/grammatik.js`; Eigennamen stehen ohne Artikel, ihr Geschlecht dient später den Fürwörtern
++ Platzhalter für Hauptwörter: `{ziel.akk}` mit bestimmtem Artikel (Standard: Nominativ, bestimmt), `{was.nom.ein}` mit unbestimmtem, `{wer.gen.ohne}` ohne Artikel
++ Jede Sprache bekommt ihre eigene Regeltabelle; Sprachen mit Sonderregeln (englisch a/an) bekommen zusätzlich eigenen Code
++ Später: Mehrzahl (`mehrzahl` mit den vier Fällen, Artikel für `p`), Adjektivendungen für Affixe (ein verfluchtes Braupaddel)
++ Die Datenprüfung meldet Textschlüssel aus den Daten, die in der Sprachdatei fehlen, und unvollständige Hauptwörter (Geschlecht, Fälle); fehlende Schlüssel aus dem Code erscheinen als `[schluessel]` und als Warnung in der Konsole
 
 ## Erzeugte Texte
 
@@ -35,4 +39,4 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 
 + Liste der Korpustexte mit Quelle und Rechtsgrundlage
 + Wo erzeugte Texte vorkommen: Bücher, Schriftrollen, Inschriften, HACCP-Aushänge, Händlergerede
-+ Endgültiges Format der Sprachdateien und Grammatik (Geschlecht, Mehrzahl, unbestimmter Artikel)
++ Mehrzahl und Adjektive im Detail

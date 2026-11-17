@@ -209,9 +209,9 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + `src/systeme/`: Bewegung, Kampf, Sicht, Pegel, Brauen, Handel u.a.
 + `src/ki/`: Verhaltensmodule
 + `src/welt/`: Dungeon-Erzeugung
-+ `src/anzeige/`: Renderer, Kamera, Oberfläche, Effekte
++ `src/anzeige/`: Renderer, Kamera, Oberfläche, Log, Effekte, Textzugriff und Grammatik
 + `src/eingabe/`: Tastenbelegung, Übersetzung in Befehle
 + `daten/`: Inhalte als JS-Datendateien, gesammelt in `daten/index.js`; `daten/zeichen.js` ist das Tileset aus Zeichen
-+ `sprache/de/`, `sprache/en/`: Texte
++ `sprache/de/`, `sprache/en/`: Texte (`texte.js`) und Grammatikregeln (`grammatik.js`) als Daten
 + `lib/`: Bibliotheken (rot.js) samt ihrer Lizenzdateien
 + `werkzeuge/`: Arena, Statistiken, Bots
