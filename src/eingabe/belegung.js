@@ -24,5 +24,11 @@ export default {
     Tab: "log_umschalten",
     Enter: "neustart",
     NumpadEnter: "neustart",
+    Escape: "reise_abbrechen",
   },
+  // Maustasten nach MouseEvent.button (0 links, 1 Mitte, 2 rechts); Rad: Zoom oder nichts
+  maus: {
+    0: "handeln", // Klick wird über die Klickregeln gedeutet (eingabe/maus.js)
+  },
+  rad: "zoom",
 };

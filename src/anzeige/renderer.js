@@ -41,7 +41,8 @@ export class Renderer {
     ctx.globalAlpha = 1;
   }
 
-  zeichnen(spiel, kamera, ansicht, zoom) {
+  // markierungen: { zeiger: {x, y} | null, weg: [{x, y}] } (reine Anzeige)
+  zeichnen(spiel, kamera, ansicht, zoom, markierungen = {}) {
     const ctx = this.ctx;
     const z = spiel.zustand;
     const e = z.ebene;
@@ -77,6 +78,23 @@ export class Renderer {
       const eintrag = istWesen(n) ? ts.wesen[n.typ] : ts.gegenstaende[n.typ];
       const boden = ts.gelaende[gelaendeNamen[e.felder[n.position.y][n.position.x]]];
       this.feld(sx, sy, zoom, { ...eintrag, hintergrund: boden && boden.hintergrund }, 1);
+    }
+
+    this.markieren(kamera, ansicht, zoom, markierungen);
+  }
+
+  markieren(kamera, ansicht, zoom, { zeiger = null, weg = [] }) {
+    const ctx = this.ctx;
+    const imBild = (f) => f.x - kamera.x >= 0 && f.y - kamera.y >= 0 && f.x - kamera.x < ansicht.breite && f.y - kamera.y < ansicht.hoehe;
+    ctx.fillStyle = "rgba(224, 168, 58, 0.25)";
+    for (const f of weg) {
+      if (imBild(f)) ctx.fillRect((f.x - kamera.x) * zoom, (f.y - kamera.y) * zoom, zoom, zoom);
+    }
+    if (zeiger && imBild(zeiger)) {
+      ctx.strokeStyle = "#c87533";
+      ctx.lineWidth = Math.max(1, Math.floor(zoom / 16));
+      const d = ctx.lineWidth / 2;
+      ctx.strokeRect((zeiger.x - kamera.x) * zoom + d, (zeiger.y - kamera.y) * zoom + d, zoom - 2 * d, zoom - 2 * d);
     }
   }
 }

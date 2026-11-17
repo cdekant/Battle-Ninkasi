@@ -38,6 +38,13 @@ export default {
   "log.abgelehnt.ungueltig": "Das geht so nicht.",
   "log.abgelehnt.unbekannt": "Unbekannter Befehl.",
 
+  // Reise per Maus (nur Anzeige, keine Spielereignisse); "angekommen" und "abgebrochen" bleiben stumm
+  "reise.kein_weg": "Dorthin kennt Ninkasi keinen Weg.",
+  "reise.feinde_in_sicht": "Mit Feinden in Sicht wird nicht spaziert.",
+  "reise.gegner_in_sicht": "Etwas regt sich. Ninkasi bleibt stehen.",
+  "reise.schaden": "Autsch. Schluss mit dem Ausflug.",
+  "reise.versperrt": "Da steht jemand im Weg.",
+
   // Oberfläche
   "ui.lp": "LP",
   "ui.mp": "MP",
@@ -50,6 +57,6 @@ export default {
   "ui.startwert": "Startwert",
   "ui.zeit": "Zeit",
   "ui.version": "Version",
-  "ui.tasten": "Ziffernblock: bewegen, 5: warten, G: aufheben, T: trinken, +/-: Zoom, Tab: Log",
+  "ui.tasten": "Ziffernblock: bewegen, 5: warten, G: aufheben, T: trinken, +/-: Zoom, Tab: Log. Maus: Klick reist, greift an oder hebt auf, Rad zoomt, jede Taste hält an.",
   "ui.datenfehler": "Fehler in den Daten",
 };
