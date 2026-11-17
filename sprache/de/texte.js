@@ -1,11 +1,20 @@
-// Deutsche Texte. Schlüssel -> Text oder, für Wesen und Gegenstände, Formen nach Fall.
-// Platzhalter: {name} bzw. {wer.nom}, {ziel.akk} usw. (Formen: name, nom, akk, dat)
-// Format vorläufig, siehe docs/Texte.md.
+// Deutsche Texte. Schlüssel -> Text, für Wesen und Gegenstände ein Hauptwort mit Geschlecht und Fällen.
+// Artikel kommen aus grammatik.js. Platzhalter: {menge}, {ziel.akk}, {was.nom.ein}, {wer.gen.ohne},
+// siehe docs/Texte.md.
 export default {
   // Wesen und Gegenstände
-  "wesen.ninkasi": { name: "Ninkasi", nom: "Ninkasi", akk: "Ninkasi", dat: "Ninkasi" },
-  "wesen.essigbakterium": { name: "Essigbakterium", nom: "das Essigbakterium", akk: "das Essigbakterium", dat: "dem Essigbakterium" },
-  "gegenstand.bier": { name: "Bier", nom: "das Bier", akk: "das Bier", dat: "dem Bier", ein: "ein Bier" },
+  "wesen.ninkasi": {
+    geschlecht: "f", eigenname: true,
+    einzahl: { nom: "Ninkasi", gen: "Ninkasis", dat: "Ninkasi", akk: "Ninkasi" },
+  },
+  "wesen.essigbakterium": {
+    geschlecht: "n",
+    einzahl: { nom: "Essigbakterium", gen: "Essigbakteriums", dat: "Essigbakterium", akk: "Essigbakterium" },
+  },
+  "gegenstand.bier": {
+    geschlecht: "n",
+    einzahl: { nom: "Bier", gen: "Biers", dat: "Bier", akk: "Bier" },
+  },
 
   // Log
   "log.willkommen": "Ninkasi erwacht in einem feuchten Keller. Nüchtern. Das muss sich ändern.",
@@ -13,7 +22,7 @@ export default {
   "log.verfehlt": "{quelle.nom} verfehlt {ziel.akk}.",
   "log.tod": "{opfer.nom} zerplatzt zu saurem Matsch.",
   "log.tod_ninkasi": "Ninkasi stirbt. Ausgerechnet nüchterner als ihr lieb war. [Eingabe] für einen neuen Lauf.",
-  "log.liegt_hier": "Hier liegt {was.ein}.",
+  "log.liegt_hier": "Hier liegt {was.nom.ein}.",
   "log.aufgehoben": "{wer.nom} nimmt {was.akk} an sich.",
   "log.getrunken": "{wer.nom} leert {was.akk} in einem Zug.",
   "log.geheilt": "+{menge} {wert}.",

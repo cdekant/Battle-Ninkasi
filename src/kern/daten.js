@@ -47,14 +47,21 @@ function pruefeText(texte, schluessel, ort, fehler) {
   if (texte && !(schluessel in texte)) fehler.push(`${ort}: Text "${schluessel}" fehlt in der Sprachdatei`);
 }
 
+// Texte von Wesen und Gegenständen sind Hauptwörter; die Prüfung kommt von der Grammatik der Sprache
+function pruefeNomen(sprache, schluessel, fehler) {
+  if (!sprache.nomenPruefen || !sprache.texte || !(schluessel in sprache.texte)) return;
+  fehler.push(...sprache.nomenPruefen(sprache.texte[schluessel], `Text "${schluessel}"`));
+}
+
 function pruefeEffekt(daten, name, ort, fehler) {
   if (!daten.effekte[name]) fehler.push(`${ort}: Effekt "${name}" gibt es nicht`);
 }
 
-function pruefeWesen(daten, texte, name, w, fehler) {
+function pruefeWesen(daten, sprache, name, w, fehler) {
   const ort = `wesen.${name}`;
   if (w.abstrakt) return;
-  pruefeText(texte, w.text, ort, fehler);
+  pruefeText(sprache.texte, w.text, ort, fehler);
+  pruefeNomen(sprache, w.text, fehler);
   if (typeof w.fraktion !== "string") fehler.push(`${ort}: fraktion fehlt`);
   if (!w.werte || !w.werte.lp) fehler.push(`${ort}: werte.lp fehlt`);
   for (const [wn, wd] of Object.entries(w.werte || {})) {
@@ -71,10 +78,11 @@ function pruefeWesen(daten, texte, name, w, fehler) {
   if (!daten.zeichen.wesen[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js`);
 }
 
-function pruefeGegenstand(daten, texte, name, g, fehler) {
+function pruefeGegenstand(daten, sprache, name, g, fehler) {
   const ort = `gegenstaende.${name}`;
   if (g.abstrakt) return;
-  pruefeText(texte, g.text, ort, fehler);
+  pruefeText(sprache.texte, g.text, ort, fehler);
+  pruefeNomen(sprache, g.text, fehler);
   if (g.trinkbar) pruefeEffekt(daten, g.trinkbar.effekt, `${ort}.trinkbar`, fehler);
   if (!daten.zeichen.gegenstaende[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js`);
 }
@@ -106,16 +114,17 @@ function pruefeEbene(daten, name, e, fehler) {
   for (const t of ["wand", "boden"]) if (!daten.gelaende[e.gelaende?.[t]]) fehler.push(`${ort}: gelaende.${t} verweist auf unbekanntes Gelände`);
 }
 
-// Gibt { daten, fehler } zurück; daten mit aufgelösten Vorlagen
-export function vorbereiten(roh, texte) {
+// Gibt { daten, fehler } zurück; daten mit aufgelösten Vorlagen.
+// sprache: { texte, nomenPruefen? }, nomenPruefen(eintrag, ort) gibt eine Liste von Fehlern zurück
+export function vorbereiten(roh, sprache = {}) {
   const fehler = [];
   const daten = { ...roh };
   daten.wesen = vorlagenAufloesen(roh.wesen, "wesen", fehler);
   daten.gegenstaende = vorlagenAufloesen(roh.gegenstaende, "gegenstaende", fehler);
 
   for (const [n, e] of Object.entries(daten.effekte)) pruefeEffektdaten(n, e, fehler);
-  for (const [n, w] of Object.entries(daten.wesen)) pruefeWesen(daten, texte, n, w, fehler);
-  for (const [n, g] of Object.entries(daten.gegenstaende)) pruefeGegenstand(daten, texte, n, g, fehler);
+  for (const [n, w] of Object.entries(daten.wesen)) pruefeWesen(daten, sprache, n, w, fehler);
+  for (const [n, g] of Object.entries(daten.gegenstaende)) pruefeGegenstand(daten, sprache, n, g, fehler);
   for (const [n, e] of Object.entries(daten.ebenen)) pruefeEbene(daten, n, e, fehler);
   for (const [n, g] of Object.entries(daten.gelaende)) {
     if (typeof g.kennung !== "string" || g.kennung.length !== 1) fehler.push(`gelaende.${n}: kennung muss genau ein Zeichen sein`);

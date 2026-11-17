@@ -4,12 +4,14 @@
 import VERSION from "./version.js";
 import rohdaten from "../daten/index.js";
 import texteDe from "../sprache/de/texte.js";
+import grammatikDe from "../sprache/de/grammatik.js";
 import belegung from "./eingabe/belegung.js";
 import { datenLaden, neuesSpiel, befehl } from "./kern/spiel.js";
 import { hoeren } from "./kern/ereignisse.js";
 import { ableiten } from "./kern/zufall.js";
 import { spieler } from "./kern/zustand.js";
 import { erstelleTexte } from "./anzeige/texte.js";
+import { erstelleGrammatik } from "./anzeige/grammatik.js";
 import { Renderer } from "./anzeige/renderer.js";
 import { neueKamera, folgen } from "./anzeige/kamera.js";
 import { Oberflaeche } from "./anzeige/oberflaeche.js";
@@ -19,7 +21,8 @@ import { uebersetzen } from "./eingabe/eingabe.js";
 const ZOOMSTUFEN = [16, 32, 48, 64];
 const SPEICHER = "battle-ninkasi.einstellungen";
 
-const texte = erstelleTexte(texteDe);
+const grammatik = erstelleGrammatik(grammatikDe);
+const texte = erstelleTexte(texteDe, grammatik);
 
 function fehlerZeigen(titel, text) {
   const el = document.getElementById("fehler");
@@ -51,7 +54,7 @@ function zufaelligerStartwert() {
 
 let daten;
 try {
-  daten = datenLaden(rohdaten, texteDe);
+  daten = datenLaden(rohdaten, { texte: texteDe, nomenPruefen: grammatik.pruefen });
 } catch (e) {
   fehlerZeigen(texte.t("ui.datenfehler"), e.message);
   throw e;

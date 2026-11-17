@@ -17,9 +17,10 @@ import { melden } from "./ereignisse.js";
 import { erzeugen as ebeneErzeugen } from "../welt/ebene.js";
 import { aktualisieren as sichtAktualisieren } from "../systeme/sicht.js";
 
-// Rohdaten prüfen und vorbereiten; wirft Datenfehler mit allen Meldungen
-export function datenLaden(roh, texte) {
-  const { daten, fehler } = vorbereiten(roh, texte);
+// Rohdaten prüfen und vorbereiten; wirft Datenfehler mit allen Meldungen.
+// sprache: { texte, nomenPruefen? } (siehe kern/daten.js)
+export function datenLaden(roh, sprache) {
+  const { daten, fehler } = vorbereiten(roh, sprache);
   if (fehler.length) throw new Datenfehler(fehler);
   return daten;
 }

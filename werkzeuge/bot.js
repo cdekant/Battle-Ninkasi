@@ -4,6 +4,8 @@
 
 import rohdaten from "../daten/index.js";
 import texte from "../sprache/de/texte.js";
+import grammatikDe from "../sprache/de/grammatik.js";
+import { erstelleGrammatik } from "../src/anzeige/grammatik.js";
 import { datenLaden, neuesSpiel, befehl, spielstand, nachspielen } from "../src/kern/spiel.js";
 import { erzeugen, ganzzahl } from "../src/kern/zufall.js";
 import { alle, spieler } from "../src/kern/zustand.js";
@@ -12,7 +14,7 @@ import { erstesGetraenk } from "../src/systeme/inventar.js";
 import { hoeren } from "../src/kern/ereignisse.js";
 
 const [laeufe = 20, maxBefehle = 3000, erster = 1] = process.argv.slice(2).map(Number);
-const daten = datenLaden(rohdaten, texte);
+const daten = datenLaden(rohdaten, { texte, nomenPruefen: erstelleGrammatik(grammatikDe).pruefen });
 
 function invarianten(spiel) {
   const z = spiel.zustand;

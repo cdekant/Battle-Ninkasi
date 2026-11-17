@@ -34,18 +34,18 @@ export class Oberflaeche {
       if (g) gepaeck[g.text] = (gepaeck[g.text] || 0) + 1;
     }
     const gepaeckHtml = Object.keys(gepaeck).length
-      ? Object.entries(gepaeck).map(([text, n]) => `<li>${form({ text })} x ${n}</li>`).join("")
+      ? Object.entries(gepaeck).map(([text, n]) => `<li>${form({ text }, "nom", "ohne")} x ${n}</li>`).join("")
       : `<li class="leise">${t("ui.leer")}</li>`;
 
     const gegner = Object.values(z.entitaeten).filter(
       (e) => e.position && e.fraktion !== undefined && e.fraktion !== p.fraktion && sichtbar.has(e.position.y * z.ebene.breite + e.position.x)
     );
     const gegnerHtml = gegner.length
-      ? gegner.map((g) => `<li>${balken(form(g), g.werte.lp.aktuell, maximum(g, "lp"), "lp klein")}</li>`).join("")
+      ? gegner.map((g) => `<li>${balken(form(g, "nom", "ohne"),g.werte.lp.aktuell, maximum(g, "lp"), "lp klein")}</li>`).join("")
       : `<li class="leise">${t("ui.niemand")}</li>`;
 
     this.el.innerHTML = `
-      <h1>${form(p)}</h1>
+      <h1>${form(p, "nom", "ohne")}</h1>
       ${balken(t("ui.lp"), w.lp.aktuell, maximum(p, "lp"), "lp")}
       ${balken(t("ui.mp"), w.mp.aktuell, maximum(p, "mp"), "mp")}
       <h2>${t("ui.pegel")}</h2>
