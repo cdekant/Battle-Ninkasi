@@ -1,6 +1,6 @@
 # Battle Ninkasi - Grundlagen
 
-Stand: 2026-11-17
+Stand: 2026-11-18
 
 ## Spiel
 
@@ -15,15 +15,28 @@ Stand: 2026-11-17
 ## Spielkern
 
 + Ninkasi ist die Inkarnation der mesopotamischen Göttin des Bieres, alkoholaffin
-+ Alkohol ist Ressource: Bier, eventuell auch Wein und Spirituosen
-+ Drei Werte: Lebenspunkte (LP), Magiepunkte (MP), Pegelpunkte (PP)
-+ PP sind das Maß des Rauschpegels, Psi hat keinen eigenen Vorrat
-+ Erstes Konzept: Bier füllt LP, Wein füllt MP, alle Getränke füllen PP
-+ LP und MP regenerieren über die Zeit, aber nur mit Pegel: nüchtern keine Regeneration
-+ Psi: hohes Risiko, hoher Ertrag; wirkt sofort auf Einzelziele (Gedanken, Furcht, Kontrolle, Teleport)
-+ Magie: langsamer, wirkt über die Zeit, etwas mehr in Richtung Crowd Control
-+ Spirituosen heben den Rauschpegel schneller als Wein und Bier
++ Alkohol ist Ressource: Bier, Wein und Brand
++ Drei Vorräte: Lebenspunkte (LP), Magiepunkte (MP), Psi-Punkte (PP)
++ Dazu der Pegel, gemessen in Promille: 100 entsprechen 1 ‰, nach oben offen; in der Oberfläche als ‰, in Text und Doku "Pegel"
++ Magie und Psi sind getrennte Systeme mit eigenem Vorrat
++ Magie: gebunden an Ritual, Schrift und Alchemie, kostet neben MP auch Zeit und Material; langsamer, wirkt über die Zeit, etwas mehr in Richtung Crowd Control
++ Psi: sofort und rein geistig, hohes Risiko, hoher Ertrag; wirkt auf Einzelziele (Gedanken, Furcht, Kontrolle, Teleport); Wirksamkeit und Risiko steigen mit dem Pegel
++ Jeder Vorrat regeneriert mit eigenem Verlauf über den Pegel:
+  + LP regenerieren immer, langsam (Vorbild: Brogue); ohne Pegel etwas langsamer, am schnellsten bei einem optimalen Pegel weit über dem von Normalsterblichen, darüber wieder abnehmend
+  + MP regenerieren nüchtern am schnellsten, je höher der Pegel, desto langsamer
+  + PP regenerieren nur mit Pegel, je höher der Pegel, desto schneller
++ Folge: Auf Magie bereitet man sich nüchtern vor, Psi braucht für Regeneration und Wirksamkeit einen möglichst hohen Pegel, bei dem das Risiko steigt; Mischbuilds müssen ihren Rausch planen
++ Meditieren und Schriftrollen schreiben nur nüchtern
++ Vorschlag, noch nicht bestätigt: Bier füllt LP, Wein füllt MP, Brand füllt PP oder wirkt nur über den Pegel; jedes Getränk hebt den Pegel nach seinem Alkoholgehalt
++ Brand hebt den Pegel schneller als Wein und Bier
++ Wein füllt MP sofort, bremst über den Pegel aber die MP-Regeneration
 + Rauschpegel klingt über die Zeit ab
++ Vorschlag, noch nicht bestätigt: linearer Abbau wie in der Wirklichkeit (etwa 0,1 bis 0,15 ‰ pro Stunde), Trinkfestigkeit beschleunigt ihn; ein hoher Pegel hält so lange an
++ Option, noch nicht entschieden: Ausdauer als vierter Vorrat
+  + Kosten nur für körperliche Sonderaktionen (Kopfstoß, Bierfontäne, Sprint, Ringen, Werfen), nie für Bewegen und normales Angreifen
+  + Regeneriert schnell und unabhängig vom Pegel, der einzige Vorrat, der auch nüchtern verlässlich zurückkommt
+  + Name vielleicht "Puste"
+  + Kater: Sinkt der Pegel nach einem Rausch, sinkt vorübergehend die höchste Ausdauer; Ansatzpunkt für den Makel Aldehyd-Dehydrogenase-Mangel
 + Bestimmte Aktionen sind nur mit einem bestimmten Pegel durchführbar
 + Rauschpegel bringt Risiko
 + Brausystem mit Zutaten und Rezepten
@@ -92,12 +105,16 @@ Stand: 2026-11-17
 
 ## Offen
 
-+ Regeneration im Detail: ab welchem Pegel, wie schnell, ob sie mit dem Pegel steigt
-+ Wie Psi mit dem Pegel zusammenhängt: Mindestpegel, Pegel verbrauchen oder Pegel weiter erhöhen
++ Regeneration im Detail: Raten und Form der Verläufe
++ Wo das Optimum der LP-Regeneration liegt (etwa 1,5 ‰?) und ob Trinkfestigkeit es nach oben verschiebt
++ Ob die LP-Regeneration bei sehr hohem Pegel negativ wird (Alkoholvergiftung), als natürliche Grenze des offenen Pegels
++ Ob die MP-Regeneration bei hohem Pegel auf null sinkt oder nur immer langsamer wird
++ Wofür der Brand gut ist: PP direkt füllen oder nur über den Pegel wirken
++ Ab welcher Schwelle "nüchtern" für Meditieren und Schriftrollen gilt
 + Worin das Risiko von Psi besteht (Fehlschlag, Kontrollverlust, Rückschlag)
 + Magie im Detail: welche Wirkungen über die Zeit (Schaden, Flächen, Segen und Fluch, Beschwörung)
 + Rauschpegel im Detail: Schwellen, Risiken, Aktionen mit Mindestpegel
-+ Wein und Spirituosen ja oder nein
++ Ausdauer: ob überhaupt, Zuordnung zu Gewandtheit oder Körperlichkeit, Verhältnis zu einer Nahrungsuhr
 + Endboss: Sobrietas oder erfundener Gott der Nüchternheit
 + Unterschiede der Mikroorganismen ausarbeiten (Hefen, Bakterien, Schimmel, weitere Gruppen)
 + Brausystem im Detail: Zutaten, Rezepte, Wirkung der Kessel-Tiers, Reihenfolge der Materialien

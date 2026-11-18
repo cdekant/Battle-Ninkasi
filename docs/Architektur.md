@@ -36,7 +36,7 @@ Stand: 2026-11-18
 + Eine Entität ist eine ID plus Komponenten, z.B. Position, Werte, Inventar, KI, Fraktion, Handel, Braukessel, Sicht
 + Unterschiede entstehen allein durch die Kombination der Komponenten
 + Beispiele: Psi-Kontrolle ändert die Fraktion; Kulturhefe als Verbündete ist ein Dateneintrag; ein Phage tauscht beim Befall Komponenten des Bakteriums aus; ein wandernder Händler hat eine Handelskomponente und eine friedliche Fraktion
-+ Werte (LP, MP, PP und weitere) sind ein erweiterbarer Satz, keine fest verdrahteten Felder
++ Werte (LP, MP, PP, Pegel und weitere) sind ein erweiterbarer Satz, keine fest verdrahteten Felder
 + Der gesamte Zustand ist reine Daten und als JSON serialisierbar (keine Funktionen, keine DOM-Objekte)
 
 ## Zeitmodell
@@ -150,7 +150,8 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 
 + Karte auf dem größten Teil des Bildschirms, rechts eine Seitenleiste (etwa 400 px), unten ein Log (4 bis 5 Zeilen, aufklappbar)
 + Sichtbar bei 1080p neben Seitenleiste und Log: bei 16 px etwa 95x57 Felder, bei 32 px etwa 47x28, bei 48 px etwa 31x19, bei 64 px etwa 23x14
-+ Seitenleiste: LP und MP als Balken, Pegel als eigene, auffällige Anzeige mit eingezeichneten Schwellen, aktive Zustände, Liste der sichtbaren Gegner (Vorbild: Brogue)
++ Seitenleiste: LP, MP und PP als Balken, Pegel als eigene, auffällige Anzeige in ‰ mit eingezeichneten Schwellen, aktive Zustände, Liste der sichtbaren Gegner (Vorbild: Brogue)
++ Vorschlag, noch nicht bestätigt: Der Pegel ist nach oben offen und wird logarithmisch angezeigt, in Verdopplungsschritten gleicher Breite (0, 0,5, 1, 2, 4, 8, 16 ‰ ...); eingezeichnet sind Schwellen und das Optimum der LP-Regeneration, daneben steht der genaue Wert (z.B. 2,35 ‰)
 + Inventar, Skillübersicht, Handel und Brauen als Fenster über der Karte; Öffnen und Schließen sind keine Befehle
 + Übersichtskarte per Umschalttaste, gezeichnet vom selben Renderer mit kleinen Feldern (4 bis 8 px); eine Minimap in der Seitenleiste ist später mit demselben Renderer möglich
 + Alle Elemente sind Anzeige und lassen sich ändern, ohne die Logik zu berühren
@@ -234,6 +235,7 @@ Vorläufige Ideen, noch nicht umgesetzt.
 + Essigbakterium: 15 LP, Biss 1W4 mit 70%, Verhaltensmodul "jagen" (sieht es Ninkasi, folgt es ihr, sonst geht es zur letzten bekannten Position und wartet)
 + Bier: aufheben mit G, trinken mit T; +20 LP, +20 PP
 + Pegel je Welttick: PP -1, mit PP > 0 Regeneration 0,5 LP und 0,5 MP; Schwellen 25, 50, 75 werden angezeigt und gemeldet, haben aber noch keine Wirkung
++ Stand des Konzepts weicht ab: Im Prototyp steht `pp` noch für den Pegel; geplant sind der Pegel in Promille (100 je 1 ‰, nach oben offen), PP als Psi-Punkte und eigene Verläufe der Regeneration für LP, MP und PP, siehe [Grundlagen.md](Grundlagen.md)
 + Alle Aktionen kosten 100
 + Tasten: Ziffernblock zum Bewegen, 5 Warten, +/- Zoom (16, 32, 48, 64 px), Tab klappt das Log auf, Eingabe startet nach dem Tod einen neuen Lauf
 + Maus (ab 0.1.0): Klick reist, greift an oder hebt auf, Rad zoomt, siehe Maus und Reise

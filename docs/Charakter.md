@@ -1,10 +1,10 @@
 # Battle Ninkasi - Charakter und Lernen
 
-Stand: 2026-11-17
+Stand: 2026-11-18
 
 ## Charaktererstellung
 
-+ Spieler verteilt Punkte auf fünf bis sieben Eigenschaften
++ Spieler verteilt Punkte auf sechs Eigenschaften
 + Makel gehören zur Charaktererstellung: Nachteil gegen zusätzliche Punkte
 + Beispiele für Makel: Blindheit (Sichtweite stark eingeschränkt), dysfunktionale Alkoholdehydrogenase
 + Weitere Makel, auszuarbeiten: Aldehyd-Dehydrogenase-Mangel (Acetaldehyd, Flush, Katerschaden), Zöliakie (Gerste und Weizen schaden), Gicht (Purine im Bier lösen Anfälle aus)
@@ -12,16 +12,41 @@ Stand: 2026-11-17
 
 ## Startwerte
 
-+ Vorläufig, Grundlage fürs Balancing: 100 LP, 100 MP, 0 PP
++ Vorläufig, Grundlage fürs Balancing: 100 LP, 100 MP, Pegel 0 ‰
 + 100 als Grundwert, damit Boni in Prozent vom Grundwert glatte ganze Zahlen ergeben
-+ Mit 0 PP startet Ninkasi nüchtern und regeneriert erst nach dem ersten Getränk
-+ Höchstwert der PP noch offen, im Prototyp vorläufig 100
++ Mit Pegel 0 startet Ninkasi nüchtern: LP regenerieren langsam, MP am schnellsten, PP gar nicht (Verläufe in [Grundlagen.md](Grundlagen.md))
++ Startwert und Höchstwert der PP (Psi-Punkte) noch offen
++ Der Pegel ist nach oben offen; im Prototyp steht `pp` noch für den Pegel mit Höchstwert 100
 
 ## Eigenschaften
 
++ Sechs Eigenschaften: Körperlichkeit, Trinkfestigkeit, Gewandtheit, Sinnlichkeit, Klugheit, Braukunde
 + Eigenschaften sind reine Lernwerte: Sie senken die EP-Kosten von Skills
 + Jeder Skill hat eine primäre und eine sekundäre Eigenschaft (Vorbild: EVE Online)
 + Beispiel: Hohe Körperlichkeit lässt Skills, die LP erhöhen, schneller lernen
++ Vorbild D&D (sechs Eigenschaften), Weisheit und Intelligenz geschärft zu Lebendigem (Braukunde) und Mechanischem (Klugheit)
+
+### Bereiche
+
++ Körperlichkeit: Kraft, LP, Nahkampf, Tragen, Kopfstoß
++ Trinkfestigkeit: Pegel, Widerstand gegen Gift und Infektion; thematisch verwandt mit den Makeln des Stoffwechsels
++ Gewandtheit: Schnelligkeit, Ausweichen, Schleichen, Fernkampf, Reaktion (z.B. Fallen im letzten Moment bemerken)
++ Sinnlichkeit: bewusst doppeldeutig, die Sinne und das Sinnliche; Wahrnehmung (Nachtsicht, Fernsicht, Fallen entdecken), Ego, Charisma, Gefährten, Handel, Psi
++ Klugheit: Anlagen, Prozesse, Fallen entschärfen, Rätsel, Zauber als erlernte Formel
++ Braukunde: die Weisheit dieser Welt, Brauen ist heiliges Wissen; Brauen, Alchemie, Mikroorganismen, Kreaturen verstehen, göttliche Gaben
++ Sinnlichkeit ist die schwerste Eigenschaft, Ausgleich über das Balancing
++ Vorräte und Eigenschaften: LP zu Körperlichkeit, MP zu Klugheit und Braukunde, PP zu Sinnlichkeit, Pegel zu Trinkfestigkeit, Ausdauer (Option) zu Gewandtheit oder Körperlichkeit
++ Vorschlag, noch nicht bestätigt: Trinkfestigkeit hebt die Schwellen des Pegels, beschleunigt seinen Abbau und verschiebt das Optimum der LP-Regeneration nach oben
+
+### Magie und Psi
+
++ Getrennte Systeme, siehe [Grundlagen.md](Grundlagen.md): Magie gebunden an Ritual, Schrift und Alchemie (MP), Psi sofort und rein geistig (PP)
++ Psi: primär Sinnlichkeit
++ Vorschlag, noch nicht bestätigt: Magie gehört keiner einzelnen Eigenschaft, die Paarung prägt ihren Charakter
+  + Zauber als Formel (Schriftrollen, HACCP-Aushänge): primär Klugheit, sekundär Braukunde
+  + Alchemie (Tränke, Gärung, Gifte): primär Braukunde, sekundär Klugheit
+  + Göttliche Gabe (Altäre, Nebengottheiten): primär Braukunde, sekundär Sinnlichkeit
++ Vorschlag, noch nicht bestätigt: Psi sekundär Klugheit
 
 ## Skills
 
@@ -73,7 +98,7 @@ Stand: 2026-11-17
 + Nachrückende Gegner: ob, wie oft, mit welchem EP-Faktor
 + Mechanismus für verminderte EP: Abstand Gegnerstufe zu Skillstufe oder Sättigung pro Gegnertyp
 + Wo freie EP verteilt werden (sofort oder an bestimmten Orten), zunächst per Schalter
-+ Namen und Zahl der Eigenschaften
++ Zuordnung aller Skills zu primärer und sekundärer Eigenschaft, später als eigener Skillkatalog
 + Katalog der Makel und ihr Punktwert
 + Ob passive Skills auch gebundene EP bekommen
 + Verteilung gebundener EP, wenn mehrere Skills beteiligt sind
