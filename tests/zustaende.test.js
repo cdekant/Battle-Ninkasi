@@ -99,16 +99,16 @@ test("einzeln: eigene Instanzen mit eigenem Ende, höchstens hoechstStapel", () 
   assert.deepEqual(instanzen(traegerin, "blutung").map((instanz) => instanz.ende), [400]);
 });
 
-test("Verlauf abklingend: Modifikatoren werden je Welttick nachgeführt und am Ende entfernt", () => {
+test("Verlauf abklingend: Modifikatoren folgen bei jeder Abfrage dem Verlauf und entfallen am Ende", () => {
   const spiel = spielBauen();
   const traegerin = wesen(spiel, 2, 1);
   zustandSetzen(spiel, traegerin, "abklingender_segen", { staerke: 2 });
-  assert.equal(modifiziert(traegerin, "trefferchance", 50), 70);
+  assert.equal(modifiziert(spiel, traegerin, "trefferchance", 50), 70);
   weltLaufenLassen(spiel, 500);
-  assert.equal(modifiziert(traegerin, "trefferchance", 50), 60);
+  assert.equal(modifiziert(spiel, traegerin, "trefferchance", 50), 60);
   weltLaufenLassen(spiel, 1000);
-  assert.equal(modifiziert(traegerin, "trefferchance", 50), 50);
-  assert.deepEqual(traegerin.modifikatoren, []);
+  assert.equal(modifiziert(spiel, traegerin, "trefferchance", 50), 50);
+  assert.equal(traegerin.modifikatoren, undefined, "nichts wird in die Liste der Trägerin geschrieben");
 });
 
 test("Unbegrenzt bis zum Entfernen per Tag; beimBeginn und beimEnde wirken auf die Trägerin", () => {

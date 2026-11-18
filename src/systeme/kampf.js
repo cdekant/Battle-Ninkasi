@@ -36,7 +36,7 @@ export function nahkampf(spiel, angreifer, ziel) {
 
 function einzelangriff(spiel, angreifer, ziel) {
   const angriff = angreifer.angriff;
-  const trefferchance = modifiziert(angreifer, "trefferchance", angriff.trefferchance);
+  const trefferchance = modifiziert(spiel, angreifer, "trefferchance", angriff.trefferchance);
   const mittel = { art: "angriff", name: angriff.effekt };
   const beteiligte = { quelleId: angreifer.id, urheberId: angreifer.beschworenVon ?? angreifer.id, zielId: ziel.id, ursache: "nahkampf", kettentiefe: 0, mittel };
   if (mitProzentChance(spiel.zustand.zufallszustand, trefferchance)) {

@@ -10,7 +10,7 @@
 //                 "einzeln"     jede Anwendung eine eigene Instanz, höchstens hoechstStapel
 //   verlauf:      "gleichbleibend" (Vorgabe) | "abklingend" | "ansteigend" | eigene Kurve
 //                 [[anteilProzent, staerkeProzent], ...] über den Anteil der verstrichenen Dauer
-//   modifikatoren: [{ ziel, art, betrag }], betrag je Stärke 1, mit dem Verlauf skaliert
+//   modifikatoren: [{ ziel, art, betrag }], betrag je Stärke 1, mit dem Verlauf skaliert (siehe modifikatorSkaliert)
 //   jeTick, beimBeginn, beimEnde: Effekte auf die Trägerin; Mengen mit mitStaerke skalieren mit der Stärke
 //   gebundenAnQuelle: endet mit dem Tod oder Verschwinden der Quelle (aufrechterhaltener Zauber, Beschworene)
 //   handlungsunfaehig: true  die Trägerin muss warten (Ninkasi: jede Eingabe wird zu warten, siehe kern/spiel.js)
@@ -21,8 +21,8 @@
 // Instanz an der Entität: zustaende: [{ nummer, name, quelleId, urheberId, urheberFraktion, beginn, ende, staerke, stapel }]
 // Takt: Weltuhr (je Welttick, solange zeit < ende); Hast und Verlangsamung der Trägerin ändern daran nichts.
 // Ende: Zeitereignis "zustand_ende", gebunden an die Trägerin; wurde der Zustand inzwischen verlängert,
-// reiht es sich zum neuen Ende wieder ein. Modifikatoren stehen mit der Quelle "zustand:<nummer>" in der
-// Liste der Trägerin und werden bei Beginn, Stapeln und jedem Welttick nachgeführt.
+// reiht es sich zum neuen Ende wieder ein. Modifikatoren liefert die Modifikatorquelle "zustaende" bei jeder
+// Abfrage, mit Stärke und Verlauf zur aktuellen Zeit skaliert und mit der Quelle "zustand:<nummer>".
 
 import { anmelden, holen } from "../kern/register.js";
 import { alleEntitaeten, fraktionVon } from "../kern/zustand.js";
@@ -31,7 +31,7 @@ import { hakenAusloesen, melden, bezugAuf } from "../kern/ereignisse.js";
 import { effektAnwenden } from "../kern/effekte.js";
 import { bausteinAnmelden } from "../kern/bausteine.js";
 import { wertAufKurve } from "../kern/kurven.js";
-import { prozentVon, modifikatorHinzufuegen, modifikatorenEntfernen } from "../kern/werte.js";
+import { modifikatorSkaliert } from "../kern/werte.js";
 
 export const STAPELREGELN = ["erneuern", "aufaddieren", "staerkster", "einzeln"];
 
@@ -66,15 +66,17 @@ export function staerkeProzent(spiel, instanz) {
 
 const modifikatorQuelle = (instanz) => `zustand:${instanz.nummer}`;
 
-function modifikatorenNachfuehren(spiel, traegerin, instanz) {
-  modifikatorenEntfernen(traegerin, modifikatorQuelle(instanz));
-  const definition = definitionVon(spiel, instanz.name);
-  if (!definition.modifikatoren?.length) return;
-  const prozent = staerkeProzent(spiel, instanz);
-  for (const modifikator of definition.modifikatoren) {
-    modifikatorHinzufuegen(traegerin, { ziel: modifikator.ziel, art: modifikator.art, betrag: prozentVon(modifikator.betrag, prozent), quelle: modifikatorQuelle(instanz) });
+// Modifikatorquelle: alle Zustände der Trägerin in ihrer Reihenfolge, skaliert mit der Stärke zur aktuellen Zeit
+anmelden("modifikatorquellen", "zustaende", (spiel, traegerin) => {
+  const ergebnis = [];
+  for (const instanz of traegerin.zustaende || []) {
+    const modifikatoren = definitionVon(spiel, instanz.name).modifikatoren;
+    if (!modifikatoren?.length) continue;
+    const prozent = staerkeProzent(spiel, instanz);
+    for (const modifikator of modifikatoren) ergebnis.push({ ...modifikatorSkaliert(modifikator, prozent), quelle: modifikatorQuelle(instanz) });
   }
-}
+  return ergebnis;
+});
 
 // Kontext für Effekte und Haken eines Zustands; wirkt auf die Trägerin, zugerechnet der Urheberin
 function zustandsKontext(spiel, traegerin, instanz, kettentiefe = 0) {
@@ -112,7 +114,6 @@ function neueInstanz(spiel, traegerin, name, angaben, ende) {
   if (!traegerin.zustaende) traegerin.zustaende = [];
   traegerin.zustaende.push(instanz);
   if (ende !== null) ereignisEinreihen(zustand, ende, "zustand_ende", { traegerinId: traegerin.id, nummer: instanz.nummer }, traegerin.id);
-  modifikatorenNachfuehren(spiel, traegerin, instanz);
   melden(spiel, "zustand_beginnt", { wer: bezugAuf(traegerin), zustand: name, staerke: instanz.staerke });
   hakenAusloesen(spiel, "zustand_beginnt", hakenKontext(traegerin, instanz, angaben.kettentiefe));
   zustandsEffekt(spiel, traegerin, instanz, definitionVon(spiel, name).beimBeginn, angaben.kettentiefe);
@@ -160,7 +161,6 @@ export function zustandSetzen(spiel, traegerin, name, angaben = {}) {
     instanz.staerke = Math.max(instanz.staerke, vollstaendig.staerke);
     dauerErneuern(spiel, instanz, vollstaendig, ende);
   }
-  modifikatorenNachfuehren(spiel, traegerin, instanz);
   return instanz;
 }
 
@@ -169,7 +169,6 @@ export function zustandBeenden(spiel, traegerin, instanz, grund, kettentiefe = 0
   if (!traegerin.zustaende?.includes(instanz)) return;
   traegerin.zustaende = traegerin.zustaende.filter((andere) => andere !== instanz);
   if (traegerin.zustaende.length === 0) delete traegerin.zustaende;
-  modifikatorenEntfernen(traegerin, modifikatorQuelle(instanz));
   melden(spiel, "zustand_endet", { wer: bezugAuf(traegerin), zustand: instanz.name, grund });
   hakenAusloesen(spiel, "zustand_endet", hakenKontext(traegerin, instanz, kettentiefe, { grund }));
   zustandsEffekt(spiel, traegerin, instanz, definitionVon(spiel, instanz.name).beimEnde, kettentiefe);
@@ -186,14 +185,13 @@ anmelden("zeitereignisse", "zustand_ende", (spiel, { traegerinId, nummer }) => {
   zustandBeenden(spiel, traegerin, instanz, "abgelaufen");
 });
 
-// Je Welttick: Verlauf der Modifikatoren nachführen, dann jeTick; Entitäten nach ID, Zustände in ihrer Reihenfolge
+// Je Welttick: jeTick; Entitäten nach ID, Zustände in ihrer Reihenfolge
 anmelden("welttick", "zustaende", (spiel) => {
   const zustand = spiel.zustand;
   for (const traegerin of alleEntitaeten(zustand)) {
     for (const instanz of [...(traegerin.zustaende || [])]) {
       if (!zustand.entitaeten[traegerin.id] || !traegerin.zustaende?.includes(instanz)) continue;
       if (instanz.ende !== null && zustand.zeit >= instanz.ende) continue;
-      modifikatorenNachfuehren(spiel, traegerin, instanz);
       zustandsEffekt(spiel, traegerin, instanz, definitionVon(spiel, instanz.name).jeTick, 0);
     }
   }

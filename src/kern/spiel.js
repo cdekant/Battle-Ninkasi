@@ -48,7 +48,7 @@ export function neuesSpiel(daten, startwert) {
 export function zeitkosten(spiel, entitaet, aktion) {
   const grundkosten = spiel.daten.aktionen[aktion];
   if (grundkosten === undefined) throw new Error(`Keine Kosten für Aktion "${aktion}" in daten/aktionen.js`);
-  return Math.max(1, modifiziert(entitaet, [`kosten.${aktion}`, "kosten.alle"], grundkosten));
+  return Math.max(1, modifiziert(spiel, entitaet, [`kosten.${aktion}`, "kosten.alle"], grundkosten));
 }
 
 // Ninkasi wartet auf eine Eingabe, außer ein Zustand gibt ihr eine KI (Furcht, Rausch, Psi-Kontrolle)

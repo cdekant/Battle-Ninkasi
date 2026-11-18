@@ -43,7 +43,7 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 Status: umgesetzt in Version 0.6.0 (Grundgerüst) und 0.7.0 (Verhalten, Beschwörung), beschrieben in [Architektur.md](Architektur.md) (Zustände, Befehle, Wahrnehmung)
 
-Entschieden: Takt ist die Weltuhr; Stapelregel je Zustand, Vorgabe `erneuern`; Verlauf mit drei Namen oder eigener Kurve; handlungsunfähige Ninkasi wartet je Eingabe eine Aktion; Torkeln und Verwirrung über denselben Veränderer, Verwirrung greift auch Freunde an; Beschworene werden der Beschwörerin zugerechnet; Zustände im Spielinhalt erst, wenn der Systemausbau abgeschlossen ist (bis dahin nur in den Tests)
+Entschieden: Takt ist die Weltuhr; Stapelregel je Zustand, Vorgabe `erneuern`; Verlauf mit drei Namen oder eigener Kurve; handlungsunfähige Ninkasi wartet je Eingabe eine Aktion; Torkeln und Verwirrung über denselben Veränderer, Verwirrung greift auch Freunde an; Beschworene werden der Beschwörerin zugerechnet; Zustände im Spielinhalt erst, wenn der Systemausbau abgeschlossen ist (bis dahin nur in den Tests); seit 0.8.0 kommen ihre Modifikatoren aus der Modifikatorquelle `zustaende`
 
 Offener Rest:
 
@@ -54,14 +54,16 @@ Offener Rest:
 
 ## 4. Modifikatoren
 
-Status: offen
+Status: in Arbeit; umgesetzt in Version 0.8.0 (Register der Modifikatorquellen, Verrechnung, Zustände ohne Nachführen), beschrieben in [Architektur.md](Architektur.md) (Modifikatoren, Zustände)
 
-+ Bisher als Liste gespeichert (`entitaet.modifikatoren`); künftig bei Bedarf aus allen Quellen gesammelt: Ausrüstung, Zustände, Skills, Auren in Reichweite, Pegelschwellen, über ein Register der Modifikatorquellen
-+ Auren ändern sich mit jedem Schritt und sind nur so sauber abbildbar
-+ Zustände schreiben ihre Modifikatoren seit 0.6.0 noch in die Liste der Trägerin und führen sie je Welttick nach; mit dem Register der Modifikatorquellen werden auch sie bei Bedarf berechnet (dafür braucht `modifiziert` Zugriff auf Daten und Uhrzeit des Spiels)
-+ Verrechnung erweitern: neben `plus` und `prozent` auch `mal` (Vorschlag "zwischen Quellen multiplizieren" in [Charakter.md](Charakter.md)), `setzen`, Mindest- und Höchstwert
-+ Bedingungen am Modifikator: ab Pegel X, unter 30 % LP, nur gegen Bakterien, Set aus zwei Kupfer-Items
-+ Ziele über Tags, z.B. `kosten.tag:psi`, `schaden.tag:feuer`; Umsetzung des Tag-Systems aus [Charakter.md](Charakter.md)
+Entschieden: Verrechnung nach dem Vorbild "increased" und "more" (Prozente addieren, nur `mal` multipliziert, einmal gerundet, `hoechstens` gewinnt gegen `mindestens`); Boni zwischen Quellen multiplizieren nicht automatisch, sondern nur über `mal` in den Daten; Auren ohne Sichtlinie (Option `sichtlinie: true`), `wen` aus Sicht der Trägerin, standardmäßig nicht auf sich selbst; Tags als eigenes Feld am Modifikator
+
+Offen, für Version 0.9.0:
+
++ Bedingungen am Modifikator `wenn: [{ bedingung, ...parameter }]` über ein Register `modifikatorbedingungen`: `pegel_ab { wert }`, `wert_unter_prozent { wert, prozent }`, `gegenueber_tag { tag }` (Gegenüber über `umstaende.gegenueberId`); Bedingungen lesen nur Rohwerte, ein Schutz meldet Rekursion; Sets aus Gegenständen mit Punkt 9; Pegelschwellen sind damit gewöhnliche Modifikatoren mit `pegel_ab`
++ Tags: `{ ziel: "kosten", tag: "psi", ... }` wirkt nur, wenn die Abfrage den Tag in `umstaende.tags` mitbringt (aus `mittel` und Effektkontext); Tags an Wesen für "nur gegen Bakterien"; Schadensarten als Tags folgen mit Punkt 5
++ Auren: `auren: [{ reichweite, wen: "feinde" | "freunde" | "alle", selbst?, sichtlinie?, modifikatoren }]` an Wesen und Zuständen, Kreis wie in der Zielauswahl, als Modifikatorquelle `auren`; räumlicher Index erst mit Punkt 7, wenn der Bot es zeigt
++ Quellen `ausruestung` (Punkt 9) und `skills` (mit dem Skillsystem)
 
 ## 5. Kampfwerte
 

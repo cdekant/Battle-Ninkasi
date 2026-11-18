@@ -2,8 +2,16 @@
 // Wert in der Entität:   werte: { lp: { grundwert: 100, aktuell: 100, hundertstelRest: 0 } }
 //   ohne grundwert ist der Wert nach oben offen (z.B. der Pegel), nach unten bleibt er bei 0
 //   hundertstelRest: Bruchteile in Hundertsteln, ein voller Punkt wird gutgeschrieben
-// Modifikator:           { ziel: "lp" | "kosten.bewegen" | "kosten.alle" | ..., art: "plus" | "prozent", betrag, quelle }
-// Verrechnung vorläufig: alle Plus-Werte und alle Prozente addieren, Prozente vom Grundwert.
+// Modifikator: { ziel: "lp" | "kosten.bewegen" | "kosten.alle" | ..., art, betrag, quelle }
+//   art: "plus" | "prozent" | "mal" | "mindestens" | "hoechstens" | "setzen"; betrag ganzzahlig, bei "mal" in Prozent (150 = x1,5)
+// Modifikatoren werden bei jeder Abfrage aus allen Quellen gesammelt (Register "modifikatorquellen"), nichts wird nachgeführt.
+// Verrechnung (siehe docs/Architektur.md, Modifikatoren):
+//   (basiswert + Summe plus) x (100 + Summe prozent) / 100 x jedes mal / 100, einmal gerundet,
+//   dann mindestens (der höchste), dann hoechstens (der niedrigste, gewinnt also); setzen zählt als beides.
+
+import { anmelden, alle } from "./register.js";
+
+export const MODIFIKATORARTEN = ["plus", "prozent", "mal", "mindestens", "hoechstens", "setzen"];
 
 // Einheitliche Rundung für Prozentrechnung
 export function prozentVon(wert, prozent) {
@@ -22,16 +30,46 @@ export function geteiltGerundet(wert, teiler) {
   return Math.round(wert / teiler);
 }
 
-// Wendet alle Modifikatoren mit einem der Ziele auf einen Basiswert an
-export function modifiziert(entitaet, ziele, basiswert) {
+// Alle Modifikatoren einer Entität aus allen Quellen, in der Reihenfolge der Anmeldung der Quellen
+export function alleModifikatoren(spiel, entitaet) {
+  const ergebnis = [];
+  for (const [, quelle] of alle("modifikatorquellen")) ergebnis.push(...quelle(spiel, entitaet));
+  return ergebnis;
+}
+
+// Die Modifikatoren mit einem der Ziele, jeweils mit Quelle; Grundlage für Erklärungen in der Anzeige
+export function modifikatorenAufgeschluesselt(spiel, entitaet, ziele) {
   const zielListe = Array.isArray(ziele) ? ziele : [ziele];
-  let summePlus = 0, summeProzent = 0;
-  for (const modifikator of entitaet.modifikatoren || []) {
-    if (!zielListe.includes(modifikator.ziel)) continue;
-    if (modifikator.art === "plus") summePlus += modifikator.betrag;
-    else if (modifikator.art === "prozent") summeProzent += modifikator.betrag;
+  return alleModifikatoren(spiel, entitaet).filter((modifikator) => zielListe.includes(modifikator.ziel));
+}
+
+// Verrechnet Modifikatoren mit einem Basiswert; ganzzahlig bis zur einen Rundung am Ende
+export function verrechnet(basiswert, modifikatoren) {
+  let summePlus = 0, summeProzent = 0, zaehler = 1, nenner = 1;
+  let untergrenze = -Infinity, obergrenze = Infinity;
+  for (const { art, betrag } of modifikatoren) {
+    if (art === "plus") summePlus += betrag;
+    else if (art === "prozent") summeProzent += betrag;
+    else if (art === "mal") { zaehler *= betrag; nenner *= 100; }
+    if (art === "mindestens" || art === "setzen") untergrenze = Math.max(untergrenze, betrag);
+    if (art === "hoechstens" || art === "setzen") obergrenze = Math.min(obergrenze, betrag);
   }
-  return basiswert + summePlus + prozentVon(basiswert, summeProzent);
+  const ergebnis = Math.round(((basiswert + summePlus) * (100 + summeProzent) * zaehler) / (100 * nenner));
+  return Math.min(obergrenze, Math.max(untergrenze, ergebnis));
+}
+
+// Wendet alle Modifikatoren mit einem der Ziele auf einen Basiswert an
+export function modifiziert(spiel, entitaet, ziele, basiswert) {
+  return verrechnet(basiswert, modifikatorenAufgeschluesselt(spiel, entitaet, ziele));
+}
+
+// Skaliert einen Modifikator mit einer Stärke in Prozent (Zustände): plus und prozent im Betrag,
+// mal im Anteil über 100 (mal 150 bei 50 % wird mal 125), Grenzen gar nicht
+export function modifikatorSkaliert(modifikator, staerkeProzent) {
+  const { art, betrag } = modifikator;
+  if (art === "plus" || art === "prozent") return { ...modifikator, betrag: prozentVon(betrag, staerkeProzent) };
+  if (art === "mal") return { ...modifikator, betrag: 100 + prozentVon(betrag - 100, staerkeProzent) };
+  return { ...modifikator };
 }
 
 // Wert, dessen Fall auf 0 tötet (Daten: lebenswert, Vorgabe "lp"); siehe systeme/tod.js
@@ -52,34 +90,35 @@ export function hatHoechstwert(entitaet, wertName) {
 }
 
 // Höchstwert aus Grundwert und Modifikatoren; Infinity für offene Werte (wird nur berechnet, nie gespeichert)
-export function hoechstwert(entitaet, wertName) {
+export function hoechstwert(spiel, entitaet, wertName) {
   if (!hatHoechstwert(entitaet, wertName)) return Infinity;
-  return modifiziert(entitaet, wertName, entitaet.werte[wertName].grundwert);
+  return modifiziert(spiel, entitaet, wertName, entitaet.werte[wertName].grundwert);
 }
 
 // Ändert einen Wert innerhalb 0 bis Höchstwert, gibt die tatsächliche Änderung zurück.
 // Ohne Haken; im Spiel läuft jede Änderung über wertAendern in kern/effekte.js.
-export function wertBegrenztAendern(entitaet, wertName, aenderung) {
+export function wertBegrenztAendern(spiel, entitaet, wertName, aenderung) {
   const wert = entitaet.werte[wertName];
   const vorher = wert.aktuell;
-  wert.aktuell = Math.max(0, Math.min(hoechstwert(entitaet, wertName), vorher + aenderung));
+  wert.aktuell = Math.max(0, Math.min(hoechstwert(spiel, entitaet, wertName), vorher + aenderung));
   return wert.aktuell - vorher;
 }
 
 // Änderung in Hundertsteln über den Rest; gibt die Änderung in vollen Punkten zurück
-export function wertBegrenztAendernInHundertsteln(entitaet, wertName, hundertstel) {
+export function wertBegrenztAendernInHundertsteln(spiel, entitaet, wertName, hundertstel) {
   const wert = entitaet.werte[wertName];
   wert.hundertstelRest = (wert.hundertstelRest || 0) + hundertstel;
   const vollePunkte = Math.trunc(wert.hundertstelRest / 100);
   wert.hundertstelRest -= vollePunkte * 100;
-  const geaendert = vollePunkte !== 0 ? wertBegrenztAendern(entitaet, wertName, vollePunkte) : 0;
+  const geaendert = vollePunkte !== 0 ? wertBegrenztAendern(spiel, entitaet, wertName, vollePunkte) : 0;
   // am Anschlag keinen Rest ansammeln
-  const amHoechstwert = wert.aktuell >= hoechstwert(entitaet, wertName) && wert.hundertstelRest > 0;
+  const amHoechstwert = wert.aktuell >= hoechstwert(spiel, entitaet, wertName) && wert.hundertstelRest > 0;
   const amNullpunkt = wert.aktuell <= 0 && wert.hundertstelRest < 0;
   if (amHoechstwert || amNullpunkt) wert.hundertstelRest = 0;
   return geaendert;
 }
 
+// Quelle "eigene": die Liste an der Entität (feste Modifikatoren, z.B. aus Daten der Wesen oder in Tests)
 export function modifikatorHinzufuegen(entitaet, modifikator) {
   if (!entitaet.modifikatoren) entitaet.modifikatoren = [];
   entitaet.modifikatoren.push(modifikator);
@@ -89,6 +128,8 @@ export function modifikatorHinzufuegen(entitaet, modifikator) {
 export function modifikatorenEntfernen(entitaet, quelle) {
   if (entitaet.modifikatoren) entitaet.modifikatoren = entitaet.modifikatoren.filter((modifikator) => modifikator.quelle !== quelle);
 }
+
+anmelden("modifikatorquellen", "eigene", (spiel, entitaet) => entitaet.modifikatoren || []);
 
 // Erzeugt den Wertesatz einer Entität aus Daten: { lp: { grundwert: 100, anfangswert?: 100 }, pegel: { anfangswert: 0 } }
 export function werteAusDaten(wertedaten) {

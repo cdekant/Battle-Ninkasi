@@ -52,21 +52,21 @@ test("Negative Kurvenwerte sind Schwund, nie unter 0", () => {
 });
 
 test("Modifikatoren: Regeneration, Schwund und Kurvenverschiebung wirken getrennt", () => {
-  const { trinkerin } = spielMitTrinkerin({ pegel: 150, regeneration: { lp: LP_KURVE, pp: [[0, -30], [50, 0]] } });
+  const { spiel, trinkerin } = spielMitTrinkerin({ pegel: 150, regeneration: { lp: LP_KURVE, pp: [[0, -30], [50, 0]] } });
   trinkerin.werte.pegel.aktuell = 0;
-  assert.equal(rateBeimPegel(trinkerin, "pp"), -30);
+  assert.equal(rateBeimPegel(spiel, trinkerin, "pp"), -30);
   modifikatorHinzufuegen(trinkerin, { ziel: "regeneration.pp", art: "prozent", betrag: 100, quelle: "falsch" });
-  assert.equal(rateBeimPegel(trinkerin, "pp"), -30, "Bonus auf Regeneration verstärkt keinen Schwund");
+  assert.equal(rateBeimPegel(spiel, trinkerin, "pp"), -30, "Bonus auf Regeneration verstärkt keinen Schwund");
   modifikatorHinzufuegen(trinkerin, { ziel: "schwund.pp", art: "prozent", betrag: -50, quelle: "geistesanker" });
-  assert.equal(rateBeimPegel(trinkerin, "pp"), -15);
+  assert.equal(rateBeimPegel(spiel, trinkerin, "pp"), -15);
 
   trinkerin.werte.pegel.aktuell = 150;
   modifikatorHinzufuegen(trinkerin, { ziel: "regeneration.lp", art: "prozent", betrag: 50, quelle: "heilschlaf" });
-  assert.equal(rateBeimPegel(trinkerin, "lp"), 120);
+  assert.equal(rateBeimPegel(spiel, trinkerin, "lp"), 120);
   modifikatorHinzufuegen(trinkerin, { ziel: "kurvenverschiebung.lp", art: "plus", betrag: 100, quelle: "trinkfestigkeit" });
   trinkerin.werte.pegel.aktuell = 250;
-  assert.equal(rateBeimPegel(trinkerin, "lp"), 120);
-  assert.equal(optimalerPegel(trinkerin, "lp"), 250);
+  assert.equal(rateBeimPegel(spiel, trinkerin, "lp"), 120);
+  assert.equal(optimalerPegel(spiel, trinkerin, "lp"), 250);
 });
 
 test("Abbau des Pegels je Welttick, mit Modifikator, nie unter 0", () => {

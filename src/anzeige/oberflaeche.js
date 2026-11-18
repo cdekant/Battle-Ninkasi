@@ -60,16 +60,16 @@ export class Oberflaeche {
       && sichtbareFelder.has(entitaet.position.y * zustand.ebene.breite + entitaet.position.x)
     );
     const gegnerHtml = sichtbareGegner.length
-      ? sichtbareGegner.map((gegner) => `<li>${balken(nomenForm(gegner, "nom", "ohne"), gegner.werte.lp.aktuell, hoechstwert(gegner, "lp"), "lp klein")}</li>`).join("")
+      ? sichtbareGegner.map((gegner) => `<li>${balken(nomenForm(gegner, "nom", "ohne"), gegner.werte.lp.aktuell, hoechstwert(spiel, gegner, "lp"), "lp klein")}</li>`).join("")
       : `<li class="leise">${text("ui.niemand")}</li>`;
 
     this.element.innerHTML = `
       <h1>${nomenForm(ninkasi, "nom", "ohne")}</h1>
-      ${balken(text("ui.lp"), werte.lp.aktuell, hoechstwert(ninkasi, "lp"), "lp")}
-      ${balken(text("ui.mp"), werte.mp.aktuell, hoechstwert(ninkasi, "mp"), "mp")}
-      ${balken(text("ui.pp"), werte.pp.aktuell, hoechstwert(ninkasi, "pp"), "pp")}
+      ${balken(text("ui.lp"), werte.lp.aktuell, hoechstwert(spiel, ninkasi, "lp"), "lp")}
+      ${balken(text("ui.mp"), werte.mp.aktuell, hoechstwert(spiel, ninkasi, "mp"), "mp")}
+      ${balken(text("ui.pp"), werte.pp.aktuell, hoechstwert(spiel, ninkasi, "pp"), "pp")}
       <h2>${text("ui.pegel")}</h2>
-      ${pegelLeiste(text("ui.promille"), werte.pegel.aktuell, ninkasi.stoffwechsel.schwellen || [], optimalerPegel(ninkasi, "lp"))}
+      ${pegelLeiste(text("ui.promille"), werte.pegel.aktuell, ninkasi.stoffwechsel.schwellen || [], optimalerPegel(spiel, ninkasi, "lp"))}
       <h2>${text("ui.gepaeck")}</h2>
       <ul>${gepaeckHtml}</ul>
       <h2>${text("ui.in_sicht")}</h2>

@@ -25,7 +25,7 @@ function invariantenPruefen(spiel) {
   for (const entitaet of alleEntitaeten(zustand)) {
     for (const [wertName, wert] of Object.entries(entitaet.werte || {})) {
       if (!Number.isInteger(wert.aktuell) || wert.aktuell < 0) throw new Error(`#${entitaet.id} ${wertName} ungültig: ${wert.aktuell}`);
-      if (wert.aktuell > hoechstwert(entitaet, wertName)) throw new Error(`#${entitaet.id} ${wertName} über dem Höchstwert: ${wert.aktuell}`);
+      if (wert.aktuell > hoechstwert(spiel, entitaet, wertName)) throw new Error(`#${entitaet.id} ${wertName} über dem Höchstwert: ${wert.aktuell}`);
     }
     if (entitaet.position) {
       if (!passierbar(spiel, entitaet.position.x, entitaet.position.y)) throw new Error(`#${entitaet.id} steht in der Wand`);

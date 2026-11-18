@@ -123,7 +123,7 @@ test("Zustände: Felder, Verweise und Kreise über Beginn und Ende werden geprü
     [{ ...gueltig, hoechstStapel: 0 }, "hoechstStapel"],
     [{ ...gueltig, verlauf: "wellig" }, "verlauf"],
     [{ ...gueltig, verlauf: [[50, 1], [10, 2]] }, "aufsteigen"],
-    [{ ...gueltig, modifikatoren: [{ ziel: "lp", art: "mal", betrag: 2 }] }, "modifikatoren[0]"],
+    [{ ...gueltig, modifikatoren: [{ ziel: "lp", art: "verdoppeln", betrag: 2 }] }, "modifikatoren[0]"],
     [{ ...gueltig, jeTick: "gibt_es_nicht" }, "Effekt"],
     [{ ...gueltig, ausloeser: [{ bei: "vor_schaden", effekt: "biss_klein" }] }, "keine Auslöser erlaubt"],
   ];

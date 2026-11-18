@@ -89,7 +89,7 @@ function verlustMerken(entitaet, wertName, geaendert, ursprung) {
 // ursprung (optional): { urheberId, ursache, mittel, kettentiefe }, siehe ursprungAus
 export function wertAendern(spiel, entitaet, wertName, aenderung, ursprung = null) {
   const vorher = entitaet.werte[wertName].aktuell;
-  const geaendert = wertBegrenztAendern(entitaet, wertName, aenderung);
+  const geaendert = wertBegrenztAendern(spiel, entitaet, wertName, aenderung);
   verlustMerken(entitaet, wertName, geaendert, ursprung);
   if (geaendert !== 0) hakenAusloesen(spiel, "nach_wertaenderung", { entitaet, wertName, vorher, nachher: entitaet.werte[wertName].aktuell });
   return geaendert;
@@ -97,7 +97,7 @@ export function wertAendern(spiel, entitaet, wertName, aenderung, ursprung = nul
 
 export function wertAendernInHundertsteln(spiel, entitaet, wertName, hundertstel, ursprung = null) {
   const vorher = entitaet.werte[wertName].aktuell;
-  const geaendert = wertBegrenztAendernInHundertsteln(entitaet, wertName, hundertstel);
+  const geaendert = wertBegrenztAendernInHundertsteln(spiel, entitaet, wertName, hundertstel);
   verlustMerken(entitaet, wertName, geaendert, ursprung);
   if (geaendert !== 0) hakenAusloesen(spiel, "nach_wertaenderung", { entitaet, wertName, vorher, nachher: entitaet.werte[wertName].aktuell });
   return geaendert;

@@ -19,25 +19,25 @@ import { wertAufKurve, stelleDesHoechstwerts } from "../kern/kurven.js";
 import { wertAendernInHundertsteln } from "../kern/effekte.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 
-function kurvenverschiebung(entitaet, wertName) {
-  return modifiziert(entitaet, `kurvenverschiebung.${wertName}`, 0);
+function kurvenverschiebung(spiel, entitaet, wertName) {
+  return modifiziert(spiel, entitaet, `kurvenverschiebung.${wertName}`, 0);
 }
 
 // Rate in Hundertsteln je Welttick beim aktuellen Pegel, mit Modifikatoren; negativ heißt Schwund
-export function rateBeimPegel(entitaet, wertName) {
+export function rateBeimPegel(spiel, entitaet, wertName) {
   const kurve = entitaet.stoffwechsel.regeneration[wertName];
-  const stelle = entitaet.werte.pegel.aktuell - kurvenverschiebung(entitaet, wertName);
+  const stelle = entitaet.werte.pegel.aktuell - kurvenverschiebung(spiel, entitaet, wertName);
   const rate = wertAufKurve(kurve, stelle);
-  if (rate > 0) return Math.max(0, modifiziert(entitaet, `regeneration.${wertName}`, rate));
-  if (rate < 0) return -Math.max(0, modifiziert(entitaet, `schwund.${wertName}`, -rate));
+  if (rate > 0) return Math.max(0, modifiziert(spiel, entitaet, `regeneration.${wertName}`, rate));
+  if (rate < 0) return -Math.max(0, modifiziert(spiel, entitaet, `schwund.${wertName}`, -rate));
   return 0;
 }
 
 // Pegel mit der schnellsten Regeneration eines Werts, z.B. für die Anzeige des LP-Optimums
-export function optimalerPegel(entitaet, wertName) {
+export function optimalerPegel(spiel, entitaet, wertName) {
   const kurve = entitaet.stoffwechsel?.regeneration?.[wertName];
   if (!kurve) return undefined;
-  return stelleDesHoechstwerts(kurve) + kurvenverschiebung(entitaet, wertName);
+  return stelleDesHoechstwerts(kurve) + kurvenverschiebung(spiel, entitaet, wertName);
 }
 
 anmelden("welttick", "stoffwechsel", (spiel) => {
@@ -48,10 +48,10 @@ anmelden("welttick", "stoffwechsel", (spiel) => {
     // Schwund der LP kann töten (z.B. Alkoholvergiftung), getötet wird in der Zustandsprüfung (systeme/tod.js)
     for (const wertName of Object.keys(stoffwechsel.regeneration || {})) {
       if (!hatWert(entitaet, wertName)) continue;
-      const rate = rateBeimPegel(entitaet, wertName);
+      const rate = rateBeimPegel(spiel, entitaet, wertName);
       if (rate !== 0) wertAendernInHundertsteln(spiel, entitaet, wertName, rate, { urheberId: null, ursache: `schwund.${wertName}`, kettentiefe: 0 });
     }
-    const abbau = Math.max(0, modifiziert(entitaet, "abbau.pegel", stoffwechsel.abbauHundertstel || 0));
+    const abbau = Math.max(0, modifiziert(spiel, entitaet, "abbau.pegel", stoffwechsel.abbauHundertstel || 0));
     if (abbau > 0) wertAendernInHundertsteln(spiel, entitaet, "pegel", -abbau);
   }
 });

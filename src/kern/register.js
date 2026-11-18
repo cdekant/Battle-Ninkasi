@@ -10,6 +10,7 @@ const ARTEN = [
   "befehle",            // Befehlsarten: { pruefen, ausfuehren }
   "bausteine",          // Effekt-Grundbausteine: (spiel, kontext, parameter) => void
   "ki",                 // Verhaltensmodule: (spiel, akteur, ki) => befehl; ki ist die wirksame KI-Komponente (siehe kiVon)
+  "modifikatorquellen", // Quellen der Modifikatoren: (spiel, entitaet) => [modifikator], bei jeder Abfrage gesammelt
   "befehlsveraenderer", // Veränderer aus Zuständen: (spiel, akteur, befehl, parameter, staerkeProzent) => befehl
   "zielmuster",         // Zielmuster: (spiel, auswahl, parameter) => [{x, y}], auswahl = { ursprung, zielpunkt, quelleId }
   "welttick",           // Handler der Weltuhr: (spiel) => void

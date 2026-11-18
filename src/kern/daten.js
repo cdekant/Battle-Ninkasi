@@ -6,7 +6,7 @@ import { hat, holen } from "./register.js";
 import { istWuerfelausdruck } from "./zufall.js";
 import { kurvenfehler } from "./kurven.js";
 import { HAKENKATALOG, AUSLOESER_ROLLEN, AUSLOESER_ZIELE } from "./hakenkatalog.js";
-import { HINTERLASSENSCHAFT_REGELN } from "./werte.js";
+import { HINTERLASSENSCHAFT_REGELN, MODIFIKATORARTEN } from "./werte.js";
 import { TRIFFT_ARTEN } from "../systeme/zielauswahl.js";
 import { STAPELREGELN, VERLAEUFE } from "../systeme/zustaende.js";
 
@@ -276,8 +276,8 @@ function pruefeZustand(daten, sprache, name, zustand, fehler) {
   if (zustand.modifikatoren !== undefined) {
     if (!Array.isArray(zustand.modifikatoren)) fehler.push(`${ort}: modifikatoren muss eine Liste sein`);
     else zustand.modifikatoren.forEach((modifikator, nummer) => {
-      const gueltig = typeof modifikator?.ziel === "string" && ["plus", "prozent"].includes(modifikator.art) && istGanzzahl(modifikator.betrag);
-      if (!gueltig) fehler.push(`${ort}.modifikatoren[${nummer}]: braucht ziel, art (plus oder prozent) und betrag als ganze Zahl`);
+      const gueltig = typeof modifikator?.ziel === "string" && MODIFIKATORARTEN.includes(modifikator.art) && istGanzzahl(modifikator.betrag);
+      if (!gueltig) fehler.push(`${ort}.modifikatoren[${nummer}]: braucht ziel, art (${MODIFIKATORARTEN.join(", ")}) und betrag als ganze Zahl`);
     });
   }
   if (zustand.ausloeser !== undefined) pruefeAusloeser(daten, zustand.ausloeser, ort, fehler);
