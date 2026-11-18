@@ -71,6 +71,10 @@ try {
   throw fehler;
 }
 
+// Favicon aus dem Tile von Ninkasi im Satz 32; fehlt es, bleibt das leere Icon aus index.html
+const ninkasiBild = tilebilder.bild("ninkasi", 32);
+if (ninkasiBild) document.getElementById("favicon").href = ninkasiBild.toDataURL("image/png");
+
 const einstellungen = einstellungenLaden();
 if (!einstellungen.zoomstufen.includes(einstellungen.zoom)) einstellungen.zoom = einstellungen.zoomstufen[0];
 

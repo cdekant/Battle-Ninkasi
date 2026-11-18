@@ -10,7 +10,7 @@ Stand: 2026-11-18
 + Inhalte sind Daten, Mechanik ist Code; neue Inhalte brauchen im Regelfall keinen neuen Code
 + Jeder Lauf ist aus Startwert und Befehlsliste exakt reproduzierbar
 + Keine Spiele-Engine, kein Build-Schritt; JavaScript-Module (ES-Module), lokal über einen Webserver gestartet, da Module über `file://` nicht laden
-+ Startskript `starten.py` (unter Windows per `starten.bat`): Webserver auf `127.0.0.1:8000` (belegt: freier Port) ohne Zwischenspeicher (`Cache-Control: no-store`), dazu Firefox als eigene Instanz (`-no-remote`) mit Entwicklungsprofil `.firefox-profil/` (in `.gitignore`, wird bei Bedarf angelegt, Einstellungen über `user.js`); endet Firefox, endet der Server; unter Windows mit `-wait-for-browser`, da `firefox.exe` sonst nur einen sofort endenden Startprozess ist; endet Firefox ohne Fehler binnen 5 Sekunden, läuft der Server bis Strg+C weiter; Firefox-Pfad notfalls über Umgebungsvariable `FIREFOX`
++ Startskript `starten.py` (unter Windows per `starten.bat`): Webserver auf `127.0.0.1:8000` (belegt: freier Port) ohne Zwischenspeicher (`Cache-Control: no-store`), dazu Firefox als eigene Instanz (`-no-remote`) mit Entwicklungsprofil `.firefox-profil/` (in `.gitignore`, wird bei Bedarf angelegt, Einstellungen über `user.js`); Fenster ohne Tabs, Adressleiste und Titelleiste über `chrome/userChrome.css` im Profil (dazu `toolkit.legacyUserProfileCustomizations.stylesheets` und `browser.tabs.inTitlebar` = 1), mit `--mit-leisten` gewohnte Oberfläche, dann bleibt `userChrome.css` leer; endet Firefox, endet der Server; unter Windows mit `-wait-for-browser`, da `firefox.exe` sonst nur einen sofort endenden Startprozess ist; endet Firefox ohne Fehler binnen 5 Sekunden, läuft der Server bis Strg+C weiter; Firefox-Pfad notfalls über Umgebungsvariable `FIREFOX`
 + Spieleinstellungen liegen im `localStorage` und gelten je Ursprung (Host und Port); deshalb fester Port
 
 ## Datenfluss
@@ -260,7 +260,7 @@ Vorläufige Ideen, noch nicht umgesetzt.
 
 ## Verzeichnisse
 
-+ `index.html` als Einstieg, `src/main.js` verdrahtet Logik, Anzeige und Eingabe
++ `index.html` als Einstieg, `src/main.js` verdrahtet Logik, Anzeige und Eingabe und setzt beim Start das Favicon aus dem Tile `ninkasi` (Satz 32)
 + `package.json`: nur `"type": "module"` und `"private": true`, damit Node alle `.js`-Dateien als ES-Module liest; keine Abhängigkeiten, kein Build
 + `src/version.js`: Versionsnummer
 + `src/kern/`: Spiel und Eingangstür für Befehle (`spiel.js`), Zustand und Entitäten, Zeit, Zufall, Ereignisse, Werte und Modifikatoren, Effekte, Grundbausteine, Register, Datenprüfung

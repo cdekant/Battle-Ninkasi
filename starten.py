@@ -6,8 +6,12 @@ einer eigenen Firefox-Instanz mit eigenem Profil (.firefox-profil/, nicht im Rep
 Wird dieses Firefox-Fenster geschlossen, endet auch der Server. Strg+C im Terminal
 beendet den Server sofort.
 
-Aufruf: python starten.py (Windows, auch per Doppelklick auf starten.bat)
-        python3 starten.py oder ./starten.py (Debian)
+Das Fenster zeigt nur die Seite, ohne Tabs, Adressleiste und Titelleiste (über
+userChrome.css im Profil). F5 lädt neu, F12 öffnet die Entwicklerwerkzeuge, Alt+F4
+schließt. Mit --mit-leisten erscheint die gewohnte Firefox-Oberfläche.
+
+Aufruf: python starten.py [--mit-leisten] (Windows, auch per Doppelklick auf starten.bat)
+        python3 starten.py oder ./starten.py [--mit-leisten] (Debian)
 Firefox an anderem Ort: Umgebungsvariable FIREFOX auf den Programmpfad setzen.
 """
 
@@ -38,7 +42,17 @@ firefoxEinstellungen = {
     "toolkit.telemetry.reportingpolicy.firstRun": False,
     "browser.sessionstore.resume_from_crash": False,
     "browser.tabs.warnOnClose": False,
+    # Lässt Firefox userChrome.css aus dem Profil lesen (Fenster ohne Leisten).
+    "toolkit.legacyUserProfileCustomizations.stylesheets": True,
+    # Firefox zeichnet die Titelleiste selbst, sie verschwindet daher mit den Leisten.
+    "browser.tabs.inTitlebar": 1,
 }
+
+# Blendet Tabs, Adressleiste, Lesezeichen und Titelleiste aus, übrig bleibt die Seite.
+fensterOhneLeisten = """\
+/* Geschrieben von starten.py, Änderungen gehen beim nächsten Start verloren. */
+#navigator-toolbox { visibility: collapse !important; }
+"""
 
 
 class EntwicklungsAnfragen(http.server.SimpleHTTPRequestHandler):
@@ -102,8 +116,13 @@ def firefoxFinden():
     return None
 
 
-def profilVorbereiten():
+def profilVorbereiten(mitLeisten):
     profilverzeichnis.mkdir(exist_ok=True)
+    # Mit Leisten bleibt die Datei leer, damit ein früherer Lauf ohne Leisten nicht nachwirkt.
+    chromeVerzeichnis = profilverzeichnis / "chrome"
+    chromeVerzeichnis.mkdir(exist_ok=True)
+    stylesheet = "" if mitLeisten else fensterOhneLeisten
+    (chromeVerzeichnis / "userChrome.css").write_text(stylesheet, encoding="utf-8")
     zeilen = [f'user_pref("{name}", {wertAlsJs(wert)});' for name, wert in firefoxEinstellungen.items()]
     (profilverzeichnis / "user.js").write_text("\n".join(zeilen) + "\n", encoding="utf-8")
 
@@ -117,6 +136,7 @@ def wertAlsJs(wert):
 
 
 def main():
+    mitLeisten = "--mit-leisten" in sys.argv[1:]
     server = serverStarten()
     adresse = f"http://127.0.0.1:{server.server_address[1]}/"
     print(f"Battle Ninkasi läuft unter {adresse}")
@@ -128,7 +148,7 @@ def main():
             print("Adresse im Browser öffnen, Strg+C beendet den Server.")
             while True:
                 time.sleep(1)
-        profilVorbereiten()
+        profilVorbereiten(mitLeisten)
         firefoxAufruf = [firefoxPfad, "-no-remote", "-profile", str(profilverzeichnis)]
         if os.name == "nt":
             # Unter Windows startet firefox.exe nur einen Startprozess, der den Browser
