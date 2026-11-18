@@ -3,7 +3,8 @@
 // Grundbausteine sind Code im Register "bausteine", siehe bausteine.js und systeme/zielbausteine.js.
 // Kontext: { quelleId, urheberId, urheberFraktion, zielId, ursprung, zielfeld, ursache, kettentiefe, mittel, tags, werte }
 //   quelleId:    wirkt unmittelbar (Wesen, Fass, Geschoss, Falle)
-//   urheberId:   wird die Wirkung zugerechnet (EP, Zorn, Todesursache), Vorgabe die Quelle;
+//   urheberId:   wird die Wirkung zugerechnet (EP, Zorn, Todesursache), Vorgabe die Quelle, bei Beschworenen
+//                deren Beschwörerin (beschworenVon);
 //                urheberFraktion bleibt erhalten, auch wenn die Urheberin schon entfernt ist
 //   zielId:      das Wesen, auf das ein Schritt wirkt, oder null (Wirkung auf ein Feld)
 //   ursprung:    Feld, von dem Muster ausgehen, Vorgabe die Position der Quelle
@@ -19,6 +20,7 @@
 // nach dem Vorgang (systeme/tod.js); dafür merkt sich das Wesen, wem der Verlust zuzurechnen ist.
 
 import { holen } from "./register.js";
+import { fraktionVon } from "./zustand.js";
 import { hakenAusloesen } from "./ereignisse.js";
 import { wertBegrenztAendern, wertBegrenztAendernInHundertsteln, lebenswertName } from "./werte.js";
 
@@ -29,7 +31,7 @@ export function kontextVervollstaendigen(spiel, kontext, effekt = {}) {
   const entitaeten = spiel.zustand.entitaeten;
   const quelle = entitaeten[kontext.quelleId], ziel = entitaeten[kontext.zielId];
   const quelleId = kontext.quelleId ?? null;
-  const urheberId = kontext.urheberId ?? quelleId;
+  const urheberId = kontext.urheberId ?? quelle?.beschworenVon ?? quelleId;
   const ursprung = kontext.ursprung ?? feldKopie(quelle?.position) ?? feldKopie(ziel?.position);
   const tags = [...(kontext.tags || [])];
   for (const tag of effekt.tags || []) if (!tags.includes(tag)) tags.push(tag);
@@ -37,7 +39,7 @@ export function kontextVervollstaendigen(spiel, kontext, effekt = {}) {
     ...kontext,
     quelleId,
     urheberId,
-    urheberFraktion: kontext.urheberFraktion !== undefined ? kontext.urheberFraktion : entitaeten[urheberId]?.fraktion ?? null,
+    urheberFraktion: kontext.urheberFraktion !== undefined ? kontext.urheberFraktion : fraktionVon(entitaeten[urheberId]) ?? fraktionVon(quelle) ?? null,
     zielId: kontext.zielId ?? null,
     ursprung,
     zielfeld: kontext.zielfeld ?? feldKopie(ziel?.position) ?? ursprung,

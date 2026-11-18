@@ -11,6 +11,9 @@ import { aufDerKarte, durchsichtig, feldIndex } from "./karte.js";
 import { entitaetenAuf } from "../kern/zustand.js";
 import { istWesen } from "../systeme/kampf.js";
 
+// Die acht Nachbarrichtungen in fester Reihenfolge (zeilenweise von links oben)
+export const ACHT_RICHTUNGEN = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]].map(([dx, dy]) => ({ dx, dy }));
+
 export const gleichesFeld = (feldA, feldB) => feldA.x === feldB.x && feldA.y === feldB.y;
 
 const feldKopie = (feld) => ({ x: feld.x, y: feld.y });

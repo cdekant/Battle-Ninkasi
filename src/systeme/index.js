@@ -8,3 +8,5 @@ import "./tod.js";
 import "./zielauswahl.js";
 import "./zielbausteine.js";
 import "./zustaende.js";
+import "./befehlsveraenderer.js";
+import "./beschwoerung.js";

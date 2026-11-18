@@ -12,15 +12,20 @@
 //                 [[anteilProzent, staerkeProzent], ...] über den Anteil der verstrichenen Dauer
 //   modifikatoren: [{ ziel, art, betrag }], betrag je Stärke 1, mit dem Verlauf skaliert
 //   jeTick, beimBeginn, beimEnde: Effekte auf die Trägerin; Mengen mit mitStaerke skalieren mit der Stärke
-//   gebundenAnQuelle: endet mit dem Tod der Quelle (aufrechterhaltener Zauber)
+//   gebundenAnQuelle: endet mit dem Tod oder Verschwinden der Quelle (aufrechterhaltener Zauber, Beschworene)
+//   handlungsunfaehig: true  die Trägerin muss warten (Ninkasi: jede Eingabe wird zu warten, siehe kern/spiel.js)
+//   befehl: { veraenderer, ...parameter }  verändert jeden Befehl der Trägerin (Register "befehlsveraenderer")
+//   ki: { modul, ...parameter }            überlagert die KI, bei Ninkasi übernimmt sie die KI für die Dauer
+//   fraktion: "urheber" | "eigene" | Name  überlagert die Fraktion ("eigene": mit allen verfeindet)
+//   Fraktion und KI werden beim Beginn in die Instanz geschrieben; es gilt die jüngste Überlagerung
 // Instanz an der Entität: zustaende: [{ nummer, name, quelleId, urheberId, urheberFraktion, beginn, ende, staerke, stapel }]
 // Takt: Weltuhr (je Welttick, solange zeit < ende); Hast und Verlangsamung der Trägerin ändern daran nichts.
 // Ende: Zeitereignis "zustand_ende", gebunden an die Trägerin; wurde der Zustand inzwischen verlängert,
 // reiht es sich zum neuen Ende wieder ein. Modifikatoren stehen mit der Quelle "zustand:<nummer>" in der
 // Liste der Trägerin und werden bei Beginn, Stapeln und jedem Welttick nachgeführt.
 
-import { anmelden } from "../kern/register.js";
-import { alleEntitaeten } from "../kern/zustand.js";
+import { anmelden, holen } from "../kern/register.js";
+import { alleEntitaeten, fraktionVon } from "../kern/zustand.js";
 import { ereignisEinreihen } from "../kern/zeit.js";
 import { hakenAusloesen, melden, bezugAuf } from "../kern/ereignisse.js";
 import { effektAnwenden } from "../kern/effekte.js";
@@ -40,6 +45,10 @@ function definitionVon(spiel, name) {
   const definition = spiel.daten.zustaende?.[name];
   if (!definition) throw new Error(`Unbekannter Zustand "${name}"`);
   return definition;
+}
+
+export function istHandlungsunfaehig(spiel, entitaet) {
+  return (entitaet?.zustaende || []).some((instanz) => definitionVon(spiel, instanz.name).handlungsunfaehig);
 }
 
 export function hatZustand(entitaet, name) {
@@ -94,6 +103,12 @@ function neueInstanz(spiel, traegerin, name, angaben, ende) {
     quelleId: angaben.quelleId, urheberId: angaben.urheberId, urheberFraktion: angaben.urheberFraktion,
     beginn: zustand.zeit, ende, staerke: angaben.staerke, stapel: 1,
   };
+  const definition = definitionVon(spiel, name);
+  if (definition.fraktion !== undefined) {
+    const nachArt = { urheber: angaben.urheberFraktion, eigene: `eigene:${instanz.nummer}` };
+    instanz.fraktion = definition.fraktion in nachArt ? nachArt[definition.fraktion] : definition.fraktion;
+  }
+  if (definition.ki) instanz.ki = { ...structuredClone(definition.ki), letzteBekanntePosition: null, bedrohungId: angaben.urheberId };
   if (!traegerin.zustaende) traegerin.zustaende = [];
   traegerin.zustaende.push(instanz);
   if (ende !== null) ereignisEinreihen(zustand, ende, "zustand_ende", { traegerinId: traegerin.id, nummer: instanz.nummer }, traegerin.id);
@@ -120,7 +135,7 @@ export function zustandSetzen(spiel, traegerin, name, angaben = {}) {
   const definition = definitionVon(spiel, name);
   const vollstaendig = {
     quelleId: angaben.quelleId ?? null, urheberId: angaben.urheberId ?? angaben.quelleId ?? null,
-    urheberFraktion: angaben.urheberFraktion ?? spiel.zustand.entitaeten[angaben.urheberId ?? angaben.quelleId]?.fraktion ?? null,
+    urheberFraktion: angaben.urheberFraktion ?? fraktionVon(spiel.zustand.entitaeten[angaben.urheberId ?? angaben.quelleId]) ?? null,
     staerke: angaben.staerke ?? 1, kettentiefe: angaben.kettentiefe ?? 0,
   };
   const dauer = angaben.dauer ?? definition.dauer;
@@ -184,14 +199,28 @@ anmelden("welttick", "zustaende", (spiel) => {
   }
 });
 
-// Stirbt eine Quelle, enden ihre gebundenen Zustände (aufrechterhaltener Zauber)
-anmelden("haken", "nach_tod", (spiel, kontext) => {
+// Stirbt oder verschwindet eine Quelle, enden ihre gebundenen Zustände (aufrechterhaltener Zauber, Beschworene)
+export function quelleEntfaellt(spiel, quelleId, kettentiefe = 0) {
   for (const traegerin of alleEntitaeten(spiel.zustand)) {
     for (const instanz of [...(traegerin.zustaende || [])]) {
-      if (instanz.quelleId === kontext.zielId && definitionVon(spiel, instanz.name).gebundenAnQuelle) {
-        zustandBeenden(spiel, traegerin, instanz, "quelle_tot", kontext.kettentiefe ?? 0);
+      if (!spiel.zustand.entitaeten[traegerin.id]) break;
+      if (instanz.quelleId === quelleId && definitionVon(spiel, instanz.name).gebundenAnQuelle) {
+        zustandBeenden(spiel, traegerin, instanz, "quelle_tot", kettentiefe);
       }
     }
+  }
+}
+
+anmelden("haken", "nach_tod", (spiel, kontext) => quelleEntfaellt(spiel, kontext.zielId, kontext.kettentiefe ?? 0));
+
+// Befehl verändern: jeder Zustand mit befehl wendet seinen Veränderer an, in der Reihenfolge der Zustände
+anmelden("haken", "vor_befehl", (spiel, kontext) => {
+  const akteur = spiel.zustand.entitaeten[kontext.akteurId];
+  for (const instanz of [...(akteur?.zustaende || [])]) {
+    const veraenderung = definitionVon(spiel, instanz.name).befehl;
+    if (!veraenderung) continue;
+    const { veraenderer, ...parameter } = veraenderung;
+    kontext.befehl = holen("befehlsveraenderer", veraenderer)(spiel, akteur, kontext.befehl, parameter, staerkeProzent(spiel, instanz));
   }
 });
 

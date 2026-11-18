@@ -9,6 +9,7 @@ import { feldIndex, passierbar } from "../welt/karte.js";
 import { naechstesWegfeld } from "../welt/wege.js";
 import { lageErfassen, sichtbareFeinde, gefahrPruefen } from "../systeme/gefahr.js";
 import { istWesen } from "../systeme/kampf.js";
+import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 
 const WEG_OPTIONEN = { nurErkundet: true };
 
@@ -23,11 +24,12 @@ export function reiseBeginnen(spiel, ziel, einstellungen) {
   return { reise: { ziel: { x: ziel.x, y: ziel.y }, lage: lageErfassen(spiel), schrittzahl: 0 } };
 }
 
-// Gibt { befehl } oder { halt } zurück; halt: "angekommen", "vorbei", "kein_weg", "versperrt",
+// Gibt { befehl } oder { halt } zurück; halt: "angekommen", "vorbei", "kein_weg", "versperrt", "handlungsunfaehig",
 // "gegenstand" oder der Name einer Gefahrenprüfung
 export function naechsterReiseschritt(spiel, reise, einstellungen) {
   const zustand = spiel.zustand;
   if (zustand.vorbei) return { halt: "vorbei" };
+  if (istHandlungsunfaehig(spiel, spielerin(zustand))) return { halt: "handlungsunfaehig" };
   const position = spielerin(zustand).position;
   if (position.x === reise.ziel.x && position.y === reise.ziel.y) return { halt: "angekommen" };
 

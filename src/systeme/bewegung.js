@@ -1,5 +1,6 @@
 // Befehle "bewegen" (mit Angriff durch Hineinlaufen) und "warten".
-// Befehle: { art: "bewegen", dx: -1..1, dy: -1..1 }, { art: "warten" }
+// Befehle: { art: "bewegen", dx: -1..1, dy: -1..1, angreifen? }, { art: "warten" }
+// Hineinlaufen greift Feinde an; mit angreifen: true jedes Wesen (Rausch, Verwirrung, gezielter Angriff auf Freunde).
 
 import { anmelden } from "../kern/register.js";
 import { entitaetenAuf } from "../kern/zustand.js";
@@ -21,9 +22,10 @@ const istEinzelschritt = (versatz) => Number.isInteger(versatz) && versatz >= -1
 anmelden("befehle", "bewegen", {
   pruefen(spiel, akteur, befehl) {
     if (!istEinzelschritt(befehl.dx) || !istEinzelschritt(befehl.dy) || (befehl.dx === 0 && befehl.dy === 0)) return "ungueltig";
+    if (befehl.angreifen !== undefined && typeof befehl.angreifen !== "boolean") return "ungueltig";
     const { x, y } = zielfeld(akteur, befehl);
     const anderesWesen = wesenAuf(spiel, x, y);
-    if (anderesWesen) return feindlich(akteur, anderesWesen) && akteur.angriff ? null : "besetzt";
+    if (anderesWesen) return akteur.angriff && (feindlich(akteur, anderesWesen) || befehl.angreifen === true) ? null : "besetzt";
     if (!passierbar(spiel, x, y)) return "wand";
     return null;
   },

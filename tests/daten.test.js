@@ -135,3 +135,29 @@ test("Zustände: Felder, Verweise und Kreise über Beginn und Ende werden geprü
   const kreis = mitZustand({ text: "test", beimBeginn: "setzen" }, { setzen: { schritte: [{ baustein: "zustand_setzen", zustand: "test" }] } });
   assert.ok(kreis.some((meldung) => meldung.includes("setzen > setzen")));
 });
+
+test("Verhalten in Zuständen und Beschwören werden geprüft", () => {
+  const mitZustand = (zustand, effekte = {}) => {
+    const daten = structuredClone(rohdaten);
+    daten.zustaende = { test: { text: "test", ...zustand } };
+    Object.assign(daten.effekte, effekte);
+    return vorbereiten(daten).fehler;
+  };
+  const gueltig = { handlungsunfaehig: false, fraktion: "urheber", ki: { modul: "jagen", trifft: "wesen" }, befehl: { veraenderer: "abweichen", chance: 30, freundeAngreifen: true } };
+  assert.deepEqual(mitZustand(gueltig), []);
+  const erwartet = [
+    [{ handlungsunfaehig: "ja" }, "handlungsunfaehig"],
+    [{ fraktion: 3 }, "fraktion"],
+    [{ ki: { modul: "tanzen" } }, "Verhaltensmodul"],
+    [{ ki: { modul: "jagen", trifft: "niemand" } }, "trifft"],
+    [{ befehl: { veraenderer: "zaubern" } }, "Befehlsveränderer"],
+    [{ befehl: { veraenderer: "abweichen" } }, "chance fehlt"],
+  ];
+  for (const [zustand, teilDerMeldung] of erwartet) {
+    assert.ok(mitZustand(zustand).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
+  }
+  const rufen = (wesen) => ({ rufen: { schritte: [{ baustein: "beschwoeren", wesen }] } });
+  assert.deepEqual(mitZustand({}, rufen("essigbakterium")), []);
+  assert.ok(mitZustand({}, rufen("bakterium")).some((meldung) => meldung.includes('Wesen "bakterium"')), "abstrakte Vorlage");
+  assert.ok(mitZustand({}, rufen("drache")).some((meldung) => meldung.includes('Wesen "drache"')));
+});

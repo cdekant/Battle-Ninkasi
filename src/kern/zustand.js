@@ -75,6 +75,23 @@ export function entitaetEntfernen(zustand, id) {
   gebundeneEreignisseEntfernen(zustand, id);
 }
 
+// Wirksame Fraktion und KI: die des jüngsten Zustands, der sie überlagert (systeme/zustaende.js), sonst die eigene
+function juengsteUeberlagerung(entitaet, feld) {
+  const zustaende = entitaet?.zustaende || [];
+  for (let position = zustaende.length - 1; position >= 0; position--) {
+    if (zustaende[position][feld] !== undefined) return zustaende[position][feld];
+  }
+  return entitaet?.[feld];
+}
+
+export function fraktionVon(entitaet) {
+  return juengsteUeberlagerung(entitaet, "fraktion");
+}
+
+export function kiVon(entitaet) {
+  return juengsteUeberlagerung(entitaet, "ki");
+}
+
 export function spielerin(zustand) {
   return entitaetMitId(zustand, zustand.spielerinId);
 }

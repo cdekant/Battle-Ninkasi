@@ -3,7 +3,8 @@
 // Komponente in den Daten: sicht: { reichweite: 8 }
 
 import PreciseShadowcasting from "../../lib/rot/fov/precise-shadowcasting.js";
-import { durchsichtig, feldIndex, aufDerKarte } from "../welt/karte.js";
+import { durchsichtig, feldIndex, aufDerKarte, abstand } from "../welt/karte.js";
+import { sichtlinieFrei } from "../welt/geometrie.js";
 import { modifiziert } from "../kern/werte.js";
 import { spielerin } from "../kern/zustand.js";
 
@@ -27,4 +28,16 @@ export function sichtfeldAktualisieren(spiel) {
 
 export function istSichtbar(zustand, x, y) {
   return zustand.sichtbareFelder.includes(feldIndex(zustand.ebene, x, y));
+}
+
+// Sieht ein Wesen ein anderes? Vereinfachung bis zur Wahrnehmung (Punkt 7 der Arbeitsliste):
+//   Ninkasi sieht, was in ihrem Sichtfeld liegt; ein Wesen sieht Ninkasi, wenn sie es sieht und es nah genug ist;
+//   andere sehen einander mit freier Sichtlinie innerhalb ihrer Sichtweite.
+export function sieht(spiel, betrachter, ziel) {
+  const zustand = spiel.zustand;
+  if (!betrachter.position || !ziel.position) return false;
+  if (betrachter.id === zustand.spielerinId) return istSichtbar(zustand, ziel.position.x, ziel.position.y);
+  const nahGenug = abstand(betrachter.position, ziel.position) <= reichweiteSicht(betrachter);
+  if (ziel.id === zustand.spielerinId) return nahGenug && istSichtbar(zustand, betrachter.position.x, betrachter.position.y);
+  return nahGenug && sichtlinieFrei(spiel, betrachter.position, ziel.position);
 }

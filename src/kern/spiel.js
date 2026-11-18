@@ -10,15 +10,16 @@ import "../systeme/index.js";
 import "../ki/index.js";
 import VERSION from "../version.js";
 import { vorbereiten, Datenfehler } from "./daten.js";
-import { neuerZustand, entitaetMitId, alleEntitaeten, spielerin } from "./zustand.js";
+import { neuerZustand, entitaetMitId, alleEntitaeten, spielerin, kiVon } from "./zustand.js";
 import { zufallErzeugen, startwertAbleiten } from "./zufall.js";
 import { WELTTICK, einreihen, ersterEintrag, ersterEintragEntnehmen, akteurEinreihen } from "./zeit.js";
 import { holen, hat, alle as alleImRegister } from "./register.js";
 import { modifiziert } from "./werte.js";
-import { melden } from "./ereignisse.js";
+import { melden, bezugAuf, hakenAusloesen } from "./ereignisse.js";
 import { vorgangAbschliessen } from "./vorgang.js";
 import { ebeneErzeugen } from "../welt/ebene.js";
 import { sichtfeldAktualisieren } from "../systeme/sicht.js";
+import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 
 // Rohdaten prüfen und vorbereiten; wirft Datenfehler mit allen Meldungen.
 // sprache: { texte, nomenPruefen? } (siehe kern/daten.js)
@@ -50,11 +51,14 @@ export function zeitkosten(spiel, entitaet, aktion) {
   return Math.max(1, modifiziert(entitaet, [`kosten.${aktion}`, "kosten.alle"], grundkosten));
 }
 
+// Ninkasi wartet auf eine Eingabe, außer ein Zustand gibt ihr eine KI (Furcht, Rausch, Psi-Kontrolle)
+function wartetAufEingabe(zustand, eintrag) {
+  return Boolean(eintrag && eintrag.art === "akteur" && eintrag.akteurId === zustand.spielerinId && !kiVon(spielerin(zustand)));
+}
+
 export function spielerinAmZug(spiel) {
   const zustand = spiel.zustand;
-  if (zustand.vorbei) return false;
-  const eintrag = ersterEintrag(zustand);
-  return Boolean(eintrag && eintrag.art === "akteur" && eintrag.akteurId === zustand.spielerinId);
+  return !zustand.vorbei && wartetAufEingabe(zustand, ersterEintrag(zustand));
 }
 
 // Gibt null zurück, wenn der Befehl gültig ist, sonst den Grund der Ablehnung
@@ -63,8 +67,17 @@ function befehlPruefen(spiel, akteur, befehl) {
   return holen("befehle", befehl.art).pruefen(spiel, akteur, befehl);
 }
 
+// Haken "vor_befehl": Zustände dürfen den Befehl verändern (Torkeln, Verwirrung); ein abgebrochener oder
+// ungültig gewordener Befehl wird zu warten
+function befehlVeraendern(spiel, akteur, befehl) {
+  const kontext = hakenAusloesen(spiel, "vor_befehl", { akteurId: akteur.id, quelleId: akteur.id, zielId: null, kettentiefe: 0, befehl, abgebrochen: false });
+  if (kontext.abgebrochen || befehlPruefen(spiel, akteur, kontext.befehl)) return { art: "warten" };
+  return kontext.befehl;
+}
+
 function befehlAusfuehren(spiel, akteur, befehl) {
-  const aktion = holen("befehle", befehl.art).ausfuehren(spiel, akteur, befehl);
+  const wirksamerBefehl = befehlVeraendern(spiel, akteur, befehl);
+  const aktion = holen("befehle", wirksamerBefehl.art).ausfuehren(spiel, akteur, wirksamerBefehl);
   vorgangAbschliessen(spiel);
   const zustand = spiel.zustand;
   const akteurNochImSpiel = entitaetMitId(zustand, akteur.id) && !(akteur.id === zustand.spielerinId && zustand.vorbei);
@@ -73,11 +86,21 @@ function befehlAusfuehren(spiel, akteur, befehl) {
 
 // Die Eingangstür: einziger Weg, wie Entscheidungen der Spielerin in die Logik gelangen.
 // Gibt { ok: true } oder { ok: false, grund } zurück; abgelehnte Befehle kosten nichts.
+// Ist Ninkasi handlungsunfähig, wird jede Eingabe angenommen, aufgezeichnet und als warten ausgeführt
+// (Meldung "handlungsunfaehig", Rückgabe { ok: true, handlungsunfaehig: true }).
 export function befehlGeben(spiel, befehl) {
   const zustand = spiel.zustand;
   if (zustand.vorbei) return { ok: false, grund: "vorbei" };
   if (!spielerinAmZug(spiel)) return { ok: false, grund: "nicht_am_zug" };
   const ninkasi = spielerin(zustand);
+  if (istHandlungsunfaehig(spiel, ninkasi)) {
+    spiel.befehle.push(structuredClone(befehl ?? null));
+    melden(spiel, "handlungsunfaehig", { wer: bezugAuf(ninkasi) });
+    ersterEintragEntnehmen(zustand);
+    befehlAusfuehren(spiel, ninkasi, { art: "warten" });
+    warteschlangeAbarbeiten(spiel);
+    return { ok: true, handlungsunfaehig: true };
+  }
   const grund = befehlPruefen(spiel, ninkasi, befehl);
   if (grund) {
     melden(spiel, "abgelehnt", { grund, befehl });
@@ -90,13 +113,13 @@ export function befehlGeben(spiel, befehl) {
   return { ok: true };
 }
 
-// Arbeitet die Warteschlange ab, bis Ninkasi am Zug ist oder das Spiel vorbei ist
-function warteschlangeAbarbeiten(spiel) {
+// Arbeitet die Warteschlange ab, bis Ninkasi am Zug ist oder das Spiel vorbei ist (exportiert für Tests)
+export function warteschlangeAbarbeiten(spiel) {
   const zustand = spiel.zustand;
   let schleifenschutz = 0;
   while (!zustand.vorbei) {
     const eintrag = ersterEintrag(zustand);
-    if (!eintrag || (eintrag.art === "akteur" && eintrag.akteurId === zustand.spielerinId)) return;
+    if (!eintrag || wartetAufEingabe(zustand, eintrag)) return;
     ersterEintragEntnehmen(zustand);
     if (eintrag.art === "weltuhr") {
       for (const [, handler] of alleImRegister("welttick")) {
@@ -109,8 +132,9 @@ function warteschlangeAbarbeiten(spiel) {
       vorgangAbschliessen(spiel);
     } else {
       const akteur = entitaetMitId(zustand, eintrag.akteurId);
-      if (!akteur || !akteur.ki) continue;
-      let befehl = holen("ki", akteur.ki.modul)(spiel, akteur);
+      const ki = akteur && kiVon(akteur);
+      if (!ki) continue;
+      let befehl = istHandlungsunfaehig(spiel, akteur) ? { art: "warten" } : holen("ki", ki.modul)(spiel, akteur, ki);
       if (befehlPruefen(spiel, akteur, befehl)) befehl = { art: "warten" };
       befehlAusfuehren(spiel, akteur, befehl);
     }

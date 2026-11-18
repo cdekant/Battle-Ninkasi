@@ -29,6 +29,7 @@ export default {
   "log.wert_geaendert": "{menge} {wertName}.",
   "log.pegel_steigt": "Pegel über {schwelle}. Die Welt wird freundlicher.",
   "log.pegel_sinkt": "Pegel unter {schwelle}. Die Welt wird schärfer, leider.",
+  "log.handlungsunfaehig": "Leider nicht möglich. Ninkasi kann sich nicht rühren.",
   "log.nuechtern": "Stocknüchtern. Der Kopf wird klar, der Geist leer.",
   "log.abgelehnt.wand": "Die Wand gibt nicht nach.",
   "log.abgelehnt.besetzt": "Da steht schon jemand.",

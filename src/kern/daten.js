@@ -86,7 +86,7 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
     if (wesen.angriff.muster !== undefined) pruefeMuster(daten, wesen.angriff.muster, `${ort}.angriff.muster`, fehler);
     pruefeParameter(daten, { trifft: TRIFFT_ARTEN }, wesen.angriff, `${ort}.angriff`, fehler);
   }
-  if (wesen.ki && !hat("ki", wesen.ki.modul)) fehler.push(`${ort}: Verhaltensmodul "${wesen.ki.modul}" ist nicht angemeldet`);
+  if (wesen.ki) pruefeKi(daten, wesen.ki, `${ort}.ki`, fehler);
   if (wesen.stoffwechsel) pruefeStoffwechsel(wesen, ort, fehler);
   if (wesen.sicht && !istGanzzahl(wesen.sicht.reichweite)) fehler.push(`${ort}: sicht.reichweite muss eine ganze Zahl sein`);
   if (wesen.lebenswert !== undefined && !wesen.werte?.[wesen.lebenswert]) fehler.push(`${ort}: lebenswert "${wesen.lebenswert}" ist kein Wert des Wesens`);
@@ -168,7 +168,7 @@ function pruefeMenge(schritt, ort, fehler) {
 const istZahlAbNull = (wert) => istGanzzahl(wert) && wert >= 0;
 
 // Parameter nach Beschreibung (siehe kern/bausteine.js): "text", "ganzzahl", "wahrheitswert", "effekt",
-// "muster", "zustand", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
+// "muster", "zustand", "wesen", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
 function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
   for (const [feld, typ] of Object.entries(beschreibung)) {
     const wert = werte[feld];
@@ -192,6 +192,7 @@ function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
     else if (grundtyp === "effekt") pruefeEffektVerweis(daten, wert, `${ort}.${feld}`, fehler);
     else if (grundtyp === "muster") pruefeMuster(daten, wert, `${ort}.${feld}`, fehler);
     else if (grundtyp === "zustand" && !daten.zustaende?.[wert]) fehler.push(`${ort}.${feld}: Zustand "${wert}" gibt es nicht`);
+    else if (grundtyp === "wesen" && (!daten.wesen?.[wert] || daten.wesen[wert].abstrakt)) fehler.push(`${ort}.${feld}: Wesen "${wert}" gibt es nicht`);
   }
 }
 
@@ -245,6 +246,12 @@ function pruefeEffektKreise(daten, fehler) {
   for (const name of Object.keys(effekte)) besuchen(name, [name]);
 }
 
+// KI-Komponente: { modul, trifft?, ... }
+function pruefeKi(daten, ki, ort, fehler) {
+  if (!istObjekt(ki) || !hat("ki", ki.modul)) return fehler.push(`${ort}: Verhaltensmodul "${ki?.modul}" ist nicht angemeldet`);
+  pruefeParameter(daten, { trifft: TRIFFT_ARTEN }, ki, ort, fehler);
+}
+
 // Zustände, siehe systeme/zustaende.js
 function pruefeZustand(daten, sprache, name, zustand, fehler) {
   const ort = `zustaende.${name}`;
@@ -252,7 +259,14 @@ function pruefeZustand(daten, sprache, name, zustand, fehler) {
   pruefeText(sprache.texte, zustand.text, ort, fehler);
   if (zustand.dauer !== undefined && !(istGanzzahl(zustand.dauer) && zustand.dauer > 0)) fehler.push(`${ort}: dauer muss eine ganze Zahl > 0 sein`);
   if (zustand.hoechstStapel !== undefined && !(istGanzzahl(zustand.hoechstStapel) && zustand.hoechstStapel > 0)) fehler.push(`${ort}: hoechstStapel muss eine ganze Zahl > 0 sein`);
-  pruefeParameter(daten, { stapel: STAPELREGELN, jeTick: "effekt?", beimBeginn: "effekt?", beimEnde: "effekt?", gebundenAnQuelle: "wahrheitswert?" }, zustand, ort, fehler);
+  const felder = { stapel: STAPELREGELN, jeTick: "effekt?", beimBeginn: "effekt?", beimEnde: "effekt?", gebundenAnQuelle: "wahrheitswert?", handlungsunfaehig: "wahrheitswert?", fraktion: "text?" };
+  pruefeParameter(daten, felder, zustand, ort, fehler);
+  if (zustand.ki !== undefined) pruefeKi(daten, zustand.ki, `${ort}.ki`, fehler);
+  if (zustand.befehl !== undefined) {
+    const veraenderer = zustand.befehl?.veraenderer;
+    if (!hat("befehlsveraenderer", veraenderer)) fehler.push(`${ort}.befehl: Befehlsveränderer "${veraenderer}" ist nicht angemeldet`);
+    else pruefeParameter(daten, holen("befehlsveraenderer", veraenderer).parameter || {}, zustand.befehl, `${ort}.befehl`, fehler);
+  }
   if (typeof zustand.verlauf === "string") {
     if (!(zustand.verlauf in VERLAEUFE)) fehler.push(`${ort}: verlauf muss eines von ${Object.keys(VERLAEUFE).join(", ")} oder eine Kurve sein`);
   } else if (zustand.verlauf !== undefined) {

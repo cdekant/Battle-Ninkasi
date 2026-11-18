@@ -9,7 +9,7 @@
 // Zielarten für Fähigkeiten (Punkt 6) und Vorschau: siehe zielAufloesen.
 
 import { anmelden, holen } from "../kern/register.js";
-import { entitaetenAuf } from "../kern/zustand.js";
+import { entitaetenAuf, fraktionVon } from "../kern/zustand.js";
 import { aufDerKarte } from "../welt/karte.js";
 import { kreis, kegel, flugbahn, sichtlinieFrei, felderOrdnen, gleichesFeld, inReichweite, KEGEL_OEFFNUNGEN } from "../welt/geometrie.js";
 import { istWesen } from "./kampf.js";
@@ -57,19 +57,19 @@ export function musterFelder(spiel, muster, auswahl) {
 
 export const TRIFFT_ARTEN = ["alle", "wesen", "feinde", "verbuendete"];
 
-function trifftZu(trifft, urheberFraktion, entitaet) {
+export function trifftZu(trifft, urheberFraktion, entitaet) {
   if (trifft === "alle") return true;
   if (!istWesen(entitaet)) return false;
   if (trifft === "wesen") return true;
   if (urheberFraktion == null) return false;
-  return trifft === "feinde" ? entitaet.fraktion !== urheberFraktion : entitaet.fraktion === urheberFraktion;
+  return trifft === "feinde" ? fraktionVon(entitaet) !== urheberFraktion : fraktionVon(entitaet) === urheberFraktion;
 }
 
 // Entitäten auf den Feldern, in der Reihenfolge der Felder, je Feld nach Entitäts-ID.
 // optionen: { trifft (Vorgabe "alle"), urheberId, urheberFraktion (Vorgabe die der Urheberin), ohneUrheber }
 export function entitaetenAufFeldern(spiel, felder, { trifft = "alle", urheberId = null, urheberFraktion, ohneUrheber = false } = {}) {
   const zustand = spiel.zustand;
-  const fraktion = urheberFraktion !== undefined ? urheberFraktion : zustand.entitaeten[urheberId]?.fraktion ?? null;
+  const fraktion = urheberFraktion !== undefined ? urheberFraktion : fraktionVon(zustand.entitaeten[urheberId]) ?? null;
   const ergebnis = [];
   for (const feld of felder) {
     for (const entitaet of entitaetenAuf(zustand, feld.x, feld.y)) {

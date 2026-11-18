@@ -23,7 +23,7 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 + Ersatzwirkungen aus Daten (z.B. "Phönixbier verhindert einmal den Tod", "Schild fängt einen Treffer ab"): eigener Typ, der sofort am Haken "davor" wirkt und sich verbrauchen kann; mit den Zuständen (Punkt 3)
 + Auslöser auch an Skills (Punkt 4) und an Ausrüstung und Inventar der Trägerin nach dem Vorbild der Kaskade in Caves of Qud (Punkt 9)
-+ Die reservierten Haken des Katalogs in Betrieb nehmen: `vor_befehl`, `zug_beginn`, `zug_ende` (Punkt 3), `vor_angriff` (Punkt 5), `betritt_feld`, `verlaesst_feld` (Punkt 8), `gegenstand_benutzt` (Punkt 9)
++ Die reservierten Haken des Katalogs in Betrieb nehmen: `zug_beginn`, `zug_ende` (Punkt 3, sobald etwas sie braucht), `vor_angriff` (Punkt 5), `betritt_feld`, `verlaesst_feld` (Punkt 8), `gegenstand_benutzt` (Punkt 9)
 + Index im `zwischenspeicher`, welche Entitäten Auslöser für einen Haken tragen (Vorbild "WantEvent" in Caves of Qud); erst nötig, wenn mehr als die Beteiligten gefragt werden
 + Erster Auslöser im Spielinhalt (z.B. Säurespritzer des Essigbakteriums beim Tod): Spieldesign, noch nicht entschieden
 
@@ -41,16 +41,16 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 ## 3. Zustände
 
-Status: Grundgerüst umgesetzt in Version 0.6.0, beschrieben in [Architektur.md](Architektur.md) (Zustände); der Rest folgt als 0.7.0
+Status: umgesetzt in Version 0.6.0 (Grundgerüst) und 0.7.0 (Verhalten, Beschwörung), beschrieben in [Architektur.md](Architektur.md) (Zustände, Befehle, Wahrnehmung)
 
-Entschieden: Takt ist die Weltuhr; Stapelregel je Zustand, Vorgabe `erneuern`; Verlauf mit drei Namen oder eigener Kurve; Zustände im Spielinhalt erst, wenn der Systemausbau abgeschlossen ist (bis dahin nur in den Tests)
+Entschieden: Takt ist die Weltuhr; Stapelregel je Zustand, Vorgabe `erneuern`; Verlauf mit drei Namen oder eigener Kurve; handlungsunfähige Ninkasi wartet je Eingabe eine Aktion; Torkeln und Verwirrung über denselben Veränderer, Verwirrung greift auch Freunde an; Beschworene werden der Beschwörerin zugerechnet; Zustände im Spielinhalt erst, wenn der Systemausbau abgeschlossen ist (bis dahin nur in den Tests)
 
-Offen für 0.7.0:
+Offener Rest:
 
-+ Handlungsunfähig (Betäubung, Lähmung, Filmriss): Trägerin wird eingereiht, muss aber warten
-+ Befehl verändern (Torkeln, Verwirrung) über den Haken `vor_befehl`; Grundlage für "Torkeln, Fehlschläge" des Pegels
-+ KI überlagern (Furcht, Psi-Kontrolle, Wut): Stapel von KI-Modulen und Fraktionen, der jüngste gilt, nach Ende kehrt der ursprüngliche Stand zurück
-+ Anzeige der Zustände an Ninkasi und an Gegnern (Oberfläche, Log-Texte zu den Meldungen `zustand_beginnt` und `zustand_endet`)
++ Anzeige der Zustände an Ninkasi und an Gegnern (Oberfläche, Log-Texte zu `zustand_beginnt`, `zustand_endet`, `abgewichen`, `beschworen`, `verschwindet`); mit dem großen Punkt Oberfläche
++ Torkeln aus dem Pegel: eine Schwelle des Stoffwechsels setzt einen Zustand (Spieldesign in [Grundlagen.md](Grundlagen.md))
++ Wer bei Verwirrung Zauber oder Fernkampf benutzt, trifft womöglich ein anderes Ziel: eigener Veränderer mit dem Befehl `faehigkeit` (Punkt 6)
++ Ob gebundene EP für Tötungen durch Beschworene in den Skill der Beschwörung fließen: Spieldesign in [Charakter.md](Charakter.md)
 
 ## 4. Modifikatoren
 
@@ -91,7 +91,7 @@ Status: offen
 + Sichtlinie und Flugbahn gibt es seit 0.5.0 (`src/welt/geometrie.js`); offen ist, dass Gegner sie benutzen, wenn sie schießen oder Psi wirken
 + Option für Verbündete im Weg einer Flugbahn (darüber hinweg oder vorbei); die Anzeige spielt die Bahn aus der Meldung `geschoss` ab
 + Wurfgegenstände landen auf einem Feld (Flasche werfen: Fernkampf, Fläche und Gegenstand zugleich)
-+ Beziehungen der Fraktionen als Daten statt "andere Fraktion ist feindlich": Phagen gegen Bakterien, Kulturhefe gegen wilde Hefe, Händler neutral; Überschreibungen je Wesen (provoziert, kontrolliert)
++ Beziehungen der Fraktionen als Daten statt "andere Fraktion ist feindlich": Phagen gegen Bakterien, Kulturhefe gegen wilde Hefe, Händler neutral; Überschreibungen je Wesen gibt es seit 0.7.0 über Zustände (`fraktionVon`)
 + Wahrnehmung je Wesen statt der Vereinfachung des Prototyps: Wachzustand (schläft, wach, jagt), Lärm, Schleichen; siehe Wahrnehmung in [Architektur.md](Architektur.md)
 + Bewegungsarten (unbeweglich, laufend, fliegend, schwebend), Passierbarkeit und Wegfindung je Bewegungsart
 + Verschieben: Rückstoß, Ziehen, Platztausch, Teleport mit Kollisionsregeln

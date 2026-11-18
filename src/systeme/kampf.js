@@ -8,6 +8,7 @@ import { mitProzentChance } from "../kern/zufall.js";
 import { modifiziert } from "../kern/werte.js";
 import { effektAnwenden } from "../kern/effekte.js";
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
+import { fraktionVon } from "../kern/zustand.js";
 import { musterFelder, entitaetenAufFeldern } from "./zielauswahl.js";
 
 export function istWesen(entitaet) {
@@ -15,7 +16,7 @@ export function istWesen(entitaet) {
 }
 
 export function feindlich(erstesWesen, zweitesWesen) {
-  return istWesen(erstesWesen) && istWesen(zweitesWesen) && erstesWesen.fraktion !== zweitesWesen.fraktion;
+  return istWesen(erstesWesen) && istWesen(zweitesWesen) && fraktionVon(erstesWesen) !== fraktionVon(zweitesWesen);
 }
 
 function angriffsziele(spiel, angreifer, ziel) {
@@ -23,7 +24,7 @@ function angriffsziele(spiel, angreifer, ziel) {
   if (!angriff.muster) return [ziel];
   const auswahl = { ursprung: { ...angreifer.position }, zielpunkt: { ...ziel.position }, quelleId: angreifer.id };
   const felder = musterFelder(spiel, angriff.muster, auswahl);
-  return entitaetenAufFeldern(spiel, felder, { trifft: angriff.trifft ?? "wesen", urheberId: angreifer.id, ohneUrheber: true });
+  return entitaetenAufFeldern(spiel, felder, { trifft: angriff.trifft ?? "wesen", urheberId: angreifer.id, urheberFraktion: fraktionVon(angreifer), ohneUrheber: true });
 }
 
 export function nahkampf(spiel, angreifer, ziel) {
@@ -37,7 +38,7 @@ function einzelangriff(spiel, angreifer, ziel) {
   const angriff = angreifer.angriff;
   const trefferchance = modifiziert(angreifer, "trefferchance", angriff.trefferchance);
   const mittel = { art: "angriff", name: angriff.effekt };
-  const beteiligte = { quelleId: angreifer.id, urheberId: angreifer.id, zielId: ziel.id, ursache: "nahkampf", kettentiefe: 0, mittel };
+  const beteiligte = { quelleId: angreifer.id, urheberId: angreifer.beschworenVon ?? angreifer.id, zielId: ziel.id, ursache: "nahkampf", kettentiefe: 0, mittel };
   if (mitProzentChance(spiel.zustand.zufallszustand, trefferchance)) {
     effektAnwenden(spiel, angriff.effekt, beteiligte);
     hakenAusloesen(spiel, "nach_treffer", { ...beteiligte });

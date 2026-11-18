@@ -17,6 +17,7 @@ import { HAKENKATALOG, AUSLOESER_ROLLEN } from "./hakenkatalog.js";
 import { effektAnwenden } from "./effekte.js";
 import { mitProzentChance } from "./zufall.js";
 import { prozentWiederholt } from "./werte.js";
+import { fraktionVon } from "./zustand.js";
 
 // Der Verteiler läuft nach allen Code-Handlern eines Hakens
 export const RANG_AUSLOESER = 1000;
@@ -59,7 +60,7 @@ function ausloeserVormerken(spiel, hakenName, kontext) {
       if (schonVorgemerkt.has(schluessel)) continue;
       schonVorgemerkt.add(schluessel);
       warteschlange.push({
-        ausloeser, traegerinId, traegerinFraktion: traegerin.fraktion ?? null,
+        ausloeser, traegerinId, traegerinFraktion: fraktionVon(traegerin) ?? null,
         quelleId: kontext.quelleId ?? null, zielId: kontext.zielId ?? null,
         feld: feldKopie(kontext.position) ?? feldKopie(traegerin.position), kettentiefe,
       });
