@@ -2,7 +2,7 @@
 // Nur Haken aus diesem Katalog lassen sich anmelden und auslösen; Mods ergänzen hier eigene.
 //   inBetrieb:        die Logik löst den Haken schon aus (sonst reserviert für einen späteren Ausbau)
 //   ausloeserErlaubt: Auslöser aus Daten dürfen daran hängen (nur Haken "danach", nie "davor")
-// Kontext der Haken mit Beteiligten: { quelleId, zielId, ursache, kettentiefe, ... }
+// Kontext der Haken mit Beteiligten: { quelleId, urheberId, zielId, ursache, kettentiefe, mittel, tags, ... }
 
 export const HAKENKATALOG = {
   vor_schaden: { inBetrieb: true, ausloeserErlaubt: false },      // + menge; Handler ändern menge oder brechen ab
@@ -26,4 +26,4 @@ export const HAKENKATALOG = {
 
 // Auslöser in den Daten: { bei, rolle?, ziel?, effekt, chance?, daempfung? }
 export const AUSLOESER_ROLLEN = ["quelle", "ziel"]; // welche Rolle die Trägerin im Ereignis haben muss
-export const AUSLOESER_ZIELE = ["selbst", "quelle", "ziel"]; // worauf der Effekt wirkt
+export const AUSLOESER_ZIELE = ["selbst", "quelle", "ziel", "feld"]; // worauf der Effekt wirkt

@@ -2,7 +2,7 @@
 // Nach jedem Vorgang stirbt jedes Wesen, dessen Lebenswert (Daten: lebenswert, Vorgabe "lp") bei 0 liegt,
 // in fester Reihenfolge nach Entitäts-ID. Ablauf je Wesen:
 //   1. Haken "vor_tod": Abbruch verhindert den Tod, aber nur, wenn der Lebenswert danach über 0 liegt
-//   2. Meldung "tod" mit Verursacher und Ursache (aus letzterVerlust, siehe kern/effekte.js)
+//   2. Meldung "tod" mit Urheber, Ursache und Mittel (aus letzterVerlust, siehe kern/effekte.js)
 //   3. Haken "nach_tod" mit der letzten Position, hier hängen Auslöser (Sporen, Säurespritzer)
 //   4. Hinterlassenschaft nach Daten: beimTod: { inventar: "fallen_lassen" (Vorgabe) | "vernichten" }
 //   5. Entfernen samt Akteur und gebundenen Zeitereignissen; bei Ninkasi ist das Spiel vorbei, sie bleibt im Zustand
@@ -36,8 +36,9 @@ function hinterlassenschaftVerteilen(spiel, entitaet) {
 // Gibt true zurück, wenn das Wesen gestorben ist
 export function sterben(spiel, entitaet) {
   const zustand = spiel.zustand;
-  const verlust = entitaet.letzterVerlust || { urheberId: null, ursache: null, kettentiefe: 0 };
-  const beteiligte = { quelleId: verlust.urheberId, zielId: entitaet.id, ursache: verlust.ursache, kettentiefe: verlust.kettentiefe };
+  const verlust = entitaet.letzterVerlust || { urheberId: null, ursache: null, mittel: null, kettentiefe: 0 };
+  const mittel = verlust.mittel ?? null;
+  const beteiligte = { quelleId: verlust.urheberId, urheberId: verlust.urheberId, zielId: entitaet.id, ursache: verlust.ursache, kettentiefe: verlust.kettentiefe, mittel };
 
   const vorher = hakenAusloesen(spiel, "vor_tod", { ...beteiligte, abgebrochen: false });
   if (vorher.abgebrochen && !istTot(entitaet)) {
@@ -46,7 +47,7 @@ export function sterben(spiel, entitaet) {
   }
 
   const urheber = entitaetMitId(zustand, verlust.urheberId);
-  melden(spiel, "tod", { opfer: bezugAuf(entitaet), quelle: urheber ? bezugAuf(urheber) : null, ursache: verlust.ursache });
+  melden(spiel, "tod", { opfer: bezugAuf(entitaet), quelle: urheber ? bezugAuf(urheber) : null, ursache: verlust.ursache, mittel });
   const position = entitaet.position ? { x: entitaet.position.x, y: entitaet.position.y } : null;
   hakenAusloesen(spiel, "nach_tod", { ...beteiligte, position });
 

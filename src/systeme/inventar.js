@@ -38,7 +38,7 @@ anmelden("befehle", "trinken", {
     akteur.inventar = akteur.inventar.filter((id) => id !== gegenstand.id);
     melden(spiel, "getrunken", { wer: bezugAuf(akteur), was: bezugAuf(gegenstand) });
     entitaetEntfernen(spiel.zustand, gegenstand.id);
-    effektAnwenden(spiel, gegenstand.trinkbar.effekt, { quelleId: akteur.id, zielId: akteur.id, ursache: "trinken" });
+    effektAnwenden(spiel, gegenstand.trinkbar.effekt, { quelleId: akteur.id, zielId: akteur.id, ursache: "trinken", mittel: { art: "gegenstand", name: gegenstand.typ } });
     return "trinken";
   },
 });

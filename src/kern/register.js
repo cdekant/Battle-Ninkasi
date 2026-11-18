@@ -10,7 +10,7 @@ const ARTEN = [
   "befehle",            // Befehlsarten: { pruefen, ausfuehren }
   "bausteine",          // Effekt-Grundbausteine: (spiel, kontext, parameter) => void
   "ki",                 // Verhaltensmodule: (spiel, akteur) => befehl
-  "zielmuster",         // Zielmuster: (spiel, akteur, parameter) => [{x, y}]
+  "zielmuster",         // Zielmuster: (spiel, auswahl, parameter) => [{x, y}], auswahl = { ursprung, zielpunkt, quelleId }
   "welttick",           // Handler der Weltuhr: (spiel) => void
   "zeitereignisse",     // Handler für Zeitereignisse: (spiel, daten) => void
   "haken",              // interne Haken, Listen je Name: (spiel, kontext) => void

@@ -1,10 +1,14 @@
 // Nahkampf: Trefferwurf, bei Treffer wirkt der Angriffseffekt aus den Daten; danach Haken "nach_treffer" oder "verfehlt".
-// Angriff in den Daten: angriff: { trefferchance: 80, effekt: "faustschlag" }
+// Angriff in den Daten: angriff: { trefferchance: 80, effekt: "faustschlag", muster?, trifft? }
+//   muster (siehe systeme/zielauswahl.js) vom Angreifer in Richtung des Ziels, z.B. Rundumschlag
+//   { art: "angrenzend" } oder Speer { art: "linie", laenge: 2 }; jedes getroffene Wesen bekommt einen
+//   eigenen Trefferwurf, in der Reihenfolge der Felder; trifft Vorgabe "wesen", der Angreifer nie selbst
 
 import { mitProzentChance } from "../kern/zufall.js";
 import { modifiziert } from "../kern/werte.js";
 import { effektAnwenden } from "../kern/effekte.js";
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
+import { musterFelder, entitaetenAufFeldern } from "./zielauswahl.js";
 
 export function istWesen(entitaet) {
   return Boolean(entitaet && entitaet.fraktion !== undefined && entitaet.werte && entitaet.werte.lp);
@@ -14,11 +18,26 @@ export function feindlich(erstesWesen, zweitesWesen) {
   return istWesen(erstesWesen) && istWesen(zweitesWesen) && erstesWesen.fraktion !== zweitesWesen.fraktion;
 }
 
-export function nahkampf(spiel, angreifer, ziel) {
+function angriffsziele(spiel, angreifer, ziel) {
   const angriff = angreifer.angriff;
-  if (!angriff) return;
+  if (!angriff.muster) return [ziel];
+  const auswahl = { ursprung: { ...angreifer.position }, zielpunkt: { ...ziel.position }, quelleId: angreifer.id };
+  const felder = musterFelder(spiel, angriff.muster, auswahl);
+  return entitaetenAufFeldern(spiel, felder, { trifft: angriff.trifft ?? "wesen", urheberId: angreifer.id, ohneUrheber: true });
+}
+
+export function nahkampf(spiel, angreifer, ziel) {
+  if (!angreifer.angriff) return;
+  for (const getroffenes of angriffsziele(spiel, angreifer, ziel)) {
+    if (spiel.zustand.entitaeten[getroffenes.id]) einzelangriff(spiel, angreifer, getroffenes);
+  }
+}
+
+function einzelangriff(spiel, angreifer, ziel) {
+  const angriff = angreifer.angriff;
   const trefferchance = modifiziert(angreifer, "trefferchance", angriff.trefferchance);
-  const beteiligte = { quelleId: angreifer.id, zielId: ziel.id, ursache: "nahkampf", kettentiefe: 0 };
+  const mittel = { art: "angriff", name: angriff.effekt };
+  const beteiligte = { quelleId: angreifer.id, urheberId: angreifer.id, zielId: ziel.id, ursache: "nahkampf", kettentiefe: 0, mittel };
   if (mitProzentChance(spiel.zustand.zufallszustand, trefferchance)) {
     effektAnwenden(spiel, angriff.effekt, beteiligte);
     hakenAusloesen(spiel, "nach_treffer", { ...beteiligte });

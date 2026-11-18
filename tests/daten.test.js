@@ -40,7 +40,7 @@ test("Auslöser: Haken, Rolle, Ziel, Prozente und Effekt werden geprüft", () =>
     [{ ...gueltig, bei: "vor_schaden" }, "keine Auslöser erlaubt"],
     [{ ...gueltig, bei: "betritt_feld" }, "noch nicht ausgelöst"],
     [{ ...gueltig, rolle: "zuschauer" }, "rolle"],
-    [{ ...gueltig, ziel: "feld" }, "ziel"],
+    [{ ...gueltig, ziel: "nachbarin" }, "ziel"],
     [{ ...gueltig, chance: 150 }, "chance"],
     [{ ...gueltig, effekt: "gibt_es_nicht" }, "Effekt"],
   ];
@@ -55,4 +55,49 @@ test("Tod: Lebenswert und Hinterlassenschaft werden geprüft, Regeln sind Pflich
   const ohneRegeln = structuredClone(rohdaten);
   delete ohneRegeln.regeln;
   assert.ok(vorbereiten(ohneRegeln).fehler.some((meldung) => meldung.includes("regeln.ausloeser")));
+});
+
+test("Zielmuster, Bausteine mit Zielauswahl und Mengen werden geprüft", () => {
+  const mitEffekt = (schritt) => {
+    const daten = structuredClone(rohdaten);
+    daten.effekte.test = { schritte: [schritt] };
+    return vorbereiten(daten).fehler;
+  };
+  const gueltig = { baustein: "fuer_jedes_ziel", muster: { art: "kreis", radius: 1 }, effekt: "biss_klein", trifft: "feinde" };
+  assert.deepEqual(mitEffekt(gueltig), []);
+  assert.deepEqual(mitEffekt({ baustein: "springen", anzahl: 3, reichweite: 2, effekt: "biss_klein", wahl: "zufaellig" }), []);
+  assert.deepEqual(mitEffekt({ baustein: "heilen", menge: { aus: "summeSchaden", prozent: 50 } }), []);
+  const erwartet = [
+    [{ ...gueltig, muster: { art: "spirale" } }, "nicht angemeldet"],
+    [{ ...gueltig, muster: "kreis" }, "{ art, ... }"],
+    [{ ...gueltig, muster: { art: "kreis" } }, "radius fehlt"],
+    [{ ...gueltig, muster: { art: "kegel", laenge: 3, oeffnung: 77 } }, "oeffnung"],
+    [{ ...gueltig, muster: { art: "kreis", radius: 1, durchWaende: "ja" } }, "durchWaende"],
+    [{ ...gueltig, effekt: "gibt_es_nicht" }, "Effekt"],
+    [{ ...gueltig, trifft: "freunde" }, "trifft"],
+    [{ baustein: "geschoss", effekt: "biss_klein" }, "reichweite fehlt"],
+    [{ baustein: "heilen", menge: { prozent: 50 } }, "menge.aus"],
+    [{ baustein: "schaden", menge: 5, prozentJeSprung: -1 }, "prozentJeSprung"],
+  ];
+  for (const [schritt, teilDerMeldung] of erwartet) {
+    assert.ok(mitEffekt(schritt).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
+  }
+});
+
+test("Effekte dürfen sich nicht im Kreis aufrufen", () => {
+  const daten = structuredClone(rohdaten);
+  daten.effekte.ping = { schritte: [{ baustein: "geschoss", reichweite: 3, effekt: "pong" }] };
+  daten.effekte.pong = { schritte: [{ baustein: "fuer_jedes_ziel", muster: { art: "selbst" }, effekt: "ping" }] };
+  daten.effekte.selbstbezug = { schritte: [{ baustein: "auf_feld", muster: { art: "feld" }, effekt: "selbstbezug" }] };
+  const kreise = vorbereiten(daten).fehler.filter((meldung) => meldung.includes("im Kreis"));
+  assert.equal(kreise.length, 2);
+  assert.ok(kreise.some((meldung) => meldung.includes("ping > pong > ping")));
+});
+
+test("Angriff mit Muster und trifft wird geprüft", () => {
+  const mitAngriff = (zusatz) => mitNinkasi((ninkasi) => ({ angriff: { ...ninkasi.angriff, ...zusatz } }));
+  assert.deepEqual(mitAngriff({ muster: { art: "linie", laenge: 2 }, trifft: "feinde" }), []);
+  assert.ok(mitAngriff({ muster: { art: "angrenzend", durchWaende: 1 } }).some((meldung) => meldung.includes("durchWaende")));
+  assert.ok(mitAngriff({ muster: "angrenzend" }).some((meldung) => meldung.includes("angriff.muster")));
+  assert.ok(mitAngriff({ trifft: "niemand" }).some((meldung) => meldung.includes("trifft")));
 });

@@ -32,6 +32,12 @@ export function spielerinSetzen(spiel, x, y, lp = 100) {
   return ninkasi;
 }
 
+// Ninkasi sieht die ganze Karte (statt des Schattenwurfs aus systeme/sicht.js)
+export function allesSichtbar(spiel) {
+  const ebene = spiel.zustand.ebene;
+  spiel.zustand.sichtbareFelder = Array.from({ length: ebene.breite * ebene.hoehe }, (_, feldIndex) => feldIndex);
+}
+
 // Gegenstand im Inventar einer Trägerin
 export function gegenstandTragen(spiel, traegerin, komponenten = {}) {
   const gegenstand = entitaetErzeugen(spiel.zustand, { aufhebbar: true, ...komponenten, getragenVon: traegerin.id });

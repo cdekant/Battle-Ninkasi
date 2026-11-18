@@ -23,21 +23,21 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 + Ersatzwirkungen aus Daten (z.B. "Phönixbier verhindert einmal den Tod", "Schild fängt einen Treffer ab"): eigener Typ, der sofort am Haken "davor" wirkt und sich verbrauchen kann; mit den Zuständen (Punkt 3)
 + Auslöser auch an Zuständen (Punkt 3), Skills (Punkt 4) und an Ausrüstung und Inventar der Trägerin nach dem Vorbild der Kaskade in Caves of Qud (Punkt 9)
-+ Ziel `feld` für Auslöser (Sporen auf die Felder um das Opfer), mit der Zielauswahl (Punkt 2)
 + Die reservierten Haken des Katalogs in Betrieb nehmen: `vor_befehl`, `zug_beginn`, `zug_ende`, `zustand_beginnt`, `zustand_endet` (Punkt 3), `vor_angriff` (Punkt 5), `betritt_feld`, `verlaesst_feld` (Punkt 8), `gegenstand_benutzt` (Punkt 9)
 + Index im `zwischenspeicher`, welche Entitäten Auslöser für einen Haken tragen (Vorbild "WantEvent" in Caves of Qud); erst nötig, wenn mehr als die Beteiligten gefragt werden
 + Erster Auslöser im Spielinhalt (z.B. Säurespritzer des Essigbakteriums beim Tod): Spieldesign, noch nicht entschieden
 
 ## 2. Effektkontext, Zielauswahl, verschachtelte Effekte
 
-Status: offen
+Status: umgesetzt in Version 0.5.0, beschrieben in [Architektur.md](Architektur.md) (Effektsystem, Auslöser, Zielauswahl)
 
-+ Kontext bisher `{ quelleId, zielId, ursache }`, also nur ein Ziel; künftig mit Ursprung (Feld), Zielpunkt, Richtung und Zielliste
-+ Urheberkette im Kontext: wer verursacht (EP, Fraktionszorn, Todesursache), womit (Fähigkeit, Gegenstand, Zustand, Falle, Gelände), mit welchen Tags; Grundlage für gebundene EP ("fließen in die beteiligten Skills")
-+ Zielmuster mit Ursprung und Zielpunkt statt nur Akteur: angrenzend, Linie, Strahl, Kegel, Kreis, Fläche um einen Aufschlagpunkt
-+ Verschachtelte Effekte: Schritt "für jedes Ziel im Muster: Effekt X", Schritt "auf Feld: Effekt Y"; z.B. Geschoss, beim Aufschlag Fläche 3x3, je Ziel Schaden und Zustand
-+ Werte zwischen Schritten weitergeben: "heile 50 % des verursachten Schadens", "Schaden auf alle Ziele verteilt"
-+ Ein Effekt bricht nicht mehr pauschal ab, wenn das Ziel stirbt; Schritte erklären, ob sie ein lebendes Ziel brauchen
+Offener Rest, wird mit den genannten Punkten umgesetzt:
+
++ Befehl `faehigkeit` mit Zielangabe, Zielmodus und Tooltip der Anzeige auf Grundlage von `zielAufloesen` (Punkt 6)
++ Vorschau je Wesen "sicher" oder "vielleicht" getroffen, sobald Trefferwurf und Ausweichen für Flächen gelten (Punkt 5)
++ Wirkung auf die Quelle innerhalb eines Effekts, z.B. Vampirbiss (Schaden am Ziel, Heilung am Angreifer); bisher nur über einen Effekt mit der Quelle als Ziel (Lebensraub-Nova); möglicher Parameter `auf: "quelle"` an den Mengenbausteinen
++ Sichtlinie und Flugbahn für die KI (Punkt 7); nach dem Anspielen prüfen, ob Ersatzlinien oder symmetrischer Schattenwurf für das Sichtfeld nötig sind
++ Waffen mit Muster (Rundumschlag, Speer) im Spielinhalt (Punkt 9), Animation der Meldungen `geschoss` und `flaeche` in der Anzeige
 
 ## 3. Zustände
 
@@ -86,8 +86,8 @@ Status: offen
 
 Status: offen
 
-+ Allgemeine Sichtlinie von A nach B (ganzzahlig, etwa Bresenham), auch für Gegner, die schießen oder Psi wirken
-+ Flugbahn endet am ersten Hindernis oder Wesen, Option für Verbündete im Weg; Meldung mit der Bahn, die Anzeige spielt sie ab
++ Sichtlinie und Flugbahn gibt es seit 0.5.0 (`src/welt/geometrie.js`); offen ist, dass Gegner sie benutzen, wenn sie schießen oder Psi wirken
++ Option für Verbündete im Weg einer Flugbahn (darüber hinweg oder vorbei); die Anzeige spielt die Bahn aus der Meldung `geschoss` ab
 + Wurfgegenstände landen auf einem Feld (Flasche werfen: Fernkampf, Fläche und Gegenstand zugleich)
 + Beziehungen der Fraktionen als Daten statt "andere Fraktion ist feindlich": Phagen gegen Bakterien, Kulturhefe gegen wilde Hefe, Händler neutral; Überschreibungen je Wesen (provoziert, kontrolliert)
 + Wahrnehmung je Wesen statt der Vereinfachung des Prototyps: Wachzustand (schläft, wach, jagt), Lärm, Schleichen; siehe Wahrnehmung in [Architektur.md](Architektur.md)

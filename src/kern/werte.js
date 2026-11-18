@@ -10,6 +10,18 @@ export function prozentVon(wert, prozent) {
   return Math.round((wert * prozent) / 100);
 }
 
+// Wiederholte Prozentrechnung, je Stufe einzeln gerundet (Dämpfung der Auslöser, Abschwächung je Sprung)
+export function prozentWiederholt(wert, prozent, anzahlStufen) {
+  let ergebnis = wert;
+  for (let stufe = 0; stufe < anzahlStufen; stufe++) ergebnis = prozentVon(ergebnis, prozent);
+  return ergebnis;
+}
+
+// Einheitliche Rundung beim Teilen (verteilter Schaden), teiler > 0
+export function geteiltGerundet(wert, teiler) {
+  return Math.round(wert / teiler);
+}
+
 // Wendet alle Modifikatoren mit einem der Ziele auf einen Basiswert an
 export function modifiziert(entitaet, ziele, basiswert) {
   const zielListe = Array.isArray(ziele) ? ziele : [ziele];

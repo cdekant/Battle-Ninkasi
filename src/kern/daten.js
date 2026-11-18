@@ -7,6 +7,7 @@ import { istWuerfelausdruck } from "./zufall.js";
 import { kurvenfehler } from "./kurven.js";
 import { HAKENKATALOG, AUSLOESER_ROLLEN, AUSLOESER_ZIELE } from "./hakenkatalog.js";
 import { HINTERLASSENSCHAFT_REGELN } from "./werte.js";
+import { TRIFFT_ARTEN } from "../systeme/zielauswahl.js";
 
 const istObjekt = (wert) => wert && typeof wert === "object" && !Array.isArray(wert);
 
@@ -81,7 +82,8 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
   if (wesen.angriff) {
     if (!istGanzzahl(wesen.angriff.trefferchance)) fehler.push(`${ort}: angriff.trefferchance muss eine ganze Zahl sein`);
     pruefeEffektVerweis(daten, wesen.angriff.effekt, `${ort}.angriff`, fehler);
-    if (wesen.angriff.muster && !hat("zielmuster", wesen.angriff.muster)) fehler.push(`${ort}: Zielmuster "${wesen.angriff.muster}" ist nicht angemeldet`);
+    if (wesen.angriff.muster !== undefined) pruefeMuster(daten, wesen.angriff.muster, `${ort}.angriff.muster`, fehler);
+    pruefeParameter(daten, { trifft: TRIFFT_ARTEN }, wesen.angriff, `${ort}.angriff`, fehler);
   }
   if (wesen.ki && !hat("ki", wesen.ki.modul)) fehler.push(`${ort}: Verhaltensmodul "${wesen.ki.modul}" ist nicht angemeldet`);
   if (wesen.stoffwechsel) pruefeStoffwechsel(wesen, ort, fehler);
@@ -147,23 +149,92 @@ function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
   if (!daten.zeichen.gegenstaende[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js`);
 }
 
-function pruefeEffekt(name, effekt, fehler) {
+// Menge eines Schritts, siehe mengeBestimmen in kern/bausteine.js
+function pruefeMenge(schritt, ort, fehler) {
+  if (schritt.wuerfel === undefined && schritt.menge === undefined) fehler.push(`${ort}: wuerfel oder menge fehlt`);
+  if (schritt.wuerfel !== undefined && !istWuerfelausdruck(schritt.wuerfel)) fehler.push(`${ort}: ungültiger Würfelausdruck "${schritt.wuerfel}"`);
+  if (istObjekt(schritt.menge)) {
+    if (typeof schritt.menge.aus !== "string") fehler.push(`${ort}: menge.aus fehlt`);
+    if (schritt.menge.prozent !== undefined && !istZahlAbNull(schritt.menge.prozent)) fehler.push(`${ort}: menge.prozent muss eine ganze Zahl >= 0 sein`);
+  } else if (schritt.menge !== undefined && !istGanzzahl(schritt.menge)) {
+    fehler.push(`${ort}: menge muss eine ganze Zahl oder { aus, prozent } sein`);
+  }
+  if (schritt.teilen !== undefined && typeof schritt.teilen !== "string") fehler.push(`${ort}: teilen muss ein Name aus der Ablage sein`);
+  if (schritt.prozentJeSprung !== undefined && !istZahlAbNull(schritt.prozentJeSprung)) fehler.push(`${ort}: prozentJeSprung muss eine ganze Zahl >= 0 sein`);
+}
+
+const istZahlAbNull = (wert) => istGanzzahl(wert) && wert >= 0;
+
+// Parameter nach Beschreibung (siehe kern/bausteine.js): "text", "ganzzahl", "wahrheitswert", "effekt",
+// "muster", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
+function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
+  for (const [feld, typ] of Object.entries(beschreibung)) {
+    const wert = werte[feld];
+    if (Array.isArray(typ)) {
+      if (wert !== undefined && !typ.includes(wert)) fehler.push(`${ort}: ${feld} muss eines von ${typ.join(", ")} sein`);
+      continue;
+    }
+    if (typ === "wuerfel|menge") {
+      pruefeMenge(werte, ort, fehler);
+      continue;
+    }
+    const freiwillig = typ.endsWith("?");
+    const grundtyp = freiwillig ? typ.slice(0, -1) : typ;
+    if (wert === undefined) {
+      if (!freiwillig) fehler.push(`${ort}: ${feld} fehlt`);
+      continue;
+    }
+    if (grundtyp === "text" && typeof wert !== "string") fehler.push(`${ort}: ${feld} muss ein Text sein`);
+    else if (grundtyp === "ganzzahl" && !istZahlAbNull(wert)) fehler.push(`${ort}: ${feld} muss eine ganze Zahl >= 0 sein`);
+    else if (grundtyp === "wahrheitswert" && typeof wert !== "boolean") fehler.push(`${ort}: ${feld} muss true oder false sein`);
+    else if (grundtyp === "effekt") pruefeEffektVerweis(daten, wert, `${ort}.${feld}`, fehler);
+    else if (grundtyp === "muster") pruefeMuster(daten, wert, `${ort}.${feld}`, fehler);
+  }
+}
+
+// Zielmuster: { art, ...parameter }, siehe systeme/zielauswahl.js
+function pruefeMuster(daten, muster, ort, fehler) {
+  if (!istObjekt(muster) || typeof muster.art !== "string") return fehler.push(`${ort}: Zielmuster braucht die Form { art, ... }`);
+  if (!hat("zielmuster", muster.art)) return fehler.push(`${ort}: Zielmuster "${muster.art}" ist nicht angemeldet`);
+  pruefeParameter(daten, holen("zielmuster", muster.art).parameter || {}, muster, ort, fehler);
+}
+
+function pruefeEffekt(daten, name, effekt, fehler) {
   const ort = `effekte.${name}`;
+  if (effekt.tags !== undefined && !(Array.isArray(effekt.tags) && effekt.tags.every((tag) => typeof tag === "string"))) fehler.push(`${ort}: tags muss eine Liste von Texten sein`);
   if (!Array.isArray(effekt.schritte) || effekt.schritte.length === 0) return fehler.push(`${ort}: schritte fehlen`);
   effekt.schritte.forEach((schritt, nummer) => {
     const schrittOrt = `${ort}.schritte[${nummer}]`;
     if (!hat("bausteine", schritt.baustein)) return fehler.push(`${schrittOrt}: Baustein "${schritt.baustein}" ist nicht angemeldet`);
-    const parameterBeschreibung = holen("bausteine", schritt.baustein).parameter || {};
-    for (const [feld, typ] of Object.entries(parameterBeschreibung)) {
-      if (typ === "wuerfel|menge") {
-        if (schritt.wuerfel === undefined && schritt.menge === undefined) fehler.push(`${schrittOrt}: wuerfel oder menge fehlt`);
-        if (schritt.wuerfel !== undefined && !istWuerfelausdruck(schritt.wuerfel)) fehler.push(`${schrittOrt}: ungültiger Würfelausdruck "${schritt.wuerfel}"`);
-        if (schritt.menge !== undefined && !istGanzzahl(schritt.menge)) fehler.push(`${schrittOrt}: menge muss eine ganze Zahl sein`);
-      } else if (typ === "text" && typeof schritt[feld] !== "string") {
-        fehler.push(`${schrittOrt}: ${feld} fehlt`);
-      }
-    }
+    pruefeParameter(daten, holen("bausteine", schritt.baustein).parameter || {}, schritt, schrittOrt, fehler);
   });
+}
+
+// Namen der Effekte, die ein Effekt in seinen Schritten aufruft (Parameter vom Typ "effekt")
+function aufgerufeneEffekte(effekt) {
+  const namen = [];
+  for (const schritt of effekt.schritte || []) {
+    if (!hat("bausteine", schritt.baustein)) continue;
+    for (const [feld, typ] of Object.entries(holen("bausteine", schritt.baustein).parameter || {})) {
+      if ((typ === "effekt" || typ === "effekt?") && typeof schritt[feld] === "string") namen.push(schritt[feld]);
+    }
+  }
+  return namen;
+}
+
+// Benannte Effekte dürfen sich nicht im Kreis aufrufen; jeder Kreis wird einmal gemeldet
+function pruefeEffektKreise(effekte, fehler) {
+  const fertig = new Set();
+  const besuchen = (name, kette) => {
+    if (fertig.has(name) || !effekte[name]) return;
+    for (const aufgerufen of aufgerufeneEffekte(effekte[name])) {
+      const position = kette.indexOf(aufgerufen);
+      if (position >= 0) fehler.push(`effekte.${aufgerufen}: Effekte rufen sich im Kreis auf (${[...kette.slice(position), aufgerufen].join(" > ")})`);
+      else besuchen(aufgerufen, [...kette, aufgerufen]);
+    }
+    fertig.add(name);
+  };
+  for (const name of Object.keys(effekte)) besuchen(name, [name]);
 }
 
 function pruefeEbene(daten, name, ebene, fehler) {
@@ -190,7 +261,8 @@ export function vorbereiten(rohdaten, sprache = {}) {
   daten.wesen = vorlagenAufloesen(rohdaten.wesen, "wesen", fehler);
   daten.gegenstaende = vorlagenAufloesen(rohdaten.gegenstaende, "gegenstaende", fehler);
 
-  for (const [name, effekt] of Object.entries(daten.effekte)) pruefeEffekt(name, effekt, fehler);
+  for (const [name, effekt] of Object.entries(daten.effekte)) pruefeEffekt(daten, name, effekt, fehler);
+  pruefeEffektKreise(daten.effekte, fehler);
   for (const [name, wesen] of Object.entries(daten.wesen)) pruefeWesen(daten, sprache, name, wesen, fehler);
   for (const [name, gegenstand] of Object.entries(daten.gegenstaende)) pruefeGegenstand(daten, sprache, name, gegenstand, fehler);
   for (const [name, ebene] of Object.entries(daten.ebenen)) pruefeEbene(daten, name, ebene, fehler);
