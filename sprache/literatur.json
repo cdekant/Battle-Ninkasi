@@ -18,5 +18,46 @@
     "DOI": "10.11588/propylaeumdok.00006162",
     "keyword": "sumerisch, Bier, Hymne, Trinklied",
     "note": "Nur Fachquelle: Übersetzung urheberrechtlich geschützt, nicht zitieren. Grundlage der Nachdichtungen sprache/de/korpus/ninkasi-hymne.md und trinklied.md."
+  },
+  {
+    "id": "sallaberger2012bierbrauen",
+    "type": "chapter",
+    "author": [{ "family": "Sallaberger", "given": "Walther" }],
+    "title": "Bierbrauen in Versen: Eine neue Edition und Interpretation der Ninkasi-Hymne",
+    "container-title": "Altorientalische Studien zu Ehren von Pascal Attinger",
+    "editor": [
+      { "family": "Ecklin", "given": "Sabine" },
+      { "family": "Mittermayer", "given": "Catherine" }
+    ],
+    "collection-title": "Orbis Biblicus et Orientalis",
+    "collection-number": "256",
+    "publisher": "Academic Press; Vandenhoeck & Ruprecht",
+    "publisher-place": "Fribourg; Göttingen",
+    "issued": { "date-parts": [[2012]] },
+    "page": "291-328",
+    "keyword": "sumerisch, Bier, Hymne, Trinklied, Edition",
+    "note": "Nur Fachquelle: Übersetzung urheberrechtlich geschützt, nicht zitieren. Liegt laut Sekundärquelle auf ZORA (Universität Zürich), Lizenz dort noch ungeprüft."
+  },
+  {
+    "id": "etcsl4231ninkasi",
+    "type": "webpage",
+    "author": [
+      { "family": "Black", "given": "Jeremy A." },
+      { "family": "Cunningham", "given": "Graham" },
+      { "family": "Ebeling", "given": "Jarle" },
+      { "family": "Flückiger-Hawker", "given": "Esther" },
+      { "family": "Robson", "given": "Eleanor" },
+      { "family": "Taylor", "given": "Jon" },
+      { "family": "Zólyomi", "given": "Gábor" }
+    ],
+    "title": "A hymn to Ninkasi (Ninkasi A)",
+    "container-title": "The Electronic Text Corpus of Sumerian Literature",
+    "publisher": "Faculty of Oriental Studies, University of Oxford",
+    "publisher-place": "Oxford",
+    "issued": { "date-parts": [[2006]] },
+    "number": "c.4.23.1",
+    "URL": "https://etcsl.orinst.ox.ac.uk/cgi-bin/etcsl.cgi?text=t.4.23.1",
+    "keyword": "sumerisch, Bier, Hymne",
+    "note": "Nur Fachquelle: englische Übersetzung urheberrechtlich geschützt (© The ETCSL project, University of Oxford), nicht zitieren. Grundlage der Lesart in sprache/de/korpus/ninkasi-hymne-b.md."
   }
 ]

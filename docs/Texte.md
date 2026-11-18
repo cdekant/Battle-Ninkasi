@@ -51,6 +51,11 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 |---|---|---|---|
 | `de/korpus/ninkasi-hymne.md` | Nachdichtung | `sallaberger2020ninkasi` | eigener Text, CC BY-NC-SA 4.0; sumerisches Original gemeinfrei |
 | `de/korpus/trinklied.md` | Nachdichtung | `sallaberger2020ninkasi` | eigener Text, CC BY-NC-SA 4.0; sumerisches Original gemeinfrei |
+| `de/korpus/ninkasi-hymne-b.md` | Nachdichtung, andere Lesart | `etcsl4231ninkasi` | eigener Text, CC BY-NC-SA 4.0; sumerisches Original gemeinfrei |
+| `de/korpus/trinklied-b.md` | Nachdichtung, freiere Bilder | `sallaberger2020ninkasi` | eigener Text, CC BY-NC-SA 4.0; sumerisches Original gemeinfrei |
+
++ Varianten desselben Originals tragen die Endung `-b`, `-c` usw.; sie folgen einer anderen Lesart oder anderen Bildern und erweitern so den Wortschatz der Markow-Ketten
++ Weitere Fachquellen ohne eigene Nachdichtung: `sallaberger2012bierbrauen` (Lizenz auf ZORA ungeprüft, falls frei lizenziert, wären wörtliche Zitate möglich)
 
 ## Offen
 
