@@ -102,6 +102,7 @@ Status: offen
 Status: offen
 
 + Zustand je Feld: Tür offen oder geschlossen, zerstörbare Wand, Hebel, Schalter
++ Was Linien aufhält: bisher enden Linie, Strahl und Flugbahn an undurchsichtigen Feldern, wie die Sichtlinie (`src/welt/geometrie.js`); für Gelände, das durchsichtig, aber nicht passierbar ist (Gitter, Gärröhren aus Glas), eine eigene Eigenschaft im Gelände, ob Geschosse durchfliegen
 + Feldschichten als eigene Gitter im Zustand: Gelände, Oberfläche (Bierpfütze, Säure, Schleim, Myzel, Blut), Gas mit Konzentration; je Schicht ein Handler der Weltuhr für Ausbreitung (Vorbild Brogue)
 + Feuer mit Ausbreitung, Zusammenspiel mit Alkohol (Hochprozentiges als Brandbeschleuniger) und Gas (CO2 im Gärkeller sammelt sich und erstickt)
 + Ereignis beim Betreten eines Felds (Fallen, Oberflächen)
