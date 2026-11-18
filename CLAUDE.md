@@ -23,7 +23,7 @@
 ## Repository und Umgebung
 
 + Öffentliches Repo: https://github.com/cdekant/Battle-Ninkasi, grundsätzlich auf Hauptbranch `main` arbeiten
-+ Starten: `python -m http.server` im Hauptverzeichnis, dann `http://localhost:8000/`; Test der Logik: `node --test` (Unittests in `tests/`) und `node werkzeuge/bot.js`
++ Starten: `starten.bat` (Windows) bzw. `./starten.py` (Debian) startet Server und eigene Firefox-Instanz mit Profil `.firefox-profil/` (nicht im Repo), Schließen des Fensters beendet den Server; von Hand: `python -m http.server`, dann `http://localhost:8000/`, Ende mit Strg+C; Test der Logik: `node --test` (Unittests in `tests/`) und `node werkzeuge/bot.js`
 + Zeilenenden im Repo durchgängig LF, festgelegt in `.gitattributes`.
 + Versionen nach Schema Ära.Feature.Fix, Nummer in `src/version.js`, jede Version mit annotiertem Git-Tag; Details in [docs/Architektur.md](docs/Architektur.md).
 + `Artwork/` enthält Konzeptbilder als JPG (Qualität 85), in Unterordnern nach Thema (`kampf/`, `titel/`, `tempel/`, `brauerei/`, `ninkasi/`); Dateinamen klein, mit Bindestrichen, ohne Umlaute und Leerzeichen, Varianten nummeriert (`-01`).

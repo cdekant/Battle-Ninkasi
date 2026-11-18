@@ -1,6 +1,6 @@
 # Battle Ninkasi - Architektur
 
-Stand: 2026-11-17
+Stand: 2026-11-18
 
 ## Grundsätze
 
@@ -9,7 +9,9 @@ Stand: 2026-11-17
 + Die Logik läuft auch ohne Browser (Node), für Tests, Simulationen und Balancing
 + Inhalte sind Daten, Mechanik ist Code; neue Inhalte brauchen im Regelfall keinen neuen Code
 + Jeder Lauf ist aus Startwert und Befehlsliste exakt reproduzierbar
-+ Keine Spiele-Engine, kein Build-Schritt; JavaScript-Module (ES-Module), lokal über einen Webserver gestartet (z.B. `python -m http.server`), da Module über `file://` nicht laden
++ Keine Spiele-Engine, kein Build-Schritt; JavaScript-Module (ES-Module), lokal über einen Webserver gestartet, da Module über `file://` nicht laden
++ Startskript `starten.py` (unter Windows per `starten.bat`): Webserver auf `127.0.0.1:8000` (belegt: freier Port) ohne Zwischenspeicher (`Cache-Control: no-store`), dazu Firefox als eigene Instanz (`-no-remote`) mit Entwicklungsprofil `.firefox-profil/` (in `.gitignore`, wird bei Bedarf angelegt, Einstellungen über `user.js`); endet Firefox, endet der Server; unter Windows mit `-wait-for-browser`, da `firefox.exe` sonst nur einen sofort endenden Startprozess ist; endet Firefox ohne Fehler binnen 5 Sekunden, läuft der Server bis Strg+C weiter; Firefox-Pfad notfalls über Umgebungsvariable `FIREFOX`
++ Spieleinstellungen liegen im `localStorage` und gelten je Ursprung (Host und Port); deshalb fester Port
 
 ## Datenfluss
 
