@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  prozentVon, hoechstwert, wertBegrenztAendern, wertBegrenztAendernInHundertsteln,
+  prozentVon, hoechstwert, hatHoechstwert, wertBegrenztAendern, wertBegrenztAendernInHundertsteln,
   modifikatorHinzufuegen, modifikatorenEntfernen, werteAusDaten,
 } from "../src/kern/werte.js";
 
@@ -12,6 +12,27 @@ test("werteAusDaten: Anfangswert ist der Grundwert, wenn nichts anderes angegebe
     lp: { grundwert: 100, aktuell: 100, hundertstelRest: 0 },
     pp: { grundwert: 100, aktuell: 0, hundertstelRest: 0 },
   });
+});
+
+test("werteAusDaten: ohne Grundwert ist der Wert nach oben offen", () => {
+  const wesen = { werte: werteAusDaten({ pegel: { anfangswert: 0 } }) };
+  assert.deepEqual(wesen.werte, { pegel: { aktuell: 0, hundertstelRest: 0 } });
+  assert.equal(hatHoechstwert(wesen, "pegel"), false);
+  assert.equal(hoechstwert(wesen, "pegel"), Infinity);
+});
+
+test("Offener Wert steigt über jede Grenze und bleibt nach unten bei 0", () => {
+  const wesen = { werte: werteAusDaten({ pegel: { anfangswert: 0 } }) };
+  assert.equal(wertBegrenztAendern(wesen, "pegel", 5000), 5000);
+  assert.equal(wertBegrenztAendern(wesen, "pegel", -6000), -5000);
+  assert.equal(wesen.werte.pegel.aktuell, 0);
+  wertBegrenztAendernInHundertsteln(wesen, "pegel", 250);
+  assert.equal(wesen.werte.pegel.aktuell, 2);
+  assert.equal(wesen.werte.pegel.hundertstelRest, 50);
+  wertBegrenztAendernInHundertsteln(wesen, "pegel", -400);
+  assert.equal(wesen.werte.pegel.aktuell, 0);
+  assert.equal(wesen.werte.pegel.hundertstelRest, 0);
+  assert.equal(JSON.stringify(wesen.werte), '{"pegel":{"aktuell":0,"hundertstelRest":0}}');
 });
 
 test("prozentVon rundet kaufmännisch", () => {

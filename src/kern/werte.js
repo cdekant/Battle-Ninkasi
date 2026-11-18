@@ -1,5 +1,6 @@
-// Werte (LP, MP, PP und weitere) als erweiterbarer Satz, berechnet aus Grundwert und Modifikatoren.
+// Werte (LP, MP, PP, Pegel und weitere) als erweiterbarer Satz, berechnet aus Grundwert und Modifikatoren.
 // Wert in der Entität:   werte: { lp: { grundwert: 100, aktuell: 100, hundertstelRest: 0 } }
+//   ohne grundwert ist der Wert nach oben offen (z.B. der Pegel), nach unten bleibt er bei 0
 //   hundertstelRest: Bruchteile in Hundertsteln, ein voller Punkt wird gutgeschrieben
 // Modifikator:           { ziel: "lp" | "kosten.bewegen" | "kosten.alle" | ..., art: "plus" | "prozent", betrag, quelle }
 // Verrechnung vorläufig: alle Plus-Werte und alle Prozente addieren, Prozente vom Grundwert.
@@ -25,7 +26,14 @@ export function hatWert(entitaet, wertName) {
   return Boolean(entitaet.werte && entitaet.werte[wertName]);
 }
 
+// Ein Wert ohne Grundwert hat keine Obergrenze
+export function hatHoechstwert(entitaet, wertName) {
+  return entitaet.werte[wertName].grundwert !== undefined;
+}
+
+// Höchstwert aus Grundwert und Modifikatoren; Infinity für offene Werte (wird nur berechnet, nie gespeichert)
 export function hoechstwert(entitaet, wertName) {
+  if (!hatHoechstwert(entitaet, wertName)) return Infinity;
   return modifiziert(entitaet, wertName, entitaet.werte[wertName].grundwert);
 }
 
@@ -62,11 +70,14 @@ export function modifikatorenEntfernen(entitaet, quelle) {
   if (entitaet.modifikatoren) entitaet.modifikatoren = entitaet.modifikatoren.filter((modifikator) => modifikator.quelle !== quelle);
 }
 
-// Erzeugt den Wertesatz einer Entität aus Daten: { lp: { grundwert: 100, anfangswert?: 100 } }
+// Erzeugt den Wertesatz einer Entität aus Daten: { lp: { grundwert: 100, anfangswert?: 100 }, pegel: { anfangswert: 0 } }
 export function werteAusDaten(wertedaten) {
   const werte = {};
   for (const [wertName, daten] of Object.entries(wertedaten || {})) {
-    werte[wertName] = { grundwert: daten.grundwert, aktuell: daten.anfangswert ?? daten.grundwert, hundertstelRest: 0 };
+    const aktuell = daten.anfangswert ?? daten.grundwert;
+    werte[wertName] = daten.grundwert === undefined
+      ? { aktuell, hundertstelRest: 0 }
+      : { grundwert: daten.grundwert, aktuell, hundertstelRest: 0 };
   }
   return werte;
 }

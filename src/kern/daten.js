@@ -67,8 +67,13 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
   if (typeof wesen.fraktion !== "string") fehler.push(`${ort}: fraktion fehlt`);
   if (!wesen.werte || !wesen.werte.lp) fehler.push(`${ort}: werte.lp fehlt`);
   for (const [wertName, wertDaten] of Object.entries(wesen.werte || {})) {
-    if (!istGanzzahl(wertDaten.grundwert) || wertDaten.grundwert < 0) fehler.push(`${ort}: werte.${wertName}.grundwert muss eine ganze Zahl >= 0 sein`);
-    if (wertDaten.anfangswert !== undefined && !istGanzzahl(wertDaten.anfangswert)) fehler.push(`${ort}: werte.${wertName}.anfangswert muss eine ganze Zahl sein`);
+    // ohne grundwert nach oben offen, dann ist anfangswert Pflicht
+    if (wertDaten.grundwert === undefined) {
+      if (wertDaten.anfangswert === undefined) fehler.push(`${ort}: werte.${wertName} braucht grundwert oder, wenn nach oben offen, anfangswert`);
+    } else if (!istGanzzahl(wertDaten.grundwert) || wertDaten.grundwert < 0) {
+      fehler.push(`${ort}: werte.${wertName}.grundwert muss eine ganze Zahl >= 0 sein`);
+    }
+    if (wertDaten.anfangswert !== undefined && (!istGanzzahl(wertDaten.anfangswert) || wertDaten.anfangswert < 0)) fehler.push(`${ort}: werte.${wertName}.anfangswert muss eine ganze Zahl >= 0 sein`);
   }
   if (wesen.angriff) {
     if (!istGanzzahl(wesen.angriff.trefferchance)) fehler.push(`${ort}: angriff.trefferchance muss eine ganze Zahl sein`);

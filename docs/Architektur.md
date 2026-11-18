@@ -37,6 +37,8 @@ Stand: 2026-11-18
 + Unterschiede entstehen allein durch die Kombination der Komponenten
 + Beispiele: Psi-Kontrolle ändert die Fraktion; Kulturhefe als Verbündete ist ein Dateneintrag; ein Phage tauscht beim Befall Komponenten des Bakteriums aus; ein wandernder Händler hat eine Handelskomponente und eine friedliche Fraktion
 + Werte (LP, MP, PP, Pegel und weitere) sind ein erweiterbarer Satz, keine fest verdrahteten Felder
++ Ein Wert ohne Grundwert ist nach oben offen (z.B. der Pegel), sein Höchstwert wird als `Infinity` berechnet und nie gespeichert; nach unten bleibt jeder Wert bei 0
++ Kurven sind Daten: Stützpunkte `[[stelle, wert], ...]`, dazwischen linear und ganzzahlig, außerhalb gleichbleibend (`src/kern/kurven.js`); z.B. Regeneration über dem Pegel
 + Der gesamte Zustand ist reine Daten und als JSON serialisierbar (keine Funktionen, keine DOM-Objekte)
 
 ## Zeitmodell
@@ -265,7 +267,7 @@ Vorläufige Ideen, noch nicht umgesetzt.
 + `index.html` als Einstieg, `src/main.js` verdrahtet Logik, Anzeige und Eingabe und setzt beim Start das Favicon aus dem Tile `ninkasi` (Satz 32)
 + `package.json`: nur `"type": "module"` und `"private": true`, damit Node alle `.js`-Dateien als ES-Module liest; keine Abhängigkeiten, kein Build
 + `src/version.js`: Versionsnummer
-+ `src/kern/`: Spiel und Eingangstür für Befehle (`spiel.js`), Zustand und Entitäten, Zeit, Zufall, Ereignisse, Werte und Modifikatoren, Effekte, Grundbausteine, Register, Datenprüfung
++ `src/kern/`: Spiel und Eingangstür für Befehle (`spiel.js`), Zustand und Entitäten, Zeit, Zufall, Ereignisse, Werte und Modifikatoren, Kurven, Effekte, Grundbausteine, Register, Datenprüfung
 + `src/systeme/`: Bewegung, Kampf, Sicht, Pegel, Inventar, Gefahrenprüfung, später Brauen, Handel u.a.
 + `src/ki/`: Verhaltensmodule
 + `src/welt/`: Dungeon-Erzeugung, Zugriff auf die Karte, Wegfindung
