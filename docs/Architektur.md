@@ -36,6 +36,7 @@ Stand: 2026-11-18
 + Eine Entität ist eine ID plus Komponenten, z.B. Position, Werte, Inventar, KI, Fraktion, Handel, Braukessel, Sicht
 + Unterschiede entstehen allein durch die Kombination der Komponenten
 + Beispiele: Psi-Kontrolle ändert die Fraktion; Kulturhefe als Verbündete ist ein Dateneintrag; ein Phage tauscht beim Befall Komponenten des Bakteriums aus; ein wandernder Händler hat eine Handelskomponente und eine friedliche Fraktion
++ Wesen können in den Daten außerdem `tags`, feste `modifikatoren` und `auren` tragen, siehe Modifikatoren
 + Werte (LP, MP, PP, Pegel und weitere) sind ein erweiterbarer Satz, keine fest verdrahteten Felder
 + Ein Wert ohne Grundwert ist nach oben offen (z.B. der Pegel), sein Höchstwert wird als `Infinity` berechnet und nie gespeichert; nach unten bleibt jeder Wert bei 0
 + Kurven sind Daten: Stützpunkte `[[stelle, wert], ...]`, dazwischen linear und ganzzahlig, außerhalb gleichbleibend (`src/kern/kurven.js`); z.B. Regeneration über dem Pegel
@@ -79,15 +80,22 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 
 ## Modifikatoren
 
-+ Modifikator: `{ ziel, art, betrag, quelle }`, z.B. `{ ziel: "kosten.bewegen", art: "prozent", betrag: -5 }`; Ziele sind Namen wie `lp`, `trefferchance`, `reichweiteSicht`, `kosten.<aktion>`, `kosten.alle`, `regeneration.<wert>`, `schwund.<wert>`, `kurvenverschiebung.<wert>`, `abbau.pegel`
++ Modifikator: `{ ziel, art, betrag, quelle, tag?, wenn? }`, z.B. `{ ziel: "kosten.bewegen", art: "prozent", betrag: -5 }`; Ziele sind Namen wie `lp`, `trefferchance`, `reichweiteSicht`, `kosten.<aktion>`, `kosten.alle`, `regeneration.<wert>`, `schwund.<wert>`, `kurvenverschiebung.<wert>`, `abbau.pegel`
 + Arten: `plus`, `prozent`, `mal` (Betrag in Prozent, `150` heißt x1,5), `mindestens`, `hoechstens`, `setzen` (zählt als `mindestens` und `hoechstens` mit demselben Betrag); alle Beträge ganzzahlig
 + Verrechnung (`verrechnet` in `src/kern/werte.js`, Vorbild "increased" und "more" in Path of Exile): (Basiswert + Summe aller `plus`) x (100 + Summe aller `prozent`) / 100 x jedes `mal` / 100, ganzzahlig gerechnet und einmal am Ende gerundet, die Reihenfolge der Modifikatoren spielt also keine Rolle; danach hebt `mindestens` (der höchste) und senkt `hoechstens` (der niedrigste), bei Widerspruch gewinnt `hoechstens` (Blindheit schlägt Fernsicht)
 + Prozente addieren sich, zehnmal +5 % sind +50 %; nur `mal` multipliziert, und nur dort, wo die Daten es ausdrücklich sagen; so wachsen Werte nicht unbemerkt exponentiell, Spielraum für Boni zwischen Quellen (Vorschlag in [Charakter.md](Charakter.md)) gibt `mal`
 + Kein Wert baut auf seinem letzten Ergebnis auf, jede Abfrage rechnet vom Grundwert; Untergrenzen wie "Kosten mindestens 1" setzen die Aufrufer
 + Quellen sind ein Register (`modifikatorquellen`), Signatur `(spiel, entitaet) => [modifikator]`; `modifiziert(spiel, entitaet, ziele, basiswert)` sammelt bei jeder Abfrage aus allen Quellen in der Reihenfolge der Anmeldung, gespeichert oder nachgeführt wird nichts
 + Mitgelieferte Quellen: `eigene` (die Liste `entitaet.modifikatoren`, mit `modifikatorHinzufuegen` und `modifikatorenEntfernen` je Quelle), `zustaende` (siehe Zustände); Ausrüstung, Skills und Auren melden sich später als eigene Quellen an
-+ `modifikatorenAufgeschluesselt(spiel, entitaet, ziele)` liefert die wirksamen Modifikatoren mit ihrer Quelle, als Grundlage für Erklärungen in der Oberfläche
++ `modifikatorenAufgeschluesselt(spiel, entitaet, ziele, umstaende?)` liefert die wirksamen Modifikatoren mit ihrer Quelle, als Grundlage für Erklärungen in der Oberfläche
 + `hoechstwert(spiel, entitaet, wertName)` und alle Begrenzungen von Werten rechnen über `modifiziert`; nach oben offene Werte (Pegel) haben keinen Höchstwert
++ Umstände einer Abfrage: `modifiziert(spiel, entitaet, ziele, basiswert, { gegenueberId?, tags? })`; der Nahkampf gibt für die Trefferchance das Ziel und die Tags seines Effekts mit, `zeitkosten` reicht Umstände durch
++ Tags: ein Modifikator mit `tag` wirkt nur, wenn die Abfrage den Tag in `umstaende.tags` mitbringt, z.B. `{ ziel: "kosten", tag: "psi", art: "prozent", betrag: -10 }` für alle Psi-Fähigkeiten, auch künftige; Wesen tragen `tags` (z.B. `["bakterium", "essig"]`), Schadensarten werden Tags an Effekten (Punkt 5 der Arbeitsliste)
++ Bedingungen: `wenn: [{ bedingung, ...parameter }]`, alle müssen gelten; Register `modifikatorbedingungen`, Signatur `(spiel, entitaet, parameter, umstaende) => boolean`, Parameter für die Datenprüfung wie bei den Bausteinen (`src/systeme/modifikatoren.js`)
++ Mitgelieferte Bedingungen: `pegel_ab { wert }`, `pegel_unter { wert }` (z.B. nüchtern), `wert_unter_prozent { wert, prozent }` (gemessen am Grundwert ohne Modifikatoren), `gegenueber_tag { tag }`; Schwellen des Pegels sind damit gewöhnliche Modifikatoren mit `pegel_ab`
++ Bedingungen lesen nur Rohwerte und rufen `modifiziert` nicht auf; fragen sich Modifikatoren doch im Kreis ab, bricht ein Schutz nach acht Ebenen mit einer Fehlermeldung ab
++ Auren (Modifikatorquelle `auren`): `auren: [{ reichweite, trifft, selbst?, sichtlinie?, modifikatoren }]` an Wesen und Zuständen; Reichweite als Kreis wie in der Zielauswahl, `trifft` aus Sicht der Trägerin mit den Werten der Zielauswahl (`feinde`, `verbuendete`, `wesen`, `alle`); standardmäßig nicht auf die Trägerin selbst und durch Wände (Gerüche, Dunst, Sporen), mit `sichtlinie: true` nur bei freier Sicht; Auren in Zuständen skalieren mit Stärke und Verlauf; Quelle `aura:<id>` bzw. `aura:zustand:<nummer>`
++ Auren werden bei jeder Abfrage über alle Entitäten gesucht; ein räumlicher Index kommt mit Punkt 7 der Arbeitsliste, wenn viele Wesen es nötig machen
 
 ## Effektsystem
 
@@ -161,7 +169,7 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 
 ## Zustände
 
-+ Zustände sind Daten (`daten/zustaende.js`, mit Vorlagen), umgesetzt in `src/systeme/zustaende.js`: `{ text, tags, dauer, stapel, hoechstStapel, verlauf, modifikatoren, jeTick, beimBeginn, beimEnde, ausloeser, gebundenAnQuelle }`
++ Zustände sind Daten (`daten/zustaende.js`, mit Vorlagen), umgesetzt in `src/systeme/zustaende.js`: `{ text, tags, dauer, stapel, hoechstStapel, verlauf, modifikatoren, auren, jeTick, beimBeginn, beimEnde, ausloeser, gebundenAnQuelle }`
 + An der Entität als Liste von Instanzen: `zustaende: [{ nummer, name, quelleId, urheberId, urheberFraktion, beginn, ende, staerke, stapel }]`; die Nummer zählt der Zustand des Spiels hoch
 + `dauer` in Zeiteinheiten, ohne Angabe unbegrenzt bis zum Entfernen; `staerke` Vorgabe 1
 + Takt ist die Weltuhr: je Welttick wirkt `jeTick`, solange das Ende nicht erreicht ist; Hast und Verlangsamung der Trägerin ändern daran nichts (Vorbild DCSS: Hast hilft, Verlangsamung schadet)
@@ -375,7 +383,7 @@ Vorläufige Ideen, noch nicht umgesetzt:
 + `package.json`: nur `"type": "module"` und `"private": true`, damit Node alle `.js`-Dateien als ES-Module liest; keine Abhängigkeiten, kein Build
 + `src/version.js`: Versionsnummer
 + `src/kern/`: Spiel und Eingangstür für Befehle (`spiel.js`), Zustand und Entitäten, Zeit, Zufall, Ereignisse und Katalog der Haken, Auslöser, Abschluss eines Vorgangs, Werte und Modifikatoren, Kurven, Effekte, Grundbausteine, Register, Datenprüfung
-+ `src/systeme/`: Bewegung, Kampf, Sicht, Stoffwechsel, Inventar, Gefahrenprüfung, Tod, Zielauswahl samt Zielmustern, Bausteine mit Zielauswahl, Zustände, Befehlsveränderer, Beschwörung, später Brauen, Handel u.a.
++ `src/systeme/`: Bewegung, Kampf, Sicht, Stoffwechsel, Inventar, Gefahrenprüfung, Tod, Zielauswahl samt Zielmustern, Bausteine mit Zielauswahl, Zustände, Befehlsveränderer, Beschwörung, Bedingungen der Modifikatoren und Auren, später Brauen, Handel u.a.
 + `src/ki/`: Verhaltensmodule (`abwarten`, `jagen`, `fliehen`) und ihre Zielwahl
 + `src/welt/`: Dungeon-Erzeugung, Zugriff auf die Karte, Wegfindung, Geometrie (Linie, Sichtlinie, Flugbahn, Kreis, Kegel)
 + `src/anzeige/`: Renderer, Tilebilder (Pixeldaten zu Bildern), Kamera, Oberfläche, Anzeige des Pegels, Log, Effekte, Textzugriff und Grammatik

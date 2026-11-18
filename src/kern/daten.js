@@ -94,6 +94,9 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
     fehler.push(`${ort}: beimTod.inventar muss eines von ${HINTERLASSENSCHAFT_REGELN.join(", ")} sein`);
   }
   if (wesen.ausloeser !== undefined) pruefeAusloeser(daten, wesen.ausloeser, ort, fehler);
+  if (wesen.tags !== undefined && !istTextliste(wesen.tags)) fehler.push(`${ort}: tags muss eine Liste von Texten sein`);
+  if (wesen.modifikatoren !== undefined) pruefeModifikatoren(daten, wesen.modifikatoren, `${ort}.modifikatoren`, fehler);
+  if (wesen.auren !== undefined) pruefeAuren(daten, wesen.auren, ort, fehler);
   if (!daten.zeichen.wesen[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js`);
 }
 
@@ -196,6 +199,46 @@ function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
   }
 }
 
+const istTextliste = (wert) => Array.isArray(wert) && wert.every((eintrag) => typeof eintrag === "string");
+
+// Modifikatoren: [{ ziel, art, betrag, tag?, wenn? }], siehe kern/werte.js
+function pruefeModifikatoren(daten, liste, ort, fehler) {
+  if (!Array.isArray(liste)) {
+    fehler.push(`${ort}: muss eine Liste sein`);
+    return;
+  }
+  liste.forEach((modifikator, nummer) => {
+    const stelle = `${ort}[${nummer}]`;
+    const gueltig = typeof modifikator?.ziel === "string" && MODIFIKATORARTEN.includes(modifikator.art) && istGanzzahl(modifikator.betrag);
+    if (!gueltig) fehler.push(`${stelle}: braucht ziel, art (${MODIFIKATORARTEN.join(", ")}) und betrag als ganze Zahl`);
+    if (modifikator?.tag !== undefined && typeof modifikator.tag !== "string") fehler.push(`${stelle}: tag muss ein Text sein`);
+    if (modifikator?.wenn === undefined) return;
+    if (!Array.isArray(modifikator.wenn)) {
+      fehler.push(`${stelle}: wenn muss eine Liste sein`);
+      return;
+    }
+    modifikator.wenn.forEach((bedingung, bedingungsnummer) => {
+      const bedingungsstelle = `${stelle}.wenn[${bedingungsnummer}]`;
+      if (!hat("modifikatorbedingungen", bedingung?.bedingung)) fehler.push(`${bedingungsstelle}: Bedingung "${bedingung?.bedingung}" ist nicht angemeldet`);
+      else pruefeParameter(daten, holen("modifikatorbedingungen", bedingung.bedingung).parameter || {}, bedingung, bedingungsstelle, fehler);
+    });
+  });
+}
+
+// Auren: [{ reichweite, trifft, selbst?, sichtlinie?, modifikatoren }], siehe systeme/modifikatoren.js
+function pruefeAuren(daten, auren, ort, fehler) {
+  if (!Array.isArray(auren)) {
+    fehler.push(`${ort}: auren muss eine Liste sein`);
+    return;
+  }
+  auren.forEach((aura, nummer) => {
+    const stelle = `${ort}.auren[${nummer}]`;
+    pruefeParameter(daten, { reichweite: "ganzzahl", selbst: "wahrheitswert?", sichtlinie: "wahrheitswert?" }, aura, stelle, fehler);
+    if (!TRIFFT_ARTEN.includes(aura.trifft)) fehler.push(`${stelle}: trifft muss eines von ${TRIFFT_ARTEN.join(", ")} sein`);
+    pruefeModifikatoren(daten, aura.modifikatoren ?? "fehlt", `${stelle}.modifikatoren`, fehler);
+  });
+}
+
 // Zielmuster: { art, ...parameter }, siehe systeme/zielauswahl.js
 function pruefeMuster(daten, muster, ort, fehler) {
   if (!istObjekt(muster) || typeof muster.art !== "string") return fehler.push(`${ort}: Zielmuster braucht die Form { art, ... }`);
@@ -273,13 +316,8 @@ function pruefeZustand(daten, sprache, name, zustand, fehler) {
     fehler.push(...kurvenfehler(zustand.verlauf, `${ort}.verlauf`));
   }
   if (zustand.tags !== undefined && !(Array.isArray(zustand.tags) && zustand.tags.every((tag) => typeof tag === "string"))) fehler.push(`${ort}: tags muss eine Liste von Texten sein`);
-  if (zustand.modifikatoren !== undefined) {
-    if (!Array.isArray(zustand.modifikatoren)) fehler.push(`${ort}: modifikatoren muss eine Liste sein`);
-    else zustand.modifikatoren.forEach((modifikator, nummer) => {
-      const gueltig = typeof modifikator?.ziel === "string" && MODIFIKATORARTEN.includes(modifikator.art) && istGanzzahl(modifikator.betrag);
-      if (!gueltig) fehler.push(`${ort}.modifikatoren[${nummer}]: braucht ziel, art (${MODIFIKATORARTEN.join(", ")}) und betrag als ganze Zahl`);
-    });
-  }
+  if (zustand.modifikatoren !== undefined) pruefeModifikatoren(daten, zustand.modifikatoren, `${ort}.modifikatoren`, fehler);
+  if (zustand.auren !== undefined) pruefeAuren(daten, zustand.auren, ort, fehler);
   if (zustand.ausloeser !== undefined) pruefeAusloeser(daten, zustand.ausloeser, ort, fehler);
 }
 

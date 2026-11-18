@@ -65,7 +65,7 @@ Stand: 2026-11-18
 + Der Zufall prägt den Build
 + Vorschlag, noch nicht bestätigt: Ausnahmen nur für körpereigene Fähigkeiten ohne mögliches Fundstück (Kopfstoß, Bierfontäne, Rülpser)
 + Höhere Tiers verändern Fähigkeiten qualitativ (z.B. Psi-Teleport nimmt ein Ziel mit)
-+ Vorschlag, noch nicht bestätigt: Tag-System, Fähigkeiten tragen Tags, Skills wirken auf Tags
++ Vorschlag, noch nicht bestätigt: Tag-System, Fähigkeiten tragen Tags, Skills wirken auf Tags; technisch seit 0.9.0 möglich über `tag` am Modifikator, siehe Modifikatoren in [Architektur.md](Architektur.md)
 + Vorschlag, noch nicht bestätigt: Boni innerhalb eines Skill-Sets addieren, zwischen Quellen multiplizieren (Vorbild EVE Online: die Stufen eines Skills addieren sich, verschiedene Skills multiplizieren); technisch: `prozent` addiert sich immer, ein Skill liefert für das Multiplizieren einen einzigen `mal`-Modifikator (z.B. `mal 125` auf Stufe 5), siehe Modifikatoren in [Architektur.md](Architektur.md)
 + Vorschlag, noch nicht bestätigt: Querlernen auf verwandte Skills (Vorbild: Dungeon Crawl Stone Soup)
 + Vorschlag, noch nicht bestätigt: fortgeschrittene Skills über Fundstücke freischalten (Braubücher, Rezepturen)

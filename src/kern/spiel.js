@@ -44,11 +44,11 @@ export function neuesSpiel(daten, startwert) {
   return spiel;
 }
 
-// Zeitkosten einer Aktion für eine Entität, mit Modifikatoren für die Aktion und für alle
-export function zeitkosten(spiel, entitaet, aktion) {
+// Zeitkosten einer Aktion für eine Entität, mit Modifikatoren für die Aktion und für alle; umstaende siehe kern/werte.js
+export function zeitkosten(spiel, entitaet, aktion, umstaende = {}) {
   const grundkosten = spiel.daten.aktionen[aktion];
   if (grundkosten === undefined) throw new Error(`Keine Kosten für Aktion "${aktion}" in daten/aktionen.js`);
-  return Math.max(1, modifiziert(spiel, entitaet, [`kosten.${aktion}`, "kosten.alle"], grundkosten));
+  return Math.max(1, modifiziert(spiel, entitaet, [`kosten.${aktion}`, "kosten.alle"], grundkosten, umstaende));
 }
 
 // Ninkasi wartet auf eine Eingabe, außer ein Zustand gibt ihr eine KI (Furcht, Rausch, Psi-Kontrolle)

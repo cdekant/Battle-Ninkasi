@@ -22,7 +22,7 @@ Status: umgesetzt in Version 0.4.0, beschrieben in [Architektur.md](Architektur.
 Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 + Ersatzwirkungen aus Daten (z.B. "Phönixbier verhindert einmal den Tod", "Schild fängt einen Treffer ab"): eigener Typ, der sofort am Haken "davor" wirkt und sich verbrauchen kann; mit den Zuständen (Punkt 3)
-+ Auslöser auch an Skills (Punkt 4) und an Ausrüstung und Inventar der Trägerin nach dem Vorbild der Kaskade in Caves of Qud (Punkt 9)
++ Auslöser auch an Skills (mit dem Skillsystem) und an Ausrüstung und Inventar der Trägerin nach dem Vorbild der Kaskade in Caves of Qud (Punkt 9)
 + Die reservierten Haken des Katalogs in Betrieb nehmen: `zug_beginn`, `zug_ende` (Punkt 3, sobald etwas sie braucht), `vor_angriff` (Punkt 5), `betritt_feld`, `verlaesst_feld` (Punkt 8), `gegenstand_benutzt` (Punkt 9)
 + Index im `zwischenspeicher`, welche Entitäten Auslöser für einen Haken tragen (Vorbild "WantEvent" in Caves of Qud); erst nötig, wenn mehr als die Beteiligten gefragt werden
 + Erster Auslöser im Spielinhalt (z.B. Säurespritzer des Essigbakteriums beim Tod): Spieldesign, noch nicht entschieden
@@ -54,16 +54,17 @@ Offener Rest:
 
 ## 4. Modifikatoren
 
-Status: in Arbeit; umgesetzt in Version 0.8.0 (Register der Modifikatorquellen, Verrechnung, Zustände ohne Nachführen), beschrieben in [Architektur.md](Architektur.md) (Modifikatoren, Zustände)
+Status: umgesetzt in Version 0.8.0 (Register der Modifikatorquellen, Verrechnung, Zustände ohne Nachführen) und 0.9.0 (Bedingungen, Tags, Auren), beschrieben in [Architektur.md](Architektur.md) (Modifikatoren, Zustände)
 
-Entschieden: Verrechnung nach dem Vorbild "increased" und "more" (Prozente addieren, nur `mal` multipliziert, einmal gerundet, `hoechstens` gewinnt gegen `mindestens`); Boni zwischen Quellen multiplizieren nicht automatisch, sondern nur über `mal` in den Daten; Auren ohne Sichtlinie (Option `sichtlinie: true`), `wen` aus Sicht der Trägerin, standardmäßig nicht auf sich selbst; Tags als eigenes Feld am Modifikator
+Entschieden: Verrechnung nach dem Vorbild "increased" und "more" (Prozente addieren, nur `mal` multipliziert, einmal gerundet, `hoechstens` gewinnt gegen `mindestens`); Boni zwischen Quellen multiplizieren nicht automatisch, sondern nur über `mal` in den Daten; Auren ohne Sichtlinie (Option `sichtlinie: true`), `trifft` aus Sicht der Trägerin mit den Werten der Zielauswahl, standardmäßig nicht auf sich selbst; Tags als eigenes Feld am Modifikator
 
-Offen, für Version 0.9.0:
+Offener Rest, wird mit den genannten Punkten umgesetzt:
 
-+ Bedingungen am Modifikator `wenn: [{ bedingung, ...parameter }]` über ein Register `modifikatorbedingungen`: `pegel_ab { wert }`, `wert_unter_prozent { wert, prozent }`, `gegenueber_tag { tag }` (Gegenüber über `umstaende.gegenueberId`); Bedingungen lesen nur Rohwerte, ein Schutz meldet Rekursion; Sets aus Gegenständen mit Punkt 9; Pegelschwellen sind damit gewöhnliche Modifikatoren mit `pegel_ab`
-+ Tags: `{ ziel: "kosten", tag: "psi", ... }` wirkt nur, wenn die Abfrage den Tag in `umstaende.tags` mitbringt (aus `mittel` und Effektkontext); Tags an Wesen für "nur gegen Bakterien"; Schadensarten als Tags folgen mit Punkt 5
-+ Auren: `auren: [{ reichweite, wen: "feinde" | "freunde" | "alle", selbst?, sichtlinie?, modifikatoren }]` an Wesen und Zuständen, Kreis wie in der Zielauswahl, als Modifikatorquelle `auren`; räumlicher Index erst mit Punkt 7, wenn der Bot es zeigt
-+ Quellen `ausruestung` (Punkt 9) und `skills` (mit dem Skillsystem)
++ Modifikatorquellen `ausruestung` (Punkt 9) und `skills` (mit dem Skillsystem in [Charakter.md](Charakter.md))
++ Bedingung für Sets aus Gegenständen, z.B. zwei Kupfer-Items (Punkt 9)
++ Tags in weiteren Abfragen: Schadensarten an Effekten und Widerstände (Punkt 5), Kosten und Tags der Fähigkeiten (Punkt 6)
++ Räumlicher Index für die Suche nach Auren (Punkt 7); seit 0.9.0 braucht der Bot etwa ein Viertel länger
++ Anzeige der Aufschlüsselung (`modifikatorenAufgeschluesselt`) in der Oberfläche
 
 ## 5. Kampfwerte
 

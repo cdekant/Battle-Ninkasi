@@ -161,3 +161,27 @@ test("Verhalten in Zuständen und Beschwören werden geprüft", () => {
   assert.ok(mitZustand({}, rufen("bakterium")).some((meldung) => meldung.includes('Wesen "bakterium"')), "abstrakte Vorlage");
   assert.ok(mitZustand({}, rufen("drache")).some((meldung) => meldung.includes('Wesen "drache"')));
 });
+
+test("Modifikatoren, Tags und Auren an Wesen und Zuständen werden geprüft", () => {
+  const modifikator = { ziel: "trefferchance", art: "plus", betrag: 10, tag: "psi", wenn: [{ bedingung: "pegel_ab", wert: 100 }, { bedingung: "gegenueber_tag", tag: "bakterium" }] };
+  const aura = { reichweite: 2, trifft: "feinde", sichtlinie: true, modifikatoren: [modifikator] };
+  const gueltig = { tags: ["hefe"], modifikatoren: [modifikator], auren: [aura] };
+  assert.deepEqual(mitNinkasi(() => gueltig), []);
+  const erwartet = [
+    [{ ...gueltig, tags: "hefe" }, "tags"],
+    [{ ...gueltig, modifikatoren: [{ ...modifikator, tag: 3 }] }, "tag muss ein Text"],
+    [{ ...gueltig, modifikatoren: [{ ...modifikator, wenn: { bedingung: "pegel_ab" } }] }, "wenn muss eine Liste"],
+    [{ ...gueltig, modifikatoren: [{ ...modifikator, wenn: [{ bedingung: "gibt_es_nicht" }] }] }, 'Bedingung "gibt_es_nicht"'],
+    [{ ...gueltig, modifikatoren: [{ ...modifikator, wenn: [{ bedingung: "pegel_ab" }] }] }, "wenn[0]: wert fehlt"],
+    [{ ...gueltig, auren: [{ ...aura, trifft: "freunde" }] }, "trifft"],
+    [{ ...gueltig, auren: [{ ...aura, reichweite: -1 }] }, "reichweite"],
+    [{ ...gueltig, auren: [{ ...aura, modifikatoren: undefined }] }, "auren[0].modifikatoren"],
+    [{ ...gueltig, auren: [{ ...aura, modifikatoren: [{ ...modifikator, art: "doppelt" }] }] }, "auren[0].modifikatoren[0]"],
+  ];
+  for (const [abweichung, teilDerMeldung] of erwartet) {
+    assert.ok(mitNinkasi(() => abweichung).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
+  }
+  const daten = structuredClone(rohdaten);
+  daten.zustaende = { test: { text: "test", auren: [{ ...aura, trifft: "niemand" }] } };
+  assert.ok(vorbereiten(daten).fehler.some((meldung) => meldung.includes("zustaende.test.auren[0]")));
+});
