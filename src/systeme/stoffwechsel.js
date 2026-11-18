@@ -16,7 +16,7 @@ import { anmelden } from "../kern/register.js";
 import { alleEntitaeten } from "../kern/zustand.js";
 import { modifiziert, hatWert } from "../kern/werte.js";
 import { wertAufKurve, stelleDesHoechstwerts } from "../kern/kurven.js";
-import { wertAendernInHundertsteln, toeten } from "../kern/effekte.js";
+import { wertAendernInHundertsteln } from "../kern/effekte.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 
 function kurvenverschiebung(entitaet, wertName) {
@@ -44,20 +44,13 @@ anmelden("welttick", "stoffwechsel", (spiel) => {
   for (const entitaet of alleEntitaeten(spiel.zustand)) {
     const stoffwechsel = entitaet.stoffwechsel;
     if (!stoffwechsel || !hatWert(entitaet, "pegel") || entitaet.position === undefined) continue;
-    // alle Raten am Pegel vor dem Abbau, in der Reihenfolge der Daten
-    let gestorben = false;
+    // alle Raten am Pegel vor dem Abbau, in der Reihenfolge der Daten;
+    // Schwund der LP kann töten (z.B. Alkoholvergiftung), getötet wird in der Zustandsprüfung (systeme/tod.js)
     for (const wertName of Object.keys(stoffwechsel.regeneration || {})) {
       if (!hatWert(entitaet, wertName)) continue;
       const rate = rateBeimPegel(entitaet, wertName);
-      if (rate !== 0) wertAendernInHundertsteln(spiel, entitaet, wertName, rate);
-      // Schwund der LP kann töten (z.B. Alkoholvergiftung)
-      if (wertName === "lp" && entitaet.werte.lp.aktuell <= 0) {
-        toeten(spiel, entitaet, null);
-        gestorben = true;
-        break;
-      }
+      if (rate !== 0) wertAendernInHundertsteln(spiel, entitaet, wertName, rate, { urheberId: null, ursache: `schwund.${wertName}`, kettentiefe: 0 });
     }
-    if (gestorben) continue;
     const abbau = Math.max(0, modifiziert(entitaet, "abbau.pegel", stoffwechsel.abbauHundertstel || 0));
     if (abbau > 0) wertAendernInHundertsteln(spiel, entitaet, "pegel", -abbau);
   }

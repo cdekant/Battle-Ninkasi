@@ -5,6 +5,8 @@
 import { hat, holen } from "./register.js";
 import { istWuerfelausdruck } from "./zufall.js";
 import { kurvenfehler } from "./kurven.js";
+import { HAKENKATALOG, AUSLOESER_ROLLEN, AUSLOESER_ZIELE } from "./hakenkatalog.js";
+import { HINTERLASSENSCHAFT_REGELN } from "./werte.js";
 
 const istObjekt = (wert) => wert && typeof wert === "object" && !Array.isArray(wert);
 
@@ -84,7 +86,39 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
   if (wesen.ki && !hat("ki", wesen.ki.modul)) fehler.push(`${ort}: Verhaltensmodul "${wesen.ki.modul}" ist nicht angemeldet`);
   if (wesen.stoffwechsel) pruefeStoffwechsel(wesen, ort, fehler);
   if (wesen.sicht && !istGanzzahl(wesen.sicht.reichweite)) fehler.push(`${ort}: sicht.reichweite muss eine ganze Zahl sein`);
+  if (wesen.lebenswert !== undefined && !wesen.werte?.[wesen.lebenswert]) fehler.push(`${ort}: lebenswert "${wesen.lebenswert}" ist kein Wert des Wesens`);
+  if (wesen.beimTod?.inventar !== undefined && !HINTERLASSENSCHAFT_REGELN.includes(wesen.beimTod.inventar)) {
+    fehler.push(`${ort}: beimTod.inventar muss eines von ${HINTERLASSENSCHAFT_REGELN.join(", ")} sein`);
+  }
+  if (wesen.ausloeser !== undefined) pruefeAusloeser(daten, wesen.ausloeser, ort, fehler);
   if (!daten.zeichen.wesen[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js`);
+}
+
+const istProzent = (wert) => istGanzzahl(wert) && wert >= 0 && wert <= 100;
+
+// Auslöser, siehe kern/ausloeser.js
+function pruefeAusloeser(daten, liste, ort, fehler) {
+  if (!Array.isArray(liste)) return fehler.push(`${ort}: ausloeser muss eine Liste sein`);
+  liste.forEach((ausloeser, nummer) => {
+    const eintragOrt = `${ort}.ausloeser[${nummer}]`;
+    const haken = HAKENKATALOG[ausloeser.bei];
+    if (!haken) fehler.push(`${eintragOrt}: Haken "${ausloeser.bei}" steht nicht im Katalog`);
+    else if (!haken.ausloeserErlaubt) fehler.push(`${eintragOrt}: am Haken "${ausloeser.bei}" sind keine Auslöser erlaubt`);
+    else if (!haken.inBetrieb) fehler.push(`${eintragOrt}: Haken "${ausloeser.bei}" wird noch nicht ausgelöst`);
+    if (ausloeser.rolle !== undefined && !AUSLOESER_ROLLEN.includes(ausloeser.rolle)) fehler.push(`${eintragOrt}: rolle muss eines von ${AUSLOESER_ROLLEN.join(", ")} sein`);
+    if (ausloeser.ziel !== undefined && !AUSLOESER_ZIELE.includes(ausloeser.ziel)) fehler.push(`${eintragOrt}: ziel muss eines von ${AUSLOESER_ZIELE.join(", ")} sein`);
+    for (const feld of ["chance", "daempfung"]) {
+      if (ausloeser[feld] !== undefined && !istProzent(ausloeser[feld])) fehler.push(`${eintragOrt}: ${feld} muss eine ganze Zahl von 0 bis 100 sein`);
+    }
+    pruefeEffektVerweis(daten, ausloeser.effekt, eintragOrt, fehler);
+  });
+}
+
+function pruefeRegeln(regeln, fehler) {
+  const ausloeser = regeln?.ausloeser;
+  if (!ausloeser) return fehler.push("regeln.ausloeser fehlt");
+  if (!istProzent(ausloeser.daempfungProStufe)) fehler.push("regeln.ausloeser.daempfungProStufe muss eine ganze Zahl von 0 bis 100 sein");
+  if (!istGanzzahl(ausloeser.hoechsteKettentiefe) || ausloeser.hoechsteKettentiefe < 0) fehler.push("regeln.ausloeser.hoechsteKettentiefe muss eine ganze Zahl >= 0 sein");
 }
 
 // Stoffwechsel: braucht den Wert pegel, Kurven nur für vorhandene Werte (siehe systeme/stoffwechsel.js)
@@ -167,6 +201,7 @@ export function vorbereiten(rohdaten, sprache = {}) {
   for (const [aktion, kosten] of Object.entries(daten.aktionen)) {
     if (!istGanzzahl(kosten) || kosten <= 0) fehler.push(`aktionen.${aktion}: Kosten müssen eine ganze Zahl > 0 sein`);
   }
+  pruefeRegeln(daten.regeln, fehler);
   if (!daten.wesen.ninkasi) fehler.push("wesen.ninkasi fehlt");
   return { daten, fehler };
 }

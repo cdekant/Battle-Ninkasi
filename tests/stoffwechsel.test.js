@@ -6,6 +6,8 @@ import { werteAusDaten, modifikatorHinzufuegen } from "../src/kern/werte.js";
 import { wertAendern } from "../src/kern/effekte.js";
 import { holen } from "../src/kern/register.js";
 import { hoererAnmelden } from "../src/kern/ereignisse.js";
+import { vorgangAbschliessen } from "../src/kern/vorgang.js";
+import "../src/systeme/tod.js";
 import { rateBeimPegel, optimalerPegel } from "../src/systeme/stoffwechsel.js";
 
 const welttick = (spiel, anzahl = 1) => {
@@ -98,9 +100,12 @@ test("Schwellen und Nüchternheit werden in beide Richtungen gemeldet", () => {
   assert.equal(meldungen.at(-1).art, "nuechtern");
 });
 
-test("Schwund der LP tötet", () => {
+test("Schwund der LP tötet nach dem Vorgang, Ursache ist der Schwund", () => {
   const { spiel, trinkerin, meldungen } = spielMitTrinkerin({ lp: 1, regeneration: { lp: [[0, -100]] } });
   welttick(spiel);
+  assert.equal(trinkerin.werte.lp.aktuell, 0);
+  vorgangAbschliessen(spiel);
   assert.equal(spiel.zustand.entitaeten[trinkerin.id], undefined);
   assert.equal(meldungen.at(-1).art, "tod");
+  assert.equal(meldungen.at(-1).ursache, "schwund.lp");
 });

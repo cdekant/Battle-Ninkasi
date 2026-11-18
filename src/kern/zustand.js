@@ -5,7 +5,7 @@
 // Schlüssel aufsteigend, die Reihenfolge ist also fest (Erzeugungsreihenfolge).
 
 import { werteAusDaten } from "./werte.js";
-import { akteurEntfernen } from "./zeit.js";
+import { akteurEntfernen, gebundeneEreignisseEntfernen } from "./zeit.js";
 
 export function neuerZustand(startwert) {
   return {
@@ -58,9 +58,20 @@ export function entitaetenAuf(zustand, x, y) {
   return alleEntitaeten(zustand).filter((entitaet) => entitaet.position && entitaet.position.x === x && entitaet.position.y === y);
 }
 
+// Entfernt eine Entität samt ihrem Platz in der Warteschlange, ihren gebundenen Zeitereignissen
+// und allem, was sie trägt; ist sie selbst getragen, verschwindet sie aus dem Inventar der Trägerin.
+// Wer Getragenes behalten will (z.B. fallen lassen beim Tod), muss es vorher herausnehmen.
 export function entitaetEntfernen(zustand, id) {
+  const entitaet = zustand.entitaeten[id];
+  if (!entitaet) return;
+  if (entitaet.getragenVon !== undefined) {
+    const traegerin = zustand.entitaeten[entitaet.getragenVon];
+    if (traegerin && traegerin.inventar) traegerin.inventar = traegerin.inventar.filter((getragenId) => getragenId !== id);
+  }
+  for (const getragenId of entitaet.inventar || []) entitaetEntfernen(zustand, getragenId);
   delete zustand.entitaeten[id];
   akteurEntfernen(zustand, id);
+  gebundeneEreignisseEntfernen(zustand, id);
 }
 
 export function spielerin(zustand) {

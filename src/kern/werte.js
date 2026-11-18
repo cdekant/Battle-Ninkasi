@@ -22,6 +22,14 @@ export function modifiziert(entitaet, ziele, basiswert) {
   return basiswert + summePlus + prozentVon(basiswert, summeProzent);
 }
 
+// Wert, dessen Fall auf 0 tötet (Daten: lebenswert, Vorgabe "lp"); siehe systeme/tod.js
+export function lebenswertName(entitaet) {
+  return entitaet.lebenswert || "lp";
+}
+
+// Was beim Tod mit dem Inventar geschieht (Daten: beimTod: { inventar })
+export const HINTERLASSENSCHAFT_REGELN = ["fallen_lassen", "vernichten"];
+
 export function hatWert(entitaet, wertName) {
   return Boolean(entitaet.werte && entitaet.werte[wertName]);
 }

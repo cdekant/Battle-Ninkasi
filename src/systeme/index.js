@@ -4,3 +4,4 @@ import "./bewegung.js";
 import "./inventar.js";
 import "./stoffwechsel.js";
 import "./gefahr.js";
+import "./tod.js";

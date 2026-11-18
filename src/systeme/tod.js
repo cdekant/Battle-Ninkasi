@@ -1,0 +1,72 @@
+// Tod als Zustandsprüfung (siehe docs/Architektur.md, Tod und Zustandsprüfung).
+// Nach jedem Vorgang stirbt jedes Wesen, dessen Lebenswert (Daten: lebenswert, Vorgabe "lp") bei 0 liegt,
+// in fester Reihenfolge nach Entitäts-ID. Ablauf je Wesen:
+//   1. Haken "vor_tod": Abbruch verhindert den Tod, aber nur, wenn der Lebenswert danach über 0 liegt
+//   2. Meldung "tod" mit Verursacher und Ursache (aus letzterVerlust, siehe kern/effekte.js)
+//   3. Haken "nach_tod" mit der letzten Position, hier hängen Auslöser (Sporen, Säurespritzer)
+//   4. Hinterlassenschaft nach Daten: beimTod: { inventar: "fallen_lassen" (Vorgabe) | "vernichten" }
+//   5. Entfernen samt Akteur und gebundenen Zeitereignissen; bei Ninkasi ist das Spiel vorbei, sie bleibt im Zustand
+
+import { anmelden } from "../kern/register.js";
+import { alleEntitaeten, entitaetMitId, entitaetEntfernen } from "../kern/zustand.js";
+import { akteurEntfernen } from "../kern/zeit.js";
+import { lebenswertName } from "../kern/werte.js";
+import { hakenAusloesen, melden, bezugAuf } from "../kern/ereignisse.js";
+
+function istTot(entitaet) {
+  const lebenswert = entitaet.werte && entitaet.werte[lebenswertName(entitaet)];
+  return Boolean(lebenswert) && lebenswert.aktuell <= 0;
+}
+
+function hinterlassenschaftVerteilen(spiel, entitaet) {
+  const regel = entitaet.beimTod?.inventar ?? "fallen_lassen";
+  for (const gegenstandId of [...(entitaet.inventar || [])]) {
+    const gegenstand = entitaetMitId(spiel.zustand, gegenstandId);
+    if (!gegenstand) continue;
+    if (regel === "fallen_lassen" && entitaet.position) {
+      delete gegenstand.getragenVon;
+      gegenstand.position = { x: entitaet.position.x, y: entitaet.position.y };
+    } else {
+      entitaetEntfernen(spiel.zustand, gegenstandId);
+    }
+  }
+  if (entitaet.inventar) entitaet.inventar = [];
+}
+
+// Gibt true zurück, wenn das Wesen gestorben ist
+export function sterben(spiel, entitaet) {
+  const zustand = spiel.zustand;
+  const verlust = entitaet.letzterVerlust || { urheberId: null, ursache: null, kettentiefe: 0 };
+  const beteiligte = { quelleId: verlust.urheberId, zielId: entitaet.id, ursache: verlust.ursache, kettentiefe: verlust.kettentiefe };
+
+  const vorher = hakenAusloesen(spiel, "vor_tod", { ...beteiligte, abgebrochen: false });
+  if (vorher.abgebrochen && !istTot(entitaet)) {
+    delete entitaet.letzterVerlust;
+    return false;
+  }
+
+  const urheber = entitaetMitId(zustand, verlust.urheberId);
+  melden(spiel, "tod", { opfer: bezugAuf(entitaet), quelle: urheber ? bezugAuf(urheber) : null, ursache: verlust.ursache });
+  const position = entitaet.position ? { x: entitaet.position.x, y: entitaet.position.y } : null;
+  hakenAusloesen(spiel, "nach_tod", { ...beteiligte, position });
+
+  if (entitaet.id === zustand.spielerinId) {
+    zustand.vorbei = true;
+    akteurEntfernen(zustand, entitaet.id);
+  } else {
+    hinterlassenschaftVerteilen(spiel, entitaet);
+    entitaetEntfernen(zustand, entitaet.id);
+  }
+  return true;
+}
+
+anmelden("zustandspruefungen", "tod", (spiel) => {
+  const zustand = spiel.zustand;
+  let jemandGestorben = false;
+  for (const entitaet of alleEntitaeten(zustand)) {
+    if (!zustand.entitaeten[entitaet.id] || !istTot(entitaet)) continue;
+    if (entitaet.id === zustand.spielerinId && zustand.vorbei) continue;
+    if (sterben(spiel, entitaet)) jemandGestorben = true;
+  }
+  return jemandGestorben;
+});

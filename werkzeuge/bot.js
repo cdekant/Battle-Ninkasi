@@ -37,6 +37,16 @@ function invariantenPruefen(spiel) {
     }
   }
   if (!zustand.vorbei && spielerin(zustand).werte.lp.aktuell <= 0) throw new Error("Ninkasi tot, Spiel nicht vorbei");
+  // Tod und Auslöser (siehe src/systeme/tod.js, src/kern/ausloeser.js)
+  for (const entitaet of alleEntitaeten(zustand)) {
+    const lebenswert = entitaet.werte?.[entitaet.lebenswert || "lp"];
+    if (lebenswert && lebenswert.aktuell <= 0 && entitaet.id !== zustand.spielerinId) throw new Error(`#${entitaet.id} mit Lebenswert 0 noch im Spiel`);
+    if (entitaet.getragenVon !== undefined && !zustand.entitaeten[entitaet.getragenVon]?.inventar?.includes(entitaet.id)) throw new Error(`#${entitaet.id} getragen von fehlender Trägerin`);
+  }
+  for (const eintrag of zustand.warteschlange) {
+    if (eintrag.gebundenAn !== undefined && !zustand.entitaeten[eintrag.gebundenAn]) throw new Error(`Zeitereignis gebunden an fehlende #${eintrag.gebundenAn}`);
+  }
+  if (spiel.anstehendeAusloeser.length) throw new Error("Auslöser nach Abschluss des Vorgangs noch vorgemerkt");
 }
 
 function zufallsbefehl(botZufall, spiel) {

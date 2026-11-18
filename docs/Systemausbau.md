@@ -13,20 +13,20 @@ Arbeitsliste der Strukturen, die Logik und Datenmodell noch brauchen, damit Fern
 
 ## Bekannte Fehler
 
-+ `wert_aendern` auf `lp` kann ein Wesen auf 0 LP setzen, ohne dass es stirbt; nur der Baustein `schaden` und der Stoffwechsel prüfen den Tod (siehe Punkt 1)
-+ Stirbt ein Gegner, bleiben seine getragenen Gegenstände mit `getragenVon` auf eine gelöschte ID zurück (siehe Punkt 1)
-+ Zeitereignisse, die eine entfernte Entität betreffen, bleiben in der Warteschlange; `akteurEntfernen` räumt nur Akteur-Einträge (siehe Punkt 1)
++ Zurzeit keine; die drei Fehler aus der Prüfung (Tod durch `wert_aendern`, verwaiste Gegenstände, verwaiste Zeitereignisse) sind mit 0.4.0 behoben
 
 ## 1. Tod, Haken, Auslöser
 
-Status: offen
+Status: umgesetzt in Version 0.4.0, beschrieben in [Architektur.md](Architektur.md) (Ereignisse, Tod und Zustandsprüfung, Auslöser)
 
-+ Tod zentral: Prüfung auf LP 0 nach jeder Wertänderung an einer Stelle, nicht je Baustein
-+ Haken `vor_tod` (Wiederbelebung, Schutzzauber, letzter Funke) und `nach_tod` (Sporen, Zweiteilung beim Tod, Loot)
-+ Beim Tod: getragene Gegenstände fallen auf das Feld oder werden nach Regel entfernt; Zeitereignisse der Entität werden bereinigt
-+ Katalog der Haken, fest benannt und dokumentiert: `vor_befehl`, `zug_beginn`, `zug_ende`, `vor_angriff`, `nach_treffer`, `verfehlt`, `vor_schaden`, `nach_schaden`, `vor_tod`, `nach_tod`, `betritt_feld`, `verlaesst_feld`, `zustand_beginnt`, `zustand_endet`, `gegenstand_benutzt`, `nach_wertaenderung`
-+ Auslöser aus Daten: Entitäten, Gegenstände, Zustände und Skills tragen Auslöser (z.B. `{ bei: "nach_treffer", chance: 15, effekt: "zweiter_angriff" }`); ein Verteiler arbeitet bei jedem Haken die Auslöser der Beteiligten in fester Reihenfolge ab
-+ Tiefenbegrenzung gegen Endlosketten (Dornen gegen Dornen, Explosion löst Explosion aus)
+Offener Rest, wird mit den genannten Punkten umgesetzt:
+
++ Ersatzwirkungen aus Daten (z.B. "Phönixbier verhindert einmal den Tod", "Schild fängt einen Treffer ab"): eigener Typ, der sofort am Haken "davor" wirkt und sich verbrauchen kann; mit den Zuständen (Punkt 3)
++ Auslöser auch an Zuständen (Punkt 3), Skills (Punkt 4) und an Ausrüstung und Inventar der Trägerin nach dem Vorbild der Kaskade in Caves of Qud (Punkt 9)
++ Ziel `feld` für Auslöser (Sporen auf die Felder um das Opfer), mit der Zielauswahl (Punkt 2)
++ Die reservierten Haken des Katalogs in Betrieb nehmen: `vor_befehl`, `zug_beginn`, `zug_ende`, `zustand_beginnt`, `zustand_endet` (Punkt 3), `vor_angriff` (Punkt 5), `betritt_feld`, `verlaesst_feld` (Punkt 8), `gegenstand_benutzt` (Punkt 9)
++ Index im `zwischenspeicher`, welche Entitäten Auslöser für einen Haken tragen (Vorbild "WantEvent" in Caves of Qud); erst nötig, wenn mehr als die Beteiligten gefragt werden
++ Erster Auslöser im Spielinhalt (z.B. Säurespritzer des Essigbakteriums beim Tod): Spieldesign, noch nicht entschieden
 
 ## 2. Effektkontext, Zielauswahl, verschachtelte Effekte
 
@@ -130,3 +130,5 @@ Status: offen, jeweils erst Spieldesign in [Grundlagen.md](Grundlagen.md) entsch
 + Untersuchen mit Beschreibung und Gefahreneinschätzung, Vorschau der Trefferchance ohne Spiel-Zufall
 + Todesbericht (Morgue) mit Todesursache und Statistik des Laufs; braucht die Urheberkette aus Punkt 2
 + Speichern als Schnappschuss zusätzlich zum Nachspielen, da lange Läufe sonst langsam laden; Mods gehören in die Prüfsumme der Daten
++ Vorschau durch Simulation auf einer Kopie des Zustands (Vorbild Desktop Dungeons), z.B. "wie viel Schaden macht dieser Angriff"; der Zustand ist JSON, die Kopie also billig
++ Leichen als Hinterlassenschaft: gärende Überreste, Nahrung für Mikroorganismen

@@ -1,9 +1,11 @@
 // Das Spiel: Zustand, Daten und die einzige Eingangstür für Befehle.
-// spiel = { daten, zustand, befehle, hoerer, zwischenspeicher }
+// spiel = { daten, zustand, befehle, hoerer, zwischenspeicher, anstehendeAusloeser }
 //   zustand: reine Daten (JSON), befehle: Aufzeichnung für den Spielstand,
-//   hoerer: Empfänger der Meldungen, zwischenspeicher: abgeleitete Nachschlagetabellen (nicht im Zustand)
+//   hoerer: Empfänger der Meldungen, zwischenspeicher: abgeleitete Nachschlagetabellen (nicht im Zustand),
+//   anstehendeAusloeser: vorgemerkte Auslöser, nach jedem Vorgang leer (siehe kern/vorgang.js)
 
 import "./bausteine.js";
+import "./ausloeser.js";
 import "../systeme/index.js";
 import "../ki/index.js";
 import VERSION from "../version.js";
@@ -14,6 +16,7 @@ import { WELTTICK, einreihen, ersterEintrag, ersterEintragEntnehmen, akteurEinre
 import { holen, hat, alle as alleImRegister } from "./register.js";
 import { modifiziert } from "./werte.js";
 import { melden } from "./ereignisse.js";
+import { vorgangAbschliessen } from "./vorgang.js";
 import { ebeneErzeugen } from "../welt/ebene.js";
 import { sichtfeldAktualisieren } from "../systeme/sicht.js";
 
@@ -27,7 +30,7 @@ export function datenLaden(rohdaten, sprache) {
 
 export function neuesSpiel(daten, startwert) {
   const zustand = neuerZustand(startwert >>> 0);
-  const spiel = { daten, zustand, befehle: [], hoerer: [], zwischenspeicher: {} };
+  const spiel = { daten, zustand, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
   zustand.zufallszustand = zufallErzeugen(startwertAbleiten(zustand.startwert, "spiel"));
 
   ebeneErzeugen(spiel, daten.startebene);
@@ -62,6 +65,7 @@ function befehlPruefen(spiel, akteur, befehl) {
 
 function befehlAusfuehren(spiel, akteur, befehl) {
   const aktion = holen("befehle", befehl.art).ausfuehren(spiel, akteur, befehl);
+  vorgangAbschliessen(spiel);
   const zustand = spiel.zustand;
   const akteurNochImSpiel = entitaetMitId(zustand, akteur.id) && !(akteur.id === zustand.spielerinId && zustand.vorbei);
   if (akteurNochImSpiel) akteurEinreihen(zustand, akteur.id, zeitkosten(spiel, akteur, aktion));
@@ -95,10 +99,14 @@ function warteschlangeAbarbeiten(spiel) {
     if (!eintrag || (eintrag.art === "akteur" && eintrag.akteurId === zustand.spielerinId)) return;
     ersterEintragEntnehmen(zustand);
     if (eintrag.art === "weltuhr") {
-      for (const [, handler] of alleImRegister("welttick")) handler(spiel);
+      for (const [, handler] of alleImRegister("welttick")) {
+        handler(spiel);
+        vorgangAbschliessen(spiel);
+      }
       einreihen(zustand, { zeit: zustand.zeit + WELTTICK, art: "weltuhr" });
     } else if (eintrag.art === "ereignis") {
       holen("zeitereignisse", eintrag.ereignistyp)(spiel, eintrag.daten);
+      vorgangAbschliessen(spiel);
     } else {
       const akteur = entitaetMitId(zustand, eintrag.akteurId);
       if (!akteur || !akteur.ki) continue;

@@ -1,5 +1,6 @@
 // Zeitstrahl und Warteschlange (siehe docs/Architektur.md, Zeitmodell).
-// Einträge: { zeit, art: "weltuhr" | "ereignis" | "akteur", akteurId?, ereignistyp?, daten?, einreihungsnummer }
+// Einträge: { zeit, art: "weltuhr" | "ereignis" | "akteur", akteurId?, ereignistyp?, daten?, gebundenAn?, einreihungsnummer }
+// gebundenAn: ID einer Entität; wird sie entfernt, entfällt das Zeitereignis mit ihr
 // Gleichstand: zuerst Weltuhr, dann Zeitereignisse (nach Einreihung),
 // dann Akteure nach Erzeugungsreihenfolge (Entitäts-ID).
 
@@ -24,8 +25,10 @@ export function akteurEinreihen(zustand, akteurId, verzoegerung) {
 }
 
 // Zeitereignis: ereignistyp ist ein Name im Register "zeitereignisse"
-export function ereignisEinreihen(zustand, zeitpunkt, ereignistyp, daten = {}) {
-  einreihen(zustand, { zeit: zeitpunkt, art: "ereignis", ereignistyp, daten });
+export function ereignisEinreihen(zustand, zeitpunkt, ereignistyp, daten = {}, gebundenAn = null) {
+  const eintrag = { zeit: zeitpunkt, art: "ereignis", ereignistyp, daten };
+  if (gebundenAn !== null) eintrag.gebundenAn = gebundenAn;
+  einreihen(zustand, eintrag);
 }
 
 function indexDesErstenEintrags(zustand) {
@@ -53,4 +56,8 @@ export function ersterEintragEntnehmen(zustand) {
 
 export function akteurEntfernen(zustand, akteurId) {
   zustand.warteschlange = zustand.warteschlange.filter((eintrag) => !(eintrag.art === "akteur" && eintrag.akteurId === akteurId));
+}
+
+export function gebundeneEreignisseEntfernen(zustand, entitaetId) {
+  zustand.warteschlange = zustand.warteschlange.filter((eintrag) => eintrag.gebundenAn !== entitaetId);
 }

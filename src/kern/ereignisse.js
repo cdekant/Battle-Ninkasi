@@ -3,10 +3,16 @@
 // Meldungen: nach außen, rein lesend; Hörer dürfen weder den Zustand ändern noch den Spiel-Zufall benutzen
 
 import { hat, holen } from "./register.js";
+import { HAKENKATALOG } from "./hakenkatalog.js";
 
+// Setzt ein Handler kontext.abgebrochen = true, laufen die weiteren Handler nicht mehr
 export function hakenAusloesen(spiel, hakenName, kontext) {
+  if (!(hakenName in HAKENKATALOG)) throw new Error(`Haken "${hakenName}" steht nicht im Katalog (kern/hakenkatalog.js)`);
   if (!hat("haken", hakenName)) return kontext;
-  for (const handler of holen("haken", hakenName)) handler(spiel, kontext);
+  for (const handler of holen("haken", hakenName)) {
+    if (kontext.abgebrochen) break;
+    handler(spiel, kontext);
+  }
   return kontext;
 }
 

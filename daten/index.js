@@ -7,6 +7,7 @@ import aktionen from "./aktionen.js";
 import gelaende from "./gelaende.js";
 import ebenen from "./ebenen.js";
 import zeichen from "./zeichen.js";
+import regeln from "./regeln.js";
 
 export default {
   wesen: { ...ninkasi, ...gegner },
@@ -17,4 +18,5 @@ export default {
   ebenen,
   startebene: "keller",
   zeichen,
+  regeln,
 };
