@@ -1,0 +1,132 @@
+# Battle Ninkasi - Systemausbau
+
+Stand: 2026-11-18
+
+Arbeitsliste der Strukturen, die Logik und Datenmodell noch brauchen, damit Fernkampf, Flächenwirkung, Effekte über Zeit, Magie, Psi, Nahkampf und viele Gegner überwiegend als Daten abbildbar sind. Grundlage ist eine Prüfung von Doku und Code mit Stand 0.3.0. Die Begriffe (Wirkungsarten, Effektsystem, Register, Zeitmodell) stehen in [Architektur.md](Architektur.md).
+
+## Arbeitsweise
+
++ Jeder Punkt wird vor der Umsetzung als Vorschlag ausgearbeitet und freigegeben
++ Ist ein Punkt umgesetzt, wandert seine Beschreibung nach [Architektur.md](Architektur.md) (bzw. [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md)) und wird hier gestrichen; bleibt nur ein Rest offen, steht hier nur der Rest
++ Status je Punkt: offen, in Arbeit, umgesetzt in Version X
++ Die Reihenfolge ist eine Empfehlung: 1 bis 4 sind Kernarchitektur, danach sind die meisten Systeme Daten plus wenige neue Bausteine
+
+## Bekannte Fehler
+
++ `wert_aendern` auf `lp` kann ein Wesen auf 0 LP setzen, ohne dass es stirbt; nur der Baustein `schaden` und der Stoffwechsel prüfen den Tod (siehe Punkt 1)
++ Stirbt ein Gegner, bleiben seine getragenen Gegenstände mit `getragenVon` auf eine gelöschte ID zurück (siehe Punkt 1)
++ Zeitereignisse, die eine entfernte Entität betreffen, bleiben in der Warteschlange; `akteurEntfernen` räumt nur Akteur-Einträge (siehe Punkt 1)
+
+## 1. Tod, Haken, Auslöser
+
+Status: offen
+
++ Tod zentral: Prüfung auf LP 0 nach jeder Wertänderung an einer Stelle, nicht je Baustein
++ Haken `vor_tod` (Wiederbelebung, Schutzzauber, letzter Funke) und `nach_tod` (Sporen, Zweiteilung beim Tod, Loot)
++ Beim Tod: getragene Gegenstände fallen auf das Feld oder werden nach Regel entfernt; Zeitereignisse der Entität werden bereinigt
++ Katalog der Haken, fest benannt und dokumentiert: `vor_befehl`, `zug_beginn`, `zug_ende`, `vor_angriff`, `nach_treffer`, `verfehlt`, `vor_schaden`, `nach_schaden`, `vor_tod`, `nach_tod`, `betritt_feld`, `verlaesst_feld`, `zustand_beginnt`, `zustand_endet`, `gegenstand_benutzt`, `nach_wertaenderung`
++ Auslöser aus Daten: Entitäten, Gegenstände, Zustände und Skills tragen Auslöser (z.B. `{ bei: "nach_treffer", chance: 15, effekt: "zweiter_angriff" }`); ein Verteiler arbeitet bei jedem Haken die Auslöser der Beteiligten in fester Reihenfolge ab
++ Tiefenbegrenzung gegen Endlosketten (Dornen gegen Dornen, Explosion löst Explosion aus)
+
+## 2. Effektkontext, Zielauswahl, verschachtelte Effekte
+
+Status: offen
+
++ Kontext bisher `{ quelleId, zielId, ursache }`, also nur ein Ziel; künftig mit Ursprung (Feld), Zielpunkt, Richtung und Zielliste
++ Urheberkette im Kontext: wer verursacht (EP, Fraktionszorn, Todesursache), womit (Fähigkeit, Gegenstand, Zustand, Falle, Gelände), mit welchen Tags; Grundlage für gebundene EP ("fließen in die beteiligten Skills")
++ Zielmuster mit Ursprung und Zielpunkt statt nur Akteur: angrenzend, Linie, Strahl, Kegel, Kreis, Fläche um einen Aufschlagpunkt
++ Verschachtelte Effekte: Schritt "für jedes Ziel im Muster: Effekt X", Schritt "auf Feld: Effekt Y"; z.B. Geschoss, beim Aufschlag Fläche 3x3, je Ziel Schaden und Zustand
++ Werte zwischen Schritten weitergeben: "heile 50 % des verursachten Schadens", "Schaden auf alle Ziele verteilt"
++ Ein Effekt bricht nicht mehr pauschal ab, wenn das Ziel stirbt; Schritte erklären, ob sie ein lebendes Ziel brauchen
+
+## 3. Zustände
+
+Status: offen
+
++ Liste je Entität: `{ name, quelle, urheberId, beginn, ende, staerke, stapel, verlauf }`, Ende über Zeitereignis
++ Stapelregeln (erneuern, aufaddieren, nur der stärkste) und Verlauf (gleichbleibend, abklingend, ansteigend) wie in [Architektur.md](Architektur.md)
++ Takt für Wirkung über Zeit: Weltuhr oder Zug der Trägerin; offene Entscheidung, sie bestimmt, wie Hast und Verlangsamung auf Schaden über Zeit wirken
++ Handlungsunfähig (Betäubung, Lähmung, Filmriss): Trägerin wird eingereiht, muss aber warten
++ Befehl verändern (Torkeln, Verwirrung) über den Haken `vor_befehl`; Grundlage für "Torkeln, Fehlschläge" des Pegels
++ KI überlagern (Furcht, Psi-Kontrolle, Wut): Stapel von KI-Modulen und Fraktionen, der jüngste gilt, nach Ende kehrt der ursprüngliche Stand zurück
++ Zustände, die an ihre Quelle gebunden sind (aufrechterhaltener Zauber endet mit dem Tod der Wirkenden)
+
+## 4. Modifikatoren
+
+Status: offen
+
++ Bisher als Liste gespeichert (`entitaet.modifikatoren`); künftig bei Bedarf aus allen Quellen gesammelt: Ausrüstung, Zustände, Skills, Auren in Reichweite, Pegelschwellen, über ein Register der Modifikatorquellen
++ Auren ändern sich mit jedem Schritt und sind nur so sauber abbildbar
++ Verrechnung erweitern: neben `plus` und `prozent` auch `mal` (Vorschlag "zwischen Quellen multiplizieren" in [Charakter.md](Charakter.md)), `setzen`, Mindest- und Höchstwert
++ Bedingungen am Modifikator: ab Pegel X, unter 30 % LP, nur gegen Bakterien, Set aus zwei Kupfer-Items
++ Ziele über Tags, z.B. `kosten.tag:psi`, `schaden.tag:feuer`; Umsetzung des Tag-Systems aus [Charakter.md](Charakter.md)
+
+## 5. Kampfwerte
+
+Status: offen
+
++ Schadensarten (z.B. stumpf, Säure, Feuer, Alkohol, geistig) als Daten
++ Widerstand, Immunität und Verwundbarkeit je Schadensart über Modifikatoren; wichtigster Hebel für die Vielfalt der Mikroorganismen
++ Verteidigung des Ziels im Trefferwurf (Ausweichen), Rüstung als Abzug im Haken `vor_schaden`
++ Krit als Mechanik (die Anzeige plant Krit-Zahlen schon ein)
++ Marker am Angriff: unblockbar, verfehlt nie, ignoriert Rüstung
++ Mehrere Angriffe je Wesen (Biss und Sporenstoß) und Waffen mit eigenem Angriffsprofil statt einer einzigen Komponente `angriff`
+
+## 6. Fähigkeiten und lange Aktionen
+
+Status: offen
+
++ Datentyp Fähigkeit für Magie, Psi, Fernkampf und körpereigene Aktionen: Kosten (MP, PP, Pegel, Material, Zeit), Abklingzeit, Voraussetzungen (Skillstufe, Mindestpegel, nüchtern), Zielart (selbst, Einzelziel, Feld, Richtung, Muster), Reichweite, Wirkung, Tags
++ Psi: Risikotabelle (Fehlschlag, Rückschlag, Glimmer) abhängig vom Pegel
++ Magie: Unterhaltskosten je Tick für aufrechterhaltene Zauber, Kanalisieren über mehrere Schritte (Rituale)
++ Befehl mit Ziel: `{ art: "faehigkeit", faehigkeitId, ziel: {x, y} | zielId }`; der Zielmodus ist Anzeige-Zustand
++ Laufende Aktion als Komponente am Akteur, unterbrechbar über die Gefahrenprüfung: Brauen, Ritual, Rasten bis voll, Auto-Erkunden
+
+## 7. Fernkampf, Fraktionen, Wahrnehmung, viele Gegner
+
+Status: offen
+
++ Allgemeine Sichtlinie von A nach B (ganzzahlig, etwa Bresenham), auch für Gegner, die schießen oder Psi wirken
++ Flugbahn endet am ersten Hindernis oder Wesen, Option für Verbündete im Weg; Meldung mit der Bahn, die Anzeige spielt sie ab
++ Wurfgegenstände landen auf einem Feld (Flasche werfen: Fernkampf, Fläche und Gegenstand zugleich)
++ Beziehungen der Fraktionen als Daten statt "andere Fraktion ist feindlich": Phagen gegen Bakterien, Kulturhefe gegen wilde Hefe, Händler neutral; Überschreibungen je Wesen (provoziert, kontrolliert)
++ Wahrnehmung je Wesen statt der Vereinfachung des Prototyps: Wachzustand (schläft, wach, jagt), Lärm, Schleichen; siehe Wahrnehmung in [Architektur.md](Architektur.md)
++ Bewegungsarten (unbeweglich, laufend, fliegend, schwebend), Passierbarkeit und Wegfindung je Bewegungsart
++ Verschieben: Rückstoß, Ziehen, Platztausch, Teleport mit Kollisionsregeln
++ Gelegenheitsangriffe und Konter als Reaktionen ohne Zeitkosten
++ Leistung: räumlicher Index im `zwischenspeicher` (aus dem Zustand ableitbar, nicht gespeichert), schnellere Warteschlange, Obergrenze der Population für teilende Mikroorganismen
++ Mehrfeld-Wesen und Bossphasen: offen, ob nötig
+
+## 8. Gelände, Feldschichten, Ebenen
+
+Status: offen
+
++ Zustand je Feld: Tür offen oder geschlossen, zerstörbare Wand, Hebel, Schalter
++ Feldschichten als eigene Gitter im Zustand: Gelände, Oberfläche (Bierpfütze, Säure, Schleim, Myzel, Blut), Gas mit Konzentration; je Schicht ein Handler der Weltuhr für Ausbreitung (Vorbild Brogue)
++ Feuer mit Ausbreitung, Zusammenspiel mit Alkohol (Hochprozentiges als Brandbeschleuniger) und Gas (CO2 im Gärkeller sammelt sich und erstickt)
++ Ereignis beim Betreten eines Felds (Fallen, Oberflächen)
++ Mehrere Ebenen: Treppen, Hub, ob Ebenen erhalten bleiben
++ Populationen nach Tiefe: gewichtete Tabellen, Rudel, Gegner aus tieferen Ebenen, Affixe; bisher feste Zahlen in der Ebene `keller`
+
+## 9. Gegenstände
+
+Status: offen
+
++ Stapel, Ladungen, Behälter (leere Flasche, Fass)
++ Ausrüstung mit Slots, Befehle `anlegen` und `ablegen`, Modifikatoren mit dem Gegenstand als Quelle (siehe Punkt 4)
++ Gewicht und Tragkraft (Körperlichkeit "Tragen")
++ Haltbarkeit und Verderben (Bier wird sauer), Fluch
++ Unidentifizierte Gegenstände: unbekannte Biere mit Etiketten, Probieren kostet, Sinnlichkeit oder Braukunde erkennt
+
+## 10. Weitere Systeme aus gängigen Roguelikes
+
+Status: offen, jeweils erst Spieldesign in [Grundlagen.md](Grundlagen.md) entscheiden
+
++ Gunst der Nebengottheiten als Wert mit Geboten und Tabus (Vorbild DCSS)
++ Fallen, Türen, Schlüssel, Hebel, Themenräume (Vorbild Brogue "Machines"); Struktur für Rätsel, die EP bringen
++ Druck gegen endloses Rasten: Nahrungsuhr, Nachrücken oder Verderben; LP regenerieren immer, Pegelabbau und Psi-Schwund allein sind kein Druck
++ Telepathie (Psi-Gedankenlesen als Wahrnehmungsart "Wesen durch Wände") und Unsichtbarkeit
++ Filmriss als Mechanik: Zeitsprung, verlorene Erinnerung an erkundete Felder
++ Untersuchen mit Beschreibung und Gefahreneinschätzung, Vorschau der Trefferchance ohne Spiel-Zufall
++ Todesbericht (Morgue) mit Todesursache und Statistik des Laufs; braucht die Urheberkette aus Punkt 2
++ Speichern als Schnappschuss zusätzlich zum Nachspielen, da lange Läufe sonst langsam laden; Mods gehören in die Prüfsumme der Daten

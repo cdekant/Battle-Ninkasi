@@ -245,6 +245,7 @@ Vorläufige Ideen, noch nicht umgesetzt.
 + Maus (ab 0.1.0): Klick reist, greift an oder hebt auf, Rad zoomt, siehe Maus und Reise
 + Nicht enthalten: Vollbild, ganzzahlige Skalierung für 4K, Übersichtskarte, Umschauen, Markierungen für Gegner außerhalb des Ausschnitts, Spielstand speichern und laden (Nachspielen ist vorhanden), Prüfsumme der Daten, Englisch
 + Vereinfachung: Ein Gegner sieht Ninkasi, wenn sie ihn sieht und er innerhalb seiner Sichtweite steht
++ Fehlende Strukturen und bekannte Fehler stehen als Arbeitsliste in [Systemausbau.md](Systemausbau.md)
 
 ## Tests und Balancing
 
