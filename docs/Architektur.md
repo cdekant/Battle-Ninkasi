@@ -123,7 +123,7 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Steigt eine Zahl, beginnen die Zahlen rechts davon wieder bei 0
 + 0.0.0 ist die erste Version des Prototyps
 + Die Version ist Teil jedes Spielstands, siehe Zufall und Wiederholbarkeit
-+ Einzige Quelle der Versionsnummer ist das Modul `src/version.js` (`export default "0.0.0"`), von Browser und Node gleich importiert
++ Einzige Quelle der Versionsnummer ist das Modul `src/version.js` (`export default "<Version>"`), von Browser und Node gleich importiert
 + Jede Version bekommt einen annotierten Git-Tag (`v0.3.1`), auch Fehlerbehebungen
 + Ablauf: Nummer in `src/version.js` erhöhen, committen, taggen, pushen
 + Commits zwischen zwei Versionen tragen dieselbe Nummer wie die vorige Version; verbindlich nachspielbar sind nur Spielstände getaggter Versionen
@@ -133,9 +133,9 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Karte auf Canvas, Oberfläche und Effekte als HTML/CSS darüber
 + Bezugsgröße 1920x1080, bevorzugt im Vollbild; Vollbild erst nach einer Nutzeraktion (Browser-Regel)
 + Ganzzahlige Skalierung, damit Pixelart scharf bleibt: 1080p 1:1, 4K doppelt, dazwischen 1:1 mit Rand
-+ Pixelart in vier Sätzen: 16, 32, 48 und 64 px, jeder Satz eigens gezeichnet, größere Sätze mit mehr Details
++ Pixelart in vier Sätzen: 16, 32, 48 und 64 px
 + Gezeichnet wird nur der größte Satz (64 px); die kleineren leitet `werkzeuge/tiles-ableiten.js` daraus ab (Flächenmittel, Vorrang für Signalfarben, Fugenregel für Gelände, Palette, Umriss neu) und warnt bei Verdacht auf verlorene Details; nachgearbeitet wird nur bei Warnungen oder sichtbaren Mängeln; so haben alle Sätze dieselben Formen
-+ Begonnen wird mit einem Satz; fehlende Sätze und fehlende Tiles ersetzt der Renderer durch Skalieren eines vorhandenen Satzes oder durch ein Zeichen
++ Keine Zeichen als Platzhalter: Jede neue Entität kommt direkt als Tile ins Spiel, gezeichnet in 64 px, die kleineren Sätze abgeleitet; das Zeichen bleibt nur Absicherung, falls ein Tile fehlt
 + Ein Tileset ist eine Datendatei mit Einträgen je Auflösung; der Renderer wählt zur Zoomstufe den passenden Satz und einen ganzzahligen Faktor
 + Tiles sind Pixeldaten (Palette plus Pixelmatrix als JS-Datendatei in `grafik/`), der Renderer baut daraus beim Start die Bilder; Einzelheiten in [Tileset.md](Tileset.md)
 + Zoom ist eine Einstellung mit frei festlegbaren Stufen, nicht an bestimmte Tile-Größen gebunden; scharf bleibt Pixelart nur in ganzzahligen Vielfachen ihrer Auflösung (16 als 16, 32, 48, 64 px; 32 als 32, 64, 96 px)
@@ -222,11 +222,11 @@ Vorläufige Ideen, noch nicht umgesetzt.
 + Optionen: nur erkundete Felder (Spielerin, keine Hellseherei), Wesen meiden
 + Später: Kosten je Gelände (Fallen meiden), dann für KI und Spielerin zugleich
 
-## Erster Prototyp
+## Prototyp
 
-+ Version 0.0.0
++ Stand 0.2.0, begonnen als 0.0.0; 0.1.0 Maus und Reise, 0.2.0 Tiles im Spiel
 + Umfang: eine Ebene, Bewegen, Sichtfeld, ein Gegnertyp, Nahkampf, ein Getränk, Pegel, Log
-+ Zeichen als Platzhalter statt Tiles
++ Tiles in allen vier Sätzen (ab 0.2.0), Zeichen nur noch als Absicherung
 + rot.js 2.2.1 (Lizenz BSD-3-Clause) liegt unverändert als ES-Module in `lib/rot/`, mit `LICENSE.txt`; benutzt werden Digger (Dungeon), PreciseShadowcasting (Sichtfeld) und AStar (Wegfindung der Gegner); Warteschlange und Spiel-RNG sind eigener Code, da sie als JSON speicherbar sein müssen
 + Starten: im Hauptverzeichnis `python -m http.server`, dann `http://localhost:8000/`; Startwert per `?seed=1234`, sonst zufällig, er wird in die URL geschrieben
 + Testen: `node werkzeuge/bot.js [Läufe] [Befehle] [erster Startwert]` spielt mit zufälligen Befehlen, prüft Invarianten und vergleicht den Zustand nach dem Nachspielen

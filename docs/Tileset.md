@@ -1,6 +1,6 @@
 # Battle Ninkasi - Tileset
 
-Stand: 2026-11-17
+Stand: 2026-11-18
 
 Plan für das Zeichnen der Tiles; wird nach Bedarf umgebaut. Regeln zur Anzeige (Sätze, Zoom, Ersatz fehlender Tiles) stehen in [Architektur.md](Architektur.md), Grundsätze in [Grundlagen.md](Grundlagen.md).
 
@@ -124,7 +124,7 @@ Verbindliche Regeln für jedes Tile, damit das Tileset wie aus einem Guss wirkt;
 3. Einbau in den Renderer: Tiles aus Pixeldaten, Ersatz fehlender Tiles durch Zeichen (erledigt, `src/anzeige/tilebilder.js`, Tests in `tests/tilebilder.test.js`)
 4. Kleine Sätze 48, 32 und 16 px für die fünf Tiles der Stilprobe: zunächst von Hand generalisiert, wegen abweichender Formen ersetzt durch Ableiten per Werkzeug mit Nacharbeit (erledigt)
 5. Erstliste in 64 px vervollständigen: Tür, Treppe, zweiter Gegner, Truhe, Falle; kleine Sätze per Werkzeug
-6. Danach Tile für Tile nach Bedarf neuer Inhalte
+6. Danach Tile für Tile nach Bedarf neuer Inhalte; jede neue Entität kommt direkt als Tile, ohne Zeichen als Platzhalter
 
 ## Offene Fragen
 

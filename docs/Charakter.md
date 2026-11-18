@@ -4,7 +4,7 @@ Stand: 2026-11-18
 
 ## Charaktererstellung
 
-+ Spieler verteilt Punkte auf sechs Eigenschaften
++ Spielerin verteilt Punkte auf sechs Eigenschaften
 + Makel gehören zur Charaktererstellung: Nachteil gegen zusätzliche Punkte
 + Beispiele für Makel: Blindheit (Sichtweite stark eingeschränkt), dysfunktionale Alkoholdehydrogenase
 + Weitere Makel, auszuarbeiten: Aldehyd-Dehydrogenase-Mangel (Acetaldehyd, Flush, Katerschaden), Zöliakie (Gerste und Weizen schaden), Gicht (Purine im Bier lösen Anfälle aus)

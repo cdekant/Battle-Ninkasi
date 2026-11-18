@@ -3,3 +3,6 @@
 
 # Originale und Rohtexte zur Literatur, nur zur Quellenerfassung, nicht frei
 sprache/Literatur/
+
+# Zwischenspeicher von Python (starten.py)
+__pycache__/
