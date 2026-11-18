@@ -16,7 +16,8 @@ Battle Ninkasi besteht aus Teilen unter verschiedenen Lizenzen.
 
 ## Konzeptbilder in `Artwork/`
 
-+ Gilt für: alle Bilder in `Artwork/` (Ordner `brauerei/`, `kampf/`, `ninkasi/`, `tempel/`, `titel/`), Stand 2026-11-18
++ Gilt für: öffentliche Bilder direkt in den Themenordnern von `Artwork/` (`brauerei/`, `kampf/`, `ninkasi/`, `tempel/`, `titel/`), Stand 2026-11-18: derzeit keine
++ Die private Sammlung in `Artwork/<thema>/privat/` ist nicht Teil des Repos und nicht freigegeben
 + Die Bilder wurden mit Bildgeneratoren erstellt und sind nach unserer Einschätzung nicht urheberrechtlich geschützt
 + Soweit dennoch Rechte bestehen, werden sie unter CC0 1.0 Universal freigegeben (gemeinfrei)
 + Volltext: [LICENSES/CC0-1.0.txt](LICENSES/CC0-1.0.txt)
