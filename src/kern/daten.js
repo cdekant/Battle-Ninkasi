@@ -4,6 +4,7 @@
 
 import { hat, holen } from "./register.js";
 import { istWuerfelausdruck } from "./zufall.js";
+import { kurvenfehler } from "./kurven.js";
 
 const istObjekt = (wert) => wert && typeof wert === "object" && !Array.isArray(wert);
 
@@ -81,8 +82,26 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
     if (wesen.angriff.muster && !hat("zielmuster", wesen.angriff.muster)) fehler.push(`${ort}: Zielmuster "${wesen.angriff.muster}" ist nicht angemeldet`);
   }
   if (wesen.ki && !hat("ki", wesen.ki.modul)) fehler.push(`${ort}: Verhaltensmodul "${wesen.ki.modul}" ist nicht angemeldet`);
+  if (wesen.stoffwechsel) pruefeStoffwechsel(wesen, ort, fehler);
   if (wesen.sicht && !istGanzzahl(wesen.sicht.reichweite)) fehler.push(`${ort}: sicht.reichweite muss eine ganze Zahl sein`);
   if (!daten.zeichen.wesen[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js`);
+}
+
+// Stoffwechsel: braucht den Wert pegel, Kurven nur für vorhandene Werte (siehe systeme/stoffwechsel.js)
+function pruefeStoffwechsel(wesen, ort, fehler) {
+  const stoffwechsel = wesen.stoffwechsel;
+  if (!wesen.werte || !wesen.werte.pegel) fehler.push(`${ort}: stoffwechsel braucht den Wert pegel`);
+  if (stoffwechsel.abbauHundertstel !== undefined && (!istGanzzahl(stoffwechsel.abbauHundertstel) || stoffwechsel.abbauHundertstel < 0)) {
+    fehler.push(`${ort}: stoffwechsel.abbauHundertstel muss eine ganze Zahl >= 0 sein`);
+  }
+  const schwellen = stoffwechsel.schwellen || [];
+  if (!Array.isArray(schwellen) || !schwellen.every((schwelle) => istGanzzahl(schwelle) && schwelle > 0)) {
+    fehler.push(`${ort}: stoffwechsel.schwellen müssen ganze Zahlen > 0 sein`);
+  }
+  for (const [wertName, kurve] of Object.entries(stoffwechsel.regeneration || {})) {
+    if (!wesen.werte || !wesen.werte[wertName]) fehler.push(`${ort}: stoffwechsel.regeneration.${wertName} ohne Wert ${wertName}`);
+    fehler.push(...kurvenfehler(kurve, `${ort}.stoffwechsel.regeneration.${wertName}`));
+  }
 }
 
 function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {

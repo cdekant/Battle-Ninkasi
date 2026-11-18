@@ -14,9 +14,9 @@ Stand: 2026-11-18
 
 + Vorläufig, Grundlage fürs Balancing: 100 LP, 100 MP, Pegel 0 ‰
 + 100 als Grundwert, damit Boni in Prozent vom Grundwert glatte ganze Zahlen ergeben
-+ Mit Pegel 0 startet Ninkasi nüchtern: LP regenerieren langsam, MP am schnellsten, PP gar nicht (Verläufe in [Grundlagen.md](Grundlagen.md))
-+ Startwert und Höchstwert der PP (Psi-Punkte) noch offen
-+ Der Pegel ist nach oben offen; im Prototyp steht `pp` noch für den Pegel mit Höchstwert 100
++ Mit Pegel 0 startet Ninkasi nüchtern: LP regenerieren langsam, MP am schnellsten, PP schwinden (Verläufe in [Grundlagen.md](Grundlagen.md))
++ PP (Psi-Punkte) vorläufig 0 von 100, Start- und Höchstwert noch offen
++ Der Pegel ist nach oben offen
 
 ## Eigenschaften
 
@@ -36,7 +36,8 @@ Stand: 2026-11-18
 + Braukunde: die Weisheit dieser Welt, Brauen ist heiliges Wissen; Brauen, Alchemie, Mikroorganismen, Kreaturen verstehen, göttliche Gaben
 + Sinnlichkeit ist die schwerste Eigenschaft, Ausgleich über das Balancing
 + Vorräte und Eigenschaften: LP zu Körperlichkeit, MP zu Klugheit und Braukunde, PP zu Sinnlichkeit, Pegel zu Trinkfestigkeit, Ausdauer (Option) zu Gewandtheit oder Körperlichkeit
-+ Vorschlag, noch nicht bestätigt: Trinkfestigkeit hebt die Schwellen des Pegels, beschleunigt seinen Abbau und verschiebt das Optimum der LP-Regeneration nach oben
++ Vorschlag, noch nicht bestätigt: Trinkfestigkeit hebt die Schwellen des Pegels, beschleunigt seinen Abbau und verschiebt das Optimum der LP-Regeneration nach oben (über die Modifikatoren `abbau.pegel` und `kurvenverschiebung.lp`)
++ Skills, Schriftrollen und Items wirken auf Regeneration und Schwund über Modifikatoren, siehe Stoffwechsel in [Architektur.md](Architektur.md)
 
 ### Magie und Psi
 

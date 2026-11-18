@@ -2,6 +2,7 @@
 // Unten 5 Zeilen, aufklappbar (Anzeige-Zustand).
 
 import { satzanfang } from "./texte.js";
+import { promilleText } from "./pegelanzeige.js";
 
 const SICHTBARE_ZEILEN = 5;
 const HOECHSTE_ZEILENZAHL = 500;
@@ -45,9 +46,13 @@ export class Log {
       case "wert_geaendert": {
         if (meldung.menge === 0) return;
         const vorzeichen = meldung.menge > 0 ? "+" : "";
-        const platzhalter = { ...meldung, menge: vorzeichen + meldung.menge, wertName: text(`ui.${meldung.wertName}`) };
+        const menge = meldung.wertName === "pegel" ? promilleText(meldung.menge) : meldung.menge;
+        const platzhalter = { ...meldung, menge: vorzeichen + menge, wertName: text(`ui.${meldung.wertName}`) };
         return this.zeile(text(`log.${meldung.art}`, platzhalter), "gut");
       }
+      case "pegel_steigt":
+      case "pegel_sinkt":
+        return this.zeile(text(`log.${meldung.art}`, { ...meldung, schwelle: promilleText(meldung.schwelle) }));
       case "abgelehnt": {
         const schluessel = `log.abgelehnt.${meldung.grund}`;
         if (hatSchluessel(schluessel)) this.zeile(text(schluessel), "leise");

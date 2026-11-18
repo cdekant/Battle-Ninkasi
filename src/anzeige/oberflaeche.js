@@ -1,17 +1,33 @@
-// Seitenleiste: LP, MP, Pegel mit Schwellen, Gepäck, sichtbare Gegner, Startwert.
+// Seitenleiste: LP, MP, PP, Pegel als logarithmische Leiste mit Schwellen, Gepäck, sichtbare Gegner, Startwert.
 // Liest den Zustand nur.
 
 import { spielerin, entitaetMitId } from "../kern/zustand.js";
 import { hoechstwert } from "../kern/werte.js";
+import { optimalerPegel } from "../systeme/stoffwechsel.js";
+import { promilleText, leistenanteil, TEILSTRICHE } from "./pegelanzeige.js";
 
-function balken(beschriftung, aktuellerWert, hoechsterWert, cssKlasse, schwellen = []) {
+function balken(beschriftung, aktuellerWert, hoechsterWert, cssKlasse) {
   const fuellungProzent = hoechsterWert > 0 ? Math.round((aktuellerWert / hoechsterWert) * 100) : 0;
-  const schwellenMarken = schwellen
-    .map((schwelle) => `<span class="schwelle" style="left:${Math.round((schwelle / hoechsterWert) * 100)}%"></span>`)
-    .join("");
   return `<div class="wert ${cssKlasse}">
     <div class="wert-kopf"><span>${beschriftung}</span><span>${aktuellerWert} / ${hoechsterWert}</span></div>
-    <div class="balken"><div class="fuellung" style="width:${fuellungProzent}%"></div>${schwellenMarken}</div>
+    <div class="balken"><div class="fuellung" style="width:${fuellungProzent}%"></div></div>
+  </div>`;
+}
+
+// Pegel nach oben offen: Leiste in Verdopplungsschritten, Schwellen, Optimum der LP, genauer Wert
+function pegelLeiste(beschriftung, pegel, schwellen, optimumLp) {
+  const prozentAufLeiste = (wert) => (leistenanteil(wert) * 100).toFixed(2);
+  const schwellenMarken = schwellen
+    .map((schwelle) => `<span class="schwelle" style="left:${prozentAufLeiste(schwelle)}%"></span>`)
+    .join("");
+  const optimumMarke = optimumLp === undefined ? "" : `<span class="optimum" style="left:${prozentAufLeiste(optimumLp)}%"></span>`;
+  const teilstrichBeschriftung = TEILSTRICHE
+    .map((teilstrich) => `<span style="left:${prozentAufLeiste(teilstrich)}%">${promilleText(teilstrich).replace(",0 ‰", "").replace(" ‰", "")}</span>`)
+    .join("");
+  return `<div class="wert pegel">
+    <div class="wert-kopf"><span>${beschriftung}</span><span>${promilleText(pegel)}</span></div>
+    <div class="balken"><div class="fuellung" style="width:${prozentAufLeiste(pegel)}%"></div>${schwellenMarken}${optimumMarke}</div>
+    <div class="teilstriche">${teilstrichBeschriftung}</div>
   </div>`;
 }
 
@@ -51,8 +67,9 @@ export class Oberflaeche {
       <h1>${nomenForm(ninkasi, "nom", "ohne")}</h1>
       ${balken(text("ui.lp"), werte.lp.aktuell, hoechstwert(ninkasi, "lp"), "lp")}
       ${balken(text("ui.mp"), werte.mp.aktuell, hoechstwert(ninkasi, "mp"), "mp")}
+      ${balken(text("ui.pp"), werte.pp.aktuell, hoechstwert(ninkasi, "pp"), "pp")}
       <h2>${text("ui.pegel")}</h2>
-      ${balken(text("ui.pp"), werte.pp.aktuell, hoechstwert(ninkasi, "pp"), "pegel", ninkasi.pegel.schwellen)}
+      ${pegelLeiste(text("ui.promille"), werte.pegel.aktuell, ninkasi.stoffwechsel.schwellen || [], optimalerPegel(ninkasi, "lp"))}
       <h2>${text("ui.gepaeck")}</h2>
       <ul>${gepaeckHtml}</ul>
       <h2>${text("ui.in_sicht")}</h2>

@@ -12,6 +12,7 @@ import { alleEntitaeten, spielerin } from "../src/kern/zustand.js";
 import { passierbar } from "../src/welt/karte.js";
 import { erstesGetraenk } from "../src/systeme/inventar.js";
 import { hoererAnmelden } from "../src/kern/ereignisse.js";
+import { hoechstwert } from "../src/kern/werte.js";
 import { reiseBeginnen, naechsterReiseschritt } from "../src/eingabe/reise.js";
 import einstellungen from "../src/eingabe/einstellungen.js";
 
@@ -24,6 +25,7 @@ function invariantenPruefen(spiel) {
   for (const entitaet of alleEntitaeten(zustand)) {
     for (const [wertName, wert] of Object.entries(entitaet.werte || {})) {
       if (!Number.isInteger(wert.aktuell) || wert.aktuell < 0) throw new Error(`#${entitaet.id} ${wertName} ungültig: ${wert.aktuell}`);
+      if (wert.aktuell > hoechstwert(entitaet, wertName)) throw new Error(`#${entitaet.id} ${wertName} über dem Höchstwert: ${wert.aktuell}`);
     }
     if (entitaet.position) {
       if (!passierbar(spiel, entitaet.position.x, entitaet.position.y)) throw new Error(`#${entitaet.id} steht in der Wand`);
@@ -68,7 +70,7 @@ function reisen(botZufall, spiel) {
 
 let anzahlTode = 0, anzahlFehler = 0;
 const reisenNachHaltegrund = {};
-console.log("Startwert  Befehle  Zeit     LP   PP  Getötet  Biere  Ergebnis");
+console.log("Startwert  Befehle  Zeit     LP   MP   PP  Pegel  Getötet  Biere  Ergebnis");
 for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe; startwert++) {
   try {
     const spiel = neuesSpiel(daten, startwert);
@@ -94,7 +96,8 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
     if (spiel.zustand.vorbei) anzahlTode++;
     console.log(
       `${String(startwert).padStart(9)}  ${String(spiel.befehle.length).padStart(7)}  ${String(spiel.zustand.zeit).padStart(7)}  ` +
-      `${String(ninkasi.werte.lp.aktuell).padStart(3)}  ${String(ninkasi.werte.pp.aktuell).padStart(3)}  ${String(getoetet).padStart(7)}  ` +
+      `${String(ninkasi.werte.lp.aktuell).padStart(3)}  ${String(ninkasi.werte.mp.aktuell).padStart(3)}  ${String(ninkasi.werte.pp.aktuell).padStart(3)}  ` +
+      `${String(ninkasi.werte.pegel.aktuell).padStart(5)}  ${String(getoetet).padStart(7)}  ` +
       `${String(getrunkeneBiere).padStart(5)}  ${spiel.zustand.vorbei ? "tot" : "lebt"}, nachgespielt ok`
     );
   } catch (fehler) {

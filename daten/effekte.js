@@ -9,7 +9,7 @@ export default {
   bier_trinken: {
     schritte: [
       { baustein: "heilen", wertName: "lp", menge: 20 },
-      { baustein: "wert_aendern", wertName: "pp", menge: 20 },
+      { baustein: "wert_aendern", wertName: "pegel", menge: 50 }, // etwa 0,5 ‰
     ],
   },
 };

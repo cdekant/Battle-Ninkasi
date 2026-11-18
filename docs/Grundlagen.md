@@ -24,7 +24,8 @@ Stand: 2026-11-18
 + Jeder Vorrat regeneriert mit eigenem Verlauf über den Pegel:
   + LP regenerieren immer, langsam (Vorbild: Brogue); ohne Pegel etwas langsamer, am schnellsten bei einem optimalen Pegel weit über dem von Normalsterblichen, darüber wieder abnehmend
   + MP regenerieren nüchtern am schnellsten, je höher der Pegel, desto langsamer
-  + PP regenerieren nur mit Pegel, je höher der Pegel, desto schneller
+  + PP regenerieren nur bei hohem Pegel, je höher, desto schneller; unter einer niedrigen Schwelle schwinden sie
+  + Regeneration und Schwund sind für jeden Vorrat möglich; Skills, Schriftrollen, Items und Zustände passen Rate, Schwund und Lage der Verläufe an, siehe [Architektur.md](Architektur.md)
 + Folge: Auf Magie bereitet man sich nüchtern vor, Psi braucht für Regeneration und Wirksamkeit einen möglichst hohen Pegel, bei dem das Risiko steigt; Mischbuilds müssen ihren Rausch planen
 + Meditieren und Schriftrollen schreiben nur nüchtern
 + Vorschlag, noch nicht bestätigt: Bier füllt LP, Wein füllt MP, Brand füllt PP oder wirkt nur über den Pegel; jedes Getränk hebt den Pegel nach seinem Alkoholgehalt

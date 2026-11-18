@@ -12,6 +12,8 @@
   --lp: #c0392b;
   --mp: #3a7bd5;
   --pegel: #e0a83a;
+  --pp: #1f8fd8;
+  --pp-hell: #3af2ff;
   --gut: #8fbf4a;
   --schlimm: #e5533d;
   --log-zeile: 1.35em;
@@ -67,9 +69,15 @@ html, body {
 .fuellung { height: 100%; }
 .lp .fuellung { background: var(--lp); }
 .mp .fuellung { background: var(--mp); }
+.pp .fuellung { background: linear-gradient(90deg, var(--pp), var(--pp-hell)); }
 .pegel .balken { height: 18px; border-color: var(--kupfer); }
 .pegel .fuellung { background: linear-gradient(90deg, #8a5a1c, var(--pegel)); }
 .schwelle { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--text); opacity: 0.7; }
+.optimum { position: absolute; top: -5px; bottom: -5px; width: 2px; background: var(--lp); }
+.teilstriche { position: relative; height: 1.2em; font-size: 0.7em; color: var(--leise); }
+.teilstriche span { position: absolute; transform: translateX(-50%); }
+.teilstriche span:first-child { transform: none; }
+.teilstriche span:last-child { transform: translateX(-100%); }
 .wert.klein .balken { height: 6px; }
 
 .fuss { margin-top: 24px; font-size: 0.8em; color: var(--leise); line-height: 1.5; }

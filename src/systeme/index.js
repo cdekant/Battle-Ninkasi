@@ -2,5 +2,5 @@
 // Die Reihenfolge hier ist die Anmeldereihenfolge und damit fest.
 import "./bewegung.js";
 import "./inventar.js";
-import "./pegel.js";
+import "./stoffwechsel.js";
 import "./gefahr.js";
