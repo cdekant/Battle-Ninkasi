@@ -9,7 +9,8 @@
 // Ein Haken stellt passende Auslöser nur in eine Warteschlange (nicht im Zustand, sie ist nach jedem
 // Vorgang leer); abgearbeitet werden sie nacheinander in der Reihenfolge des Vormerkens, siehe
 // kern/vorgang.js. Ihre Effekte laufen eine Kettenstufe tiefer; ab der höchsten Kettentiefe wird nichts
-// mehr vorgemerkt. Gefragt werden bisher nur die beteiligten Entitäten selbst (Quelle, dann Ziel).
+// mehr vorgemerkt. Gefragt werden die beteiligten Entitäten (Quelle, dann Ziel), je Entität zuerst
+// ihre eigenen Auslöser, dann die ihrer Zustände in deren Reihenfolge (Daten: zustaende.<name>.ausloeser).
 
 import { anmelden } from "./register.js";
 import { HAKENKATALOG, AUSLOESER_ROLLEN } from "./hakenkatalog.js";
@@ -32,6 +33,17 @@ export function wirksameChance(grundchance, kettentiefe, daempfung) {
 
 const feldKopie = (feld) => (feld ? { x: feld.x, y: feld.y } : null);
 
+// Auslöser einer Entität mit festem Schlüssel je Eintrag: eigene, dann die ihrer Zustände
+function ausloeserDer(spiel, entitaet) {
+  const ergebnis = [];
+  (entitaet.ausloeser || []).forEach((ausloeser, nummer) => ergebnis.push({ ausloeser, schluessel: `${entitaet.id}:${nummer}` }));
+  for (const instanz of entitaet.zustaende || []) {
+    const liste = spiel.daten.zustaende?.[instanz.name]?.ausloeser || [];
+    liste.forEach((ausloeser, nummer) => ergebnis.push({ ausloeser, schluessel: `${entitaet.id}:z${instanz.nummer}:${nummer}` }));
+  }
+  return ergebnis;
+}
+
 function ausloeserVormerken(spiel, hakenName, kontext) {
   const kettentiefe = kontext.kettentiefe ?? 0;
   if (kettentiefe >= spiel.daten.regeln.ausloeser.hoechsteKettentiefe) return;
@@ -40,19 +52,18 @@ function ausloeserVormerken(spiel, hakenName, kontext) {
   for (const rolle of AUSLOESER_ROLLEN) {
     const traegerinId = kontext[`${rolle}Id`];
     const traegerin = traegerinId == null ? null : spiel.zustand.entitaeten[traegerinId];
-    if (!traegerin || !traegerin.ausloeser) continue;
-    traegerin.ausloeser.forEach((ausloeser, nummer) => {
-      if (ausloeser.bei !== hakenName) return;
-      if (ausloeser.rolle && ausloeser.rolle !== rolle) return;
-      const schluessel = `${traegerinId}:${nummer}`;
-      if (schonVorgemerkt.has(schluessel)) return;
+    if (!traegerin) continue;
+    for (const { ausloeser, schluessel } of ausloeserDer(spiel, traegerin)) {
+      if (ausloeser.bei !== hakenName) continue;
+      if (ausloeser.rolle && ausloeser.rolle !== rolle) continue;
+      if (schonVorgemerkt.has(schluessel)) continue;
       schonVorgemerkt.add(schluessel);
       warteschlange.push({
         ausloeser, traegerinId, traegerinFraktion: traegerin.fraktion ?? null,
         quelleId: kontext.quelleId ?? null, zielId: kontext.zielId ?? null,
         feld: feldKopie(kontext.position) ?? feldKopie(traegerin.position), kettentiefe,
       });
-    });
+    }
   }
 }
 

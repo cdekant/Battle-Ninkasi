@@ -7,17 +7,19 @@ import { neuerZustand, entitaetErzeugen } from "../src/kern/zustand.js";
 import { werteAusDaten } from "../src/kern/werte.js";
 import { zufallErzeugen } from "../src/kern/zufall.js";
 import { hoererAnmelden } from "../src/kern/ereignisse.js";
-import { anmelden, abmelden } from "../src/kern/register.js";
+import { anmelden, abmelden, alle, holen } from "../src/kern/register.js";
+import { WELTTICK, einreihen, ersterEintrag, ersterEintragEntnehmen } from "../src/kern/zeit.js";
+import { vorgangAbschliessen } from "../src/kern/vorgang.js";
 
 // Spiel mit einer Karte aus Zeilen ("#" Wand, "." Boden), alles erkundet.
-// optionen: { effekte: Testeffekte, regeln: Abweichungen der Regelwerte, startwert }
-export function miniSpiel(kartenzeilen, { effekte = {}, regeln: regelAbweichungen = {}, startwert = 1 } = {}) {
+// optionen: { effekte: Testeffekte, zustaende: Testzustände, regeln: Abweichungen der Regelwerte, startwert }
+export function miniSpiel(kartenzeilen, { effekte = {}, zustaende = {}, regeln: regelAbweichungen = {}, startwert = 1 } = {}) {
   const zustand = neuerZustand(startwert);
   zustand.zufallszustand = zufallErzeugen(startwert);
   const breite = kartenzeilen[0].length, hoehe = kartenzeilen.length;
   zustand.ebene = { name: "test", breite, hoehe, felder: kartenzeilen, erkundet: new Array(breite * hoehe).fill(1) };
   const testregeln = { ...regeln, ausloeser: { ...regeln.ausloeser, ...regelAbweichungen.ausloeser } };
-  return { zustand, daten: { gelaende, effekte, regeln: testregeln }, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
+  return { zustand, daten: { gelaende, effekte, zustaende, regeln: testregeln }, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
 }
 
 // Wesen mit Position, Fraktion und LP; weitere Komponenten (ausloeser, angriff, beimTod ...) über zusatz
@@ -44,6 +46,29 @@ export function gegenstandTragen(spiel, traegerin, komponenten = {}) {
   if (!traegerin.inventar) traegerin.inventar = [];
   traegerin.inventar.push(gegenstand.id);
   return gegenstand;
+}
+
+// Lässt die Welt bis zu einem Zeitpunkt laufen: Weltuhr und Zeitereignisse samt Abschluss des Vorgangs,
+// Akteure werden übersprungen (sie handeln in diesen Tests nicht)
+export function weltLaufenLassen(spiel, bisZeit) {
+  const zustand = spiel.zustand;
+  if (!zustand.warteschlange.some((eintrag) => eintrag.art === "weltuhr")) {
+    einreihen(zustand, { zeit: (Math.floor(zustand.zeit / WELTTICK) + 1) * WELTTICK, art: "weltuhr" });
+  }
+  for (let eintrag = ersterEintrag(zustand); eintrag && eintrag.zeit <= bisZeit; eintrag = ersterEintrag(zustand)) {
+    ersterEintragEntnehmen(zustand);
+    if (eintrag.art === "weltuhr") {
+      for (const [, handler] of alle("welttick")) {
+        handler(spiel);
+        vorgangAbschliessen(spiel);
+      }
+      einreihen(zustand, { zeit: zustand.zeit + WELTTICK, art: "weltuhr" });
+    } else if (eintrag.art === "ereignis") {
+      holen("zeitereignisse", eintrag.ereignistyp)(spiel, eintrag.daten);
+      vorgangAbschliessen(spiel);
+    }
+  }
+  zustand.zeit = bisZeit;
 }
 
 // Schneidet alle Meldungen mit

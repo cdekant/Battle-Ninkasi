@@ -22,8 +22,8 @@ Status: umgesetzt in Version 0.4.0, beschrieben in [Architektur.md](Architektur.
 Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 + Ersatzwirkungen aus Daten (z.B. "Phönixbier verhindert einmal den Tod", "Schild fängt einen Treffer ab"): eigener Typ, der sofort am Haken "davor" wirkt und sich verbrauchen kann; mit den Zuständen (Punkt 3)
-+ Auslöser auch an Zuständen (Punkt 3), Skills (Punkt 4) und an Ausrüstung und Inventar der Trägerin nach dem Vorbild der Kaskade in Caves of Qud (Punkt 9)
-+ Die reservierten Haken des Katalogs in Betrieb nehmen: `vor_befehl`, `zug_beginn`, `zug_ende`, `zustand_beginnt`, `zustand_endet` (Punkt 3), `vor_angriff` (Punkt 5), `betritt_feld`, `verlaesst_feld` (Punkt 8), `gegenstand_benutzt` (Punkt 9)
++ Auslöser auch an Skills (Punkt 4) und an Ausrüstung und Inventar der Trägerin nach dem Vorbild der Kaskade in Caves of Qud (Punkt 9)
++ Die reservierten Haken des Katalogs in Betrieb nehmen: `vor_befehl`, `zug_beginn`, `zug_ende` (Punkt 3), `vor_angriff` (Punkt 5), `betritt_feld`, `verlaesst_feld` (Punkt 8), `gegenstand_benutzt` (Punkt 9)
 + Index im `zwischenspeicher`, welche Entitäten Auslöser für einen Haken tragen (Vorbild "WantEvent" in Caves of Qud); erst nötig, wenn mehr als die Beteiligten gefragt werden
 + Erster Auslöser im Spielinhalt (z.B. Säurespritzer des Essigbakteriums beim Tod): Spieldesign, noch nicht entschieden
 
@@ -41,15 +41,16 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 ## 3. Zustände
 
-Status: offen
+Status: Grundgerüst umgesetzt in Version 0.6.0, beschrieben in [Architektur.md](Architektur.md) (Zustände); der Rest folgt als 0.7.0
 
-+ Liste je Entität: `{ name, quelle, urheberId, beginn, ende, staerke, stapel, verlauf }`, Ende über Zeitereignis
-+ Stapelregeln (erneuern, aufaddieren, nur der stärkste) und Verlauf (gleichbleibend, abklingend, ansteigend) wie in [Architektur.md](Architektur.md)
-+ Takt für Wirkung über Zeit: Weltuhr oder Zug der Trägerin; offene Entscheidung, sie bestimmt, wie Hast und Verlangsamung auf Schaden über Zeit wirken
+Entschieden: Takt ist die Weltuhr; Stapelregel je Zustand, Vorgabe `erneuern`; Verlauf mit drei Namen oder eigener Kurve; Zustände im Spielinhalt erst, wenn der Systemausbau abgeschlossen ist (bis dahin nur in den Tests)
+
+Offen für 0.7.0:
+
 + Handlungsunfähig (Betäubung, Lähmung, Filmriss): Trägerin wird eingereiht, muss aber warten
 + Befehl verändern (Torkeln, Verwirrung) über den Haken `vor_befehl`; Grundlage für "Torkeln, Fehlschläge" des Pegels
 + KI überlagern (Furcht, Psi-Kontrolle, Wut): Stapel von KI-Modulen und Fraktionen, der jüngste gilt, nach Ende kehrt der ursprüngliche Stand zurück
-+ Zustände, die an ihre Quelle gebunden sind (aufrechterhaltener Zauber endet mit dem Tod der Wirkenden)
++ Anzeige der Zustände an Ninkasi und an Gegnern (Oberfläche, Log-Texte zu den Meldungen `zustand_beginnt` und `zustand_endet`)
 
 ## 4. Modifikatoren
 
@@ -57,6 +58,7 @@ Status: offen
 
 + Bisher als Liste gespeichert (`entitaet.modifikatoren`); künftig bei Bedarf aus allen Quellen gesammelt: Ausrüstung, Zustände, Skills, Auren in Reichweite, Pegelschwellen, über ein Register der Modifikatorquellen
 + Auren ändern sich mit jedem Schritt und sind nur so sauber abbildbar
++ Zustände schreiben ihre Modifikatoren seit 0.6.0 noch in die Liste der Trägerin und führen sie je Welttick nach; mit dem Register der Modifikatorquellen werden auch sie bei Bedarf berechnet (dafür braucht `modifiziert` Zugriff auf Daten und Uhrzeit des Spiels)
 + Verrechnung erweitern: neben `plus` und `prozent` auch `mal` (Vorschlag "zwischen Quellen multiplizieren" in [Charakter.md](Charakter.md)), `setzen`, Mindest- und Höchstwert
 + Bedingungen am Modifikator: ab Pegel X, unter 30 % LP, nur gegen Bakterien, Set aus zwei Kupfer-Items
 + Ziele über Tags, z.B. `kosten.tag:psi`, `schaden.tag:feuer`; Umsetzung des Tag-Systems aus [Charakter.md](Charakter.md)

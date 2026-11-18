@@ -66,7 +66,7 @@ Skills, Items, Zustände und Fähigkeiten wirken über sechs Arten, die frei kom
 1. Modifikatoren ändern Zahlen, z.B. "Braupaddel der Geschwindigkeit: Angriff kostet 33% weniger Zeit", "Skill: Bewegung 5% schneller"
 2. Auslöser-Effekte reagieren auf Ereignisse, z.B. "bei Angriff, 15% Chance, weiterer Angriff", "beim Tod Sporen freisetzen"
 3. Aktionsveränderer ändern, wie eine Aktion abläuft: Zielmuster, Reichweite, Fläche; z.B. "Braupaddel des Rundumschlags trifft alle angrenzenden Felder", "Speer trifft zwei Felder in Linie"; Zielmuster sind Daten (`muster: { art: "angrenzend" }`, `muster: { art: "linie", laenge: 2 }`), siehe Zielauswahl
-4. Zustände sind zeitlich begrenzt, mit Verlauf (gleichbleibend, abklingend, ansteigend) und Stapelregel (erneuern, aufaddieren, nur der stärkste); sie bündeln selbst Modifikatoren und Auslöser; z.B. Schaden über Zeit, abklingender Segen, sich steigernde Vergiftung
+4. Zustände sind zeitlich begrenzt, mit Verlauf (gleichbleibend, abklingend, ansteigend) und Stapelregel (erneuern, aufaddieren, nur der stärkste, einzeln); sie bündeln selbst Modifikatoren und Auslöser; z.B. Schaden über Zeit, abklingender Segen, sich steigernde Vergiftung; siehe Zustände
 5. Auren wirken auf andere im Umkreis der Trägerin, z.B. "Gegner in der Nähe langsamer", "Hefen in der Nähe sprossen schneller"
 6. Gewährte Aktionen schalten eine neue Aktion frei, z.B. "Braupaddel erlaubt Ansturm"
 
@@ -108,8 +108,8 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Interne Haken in der Logik dürfen eingreifen, z.B. "vor Schaden": Rüstung senkt den Wert, ein Schild fängt den Treffer ab; hier hängen Auslöser-Effekte und Zustände an
 + Nur Haken aus dem Katalog `src/kern/hakenkatalog.js` lassen sich anmelden und auslösen, Tippfehler fallen sofort auf; Mods ergänzen den Katalog
 + Der Katalog nennt je Haken, ob die Logik ihn schon auslöst (`inBetrieb`) und ob Auslöser aus Daten daran hängen dürfen (`ausloeserErlaubt`, nur bei Haken "danach")
-+ In Betrieb: `vor_schaden` (Menge ändern oder abbrechen), `nach_schaden` (bei Schaden über 0), `nach_treffer`, `verfehlt`, `vor_tod`, `nach_tod`, `nach_wertaenderung`
-+ Reserviert für den Ausbau ([Systemausbau.md](Systemausbau.md)): `vor_befehl`, `zug_beginn`, `zug_ende`, `zustand_beginnt`, `zustand_endet`, `vor_angriff`, `betritt_feld`, `verlaesst_feld`, `gegenstand_benutzt`
++ In Betrieb: `vor_schaden` (Menge ändern oder abbrechen), `nach_schaden` (bei Schaden über 0), `nach_treffer`, `verfehlt`, `vor_tod`, `nach_tod`, `nach_wertaenderung`, `zustand_beginnt`, `zustand_endet`
++ Reserviert für den Ausbau ([Systemausbau.md](Systemausbau.md)): `vor_befehl`, `zug_beginn`, `zug_ende`, `vor_angriff`, `betritt_feld`, `verlaesst_feld`, `gegenstand_benutzt`
 + Kontext der Haken mit Beteiligten: `{ quelleId, urheberId, zielId, ursache, kettentiefe, mittel, tags }`, dazu je Haken weitere Felder (`menge`, `position`)
 + Handler laufen nach Rang (kleiner zuerst, Vorgabe 100), bei gleichem Rang nach Anmeldung; so ist die Reihenfolge ausdrücklich geregelt, wenn Handler den Kontext verändern
 + Setzt ein Handler `kontext.abgebrochen = true`, laufen die weiteren Handler nicht mehr (z.B. Schild fängt den Treffer ab, Tod verhindert)
@@ -130,7 +130,7 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Hinterlassenschaft nach Daten: `beimTod: { inventar: "fallen_lassen" }` (Vorgabe, aufs Feld des Wesens) oder `"vernichten"`
 + Entfernen nimmt den Akteur, gebundene Zeitereignisse und alles Getragene mit; Getragenes verschwindet aus dem Inventar der Trägerin
 + Stirbt Ninkasi, ist das Spiel vorbei; sie bleibt im Zustand (Anzeige, später Todesbericht), noch vorgemerkte Auslöser verfallen
-+ Ursachen bisher: `nahkampf`, `trinken`, `ausloeser`, `schwund.<wert>` (Stoffwechsel)
++ Ursachen bisher: `nahkampf`, `trinken`, `ausloeser`, `zustand`, `schwund.<wert>` (Stoffwechsel)
 
 ## Auslöser
 
@@ -138,12 +138,28 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + `bei`: Haken aus dem Katalog mit `ausloeserErlaubt` und `inBetrieb`; `rolle`: Rolle der Trägerin im Ereignis (`quelle` oder `ziel`, ohne Angabe jede); `ziel`: worauf der Effekt wirkt (`selbst` als Vorgabe, `quelle`, `ziel` oder `feld`: die Position im Ereignis, bei `nach_tod` die letzte Position des Opfers, sonst die der Trägerin; der Effekt läuft dann ohne Wesen als Ziel mit Ursprung und Zielfeld dort, z.B. Sporen im Kreis); `chance` in Prozent, Vorgabe 100
 + Haken und Auslöser sind getrennt: Haken sind Code, wirken sofort und dürfen den Kontext ändern; Auslöser merkt ein Verteiler (Rang 1000, nach allen Code-Handlern) nur vor, abgearbeitet werden sie nach dem laufenden Schritt nacheinander in der Reihenfolge des Vormerkens (`src/kern/ausloeser.js`); kein Auslöser greift so mitten in eine Schadensrechnung ein
 + Die Warteschlange der Auslöser liegt im Spiel, nicht im Zustand; sie ist nach jedem Vorgang leer
-+ Gefragt werden bisher die beteiligten Entitäten selbst, zuerst die Quelle, dann das Ziel; Zustände, Ausrüstung und Skills kommen mit ihrem Ausbau dazu
++ Gefragt werden die beteiligten Entitäten, zuerst die Quelle, dann das Ziel; je Entität zuerst ihre eigenen Auslöser, dann die ihrer Zustände (z.B. Dornenhaut); Ausrüstung und Skills kommen mit ihrem Ausbau dazu
 + Ketten: Befehle und Welt wirken auf Kettenstufe 0, der Effekt eines Auslösers eine Stufe tiefer als sein Ereignis; die Chance sinkt je Stufe auf `daempfung` Prozent (einheitlich gerundet: 100, 50, 25, 13, 7 ...), ab der höchsten Kettentiefe wird nichts mehr vorgemerkt
 + Regelwerte in `daten/regeln.js`: `daempfungProStufe` 50, `hoechsteKettentiefe` 5; `daempfung` am Auslöser überschreibt die Regel (100 heißt ungedämpft)
 + Sichere Chancen (0 und 100) würfeln nicht, damit die Zahlenfolge des Zufalls ungestört bleibt
 + Kettenreaktionen der Welt (Feuer greift auf Gas über, Fässer explodieren nacheinander) laufen nicht über Auslöser, sondern über die Zeit (Weltuhr, Zeitereignisse); sie sind von der Kettengrenze nicht betroffen und für die Spielerin sichtbar
 + Ersatzwirkungen aus Daten ("Phönixbier verhindert einmal den Tod") sind ein eigener Typ, da sie sofort wirken müssen; Entwurf in [Systemausbau.md](Systemausbau.md)
+
+## Zustände
+
++ Zustände sind Daten (`daten/zustaende.js`, mit Vorlagen), umgesetzt in `src/systeme/zustaende.js`: `{ text, tags, dauer, stapel, hoechstStapel, verlauf, modifikatoren, jeTick, beimBeginn, beimEnde, ausloeser, gebundenAnQuelle }`
++ An der Entität als Liste von Instanzen: `zustaende: [{ nummer, name, quelleId, urheberId, urheberFraktion, beginn, ende, staerke, stapel }]`; die Nummer zählt der Zustand des Spiels hoch
++ `dauer` in Zeiteinheiten, ohne Angabe unbegrenzt bis zum Entfernen; `staerke` Vorgabe 1
++ Takt ist die Weltuhr: je Welttick wirkt `jeTick`, solange das Ende nicht erreicht ist; Hast und Verlangsamung der Trägerin ändern daran nichts (Vorbild DCSS: Hast hilft, Verlangsamung schadet)
++ Ende über das Zeitereignis `zustand_ende`, gebunden an die Trägerin; wurde der Zustand inzwischen verlängert, reiht es sich zum neuen Ende wieder ein
++ Stapelregel je Zustand, Vorgabe `erneuern` (eine Instanz, höhere Stärke, längere Dauer); `aufaddieren` (Stärken addiert bis `hoechstStapel` Anwendungen, Dauer erneuert), `staerkster` (nur eine mindestens gleich starke Anwendung ersetzt, sonst nichts), `einzeln` (eigene Instanzen mit eigenem Ende, höchstens `hoechstStapel`); verschiedene Zustände bestehen immer nebeneinander
++ Verlauf `gleichbleibend` (Vorgabe), `abklingend`, `ansteigend` oder eine eigene Kurve `[[anteilProzent, staerkeProzent], ...]` über den Anteil der verstrichenen Dauer; wird die Dauer verlängert, beginnt der Verlauf neu
++ Modifikatoren gelten je Stärke 1 und skalieren mit Stärke und Verlauf; sie stehen mit der Quelle `zustand:<nummer>` in der Liste der Trägerin, werden bei Beginn, Stapeln und jedem Welttick nachgeführt und am Ende entfernt; mit Punkt 4 der Arbeitsliste werden sie bei Bedarf berechnet
++ `jeTick`, `beimBeginn`, `beimEnde` wirken auf die Trägerin mit Ursprung an ihrer Position, zugerechnet der Urheberin, Ursache `zustand`, Mittel `{ art: "zustand", name }`, Tags des Zustands; Mengen mit `mitStaerke: true` skalieren mit der Stärke (`werte.staerkeProzent`, 100 = Stärke 1)
++ Bausteine `zustand_setzen { zustand, dauer?, staerke? }` und `zustand_entfernen { zustand? , tag? }` auf das Ziel
++ Haken `zustand_beginnt` und `zustand_endet` (mit `grund`: `abgelaufen`, `entfernt`, `quelle_tot`), Meldungen gleichen Namens
++ `gebundenAnQuelle: true`: der Zustand endet mit dem Tod der Quelle (aufrechterhaltener Zauber)
++ Die Datenprüfung verfolgt Kreise auch über Zustände: ein Effekt, der einen Zustand setzt, dessen `beimBeginn` ihn wieder aufruft, ist ein Fehler
 
 ## Zielauswahl
 
@@ -336,14 +352,14 @@ Vorläufige Ideen, noch nicht umgesetzt.
 + `package.json`: nur `"type": "module"` und `"private": true`, damit Node alle `.js`-Dateien als ES-Module liest; keine Abhängigkeiten, kein Build
 + `src/version.js`: Versionsnummer
 + `src/kern/`: Spiel und Eingangstür für Befehle (`spiel.js`), Zustand und Entitäten, Zeit, Zufall, Ereignisse und Katalog der Haken, Auslöser, Abschluss eines Vorgangs, Werte und Modifikatoren, Kurven, Effekte, Grundbausteine, Register, Datenprüfung
-+ `src/systeme/`: Bewegung, Kampf, Sicht, Stoffwechsel, Inventar, Gefahrenprüfung, Tod, Zielauswahl samt Zielmustern, Bausteine mit Zielauswahl, später Brauen, Handel u.a.
++ `src/systeme/`: Bewegung, Kampf, Sicht, Stoffwechsel, Inventar, Gefahrenprüfung, Tod, Zielauswahl samt Zielmustern, Bausteine mit Zielauswahl, Zustände, später Brauen, Handel u.a.
 + `src/ki/`: Verhaltensmodule
 + `src/welt/`: Dungeon-Erzeugung, Zugriff auf die Karte, Wegfindung, Geometrie (Linie, Sichtlinie, Flugbahn, Kreis, Kegel)
 + `src/anzeige/`: Renderer, Tilebilder (Pixeldaten zu Bildern), Kamera, Oberfläche, Anzeige des Pegels, Log, Effekte, Textzugriff und Grammatik
 + `src/eingabe/`: Belegung, Übersetzung in Befehle, Maus und Klickregeln, Reise, Vorgaben der Einstellungen
-+ `daten/`: Inhalte als JS-Datendateien, gesammelt in `daten/index.js`; `daten/regeln.js` hält Regelwerte für das Balancing (z.B. Kettengrenze der Auslöser); `daten/zeichen.js` ist das Tileset aus Zeichen, Ersatz, wo kein Tile aus `grafik/` passt
++ `daten/`: Inhalte als JS-Datendateien, gesammelt in `daten/index.js`; `daten/zustaende.js` die Zustände; `daten/regeln.js` hält Regelwerte für das Balancing (z.B. Kettengrenze der Auslöser); `daten/zeichen.js` ist das Tileset aus Zeichen, Ersatz, wo kein Tile aus `grafik/` passt
 + `grafik/`: Palette und Tiles als Pixeldaten, unter der Grafiklizenz, dazu die Vorschauseite `vorschau.html`; siehe [Tileset.md](Tileset.md)
 + `sprache/de/`, `sprache/en/`: Texte (`texte.js`) und Grammatikregeln (`grammatik.js`) als Daten
 + `lib/`: Bibliotheken (rot.js) samt ihrer Lizenzdateien
 + `werkzeuge/`: Arena, Statistiken, Bots; `tiles-ableiten.js` leitet die kleinen Tile-Sätze ab und schreibt `grafik/tileset.js`
-+ `tests/`: Unittests (`*.test.js`), siehe Tests und Balancing; `tests/hilfen.js` baut kleine Spiele aus Testkarten (ohne Dungeon-Erzeugung) mit Testeffekten und Regelwerten, samt Wesen, Spielerin und getragenen Gegenständen, macht auf Wunsch die ganze Karte sichtbar, schneidet Meldungen mit und meldet Haken nur für die Dauer eines Tests an
++ `tests/`: Unittests (`*.test.js`), siehe Tests und Balancing; `tests/hilfen.js` baut kleine Spiele aus Testkarten (ohne Dungeon-Erzeugung) mit Testeffekten und Regelwerten, samt Wesen, Spielerin und getragenen Gegenständen, macht auf Wunsch die ganze Karte sichtbar, lässt die Welt (Weltuhr, Zeitereignisse) bis zu einem Zeitpunkt laufen, schneidet Meldungen mit und meldet Haken nur für die Dauer eines Tests an

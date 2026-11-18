@@ -101,3 +101,37 @@ test("Angriff mit Muster und trifft wird geprüft", () => {
   assert.ok(mitAngriff({ muster: "angrenzend" }).some((meldung) => meldung.includes("angriff.muster")));
   assert.ok(mitAngriff({ trifft: "niemand" }).some((meldung) => meldung.includes("trifft")));
 });
+
+test("Zustände: Felder, Verweise und Kreise über Beginn und Ende werden geprüft", () => {
+  const mitZustand = (zustand, effekte = {}) => {
+    const daten = structuredClone(rohdaten);
+    daten.zustaende = { test: zustand };
+    Object.assign(daten.effekte, effekte);
+    return vorbereiten(daten).fehler;
+  };
+  const gueltig = {
+    text: "test", dauer: 300, stapel: "aufaddieren", hoechstStapel: 3, verlauf: "abklingend", tags: ["gift"],
+    modifikatoren: [{ ziel: "trefferchance", art: "plus", betrag: -10 }], jeTick: "biss_klein",
+    ausloeser: [{ bei: "nach_schaden", effekt: "biss_klein" }],
+  };
+  assert.deepEqual(mitZustand(gueltig), []);
+  assert.deepEqual(mitZustand({ ...gueltig, verlauf: [[0, 50], [100, 100]] }), []);
+  const erwartet = [
+    [{ ...gueltig, text: undefined }, "Textschlüssel"],
+    [{ ...gueltig, dauer: 0 }, "dauer"],
+    [{ ...gueltig, stapel: "verdoppeln" }, "stapel"],
+    [{ ...gueltig, hoechstStapel: 0 }, "hoechstStapel"],
+    [{ ...gueltig, verlauf: "wellig" }, "verlauf"],
+    [{ ...gueltig, verlauf: [[50, 1], [10, 2]] }, "aufsteigen"],
+    [{ ...gueltig, modifikatoren: [{ ziel: "lp", art: "mal", betrag: 2 }] }, "modifikatoren[0]"],
+    [{ ...gueltig, jeTick: "gibt_es_nicht" }, "Effekt"],
+    [{ ...gueltig, ausloeser: [{ bei: "vor_schaden", effekt: "biss_klein" }] }, "keine Auslöser erlaubt"],
+  ];
+  for (const [zustand, teilDerMeldung] of erwartet) {
+    assert.ok(mitZustand(zustand).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
+  }
+  const unbekannt = mitZustand(gueltig, { setzen: { schritte: [{ baustein: "zustand_setzen", zustand: "gibt_es_nicht" }] } });
+  assert.ok(unbekannt.some((meldung) => meldung.includes('Zustand "gibt_es_nicht"')));
+  const kreis = mitZustand({ text: "test", beimBeginn: "setzen" }, { setzen: { schritte: [{ baustein: "zustand_setzen", zustand: "test" }] } });
+  assert.ok(kreis.some((meldung) => meldung.includes("setzen > setzen")));
+});

@@ -12,12 +12,12 @@ export const HAKENKATALOG = {
   vor_tod: { inBetrieb: true, ausloeserErlaubt: false },          // Abbruch verhindert den Tod, wenn der Lebenswert wieder über 0 liegt
   nach_tod: { inBetrieb: true, ausloeserErlaubt: true },          // + position des Opfers
   nach_wertaenderung: { inBetrieb: true, ausloeserErlaubt: false }, // { entitaet, wertName, vorher, nachher }
+  zustand_beginnt: { inBetrieb: true, ausloeserErlaubt: true },   // + zustand, nummer; Ziel ist die Trägerin
+  zustand_endet: { inBetrieb: true, ausloeserErlaubt: true },     // + zustand, nummer, grund ("abgelaufen" | "entfernt" | "quelle_tot")
   // reserviert, siehe docs/Systemausbau.md
   vor_befehl: { inBetrieb: false, ausloeserErlaubt: false },
   zug_beginn: { inBetrieb: false, ausloeserErlaubt: true },
   zug_ende: { inBetrieb: false, ausloeserErlaubt: true },
-  zustand_beginnt: { inBetrieb: false, ausloeserErlaubt: true },
-  zustand_endet: { inBetrieb: false, ausloeserErlaubt: true },
   vor_angriff: { inBetrieb: false, ausloeserErlaubt: false },
   betritt_feld: { inBetrieb: false, ausloeserErlaubt: true },
   verlaesst_feld: { inBetrieb: false, ausloeserErlaubt: true },

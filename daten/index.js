@@ -8,11 +8,13 @@ import gelaende from "./gelaende.js";
 import ebenen from "./ebenen.js";
 import zeichen from "./zeichen.js";
 import regeln from "./regeln.js";
+import zustaende from "./zustaende.js";
 
 export default {
   wesen: { ...ninkasi, ...gegner },
   gegenstaende: { ...getraenke },
   effekte,
+  zustaende,
   aktionen,
   gelaende,
   ebenen,

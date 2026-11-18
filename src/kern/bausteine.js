@@ -1,10 +1,11 @@
 // Grundbausteine des Effektsystems: kleine, stabile Funktionen (spiel, kontext, parameter).
 // Neue Bausteine nur für wirklich neue Mechanik; Mods melden eigene im Register an.
 // Jeder Baustein beschreibt seine Parameter in "parameter" für die Datenprüfung (kern/daten.js):
-//   "text", "ganzzahl", "wahrheitswert", "effekt", "muster", mit "?" am Ende freiwillig;
+//   "text", "ganzzahl", "wahrheitswert", "effekt", "muster", "zustand", mit "?" am Ende freiwillig;
 //   eine Liste nennt die erlaubten Werte (freiwillig); "wuerfel|menge" siehe mengeBestimmen
 // brauchtZiel: der Baustein wirkt auf ein Wesen und wird ohne Ziel übersprungen.
-// Bausteine mit Zielauswahl (fuer_jedes_ziel, auf_feld, geschoss, springen) stehen in systeme/zielbausteine.js.
+// Bausteine mit Zielauswahl (fuer_jedes_ziel, auf_feld, geschoss, springen) stehen in systeme/zielbausteine.js,
+// zustand_setzen und zustand_entfernen in systeme/zustaende.js.
 
 import { anmelden } from "./register.js";
 import { wuerfeln } from "./zufall.js";
@@ -16,6 +17,7 @@ import { prozentVon, prozentWiederholt, geteiltGerundet } from "./werte.js";
 //   wuerfel: "1W6+2" | menge: 5 | menge: { aus: "summeSchaden", prozent?: 50 } (aus der Ablage kontext.werte)
 //   teilen: "anzahlZiele"   teilt durch einen Wert der Ablage (verteilter Schaden), wenn er über 1 liegt
 //   prozentJeSprung: 70     je Sprung einer Kette (werte.sprungnummer) bleiben so viele Prozent
+//   mitStaerke: true        skaliert mit der Stärke eines Zustands (werte.staerkeProzent, 100 = Stärke 1)
 export function mengeBestimmen(spiel, kontext, parameter) {
   const ablage = kontext.werte || {};
   let menge;
@@ -24,6 +26,7 @@ export function mengeBestimmen(spiel, kontext, parameter) {
   else menge = parameter.menge;
   if (parameter.teilen !== undefined && ablage[parameter.teilen] > 1) menge = geteiltGerundet(menge, ablage[parameter.teilen]);
   if (parameter.prozentJeSprung !== undefined) menge = prozentWiederholt(menge, parameter.prozentJeSprung, ablage.sprungnummer ?? 0);
+  if (parameter.mitStaerke && ablage.staerkeProzent !== undefined) menge = prozentVon(menge, ablage.staerkeProzent);
   return menge;
 }
 

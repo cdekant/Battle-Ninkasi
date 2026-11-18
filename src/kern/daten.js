@@ -8,6 +8,7 @@ import { kurvenfehler } from "./kurven.js";
 import { HAKENKATALOG, AUSLOESER_ROLLEN, AUSLOESER_ZIELE } from "./hakenkatalog.js";
 import { HINTERLASSENSCHAFT_REGELN } from "./werte.js";
 import { TRIFFT_ARTEN } from "../systeme/zielauswahl.js";
+import { STAPELREGELN, VERLAEUFE } from "../systeme/zustaende.js";
 
 const istObjekt = (wert) => wert && typeof wert === "object" && !Array.isArray(wert);
 
@@ -161,12 +162,13 @@ function pruefeMenge(schritt, ort, fehler) {
   }
   if (schritt.teilen !== undefined && typeof schritt.teilen !== "string") fehler.push(`${ort}: teilen muss ein Name aus der Ablage sein`);
   if (schritt.prozentJeSprung !== undefined && !istZahlAbNull(schritt.prozentJeSprung)) fehler.push(`${ort}: prozentJeSprung muss eine ganze Zahl >= 0 sein`);
+  if (schritt.mitStaerke !== undefined && typeof schritt.mitStaerke !== "boolean") fehler.push(`${ort}: mitStaerke muss true oder false sein`);
 }
 
 const istZahlAbNull = (wert) => istGanzzahl(wert) && wert >= 0;
 
 // Parameter nach Beschreibung (siehe kern/bausteine.js): "text", "ganzzahl", "wahrheitswert", "effekt",
-// "muster", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
+// "muster", "zustand", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
 function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
   for (const [feld, typ] of Object.entries(beschreibung)) {
     const wert = werte[feld];
@@ -189,6 +191,7 @@ function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
     else if (grundtyp === "wahrheitswert" && typeof wert !== "boolean") fehler.push(`${ort}: ${feld} muss true oder false sein`);
     else if (grundtyp === "effekt") pruefeEffektVerweis(daten, wert, `${ort}.${feld}`, fehler);
     else if (grundtyp === "muster") pruefeMuster(daten, wert, `${ort}.${feld}`, fehler);
+    else if (grundtyp === "zustand" && !daten.zustaende?.[wert]) fehler.push(`${ort}.${feld}: Zustand "${wert}" gibt es nicht`);
   }
 }
 
@@ -210,24 +213,29 @@ function pruefeEffekt(daten, name, effekt, fehler) {
   });
 }
 
-// Namen der Effekte, die ein Effekt in seinen Schritten aufruft (Parameter vom Typ "effekt")
-function aufgerufeneEffekte(effekt) {
+// Namen der Effekte, die ein Effekt sofort aufruft: Parameter vom Typ "effekt" und, über Parameter vom
+// Typ "zustand", die Effekte beim Beginn und Ende dieses Zustands (jeTick wirkt erst später)
+function aufgerufeneEffekte(daten, effekt) {
   const namen = [];
   for (const schritt of effekt.schritte || []) {
     if (!hat("bausteine", schritt.baustein)) continue;
     for (const [feld, typ] of Object.entries(holen("bausteine", schritt.baustein).parameter || {})) {
-      if ((typ === "effekt" || typ === "effekt?") && typeof schritt[feld] === "string") namen.push(schritt[feld]);
+      if (typeof schritt[feld] !== "string") continue;
+      if (typ === "effekt" || typ === "effekt?") namen.push(schritt[feld]);
+      const zustand = (typ === "zustand" || typ === "zustand?") && daten.zustaende?.[schritt[feld]];
+      if (zustand) for (const anlass of ["beimBeginn", "beimEnde"]) if (typeof zustand[anlass] === "string") namen.push(zustand[anlass]);
     }
   }
   return namen;
 }
 
 // Benannte Effekte dürfen sich nicht im Kreis aufrufen; jeder Kreis wird einmal gemeldet
-function pruefeEffektKreise(effekte, fehler) {
+function pruefeEffektKreise(daten, fehler) {
+  const effekte = daten.effekte;
   const fertig = new Set();
   const besuchen = (name, kette) => {
     if (fertig.has(name) || !effekte[name]) return;
-    for (const aufgerufen of aufgerufeneEffekte(effekte[name])) {
+    for (const aufgerufen of aufgerufeneEffekte(daten, effekte[name])) {
       const position = kette.indexOf(aufgerufen);
       if (position >= 0) fehler.push(`effekte.${aufgerufen}: Effekte rufen sich im Kreis auf (${[...kette.slice(position), aufgerufen].join(" > ")})`);
       else besuchen(aufgerufen, [...kette, aufgerufen]);
@@ -235,6 +243,30 @@ function pruefeEffektKreise(effekte, fehler) {
     fertig.add(name);
   };
   for (const name of Object.keys(effekte)) besuchen(name, [name]);
+}
+
+// Zustände, siehe systeme/zustaende.js
+function pruefeZustand(daten, sprache, name, zustand, fehler) {
+  const ort = `zustaende.${name}`;
+  if (zustand.abstrakt) return;
+  pruefeText(sprache.texte, zustand.text, ort, fehler);
+  if (zustand.dauer !== undefined && !(istGanzzahl(zustand.dauer) && zustand.dauer > 0)) fehler.push(`${ort}: dauer muss eine ganze Zahl > 0 sein`);
+  if (zustand.hoechstStapel !== undefined && !(istGanzzahl(zustand.hoechstStapel) && zustand.hoechstStapel > 0)) fehler.push(`${ort}: hoechstStapel muss eine ganze Zahl > 0 sein`);
+  pruefeParameter(daten, { stapel: STAPELREGELN, jeTick: "effekt?", beimBeginn: "effekt?", beimEnde: "effekt?", gebundenAnQuelle: "wahrheitswert?" }, zustand, ort, fehler);
+  if (typeof zustand.verlauf === "string") {
+    if (!(zustand.verlauf in VERLAEUFE)) fehler.push(`${ort}: verlauf muss eines von ${Object.keys(VERLAEUFE).join(", ")} oder eine Kurve sein`);
+  } else if (zustand.verlauf !== undefined) {
+    fehler.push(...kurvenfehler(zustand.verlauf, `${ort}.verlauf`));
+  }
+  if (zustand.tags !== undefined && !(Array.isArray(zustand.tags) && zustand.tags.every((tag) => typeof tag === "string"))) fehler.push(`${ort}: tags muss eine Liste von Texten sein`);
+  if (zustand.modifikatoren !== undefined) {
+    if (!Array.isArray(zustand.modifikatoren)) fehler.push(`${ort}: modifikatoren muss eine Liste sein`);
+    else zustand.modifikatoren.forEach((modifikator, nummer) => {
+      const gueltig = typeof modifikator?.ziel === "string" && ["plus", "prozent"].includes(modifikator.art) && istGanzzahl(modifikator.betrag);
+      if (!gueltig) fehler.push(`${ort}.modifikatoren[${nummer}]: braucht ziel, art (plus oder prozent) und betrag als ganze Zahl`);
+    });
+  }
+  if (zustand.ausloeser !== undefined) pruefeAusloeser(daten, zustand.ausloeser, ort, fehler);
 }
 
 function pruefeEbene(daten, name, ebene, fehler) {
@@ -260,9 +292,11 @@ export function vorbereiten(rohdaten, sprache = {}) {
   const daten = { ...rohdaten };
   daten.wesen = vorlagenAufloesen(rohdaten.wesen, "wesen", fehler);
   daten.gegenstaende = vorlagenAufloesen(rohdaten.gegenstaende, "gegenstaende", fehler);
+  daten.zustaende = vorlagenAufloesen(rohdaten.zustaende || {}, "zustaende", fehler);
 
   for (const [name, effekt] of Object.entries(daten.effekte)) pruefeEffekt(daten, name, effekt, fehler);
-  pruefeEffektKreise(daten.effekte, fehler);
+  pruefeEffektKreise(daten, fehler);
+  for (const [name, zustand] of Object.entries(daten.zustaende)) pruefeZustand(daten, sprache, name, zustand, fehler);
   for (const [name, wesen] of Object.entries(daten.wesen)) pruefeWesen(daten, sprache, name, wesen, fehler);
   for (const [name, gegenstand] of Object.entries(daten.gegenstaende)) pruefeGegenstand(daten, sprache, name, gegenstand, fehler);
   for (const [name, ebene] of Object.entries(daten.ebenen)) pruefeEbene(daten, name, ebene, fehler);
