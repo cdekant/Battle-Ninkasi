@@ -1,0 +1,22 @@
+[
+  {
+    "id": "sallaberger2020ninkasi",
+    "type": "chapter",
+    "author": [{ "family": "Sallaberger", "given": "Walther" }],
+    "title": "Die Hymne auf die Biergöttin Ninkasi",
+    "container-title": "Texte zur Wissenskultur",
+    "editor": [
+      { "family": "Janowski", "given": "Bernd" },
+      { "family": "Schwemer", "given": "Daniel" }
+    ],
+    "collection-title": "Texte aus der Umwelt des Alten Testaments, Neue Folge",
+    "collection-number": "9",
+    "publisher": "Gütersloher Verlagshaus",
+    "publisher-place": "Gütersloh",
+    "issued": { "date-parts": [[2020]] },
+    "page": "163-167",
+    "DOI": "10.11588/propylaeumdok.00006162",
+    "keyword": "sumerisch, Bier, Hymne, Trinklied",
+    "note": "Nur Fachquelle: Übersetzung urheberrechtlich geschützt, nicht zitieren. Grundlage der Nachdichtungen sprache/de/korpus/ninkasi-hymne.md und trinklied.md."
+  }
+]

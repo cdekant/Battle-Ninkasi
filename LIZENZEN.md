@@ -24,6 +24,7 @@ Battle Ninkasi besteht aus Teilen unter verschiedenen Lizenzen.
 ## Gemeinfreie Texte
 
 + Texte im Textkorpus aus gemeinfreien Quellen bleiben gemeinfrei; Quelle und Rechtsgrundlage werden je Text vermerkt
++ Nachdichtungen im Textkorpus (`sprache/de/korpus/`) sind eigene Texte unter CC BY-NC-SA 4.0; ihre Vorlagen sind gemeinfreie Originale, moderne Übersetzungen dienen nur als Fachquelle (Liste in [docs/Texte.md](docs/Texte.md))
 
 ## Bibliotheken
 

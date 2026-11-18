@@ -1,6 +1,6 @@
 # Battle Ninkasi - Texte und Textkorpus
 
-Stand: 2026-11-17
+Stand: 2026-11-18
 
 Grobskizze, auszuarbeiten.
 
@@ -33,10 +33,28 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 + Nur gemeinfreie oder selbst erstellte Texte
 + Bei Übersetzungen zählt der Übersetzer: gemeinfrei erst 70 Jahre nach seinem Tod; Keilschrift-Originale sind gemeinfrei, viele moderne Übersetzungen nicht (z.B. ETCSL)
 + Herkunft und Rechtsgrundlage jedes Korpustextes werden festgehalten
-+ Kandidaten, zu prüfen: Gilgamesch-Epos in alten Übersetzungen, Hymne an Ninkasi, mittelalterliche Brauanleitungen, Brauordnungen, Bibelstellen und antike Autoren zu Bier und Wein
++ Geschützte moderne Übersetzungen dienen nur als Fachquelle: Wir dichten aus dem gemeinfreien Original eigenständig nach und übernehmen keinen Wortlaut; das Zitatrecht deckt Zitate als Spielausstattung nicht
++ Kandidaten, zu prüfen: Gilgamesch-Epos in alten Übersetzungen, mittelalterliche Brauanleitungen, Brauordnungen, Bibelstellen und antike Autoren zu Bier und Wein
+
+### Ablage und Format
+
++ Korpustexte: `sprache/<sprache>/korpus/<name>.md`, eine Datei pro Text, Zeile = Vers, Leerzeile = Strophe, Sprecherrollen als `(Hausherr:)` am Zeilenanfang
++ YAML-Kopf im Pandoc-Stil mit `titel`, `art` (`nachdichtung`, `gemeinfrei`, `eigen`), `vorlage` (gemeinfreies Original), `quelle` (Schlüssel im Literaturverzeichnis), `lizenz`
++ Literaturverzeichnis: `sprache/literatur.json` im Format CSL-JSON, für alle Sprachen gemeinsam; liest das Spiel direkt, Pandoc mit `--citeproc --bibliography`, für biber per `pandoc sprache/literatur.json -t biblatex` umwandeln
++ Schlüssel (`id`) nach dem Schema `autorJahrKurztitel`: klein, ohne Umlaute und Leerzeichen, z.B. `sallaberger2020ninkasi`; ein "siehe auch" im Spiel verweist nur über diesen Schlüssel, die Anzeige liefert die Sprachdatei
++ Originale und Rohtexte liegen in `sprache/Literatur/` (in `.gitignore`, nicht im Repo), benannt nach dem Schlüssel: `<schluessel>.pdf`, `<schluessel>-rohtext.txt`
++ Hinweise zur Nutzung einer Quelle (etwa "nur Fachquelle") stehen im CSL-Feld `note`
+
+### Korpustexte
+
+| Datei | Art | Quelle | Rechtsgrundlage |
+|---|---|---|---|
+| `de/korpus/ninkasi-hymne.md` | Nachdichtung | `sallaberger2020ninkasi` | eigener Text, CC BY-NC-SA 4.0; sumerisches Original gemeinfrei |
+| `de/korpus/trinklied.md` | Nachdichtung | `sallaberger2020ninkasi` | eigener Text, CC BY-NC-SA 4.0; sumerisches Original gemeinfrei |
 
 ## Offen
 
-+ Liste der Korpustexte mit Quelle und Rechtsgrundlage
++ Korpustexte noch nicht an Spielinhalte gekoppelt (Brauschritte, Fundstücke), vorerst nur Material zum Experimentieren
++ Laden von `sprache/literatur.json` im Spiel (`fetch` oder `import … with { type: "json" }`) und Prüfung unbekannter Quellenschlüssel
 + Wo erzeugte Texte vorkommen: Bücher, Schriftrollen, Inschriften, HACCP-Aushänge, Händlergerede
 + Mehrzahl und Adjektive im Detail
