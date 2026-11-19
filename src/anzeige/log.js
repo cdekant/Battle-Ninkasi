@@ -51,6 +51,8 @@ export class Log {
         // angekündigte Angriffe: eigener Text der Fähigkeit, sonst still
         if (meldung.ankuendigung && hatSchluessel(meldung.ankuendigung)) this.zeile(text(meldung.ankuendigung, meldung), meldung.wer.id === this.spielerinId ? "" : "schlimm");
         return;
+      case "ebene_gewechselt":
+        return this.zeile(text("log.ebene_gewechselt", { ...meldung, richtung: text(meldung.richtung === "ab" ? "ui.hinab" : "ui.hinauf") }));
       case "population_voll":
         // ausdrücklicher Hinweis statt stillschweigend, auch auf der Konsole für die Entwicklung
         console.warn(`Obergrenze der Population erreicht (${meldung.hoechstWesen}), ${meldung.ausgefallen} Wesen entstehen nicht`);

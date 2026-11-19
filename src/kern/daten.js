@@ -199,6 +199,8 @@ function pruefeRegeln(daten, regeln, fehler) {
   else pruefeParameter(daten, { beimFestsitzen: "effekt" }, regeln.bewegung, "regeln.bewegung", fehler);
   if (!istGanzzahl(regeln.werfen?.reichweite) || regeln.werfen.reichweite < 1) fehler.push("regeln.werfen.reichweite muss eine ganze Zahl >= 1 sein");
   if (!istGanzzahl(regeln.population?.hoechstWesen) || regeln.population.hoechstWesen < 1) fehler.push("regeln.population.hoechstWesen muss eine ganze Zahl >= 1 sein");
+  if (!istProzent(regeln.population?.tieferChance)) fehler.push("regeln.population.tieferChance muss eine ganze Zahl von 0 bis 100 sein");
+  if (!istZahlAbNull(regeln.population?.tieferBis)) fehler.push("regeln.population.tieferBis muss eine ganze Zahl >= 0 sein");
   if (!istObjekt(regeln.schichten)) fehler.push("regeln.schichten fehlt");
   else pruefeParameter(daten, { hoechstOberflaeche: "ganzzahl", hoechstGas: "ganzzahl" }, regeln.schichten, "regeln.schichten", fehler);
   if (!istObjekt(regeln.feuer)) fehler.push("regeln.feuer fehlt");
@@ -590,16 +592,34 @@ function pruefeZustand(daten, sprache, name, zustand, fehler) {
   if (zustand.unterhalt !== undefined) pruefeVorratsmengen(zustand.unterhalt, `${ort}: unterhalt`, fehler);
 }
 
+// Feste Karte: gleich lange Zeilen aus Kennungen bekannter Gelände
+function pruefeKarte(daten, karte, ort, fehler) {
+  if (!Array.isArray(karte) || !karte.length || !karte.every((zeile) => typeof zeile === "string" && zeile.length === karte[0].length)) {
+    return fehler.push(`${ort}: karte muss eine Liste gleich langer Zeilen sein`);
+  }
+  const kennungen = new Set(Object.values(daten.gelaende).map((gelaende) => gelaende.kennung));
+  const fremde = [...new Set(karte.join(""))].filter((zeichen) => !kennungen.has(zeichen));
+  if (fremde.length) fehler.push(`${ort}: karte enthält unbekannte Kennungen ${fremde.join(" ")}`);
+}
+
 function pruefeEbene(daten, name, ebene, fehler) {
   const ort = `ebenen.${name}`;
-  for (const masz of ["breite", "hoehe"]) {
+  if (ebene.karte !== undefined) pruefeKarte(daten, ebene.karte, `${ort}`, fehler);
+  else for (const masz of ["breite", "hoehe"]) {
     if (!istGanzzahl(ebene[masz]) || ebene[masz] < 10) fehler.push(`${ort}: ${masz} muss eine ganze Zahl >= 10 sein`);
+  }
+  if (ebene.population !== undefined) {
+    const population = ebene.population;
+    if (!daten.populationen?.[population?.tabelle]) fehler.push(`${ort}.population: Tabelle "${population?.tabelle}" gibt es nicht`);
+    const anzahl = population?.anzahl;
+    if (!(Array.isArray(anzahl) && anzahl.length === 2 && anzahl.every(istZahlAbNull) && anzahl[0] <= anzahl[1])) fehler.push(`${ort}.population: anzahl muss [min, max] sein`);
   }
   for (const gegner of ebene.gegner || []) {
     if (!daten.wesen[gegner.typ] || daten.wesen[gegner.typ].abstrakt) fehler.push(`${ort}: Gegner "${gegner.typ}" gibt es nicht`);
   }
   // ausdrücklich statt stillschweigend: mit Ninkasi mehr Wesen, als die Obergrenze der Population zulässt
-  const bestellt = 1 + (ebene.gegner || []).reduce((summe, gegner) => summe + (istGanzzahl(gegner.anzahl) ? gegner.anzahl : 0), 0);
+  const hoechstePopulation = istGanzzahl(ebene.population?.anzahl?.[1]) ? ebene.population.anzahl[1] : 0;
+  const bestellt = 1 + hoechstePopulation + (ebene.gegner || []).reduce((summe, gegner) => summe + (istGanzzahl(gegner.anzahl) ? gegner.anzahl : 0), 0);
   const hoechstWesen = daten.regeln?.population?.hoechstWesen;
   if (istGanzzahl(hoechstWesen) && bestellt > hoechstWesen) fehler.push(`${ort}: ${bestellt} Wesen mit Ninkasi, mehr als regeln.population.hoechstWesen (${hoechstWesen})`);
   for (const falle of ebene.fallen || []) {
@@ -610,8 +630,36 @@ function pruefeEbene(daten, name, ebene, fehler) {
   for (const gegenstand of ebene.gegenstaende || []) {
     if (!daten.gegenstaende[gegenstand.typ]) fehler.push(`${ort}: Gegenstand "${gegenstand.typ}" gibt es nicht`);
   }
-  for (const rolle of ["wand", "boden"]) {
+  if (ebene.karte === undefined) for (const rolle of ["wand", "boden"]) {
     if (!daten.gelaende[ebene.gelaende?.[rolle]]) fehler.push(`${ort}: gelaende.${rolle} verweist auf unbekanntes Gelände`);
+  }
+  for (const rolle of ["tuer", "treppeAuf", "treppeAb"]) {
+    if (ebene.gelaende?.[rolle] !== undefined && !daten.gelaende[ebene.gelaende[rolle]]) fehler.push(`${ort}: gelaende.${rolle} verweist auf unbekanntes Gelände`);
+  }
+}
+
+// Abfolge der Tiefen und Populationstabellen, siehe welt/ebene.js
+function pruefeAbfolge(daten, fehler) {
+  if (!istTextliste(daten.abfolge) || !daten.abfolge.length) return fehler.push("abfolge muss eine Liste von Ebenen sein");
+  daten.abfolge.forEach((name, tiefe) => { if (!daten.ebenen[name]) fehler.push(`abfolge[${tiefe}]: Ebene "${name}" gibt es nicht`); });
+  if (!istGanzzahl(daten.starttiefe) || daten.starttiefe < 0 || daten.starttiefe >= daten.abfolge.length) fehler.push("starttiefe muss eine Tiefe der abfolge sein");
+  for (const [tabellenName, tabelle] of Object.entries(daten.populationen || {})) {
+    if (!Array.isArray(tabelle)) {
+      fehler.push(`populationen.${tabellenName} muss eine Liste sein`);
+      continue;
+    }
+    tabelle.forEach((eintrag, nummer) => {
+      const stelle = `populationen.${tabellenName}[${nummer}]`;
+      if (!daten.wesen[eintrag.typ] || daten.wesen[eintrag.typ].abstrakt) fehler.push(`${stelle}: Wesen "${eintrag.typ}" gibt es nicht`);
+      if (!(istGanzzahl(eintrag.gewicht) && eintrag.gewicht > 0)) fehler.push(`${stelle}: gewicht muss eine ganze Zahl > 0 sein`);
+      const istBereich = (wert) => Array.isArray(wert) && wert.length === 2 && wert.every(istZahlAbNull) && wert[0] <= wert[1];
+      if (!istBereich(eintrag.tiefe)) fehler.push(`${stelle}: tiefe muss [von, bis] sein`);
+      if (eintrag.rudel !== undefined && !(istBereich(eintrag.rudel) && eintrag.rudel[0] >= 1)) fehler.push(`${stelle}: rudel muss [min, max] mit min >= 1 sein`);
+      for (const affix of eintrag.affixe || []) {
+        pruefeParameter(daten, { zustand: "zustand" }, affix, `${stelle}.affixe`, fehler);
+        if (!istProzent(affix.chance)) fehler.push(`${stelle}.affixe: chance muss eine ganze Zahl von 0 bis 100 sein`);
+      }
+    });
   }
 }
 
@@ -636,10 +684,12 @@ export function vorbereiten(rohdaten, sprache = {}) {
   for (const [name, gegenstand] of Object.entries(daten.gegenstaende)) pruefeGegenstand(daten, sprache, name, gegenstand, fehler);
   for (const [name, falle] of Object.entries(daten.fallen || {})) pruefeFalle(daten, sprache, name, falle, fehler);
   for (const [name, ebene] of Object.entries(daten.ebenen)) pruefeEbene(daten, name, ebene, fehler);
+  pruefeAbfolge(daten, fehler);
   for (const [name, gelaende] of Object.entries(daten.gelaende)) {
     if (typeof gelaende.kennung !== "string" || gelaende.kennung.length !== 1) fehler.push(`gelaende.${name}: kennung muss genau ein Zeichen sein`);
     if (gelaende.laermdaempfung !== undefined && !istZahlAbNull(gelaende.laermdaempfung)) fehler.push(`gelaende.${name}: laermdaempfung muss eine ganze Zahl >= 0 sein`);
     // Bewegungsarten, siehe welt/karte.js
+    pruefeParameter(daten, { treppe: ["ab", "auf"] }, gelaende, `gelaende.${name}`, fehler);
     pruefeParameter(daten, { passierbar: "wahrheitswert?", undurchdringlich: "wahrheitswert?", beimFestsitzen: "effekt?", beimBenutzen: "effekt?", geschossdurchlaessig: "wahrheitswert?" }, gelaende, `gelaende.${name}`, fehler);
     // Türen und Zerstören, siehe systeme/gelaende.js
     if (gelaende.tuer !== undefined) {

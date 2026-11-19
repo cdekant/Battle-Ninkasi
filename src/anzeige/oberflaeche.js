@@ -79,6 +79,7 @@ export class Oberflaeche {
       <div class="fuss">
         <div>${text("ui.startwert")}: ${zustand.startwert}</div>
         <div>${text("ui.zeit")}: ${zustand.zeit}</div>
+        <div>${text("ui.tiefe")}: ${zustand.tiefe}</div>
         <div>${text("ui.version")}: ${this.version}</div>
         <div class="tasten">${text("ui.tasten")}</div>
       </div>`;

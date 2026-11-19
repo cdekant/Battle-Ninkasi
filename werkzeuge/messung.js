@@ -24,6 +24,7 @@ daten.ebenen.keller.gegner = [
   { typ: "fernkaempfer_test", anzahl: Math.round(anzahlGegner / 5) },
 ];
 if (tuerChance !== undefined) daten.ebenen.keller.tuerChance = tuerChance;
+delete daten.ebenen.keller.population; // die feste Zahl oben statt der Population nach Tiefe
 daten.regeln.population.hoechstWesen = Math.max(daten.regeln.population.hoechstWesen, 2 * anzahlGegner);
 const spiel = neuesSpiel(datenLaden(daten, { texte }), startwert);
 const ninkasi = spielerin(spiel.zustand);

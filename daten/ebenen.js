@@ -1,11 +1,24 @@
-// Levelparameter. digger: Optionen für den Digger von rot.js.
+// Ebenen (Aufbau siehe src/welt/ebene.js). Die Abfolge der Tiefen steht in daten/index.js (abfolge, starttiefe);
+// mehrere Tiefen dürfen dieselbe Vorlage nutzen. digger: Optionen für den Digger von rot.js. Zahlen vorläufig.
 export default {
+  // fester Ort zwischen den Ebenen; Dienste (Händler u.a.) folgen, siehe docs/Grundlagen.md
+  hub: {
+    karte: [
+      "###########",
+      "#.........#",
+      "#.........#",
+      "#....>....#",
+      "#.........#",
+      "#.........#",
+      "###########",
+    ],
+  },
   keller: {
     breite: 120,
     hoehe: 40,
     gelaende: { wand: "wand", boden: "boden" },
     digger: { dugPercentage: 0.35, roomWidth: [4, 12], roomHeight: [3, 7], corridorLength: [3, 10] },
-    gegner: [{ typ: "essigbakterium", anzahl: 15 }, { typ: "fernkaempfer_test", anzahl: 3 }],
+    population: { tabelle: "keller", anzahl: [16, 20] }, // Wesen je Ebene, nach Tiefe gezogen (daten/populationen.js)
     gegenstaende: [{ typ: "bier", anzahl: 10 }, { typ: "brandflasche", anzahl: 3 }],
     fallen: [{ typ: "saeureduese", anzahl: 6 }, { typ: "klappergeschirr", anzahl: 6 }],
     tuerChance: 50, // Prozent der Raumzugänge mit Tür

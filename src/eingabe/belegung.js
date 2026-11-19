@@ -14,6 +14,7 @@ export default {
     KeyG: { art: "aufheben" },
     KeyT: { art: "trinken" }, // Gegenstand wählt die Eingabe: erstes Getränk im Gepäck
     Space: { art: "fortsetzen" }, // unterbrochene lange Aktion weiterführen
+    IntlBackslash: { art: "treppe" }, // Taste <> auf deutscher Tastatur: Treppe hinab oder hinauf
   },
   anzeige: {
     NumpadAdd: "zoom_rein",

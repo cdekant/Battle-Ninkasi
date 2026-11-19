@@ -42,7 +42,7 @@ Stand: 2026-11-18
 + Kurven sind Daten: Stützpunkte `[[stelle, wert], ...]`, dazwischen linear und ganzzahlig, außerhalb gleichbleibend (`src/kern/kurven.js`); z.B. Regeneration über dem Pegel
 + Stoffwechsel (`src/systeme/stoffwechsel.js`): Komponente mit Abbau des Pegels, Schwellen und je Wert einer Kurve der Regeneration über dem Pegel (Hundertstel je Welttick); negative Kurvenwerte sind Schwund, für jeden Wert möglich, Schwund der LP kann töten
 + Skills, Schriftrollen, Items und Zustände passen den Stoffwechsel über Modifikatoren an: `regeneration.<wert>` auf positive Raten, `schwund.<wert>` auf den Betrag negativer Raten, `kurvenverschiebung.<wert>` verschiebt die Kurve nach rechts (z.B. Optimum der LP nach oben), `abbau.pegel` auf den Abbau
-+ Der gesamte Zustand ist reine Daten und als JSON serialisierbar (keine Funktionen, keine DOM-Objekte)
++ Der gesamte Zustand ist reine Daten und als JSON serialisierbar (keine Funktionen, keine DOM-Objekte); dazu gehören die Tiefe der aktuellen Ebene (`tiefe`) und die verlassenen Ebenen (`abgelegteEbenen`, siehe Ebenen)
 + Positionen ändern sich nur über `positionSetzen` (`src/kern/raumindex.js`), damit der räumliche Index stimmt; Wesen bewegt `versetzen` (siehe Bewegung)
 
 ## Zeitmodell
@@ -487,6 +487,19 @@ Vorläufige Ideen, noch nicht umgesetzt:
 + Anzeige: farbige Überlagerung auf sichtbaren Feldern, Oberfläche und Feuer unter den Entitäten, Gas darüber mit der Menge zunehmend deckend; Farben in `zeichen.schichten`; Tiles folgen
 + Im Spielinhalt (Zahlen vorläufig): die Säuredüse hinterlässt Säure (verätzt 1W3 je Tick, trocknet); drei Gärbottiche je Ebene im Inneren der Räume (Gelände-Objekte, sperren keinen Durchgang) geben CO2 ab, das sich hinter geschlossenen Türen sammelt; drei Brandflaschen je Ebene zerspringen beim Wurf zu Hochprozentigem und entzünden es; Feuer 1W6, Rauch ab 40 undurchsichtig, ab 60 Husten; Benommenheit und Ersticken sind vorläufig Giftschaden, bis es Zustände im Spielinhalt gibt
 
+## Ebenen
+
++ Vorbilder: Brogue und DCSS (Ebenen bleiben erhalten, Treppen verbinden sie), Grundlagen (Hub zwischen den Ebenen)
++ Abfolge der Tiefen in `daten/index.js`: `abfolge: ["hub", "keller", "keller", "keller"]` (Tiefe 0 ist der Hub), `starttiefe: 1`; mehrere Tiefen dürfen dieselbe Vorlage aus `daten/ebenen.js` nutzen, jede bekommt ihren eigenen abgeleiteten Zufall (`ebene.<tiefe>.<name>`), ist je Startwert also wiederholbar und doch verschieden
++ Erzeugung (`src/welt/ebene.js`, `ebeneErzeugen(spiel, tiefe)`): eine feste Karte (`karte`: Zeilen aus Geländekennungen, z.B. der Hub) wird übernommen; sonst Digger von rot.js mit Treppe hinauf in der Mitte des ersten Raums und Treppe hinab in der Mitte des Raums, der davon am weitesten entfernt ist, jeweils nur, wenn es die Tiefe gibt; Ninkasi legt die Erzeugung nicht an, sie gibt die Treppen zurück; zu Beginn steht Ninkasi auf der Treppe hinauf der Starttiefe
++ Treppen sind Gelände mit `treppe: "ab"` oder `"auf"`; Befehl `{ art: "treppe" }` (Taste <> auf deutscher Tastatur), nur für Ninkasi, Ablehnung `keine_treppe`, Zeitkosten `aktionen.treppe`; Meldung `ebene_gewechselt` mit `tiefe` und `richtung`
++ Wechsel (`src/systeme/ebenen.js`): die alte Ebene kommt mit allen Entitäten außer Ninkasi und dem, was sie trägt, und deren Einträgen der Warteschlange (Akteure, gebundene Zeitereignisse) samt Zeitpunkt nach `zustand.abgelegteEbenen[tiefe]`; die Weltuhr gehört keiner Ebene und läuft weiter
++ Verlassene Ebenen ruhen: bei der Rückkehr rücken alle Zeitangaben dort (Einträge, Beginn und Ende der Zustände) um die vergangene Zeit nach; noch nie besuchte Tiefen werden erzeugt und ihre Wesen eingereiht; Ninkasi kommt an der Gegentreppe an (wer hinabsteigt, an der Treppe hinauf), ist sie besetzt, am nächsten freien Feld
++ Der Wechsel verwirft den räumlichen Index (siehe Leistung); nur hier wird Ninkasis Position deshalb direkt gesetzt, der Index entsteht danach neu; Gasquellen und andere Vorräte im `zwischenspeicher` hängen an der Ebene und entstehen ebenso neu
++ Wesen folgen Ninkasi nicht über Treppen; Nachholen der Zeit verlassener Ebenen (Population wächst auf eine Tragfähigkeit zu) kommt mit Punkt 10 der Arbeitsliste
++ Population nach Tiefe (`population: { tabelle, anzahl: [min, max] }` an der Ebene, Tabellen in `daten/populationen.js`): Einträge `{ typ, gewicht, tiefe: [von, bis], rudel?: [min, max], affixe?: [{ zustand, chance }] }`; je Wurf gewichtet unter den Einträgen der Tiefe, mit `regeln.population.tieferChance` (10 %) aus einer bis zu `tieferBis` (2) Tiefen tieferen; ein Rudel steht beieinander (jedes weitere Mitglied auf dem freien Feld, das dem ersten am nächsten liegt), Affixe sind Zustände beim Erzeugen; findet ein Wurf nichts, fällt er aus; eine feste Liste `gegner` geht weiterhin
++ Im Spielinhalt (Zahlen vorläufig): der Hub ist ein leerer Raum mit Treppe hinab (Dienste folgen), drei Kellertiefen mit 16 bis 20 Wesen, Essigbakterien in Rudeln von 1 bis 3, Fernkämpfer ab Tiefe 2 häufiger; Treppen haben noch keine Tiles
+
 ## Wegfindung
 
 + Ein gemeinsames Modul `src/welt/wege.js` für KI und Reise, AStar aus rot.js mit acht Richtungen, je Bewegungsart (Option `bewegung`), mit oder ohne Türen (`oeffnetTueren`) und mit Feldern, die gemieden werden (`meiden`, z.B. Fallen)
@@ -496,12 +509,12 @@ Vorläufige Ideen, noch nicht umgesetzt:
 ## Prototyp
 
 + Stand 0.4.0, begonnen als 0.0.0; 0.1.0 Maus und Reise, 0.2.0 Tiles im Spiel, 0.3.0 Pegel in Promille, Psi-Punkte und Stoffwechsel, 0.4.0 Tod als Zustandsprüfung, Katalog der Haken, Auslöser aus Daten
-+ Umfang: eine Ebene, Bewegen, Sichtfeld, ein Gegnertyp, Nahkampf, ein Getränk, Pegel, Log
++ Umfang: Hub und drei Kellertiefen, Bewegen, Sichtfeld, ein Gegnertyp, Nahkampf, ein Getränk, Pegel, Log
 + Tiles in allen vier Sätzen (ab 0.2.0), Zeichen nur noch als Absicherung
 + rot.js 2.2.1 (Lizenz BSD-3-Clause) liegt unverändert als ES-Module in `lib/rot/`, mit `LICENSE.txt`; benutzt werden Digger (Dungeon), PreciseShadowcasting (Sichtfeld) und AStar (Wegfindung der Gegner); Warteschlange und Spiel-RNG sind eigener Code, da sie als JSON speicherbar sein müssen
 + Starten: im Hauptverzeichnis `python -m http.server`, dann `http://localhost:8000/`; Startwert per `?seed=1234`, sonst zufällig, er wird in die URL geschrieben
-+ Testen: `node werkzeuge/bot.js [Läufe] [Befehle] [erster Startwert]` spielt mit zufälligen Befehlen, prüft Invarianten (u.a. kein Wesen mit Lebenswert 0, nichts Getragenes ohne Trägerin, keine verwaisten Zeitereignisse, keine liegengebliebenen Auslöser) und vergleicht den Zustand nach dem Nachspielen; am Ende zählt er, wie oft Gegner Fähigkeiten gewirkt, lange Aktionen begonnen und abgebrochen haben und wie oft Ninkasi geworfen hat
-+ Ebene "keller": 120x40 Felder, 15 Essigbakterien, 3 Fernkämpfer-Tests, 10 Biere, 3 Brandflaschen, 3 Gärbottiche, je 6 Säuredüsen und Klappergeschirre, Türen an der Hälfte der Raumzugänge
++ Testen: `node werkzeuge/bot.js [Läufe] [Befehle] [erster Startwert]` spielt mit zufälligen Befehlen, prüft Invarianten (u.a. kein Wesen mit Lebenswert 0, nichts Getragenes ohne Trägerin, keine verwaisten Zeitereignisse, keine liegengebliebenen Auslöser) und vergleicht den Zustand nach dem Nachspielen; am Ende zählt er, wie oft Gegner Fähigkeiten gewirkt, lange Aktionen begonnen und abgebrochen haben und wie oft Ninkasi geworfen hat; er reist auch zu bekannten Treppen und wechselt die Ebene
++ Ebene "keller" (Tiefen 1 bis 3): 120x40 Felder, 16 bis 20 Wesen aus der Population (Essigbakterien in Rudeln, Fernkämpfer-Tests), 10 Biere, 3 Brandflaschen, 3 Gärbottiche, je 6 Säuredüsen und Klappergeschirre, Türen an der Hälfte der Raumzugänge, Treppen hinauf und hinab; Ebene "hub" (Tiefe 0) als feste Karte
 + Ninkasi: 100 LP, 100 MP, 0 von 100 PP, Pegel 0 (nach oben offen), Sichtweite 8, Nahkampf 1W6+2 stumpf mit Genauigkeit 80 (80 % gegen ein Wesen ohne Ausweichen)
 + Essigbakterium: 15 LP, Biss 1W4 mit 70%, Verhaltensmodul "jagen" (sieht es Ninkasi, folgt es ihr, sonst geht es zur letzten bekannten Position und wartet)
 + Fernkämpfer-Test (ab 0.15.0, Zeichen F, noch ohne Tile): Testgegner für die KI mit Fähigkeiten, 10 LP, hält 3 Felder Abstand, Säurespucke (Geschoss über Verbündete, Abklingzeit 3) und angekündigter Säureschwall (Kreis mit Radius 1 auf das Feld beim Beginn, 3 Schritte, durch Schaden unterbrechbar, 30 %); Zahlen vorläufig
@@ -509,7 +522,7 @@ Vorläufige Ideen, noch nicht umgesetzt:
 + Stoffwechsel je Welttick, Zahlen vorläufig in `daten/ninkasi.js`: LP 0,3 nüchtern, 0,8 bei 1,5 ‰, darüber abnehmend; MP 0,8 nüchtern, 0 ab 3 ‰; PP Schwund 0,3 nüchtern, Stillstand von 0,5 bis 1,5 ‰, dann steigend bis 1,0 bei 4 ‰; danach Abbau des Pegels um 0,01 ‰
 + Schwellen 0,5, 1, 2 und 3 ‰ werden angezeigt und gemeldet, haben aber noch keine Wirkung; die Leiste zeigt zusätzlich das Optimum der LP
 + Alle Aktionen kosten 100
-+ Tasten: Ziffernblock zum Bewegen, 5 Warten, +/- Zoom (16, 32, 48, 64 px), Tab klappt das Log auf, Eingabe startet nach dem Tod einen neuen Lauf
++ Tasten: Ziffernblock zum Bewegen, 5 Warten, <> Treppe, +/- Zoom (16, 32, 48, 64 px), Tab klappt das Log auf, Eingabe startet nach dem Tod einen neuen Lauf
 + Maus (ab 0.1.0): Klick reist, greift an oder hebt auf, Rad zoomt, siehe Maus, Reise, Rasten und Erkunden
 + Nicht enthalten: Vollbild, ganzzahlige Skalierung für 4K, Übersichtskarte, Umschauen, Markierungen für Gegner außerhalb des Ausschnitts, Spielstand speichern und laden (Nachspielen ist vorhanden), Prüfsumme der Daten, Englisch
 + Vereinfachung: Ein Gegner sieht Ninkasi, wenn sie ihn sieht und er innerhalb seiner Sichtweite steht
@@ -556,9 +569,9 @@ Vorläufige Ideen, noch nicht umgesetzt:
 + `package.json`: nur `"type": "module"` und `"private": true`, damit Node alle `.js`-Dateien als ES-Module liest; keine Abhängigkeiten, kein Build
 + `src/version.js`: Versionsnummer
 + `src/kern/`: Spiel und Eingangstür für Befehle (`spiel.js`), Zustand und Entitäten, räumlicher Index, Zeit, Zufall, Ereignisse und Katalog der Haken, Auslöser, Abschluss eines Vorgangs, Werte und Modifikatoren, Kurven, Effekte, Grundbausteine, Register, Datenprüfung
-+ `src/systeme/`: Bewegung, Kampf (Trefferwurf, Schadensrechnung), Fraktionen, Wahrnehmung, Sicht, Stoffwechsel, Inventar, Gefahrenprüfung, Tod, Zielauswahl samt Zielmustern, Bausteine mit Zielauswahl, Zustände, Befehlsveränderer, Beschwörung, Verschieben und Lage, Werfen, veränderliches Gelände und Türen, Fallen, Feldschichten und Feuer, Bedingungen der Modifikatoren und Auren, Fähigkeiten, lange Aktionen, später Brauen, Handel u.a.
++ `src/systeme/`: Bewegung, Kampf (Trefferwurf, Schadensrechnung), Fraktionen, Wahrnehmung, Sicht, Stoffwechsel, Inventar, Gefahrenprüfung, Tod, Zielauswahl samt Zielmustern, Bausteine mit Zielauswahl, Zustände, Befehlsveränderer, Beschwörung, Verschieben und Lage, Werfen, veränderliches Gelände und Türen, Fallen, Feldschichten und Feuer, Ebenen und Treppen, Bedingungen der Modifikatoren und Auren, Fähigkeiten, lange Aktionen, später Brauen, Handel u.a.
 + `src/ki/`: Verhaltensmodule (`abwarten`, `jagen`, `fliehen`), ihre Zielwahl, Schrittwahl und die Wahl der Fähigkeiten
-+ `src/welt/`: Dungeon-Erzeugung, Zugriff auf die Karte und die Feldschichten, Wegfindung, Geometrie (Linie, Sichtlinie, Flugbahn, Kreis, Kegel)
++ `src/welt/`: Dungeon-Erzeugung mit Treppen und Population nach Tiefe, Zugriff auf die Karte und die Feldschichten, Wegfindung, Geometrie (Linie, Sichtlinie, Flugbahn, Kreis, Kegel)
 + `src/anzeige/`: Renderer, Tilebilder (Pixeldaten zu Bildern), Kamera, Oberfläche, Anzeige des Pegels, Log, Effekte, Textzugriff und Grammatik
 + `src/eingabe/`: Belegung, Übersetzung in Befehle, Maus und Klickregeln, Reise, Rasten, Erkunden, Vorgaben der Einstellungen
 + `daten/`: Inhalte als JS-Datendateien, gesammelt in `daten/index.js`; `daten/zustaende.js` die Zustände; `daten/faehigkeiten.js` die Fähigkeiten, `daten/risiken.js` ihre Risikotabellen; `daten/regeln.js` hält Regelwerte für das Balancing (z.B. Kettengrenze der Auslöser, Halbwerte des Kampfs); `daten/schadensarten.js` die Schadensarten; `daten/fraktionen.js` die Fraktionen und ihre Beziehungen; `daten/zeichen.js` ist das Tileset aus Zeichen, Ersatz, wo kein Tile aus `grafik/` passt

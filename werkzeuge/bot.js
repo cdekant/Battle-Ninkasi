@@ -9,7 +9,7 @@ import { erstelleGrammatik } from "../src/anzeige/grammatik.js";
 import { datenLaden, neuesSpiel, befehlGeben, spielstand, nachspielen } from "../src/kern/spiel.js";
 import { zufallErzeugen, zufallsGanzzahl } from "../src/kern/zufall.js";
 import { alleEntitaeten, spielerin } from "../src/kern/zustand.js";
-import { passierbar } from "../src/welt/karte.js";
+import { passierbar, gelaendeAuf } from "../src/welt/karte.js";
 import { erstesGetraenk } from "../src/systeme/inventar.js";
 import { hoererAnmelden } from "../src/kern/ereignisse.js";
 import { hoechstwert } from "../src/kern/werte.js";
@@ -96,8 +96,28 @@ function reisen(botZufall, spiel) {
   return ablaufLaufenLassen(spiel, reiseBeginnen(spiel, ziel, einstellungen), naechsterReiseschritt);
 }
 
-// Ein zufälliger Ablauf: meist Reise, sonst Erkunden oder Rasten; gibt "art:haltegrund" zurück
+// Reise zu einer bekannten Treppe und hinüber in die nächste Tiefe (Ebenenwechsel, src/systeme/ebenen.js)
+function treppeNehmen(botZufall, spiel) {
+  const ebene = spiel.zustand.ebene;
+  const treppen = [];
+  ebene.erkundet.forEach((erkundet, feldIndex) => {
+    const x = feldIndex % ebene.breite, y = Math.floor(feldIndex / ebene.breite);
+    if (erkundet && gelaendeAuf(spiel, x, y)?.treppe) treppen.push({ x, y });
+  });
+  if (!treppen.length) return "keine_bekannt";
+  const ziel = treppen[zufallsGanzzahl(botZufall, 0, treppen.length - 1)];
+  const ninkasi = spielerin(spiel.zustand);
+  const dort = ninkasi.position.x === ziel.x && ninkasi.position.y === ziel.y;
+  const haltegrund = dort ? "angekommen" : ablaufLaufenLassen(spiel, reiseBeginnen(spiel, ziel, einstellungen), naechsterReiseschritt);
+  if (haltegrund !== "angekommen" || spiel.zustand.vorbei) return haltegrund;
+  const ergebnis = befehlGeben(spiel, { art: "treppe" });
+  invariantenPruefen(spiel);
+  return ergebnis.ok ? `nach_tiefe_${spiel.zustand.tiefe}` : ergebnis.grund;
+}
+
+// Ein zufälliger Ablauf: meist Reise, sonst Erkunden, Rasten oder Treppe; gibt "art:haltegrund" zurück
 function ablaufWaehlen(botZufall, spiel) {
+  if (zufallsGanzzahl(botZufall, 1, 6) === 1) return `treppe:${treppeNehmen(botZufall, spiel)}`;
   const wurf = zufallsGanzzahl(botZufall, 1, 5);
   if (wurf === 4) return `erkunden:${ablaufLaufenLassen(spiel, erkundenBeginnen(spiel, einstellungen), naechsterErkundungsschritt)}`;
   if (wurf === 5) return `rasten:${ablaufLaufenLassen(spiel, rastenBeginnen(spiel, einstellungen), naechsterRastschritt)}`;

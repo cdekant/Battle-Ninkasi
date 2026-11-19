@@ -24,9 +24,11 @@ export default {
   bewegung: {
     beimFestsitzen: "eingeklemmt", // Effekt auf ein Wesen in Gelände, das es nicht betreten kann, ohne eigenes beimFestsitzen
   },
-  // Population, siehe src/systeme/beschwoerung.js und src/welt/ebene.js
+  // Population, siehe src/systeme/beschwoerung.js und src/welt/ebene.js (Tabellen in daten/populationen.js)
   population: {
     hoechstWesen: 500, // mehr Wesen entstehen nicht (Beschwören, Erzeugen der Ebene), Meldung population_voll
+    tieferChance: 10, // Prozent je Wurf der Population: ein Gegner aus einer tieferen Tiefe
+    tieferBis: 2, // höchstens so viele Tiefen tiefer
   },
   // Fallen, siehe src/systeme/fallen.js; Zahlen vorläufig
   fallen: {

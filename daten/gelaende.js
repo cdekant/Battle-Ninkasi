@@ -13,6 +13,9 @@ export default {
   // geht beim Hindurchgehen auf und von selbst wieder zu; zu versperrt sie Sicht und dämpft Lärm
   tuer_zu: { kennung: "+", passierbar: false, durchsichtig: false, laermdaempfung: 3, tuer: { offen: "tuer_offen" }, zerstoerbar: { wird: "boden" }, brennbar: 20, brenndauer: 6, verbrenntZu: "boden" },
   tuer_offen: { kennung: "'", passierbar: true, durchsichtig: true, tuer: { zu: "tuer_zu" }, zerstoerbar: { wird: "boden" }, brennbar: 20, brenndauer: 6, verbrenntZu: "boden" },
+  // Treppen zwischen den Tiefen (src/systeme/ebenen.js)
+  treppe_ab: { kennung: ">", passierbar: true, durchsichtig: true, treppe: "ab" },
+  treppe_auf: { kennung: "<", passierbar: true, durchsichtig: true, treppe: "auf" },
   // gärt vor sich hin: Quelle von CO2 auf den Nachbarfeldern, man kommt nicht hindurch, sieht aber darüber
   gaerbottich: { kennung: "O", passierbar: false, durchsichtig: true, laermdaempfung: 4, quelle: { gas: "co2", menge: 6 } },
 };

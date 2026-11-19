@@ -7,6 +7,8 @@ export default {
     tuer_zu: { zeichen: "+", farbe: "#c87533", hintergrund: "#2a221b" },
     tuer_offen: { zeichen: "'", farbe: "#c87533", hintergrund: "#14110e" },
     gaerbottich: { zeichen: "O", farbe: "#c87533", hintergrund: "#2a221b" },
+    treppe_ab: { zeichen: ">", farbe: "#f2c14e", hintergrund: "#14110e" },
+    treppe_auf: { zeichen: "<", farbe: "#f2c14e", hintergrund: "#14110e" },
   },
   wesen: {
     ninkasi: { zeichen: "@", farbe: "#f2c14e" },

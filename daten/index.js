@@ -16,6 +16,7 @@ import fraktionen from "./fraktionen.js";
 import fallen from "./fallen.js";
 import schichten from "./schichten.js";
 import wurfgegenstaende from "./wurfgegenstaende.js";
+import populationen from "./populationen.js";
 
 export default {
   wesen: { ...ninkasi, ...gegner },
@@ -31,7 +32,10 @@ export default {
   aktionen,
   gelaende,
   ebenen,
-  startebene: "keller",
+  populationen,
+  // Tiefen von oben nach unten: 0 ist der Hub, das Spiel beginnt in starttiefe (src/welt/ebene.js, src/systeme/ebenen.js)
+  abfolge: ["hub", "keller", "keller", "keller"],
+  starttiefe: 1,
   zeichen,
   regeln,
 };

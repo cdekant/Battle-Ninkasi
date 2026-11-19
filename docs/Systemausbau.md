@@ -110,26 +110,23 @@ Offener Rest:
 
 ## 8. Gelände, Feldschichten, Ebenen
 
-Status: in Arbeit; umgesetzt in Version 0.18.0 (veränderliches Gelände, `geschossdurchlaessig`, Türen, `tueren` am Wesen, Benutzen, Fallen mit Entdecken, Haken `zug_ende`) und 0.19.0 (Feldschichten Oberfläche, Gas und Feuer, dichter Rauch versperrt die Sicht, Gärbottiche, Brandflasche), beschrieben in [Architektur.md](Architektur.md) (Gelände, Feldschichten, Wegfindung)
+Status: umgesetzt bis auf den offenen Rest, in den Versionen 0.18.0 (veränderliches Gelände, `geschossdurchlaessig`, Türen, `tueren` am Wesen, Benutzen, Fallen mit Entdecken, Haken `zug_ende`) , 0.19.0 (Feldschichten Oberfläche, Gas und Feuer, dichter Rauch versperrt die Sicht, Gärbottiche, Brandflasche) und 0.20.0 (Abfolge der Tiefen, Treppen, verlassene Ebenen ruhen, Hub als feste Karte, Population nach Tiefe mit Rudeln, Gegnern aus der Tiefe und Affixen), beschrieben in [Architektur.md](Architektur.md) (Gelände, Feldschichten, Ebenen, Wegfindung)
 
 Entschieden: Aufteilung in 0.18.0, 0.19.0 und 0.20.0; Türen nach Brogue, sie öffnen sich beim Hindurchgehen und schließen sich von selbst, wer sie öffnet, steht am Wesen (Bakterien nicht); Fallen verborgen, Entdecken nach Tarnung, Abstand und dem Kampfwert `entdecken`; verlassene Ebenen ruhen; Gas als ganzzahlige Konzentration je Feld mit Diffusion nach Brogue, Wände und geschlossene Türen halten es auf, ohne Schwerkraft, Druck und Temperatur; Flüssigkeiten zunächst als Oberfläche mit Menge, ohne Fließen; je Feld und Schicht eine Art, auf der Oberfläche verdrängt die neue, beim Gas die größere Menge; Wirkung des Gases in Stufen; dichter Rauch versperrt die Sicht
 
-Offen, Version 0.20.0 (mehrere Ebenen):
-
-+ Treppen als Gelände, Befehl zum Hinab- und Hinaufsteigen
-+ Erhaltene Ebenen: beim Verlassen samt Entitäten und Einträgen der Warteschlange ablegen, sie ruhen bis zur Rückkehr; der Wechsel verwirft den räumlichen Index
-+ Hub als feste Karte aus den Daten
-+ Populationen nach Tiefe: gewichtete Tabellen mit Tiefenbereich, Rudel, gelegentlich Gegner aus tieferen Ebenen, Affixe als Zustände beim Erzeugen; bisher feste Zahlen in der Ebene `keller`
-
 Offener Rest:
 
-+ Tiles für Türen, Fallen, Gärbottich und Brandflasche, Darstellung der Schichten über Tiles (bisher Zeichen und Farben)
++ Tiles für Türen, Treppen, Fallen, Gärbottich und Brandflasche, Darstellung der Schichten über Tiles (bisher Zeichen und Farben)
 + Reise und Erkunden halten mit `kein_weg`, wenn eine entdeckte Falle den einzigen Weg versperrt; später vielleicht mit Nachfrage, ob Ninkasi darübergehen soll
 + Ausdrückliches Suchen nach Fallen (mehrere Züge, doppeltes Entdecken), vielleicht zusammen mit dem Rasten
 + Hebel mit Wirkung in der Ferne und verschlossene Türen mit Schlüssel: mit den Themenräumen (Punkt 10)
 + Abstraktes Nachholen verlassener Ebenen: Population wächst je vergangener Zeit logistisch auf eine Tragfähigkeit aus den Daten zu (Punkt 10, Druck gegen endloses Rasten)
 + Benommenheit und Ersticken als Zustände statt Giftschaden, sobald es Zustände im Spielinhalt gibt
 + Bewusst noch ohne: Endosporen, die Feuer weckt (es gibt keine Endosporen), Licht durch Feuer (mit dem Licht), Fließen von Flüssigkeiten
++ Wesen folgen Ninkasi über Treppen (Brogue: wer neben ihr steht, kommt mit)
++ Dienste des Hubs (Spieldesign in [Grundlagen.md](Grundlagen.md)); bisher ein leerer Raum mit Treppe
++ Treppe per Maus (Reise zur Treppe und hinüber); bisher nur die Taste <>
++ Mehr Ebenenarten und Gegner, damit die Population nach Tiefe etwas zu unterscheiden hat; Themenräume wie der Gärkeller (Punkt 10)
 
 ## 9. Gegenstände
 

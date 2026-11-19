@@ -100,6 +100,19 @@ export function gebundeneEreignisseEntfernen(zustand, entitaetId) {
   entfernenWo(zustand, (eintrag) => eintrag.gebundenAn === entitaetId);
 }
 
+// Nimmt alle Einträge heraus, auf die trifftZu passt, und gibt sie zurück (Wechsel der Ebene, systeme/ebenen.js)
+export function eintraegeHerausnehmen(zustand, trifftZu) {
+  const herausgenommen = zustand.warteschlange.filter(trifftZu);
+  if (herausgenommen.length) zustand.warteschlange = heapAufbauen(zustand.warteschlange.filter((eintrag) => !trifftZu(eintrag)));
+  return herausgenommen;
+}
+
+// Fügt früher herausgenommene Einträge wieder ein, mit ihrer Einreihungsnummer (die Reihenfolge bleibt so erhalten)
+export function eintraegeEinfuegen(zustand, eintraege) {
+  if (!eintraege.length) return;
+  zustand.warteschlange = heapAufbauen([...zustand.warteschlange, ...eintraege]);
+}
+
 // Ob die Warteschlange ein gültiger Heap ist (Bot, Tests)
 export function warteschlangeGueltig(zustand) {
   const heap = zustand.warteschlange;

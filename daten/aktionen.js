@@ -8,5 +8,6 @@ export default {
   trinken: 100,
   werfen: 100,
   benutzen: 100,
+  treppe: 100,
   faehigkeit: 100, // Vorgabe, wenn eine Fähigkeit keine eigene zeit nennt
 };

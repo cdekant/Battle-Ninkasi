@@ -23,6 +23,8 @@ export function neuerZustand(startwert) {
     spielerinId: null,
     vorbei: false,
     ebene: null,
+    tiefe: null, // Tiefe der aktuellen Ebene in daten.abfolge (welt/ebene.js)
+    abgelegteEbenen: {}, // verlassene Ebenen nach Tiefe, sie ruhen bis zur Rückkehr (systeme/ebenen.js)
     sichtbareFelder: [], // Feldindizes, die Ninkasi gerade sieht (aufsteigend)
     zufallszustand: null, // Zustand des Spiel-Zufalls
   };

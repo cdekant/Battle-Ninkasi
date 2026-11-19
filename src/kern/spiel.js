@@ -10,7 +10,7 @@ import "../systeme/index.js";
 import "../ki/index.js";
 import VERSION from "../version.js";
 import { vorbereiten, Datenfehler } from "./daten.js";
-import { neuerZustand, entitaetMitId, alleEntitaeten, spielerin, kiVon } from "./zustand.js";
+import { neuerZustand, entitaetMitId, alleEntitaeten, spielerin, kiVon, entitaetAusDatensatz } from "./zustand.js";
 import { zufallErzeugen, startwertAbleiten } from "./zufall.js";
 import { WELTTICK, einreihen, ersterEintrag, ersterEintragEntnehmen, akteurEinreihen } from "./zeit.js";
 import { holen, hat, alle as alleImRegister } from "./register.js";
@@ -36,7 +36,11 @@ export function neuesSpiel(daten, startwert) {
   const spiel = { daten, zustand, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
   zustand.zufallszustand = zufallErzeugen(startwertAbleiten(zustand.startwert, "spiel"));
 
-  ebeneErzeugen(spiel, daten.startebene);
+  // Ninkasi beginnt auf der Treppe hinauf der Starttiefe (oder in der Mitte des ersten Raums, der dort liegt)
+  zustand.tiefe = daten.starttiefe;
+  const { treppeAuf, treppeAb } = ebeneErzeugen(spiel, daten.starttiefe);
+  const ninkasi = entitaetAusDatensatz(zustand, "ninkasi", daten.wesen.ninkasi, treppeAuf ?? treppeAb);
+  zustand.spielerinId = ninkasi.id;
   for (const entitaet of alleEntitaeten(zustand)) {
     if (entitaet.id === zustand.spielerinId || entitaet.ki) akteurEinreihen(zustand, entitaet.id, 0);
   }

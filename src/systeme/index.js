@@ -18,6 +18,7 @@ import "./werfen.js";
 import "./gelaende.js";
 import "./fallen.js";
 import "./schichten.js";
+import "./ebenen.js";
 import "./modifikatoren.js";
 import "./laufendeAktionen.js";
 import "./faehigkeiten.js";
