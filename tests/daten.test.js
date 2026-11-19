@@ -283,3 +283,27 @@ test("Fähigkeiten, Risikotabellen und Unterhalt werden geprüft", () => {
   daten.zustaende = { test: { text: "wesen.ninkasi", unterhalt: { mp: "viel" } } };
   assert.ok(vorbereiten(daten).fehler.some((meldung) => meldung.includes("unterhalt.mp")));
 });
+
+test("Fraktionen, Wachzustand, Lärmdämpfung und Regeln der Wahrnehmung werden geprüft", () => {
+  const mitDaten = (aendern) => {
+    const daten = structuredClone(rohdaten);
+    aendern(daten);
+    return vorbereiten(daten).fehler;
+  };
+  assert.deepEqual(mitDaten((daten) => { daten.fraktionen.ninkasi.beziehungen = { verderber: "neutral" }; }), []);
+  const erwartet = [
+    [(daten) => { daten.fraktionen.ninkasi.beziehungen = { drachen: "feind" }; }, 'Fraktion "drachen"'],
+    [(daten) => { daten.fraktionen.ninkasi.beziehungen = { verderber: "freundlich" }; }, "beziehungen.verderber"],
+    [(daten) => { delete daten.fraktionen.verderber.text; }, "fraktionen.verderber: Textschlüssel"],
+    [(daten) => { daten.wesen.essigbakterium.fraktion = "piraten"; }, 'Fraktion "piraten"'],
+    [(daten) => { daten.wesen.essigbakterium.ki = { modul: "jagen", wachzustand: "doest" }; }, "wachzustand"],
+    [(daten) => { daten.gelaende.wand.laermdaempfung = -1; }, "laermdaempfung"],
+    [(daten) => { daten.regeln.fraktionen.beziehungVorgabe = "egal"; }, "beziehungVorgabe"],
+    [(daten) => { daten.regeln.wahrnehmung.bemerkenChance = 120; }, "bemerkenChance"],
+    [(daten) => { daten.regeln.wahrnehmung.heimlichkeitNachAktion = { warten: "halb" }; }, "heimlichkeitNachAktion"],
+  ];
+  for (const [aendern, teilDerMeldung] of erwartet) {
+    assert.ok(mitDaten(aendern).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
+  }
+  assert.deepEqual(mitDaten((daten) => { daten.wesen.essigbakterium.ki = { modul: "jagen", wachzustand: "schlaeft", letzteBekanntePosition: null }; }), []);
+});

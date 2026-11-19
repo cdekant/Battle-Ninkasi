@@ -21,6 +21,7 @@ import { ebeneErzeugen } from "../welt/ebene.js";
 import { sichtfeldAktualisieren } from "../systeme/sicht.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 import { aktionAbbrechen, laufendeAktionVorDemZug } from "../systeme/laufendeAktionen.js";
+import { wahrnehmen } from "../systeme/wahrnehmung.js";
 
 // Rohdaten prüfen und vorbereiten; wirft Datenfehler mit allen Meldungen.
 // sprache: { texte, nomenPruefen? } (siehe kern/daten.js)
@@ -89,8 +90,10 @@ export function befehlAusfuehren(spiel, akteur, befehl) {
   // ausfuehren gibt die Aktionsart zurück oder { aktion, grundkosten?, umstaende? }
   const ergebnis = holen("befehle", wirksamerBefehl.art).ausfuehren(spiel, akteur, wirksamerBefehl);
   const { aktion, grundkosten, umstaende = {} } = typeof ergebnis === "string" ? { aktion: ergebnis } : ergebnis;
-  // Zugzähler: jede ausgeführte Aktion zählt als ein eigener Zug (Abklingzeit der Fähigkeiten)
+  // Zugzähler: jede ausgeführte Aktion zählt als ein eigener Zug (Abklingzeit der Fähigkeiten);
+  // die letzte Aktion bestimmt die Heimlichkeitsweite (systeme/wahrnehmung.js)
   akteur.zuege = (akteur.zuege ?? 0) + 1;
+  akteur.letzteAktion = aktion;
   vorgangAbschliessen(spiel);
   const zustand = spiel.zustand;
   const akteurNochImSpiel = entitaetMitId(zustand, akteur.id) && !(akteur.id === zustand.spielerinId && zustand.vorbei);
@@ -164,6 +167,7 @@ export function warteschlangeAbarbeiten(spiel) {
       const akteur = entitaetMitId(zustand, eintrag.akteurId);
       const ki = akteur && kiVon(akteur);
       if (!ki) continue;
+      wahrnehmen(spiel, akteur);
       let befehl = istHandlungsunfaehig(spiel, akteur) ? { art: "warten" } : holen("ki", ki.modul)(spiel, akteur, ki);
       if (befehlPruefen(spiel, akteur, befehl)) befehl = { art: "warten" };
       befehlAusfuehren(spiel, akteur, befehl);

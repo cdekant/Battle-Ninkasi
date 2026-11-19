@@ -38,7 +38,7 @@ veraendererAnmelden("abweichen", { chance: "ganzzahl", freundeAngreifen: "wahrhe
     const wesenDort = wesenAufFeld(spiel, feld)[0];
     const ausweichbefehl = { art: "bewegen", dx: richtung.dx, dy: richtung.dy };
     if (wesenDort) {
-      if (!feindlich(akteur, wesenDort) && !parameter.freundeAngreifen) continue;
+      if (!feindlich(spiel, akteur, wesenDort) && !parameter.freundeAngreifen) continue;
       ausweichbefehl.angreifen = true;
     }
     if (!bewegen.pruefen(spiel, akteur, ausweichbefehl)) kandidaten.push(ausweichbefehl);

@@ -12,7 +12,8 @@
 //   Wessen Lebenswert schon bei 0 liegt, wird von weiteren Profilen derselben Aktion nicht mehr angegriffen.
 //   Vor jedem einzelnen Angriff läuft der Haken vor_angriff; ein Abbruch lässt diesen Angriff aus.
 // Zugriff auf die Profile nur über angriffeVon, damit später Waffen ihr Profil einbringen können (Punkt 9).
-// Kampfwerte am Wesen: kampfwerte: { ausweichen?, willenskraft?, blocken?, ruestung?, kritchance? } als Punkte (Vorgabe 0),
+// Kampfwerte am Wesen: kampfwerte: { ausweichen?, willenskraft?, blocken?, ruestung?, kritchance?, heimlichkeit? } als Punkte
+//   (Vorgabe 0, heimlichkeit siehe systeme/wahrnehmung.js),
 //   abgefragt über Modifikatoren mit gleichnamigem Ziel; widerstaende: { saeure: 100, feuer: -50 }; immun: ["psi"]
 // Punkte werden über einen Halbwert zu Anteilen, die sich 100 % nur annähern: punkte / (punkte + halbwert).
 //   Trefferchance: genauigkeit / (genauigkeit + verteidigung + grundverteidigung)
@@ -26,22 +27,23 @@ import { effektAnwenden, beteiligteAus } from "../kern/effekte.js";
 import { bausteinAnmelden } from "../kern/bausteine.js";
 import { anmelden } from "../kern/register.js";
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
-import { fraktionVon } from "../kern/zustand.js";
-import { musterFelder, entitaetenAufFeldern } from "./zielauswahl.js";
+import { fraktionVon, istWesen } from "../kern/zustand.js";
 
-export const KAMPFWERTE = ["ausweichen", "willenskraft", "blocken", "ruestung", "kritchance"];
+export { istWesen };
+import { musterFelder, entitaetenAufFeldern } from "./zielauswahl.js";
+import { beziehungZwischen, urheberVon } from "./fraktionen.js";
+import { istAhnungslos, laermMachen } from "./wahrnehmung.js";
+
+export const KAMPFWERTE = ["ausweichen", "willenskraft", "blocken", "ruestung", "kritchance", "heimlichkeit"];
 export const VERTEIDIGUNGEN = ["ausweichen", "willenskraft"];
 export const MARKER = ["verfehlt_nie", "unblockbar", "ignoriert_ruestung"];
 
 // Ränge der Schadensrechnung am Haken vor_schaden; Handler ohne Rang (100) liegen zwischen Angreifer und Rüstung
 export const RANG_ANGREIFER = 50, RANG_RUESTUNG = 200, RANG_WIDERSTAND = 300;
 
-export function istWesen(entitaet) {
-  return Boolean(entitaet && entitaet.fraktion !== undefined && entitaet.werte && entitaet.werte.lp);
-}
-
-export function feindlich(erstesWesen, zweitesWesen) {
-  return istWesen(erstesWesen) && istWesen(zweitesWesen) && fraktionVon(erstesWesen) !== fraktionVon(zweitesWesen);
+// Feindlich nach der Beziehung (systeme/fraktionen.js), mit Zorn
+export function feindlich(spiel, erstesWesen, zweitesWesen) {
+  return istWesen(erstesWesen) && istWesen(zweitesWesen) && beziehungZwischen(spiel, urheberVon(erstesWesen), zweitesWesen) === "feind";
 }
 
 const kampfregeln = (spiel) => spiel.daten.regeln.kampf;
@@ -65,20 +67,25 @@ export function trefferanteil(spiel, { quelle, ziel, genauigkeit, gegen = "auswe
   return { zaehler: wirksameGenauigkeit, nenner: wirksameGenauigkeit + verteidigung };
 }
 
-// Trefferwurf, Blocken und Krit nacheinander; gibt { ergebnis: "treffer" | "ausgewichen" | "geblockt", kritisch } zurück
+// Trefferwurf, Blocken und Krit nacheinander; gibt { ergebnis: "treffer" | "ausgewichen" | "geblockt", kritisch, hinterhalt } zurück
 // wurf wie bei trefferanteil, dazu kritchance? (Punkte zusätzlich zu denen der Quelle)
+// Hinterhalt: ein ahnungsloses Ziel (systeme/wahrnehmung.js) wird sicher getroffen, nicht geblockt und kritisch
 export function trefferwurf(spiel, wurf) {
   const zufallszustand = spiel.zustand.zufallszustand;
   const { quelle, ziel, tags = [] } = wurf;
+  if (quelle && istAhnungslos(ziel)) {
+    melden(spiel, "hinterhalt", { quelle: bezugAuf(quelle), ziel: bezugAuf(ziel) });
+    return { ergebnis: "treffer", kritisch: true, hinterhalt: true };
+  }
   const regeln = kampfregeln(spiel);
   const { zaehler, nenner } = trefferanteil(spiel, wurf);
-  if (!mitAnteil(zufallszustand, zaehler, nenner)) return { ergebnis: "ausgewichen", kritisch: false };
+  if (!mitAnteil(zufallszustand, zaehler, nenner)) return { ergebnis: "ausgewichen", kritisch: false, hinterhalt: false };
   if (!tags.includes("unblockbar")) {
     const blocken = kampfwert(spiel, ziel, "blocken", { gegenueberId: quelle?.id, tags });
-    if (mitAnteil(zufallszustand, blocken, blocken + regeln.halbwertBlocken)) return { ergebnis: "geblockt", kritisch: false };
+    if (mitAnteil(zufallszustand, blocken, blocken + regeln.halbwertBlocken)) return { ergebnis: "geblockt", kritisch: false, hinterhalt: false };
   }
   const kritchance = quelle ? kampfwert(spiel, quelle, "kritchance", { gegenueberId: ziel.id, tags }, wurf.kritchance ?? 0) : 0;
-  return { ergebnis: "treffer", kritisch: mitAnteil(zufallszustand, kritchance, kritchance + regeln.halbwertKritchance) };
+  return { ergebnis: "treffer", kritisch: mitAnteil(zufallszustand, kritchance, kritchance + regeln.halbwertKritchance), hinterhalt: false };
 }
 
 const tagsDesEffekts = (spiel, effektName) => spiel.daten.effekte?.[effektName]?.tags || [];
@@ -124,6 +131,7 @@ export function nahkampf(spiel, angreifer, ziel) {
       einzelangriff(spiel, angreifer, profil, getroffenes);
     }
   });
+  laermMachen(spiel, angreifer.position, spiel.daten.regeln.wahrnehmung.laermNahkampf, angreifer.id);
   return Math.max(...ausgefuehrt.map((profil) => kostenDesProfils(spiel, profil)));
 }
 

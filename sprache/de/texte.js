@@ -35,6 +35,10 @@ export default {
   "log.faehigkeit": "{wer.nom}: {faehigkeit}!",
   "log.risiko.fehlschlag": "{wer.nom} greift ins Leere. Der Gedanke zerfasert.",
   "log.risiko.rueckschlag": "Der Gedanke schlägt zurück. {wer.nom} taumelt.",
+  "log.bemerkt": "{wer.nom} bemerkt {ziel.akk}!",
+  "log.aufgewacht": "{wer.nom} schreckt hoch.",
+  "log.hinterhalt": "{quelle.nom} überrascht {ziel.akk}!",
+  "log.zorn": "{wer.nom} wird wütend auf {auf.akk}.",
   "log.verpufft": "{wer.nom} verliert den Faden. Die Wirkung verpufft.",
   "log.aktion_unterbrochen": "Etwas stört. Weitermachen mit [Leertaste], jede andere Taste bricht ab.",
   "log.aktion_abgebrochen": "{wer.nom} bricht ab.",
@@ -60,6 +64,10 @@ export default {
   "log.abgelehnt.zu_weit": "Zu weit weg.",
   "log.abgelehnt.keine_sichtlinie": "Etwas ist im Weg.",
   "log.abgelehnt.unbekannt": "Unbekannter Befehl.",
+
+  // Fraktionen
+  "fraktion.ninkasi": "Ninkasi",
+  "fraktion.verderber": "Verderber",
 
   // Schadensarten (Platzhalter {art} im Log)
   "schaden.stumpf": "stumpf",

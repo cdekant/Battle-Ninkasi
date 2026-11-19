@@ -24,7 +24,7 @@ export const KLICKREGELN = [
     name: "angreifen",
     passt: (spiel, feld, ninkasi) =>
       abstand(feld, ninkasi.position) === 1 && istSichtbar(spiel.zustand, feld.x, feld.y)
-      && entitaetenAuf(spiel.zustand, feld.x, feld.y).some((entitaet) => feindlich(ninkasi, entitaet)),
+      && entitaetenAuf(spiel.zustand, feld.x, feld.y).some((entitaet) => feindlich(spiel, ninkasi, entitaet)),
     aktion: (spiel, feld, ninkasi) => ({ befehl: { art: "bewegen", dx: feld.x - ninkasi.position.x, dy: feld.y - ninkasi.position.y } }),
   },
   {

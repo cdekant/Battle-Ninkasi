@@ -7,6 +7,7 @@
 //   pegel_unter { wert }            Pegel unter wert, z.B. "nüchtern"
 //   wert_unter_prozent { wert, prozent }  aktueller Wert unter prozent des Grundwerts (ohne Modifikatoren)
 //   gegenueber_tag { tag }          das Gegenüber der Abfrage (umstaende.gegenueberId) trägt den Tag
+//   gegenueber_ahnungslos {}        das Gegenüber ist ahnungslos (Hinterhalt, systeme/wahrnehmung.js)
 //
 // Auren (Modifikatorquelle "auren"): an Wesen und Zuständen
 //   auren: [{ reichweite, trifft, selbst?, sichtlinie?, modifikatoren }]
@@ -22,6 +23,7 @@ import { modifikatorSkaliert, hatWert } from "../kern/werte.js";
 import { inReichweite, sichtlinieFrei } from "../welt/geometrie.js";
 import { trifftZu } from "./zielauswahl.js";
 import { staerkeProzent } from "./zustaende.js";
+import { istAhnungslos } from "./wahrnehmung.js";
 
 function bedingungAnmelden(name, parameterBeschreibung, funktion) {
   funktion.parameter = parameterBeschreibung;
@@ -45,6 +47,8 @@ bedingungAnmelden("gegenueber_tag", { tag: "text" }, (spiel, entitaet, parameter
   return Boolean(gegenueber?.tags?.includes(parameter.tag));
 });
 
+bedingungAnmelden("gegenueber_ahnungslos", {}, (spiel, entitaet, parameter, umstaende) => istAhnungslos(spiel.zustand.entitaeten[umstaende.gegenueberId]));
+
 // Alle Auren einer Trägerin: eigene und die ihrer Zustände, je mit Stärke in Prozent und Quelle
 function aurenVon(spiel, traegerin) {
   const ergebnis = (traegerin.auren || []).map((aura) => ({ aura, prozent: 100, quelle: `aura:${traegerin.id}` }));
@@ -58,7 +62,7 @@ function aurenVon(spiel, traegerin) {
 function auraErreicht(spiel, traegerin, aura, entitaet) {
   if (entitaet === traegerin) return aura.selbst === true;
   if (!inReichweite(traegerin.position, entitaet.position, aura.reichweite)) return false;
-  if (!trifftZu(aura.trifft, fraktionVon(traegerin) ?? null, entitaet)) return false;
+  if (!trifftZu(spiel, aura.trifft, { id: traegerin.id, fraktion: fraktionVon(traegerin) ?? null }, entitaet)) return false;
   return !aura.sichtlinie || sichtlinieFrei(spiel, traegerin.position, entitaet.position);
 }
 

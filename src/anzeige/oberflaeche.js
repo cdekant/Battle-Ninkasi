@@ -1,7 +1,8 @@
 // Seitenleiste: LP, MP, PP, Pegel als logarithmische Leiste mit Schwellen, Gepäck, sichtbare Gegner, Startwert.
 // Liest den Zustand nur.
 
-import { spielerin, entitaetMitId, fraktionVon } from "../kern/zustand.js";
+import { spielerin, entitaetMitId } from "../kern/zustand.js";
+import { beziehungZwischen, urheberVon } from "../systeme/fraktionen.js";
 import { hoechstwert } from "../kern/werte.js";
 import { optimalerPegel } from "../systeme/stoffwechsel.js";
 import { promilleText, leistenanteil, TEILSTRICHE } from "./pegelanzeige.js";
@@ -56,7 +57,8 @@ export class Oberflaeche {
       : `<li class="leise">${text("ui.leer")}</li>`;
 
     const sichtbareGegner = Object.values(zustand.entitaeten).filter((entitaet) =>
-      entitaet.position && entitaet.fraktion !== undefined && fraktionVon(entitaet) !== fraktionVon(ninkasi)
+      entitaet.position && entitaet.fraktion !== undefined && entitaet.id !== ninkasi.id
+      && beziehungZwischen(spiel, urheberVon(ninkasi), entitaet) !== "verbuendet"
       && sichtbareFelder.has(entitaet.position.y * zustand.ebene.breite + entitaet.position.x)
     );
     const gegnerHtml = sichtbareGegner.length

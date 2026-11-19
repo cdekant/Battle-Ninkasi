@@ -6,8 +6,7 @@
 
 import AStar from "../../lib/rot/path/astar.js";
 import { passierbar, feldIndex, aufDerKarte } from "./karte.js";
-import { entitaetenAuf } from "../kern/zustand.js";
-import { istWesen } from "../systeme/kampf.js";
+import { entitaetenAuf, istWesen } from "../kern/zustand.js";
 
 // Gibt die Felder des Weges ohne Startfeld zurück, [] wenn start = ziel, null wenn kein Weg
 export function weg(spiel, start, ziel, { nurErkundet = false, wesenMeiden = false } = {}) {

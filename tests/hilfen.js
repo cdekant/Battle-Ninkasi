@@ -5,6 +5,7 @@ import gelaende from "../daten/gelaende.js";
 import regeln from "../daten/regeln.js";
 import aktionen from "../daten/aktionen.js";
 import schadensarten from "../daten/schadensarten.js";
+import fraktionen from "../daten/fraktionen.js";
 import { neuerZustand, entitaetErzeugen } from "../src/kern/zustand.js";
 import { werteAusDaten } from "../src/kern/werte.js";
 import { zufallErzeugen } from "../src/kern/zufall.js";
@@ -18,7 +19,7 @@ import { vorgangAbschliessen } from "../src/kern/vorgang.js";
 //            gegenstaende: Testgegenstände, regeln: Abweichungen der Regelwerte, startwert }
 // Abweichend von daten/regeln.js ist die Grundverteidigung 0: Genauigkeit 100 gegen ein Wesen ohne Ausweichen trifft sicher,
 // Genauigkeit 0 verfehlt sicher, beides ohne zu würfeln.
-export function miniSpiel(kartenzeilen, { effekte = {}, zustaende = {}, wesen: wesensdaten = {}, faehigkeiten = {}, risiken = {}, gegenstaende = {}, regeln: regelAbweichungen = {}, startwert = 1 } = {}) {
+export function miniSpiel(kartenzeilen, { fraktionen: fraktionsdaten = fraktionen, effekte = {}, zustaende = {}, wesen: wesensdaten = {}, faehigkeiten = {}, risiken = {}, gegenstaende = {}, regeln: regelAbweichungen = {}, startwert = 1 } = {}) {
   const zustand = neuerZustand(startwert);
   zustand.zufallszustand = zufallErzeugen(startwert);
   const breite = kartenzeilen[0].length, hoehe = kartenzeilen.length;
@@ -28,8 +29,10 @@ export function miniSpiel(kartenzeilen, { effekte = {}, zustaende = {}, wesen: w
     ausloeser: { ...regeln.ausloeser, ...regelAbweichungen.ausloeser },
     kampf: { ...regeln.kampf, grundverteidigung: 0, ...regelAbweichungen.kampf },
     laufendeAktionen: { ...regeln.laufendeAktionen, ...regelAbweichungen.laufendeAktionen },
+    fraktionen: { ...regeln.fraktionen, ...regelAbweichungen.fraktionen },
+    wahrnehmung: { ...regeln.wahrnehmung, ...regelAbweichungen.wahrnehmung },
   };
-  return { zustand, daten: { gelaende, aktionen, effekte, schadensarten, zustaende, wesen: wesensdaten, faehigkeiten, risiken, gegenstaende, regeln: testregeln }, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
+  return { zustand, daten: { gelaende, aktionen, fraktionen: fraktionsdaten, effekte, schadensarten, zustaende, wesen: wesensdaten, faehigkeiten, risiken, gegenstaende, regeln: testregeln }, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
 }
 
 // Wesen mit Position, Fraktion und LP; weitere Komponenten (ausloeser, angriff, beimTod ...) über zusatz

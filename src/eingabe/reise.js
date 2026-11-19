@@ -4,11 +4,10 @@
 // Reise: { ziel: { x, y }, lage, schrittzahl }
 // Später: automatisches Erkunden ist dieselbe Reise mit anderer Zielwahl.
 
-import { spielerin, entitaetenAuf } from "../kern/zustand.js";
+import { spielerin, entitaetenAuf, istWesen } from "../kern/zustand.js";
 import { feldIndex, passierbar } from "../welt/karte.js";
 import { naechstesWegfeld } from "../welt/wege.js";
 import { lageErfassen, sichtbareFeinde, gefahrPruefen } from "../systeme/gefahr.js";
-import { istWesen } from "../systeme/kampf.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 
 const WEG_OPTIONEN = { nurErkundet: true };

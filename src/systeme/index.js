@@ -1,5 +1,7 @@
 // Lädt alle Systeme; sie melden sich beim Import in den Registern an.
 // Die Reihenfolge hier ist die Anmeldereihenfolge und damit fest.
+import "./fraktionen.js";
+import "./wahrnehmung.js";
 import "./kampf.js";
 import "./bewegung.js";
 import "./inventar.js";

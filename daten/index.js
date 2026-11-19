@@ -12,6 +12,7 @@ import regeln from "./regeln.js";
 import zustaende from "./zustaende.js";
 import faehigkeiten from "./faehigkeiten.js";
 import risiken from "./risiken.js";
+import fraktionen from "./fraktionen.js";
 
 export default {
   wesen: { ...ninkasi, ...gegner },
@@ -21,6 +22,7 @@ export default {
   zustaende,
   faehigkeiten,
   risiken,
+  fraktionen,
   aktionen,
   gelaende,
   ebenen,

@@ -5,6 +5,20 @@ export default {
     daempfungProStufe: 50, // Prozent der Chance, die je Kettenstufe erhalten bleibt
     hoechsteKettentiefe: 5, // tiefer wird nichts mehr ausgelöst
   },
+  // Fraktionen, siehe src/systeme/fraktionen.js
+  fraktionen: {
+    beziehungVorgabe: "feind", // für Paare ohne Angabe in daten/fraktionen.js
+  },
+  // Wahrnehmung, siehe src/systeme/wahrnehmung.js; Vorbild Brogue, alle Zahlen vorläufig
+  wahrnehmung: {
+    heimlichkeitVorgabe: 7, // Heimlichkeitsweite ohne eigenen Kampfwert heimlichkeit
+    heimlichkeitMindestens: 2,
+    // nach der letzten eigenen Aktion, in Prozent: Kämpfen verdoppelt, Warten (Rasten) halbiert
+    heimlichkeitNachAktion: { nahkampf: 200, faehigkeit: 200, warten: 50 },
+    bemerkenChance: 25, // Prozent je Zug für ein Wesen innerhalb der Weite, das noch nichts bemerkt hat
+    spurFaktor: 3, // ein jagendes Wesen verliert die Spur jenseits dieses Vielfachen der Weite
+    laermNahkampf: 6, // Lautstärke eines Nahkampfs (Kosten der Ausbreitung, freies Feld 1)
+  },
   // Lange Aktionen (Rituale, Brauen), siehe src/systeme/laufendeAktionen.js:
   // Gefahrenprüfungen (Register "gefahren"), die Ninkasi unterbrechen und fragen
   laufendeAktionen: {

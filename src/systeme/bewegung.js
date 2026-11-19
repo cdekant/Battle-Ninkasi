@@ -25,7 +25,7 @@ anmelden("befehle", "bewegen", {
     if (befehl.angreifen !== undefined && typeof befehl.angreifen !== "boolean") return "ungueltig";
     const { x, y } = zielfeld(akteur, befehl);
     const anderesWesen = wesenAuf(spiel, x, y);
-    if (anderesWesen) return kannAngreifen(spiel, akteur) && (feindlich(akteur, anderesWesen) || befehl.angreifen === true) ? null : "besetzt";
+    if (anderesWesen) return kannAngreifen(spiel, akteur) && (feindlich(spiel, akteur, anderesWesen) || befehl.angreifen === true) ? null : "besetzt";
     if (!passierbar(spiel, x, y)) return "wand";
     return null;
   },

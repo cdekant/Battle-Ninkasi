@@ -13,7 +13,7 @@ export function sichtbareFeinde(spiel) {
   const zustand = spiel.zustand;
   const ninkasi = spielerin(zustand);
   return alleEntitaeten(zustand)
-    .filter((entitaet) => entitaet.position && feindlich(ninkasi, entitaet) && istSichtbar(zustand, entitaet.position.x, entitaet.position.y))
+    .filter((entitaet) => entitaet.position && feindlich(spiel, ninkasi, entitaet) && istSichtbar(zustand, entitaet.position.x, entitaet.position.y))
     .map((entitaet) => entitaet.id);
 }
 

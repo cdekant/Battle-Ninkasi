@@ -123,7 +123,7 @@ test("Psi-Kontrolle: das Bakterium wechselt zu Ninkasi und jagt seine Artgenosse
   const artgenosse = bakterium(spiel, 6, 2);
   zustandSetzen(spiel, kontrolliert, "kontrolliert", { quelleId: ninkasi.id });
   assert.equal(fraktionVon(kontrolliert), "ninkasi");
-  assert.ok(feindlich(kontrolliert, artgenosse) && !feindlich(kontrolliert, ninkasi));
+  assert.ok(feindlich(spiel, kontrolliert, artgenosse) && !feindlich(spiel, kontrolliert, ninkasi));
   const jagen = holen("ki", "jagen");
   assert.deepEqual(jagen(spiel, kontrolliert, kiVon(kontrolliert)), { art: "bewegen", dx: 1, dy: 0 });
   assert.deepEqual(kontrolliert.ki.letzteBekanntePosition, { x: 6, y: 2 });
@@ -138,7 +138,7 @@ test("Zwietracht: eigene Fraktion, mit allen verfeindet; greift den Nächsten an
   const zerstritten = bakterium(spiel, 5, 2);
   const nachbar = bakterium(spiel, 6, 2);
   zustandSetzen(spiel, zerstritten, "zwietracht");
-  assert.ok(feindlich(zerstritten, nachbar) && feindlich(nachbar, zerstritten));
+  assert.ok(feindlich(spiel, zerstritten, nachbar) && feindlich(spiel, nachbar, zerstritten));
   assert.deepEqual(holen("ki", "jagen")(spiel, zerstritten, kiVon(zerstritten)), { art: "bewegen", dx: 1, dy: 0, angreifen: true });
 });
 

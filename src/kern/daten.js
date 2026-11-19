@@ -11,6 +11,8 @@ import { TRIFFT_ARTEN, ZIELARTEN } from "../systeme/zielauswahl.js";
 import { STAPELREGELN, VERLAEUFE } from "../systeme/zustaende.js";
 import { KAMPFWERTE } from "../systeme/kampf.js";
 import { FAEHIGKEITSARTEN } from "../systeme/faehigkeiten.js";
+import { BEZIEHUNGEN } from "../systeme/fraktionen.js";
+import { WACHZUSTAENDE } from "../systeme/wahrnehmung.js";
 
 const istObjekt = (wert) => wert && typeof wert === "object" && !Array.isArray(wert);
 
@@ -72,6 +74,7 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
   pruefeText(sprache.texte, wesen.text, ort, fehler);
   pruefeNomen(sprache, wesen.text, fehler);
   if (typeof wesen.fraktion !== "string") fehler.push(`${ort}: fraktion fehlt`);
+  else if (!daten.fraktionen?.[wesen.fraktion]) fehler.push(`${ort}: Fraktion "${wesen.fraktion}" gibt es nicht`);
   if (!wesen.werte || !wesen.werte.lp) fehler.push(`${ort}: werte.lp fehlt`);
   for (const [wertName, wertDaten] of Object.entries(wesen.werte || {})) {
     // ohne grundwert nach oben offen, dann ist anfangswert Pflicht
@@ -173,6 +176,18 @@ function pruefeRegeln(regeln, fehler) {
   const unterbrechen = regeln.laufendeAktionen?.unterbrechen;
   if (!istTextliste(unterbrechen)) fehler.push("regeln.laufendeAktionen.unterbrechen muss eine Liste von Gefahrenprüfungen sein");
   else for (const name of unterbrechen) if (!hat("gefahren", name)) fehler.push(`regeln.laufendeAktionen.unterbrechen: Gefahrenprüfung "${name}" ist nicht angemeldet`);
+  if (!BEZIEHUNGEN.includes(regeln.fraktionen?.beziehungVorgabe)) fehler.push(`regeln.fraktionen.beziehungVorgabe muss eines von ${BEZIEHUNGEN.join(", ")} sein`);
+  const wahrnehmung = regeln.wahrnehmung;
+  if (!wahrnehmung) fehler.push("regeln.wahrnehmung fehlt");
+  else {
+    for (const feld of ["heimlichkeitVorgabe", "heimlichkeitMindestens", "spurFaktor", "laermNahkampf"]) {
+      if (!istZahlAbNull(wahrnehmung[feld])) fehler.push(`regeln.wahrnehmung.${feld} muss eine ganze Zahl >= 0 sein`);
+    }
+    if (!istProzent(wahrnehmung.bemerkenChance)) fehler.push("regeln.wahrnehmung.bemerkenChance muss eine ganze Zahl von 0 bis 100 sein");
+    if (!istObjekt(wahrnehmung.heimlichkeitNachAktion) || !Object.values(wahrnehmung.heimlichkeitNachAktion).every(istZahlAbNull)) {
+      fehler.push("regeln.wahrnehmung.heimlichkeitNachAktion muss { aktion: Prozent } sein");
+    }
+  }
   if (!regeln.kampf) return fehler.push("regeln.kampf fehlt");
   for (const [feld, untergrenze] of Object.entries(KAMPFREGELN)) {
     const wert = regeln.kampf[feld];
@@ -427,7 +442,19 @@ function pruefeEffektKreise(daten, fehler) {
 // KI-Komponente: { modul, trifft?, ... }
 function pruefeKi(daten, ki, ort, fehler) {
   if (!istObjekt(ki) || !hat("ki", ki.modul)) return fehler.push(`${ort}: Verhaltensmodul "${ki?.modul}" ist nicht angemeldet`);
-  pruefeParameter(daten, { trifft: TRIFFT_ARTEN }, ki, ort, fehler);
+  pruefeParameter(daten, { trifft: TRIFFT_ARTEN, wachzustand: WACHZUSTAENDE }, ki, ort, fehler);
+}
+
+// Fraktionen: { text, beziehungen? }, siehe systeme/fraktionen.js
+function pruefeFraktionen(daten, sprache, fehler) {
+  for (const [name, fraktion] of Object.entries(daten.fraktionen || {})) {
+    const ort = `fraktionen.${name}`;
+    pruefeText(sprache.texte, fraktion.text, ort, fehler);
+    for (const [andere, wert] of Object.entries(fraktion.beziehungen || {})) {
+      if (!daten.fraktionen[andere]) fehler.push(`${ort}.beziehungen: Fraktion "${andere}" gibt es nicht`);
+      if (!BEZIEHUNGEN.includes(wert)) fehler.push(`${ort}.beziehungen.${andere} muss eines von ${BEZIEHUNGEN.join(", ")} sein`);
+    }
+  }
 }
 
 // Zustände, siehe systeme/zustaende.js
@@ -483,6 +510,7 @@ export function vorbereiten(rohdaten, sprache = {}) {
   daten.zustaende = vorlagenAufloesen(rohdaten.zustaende || {}, "zustaende", fehler);
 
   pruefeSchadensarten(daten, sprache, fehler);
+  pruefeFraktionen(daten, sprache, fehler);
   for (const [name, effekt] of Object.entries(daten.effekte)) pruefeEffekt(daten, name, effekt, fehler);
   pruefeEffektKreise(daten, fehler);
   for (const [name, zustand] of Object.entries(daten.zustaende)) pruefeZustand(daten, sprache, name, zustand, fehler);
@@ -493,6 +521,7 @@ export function vorbereiten(rohdaten, sprache = {}) {
   for (const [name, ebene] of Object.entries(daten.ebenen)) pruefeEbene(daten, name, ebene, fehler);
   for (const [name, gelaende] of Object.entries(daten.gelaende)) {
     if (typeof gelaende.kennung !== "string" || gelaende.kennung.length !== 1) fehler.push(`gelaende.${name}: kennung muss genau ein Zeichen sein`);
+    if (gelaende.laermdaempfung !== undefined && !istZahlAbNull(gelaende.laermdaempfung)) fehler.push(`gelaende.${name}: laermdaempfung muss eine ganze Zahl >= 0 sein`);
     if (!daten.zeichen.gelaende[name]) fehler.push(`gelaende.${name}: kein Zeichen in daten/zeichen.js`);
   }
   for (const [aktion, kosten] of Object.entries(daten.aktionen)) {

@@ -3,10 +3,9 @@
 // Wie die Reise, nur mit anderer Zielwahl; jeder Schritt ist ein gewöhnlicher Befehl "bewegen".
 // Ablauf: { lage, schrittzahl }
 
-import { spielerin, entitaetenAuf } from "../kern/zustand.js";
+import { spielerin, entitaetenAuf, istWesen } from "../kern/zustand.js";
 import { naechstesWegfeld, naechstesFeldMit, amRandDesErkundeten } from "../welt/wege.js";
 import { lageErfassen, sichtbareFeinde } from "../systeme/gefahr.js";
-import { istWesen } from "../systeme/kampf.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 import { unterwegsPruefen } from "./reise.js";
 

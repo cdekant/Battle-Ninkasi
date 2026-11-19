@@ -5,14 +5,14 @@
 //   Kreis, Kegel und angrenzend nur mit Sichtlinie vom Ursprung (keine Explosion um die Ecke),
 //   abschaltbar mit durchWaende: true; Linie und Strahl enden an undurchsichtigen Feldern
 // Getroffen werden Entitäten auf den Feldern nach trifft, aus Sicht der Urheberin:
-//   "alle" (auch Gegenstände), "wesen", "feinde" (andere Fraktion), "verbuendete" (gleiche Fraktion)
+//   "alle" (auch Gegenstände), "wesen", "feinde", "verbuendete" (nach der Beziehung, systeme/fraktionen.js)
 // Zielarten für Fähigkeiten (Punkt 6) und Vorschau: siehe zielAufloesen.
 
 import { anmelden, holen } from "../kern/register.js";
-import { entitaetenAuf, fraktionVon } from "../kern/zustand.js";
+import { entitaetenAuf, fraktionVon, istWesen } from "../kern/zustand.js";
 import { aufDerKarte } from "../welt/karte.js";
 import { kreis, kegel, flugbahn, sichtlinieFrei, felderOrdnen, gleichesFeld, inReichweite, KEGEL_OEFFNUNGEN } from "../welt/geometrie.js";
-import { istWesen } from "./kampf.js";
+import { beziehungZwischen } from "./fraktionen.js";
 import { istSichtbar } from "./sicht.js";
 
 function musterAnmelden(name, parameterBeschreibung, funktion) {
@@ -57,12 +57,14 @@ export function musterFelder(spiel, muster, auswahl) {
 
 export const TRIFFT_ARTEN = ["alle", "wesen", "feinde", "verbuendete"];
 
-export function trifftZu(trifft, urheberFraktion, entitaet) {
+// urheber: { id, fraktion }; feinde und verbuendete nach der Beziehung (systeme/fraktionen.js), Neutrale sind keins von beiden
+export function trifftZu(spiel, trifft, urheber, entitaet) {
   if (trifft === "alle") return true;
   if (!istWesen(entitaet)) return false;
   if (trifft === "wesen") return true;
-  if (urheberFraktion == null) return false;
-  return trifft === "feinde" ? fraktionVon(entitaet) !== urheberFraktion : fraktionVon(entitaet) === urheberFraktion;
+  if (urheber.fraktion == null) return false;
+  const beziehung = beziehungZwischen(spiel, urheber, entitaet);
+  return trifft === "feinde" ? beziehung === "feind" : beziehung === "verbuendet";
 }
 
 // Entitäten auf den Feldern, in der Reihenfolge der Felder, je Feld nach Entitäts-ID.
@@ -74,7 +76,7 @@ export function entitaetenAufFeldern(spiel, felder, { trifft = "alle", urheberId
   for (const feld of felder) {
     for (const entitaet of entitaetenAuf(zustand, feld.x, feld.y)) {
       if (ohneUrheber && entitaet.id === urheberId) continue;
-      if (trifftZu(trifft, fraktion, entitaet)) ergebnis.push(entitaet);
+      if (trifftZu(spiel, trifft, { id: urheberId, fraktion }, entitaet)) ergebnis.push(entitaet);
     }
   }
   return ergebnis;

@@ -84,6 +84,11 @@ function juengsteUeberlagerung(entitaet, feld) {
   return entitaet?.[feld];
 }
 
+// Ein Wesen hat eine Fraktion und LP (im Unterschied zu Gegenständen)
+export function istWesen(entitaet) {
+  return Boolean(entitaet && entitaet.fraktion !== undefined && entitaet.werte && entitaet.werte.lp);
+}
+
 export function fraktionVon(entitaet) {
   return juengsteUeberlagerung(entitaet, "fraktion");
 }

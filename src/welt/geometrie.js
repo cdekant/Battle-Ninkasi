@@ -8,8 +8,7 @@
 // Reihenfolge der Felder in Mustern: nach Abstand zum Ursprung (dx² + dy²), dann nach Feldindex.
 
 import { aufDerKarte, durchsichtig, feldIndex } from "./karte.js";
-import { entitaetenAuf } from "../kern/zustand.js";
-import { istWesen } from "../systeme/kampf.js";
+import { entitaetenAuf, istWesen } from "../kern/zustand.js";
 
 // Die acht Nachbarrichtungen in fester Reihenfolge (zeilenweise von links oben)
 export const ACHT_RICHTUNGEN = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]].map(([dx, dy]) => ({ dx, dy }));

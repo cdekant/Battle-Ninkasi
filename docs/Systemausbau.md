@@ -95,18 +95,34 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 ## 7. Fernkampf, Fraktionen, Wahrnehmung, viele Gegner
 
-Status: offen
+Status: in Arbeit; umgesetzt in Version 0.14.0 (Fraktionen als Daten mit Zorn, Wahrnehmung mit Wachzustand, Heimlichkeit, Bemerken, Lärm und Hinterhalt), beschrieben in [Architektur.md](Architektur.md) (Fraktionen, Wahrnehmung, Kampfwerte)
 
-+ Sichtlinie und Flugbahn gibt es seit 0.5.0 (`src/welt/geometrie.js`); offen ist, dass Gegner sie benutzen, wenn sie schießen oder Psi wirken
-+ Option für Verbündete im Weg einer Flugbahn (darüber hinweg oder vorbei); die Anzeige spielt die Bahn aus der Meldung `geschoss` ab
-+ Wurfgegenstände landen auf einem Feld (Flasche werfen: Fernkampf, Fläche und Gegenstand zugleich)
-+ Beziehungen der Fraktionen als Daten statt "andere Fraktion ist feindlich": Phagen gegen Bakterien, Kulturhefe gegen wilde Hefe, Händler neutral; Überschreibungen je Wesen gibt es seit 0.7.0 über Zustände (`fraktionVon`)
-+ Wahrnehmung je Wesen statt der Vereinfachung des Prototyps: Wachzustand (schläft, wach, jagt), Lärm, Schleichen; siehe Wahrnehmung in [Architektur.md](Architektur.md)
-+ Bewegungsarten (unbeweglich, laufend, fliegend, schwebend), Passierbarkeit und Wegfindung je Bewegungsart
-+ Verschieben: Rückstoß, Ziehen, Platztausch, Teleport mit Kollisionsregeln
-+ Gelegenheitsangriffe und Konter als Reaktionen ohne Zeitkosten
-+ Leistung: räumlicher Index im `zwischenspeicher` (aus dem Zustand ableitbar, nicht gespeichert), schnellere Warteschlange, Obergrenze der Population für teilende Mikroorganismen
-+ Mehrfeld-Wesen und Bossphasen: offen, ob nötig
+Entschieden: Vorgabe für Paare ohne Angabe ist feind, die Tabelle nennt Abweichungen; Zorn trifft das angegriffene Wesen und Genossen, die die Angreiferin sehen, nicht die ganze Fraktion; Wahrnehmung nach Brogue mit Heimlichkeit als Modifikatorziel für Skills; Hinterhalt trifft sicher und kritisch, mehr Schaden über Modifikatoren mit `gegenueber_ahnungslos`; Lärm über Weglänge, Gelände dämpft nach `laermdaempfung`; die Nutzung von Fähigkeiten steht an der KI des Wesens; keine Gelegenheitsangriffe; keine Mehrfeld-Wesen, Bossphasen über Auslöser mit Bedingungen
+
+Offen, Version 0.15.0 (die KI nutzt Fähigkeiten):
+
++ `ki: { modul: "jagen", faehigkeiten: [{ name, chance?, abstandAb?, abstandBis? }], abstandHalten? }`: die KI benutzt passende Fähigkeiten vor Nahkampf und Bewegung, Fernkämpfer halten Abstand
++ Flugbahn: die KI schießt nicht, wenn ein Verbündeter vor dem Ziel auf der Bahn steht; Option `ueberVerbuendete: true` an der Zielart, dann fliegt das Geschoss über Verbündete hinweg; die Anzeige spielt die Bahn aus der Meldung `geschoss` ab (Oberfläche)
++ Angekündigte Angriffe als lange Aktionen der Gegner (`dauer: { schritte: 2 }`, eigener Text der Ankündigung), gezielt aufs Feld, damit Ninkasi ausweichen kann; `unterbrechbar: true`: Schaden bricht die lange Aktion eines Gegners ab
++ Baustein `angreifen { profil? }` für Konter aus Auslösern, ohne Zeitkosten
++ Auslöser mit `wenn` (Bedingungen wie an Modifikatoren), z.B. Bossphasen: bei `nach_schaden`, wenn LP unter 50 %, Zustand setzen
+
+Offen, Version 0.16.0 (Bewegung, Verschieben, Werfen):
+
++ Bewegungsarten (`laufend`, `unbeweglich`, `fliegend`, `schwebend`), Gelände mit `passierbarFuer`, Wegfindung je Bewegungsart
++ Bausteine `stossen { weite }` (Aufprall an Wand oder Wesen: stumpfer Schaden je verbliebenem Feld), `ziehen { weite }`, `tauschen`, `teleportieren { muster | zufaellig }` mit festen Kollisionsregeln
++ Befehl `werfen { gegenstandId, ziel }` entlang der Flugbahn; mit `wurf: { effekt }` zerbricht der Gegenstand und wirkt, sonst landet er auf dem Feld
+
+Offen, Version 0.17.0 (viele Gegner):
+
++ `positionSetzen` statt direkter Zuweisung, darauf ein räumlicher Index im `zwischenspeicher` (aus dem Zustand ableitbar, nicht gespeichert) für Auren, `entitaetenAuf` und Zielwahl
++ Warteschlange als Heap mit fester Reihenfolge, Obergrenze der Population als Regelwert
+
+Offener Rest, wird mit den genannten Punkten umgesetzt:
+
++ Licht in der Wahrnehmung (Brogue: Heimlichkeitsweite im Licht doppelt, im Dunkeln halb), Spüren ohne Licht, Umherziehen wacher Wesen; siehe Wahrnehmung und Licht in [Architektur.md](Architektur.md)
++ Ruf bei ganzen Fraktionen (Spieldesign in [Grundlagen.md](Grundlagen.md))
++ Anzeige von Wachzustand und Heimlichkeitsweite (Oberfläche)
 
 ## 8. Gelände, Feldschichten, Ebenen
 
