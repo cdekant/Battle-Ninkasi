@@ -18,10 +18,35 @@ export default {
   },
   // Fallen (daten/fallen.js); vorläufig
   saeureduese: {
-    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "2W4" }],
+    schritte: [
+      { baustein: "schaden", art: "saeure", wuerfel: "2W4" },
+      { baustein: "oberflaeche_setzen", art: "saeure", menge: 4, muster: { art: "kreis", radius: 1 } },
+    ],
   },
   klappern: {
     schritte: [{ baustein: "laerm", lautstaerke: 14 }],
+  },
+  // Feldschichten (daten/schichten.js) und Feuer (regeln.feuer); vorläufig
+  saeure_veraetzt: {
+    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "1W3" }],
+  },
+  co2_benommen: {
+    schritte: [{ baustein: "schaden", art: "gift", menge: 1 }],
+  },
+  co2_ersticken: {
+    schritte: [{ baustein: "schaden", art: "gift", wuerfel: "1W6" }],
+  },
+  rauch_husten: {
+    schritte: [{ baustein: "schaden", art: "gift", menge: 1 }],
+  },
+  brennen: {
+    schritte: [{ baustein: "schaden", art: "feuer", wuerfel: "1W6" }],
+  },
+  brandflasche_zerspringt: {
+    schritte: [
+      { baustein: "oberflaeche_setzen", art: "brand", menge: 4, muster: { art: "kreis", radius: 1 } },
+      { baustein: "entzuenden", muster: { art: "kreis", radius: 1 } },
+    ],
   },
   // Wer in Gelände festsitzt, das er nicht betreten kann (src/systeme/verschieben.js, regeln.bewegung); vorläufig
   eingeklemmt: {

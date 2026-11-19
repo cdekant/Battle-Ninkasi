@@ -3,6 +3,8 @@
 // damit die Ebene nicht vom Spielverlauf abhängt.
 // Türen: an den Zugängen der Räume, die rot.js meldet, mit tuerChance Prozent (eigener abgeleiteter Zufall);
 // Gelände gelaende.tuer der Ebene, Vorgabe "tuer_zu". Fallen (fallen: [{ typ, anzahl }]) auf freien Feldern.
+// Gelände-Objekte (gelaendeObjekte: [{ gelaende, anzahl }], z.B. Gärbottiche) nur im Inneren von Räumen (nicht am Rand,
+// nicht im Startraum), so sperren sie keinen Durchgang; eigener abgeleiteter Zufall.
 
 import RNG from "../../lib/rot/rng.js";
 import Digger from "../../lib/rot/map/digger.js";
@@ -41,12 +43,28 @@ export function ebeneErzeugen(spiel, ebenenName) {
     }
   }
 
+  // Gelände-Objekte im Inneren der Räume außer dem Startraum
+  const objektFelder = [];
+  for (const raum of digger.getRooms().slice(1)) {
+    for (let y = raum.getTop() + 1; y <= raum.getBottom() - 1; y++) {
+      for (let x = raum.getLeft() + 1; x <= raum.getRight() - 1; x++) if (zeilen[y][x] === kennungBoden) objektFelder.push({ x, y });
+    }
+  }
+  const objektZufall = zufallErzeugen(startwertAbleiten(zustand.startwert, `ebene.${ebenenName}.objekte`));
+  for (const { gelaende, anzahl } of ebenendaten.gelaendeObjekte || []) {
+    for (let i = 0; i < anzahl && objektFelder.length; i++) {
+      const { x, y } = objektFelder.splice(zufallsGanzzahl(objektZufall, 0, objektFelder.length - 1), 1)[0];
+      zeilen[y][x] = spiel.daten.gelaende[gelaende].kennung;
+    }
+  }
+
   zustand.ebene = {
     name: ebenenName,
     breite,
     hoehe,
     felder: zeilen.map((zeile) => zeile.join("")),
     erkundet: new Array(breite * hoehe).fill(0),
+    schichten: { oberflaeche: {}, gas: {}, feuer: {} },
   };
 
   // Ninkasi in die Mitte des ersten Raums

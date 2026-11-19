@@ -33,6 +33,17 @@ export default {
     entdeckenVorgabe: 30, // Kampfwert entdecken ohne eigene Angabe
     reichweite: 5, // weiter entfernte Fallen werden nicht entdeckt
   },
+  // Feldschichten und Feuer, siehe src/systeme/schichten.js; Zahlen vorläufig
+  schichten: {
+    hoechstOberflaeche: 10, // Menge einer Oberfläche je Feld ohne eigenes hoechstens
+    hoechstGas: 1000, // Menge eines Gases je Feld ohne eigenes hoechstens
+  },
+  feuer: {
+    brennen: "brennen", // Effekt auf Wesen in einem brennenden Feld, je Welttick und beim Betreten
+    dauer: 3, // Brenndauer in Weltticks ohne eigene brenndauer
+    rauch: "rauch", // Gas, das ein Feuer je Welttick erzeugt
+    rauchMenge: 20,
+  },
   // Werfen, siehe src/systeme/werfen.js
   werfen: {
     reichweite: 6, // ohne wurf.reichweite am Gegenstand

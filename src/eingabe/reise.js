@@ -10,9 +10,10 @@ import { naechstesWegfeld } from "../welt/wege.js";
 import { lageErfassen, sichtbareFeinde, gefahrPruefen } from "../systeme/gefahr.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 import { fallenMeiden } from "../systeme/fallen.js";
+import { gefahrenMeiden, meidenZusammen } from "../systeme/schichten.js";
 
 // Wege nur über Erkundetes, nach Ninkasis wirksamer Bewegungsart
-const wegOptionen = (spiel) => ({ nurErkundet: true, bewegung: bewegungVon(spielerin(spiel.zustand)), meiden: fallenMeiden(spiel, { nurBekannte: true }) });
+const wegOptionen = (spiel) => ({ nurErkundet: true, bewegung: bewegungVon(spielerin(spiel.zustand)), meiden: meidenZusammen(fallenMeiden(spiel, { nurBekannte: true }), gefahrenMeiden(spiel)) });
 
 // Gibt { reise } oder { grund } zurück; grund: "kein_weg" | "feinde_in_sicht" | "vorbei"
 export function reiseBeginnen(spiel, ziel, einstellungen) {

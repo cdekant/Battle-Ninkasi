@@ -199,6 +199,10 @@ function pruefeRegeln(daten, regeln, fehler) {
   else pruefeParameter(daten, { beimFestsitzen: "effekt" }, regeln.bewegung, "regeln.bewegung", fehler);
   if (!istGanzzahl(regeln.werfen?.reichweite) || regeln.werfen.reichweite < 1) fehler.push("regeln.werfen.reichweite muss eine ganze Zahl >= 1 sein");
   if (!istGanzzahl(regeln.population?.hoechstWesen) || regeln.population.hoechstWesen < 1) fehler.push("regeln.population.hoechstWesen muss eine ganze Zahl >= 1 sein");
+  if (!istObjekt(regeln.schichten)) fehler.push("regeln.schichten fehlt");
+  else pruefeParameter(daten, { hoechstOberflaeche: "ganzzahl", hoechstGas: "ganzzahl" }, regeln.schichten, "regeln.schichten", fehler);
+  if (!istObjekt(regeln.feuer)) fehler.push("regeln.feuer fehlt");
+  else pruefeParameter(daten, { brennen: "effekt", dauer: "ganzzahl", rauch: "gas?", rauchMenge: "ganzzahl" }, regeln.feuer, "regeln.feuer", fehler);
   if (!istObjekt(regeln.fallen)) fehler.push("regeln.fallen fehlt");
   else pruefeParameter(daten, { entdeckenVorgabe: "ganzzahl", reichweite: "ganzzahl" }, regeln.fallen, "regeln.fallen", fehler);
   if (!regeln.kampf) return fehler.push("regeln.kampf fehlt");
@@ -233,6 +237,49 @@ function pruefeStoffwechsel(wesen, ort, fehler) {
     if (!wesen.werte || !wesen.werte[wertName]) fehler.push(`${ort}: stoffwechsel.regeneration.${wertName} ohne Wert ${wertName}`);
     fehler.push(...kurvenfehler(kurve, `${ort}.stoffwechsel.regeneration.${wertName}`));
   }
+}
+
+// Feldschichten: { oberflaechen, gase }, siehe systeme/schichten.js; Zeichen in zeichen.schichten
+function pruefeSchichten(daten, sprache, fehler) {
+  const schichten = daten.schichten;
+  if (!istObjekt(schichten) || !istObjekt(schichten.oberflaechen) || !istObjekt(schichten.gase)) return fehler.push("schichten { oberflaechen, gase } fehlen");
+  const prozentfeld = (werte, feld, ort) => {
+    if (werte[feld] !== undefined && !istProzent(werte[feld])) fehler.push(`${ort}: ${feld} muss eine ganze Zahl von 0 bis 100 sein`);
+  };
+  for (const [name, art] of Object.entries(schichten.oberflaechen)) {
+    const ort = `schichten.oberflaechen.${name}`;
+    pruefeText(sprache.texte, art.text, ort, fehler);
+    pruefeParameter(daten, { schwund: "ganzzahl?", hoechstens: "ganzzahl?", beimBetreten: "effekt?", jeTick: "effekt?", brenndauer: "ganzzahl?", verbrenntZu: "oberflaeche?", gefaehrlich: "wahrheitswert?" }, art, ort, fehler);
+    prozentfeld(art, "brennbar", ort);
+    if (art.ausbreitung !== undefined) {
+      if (!istObjekt(art.ausbreitung)) fehler.push(`${ort}: ausbreitung muss { chance } sein`);
+      else if (!istProzent(art.ausbreitung.chance)) fehler.push(`${ort}.ausbreitung: chance muss eine ganze Zahl von 0 bis 100 sein`);
+    }
+    const arten = art.ausloesenFuer;
+    if (arten !== undefined && !(istTextliste(arten) && arten.every((bewegung) => BEWEGUNGSARTEN.includes(bewegung)))) fehler.push(`${ort}: ausloesenFuer muss eine Liste aus ${BEWEGUNGSARTEN.join(", ")} sein`);
+    if (!daten.zeichen.schichten?.[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js (schichten)`);
+  }
+  for (const [name, art] of Object.entries(schichten.gase)) {
+    const ort = `schichten.gase.${name}`;
+    pruefeText(sprache.texte, art.text, ort, fehler);
+    pruefeParameter(daten, { hoechstens: "ganzzahl?", undurchsichtigAb: "ganzzahl?", explodiert: "effekt?", gefaehrlich: "wahrheitswert?" }, art, ort, fehler);
+    prozentfeld(art, "abbau", ort);
+    prozentfeld(art, "brennbar", ort);
+    if (art.stufen !== undefined) {
+      if (!Array.isArray(art.stufen)) fehler.push(`${ort}: stufen muss eine Liste sein`);
+      else art.stufen.forEach((stufe, nummer) => {
+        const stelle = `${ort}.stufen[${nummer}]`;
+        pruefeParameter(daten, { ab: "ganzzahl", effekt: "effekt" }, stufe, stelle, fehler);
+        if (nummer > 0 && istGanzzahl(stufe.ab) && stufe.ab <= art.stufen[nummer - 1].ab) fehler.push(`${stelle}: ab muss aufsteigen`);
+        if (stufe.wenn !== undefined) {
+          if (!Array.isArray(stufe.wenn)) fehler.push(`${stelle}: wenn muss eine Liste sein`);
+          else pruefeBedingungen(daten, stufe.wenn, `${stelle}.wenn`, fehler);
+        }
+      });
+    }
+    if (!daten.zeichen.schichten?.[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js (schichten)`);
+  }
+  if (!daten.zeichen.schichten?.feuer) fehler.push("zeichen.schichten.feuer fehlt");
 }
 
 // Fallen: { text, falle: { tarnung, effekt, ausloesenFuer? }, verborgen? }, siehe systeme/fallen.js
@@ -283,7 +330,7 @@ function pruefeMenge(schritt, ort, fehler) {
 const istZahlAbNull = (wert) => istGanzzahl(wert) && wert >= 0;
 
 // Parameter nach Beschreibung (siehe kern/bausteine.js): "text", "ganzzahl", "wahrheitswert", "effekt",
-// "muster", "zustand", "wesen", "schadensart", "gelaende", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
+// "muster", "zustand", "wesen", "schadensart", "gelaende", "oberflaeche", "gas", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
 function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
   for (const [feld, typ] of Object.entries(beschreibung)) {
     const wert = werte[feld];
@@ -310,6 +357,8 @@ function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
     else if (grundtyp === "schadensart" && !daten.schadensarten?.[wert]) fehler.push(`${ort}.${feld}: Schadensart "${wert}" gibt es nicht`);
     else if (grundtyp === "wesen" && (!daten.wesen?.[wert] || daten.wesen[wert].abstrakt)) fehler.push(`${ort}.${feld}: Wesen "${wert}" gibt es nicht`);
     else if (grundtyp === "gelaende" && !daten.gelaende?.[wert]) fehler.push(`${ort}.${feld}: Gelände "${wert}" gibt es nicht`);
+    else if (grundtyp === "oberflaeche" && !daten.schichten?.oberflaechen?.[wert]) fehler.push(`${ort}.${feld}: Oberfläche "${wert}" gibt es nicht`);
+    else if (grundtyp === "gas" && !daten.schichten?.gase?.[wert]) fehler.push(`${ort}.${feld}: Gas "${wert}" gibt es nicht`);
   }
 }
 
@@ -556,6 +605,7 @@ function pruefeEbene(daten, name, ebene, fehler) {
   for (const falle of ebene.fallen || []) {
     if (!daten.fallen?.[falle.typ]) fehler.push(`${ort}: Falle "${falle.typ}" gibt es nicht`);
   }
+  for (const objekt of ebene.gelaendeObjekte || []) pruefeParameter(daten, { gelaende: "gelaende", anzahl: "ganzzahl" }, objekt, `${ort}.gelaendeObjekte`, fehler);
   if (ebene.tuerChance !== undefined && !istProzent(ebene.tuerChance)) fehler.push(`${ort}: tuerChance muss eine ganze Zahl von 0 bis 100 sein`);
   for (const gegenstand of ebene.gegenstaende || []) {
     if (!daten.gegenstaende[gegenstand.typ]) fehler.push(`${ort}: Gegenstand "${gegenstand.typ}" gibt es nicht`);
@@ -575,6 +625,7 @@ export function vorbereiten(rohdaten, sprache = {}) {
   daten.zustaende = vorlagenAufloesen(rohdaten.zustaende || {}, "zustaende", fehler);
 
   pruefeSchadensarten(daten, sprache, fehler);
+  pruefeSchichten(daten, sprache, fehler);
   pruefeFraktionen(daten, sprache, fehler);
   for (const [name, effekt] of Object.entries(daten.effekte)) pruefeEffekt(daten, name, effekt, fehler);
   pruefeEffektKreise(daten, fehler);
@@ -595,6 +646,10 @@ export function vorbereiten(rohdaten, sprache = {}) {
       if (!istObjekt(gelaende.tuer) || Object.keys(gelaende.tuer).length !== 1 || !["offen", "zu"].includes(Object.keys(gelaende.tuer)[0])) fehler.push(`gelaende.${name}: tuer muss { offen } oder { zu } sein`);
       else pruefeParameter(daten, { offen: "gelaende?", zu: "gelaende?" }, gelaende.tuer, `gelaende.${name}.tuer`, fehler);
     }
+    // Feldschichten, siehe systeme/schichten.js
+    pruefeParameter(daten, { gasdurchlaessig: "wahrheitswert?", brenndauer: "ganzzahl?", verbrenntZu: "gelaende?" }, gelaende, `gelaende.${name}`, fehler);
+    if (gelaende.brennbar !== undefined && !istProzent(gelaende.brennbar)) fehler.push(`gelaende.${name}: brennbar muss eine ganze Zahl von 0 bis 100 sein`);
+    if (gelaende.quelle !== undefined) pruefeParameter(daten, { gas: "gas", menge: "ganzzahl" }, istObjekt(gelaende.quelle) ? gelaende.quelle : {}, `gelaende.${name}.quelle`, fehler);
     if (gelaende.zerstoerbar !== undefined) pruefeParameter(daten, { wird: "gelaende" }, istObjekt(gelaende.zerstoerbar) ? gelaende.zerstoerbar : {}, `gelaende.${name}.zerstoerbar`, fehler);
     const passierbarFuer = gelaende.passierbarFuer;
     if (passierbarFuer !== undefined && !(istTextliste(passierbarFuer) && passierbarFuer.every((art) => BEWEGUNGSARTEN.includes(art)))) {

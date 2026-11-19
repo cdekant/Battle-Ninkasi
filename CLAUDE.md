@@ -14,7 +14,7 @@
 
 + Roguelike-Spiel, Details in [docs/Grundlagen.md](docs/Grundlagen.md)
 + Charakter, Eigenschaften, Skills und EP in [docs/Charakter.md](docs/Charakter.md)
-+ Technische Architektur (Datenfluss, Befehle, Zeitmodell, Wirkungsarten, Modifikatoren, Kampfwerte, Fähigkeiten, lange Aktionen, Fraktionen, Effekte, Haken, Tod und Zustandsprüfung, Auslöser, Zustände, Zielauswahl, Wiederholbarkeit, Anzeige, Licht, Wahrnehmung, KI, Bewegung, Gelände, Leistung) in [docs/Architektur.md](docs/Architektur.md)
++ Technische Architektur (Datenfluss, Befehle, Zeitmodell, Wirkungsarten, Modifikatoren, Kampfwerte, Fähigkeiten, lange Aktionen, Fraktionen, Effekte, Haken, Tod und Zustandsprüfung, Auslöser, Zustände, Zielauswahl, Wiederholbarkeit, Anzeige, Licht, Wahrnehmung, KI, Bewegung, Gelände, Feldschichten, Leistung) in [docs/Architektur.md](docs/Architektur.md)
 + Sprachdateien, Textkorpus (`sprache/de/korpus/`) und Literaturverzeichnis (`sprache/literatur.json`, Originale in `sprache/Literatur/` nicht im Repo) in [docs/Texte.md](docs/Texte.md)
 + Tileset: Artstyle-Fibel, Pixeldaten, Vorschau und Ablauf in [docs/Tileset.md](docs/Tileset.md); neue Tiles folgen der Fibel
 + Arbeitsliste fehlender Strukturen (Reste aus Tod, Zielauswahl, Zuständen, Modifikatoren, Kampfwerten und Fähigkeiten, Fernkampf, Feldschichten, Ebenen, Gegenstände) samt bekannter Fehler in [docs/Systemausbau.md](docs/Systemausbau.md); umgesetzte Punkte wandern in die übrige Doku

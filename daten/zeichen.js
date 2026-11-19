@@ -6,6 +6,7 @@ export default {
     boden: { zeichen: ".", farbe: "#6b5a44", hintergrund: "#14110e" },
     tuer_zu: { zeichen: "+", farbe: "#c87533", hintergrund: "#2a221b" },
     tuer_offen: { zeichen: "'", farbe: "#c87533", hintergrund: "#14110e" },
+    gaerbottich: { zeichen: "O", farbe: "#c87533", hintergrund: "#2a221b" },
   },
   wesen: {
     ninkasi: { zeichen: "@", farbe: "#f2c14e" },
@@ -14,6 +15,16 @@ export default {
   },
   gegenstaende: {
     bier: { zeichen: "!", farbe: "#e0952b" },
+    brandflasche: { zeichen: "!", farbe: "#e5533d" },
+  },
+  // Feldschichten: Farbe der Überlagerung, bei Gas mit der Menge zunehmend deckend (src/anzeige/renderer.js)
+  schichten: {
+    saeure: { farbe: "#b4bd62" },
+    brand: { farbe: "#e0a83a" },
+    asche: { farbe: "#6b6b6b" },
+    co2: { farbe: "#7fa7c9" },
+    rauch: { farbe: "#9a9a9a" },
+    feuer: { zeichen: "^", farbe: "#ff7a1a" },
   },
   fallen: {
     saeureduese: { zeichen: "^", farbe: "#b4bd62" },

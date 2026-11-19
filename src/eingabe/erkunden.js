@@ -9,9 +9,10 @@ import { lageErfassen, sichtbareFeinde } from "../systeme/gefahr.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 import { unterwegsPruefen } from "./reise.js";
 import { fallenMeiden } from "../systeme/fallen.js";
+import { gefahrenMeiden, meidenZusammen } from "../systeme/schichten.js";
 
 // Wege nur über Erkundetes, nach Ninkasis wirksamer Bewegungsart
-const wegOptionen = (spiel) => ({ nurErkundet: true, bewegung: bewegungVon(spielerin(spiel.zustand)), meiden: fallenMeiden(spiel, { nurBekannte: true }) });
+const wegOptionen = (spiel) => ({ nurErkundet: true, bewegung: bewegungVon(spielerin(spiel.zustand)), meiden: meidenZusammen(fallenMeiden(spiel, { nurBekannte: true }), gefahrenMeiden(spiel)) });
 
 function naechstesRandfeld(spiel) {
   const position = spielerin(spiel.zustand).position;

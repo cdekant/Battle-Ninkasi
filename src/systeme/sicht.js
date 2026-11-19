@@ -3,7 +3,8 @@
 // Komponente in den Daten: sicht: { reichweite: 8 }
 
 import PreciseShadowcasting from "../../lib/rot/fov/precise-shadowcasting.js";
-import { durchsichtig, feldIndex, aufDerKarte, abstand } from "../welt/karte.js";
+import { feldIndex, aufDerKarte, abstand } from "../welt/karte.js";
+import { sichtdurchlaessig } from "../welt/schichten.js";
 import { sichtlinieFrei } from "../welt/geometrie.js";
 import { modifiziert } from "../kern/werte.js";
 import { spielerin, entitaetenMitPosition, entitaetenImUmkreis } from "../kern/zustand.js";
@@ -17,7 +18,8 @@ export function sichtfeldAktualisieren(spiel) {
   const ebene = zustand.ebene;
   const ninkasi = spielerin(zustand);
   const sichtbareFelder = new Set();
-  const lichtDurchlaessig = (x, y) => aufDerKarte(ebene, x, y) && durchsichtig(spiel, x, y);
+  // Gelände und dichter Rauch (welt/schichten.js) halten die Sicht auf
+  const lichtDurchlaessig = (x, y) => aufDerKarte(ebene, x, y) && sichtdurchlaessig(spiel, x, y);
   const schattenwurf = new PreciseShadowcasting(lichtDurchlaessig, { topology: 8 });
   schattenwurf.compute(ninkasi.position.x, ninkasi.position.y, reichweiteSicht(spiel, ninkasi), (x, y) => {
     if (aufDerKarte(ebene, x, y)) sichtbareFelder.add(feldIndex(ebene, x, y));

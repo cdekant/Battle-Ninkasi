@@ -110,16 +110,9 @@ Offener Rest:
 
 ## 8. Gelände, Feldschichten, Ebenen
 
-Status: in Arbeit; umgesetzt in Version 0.18.0 (veränderliches Gelände, `geschossdurchlaessig`, Türen, `tueren` am Wesen, Benutzen, Fallen mit Entdecken, Haken `zug_ende`), beschrieben in [Architektur.md](Architektur.md) (Gelände, Wegfindung)
+Status: in Arbeit; umgesetzt in Version 0.18.0 (veränderliches Gelände, `geschossdurchlaessig`, Türen, `tueren` am Wesen, Benutzen, Fallen mit Entdecken, Haken `zug_ende`) und 0.19.0 (Feldschichten Oberfläche, Gas und Feuer, dichter Rauch versperrt die Sicht, Gärbottiche, Brandflasche), beschrieben in [Architektur.md](Architektur.md) (Gelände, Feldschichten, Wegfindung)
 
-Entschieden: Aufteilung in 0.18.0, 0.19.0 und 0.20.0; Türen nach Brogue, sie öffnen sich beim Hindurchgehen und schließen sich von selbst, wer sie öffnet, steht am Wesen (Bakterien nicht); Fallen verborgen, Entdecken nach Tarnung, Abstand und dem Kampfwert `entdecken`; verlassene Ebenen ruhen; Gas als ganzzahlige Konzentration je Feld mit Diffusion nach Brogue, Wände und geschlossene Türen halten es auf, ohne Schwerkraft, Druck und Temperatur; Flüssigkeiten zunächst als Oberfläche mit Menge, ohne Fließen
-
-Offen, Version 0.19.0 (Feldschichten):
-
-+ Zwei Schichten neben der Karte, nur mit belegten Feldern (`{ feldindex: { art, menge } }`): Oberfläche (Bierpfütze, Säure, Schleim, Blut, Myzel) und Gas mit Konzentration
-+ Je Schicht ein Handler der Weltuhr nur über die belegten Felder: Gas gleicht sich mit den Nachbarn aus (ganzzahlig, feste Reihenfolge, Gesamtmenge bleibt bis auf Quellen und Abbau je Art), Oberflächen trocknen, Myzel wächst
-+ Wirkung beim Betreten (Haken) und je Welttick für wer darin steht, über eine Kurve über der Konzentration (CO2: Benommenheit, dann Ersticken); Quellen als Gelände (Gärbottich)
-+ Feuer als Oberfläche mit Brennbarkeit an Gelände, Oberfläche und Gas, springt mit einer Wahrscheinlichkeit über, brennt aus, hinterlässt Asche; Hochprozentiges brennt, Bier nicht; Feuer weckt Endosporen
+Entschieden: Aufteilung in 0.18.0, 0.19.0 und 0.20.0; Türen nach Brogue, sie öffnen sich beim Hindurchgehen und schließen sich von selbst, wer sie öffnet, steht am Wesen (Bakterien nicht); Fallen verborgen, Entdecken nach Tarnung, Abstand und dem Kampfwert `entdecken`; verlassene Ebenen ruhen; Gas als ganzzahlige Konzentration je Feld mit Diffusion nach Brogue, Wände und geschlossene Türen halten es auf, ohne Schwerkraft, Druck und Temperatur; Flüssigkeiten zunächst als Oberfläche mit Menge, ohne Fließen; je Feld und Schicht eine Art, auf der Oberfläche verdrängt die neue, beim Gas die größere Menge; Wirkung des Gases in Stufen; dichter Rauch versperrt die Sicht
 
 Offen, Version 0.20.0 (mehrere Ebenen):
 
@@ -130,11 +123,13 @@ Offen, Version 0.20.0 (mehrere Ebenen):
 
 Offener Rest:
 
-+ Tiles für Türen und Fallen (bisher nur Zeichen)
++ Tiles für Türen, Fallen, Gärbottich und Brandflasche, Darstellung der Schichten über Tiles (bisher Zeichen und Farben)
 + Reise und Erkunden halten mit `kein_weg`, wenn eine entdeckte Falle den einzigen Weg versperrt; später vielleicht mit Nachfrage, ob Ninkasi darübergehen soll
 + Ausdrückliches Suchen nach Fallen (mehrere Züge, doppeltes Entdecken), vielleicht zusammen mit dem Rasten
 + Hebel mit Wirkung in der Ferne und verschlossene Türen mit Schlüssel: mit den Themenräumen (Punkt 10)
 + Abstraktes Nachholen verlassener Ebenen: Population wächst je vergangener Zeit logistisch auf eine Tragfähigkeit aus den Daten zu (Punkt 10, Druck gegen endloses Rasten)
++ Benommenheit und Ersticken als Zustände statt Giftschaden, sobald es Zustände im Spielinhalt gibt
++ Bewusst noch ohne: Endosporen, die Feuer weckt (es gibt keine Endosporen), Licht durch Feuer (mit dem Licht), Fließen von Flüssigkeiten
 
 ## 9. Gegenstände
 

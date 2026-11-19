@@ -8,6 +8,7 @@
 // Reihenfolge der Felder in Mustern: nach Abstand zum Ursprung (dx² + dy²), dann nach Feldindex.
 
 import { aufDerKarte, durchsichtig, geschossdurchlaessig, feldIndex } from "./karte.js";
+import { sichtdurchlaessig } from "./schichten.js";
 import { entitaetenAuf, istWesen } from "../kern/zustand.js";
 
 // Die acht Nachbarrichtungen in fester Reihenfolge (zeilenweise von links oben)
@@ -64,7 +65,8 @@ export function sichtlinieFrei(spiel, von, nach) {
   for (let nummer = 1; nummer < felder.length; nummer++) {
     if (!schrittFrei(spiel, felder[nummer - 1], felder[nummer])) return false;
     const istEndpunkt = nummer === felder.length - 1;
-    if (!istEndpunkt && !durchsichtig(spiel, felder[nummer].x, felder[nummer].y)) return false;
+    // die Sicht hält auch dichter Rauch auf (welt/schichten.js), Wandecken bleiben eine Frage des Geländes
+    if (!istEndpunkt && !sichtdurchlaessig(spiel, felder[nummer].x, felder[nummer].y)) return false;
   }
   return true;
 }

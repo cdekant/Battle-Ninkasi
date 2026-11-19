@@ -14,10 +14,13 @@ import faehigkeiten from "./faehigkeiten.js";
 import risiken from "./risiken.js";
 import fraktionen from "./fraktionen.js";
 import fallen from "./fallen.js";
+import schichten from "./schichten.js";
+import wurfgegenstaende from "./wurfgegenstaende.js";
 
 export default {
   wesen: { ...ninkasi, ...gegner },
-  gegenstaende: { ...getraenke },
+  gegenstaende: { ...getraenke, ...wurfgegenstaende },
+  schichten,
   fallen,
   effekte,
   schadensarten,

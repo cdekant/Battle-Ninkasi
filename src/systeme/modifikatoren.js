@@ -8,6 +8,8 @@
 //   wert_unter_prozent { wert, prozent }  aktueller Wert unter prozent des Grundwerts (ohne Modifikatoren)
 //   gegenueber_tag { tag }          das Gegenüber der Abfrage (umstaende.gegenueberId) trägt den Tag
 //   gegenueber_ahnungslos {}        das Gegenüber ist ahnungslos (Hinterhalt, systeme/wahrnehmung.js)
+//   hat_tag { tag }                 die Entität trägt den Tag (tags in den Daten)
+//   ohne_tag { tag }                die Entität trägt den Tag nicht, z.B. Gas wirkt nur auf Wesen ohne "anaerob"
 //   hat_zustand { zustand }         die Entität trägt den Zustand
 //   ohne_zustand { zustand }        die Entität trägt den Zustand nicht, z.B. damit eine Bossphase nur einmal beginnt
 //
@@ -51,6 +53,10 @@ bedingungAnmelden("gegenueber_tag", { tag: "text" }, (spiel, entitaet, parameter
 });
 
 bedingungAnmelden("gegenueber_ahnungslos", {}, (spiel, entitaet, parameter, umstaende) => istAhnungslos(spiel.zustand.entitaeten[umstaende.gegenueberId]));
+
+bedingungAnmelden("hat_tag", { tag: "text" }, (spiel, entitaet, parameter) => Boolean(entitaet.tags?.includes(parameter.tag)));
+
+bedingungAnmelden("ohne_tag", { tag: "text" }, (spiel, entitaet, parameter) => !entitaet.tags?.includes(parameter.tag));
 
 const traegtZustand = (entitaet, name) => (entitaet.zustaende || []).some((instanz) => instanz.name === name);
 

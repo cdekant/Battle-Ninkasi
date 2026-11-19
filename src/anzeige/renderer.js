@@ -7,6 +7,10 @@ const SCHRIFT = '"DejaVu Sans Mono", "Cascadia Mono", Consolas, monospace';
 const DECKKRAFT_ERINNERT = 0.35; // erkundete, aber gerade nicht sichtbare Felder
 
 import { istBekannt } from "../systeme/fallen.js";
+import { schichtenVon, feldVonIndex } from "../welt/schichten.js";
+
+// Deckkraft der Feldschichten: Oberfläche und Feuer fest, Gas mit der Menge zunehmend bis höchstens GAS_DECKKRAFT
+const OBERFLAECHE_DECKKRAFT = 0.4, FEUER_DECKKRAFT = 0.6, GAS_DECKKRAFT = 0.6, GAS_VOLL = 100;
 
 export class Renderer {
   // zeichensatz: daten/zeichen.js; tilebilder: aus tilebilderErstellen oder null (nur Zeichen)
@@ -87,6 +91,10 @@ export class Renderer {
       }
     }
 
+    // Oberfläche und Feuer liegen unter allem, was auf dem Feld steht
+    this.schichtZeichnen(spiel, kamera, ansicht, zoom, sichtbareFelder, "oberflaeche");
+    this.schichtZeichnen(spiel, kamera, ansicht, zoom, sichtbareFelder, "feuer");
+
     // Fallen unter Gegenständen unter Wesen; nur, was gerade sichtbar ist, verborgene Fallen erst, wenn entdeckt
     const sichtbareEntitaeten = Object.values(zustand.entitaeten).filter((entitaet) =>
       entitaet.position && sichtbareFelder.has(entitaet.position.y * ebene.breite + entitaet.position.x)
@@ -107,7 +115,35 @@ export class Renderer {
       this.feldZeichnen(bildX, bildY, zoom, entitaet.typ, { ...zeichenEintrag, hintergrund }, 1);
     }
 
+    // Gas schwebt über allem
+    this.schichtZeichnen(spiel, kamera, ansicht, zoom, sichtbareFelder, "gas");
     this.markierungenZeichnen(kamera, ansicht, zoom, markierungen);
+  }
+
+  // Eine Feldschicht als farbige Überlagerung auf sichtbaren Feldern (Farben in zeichen.schichten, Feuer mit Zeichen)
+  schichtZeichnen(spiel, kamera, ansicht, zoom, sichtbareFelder, schicht) {
+    const pinsel = this.pinsel;
+    const ebene = spiel.zustand.ebene;
+    const farben = this.zeichensatz.schichten || {};
+    for (const [indexText, eintrag] of Object.entries(schichtenVon(ebene)[schicht])) {
+      const index = Number(indexText);
+      if (!sichtbareFelder.has(index)) continue;
+      const { x, y } = feldVonIndex(ebene, index);
+      const bildX = x - kamera.x, bildY = y - kamera.y;
+      if (bildX < 0 || bildY < 0 || bildX >= ansicht.breite || bildY >= ansicht.hoehe) continue;
+      const darstellung = farben[schicht === "feuer" ? "feuer" : eintrag.art];
+      if (!darstellung) continue;
+      const deckkraft = schicht === "gas" ? Math.min(GAS_DECKKRAFT, (GAS_DECKKRAFT * eintrag.menge) / GAS_VOLL)
+        : schicht === "feuer" ? FEUER_DECKKRAFT : OBERFLAECHE_DECKKRAFT;
+      pinsel.globalAlpha = deckkraft;
+      pinsel.fillStyle = darstellung.farbe;
+      pinsel.fillRect(bildX * zoom, bildY * zoom, zoom, zoom);
+      if (darstellung.zeichen) {
+        pinsel.globalAlpha = 1;
+        pinsel.fillText(darstellung.zeichen, bildX * zoom + zoom / 2, bildY * zoom + zoom / 2 + 1);
+      }
+    }
+    pinsel.globalAlpha = 1;
   }
 
   markierungenZeichnen(kamera, ansicht, zoom, { zeiger = null, weg = [], gefahr = [] }) {

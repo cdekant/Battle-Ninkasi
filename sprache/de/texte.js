@@ -23,6 +23,10 @@ export default {
     geschlecht: "n",
     einzahl: { nom: "Klappergeschirr", gen: "Klappergeschirrs", dat: "Klappergeschirr", akk: "Klappergeschirr" },
   },
+  "gegenstand.brandflasche": {
+    geschlecht: "f",
+    einzahl: { nom: "Brandflasche", gen: "Brandflasche", dat: "Brandflasche", akk: "Brandflasche" },
+  },
   "gegenstand.bier": {
     geschlecht: "n",
     einzahl: { nom: "Bier", gen: "Biers", dat: "Bier", akk: "Bier" },
@@ -97,6 +101,13 @@ export default {
   "faehigkeit.saeurespucke": "Säurespucke",
   "faehigkeit.saeureschwall": "Säureschwall",
   "faehigkeit.saeureschwall.ankuendigung": "{wer.nom} bläht sich auf und zielt. Gleich kommt ein Schwall.",
+
+  // Feldschichten
+  "oberflaeche.saeure": "Säure",
+  "oberflaeche.brand": "Brandlache",
+  "oberflaeche.asche": "Asche",
+  "gas.co2": "CO2",
+  "gas.rauch": "Rauch",
 
   // Fraktionen
   "fraktion.ninkasi": "Ninkasi",

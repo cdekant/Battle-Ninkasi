@@ -5,10 +5,14 @@
 // (Vorgabe regeln.bewegung.beimFestsitzen, src/systeme/verschieben.js).
 // Veränderliches Gelände (src/systeme/gelaende.js): tuer: { offen } bzw. { zu } für Türen, zerstoerbar: { wird },
 // beimBenutzen: Effekt (Hebel), geschossdurchlaessig: abweichend von durchsichtig (Gitter).
+// Feldschichten (src/systeme/schichten.js): gasdurchlaessig (Vorgabe wie passierbar), quelle: { gas, menge } je Welttick,
+// brennbar in Prozent, brenndauer, verbrenntZu: Gelände nach dem Feuer.
 export default {
   wand: { kennung: "#", passierbar: false, durchsichtig: false, laermdaempfung: 8 }, // Kosten für Lärm, ohne Angabe undurchlässig
   boden: { kennung: ".", passierbar: true, durchsichtig: true },
   // geht beim Hindurchgehen auf und von selbst wieder zu; zu versperrt sie Sicht und dämpft Lärm
-  tuer_zu: { kennung: "+", passierbar: false, durchsichtig: false, laermdaempfung: 3, tuer: { offen: "tuer_offen" }, zerstoerbar: { wird: "boden" } },
-  tuer_offen: { kennung: "'", passierbar: true, durchsichtig: true, tuer: { zu: "tuer_zu" }, zerstoerbar: { wird: "boden" } },
+  tuer_zu: { kennung: "+", passierbar: false, durchsichtig: false, laermdaempfung: 3, tuer: { offen: "tuer_offen" }, zerstoerbar: { wird: "boden" }, brennbar: 20, brenndauer: 6, verbrenntZu: "boden" },
+  tuer_offen: { kennung: "'", passierbar: true, durchsichtig: true, tuer: { zu: "tuer_zu" }, zerstoerbar: { wird: "boden" }, brennbar: 20, brenndauer: 6, verbrenntZu: "boden" },
+  // gärt vor sich hin: Quelle von CO2 auf den Nachbarfeldern, man kommt nicht hindurch, sieht aber darüber
+  gaerbottich: { kennung: "O", passierbar: false, durchsichtig: true, laermdaempfung: 4, quelle: { gas: "co2", menge: 6 } },
 };

@@ -28,6 +28,8 @@ export function gelaendeSetzen(spiel, feld, name) {
   if (vorher === name) return;
   const zeile = ebene.felder[feld.y];
   ebene.felder[feld.y] = zeile.slice(0, feld.x) + spiel.daten.gelaende[name].kennung + zeile.slice(feld.x + 1);
+  // aus der Karte abgeleitete Vorräte verwerfen (Gasquellen, systeme/schichten.js)
+  spiel.zwischenspeicher.gasquellen = null;
   melden(spiel, "gelaende_geaendert", { feld: { x: feld.x, y: feld.y }, vorher, nachher: name });
   for (const entitaet of entitaetenAuf(zustand, feld.x, feld.y)) lageVormerken(zustand, entitaet);
   const ninkasi = zustand.spielerinId != null ? spielerin(zustand) : null;
