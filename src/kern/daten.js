@@ -94,7 +94,7 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
     if (!istTextliste(wesen.faehigkeiten)) fehler.push(`${ort}: faehigkeiten muss eine Liste von Namen sein`);
     else for (const faehigkeit of wesen.faehigkeiten) if (!daten.faehigkeiten?.[faehigkeit]) fehler.push(`${ort}: Fähigkeit "${faehigkeit}" gibt es nicht`);
   }
-  pruefeParameter(daten, { bewegung: BEWEGUNGSARTEN }, wesen, ort, fehler);
+  pruefeParameter(daten, { bewegung: BEWEGUNGSARTEN, tueren: ["oeffnen", "nicht"] }, wesen, ort, fehler);
   if (wesen.ki) pruefeKi(daten, wesen.ki, `${ort}.ki`, fehler, istTextliste(wesen.faehigkeiten) ? wesen.faehigkeiten : []);
   if (wesen.stoffwechsel) pruefeStoffwechsel(wesen, ort, fehler);
   if (wesen.sicht && !istGanzzahl(wesen.sicht.reichweite)) fehler.push(`${ort}: sicht.reichweite muss eine ganze Zahl sein`);
@@ -199,6 +199,8 @@ function pruefeRegeln(daten, regeln, fehler) {
   else pruefeParameter(daten, { beimFestsitzen: "effekt" }, regeln.bewegung, "regeln.bewegung", fehler);
   if (!istGanzzahl(regeln.werfen?.reichweite) || regeln.werfen.reichweite < 1) fehler.push("regeln.werfen.reichweite muss eine ganze Zahl >= 1 sein");
   if (!istGanzzahl(regeln.population?.hoechstWesen) || regeln.population.hoechstWesen < 1) fehler.push("regeln.population.hoechstWesen muss eine ganze Zahl >= 1 sein");
+  if (!istObjekt(regeln.fallen)) fehler.push("regeln.fallen fehlt");
+  else pruefeParameter(daten, { entdeckenVorgabe: "ganzzahl", reichweite: "ganzzahl" }, regeln.fallen, "regeln.fallen", fehler);
   if (!regeln.kampf) return fehler.push("regeln.kampf fehlt");
   for (const [feld, untergrenze] of Object.entries(KAMPFREGELN)) {
     const wert = regeln.kampf[feld];
@@ -231,6 +233,19 @@ function pruefeStoffwechsel(wesen, ort, fehler) {
     if (!wesen.werte || !wesen.werte[wertName]) fehler.push(`${ort}: stoffwechsel.regeneration.${wertName} ohne Wert ${wertName}`);
     fehler.push(...kurvenfehler(kurve, `${ort}.stoffwechsel.regeneration.${wertName}`));
   }
+}
+
+// Fallen: { text, falle: { tarnung, effekt, ausloesenFuer? }, verborgen? }, siehe systeme/fallen.js
+function pruefeFalle(daten, sprache, name, falle, fehler) {
+  const ort = `fallen.${name}`;
+  pruefeText(sprache.texte, falle.text, ort, fehler);
+  pruefeNomen(sprache, falle.text, fehler);
+  if (!istObjekt(falle.falle)) return fehler.push(`${ort}: falle { tarnung, effekt } fehlt`);
+  pruefeParameter(daten, { tarnung: "ganzzahl", effekt: "effekt" }, falle.falle, `${ort}.falle`, fehler);
+  const arten = falle.falle.ausloesenFuer;
+  if (arten !== undefined && !(istTextliste(arten) && arten.every((art) => BEWEGUNGSARTEN.includes(art)))) fehler.push(`${ort}.falle: ausloesenFuer muss eine Liste aus ${BEWEGUNGSARTEN.join(", ")} sein`);
+  pruefeParameter(daten, { verborgen: "wahrheitswert?" }, falle, ort, fehler);
+  if (!daten.zeichen.fallen?.[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js`);
 }
 
 function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
@@ -268,7 +283,7 @@ function pruefeMenge(schritt, ort, fehler) {
 const istZahlAbNull = (wert) => istGanzzahl(wert) && wert >= 0;
 
 // Parameter nach Beschreibung (siehe kern/bausteine.js): "text", "ganzzahl", "wahrheitswert", "effekt",
-// "muster", "zustand", "wesen", "schadensart", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
+// "muster", "zustand", "wesen", "schadensart", "gelaende", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
 function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
   for (const [feld, typ] of Object.entries(beschreibung)) {
     const wert = werte[feld];
@@ -294,6 +309,7 @@ function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
     else if (grundtyp === "zustand" && !daten.zustaende?.[wert]) fehler.push(`${ort}.${feld}: Zustand "${wert}" gibt es nicht`);
     else if (grundtyp === "schadensart" && !daten.schadensarten?.[wert]) fehler.push(`${ort}.${feld}: Schadensart "${wert}" gibt es nicht`);
     else if (grundtyp === "wesen" && (!daten.wesen?.[wert] || daten.wesen[wert].abstrakt)) fehler.push(`${ort}.${feld}: Wesen "${wert}" gibt es nicht`);
+    else if (grundtyp === "gelaende" && !daten.gelaende?.[wert]) fehler.push(`${ort}.${feld}: Gelände "${wert}" gibt es nicht`);
   }
 }
 
@@ -537,6 +553,10 @@ function pruefeEbene(daten, name, ebene, fehler) {
   const bestellt = 1 + (ebene.gegner || []).reduce((summe, gegner) => summe + (istGanzzahl(gegner.anzahl) ? gegner.anzahl : 0), 0);
   const hoechstWesen = daten.regeln?.population?.hoechstWesen;
   if (istGanzzahl(hoechstWesen) && bestellt > hoechstWesen) fehler.push(`${ort}: ${bestellt} Wesen mit Ninkasi, mehr als regeln.population.hoechstWesen (${hoechstWesen})`);
+  for (const falle of ebene.fallen || []) {
+    if (!daten.fallen?.[falle.typ]) fehler.push(`${ort}: Falle "${falle.typ}" gibt es nicht`);
+  }
+  if (ebene.tuerChance !== undefined && !istProzent(ebene.tuerChance)) fehler.push(`${ort}: tuerChance muss eine ganze Zahl von 0 bis 100 sein`);
   for (const gegenstand of ebene.gegenstaende || []) {
     if (!daten.gegenstaende[gegenstand.typ]) fehler.push(`${ort}: Gegenstand "${gegenstand.typ}" gibt es nicht`);
   }
@@ -563,12 +583,19 @@ export function vorbereiten(rohdaten, sprache = {}) {
   for (const [name, faehigkeit] of Object.entries(daten.faehigkeiten || {})) pruefeFaehigkeit(daten, sprache, name, faehigkeit, fehler);
   for (const [name, wesen] of Object.entries(daten.wesen)) pruefeWesen(daten, sprache, name, wesen, fehler);
   for (const [name, gegenstand] of Object.entries(daten.gegenstaende)) pruefeGegenstand(daten, sprache, name, gegenstand, fehler);
+  for (const [name, falle] of Object.entries(daten.fallen || {})) pruefeFalle(daten, sprache, name, falle, fehler);
   for (const [name, ebene] of Object.entries(daten.ebenen)) pruefeEbene(daten, name, ebene, fehler);
   for (const [name, gelaende] of Object.entries(daten.gelaende)) {
     if (typeof gelaende.kennung !== "string" || gelaende.kennung.length !== 1) fehler.push(`gelaende.${name}: kennung muss genau ein Zeichen sein`);
     if (gelaende.laermdaempfung !== undefined && !istZahlAbNull(gelaende.laermdaempfung)) fehler.push(`gelaende.${name}: laermdaempfung muss eine ganze Zahl >= 0 sein`);
     // Bewegungsarten, siehe welt/karte.js
-    pruefeParameter(daten, { passierbar: "wahrheitswert?", undurchdringlich: "wahrheitswert?", beimFestsitzen: "effekt?" }, gelaende, `gelaende.${name}`, fehler);
+    pruefeParameter(daten, { passierbar: "wahrheitswert?", undurchdringlich: "wahrheitswert?", beimFestsitzen: "effekt?", beimBenutzen: "effekt?", geschossdurchlaessig: "wahrheitswert?" }, gelaende, `gelaende.${name}`, fehler);
+    // Türen und Zerstören, siehe systeme/gelaende.js
+    if (gelaende.tuer !== undefined) {
+      if (!istObjekt(gelaende.tuer) || Object.keys(gelaende.tuer).length !== 1 || !["offen", "zu"].includes(Object.keys(gelaende.tuer)[0])) fehler.push(`gelaende.${name}: tuer muss { offen } oder { zu } sein`);
+      else pruefeParameter(daten, { offen: "gelaende?", zu: "gelaende?" }, gelaende.tuer, `gelaende.${name}.tuer`, fehler);
+    }
+    if (gelaende.zerstoerbar !== undefined) pruefeParameter(daten, { wird: "gelaende" }, istObjekt(gelaende.zerstoerbar) ? gelaende.zerstoerbar : {}, `gelaende.${name}.zerstoerbar`, fehler);
     const passierbarFuer = gelaende.passierbarFuer;
     if (passierbarFuer !== undefined && !(istTextliste(passierbarFuer) && passierbarFuer.every((art) => BEWEGUNGSARTEN.includes(art)))) {
       fehler.push(`gelaende.${name}: passierbarFuer muss eine Liste aus ${BEWEGUNGSARTEN.join(", ")} sein`);

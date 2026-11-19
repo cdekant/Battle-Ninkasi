@@ -7,7 +7,7 @@
 //   kreis, kegel:   Abstand als dx² + dy²; ein Feld liegt im Kreis mit Radius r, wenn dx² + dy² <= r·(r+1)
 // Reihenfolge der Felder in Mustern: nach Abstand zum Ursprung (dx² + dy²), dann nach Feldindex.
 
-import { aufDerKarte, durchsichtig, feldIndex } from "./karte.js";
+import { aufDerKarte, durchsichtig, geschossdurchlaessig, feldIndex } from "./karte.js";
 import { entitaetenAuf, istWesen } from "../kern/zustand.js";
 
 // Die acht Nachbarrichtungen in fester Reihenfolge (zeilenweise von links oben)
@@ -87,7 +87,8 @@ export function verlaengerung(von, durch, anzahl) {
 // Bahn eines Geschosses von "von" in Richtung "nach", ohne das Startfeld.
 // optionen: { reichweite, durchdringend, ueberZielHinaus, ueberspringen }
 //   ohne ueberZielHinaus endet die Bahn am Ziel, sonst erst an der Reichweite (Maß wie beim Kreis)
-//   undurchsichtige Felder und gesperrte Wandecken halten auf, das Feld davor ist der Aufschlag
+//   Felder, die Geschosse nicht durchlassen (karte.js geschossdurchlaessig), und gesperrte Wandecken halten auf,
+//   das Feld davor ist der Aufschlag
 //   das erste Wesen hält auf, außer bei durchdringend
 //   ueberspringen(wesen): Wesen, für die sie true liefert, fliegt das Geschoss über (nicht getroffen, hält nicht auf)
 // Gibt { felder, getroffene: [IDs], aufschlag } zurück; ändert nichts.
@@ -107,7 +108,7 @@ export function flugbahn(spiel, von, nach, { reichweite = Infinity, durchdringen
   for (let nummer = 1; nummer < bahn.length; nummer++) {
     const feld = bahn[nummer];
     if (!inReichweite(von, feld, reichweite)) break;
-    if (!durchsichtig(spiel, feld.x, feld.y) || !schrittFrei(spiel, bahn[nummer - 1], feld)) break;
+    if (!geschossdurchlaessig(spiel, feld.x, feld.y) || !schrittFrei(spiel, bahn[nummer - 1], feld)) break;
     ergebnis.felder.push(feld);
     ergebnis.aufschlag = feldKopie(feld);
     for (const wesen of wesenAufFeld(spiel, feld)) if (!ueberspringen?.(wesen)) ergebnis.getroffene.push(wesen.id);

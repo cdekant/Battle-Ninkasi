@@ -7,5 +7,7 @@ export default {
     digger: { dugPercentage: 0.35, roomWidth: [4, 12], roomHeight: [3, 7], corridorLength: [3, 10] },
     gegner: [{ typ: "essigbakterium", anzahl: 15 }, { typ: "fernkaempfer_test", anzahl: 3 }],
     gegenstaende: [{ typ: "bier", anzahl: 10 }],
+    fallen: [{ typ: "saeureduese", anzahl: 6 }, { typ: "klappergeschirr", anzahl: 6 }],
+    tuerChance: 50, // Prozent der Raumzugänge mit Tür
   },
 };

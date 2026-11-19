@@ -15,6 +15,14 @@ export default {
     geschlecht: "m",
     einzahl: { nom: "Fernkämpfer-Test", gen: "Fernkämpfer-Tests", dat: "Fernkämpfer-Test", akk: "Fernkämpfer-Test" },
   },
+  "falle.saeureduese": {
+    geschlecht: "f",
+    einzahl: { nom: "Säuredüse", gen: "Säuredüse", dat: "Säuredüse", akk: "Säuredüse" },
+  },
+  "falle.klappergeschirr": {
+    geschlecht: "n",
+    einzahl: { nom: "Klappergeschirr", gen: "Klappergeschirrs", dat: "Klappergeschirr", akk: "Klappergeschirr" },
+  },
   "gegenstand.bier": {
     geschlecht: "n",
     einzahl: { nom: "Bier", gen: "Biers", dat: "Bier", akk: "Bier" },
@@ -53,6 +61,9 @@ export default {
   "log.zerbrochen": "{was.nom} zerbricht.",
   "log.gelandet": "{was.nom} landet auf dem Boden.",
   "log.population_voll": "Hinweis: Die Ebene ist voll ({hoechstWesen} Wesen), {ausgefallen} weitere entstehen nicht.",
+  "log.falle_entdeckt": "{wer.nom} entdeckt {was.akk.ein}.",
+  "log.falle_ausgeloest": "{wer.nom} tritt in {was.akk.ein}!",
+  "log.benutzt": "{wer.nom} macht sich daran zu schaffen.",
   "log.verpufft": "{wer.nom} verliert den Faden. Die Wirkung verpufft.",
   "log.aktion_unterbrochen": "Etwas stört. Weitermachen mit [Leertaste], jede andere Taste bricht ab.",
   "log.aktion_abgebrochen": "{wer.nom} bricht ab.",
@@ -74,6 +85,7 @@ export default {
   "log.abgelehnt.material_fehlt": "Es fehlt an Zutaten.",
   "log.abgelehnt.unbeweglich": "Ninkasi kommt nicht vom Fleck.",
   "log.abgelehnt.nichts_zu_werfen": "Nichts zum Werfen da.",
+  "log.abgelehnt.nichts_zu_benutzen": "Da gibt es nichts zu bedienen.",
   "log.abgelehnt.nichts_laufend": "Da gibt es nichts fortzusetzen.",
   "log.abgelehnt.kein_ziel": "Da ist niemand.",
   "log.abgelehnt.nicht_sichtbar": "Ninkasi sieht dort nichts.",

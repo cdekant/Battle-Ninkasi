@@ -8,9 +8,10 @@ import { naechstesWegfeld, naechstesFeldMit, amRandDesErkundeten } from "../welt
 import { lageErfassen, sichtbareFeinde } from "../systeme/gefahr.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 import { unterwegsPruefen } from "./reise.js";
+import { fallenMeiden } from "../systeme/fallen.js";
 
 // Wege nur über Erkundetes, nach Ninkasis wirksamer Bewegungsart
-const wegOptionen = (spiel) => ({ nurErkundet: true, bewegung: bewegungVon(spielerin(spiel.zustand)) });
+const wegOptionen = (spiel) => ({ nurErkundet: true, bewegung: bewegungVon(spielerin(spiel.zustand)), meiden: fallenMeiden(spiel, { nurBekannte: true }) });
 
 function naechstesRandfeld(spiel) {
   const position = spielerin(spiel.zustand).position;

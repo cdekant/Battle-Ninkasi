@@ -7,6 +7,10 @@
 //   phasend betritt jedes Gelände außer undurchdringlich: true (und nichts außerhalb der Karte)
 //   unbeweglich steht, wo laufend stehen kann, bewegt sich aber nicht (systeme/bewegung.js)
 //   fest: Gelände, das für keine Art außer phasend passierbar ist (Wand); dort prallt ein Stoß auf
+// Türen (systeme/gelaende.js): tuer: { offen: Gelände } an der geschlossenen Tür; wer Türen öffnet (am Wesen
+//   tueren: "oeffnen", Vorgabe, oder "nicht"), betritt sie, als wäre sie schon offen
+// Geschosse fliegen durch, was durchsichtig ist, außer geschossdurchlaessig: false; mit geschossdurchlaessig: true
+//   auch durch Undurchsichtiges (welt/geometrie.js flugbahn)
 
 import { bewegungVon } from "../kern/zustand.js";
 
@@ -45,18 +49,29 @@ export function passierbar(spiel, x, y) {
 
 export const BEWEGUNGSARTEN = ["laufend", "fliegend", "schwebend", "phasend", "unbeweglich"];
 
-// Ob ein Feld für eine Bewegungsart betretbar ist (ohne Rücksicht auf Wesen darauf)
-export function betretbarFuer(spiel, x, y, bewegungsart = "laufend") {
-  const gelaende = gelaendeAuf(spiel, x, y);
-  if (!gelaende) return false;
+function gelaendeBetretbar(gelaende, bewegungsart) {
   if (bewegungsart === "phasend") return !gelaende.undurchdringlich;
   if (gelaende.passierbar) return true;
   return bewegungsart !== "unbeweglich" && (gelaende.passierbarFuer || []).includes(bewegungsart);
 }
 
+// Ob ein Feld für eine Bewegungsart betretbar ist (ohne Rücksicht auf Wesen darauf); eine geschlossene Tür zählt
+// wie die offene, wenn oeffnetTueren gilt
+export function betretbarFuer(spiel, x, y, bewegungsart = "laufend", oeffnetTueren = true) {
+  const gelaende = gelaendeAuf(spiel, x, y);
+  if (!gelaende) return false;
+  if (gelaendeBetretbar(gelaende, bewegungsart)) return true;
+  const offen = oeffnetTueren && gelaende.tuer?.offen ? spiel.daten.gelaende[gelaende.tuer.offen] : null;
+  return Boolean(offen) && gelaendeBetretbar(offen, bewegungsart);
+}
+
+export function oeffnetTueren(wesen) {
+  return (wesen.tueren ?? "oeffnen") === "oeffnen";
+}
+
 // Ob ein Wesen mit seiner wirksamen Bewegungsart das Feld betreten (oder darauf stehen) kann
 export function betretbar(spiel, wesen, feld) {
-  return betretbarFuer(spiel, feld.x, feld.y, bewegungVon(wesen));
+  return betretbarFuer(spiel, feld.x, feld.y, bewegungVon(wesen), oeffnetTueren(wesen));
 }
 
 // Festes Gelände (oder außerhalb der Karte): für niemanden passierbar außer phasend
@@ -68,6 +83,13 @@ export function fest(spiel, x, y) {
 export function durchsichtig(spiel, x, y) {
   const gelaende = gelaendeAuf(spiel, x, y);
   return Boolean(gelaende && gelaende.durchsichtig);
+}
+
+// Ob ein Geschoss das Feld durchfliegen kann: Vorgabe wie durchsichtig, abweichend mit geschossdurchlaessig
+export function geschossdurchlaessig(spiel, x, y) {
+  const gelaende = gelaendeAuf(spiel, x, y);
+  if (!gelaende) return false;
+  return gelaende.geschossdurchlaessig ?? Boolean(gelaende.durchsichtig);
 }
 
 // Schachbrett-Abstand (acht Richtungen, Diagonale zählt 1)

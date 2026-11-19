@@ -23,7 +23,7 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 + Ersatzwirkungen aus Daten (z.B. "Phönixbier verhindert einmal den Tod", "Schild fängt einen Treffer ab"): eigener Typ, der sofort am Haken "davor" wirkt und sich verbrauchen kann; mit den Zuständen (Punkt 3)
 + Auslöser auch an Skills (mit dem Skillsystem) und an Ausrüstung und Inventar der Trägerin nach dem Vorbild der Kaskade in Caves of Qud (Punkt 9)
-+ Die reservierten Haken des Katalogs in Betrieb nehmen: `zug_beginn`, `zug_ende` (Punkt 3, sobald etwas sie braucht), `gegenstand_benutzt` (Punkt 9); `betritt_feld` und `verlaesst_feld` sind seit 0.16.0 in Betrieb, Fallen daran kommen mit Punkt 8
++ Die reservierten Haken des Katalogs in Betrieb nehmen: `zug_beginn` (Punkt 3, sobald etwas ihn braucht), `gegenstand_benutzt` (Punkt 9); `betritt_feld` und `verlaesst_feld` sind seit 0.16.0 in Betrieb, `zug_ende` seit 0.18.0
 + Index im `zwischenspeicher`, welche Entitäten Auslöser für einen Haken tragen (Vorbild "WantEvent" in Caves of Qud); erst nötig, wenn mehr als die Beteiligten gefragt werden
 + Erster Auslöser im Spielinhalt (z.B. Säurespritzer des Essigbakteriums beim Tod): Spieldesign, noch nicht entschieden
 
@@ -101,7 +101,7 @@ Entschieden: Vorgabe für Paare ohne Angabe ist feind, die Tabelle nennt Abweich
 
 Offener Rest:
 
-+ Licht in der Wahrnehmung (Brogue: Heimlichkeitsweite im Licht doppelt, im Dunkeln halb), Spüren ohne Licht, Umherziehen wacher Wesen; siehe Wahrnehmung und Licht in [Architektur.md](Architektur.md)
++ Licht in der Wahrnehmung (Brogue: Heimlichkeitsweite im Licht doppelt, im Dunkeln halb), Spüren ohne Licht, Umherziehen wacher Wesen, Spur als Geruch (Brogue folgt der Spielerin über eine Duftkarte um Ecken, passend zu Mikroorganismen, die entlang von Wegen spüren); siehe Wahrnehmung und Licht in [Architektur.md](Architektur.md)
 + Ruf bei ganzen Fraktionen (Spieldesign in [Grundlagen.md](Grundlagen.md))
 + Anzeige von Wachzustand und Heimlichkeitsweite (Oberfläche)
 + Zielmodus der Oberfläche für Werfen und Fähigkeiten (Taste, Auswahl des Gegenstands bzw. der Fähigkeit, Ziel per Maus und Tastatur, Vorschau aus `zielAufloesen`); Werfen gibt es seit 0.16.0 nur in Logik, Tests und Bot
@@ -110,15 +110,31 @@ Offener Rest:
 
 ## 8. Gelände, Feldschichten, Ebenen
 
-Status: offen
+Status: in Arbeit; umgesetzt in Version 0.18.0 (veränderliches Gelände, `geschossdurchlaessig`, Türen, `tueren` am Wesen, Benutzen, Fallen mit Entdecken, Haken `zug_ende`), beschrieben in [Architektur.md](Architektur.md) (Gelände, Wegfindung)
 
-+ Zustand je Feld: Tür offen oder geschlossen, zerstörbare Wand, Hebel, Schalter
-+ Was Linien aufhält: bisher enden Linie, Strahl und Flugbahn an undurchsichtigen Feldern, wie die Sichtlinie (`src/welt/geometrie.js`); für Gelände, das durchsichtig, aber nicht passierbar ist (Gitter, Gärröhren aus Glas), eine eigene Eigenschaft im Gelände, ob Geschosse durchfliegen
-+ Feldschichten als eigene Gitter im Zustand: Gelände, Oberfläche (Bierpfütze, Säure, Schleim, Myzel, Blut), Gas mit Konzentration; je Schicht ein Handler der Weltuhr für Ausbreitung (Vorbild Brogue)
-+ Feuer mit Ausbreitung, Zusammenspiel mit Alkohol (Hochprozentiges als Brandbeschleuniger) und Gas (CO2 im Gärkeller sammelt sich und erstickt)
-+ Ereignis beim Betreten eines Felds (Fallen, Oberflächen)
-+ Mehrere Ebenen: Treppen, Hub, ob Ebenen erhalten bleiben
-+ Populationen nach Tiefe: gewichtete Tabellen, Rudel, Gegner aus tieferen Ebenen, Affixe; bisher feste Zahlen in der Ebene `keller`
+Entschieden: Aufteilung in 0.18.0, 0.19.0 und 0.20.0; Türen nach Brogue, sie öffnen sich beim Hindurchgehen und schließen sich von selbst, wer sie öffnet, steht am Wesen (Bakterien nicht); Fallen verborgen, Entdecken nach Tarnung, Abstand und dem Kampfwert `entdecken`; verlassene Ebenen ruhen; Gas als ganzzahlige Konzentration je Feld mit Diffusion nach Brogue, Wände und geschlossene Türen halten es auf, ohne Schwerkraft, Druck und Temperatur; Flüssigkeiten zunächst als Oberfläche mit Menge, ohne Fließen
+
+Offen, Version 0.19.0 (Feldschichten):
+
++ Zwei Schichten neben der Karte, nur mit belegten Feldern (`{ feldindex: { art, menge } }`): Oberfläche (Bierpfütze, Säure, Schleim, Blut, Myzel) und Gas mit Konzentration
++ Je Schicht ein Handler der Weltuhr nur über die belegten Felder: Gas gleicht sich mit den Nachbarn aus (ganzzahlig, feste Reihenfolge, Gesamtmenge bleibt bis auf Quellen und Abbau je Art), Oberflächen trocknen, Myzel wächst
++ Wirkung beim Betreten (Haken) und je Welttick für wer darin steht, über eine Kurve über der Konzentration (CO2: Benommenheit, dann Ersticken); Quellen als Gelände (Gärbottich)
++ Feuer als Oberfläche mit Brennbarkeit an Gelände, Oberfläche und Gas, springt mit einer Wahrscheinlichkeit über, brennt aus, hinterlässt Asche; Hochprozentiges brennt, Bier nicht; Feuer weckt Endosporen
+
+Offen, Version 0.20.0 (mehrere Ebenen):
+
++ Treppen als Gelände, Befehl zum Hinab- und Hinaufsteigen
++ Erhaltene Ebenen: beim Verlassen samt Entitäten und Einträgen der Warteschlange ablegen, sie ruhen bis zur Rückkehr; der Wechsel verwirft den räumlichen Index
++ Hub als feste Karte aus den Daten
++ Populationen nach Tiefe: gewichtete Tabellen mit Tiefenbereich, Rudel, gelegentlich Gegner aus tieferen Ebenen, Affixe als Zustände beim Erzeugen; bisher feste Zahlen in der Ebene `keller`
+
+Offener Rest:
+
++ Tiles für Türen und Fallen (bisher nur Zeichen)
++ Reise und Erkunden halten mit `kein_weg`, wenn eine entdeckte Falle den einzigen Weg versperrt; später vielleicht mit Nachfrage, ob Ninkasi darübergehen soll
++ Ausdrückliches Suchen nach Fallen (mehrere Züge, doppeltes Entdecken), vielleicht zusammen mit dem Rasten
++ Hebel mit Wirkung in der Ferne und verschlossene Türen mit Schlüssel: mit den Themenräumen (Punkt 10)
++ Abstraktes Nachholen verlassener Ebenen: Population wächst je vergangener Zeit logistisch auf eine Tragfähigkeit aus den Daten zu (Punkt 10, Druck gegen endloses Rasten)
 
 ## 9. Gegenstände
 

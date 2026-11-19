@@ -28,6 +28,11 @@ export default {
   population: {
     hoechstWesen: 500, // mehr Wesen entstehen nicht (Beschwören, Erzeugen der Ebene), Meldung population_voll
   },
+  // Fallen, siehe src/systeme/fallen.js; Zahlen vorläufig
+  fallen: {
+    entdeckenVorgabe: 30, // Kampfwert entdecken ohne eigene Angabe
+    reichweite: 5, // weiter entfernte Fallen werden nicht entdeckt
+  },
   // Werfen, siehe src/systeme/werfen.js
   werfen: {
     reichweite: 6, // ohne wurf.reichweite am Gegenstand

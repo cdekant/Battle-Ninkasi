@@ -9,9 +9,10 @@ import { feldIndex, betretbar } from "../welt/karte.js";
 import { naechstesWegfeld } from "../welt/wege.js";
 import { lageErfassen, sichtbareFeinde, gefahrPruefen } from "../systeme/gefahr.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
+import { fallenMeiden } from "../systeme/fallen.js";
 
 // Wege nur über Erkundetes, nach Ninkasis wirksamer Bewegungsart
-const wegOptionen = (spiel) => ({ nurErkundet: true, bewegung: bewegungVon(spielerin(spiel.zustand)) });
+const wegOptionen = (spiel) => ({ nurErkundet: true, bewegung: bewegungVon(spielerin(spiel.zustand)), meiden: fallenMeiden(spiel, { nurBekannte: true }) });
 
 // Gibt { reise } oder { grund } zurück; grund: "kein_weg" | "feinde_in_sicht" | "vorbei"
 export function reiseBeginnen(spiel, ziel, einstellungen) {

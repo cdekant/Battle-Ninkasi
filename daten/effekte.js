@@ -16,6 +16,13 @@ export default {
   saeureschwall: {
     schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "2W4" }],
   },
+  // Fallen (daten/fallen.js); vorläufig
+  saeureduese: {
+    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "2W4" }],
+  },
+  klappern: {
+    schritte: [{ baustein: "laerm", lautstaerke: 14 }],
+  },
   // Wer in Gelände festsitzt, das er nicht betreten kann (src/systeme/verschieben.js, regeln.bewegung); vorläufig
   eingeklemmt: {
     schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "2W6" }],

@@ -3,6 +3,7 @@ export default {
   bakterium: {
     abstrakt: true,
     fraktion: "verderber",
+    tueren: "nicht", // Mikroorganismen öffnen keine Türen
     ki: { modul: "jagen", letzteBekanntePosition: null },
     sicht: { reichweite: 7 },
   },

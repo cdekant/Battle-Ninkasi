@@ -94,6 +94,8 @@ export function befehlAusfuehren(spiel, akteur, befehl) {
   // die letzte Aktion bestimmt die Heimlichkeitsweite (systeme/wahrnehmung.js)
   akteur.zuege = (akteur.zuege ?? 0) + 1;
   akteur.letzteAktion = aktion;
+  // Haken zug_ende, solange die Akteurin noch im Spiel ist (z.B. Fallen entdecken, systeme/fallen.js)
+  if (entitaetMitId(spiel.zustand, akteur.id)) hakenAusloesen(spiel, "zug_ende", { quelleId: akteur.id, zielId: akteur.id, akteurId: akteur.id, kettentiefe: 0 });
   vorgangAbschliessen(spiel);
   const zustand = spiel.zustand;
   const akteurNochImSpiel = entitaetMitId(zustand, akteur.id) && !(akteur.id === zustand.spielerinId && zustand.vorbei);

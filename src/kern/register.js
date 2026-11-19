@@ -27,6 +27,15 @@ export const RANG_VORGABE = 100;
 const register = {};
 for (const art of ARTEN) register[art] = new Map();
 
+// Vorrat der Listen, die holen (Haken) und alle liefern: sie werden bei jedem Vorgang viele Male gebraucht und erst
+// bei einer An- oder Abmeldung neu gebildet; die Listen sind eingefroren, Aufrufer dürfen sie nicht verändern
+const vorrat = new Map();
+
+function ausDemVorrat(schluessel, bilden) {
+  if (!vorrat.has(schluessel)) vorrat.set(schluessel, Object.freeze(bilden()));
+  return vorrat.get(schluessel);
+}
+
 function registerDerArt(art) {
   const eintraege = register[art];
   if (!eintraege) throw new Error(`Unbekannte Registerart "${art}"`);
@@ -36,6 +45,7 @@ function registerDerArt(art) {
 // optionen: { rang } nur für Haken
 export function anmelden(art, name, wert, optionen = {}) {
   const eintraege = registerDerArt(art);
+  vorrat.clear();
   if (art === "haken") {
     if (!(name in HAKENKATALOG)) throw new Error(`Haken "${name}" steht nicht im Katalog (kern/hakenkatalog.js)`);
     if (!eintraege.has(name)) eintraege.set(name, []);
@@ -53,6 +63,7 @@ export function anmelden(art, name, wert, optionen = {}) {
 // Entfernt einen Eintrag; bei Haken genau den angegebenen Handler (für Tests und Mods)
 export function abmelden(art, name, wert) {
   const eintraege = registerDerArt(art);
+  vorrat.clear();
   if (art === "haken") {
     const liste = eintraege.get(name) || [];
     const position = liste.findIndex((eintrag) => eintrag.handler === wert);
@@ -67,15 +78,15 @@ export function hat(art, name) {
   return registerDerArt(art).has(name);
 }
 
-// Bei Haken: die Handler in Ausführungsreihenfolge (als neue Liste)
+// Bei Haken: die Handler in Ausführungsreihenfolge (eingefrorene Liste aus dem Vorrat)
 export function holen(art, name) {
   const eintraege = registerDerArt(art);
   if (!eintraege.has(name)) throw new Error(`Register ${art}: "${name}" ist nicht angemeldet`);
-  if (art === "haken") return eintraege.get(name).map((eintrag) => eintrag.handler);
+  if (art === "haken") return ausDemVorrat(`haken:${name}`, () => eintraege.get(name).map((eintrag) => eintrag.handler));
   return eintraege.get(name);
 }
 
-// Alle Einträge einer Art in Anmeldereihenfolge
+// Alle Einträge einer Art in Anmeldereihenfolge (eingefrorene Liste aus dem Vorrat)
 export function alle(art) {
-  return [...registerDerArt(art).entries()];
+  return ausDemVorrat(`alle:${art}`, () => [...registerDerArt(art).entries()]);
 }

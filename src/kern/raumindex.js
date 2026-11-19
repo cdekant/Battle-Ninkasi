@@ -6,6 +6,7 @@
 //   zellen:        Zellschlüssel -> IDs, grobe Zellen von ZELLE x ZELLE Feldern für die Suche im Umkreis
 //   mitPosition:   IDs aller Entitäten mit Position
 //   traegerinnen:  IDs der Entitäten mit Position und eigenen Auren oder Zuständen (Kandidaten für Auren)
+//   fallen:        IDs der Entitäten mit Position und Komponente falle (systeme/fallen.js)
 // Vormerkungen für die Zustandsprüfungen nach einem Vorgang (kern/vorgang.js), ebenfalls neben dem Zustand:
 //   lageOffen:     IDs, deren Lage zu prüfen ist (versetzt, Zustände geändert; systeme/verschieben.js)
 //   todOffen:      IDs, bei denen ein Wert auf 0 gefallen ist (kern/werte.js; systeme/tod.js)
@@ -65,10 +66,12 @@ function eintragen(index, entitaet) {
   inTabelle(index.zellen, zellSchluessel(x, y), entitaet.id);
   einfuegen(index.mitPosition, entitaet.id);
   if (istTraegerin(entitaet)) einfuegen(index.traegerinnen, entitaet.id);
+  if (entitaet.falle) einfuegen(index.fallen, entitaet.id);
 }
 
 function austragen(index, entitaet) {
   herausnehmen(index.traegerinnen, entitaet.id);
+  herausnehmen(index.fallen, entitaet.id);
   if (!entitaet.position) return;
   herausnehmen(index.mitPosition, entitaet.id);
   const { x, y } = entitaet.position;
@@ -77,7 +80,7 @@ function austragen(index, entitaet) {
 }
 
 function aufbauen(zustand) {
-  const index = { felder: new Map(), zellen: new Map(), mitPosition: [], traegerinnen: [], lageOffen: [], todOffen: [] };
+  const index = { felder: new Map(), zellen: new Map(), mitPosition: [], traegerinnen: [], fallen: [], lageOffen: [], todOffen: [] };
   // Object.values liefert ganzzahlige Schlüssel aufsteigend, die Listen entstehen also schon sortiert
   for (const entitaet of Object.values(zustand.entitaeten)) eintragen(index, entitaet);
   return index;
@@ -146,13 +149,31 @@ export function idsImUmkreis(zustand, mitte, radius) {
   const zellenJeSeite = Math.floor((mitte.x + radius) / ZELLE) - Math.floor((mitte.x - radius) / ZELLE) + 1;
   if (!Number.isFinite(radius) || zellenJeSeite * zellenJeSeite > index.zellen.size) return index.mitPosition.filter(imQuadrat);
   const ergebnis = [];
-  for (let zellY = Math.floor((mitte.y - radius) / ZELLE); zellY <= Math.floor((mitte.y + radius) / ZELLE); zellY++) {
-    for (let zellX = Math.floor((mitte.x - radius) / ZELLE); zellX <= Math.floor((mitte.x + radius) / ZELLE); zellX++) {
+  const links = mitte.x - radius, rechts = mitte.x + radius, oben = mitte.y - radius, unten = mitte.y + radius;
+  let zellenMitTreffern = 0;
+  for (let zellY = Math.floor(oben / ZELLE); zellY <= Math.floor(unten / ZELLE); zellY++) {
+    for (let zellX = Math.floor(links / ZELLE); zellX <= Math.floor(rechts / ZELLE); zellX++) {
       const inDerZelle = index.zellen.get(zellY * 65536 + zellX);
-      if (inDerZelle) for (const id of inDerZelle) if (imQuadrat(id)) ergebnis.push(id);
+      if (!inDerZelle) continue;
+      zellenMitTreffern++;
+      // liegt die Zelle ganz im Quadrat, gehören alle dazu
+      const ganzDrin = zellX * ZELLE >= links && (zellX + 1) * ZELLE - 1 <= rechts && zellY * ZELLE >= oben && (zellY + 1) * ZELLE - 1 <= unten;
+      if (ganzDrin) for (const id of inDerZelle) ergebnis.push(id);
+      else for (const id of inDerZelle) if (imQuadrat(id)) ergebnis.push(id);
     }
   }
-  return ergebnis.sort((erste, zweite) => erste - zweite);
+  // die Listen der Zellen sind schon aufsteigend; nur aus mehreren Zellen muss sortiert werden
+  return zellenMitTreffern > 1 ? ergebnis.sort((erste, zweite) => erste - zweite) : ergebnis;
+}
+
+// IDs der Fallen mit Position (Kopie, aufsteigend)
+export function fallenIds(zustand) {
+  return [...indexVon(zustand).fallen];
+}
+
+// Merkt Entitäten zur Prüfung der Lage vor, z.B. nach einer Änderung des Geländes unter ihnen (systeme/gelaende.js)
+export function lageVormerken(zustand, entitaet) {
+  if (entitaet.position) einfuegen(indexVon(zustand).lageOffen, entitaet.id);
 }
 
 // IDs möglicher Trägerinnen von Auren (Kopie, aufsteigend)
@@ -193,6 +214,7 @@ export function indexPruefen(zustand) {
   const gleich = (erste, zweite) => erste.length === zweite.length && erste.every((id, stelle) => id === zweite[stelle]);
   if (!gleich(index.mitPosition, frisch.mitPosition)) abweichungen.push("mitPosition weicht ab");
   if (!gleich(index.traegerinnen, frisch.traegerinnen)) abweichungen.push("traegerinnen weicht ab");
+  if (!gleich(index.fallen, frisch.fallen)) abweichungen.push("fallen weicht ab");
   if (index.zellen.size !== frisch.zellen.size) abweichungen.push("Zahl der belegten Zellen weicht ab");
   for (const [schluessel, ids] of frisch.zellen) if (!gleich(index.zellen.get(schluessel) || [], ids)) abweichungen.push(`Zelle ${schluessel} weicht ab`);
   if (index.felder.size !== frisch.felder.size) abweichungen.push("Zahl der belegten Felder weicht ab");

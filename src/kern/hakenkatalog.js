@@ -20,9 +20,9 @@ export const HAKENKATALOG = {
   // ("schritt" | "stoss" | "zug" | "tausch" | "teleport" | "herausgedrueckt"), siehe systeme/bewegung.js
   verlaesst_feld: { inBetrieb: true, ausloeserErlaubt: true },
   betritt_feld: { inBetrieb: true, ausloeserErlaubt: true },
+  zug_ende: { inBetrieb: true, ausloeserErlaubt: true },         // { akteurId }, Quelle und Ziel die Akteurin; nach ihrer Aktion
   // reserviert, siehe docs/Systemausbau.md
   zug_beginn: { inBetrieb: false, ausloeserErlaubt: true },
-  zug_ende: { inBetrieb: false, ausloeserErlaubt: true },
   gegenstand_benutzt: { inBetrieb: false, ausloeserErlaubt: true },
 };
 

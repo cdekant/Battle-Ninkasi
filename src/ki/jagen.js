@@ -16,7 +16,8 @@ import { wesenAufFeld, gleichesFeld } from "../welt/geometrie.js";
 import { abwarten } from "./abwarten.js";
 import { naechstesSichtbaresZiel, istZielFuer } from "./ziele.js";
 import { spurweite } from "../systeme/wahrnehmung.js";
-import { abstand } from "../welt/karte.js";
+import { abstand, oeffnetTueren } from "../welt/karte.js";
+import { fallenMeiden } from "../systeme/fallen.js";
 import { faehigkeitWaehlen } from "./faehigkeitenwahl.js";
 import { schrittWeg } from "./schritte.js";
 import { bewegungVon } from "../kern/zustand.js";
@@ -62,7 +63,7 @@ anmelden("ki", "jagen", (spiel, jaeger, ki) => {
   }
 
   if (istUnbeweglich(jaeger)) return angriffDaneben(spiel, jaeger, beute, trifft);
-  const naechstesFeld = naechstesWegfeld(spiel, position, ziel, { bewegung: bewegungVon(jaeger) });
+  const naechstesFeld = naechstesWegfeld(spiel, position, ziel, { bewegung: bewegungVon(jaeger), oeffnetTueren: oeffnetTueren(jaeger), meiden: fallenMeiden(spiel) });
   if (!naechstesFeld) return abwarten();
   const befehl = { art: "bewegen", dx: naechstesFeld.x - position.x, dy: naechstesFeld.y - position.y };
   const wesenImWeg = wesenAufFeld(spiel, naechstesFeld)[0];

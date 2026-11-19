@@ -6,6 +6,8 @@
 const SCHRIFT = '"DejaVu Sans Mono", "Cascadia Mono", Consolas, monospace';
 const DECKKRAFT_ERINNERT = 0.35; // erkundete, aber gerade nicht sichtbare Felder
 
+import { istBekannt } from "../systeme/fallen.js";
+
 export class Renderer {
   // zeichensatz: daten/zeichen.js; tilebilder: aus tilebilderErstellen oder null (nur Zeichen)
   constructor(canvas, zeichensatz, tilebilder = null) {
@@ -85,16 +87,18 @@ export class Renderer {
       }
     }
 
-    // Gegenstände unter Wesen; nur, was gerade sichtbar ist
+    // Fallen unter Gegenständen unter Wesen; nur, was gerade sichtbar ist, verborgene Fallen erst, wenn entdeckt
     const sichtbareEntitaeten = Object.values(zustand.entitaeten).filter((entitaet) =>
       entitaet.position && sichtbareFelder.has(entitaet.position.y * ebene.breite + entitaet.position.x)
+      && (!entitaet.falle || istBekannt(entitaet))
     );
     const istWesen = (entitaet) => entitaet.fraktion !== undefined;
-    const zeichenreihenfolge = [...sichtbareEntitaeten.filter((entitaet) => !istWesen(entitaet)), ...sichtbareEntitaeten.filter(istWesen)];
+    const ebeneVon = (entitaet) => (entitaet.falle ? 0 : istWesen(entitaet) ? 2 : 1);
+    const zeichenreihenfolge = [0, 1, 2].flatMap((stufe) => sichtbareEntitaeten.filter((entitaet) => ebeneVon(entitaet) === stufe));
     for (const entitaet of zeichenreihenfolge) {
       const bildX = entitaet.position.x - kamera.x, bildY = entitaet.position.y - kamera.y;
       if (bildX < 0 || bildY < 0 || bildX >= ansicht.breite || bildY >= ansicht.hoehe) continue;
-      const zeichenEintrag = istWesen(entitaet) ? zeichensatz.wesen[entitaet.typ] : zeichensatz.gegenstaende[entitaet.typ];
+      const zeichenEintrag = entitaet.falle ? zeichensatz.fallen?.[entitaet.typ] : istWesen(entitaet) ? zeichensatz.wesen[entitaet.typ] : zeichensatz.gegenstaende[entitaet.typ];
       // Tiles sind durchsichtig und liegen auf dem schon gezeichneten Boden; ein Zeichen braucht den Hintergrund
       // des Bodens nur, wenn der Boden selbst als Zeichen gezeichnet wurde
       const bodenName = gelaendeNameNachKennung[ebene.felder[entitaet.position.y][entitaet.position.x]];

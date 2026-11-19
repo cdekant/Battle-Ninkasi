@@ -15,6 +15,8 @@ import "./befehlsveraenderer.js";
 import "./beschwoerung.js";
 import "./verschieben.js";
 import "./werfen.js";
+import "./gelaende.js";
+import "./fallen.js";
 import "./modifikatoren.js";
 import "./laufendeAktionen.js";
 import "./faehigkeiten.js";

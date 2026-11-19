@@ -8,7 +8,7 @@
 // Urheber in Abfragen: { id, fraktion }, damit eine schon entfernte Urheberin ihre Fraktion behält.
 
 import { anmelden } from "../kern/register.js";
-import { fraktionVon, entitaetenMitPosition } from "../kern/zustand.js";
+import { fraktionVon, entitaetenMitPosition, istWesen } from "../kern/zustand.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { sieht } from "./sicht.js";
 
@@ -45,7 +45,8 @@ function zornMerken(wesen, angreiferinId) {
 function zornPruefen(spiel, kontext) {
   const entitaeten = spiel.zustand.entitaeten;
   const angreiferin = entitaeten[kontext.urheberId], ziel = entitaeten[kontext.zielId];
-  if (!angreiferin || !ziel || angreiferin.id === ziel.id) return;
+  // nur Wesen ziehen Zorn auf sich, keine Fallen oder Fässer
+  if (!angreiferin || !ziel || angreiferin.id === ziel.id || !istWesen(angreiferin)) return;
   if (beziehungZwischen(spiel, urheberVon(angreiferin), ziel) !== "neutral") return;
   const fraktion = fraktionVon(ziel);
   zornMerken(ziel, angreiferin.id);

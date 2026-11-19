@@ -1,6 +1,8 @@
 // Erzeugung einer Ebene aus Levelparametern (daten/ebenen.js).
 // Grundriss: Digger von rot.js mit abgeleitetem Startwert, Inhalte mit eigenem abgeleiteten Zufall,
 // damit die Ebene nicht vom Spielverlauf abhängt.
+// Türen: an den Zugängen der Räume, die rot.js meldet, mit tuerChance Prozent (eigener abgeleiteter Zufall);
+// Gelände gelaende.tuer der Ebene, Vorgabe "tuer_zu". Fallen (fallen: [{ typ, anzahl }]) auf freien Feldern.
 
 import RNG from "../../lib/rot/rng.js";
 import Digger from "../../lib/rot/map/digger.js";
@@ -23,6 +25,22 @@ export function ebeneErzeugen(spiel, ebenenName) {
   // rot.js meldet je Feld 0 für Boden, 1 für Wand
   digger.create((x, y, feldart) => { if (feldart === 0) zeilen[y][x] = kennungBoden; });
 
+  // Türen an Raumzugängen, in fester Reihenfolge (Räume, dann Zugänge wie rot.js sie meldet)
+  const tuerFelder = new Set();
+  const tuerChance = ebenendaten.tuerChance ?? 0;
+  if (tuerChance > 0) {
+    const tuerZufall = zufallErzeugen(startwertAbleiten(zustand.startwert, `ebene.${ebenenName}.tueren`));
+    const kennungTuer = spiel.daten.gelaende[ebenendaten.gelaende.tuer ?? "tuer_zu"].kennung;
+    for (const raum of digger.getRooms()) {
+      raum.getDoors((x, y) => {
+        const schluessel = `${x},${y}`;
+        if (tuerFelder.has(schluessel) || zeilen[y][x] !== kennungBoden) return;
+        tuerFelder.add(schluessel);
+        if (zufallsGanzzahl(tuerZufall, 1, 100) <= tuerChance) zeilen[y][x] = kennungTuer;
+      });
+    }
+  }
+
   zustand.ebene = {
     name: ebenenName,
     breite,
@@ -41,7 +59,8 @@ export function ebeneErzeugen(spiel, ebenenName) {
   const freieFelder = [];
   for (let y = 0; y < hoehe; y++) {
     for (let x = 0; x < breite; x++) {
-      if (zeilen[y][x] !== kennungBoden) continue;
+      // nichts in Türöffnungen, ob mit Tür oder ohne
+      if (zeilen[y][x] !== kennungBoden || tuerFelder.has(`${x},${y}`)) continue;
       const imStartraum = x >= startraum.getLeft() - 1 && x <= startraum.getRight() + 1
         && y >= startraum.getTop() - 1 && y <= startraum.getBottom() + 1;
       if (!imStartraum) freieFelder.push({ x, y });
@@ -75,6 +94,12 @@ export function ebeneErzeugen(spiel, ebenenName) {
     for (let i = 0; i < gegenstandEintrag.anzahl; i++) {
       const feld = freiesFeldZiehen();
       if (feld) entitaetAusDatensatz(zustand, gegenstandEintrag.typ, spiel.daten.gegenstaende[gegenstandEintrag.typ], feld);
+    }
+  }
+  for (const fallenEintrag of ebenendaten.fallen || []) {
+    for (let i = 0; i < fallenEintrag.anzahl; i++) {
+      const feld = freiesFeldZiehen();
+      if (feld) entitaetAusDatensatz(zustand, fallenEintrag.typ, spiel.daten.fallen[fallenEintrag.typ], feld);
     }
   }
 }

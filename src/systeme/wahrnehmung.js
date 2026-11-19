@@ -12,7 +12,7 @@
 //   laermdaempfung (ohne Angabe undurchlässig); wer innerhalb der Lautstärke liegt, hört ihn.
 
 import { anmelden } from "../kern/register.js";
-import { entitaetenImUmkreis, fraktionVon } from "../kern/zustand.js";
+import { entitaetenImUmkreis, fraktionVon, istWesen } from "../kern/zustand.js";
 import { modifiziert, lebenswertName } from "../kern/werte.js";
 import { mitProzentChance } from "../kern/zufall.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
@@ -81,7 +81,8 @@ function angegriffen(spiel, kontext) {
   const entitaeten = spiel.zustand.entitaeten;
   const ziel = entitaeten[kontext.zielId];
   const angreiferin = entitaeten[kontext.urheberId] ?? entitaeten[kontext.quelleId];
-  if (!ziel?.ki || !angreiferin?.position || angreiferin.id === ziel.id) return;
+  // nur Wesen lösen das aus, keine Fallen oder Fässer
+  if (!ziel?.ki || !angreiferin?.position || !istWesen(angreiferin) || angreiferin.id === ziel.id) return;
   if (wachzustandVon(ziel) !== "jagt") melden(spiel, "bemerkt", { wer: bezugAuf(ziel), ziel: bezugAuf(angreiferin) });
   wecken(spiel, ziel, "jagt");
   ziel.ki.letzteBekanntePosition = { x: angreiferin.position.x, y: angreiferin.position.y };
