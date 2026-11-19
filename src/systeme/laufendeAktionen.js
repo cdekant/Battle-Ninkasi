@@ -1,6 +1,7 @@
 // Lange Aktionen (siehe docs/Architektur.md, Lange Aktionen): Rituale, später Brauen, laufen über mehrere Schritte.
 // Komponente an der Akteurin:
-//   laufendeAktion: { art, schritteGesamt, schritteErledigt, unterbrochen: null | Grund, lage, ...Daten der Art }
+//   laufendeAktion: { art, schritteGesamt, schritteErledigt, unterbrochen: null | Grund, lage, unterbrechbar?, ...Daten der Art }
+//   unterbrechbar: true heißt, Schaden (Haken nach_schaden) bricht die Aktion ab, Grund "schaden"; für jedes Wesen
 // Register "laufendeaktionen": art -> {
 //   schrittkosten(spiel, akteur, aktion) => { aktion, grundkosten?, umstaende? }  Zeitkosten eines Schritts
 //   abschliessen(spiel, akteur, aktion)          nach dem letzten Schritt
@@ -37,10 +38,11 @@ function schrittAusfuehren(spiel, akteur) {
   return ergebnis;
 }
 
-// Beginnt eine lange Aktion und führt ihren ersten Schritt aus; aktion: { art, schritteGesamt, ...Daten der Art }
-export function aktionBeginnen(spiel, akteur, aktion) {
+// Beginnt eine lange Aktion und führt ihren ersten Schritt aus; aktion: { art, schritteGesamt, unterbrechbar?, ...Daten der Art }
+// meldungszusatz: weitere Angaben in der Meldung "aktion_beginnt", z.B. Ankündigung und Zielfelder einer Fähigkeit
+export function aktionBeginnen(spiel, akteur, aktion, meldungszusatz = {}) {
   akteur.laufendeAktion = { ...aktion, schritteErledigt: 0, unterbrochen: null, lage: null };
-  melden(spiel, "aktion_beginnt", { wer: bezugAuf(akteur), aktionsart: aktion.art, schritte: aktion.schritteGesamt });
+  melden(spiel, "aktion_beginnt", { ...meldungszusatz, wer: bezugAuf(akteur), aktionsart: aktion.art, schritte: aktion.schritteGesamt });
   return schrittAusfuehren(spiel, akteur);
 }
 
@@ -51,6 +53,12 @@ export function aktionAbbrechen(spiel, akteur, grund) {
   melden(spiel, "aktion_abgebrochen", { wer: bezugAuf(akteur), aktionsart: aktion.art, grund });
   eintragVon(aktion).abbrechen(spiel, akteur, aktion, grund);
 }
+
+// Schaden bricht eine unterbrechbare lange Aktion ab
+anmelden("haken", "nach_schaden", (spiel, kontext) => {
+  const getroffen = spiel.zustand.entitaeten[kontext.zielId];
+  if (getroffen?.laufendeAktion?.unterbrechbar) aktionAbbrechen(spiel, getroffen, "schaden");
+});
 
 // Vor dem Zug einer Akteurin mit laufender Aktion: Abbruch bei Handlungsunfähigkeit, Pause bei Gefahr (nur Ninkasi).
 // Gibt true zurück, wenn die Logik den nächsten Schritt selbst ausführen darf.

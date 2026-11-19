@@ -6,6 +6,9 @@
 //              (nach_tod: die letzte Position des Opfers), sonst die der Trägerin; der Effekt läuft dann
 //              ohne Wesen als Ziel, mit Ursprung und Zielfeld auf diesem Feld (z.B. fuer_jedes_ziel im Kreis)
 //   chance:    Prozent, Vorgabe 100; sinkt je Kettenstufe um daempfung (Vorgabe aus daten/regeln.js)
+//   wenn:      [{ bedingung, ...parameter }] wie an Modifikatoren, geprüft an der Trägerin beim Ausführen (vor dem
+//              Wurf), Gegenüber ist die andere Partei des Ereignisses; z.B. Bossphase: bei nach_schaden, wenn LP
+//              unter 50 % und ohne_zustand, Zustand setzen
 // Ein Haken stellt passende Auslöser nur in eine Warteschlange (nicht im Zustand, sie ist nach jedem
 // Vorgang leer); abgearbeitet werden sie nacheinander in der Reihenfolge des Vormerkens, siehe
 // kern/vorgang.js. Ihre Effekte laufen eine Kettenstufe tiefer; ab der höchsten Kettentiefe wird nichts
@@ -16,7 +19,7 @@ import { anmelden } from "./register.js";
 import { HAKENKATALOG, AUSLOESER_ROLLEN } from "./hakenkatalog.js";
 import { effektAnwenden } from "./effekte.js";
 import { mitProzentChance } from "./zufall.js";
-import { prozentWiederholt } from "./werte.js";
+import { prozentWiederholt, bedingungenErfuellt } from "./werte.js";
 import { fraktionVon } from "./zustand.js";
 
 // Der Verteiler läuft nach allen Code-Handlern eines Hakens
@@ -82,6 +85,11 @@ export function naechstenAusloeserAusfuehren(spiel) {
   const zielId = zielNachArt[zielart];
   const zielFehlt = zielart === "feld" ? !vorgemerkt.feld : zielId == null || !spiel.zustand.entitaeten[zielId];
   if (zielFehlt) return true;
+  if (ausloeser.wenn) {
+    const traegerin = spiel.zustand.entitaeten[vorgemerkt.traegerinId];
+    const gegenueberId = vorgemerkt.traegerinId === vorgemerkt.quelleId ? vorgemerkt.zielId : vorgemerkt.quelleId;
+    if (!traegerin || !bedingungenErfuellt(spiel, traegerin, ausloeser.wenn, { gegenueberId })) return true;
+  }
   const daempfung = ausloeser.daempfung ?? spiel.daten.regeln.ausloeser.daempfungProStufe;
   const chance = wirksameChance(ausloeser.chance ?? 100, vorgemerkt.kettentiefe, daempfung);
   // sichere Fälle würfeln nicht, so bleibt die Zahlenfolge des Zufalls ungestört

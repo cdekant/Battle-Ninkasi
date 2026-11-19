@@ -8,6 +8,8 @@
 //   wert_unter_prozent { wert, prozent }  aktueller Wert unter prozent des Grundwerts (ohne Modifikatoren)
 //   gegenueber_tag { tag }          das Gegenüber der Abfrage (umstaende.gegenueberId) trägt den Tag
 //   gegenueber_ahnungslos {}        das Gegenüber ist ahnungslos (Hinterhalt, systeme/wahrnehmung.js)
+//   hat_zustand { zustand }         die Entität trägt den Zustand
+//   ohne_zustand { zustand }        die Entität trägt den Zustand nicht, z.B. damit eine Bossphase nur einmal beginnt
 //
 // Auren (Modifikatorquelle "auren"): an Wesen und Zuständen
 //   auren: [{ reichweite, trifft, selbst?, sichtlinie?, modifikatoren }]
@@ -48,6 +50,12 @@ bedingungAnmelden("gegenueber_tag", { tag: "text" }, (spiel, entitaet, parameter
 });
 
 bedingungAnmelden("gegenueber_ahnungslos", {}, (spiel, entitaet, parameter, umstaende) => istAhnungslos(spiel.zustand.entitaeten[umstaende.gegenueberId]));
+
+const traegtZustand = (entitaet, name) => (entitaet.zustaende || []).some((instanz) => instanz.name === name);
+
+bedingungAnmelden("hat_zustand", { zustand: "zustand" }, (spiel, entitaet, parameter) => traegtZustand(entitaet, parameter.zustand));
+
+bedingungAnmelden("ohne_zustand", { zustand: "zustand" }, (spiel, entitaet, parameter) => !traegtZustand(entitaet, parameter.zustand));
 
 // Alle Auren einer Trägerin: eigene und die ihrer Zustände, je mit Stärke in Prozent und Quelle
 function aurenVon(spiel, traegerin) {

@@ -92,7 +92,7 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
     if (!istTextliste(wesen.faehigkeiten)) fehler.push(`${ort}: faehigkeiten muss eine Liste von Namen sein`);
     else for (const faehigkeit of wesen.faehigkeiten) if (!daten.faehigkeiten?.[faehigkeit]) fehler.push(`${ort}: Fähigkeit "${faehigkeit}" gibt es nicht`);
   }
-  if (wesen.ki) pruefeKi(daten, wesen.ki, `${ort}.ki`, fehler);
+  if (wesen.ki) pruefeKi(daten, wesen.ki, `${ort}.ki`, fehler, istTextliste(wesen.faehigkeiten) ? wesen.faehigkeiten : []);
   if (wesen.stoffwechsel) pruefeStoffwechsel(wesen, ort, fehler);
   if (wesen.sicht && !istGanzzahl(wesen.sicht.reichweite)) fehler.push(`${ort}: sicht.reichweite muss eine ganze Zahl sein`);
   if (wesen.lebenswert !== undefined && !wesen.werte?.[wesen.lebenswert]) fehler.push(`${ort}: lebenswert "${wesen.lebenswert}" ist kein Wert des Wesens`);
@@ -162,6 +162,10 @@ function pruefeAusloeser(daten, liste, ort, fehler) {
       if (ausloeser[feld] !== undefined && !istProzent(ausloeser[feld])) fehler.push(`${eintragOrt}: ${feld} muss eine ganze Zahl von 0 bis 100 sein`);
     }
     pruefeEffektVerweis(daten, ausloeser.effekt, eintragOrt, fehler);
+    if (ausloeser.wenn !== undefined) {
+      if (!Array.isArray(ausloeser.wenn)) fehler.push(`${eintragOrt}: wenn muss eine Liste sein`);
+      else pruefeBedingungen(daten, ausloeser.wenn, `${eintragOrt}.wenn`, fehler);
+    }
   });
 }
 
@@ -320,7 +324,7 @@ function pruefeVorratsmengen(mengen, ort, fehler) {
 // Zielart wie in zielAufloesen (systeme/zielauswahl.js)
 function pruefeZielart(daten, zielart, ort, fehler) {
   if (!istObjekt(zielart) || !ZIELARTEN.includes(zielart.art)) return fehler.push(`${ort}: art muss eines von ${ZIELARTEN.join(", ")} sein`);
-  const felder = { reichweite: "ganzzahl?", brauchtSichtlinie: "wahrheitswert?", ohneUrheber: "wahrheitswert?", durchdringend: "wahrheitswert?", ueberZielHinaus: "wahrheitswert?", trifft: TRIFFT_ARTEN };
+  const felder = { reichweite: "ganzzahl?", brauchtSichtlinie: "wahrheitswert?", ohneUrheber: "wahrheitswert?", durchdringend: "wahrheitswert?", ueberZielHinaus: "wahrheitswert?", ueberVerbuendete: "wahrheitswert?", trifft: TRIFFT_ARTEN };
   pruefeParameter(daten, felder, zielart, ort, fehler);
   if (zielart.muster !== undefined) pruefeMuster(daten, zielart.muster, `${ort}.muster`, fehler);
 }
@@ -348,7 +352,9 @@ function pruefeFaehigkeit(daten, sprache, name, faehigkeit, fehler) {
     else pruefeBedingungen(daten, faehigkeit.voraussetzungen, `${ort}.voraussetzungen`, fehler);
   }
   if (faehigkeit.dauer !== undefined && !(istObjekt(faehigkeit.dauer) && istGanzzahl(faehigkeit.dauer.schritte) && faehigkeit.dauer.schritte > 0)) fehler.push(`${ort}: dauer muss { schritte } mit einer ganzen Zahl > 0 sein`);
-  pruefeParameter(daten, { beimAbbruch: "effekt?" }, faehigkeit, ort, fehler);
+  pruefeParameter(daten, { beimAbbruch: "effekt?", unterbrechbar: "wahrheitswert?" }, faehigkeit, ort, fehler);
+  if (faehigkeit.ankuendigung !== undefined) pruefeText(sprache.texte, faehigkeit.ankuendigung, `${ort}.ankuendigung`, fehler);
+  if ((faehigkeit.ankuendigung !== undefined || faehigkeit.unterbrechbar !== undefined) && faehigkeit.dauer === undefined) fehler.push(`${ort}: ankuendigung und unterbrechbar gibt es nur mit dauer`);
   if (faehigkeit.risiko !== undefined && !daten.risiken?.[faehigkeit.risiko]) fehler.push(`${ort}: Risikotabelle "${faehigkeit.risiko}" gibt es nicht`);
   if (art === "aktiv") {
     if (faehigkeit.ziel === undefined) fehler.push(`${ort}: ziel fehlt`);
@@ -439,10 +445,26 @@ function pruefeEffektKreise(daten, fehler) {
   for (const name of Object.keys(effekte)) besuchen(name, [name]);
 }
 
-// KI-Komponente: { modul, trifft?, ... }
-function pruefeKi(daten, ki, ort, fehler) {
+// KI-Komponente: { modul, trifft?, wachzustand?, faehigkeiten?, abstandHalten? }, siehe ki/jagen.js und ki/faehigkeitenwahl.js
+// bekannte: die Fähigkeiten des Wesens (bei einer KI aus einem Zustand null, dann zählt nur, dass es sie gibt)
+function pruefeKi(daten, ki, ort, fehler, bekannte = null) {
   if (!istObjekt(ki) || !hat("ki", ki.modul)) return fehler.push(`${ort}: Verhaltensmodul "${ki?.modul}" ist nicht angemeldet`);
-  pruefeParameter(daten, { trifft: TRIFFT_ARTEN, wachzustand: WACHZUSTAENDE }, ki, ort, fehler);
+  pruefeParameter(daten, { trifft: TRIFFT_ARTEN, wachzustand: WACHZUSTAENDE, abstandHalten: "ganzzahl?" }, ki, ort, fehler);
+  if (ki.abstandHalten === 0) fehler.push(`${ort}: abstandHalten muss eine ganze Zahl > 0 sein`);
+  if (ki.faehigkeiten === undefined) return;
+  if (!Array.isArray(ki.faehigkeiten)) return fehler.push(`${ort}: faehigkeiten muss eine Liste sein`);
+  ki.faehigkeiten.forEach((eintrag, nummer) => {
+    const stelle = `${ort}.faehigkeiten[${nummer}]`;
+    if (!istObjekt(eintrag)) return fehler.push(`${stelle}: Eintrag muss ein Objekt { name, ... } sein`);
+    pruefeParameter(daten, { name: "text", abstandAb: "ganzzahl?", abstandBis: "ganzzahl?" }, eintrag, stelle, fehler);
+    if (eintrag.chance !== undefined && !istProzent(eintrag.chance)) fehler.push(`${stelle}: chance muss eine ganze Zahl von 0 bis 100 sein`);
+    if (typeof eintrag.name === "string" && !daten.faehigkeiten?.[eintrag.name]) fehler.push(`${stelle}: Fähigkeit "${eintrag.name}" gibt es nicht`);
+    else if (bekannte && typeof eintrag.name === "string" && !bekannte.includes(eintrag.name)) fehler.push(`${stelle}: das Wesen kennt die Fähigkeit "${eintrag.name}" nicht (faehigkeiten)`);
+    if (eintrag.wenn !== undefined) {
+      if (!Array.isArray(eintrag.wenn)) fehler.push(`${stelle}: wenn muss eine Liste sein`);
+      else pruefeBedingungen(daten, eintrag.wenn, `${stelle}.wenn`, fehler);
+    }
+  });
 }
 
 // Fraktionen: { text, beziehungen? }, siehe systeme/fraktionen.js

@@ -3,7 +3,7 @@
 //   fuer_jedes_ziel: { muster, effekt, trifft?, ohneUrheber? } auf jede getroffene Entität im Muster;
 //                    schreibt werte.anzahlZiele (für teilen), Meldung "flaeche"
 //   auf_feld:        { muster, effekt } auf jedes Feld, auch leere (Ziel null, Zielfeld das Feld), Meldung "flaeche"
-//   geschoss:        { reichweite, effekt, durchdringend?, ueberZielHinaus? } vom Ursprung zum Zielfeld;
+//   geschoss:        { reichweite, effekt, durchdringend?, ueberZielHinaus?, ueberVerbuendete? } vom Ursprung zum Zielfeld;
 //                    der Effekt wirkt am ersten Wesen oder am Aufschlag (dort Ursprung und Zielfeld),
 //                    durchdringend auf jedes Wesen der Bahn; Meldung "geschoss"
 //   springen:        { anzahl, reichweite, effekt, trifft?, ohneUrheber?, wahl? } wirkt auf das Ziel und springt
@@ -17,7 +17,7 @@ import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { zufallsGanzzahl } from "../kern/zufall.js";
 import { lebenswertName } from "../kern/werte.js";
 import { flugbahn, linie } from "../welt/geometrie.js";
-import { musterFelder, entitaetenAufFeldern, TRIFFT_ARTEN } from "./zielauswahl.js";
+import { musterFelder, entitaetenAufFeldern, verbuendeteUeberspringen, TRIFFT_ARTEN } from "./zielauswahl.js";
 
 const feldKopie = (feld) => ({ x: feld.x, y: feld.y });
 
@@ -59,9 +59,10 @@ bausteinAnmelden("auf_feld", { muster: "muster", effekt: "effekt" }, (spiel, kon
   for (const feld of felder) effektAnwenden(spiel, parameter.effekt, { ...kontext, zielId: null, zielfeld: feld });
 });
 
-bausteinAnmelden("geschoss", { reichweite: "ganzzahl", effekt: "effekt", durchdringend: "wahrheitswert?", ueberZielHinaus: "wahrheitswert?" }, (spiel, kontext, parameter) => {
+bausteinAnmelden("geschoss", { reichweite: "ganzzahl", effekt: "effekt", durchdringend: "wahrheitswert?", ueberZielHinaus: "wahrheitswert?", ueberVerbuendete: "wahrheitswert?" }, (spiel, kontext, parameter) => {
   if (!kontext.ursprung || !kontext.zielfeld) return;
-  const bahn = flugbahn(spiel, kontext.ursprung, kontext.zielfeld, parameter);
+  const ueberspringen = parameter.ueberVerbuendete ? verbuendeteUeberspringen(spiel, { id: kontext.urheberId, fraktion: kontext.urheberFraktion ?? null }) : null;
+  const bahn = flugbahn(spiel, kontext.ursprung, kontext.zielfeld, { ...parameter, ueberspringen });
   melden(spiel, "geschoss", { quelle: quellbezug(spiel, kontext), bahn: bahn.felder, aufschlag: bahn.aufschlag });
   const entitaeten = spiel.zustand.entitaeten;
   if (parameter.durchdringend) {

@@ -10,6 +10,8 @@ import { nahkampf } from "../src/systeme/kampf.js";
 const KARTE = ["######", "#....#", "######"];
 
 const EFFEKTE = {
+  konter: { schritte: [{ baustein: "angreifen" }] },
+  wut_setzen: { schritte: [{ baustein: "zustand_setzen", zustand: "wut" }] },
   stoss: { schritte: [{ baustein: "schaden", menge: 3 }] },
   dornen: { schritte: [{ baustein: "schaden", menge: 1 }] },
   doppeldornen: { schritte: [{ baustein: "schaden", menge: 2 }] },
@@ -19,8 +21,10 @@ const EFFEKTE = {
 
 const DORNEN = { bei: "nach_schaden", rolle: "ziel", ziel: "quelle", effekt: "dornen" };
 
+const ZUSTAENDE = { wut: { text: "z.wut" } };
+
 function spielBauen(regeln) {
-  const spiel = miniSpiel(KARTE, { effekte: EFFEKTE, regeln });
+  const spiel = miniSpiel(KARTE, { effekte: EFFEKTE, zustaende: ZUSTAENDE, regeln });
   return { spiel, meldungen: meldungenMitschneiden(spiel) };
 }
 
@@ -122,4 +126,39 @@ test("Nahkampf löst nach_treffer und verfehlt aus", () => {
   nahkampf(spiel, sicher, ziel);
   vorgangAbschliessen(spiel);
   assert.equal(sicher.werte.lp.aktuell, 9);
+});
+
+test("wenn: Bossphase beginnt unter 50 % LP genau einmal (ohne_zustand)", () => {
+  const { spiel } = spielBauen();
+  const phase = { bei: "nach_schaden", rolle: "ziel", effekt: "wut_setzen", wenn: [{ bedingung: "wert_unter_prozent", wert: "lp", prozent: 50 }, { bedingung: "ohne_zustand", zustand: "wut" }] };
+  const angreifer = wesen(spiel, 1, 1, "ninkasi", 50);
+  const boss = wesen(spiel, 2, 1, "feinde", 10, { ausloeser: [phase] });
+  const anzahlWut = () => (boss.zustaende || []).filter((instanz) => instanz.name === "wut").length;
+  effektAnwenden(spiel, "stoss", { quelleId: angreifer.id, zielId: boss.id });
+  vorgangAbschliessen(spiel);
+  assert.equal(anzahlWut(), 0, "7 von 10 LP");
+  effektAnwenden(spiel, "stoss", { quelleId: angreifer.id, zielId: boss.id });
+  vorgangAbschliessen(spiel);
+  assert.equal(anzahlWut(), 1, "4 von 10 LP");
+  effektAnwenden(spiel, "dornen", { quelleId: angreifer.id, zielId: boss.id });
+  vorgangAbschliessen(spiel);
+  assert.equal(anzahlWut(), 1, "kein zweites Mal");
+});
+
+test("Baustein angreifen: Konter nur daneben, gegenseitige Konter enden an der Kettengrenze", () => {
+  const { spiel, meldungen } = spielBauen();
+  const konter = { bei: "nach_schaden", rolle: "ziel", ziel: "quelle", effekt: "konter", daempfung: 100 };
+  const angriffe = [{ name: "stoss", genauigkeit: 100, effekt: "dornen" }];
+  const erster = wesen(spiel, 1, 1, "ninkasi", 50, { angriffe, ausloeser: [konter] });
+  const zweiter = wesen(spiel, 2, 1, "feinde", 50, { angriffe, ausloeser: [konter] });
+  nahkampf(spiel, erster, zweiter);
+  vorgangAbschliessen(spiel);
+  assert.equal(schadensmeldungen(meldungen).length, 1 + spiel.daten.regeln.ausloeser.hoechsteKettentiefe);
+
+  const fern = spielBauen();
+  const schuetzin = wesen(fern.spiel, 1, 1, "ninkasi", 50);
+  const igel = wesen(fern.spiel, 4, 1, "feinde", 50, { angriffe, ausloeser: [konter] });
+  effektAnwenden(fern.spiel, "stoss", { quelleId: schuetzin.id, zielId: igel.id });
+  vorgangAbschliessen(fern.spiel);
+  assert.equal(schadensmeldungen(fern.meldungen).length, 1, "zu weit weg für einen Konter");
 });

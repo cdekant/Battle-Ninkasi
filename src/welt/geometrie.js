@@ -75,12 +75,13 @@ export function wesenAufFeld(spiel, feld) {
 }
 
 // Bahn eines Geschosses von "von" in Richtung "nach", ohne das Startfeld.
-// optionen: { reichweite, durchdringend, ueberZielHinaus }
+// optionen: { reichweite, durchdringend, ueberZielHinaus, ueberspringen }
 //   ohne ueberZielHinaus endet die Bahn am Ziel, sonst erst an der Reichweite (Maß wie beim Kreis)
 //   undurchsichtige Felder und gesperrte Wandecken halten auf, das Feld davor ist der Aufschlag
 //   das erste Wesen hält auf, außer bei durchdringend
+//   ueberspringen(wesen): Wesen, für die sie true liefert, fliegt das Geschoss über (nicht getroffen, hält nicht auf)
 // Gibt { felder, getroffene: [IDs], aufschlag } zurück; ändert nichts.
-export function flugbahn(spiel, von, nach, { reichweite = Infinity, durchdringend = false, ueberZielHinaus = false } = {}) {
+export function flugbahn(spiel, von, nach, { reichweite = Infinity, durchdringend = false, ueberZielHinaus = false, ueberspringen = null } = {}) {
   const ergebnis = { felder: [], getroffene: [], aufschlag: feldKopie(von) };
   if (gleichesFeld(von, nach)) return ergebnis;
   let bahn = linie(von, nach);
@@ -99,7 +100,7 @@ export function flugbahn(spiel, von, nach, { reichweite = Infinity, durchdringen
     if (!durchsichtig(spiel, feld.x, feld.y) || !schrittFrei(spiel, bahn[nummer - 1], feld)) break;
     ergebnis.felder.push(feld);
     ergebnis.aufschlag = feldKopie(feld);
-    for (const wesen of wesenAufFeld(spiel, feld)) ergebnis.getroffene.push(wesen.id);
+    for (const wesen of wesenAufFeld(spiel, feld)) if (!ueberspringen?.(wesen)) ergebnis.getroffene.push(wesen.id);
     if (ergebnis.getroffene.length && !durchdringend) break;
   }
   return ergebnis;

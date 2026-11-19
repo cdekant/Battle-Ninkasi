@@ -8,6 +8,7 @@ export default {
   wesen: {
     ninkasi: { zeichen: "@", farbe: "#f2c14e" },
     essigbakterium: { zeichen: "e", farbe: "#b4bd62" },
+    fernkaempfer_test: { zeichen: "F", farbe: "#d2763a" },
   },
   gegenstaende: {
     bier: { zeichen: "!", farbe: "#e0952b" },

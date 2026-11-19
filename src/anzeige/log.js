@@ -47,6 +47,10 @@ export class Log {
       }
       case "faehigkeit":
         return this.zeile(text("log.faehigkeit", { ...meldung, faehigkeit: hatSchluessel(meldung.text) ? text(meldung.text) : meldung.faehigkeit }));
+      case "aktion_beginnt":
+        // angekündigte Angriffe: eigener Text der Fähigkeit, sonst still
+        if (meldung.ankuendigung && hatSchluessel(meldung.ankuendigung)) this.zeile(text(meldung.ankuendigung, meldung), meldung.wer.id === this.spielerinId ? "" : "schlimm");
+        return;
       case "risiko": {
         const schluessel = `log.risiko.${meldung.ausgang}`;
         if (hatSchluessel(schluessel)) this.zeile(text(schluessel, meldung), "schlimm");

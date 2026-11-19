@@ -95,6 +95,8 @@ function ablaufWaehlen(botZufall, spiel) {
 
 let anzahlTode = 0, anzahlFehler = 0;
 const reisenNachHaltegrund = {};
+// Fähigkeiten der Gegner: gewirkt, lange Aktionen begonnen und abgebrochen
+const gegnerfaehigkeiten = { gewirkt: 0, begonnen: 0, abgebrochen: 0 };
 console.log("Startwert  Befehle  Zeit     LP   MP   PP  Pegel  Getötet  Biere  Ergebnis");
 for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe; startwert++) {
   try {
@@ -103,6 +105,10 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
     hoererAnmelden(spiel, (meldung) => {
       if (meldung.art === "tod" && meldung.opfer.id !== spiel.zustand.spielerinId) getoetet++;
       if (meldung.art === "getrunken") getrunkeneBiere++;
+      if (meldung.wer?.id === spiel.zustand.spielerinId) return;
+      if (meldung.art === "faehigkeit") gegnerfaehigkeiten.gewirkt++;
+      if (meldung.art === "aktion_beginnt") gegnerfaehigkeiten.begonnen++;
+      if (meldung.art === "aktion_abgebrochen") gegnerfaehigkeiten.abgebrochen++;
     });
     const botZufall = zufallErzeugen(startwert);
     while (spiel.befehle.length < hoechsteBefehlszahl && !spiel.zustand.vorbei) {
@@ -132,5 +138,6 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
 }
 const haltegruende = Object.entries(reisenNachHaltegrund).map(([grund, anzahl]) => `${grund} ${anzahl}`).join(", ");
 console.log(`\nAbläufe nach Haltegrund: ${haltegruende}`);
+console.log(`Fähigkeiten der Gegner: ${gegnerfaehigkeiten.gewirkt} gewirkt, ${gegnerfaehigkeiten.begonnen} lange Aktionen begonnen, ${gegnerfaehigkeiten.abgebrochen} abgebrochen`);
 console.log(`${anzahlLaeufe} Läufe, ${anzahlTode} tot, ${anzahlFehler} Fehler`);
 process.exitCode = anzahlFehler ? 1 : 0;

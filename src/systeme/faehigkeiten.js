@@ -16,14 +16,17 @@
 //                    Risiko und Wirkung kommen nach dem letzten Schritt (siehe systeme/laufendeAktionen.js); das Ziel
 //                    wird dann neu aufgelöst, passt es nicht mehr, verpufft die Wirkung (Meldung "verpufft")
 //   beimAbbruch:     Effekt auf die Wirkende, wenn eine lange Aktion abgebrochen wird
+//   ankuendigung:    Textschlüssel für den Beginn einer langen Aktion (angekündigter Angriff); die Meldung
+//                    "aktion_beginnt" nennt dazu faehigkeit, ankuendigung und die Zielfelder (felder) beim Beginn
+//   unterbrechbar:   true, Schaden bricht die lange Aktion ab (systeme/laufendeAktionen.js)
 // Befehl: { art: "faehigkeit", faehigkeit, ziel?: { x, y } | { id } | { dx, dy } }
 // Wesen kennen ihre Fähigkeiten als Liste: faehigkeiten: ["name"]; Abklingen über den Zugzähler zuege (kern/spiel.js)
 //   abklingendBis: { name: zugnummer } ab diesem Stand des Zugzählers wieder bereit
 // Risikotabelle: [{ name, chance: Kurve über den Pegel in Prozent, wirkt, effekt? }]; ein Wurf, die Ausgänge liegen
 //   hintereinander; wirkt: false heißt, die Fähigkeit selbst wirkt nicht; der Verbrauch ist in jedem Fall bezahlt.
 
-import { anmelden, holen } from "../kern/register.js";
-import { modifiziert, hatWert } from "../kern/werte.js";
+import { anmelden } from "../kern/register.js";
+import { modifiziert, hatWert, bedingungenErfuellt } from "../kern/werte.js";
 import { effektAnwenden, wertAendern } from "../kern/effekte.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { entitaetMitId, entitaetEntfernen, fraktionVon } from "../kern/zustand.js";
@@ -70,7 +73,7 @@ function abklingenLassen(spiel, wesen, name, definition) {
 }
 
 export function voraussetzungenErfuellt(spiel, wesen, definition) {
-  return (definition.voraussetzungen || []).every(({ bedingung, ...parameter }) => holen("modifikatorbedingungen", bedingung)(spiel, wesen, parameter, umstaendeVon(definition)));
+  return bedingungenErfuellt(spiel, wesen, definition.voraussetzungen, umstaendeVon(definition));
 }
 
 // Gegenstände für das Material, je Eintrag die IDs in der Reihenfolge des Inventars, oder null, wenn etwas fehlt
@@ -211,7 +214,11 @@ function faehigkeitAusfuehren(spiel, wesen, name, zielangabe) {
   abklingenLassen(spiel, wesen, name, definition);
   if (definition.dauer) {
     const ziel = zielangabe === undefined ? null : structuredClone(zielangabe);
-    return aktionBeginnen(spiel, wesen, { art: "faehigkeit", schritteGesamt: definition.dauer.schritte, faehigkeit: name, ziel });
+    const aufloesung = definition.ziel ? zielAufloesen(spiel, wesen, definition.ziel, zielangabe) : null;
+    const meldungszusatz = { faehigkeit: name, ankuendigung: definition.ankuendigung ?? null, felder: aufloesung?.ok ? aufloesung.felder : [] };
+    const aktion = { art: "faehigkeit", schritteGesamt: definition.dauer.schritte, faehigkeit: name, ziel };
+    if (definition.unterbrechbar) aktion.unterbrechbar = true;
+    return aktionBeginnen(spiel, wesen, aktion, meldungszusatz);
   }
   faehigkeitWirken(spiel, wesen, name, definition, zielangabe);
   return ergebnis;

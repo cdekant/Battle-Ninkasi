@@ -97,6 +97,8 @@ test("Flugbahn endet am ersten Wesen, durchdringend erst an der Wand, sonst am Z
   const kurz = flugbahn(spiel, von, { x: 2, y: 1 }, { durchdringend: true, ueberZielHinaus: true, reichweite: 3 });
   assert.deepEqual(kurz.aufschlag, { x: 4, y: 1 }, "Reichweite");
   assert.deepEqual(flugbahn(spiel, von, von).felder, []);
+  const ueber = flugbahn(spiel, von, { x: 6, y: 1 }, { ueberspringen: (getroffen) => getroffen.id === erstes.id });
+  assert.deepEqual([ueber.getroffene, ueber.aufschlag], [[zweites.id], { x: 5, y: 1 }], "übersprungen wird nicht getroffen und hält nicht auf");
 });
 
 test("Felder ordnen: nach Abstand zum Ursprung, dann nach Feldindex, ohne doppelte und ohne Felder außerhalb", () => {

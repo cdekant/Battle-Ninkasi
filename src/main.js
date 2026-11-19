@@ -20,6 +20,7 @@ import { tilebilderErstellen } from "./anzeige/tilebilder.js";
 import { neueKamera, folgen } from "./anzeige/kamera.js";
 import { Oberflaeche } from "./anzeige/oberflaeche.js";
 import { Log } from "./anzeige/log.js";
+import { angekuendigteFelder } from "./anzeige/ankuendigungen.js";
 import { uebersetzen } from "./eingabe/eingabe.js";
 import { feldAnPixel, klickDeuten } from "./eingabe/maus.js";
 import { reiseBeginnen, naechsterReiseschritt } from "./eingabe/reise.js";
@@ -101,7 +102,7 @@ function zeichnen() {
   // Wegvorschau zum Feld unter dem Zeiger, nur über erkundete Felder
   const vorschauZeigen = feldUnterZeiger && !laufenderAblauf && !spiel.zustand.vorbei;
   const wegvorschau = vorschauZeigen ? weg(spiel, ninkasi.position, feldUnterZeiger, { nurErkundet: true }) || [] : [];
-  renderer.zeichnen(spiel, kamera, ansicht, einstellungen.zoom, { zeiger: feldUnterZeiger, weg: wegvorschau });
+  renderer.zeichnen(spiel, kamera, ansicht, einstellungen.zoom, { zeiger: feldUnterZeiger, weg: wegvorschau, gefahr: angekuendigteFelder(spiel) });
   oberflaeche.anzeigen(spiel);
 }
 

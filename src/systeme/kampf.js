@@ -33,6 +33,7 @@ export { istWesen };
 import { musterFelder, entitaetenAufFeldern } from "./zielauswahl.js";
 import { beziehungZwischen, urheberVon } from "./fraktionen.js";
 import { istAhnungslos, laermMachen } from "./wahrnehmung.js";
+import { abstand } from "../welt/karte.js";
 
 export const KAMPFWERTE = ["ausweichen", "willenskraft", "blocken", "ruestung", "kritchance", "heimlichkeit"];
 export const VERTEIDIGUNGEN = ["ausweichen", "willenskraft"];
@@ -119,31 +120,36 @@ function angriffsziele(spiel, angreifer, profil, ziel) {
 
 const lebenswertUeberNull = (wesen) => (wesen.werte?.[lebenswertName(wesen)]?.aktuell ?? 0) > 0;
 
+// Führt die Profile gegen ein Ziel aus (Kettentiefe für Angriffe aus Auslösern); gibt die ausgeführten Profile zurück
+function profileAusfuehren(spiel, angreifer, ziel, ausgefuehrt, kettentiefe) {
+  ausgefuehrt.forEach((profil, nummer) => {
+    for (const getroffenes of angriffsziele(spiel, angreifer, profil, ziel)) {
+      if (!spiel.zustand.entitaeten[getroffenes.id]) continue;
+      if (nummer > 0 && !lebenswertUeberNull(getroffenes)) continue;
+      einzelangriff(spiel, angreifer, profil, getroffenes, kettentiefe);
+    }
+  });
+  laermMachen(spiel, angreifer.position, spiel.daten.regeln.wahrnehmung.laermNahkampf, angreifer.id);
+}
+
 // Angriffsaktion gegen ein Ziel mit allen Profilen; gibt die Grundkosten zurück (das langsamste ausgeführte Profil)
 export function nahkampf(spiel, angreifer, ziel) {
   const profile = angriffeVon(spiel, angreifer);
   if (profile.length === 0) return spiel.daten.aktionen.nahkampf;
   const ausgefuehrt = profileDerAktion(spiel, profile);
-  ausgefuehrt.forEach((profil, nummer) => {
-    for (const getroffenes of angriffsziele(spiel, angreifer, profil, ziel)) {
-      if (!spiel.zustand.entitaeten[getroffenes.id]) continue;
-      if (nummer > 0 && !lebenswertUeberNull(getroffenes)) continue;
-      einzelangriff(spiel, angreifer, profil, getroffenes);
-    }
-  });
-  laermMachen(spiel, angreifer.position, spiel.daten.regeln.wahrnehmung.laermNahkampf, angreifer.id);
+  profileAusfuehren(spiel, angreifer, ziel, ausgefuehrt, 0);
   return Math.max(...ausgefuehrt.map((profil) => kostenDesProfils(spiel, profil)));
 }
 
-function einzelangriff(spiel, angreifer, profil, ziel) {
+function einzelangriff(spiel, angreifer, profil, ziel, kettentiefe = 0) {
   const tags = [...(profil.tags || [])];
   for (const tag of tagsDesEffekts(spiel, profil.effekt)) if (!tags.includes(tag)) tags.push(tag);
   const mittel = { art: "angriff", name: profil.name };
   const urheberId = angreifer.beschworenVon ?? angreifer.id;
-  const vorher = hakenAusloesen(spiel, "vor_angriff", { quelleId: angreifer.id, urheberId, zielId: ziel.id, ursache: "nahkampf", kettentiefe: 0, mittel, tags, angriff: profil.name, abgebrochen: false });
+  const vorher = hakenAusloesen(spiel, "vor_angriff", { quelleId: angreifer.id, urheberId, zielId: ziel.id, ursache: "nahkampf", kettentiefe, mittel, tags, angriff: profil.name, abgebrochen: false });
   if (vorher.abgebrochen) return;
   const { ergebnis, kritisch } = trefferwurf(spiel, { quelle: angreifer, ziel, genauigkeit: profil.genauigkeit, tags, kritchance: profil.kritchance });
-  const beteiligte = { quelleId: angreifer.id, urheberId, zielId: ziel.id, ursache: "nahkampf", kettentiefe: 0, mittel, tags, kritisch };
+  const beteiligte = { quelleId: angreifer.id, urheberId, zielId: ziel.id, ursache: "nahkampf", kettentiefe, mittel, tags, kritisch };
   if (ergebnis === "treffer") {
     effektAnwenden(spiel, profil.effekt, beteiligte);
     hakenAusloesen(spiel, "nach_treffer", { ...beteiligte });
@@ -152,6 +158,21 @@ function einzelangriff(spiel, angreifer, profil, ziel) {
     hakenAusloesen(spiel, "verfehlt", { ...beteiligte, grund: ergebnis });
   }
 }
+
+// Angriff als Baustein, z.B. Konter aus einem Auslöser: { baustein: "angreifen", profil? }
+//   Die Quelle greift das Ziel mit ihren Angriffsprofilen an wie bei einer Angriffsaktion, ohne Zeitkosten;
+//   mit profil nur dieses eine Profil (fehlt es der Quelle, passiert nichts). Nur gegen ein Ziel daneben.
+//   Die Angriffe laufen auf der Kettentiefe des Effekts, so enden gegenseitige Konter an der höchsten Kettentiefe.
+bausteinAnmelden("angreifen", { profil: "text?" }, (spiel, kontext, parameter) => {
+  const entitaeten = spiel.zustand.entitaeten;
+  const angreifer = entitaeten[kontext.quelleId], ziel = entitaeten[kontext.zielId];
+  if (!angreifer?.position || !ziel?.position || angreifer.id === ziel.id) return;
+  if (abstand(angreifer.position, ziel.position) > 1) return;
+  const profile = angriffeVon(spiel, angreifer);
+  const ausgefuehrt = parameter.profil === undefined ? profileDerAktion(spiel, profile) : profile.filter((profil) => profil.name === parameter.profil);
+  if (ausgefuehrt.length === 0) return;
+  profileAusfuehren(spiel, angreifer, ziel, ausgefuehrt, kontext.kettentiefe ?? 0);
+}, { brauchtZiel: true });
 
 // Trefferwurf als Baustein für Fernkampf, Magie, Psi und Flächen:
 //   { baustein: "trefferwurf", genauigkeit, effekt, gegen?, sonst?, kritchance? }

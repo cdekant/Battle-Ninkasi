@@ -43,7 +43,10 @@ test("Auslöser: Haken, Rolle, Ziel, Prozente und Effekt werden geprüft", () =>
     [{ ...gueltig, ziel: "nachbarin" }, "ziel"],
     [{ ...gueltig, chance: 150 }, "chance"],
     [{ ...gueltig, effekt: "gibt_es_nicht" }, "Effekt"],
+    [{ ...gueltig, wenn: { bedingung: "pegel_ab" } }, "wenn muss eine Liste"],
+    [{ ...gueltig, wenn: [{ bedingung: "mondphase" }] }, "nicht angemeldet"],
   ];
+  assert.deepEqual(mitAusloeser({ ...gueltig, wenn: [{ bedingung: "pegel_ab", wert: 10 }] }), []);
   for (const [ausloeser, teilDerMeldung] of erwartet) {
     assert.ok(mitAusloeser(ausloeser).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
   }
@@ -238,7 +241,7 @@ test("Modifikatoren, Tags und Auren an Wesen und Zuständen werden geprüft", ()
 test("Fähigkeiten, Risikotabellen und Unterhalt werden geprüft", () => {
   const mitFaehigkeit = (faehigkeit, zusatz = {}) => {
     const daten = structuredClone(rohdaten);
-    daten.faehigkeiten = { test: faehigkeit };
+    daten.faehigkeiten = { ...daten.faehigkeiten, test: faehigkeit };
     Object.assign(daten, zusatz);
     return vorbereiten(daten).fehler;
   };
@@ -306,4 +309,31 @@ test("Fraktionen, Wachzustand, Lärmdämpfung und Regeln der Wahrnehmung werden 
     assert.ok(mitDaten(aendern).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
   }
   assert.deepEqual(mitDaten((daten) => { daten.wesen.essigbakterium.ki = { modul: "jagen", wachzustand: "schlaeft", letzteBekanntePosition: null }; }), []);
+});
+
+test("KI mit Fähigkeiten, Ankündigung und Unterbrechbarkeit werden geprüft", () => {
+  const mitGegner = (abweichung, faehigkeit = null) => {
+    const daten = structuredClone(rohdaten);
+    if (faehigkeit) daten.faehigkeiten.test = faehigkeit;
+    const gegner = daten.wesen.fernkaempfer_test;
+    daten.wesen.fernkaempfer_test = { ...gegner, ...abweichung(gegner) };
+    return vorbereiten(daten).fehler;
+  };
+  const mitKi = (ki) => mitGegner((gegner) => ({ ki: { ...gegner.ki, ...ki } }));
+  const erwartet = [
+    [{ abstandHalten: 0 }, "abstandHalten"],
+    [{ faehigkeiten: "spucke" }, "faehigkeiten muss eine Liste"],
+    [{ faehigkeiten: [{ name: "gibt_es_nicht" }] }, 'Fähigkeit "gibt_es_nicht" gibt es nicht'],
+    [{ faehigkeiten: [{ name: "saeurespucke", chance: 120 }] }, "chance"],
+    [{ faehigkeiten: [{ name: "saeurespucke", abstandAb: -1 }] }, "abstandAb"],
+    [{ faehigkeiten: [{ name: "saeurespucke", wenn: [{ bedingung: "mondphase" }] }] }, "nicht angemeldet"],
+  ];
+  for (const [ki, teilDerMeldung] of erwartet) assert.ok(mitKi(ki).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
+  const unbekannt = mitGegner(() => ({ faehigkeiten: ["saeurespucke"] }));
+  assert.ok(unbekannt.some((meldung) => meldung.includes('kennt die Fähigkeit "saeureschwall" nicht')));
+
+  const ohneDauer = { text: "wesen.ninkasi", ankuendigung: "wesen.ninkasi", unterbrechbar: true, ziel: { art: "selbst" }, wirkung: "biss_klein" };
+  assert.ok(mitGegner(() => ({}), ohneDauer).some((meldung) => meldung.includes("nur mit dauer")));
+  assert.ok(mitGegner(() => ({}), { ...ohneDauer, dauer: { schritte: 2 }, ziel: { art: "geschoss", ueberVerbuendete: "ja" } }).some((meldung) => meldung.includes("ueberVerbuendete")));
+  assert.deepEqual(mitGegner(() => ({}), { ...ohneDauer, dauer: { schritte: 2 } }), []);
 });

@@ -54,7 +54,7 @@ export class Renderer {
     pinsel.globalAlpha = 1;
   }
 
-  // markierungen: { zeiger: {x, y} | null, weg: [{x, y}] } (reine Anzeige)
+  // markierungen: { zeiger: {x, y} | null, weg: [{x, y}], gefahr: [{x, y}] angekündigte Zielfelder } (reine Anzeige)
   zeichnen(spiel, kamera, ansicht, zoom, markierungen = {}) {
     const pinsel = this.pinsel;
     const zustand = spiel.zustand;
@@ -106,10 +106,14 @@ export class Renderer {
     this.markierungenZeichnen(kamera, ansicht, zoom, markierungen);
   }
 
-  markierungenZeichnen(kamera, ansicht, zoom, { zeiger = null, weg = [] }) {
+  markierungenZeichnen(kamera, ansicht, zoom, { zeiger = null, weg = [], gefahr = [] }) {
     const pinsel = this.pinsel;
     const imAusschnitt = (feld) =>
       feld.x - kamera.x >= 0 && feld.y - kamera.y >= 0 && feld.x - kamera.x < ansicht.breite && feld.y - kamera.y < ansicht.hoehe;
+    pinsel.fillStyle = "rgba(200, 60, 40, 0.35)";
+    for (const feld of gefahr) {
+      if (imAusschnitt(feld)) pinsel.fillRect((feld.x - kamera.x) * zoom, (feld.y - kamera.y) * zoom, zoom, zoom);
+    }
     pinsel.fillStyle = "rgba(224, 168, 58, 0.25)";
     for (const feld of weg) {
       if (imAusschnitt(feld)) pinsel.fillRect((feld.x - kamera.x) * zoom, (feld.y - kamera.y) * zoom, zoom, zoom);

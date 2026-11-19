@@ -67,6 +67,11 @@ export function trifftZu(spiel, trifft, urheber, entitaet) {
   return trifft === "feinde" ? beziehung === "feind" : beziehung === "verbuendet";
 }
 
+// Für die Flugbahn (ueberVerbuendete): überspringt Wesen, die aus Sicht der Urheberin verbündet sind; urheber: { id, fraktion }
+export function verbuendeteUeberspringen(spiel, urheber) {
+  return (wesen) => wesen.id !== urheber.id && trifftZu(spiel, "verbuendete", urheber, wesen);
+}
+
 // Entitäten auf den Feldern, in der Reihenfolge der Felder, je Feld nach Entitäts-ID.
 // optionen: { trifft (Vorgabe "alle"), urheberId, urheberFraktion (Vorgabe die der Urheberin), ohneUrheber }
 export function entitaetenAufFeldern(spiel, felder, { trifft = "alle", urheberId = null, urheberFraktion, ohneUrheber = false } = {}) {
@@ -109,7 +114,8 @@ function zielpunktPruefen(spiel, akteur, zielart, zielpunkt, sichtlinieNoetig) {
 //   wesen:    beides das Wesen (smite auf ein Wesen); zielangabe { id }
 //   feld:     beides das Feld (smite); zielangabe { x, y }
 //   richtung: Ursprung die Akteurin, Zielpunkt ein Feld weiter; zielangabe { dx, dy }
-//   geschoss: Bahn von der Akteurin zum Ziel, beides der Aufschlag; zielangabe { x, y } oder { id }
+//   geschoss: Bahn von der Akteurin zum Ziel, beides der Aufschlag; zielangabe { x, y } oder { id };
+//             mit ueberVerbuendete fliegt das Geschoss über Verbündete der Akteurin hinweg
 function auswahlBestimmen(spiel, akteur, zielart, zielangabe) {
   const position = { x: akteur.position.x, y: akteur.position.y };
   const sichtlinieNoetig = zielart.brauchtSichtlinie ?? true;
@@ -141,7 +147,8 @@ function auswahlBestimmen(spiel, akteur, zielart, zielangabe) {
       // die Bahn selbst entscheidet über Wände, eine eigene Sichtlinie braucht es nicht
       const grund = zielpunktPruefen(spiel, akteur, zielart, anvisiert, false);
       if (grund) return { grund };
-      const bahn = flugbahn(spiel, position, anvisiert, { reichweite: zielart.reichweite, durchdringend: zielart.durchdringend, ueberZielHinaus: zielart.ueberZielHinaus });
+      const ueberspringen = zielart.ueberVerbuendete ? verbuendeteUeberspringen(spiel, { id: akteur.id, fraktion: fraktionVon(akteur) ?? null }) : null;
+      const bahn = flugbahn(spiel, position, anvisiert, { reichweite: zielart.reichweite, durchdringend: zielart.durchdringend, ueberZielHinaus: zielart.ueberZielHinaus, ueberspringen });
       return { ursprung: bahn.aufschlag, zielpunkt: bahn.aufschlag, zielId: bahn.getroffene[0] ?? null, bahn };
     }
     default:
@@ -151,7 +158,7 @@ function auswahlBestimmen(spiel, akteur, zielart, zielangabe) {
 
 // Löst eine Zielangabe auf, ohne etwas zu ändern oder zu würfeln: Grundlage für Befehle mit Ziel,
 // den Zielmodus der Anzeige, Tooltips und die KI.
-// zielart: { art, reichweite?, brauchtSichtlinie? (Vorgabe true), muster?, trifft?, ohneUrheber?, durchdringend?, ueberZielHinaus? }
+// zielart: { art, reichweite?, brauchtSichtlinie? (Vorgabe true), muster?, trifft?, ohneUrheber?, durchdringend?, ueberZielHinaus?, ueberVerbuendete? }
 // Gibt { ok: true, ursprung, zielpunkt, zielId, bahn, felder, betroffene: [IDs] } oder { ok: false, grund } zurück.
 // Für Ninkasi stehen in betroffene nur Entitäten auf Feldern, die sie sieht.
 export function zielAufloesen(spiel, akteur, zielart, zielangabe) {

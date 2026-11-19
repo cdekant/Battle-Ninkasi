@@ -95,17 +95,9 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 ## 7. Fernkampf, Fraktionen, Wahrnehmung, viele Gegner
 
-Status: in Arbeit; umgesetzt in Version 0.14.0 (Fraktionen als Daten mit Zorn, Wahrnehmung mit Wachzustand, Heimlichkeit, Bemerken, Lärm und Hinterhalt), beschrieben in [Architektur.md](Architektur.md) (Fraktionen, Wahrnehmung, Kampfwerte)
+Status: in Arbeit; umgesetzt in Version 0.14.0 (Fraktionen als Daten mit Zorn, Wahrnehmung mit Wachzustand, Heimlichkeit, Bemerken, Lärm und Hinterhalt) und 0.15.0 (die KI nutzt Fähigkeiten und hält Abstand, schont Verbündete, `ueberVerbuendete`, angekündigte und unterbrechbare lange Aktionen, Baustein `angreifen`, Auslöser mit `wenn`, Testgegner Fernkämpfer-Test), beschrieben in [Architektur.md](Architektur.md) (Fraktionen, Wahrnehmung, KI, Kampfwerte, Fähigkeiten, Lange Aktionen, Auslöser, Zielauswahl)
 
-Entschieden: Vorgabe für Paare ohne Angabe ist feind, die Tabelle nennt Abweichungen; Zorn trifft das angegriffene Wesen und Genossen, die die Angreiferin sehen, nicht die ganze Fraktion; Wahrnehmung nach Brogue mit Heimlichkeit als Modifikatorziel für Skills; Hinterhalt trifft sicher und kritisch, mehr Schaden über Modifikatoren mit `gegenueber_ahnungslos`; Lärm über Weglänge, Gelände dämpft nach `laermdaempfung`; die Nutzung von Fähigkeiten steht an der KI des Wesens; keine Gelegenheitsangriffe; keine Mehrfeld-Wesen, Bossphasen über Auslöser mit Bedingungen
-
-Offen, Version 0.15.0 (die KI nutzt Fähigkeiten):
-
-+ `ki: { modul: "jagen", faehigkeiten: [{ name, chance?, abstandAb?, abstandBis? }], abstandHalten? }`: die KI benutzt passende Fähigkeiten vor Nahkampf und Bewegung, Fernkämpfer halten Abstand
-+ Flugbahn: die KI schießt nicht, wenn ein Verbündeter vor dem Ziel auf der Bahn steht; Option `ueberVerbuendete: true` an der Zielart, dann fliegt das Geschoss über Verbündete hinweg; die Anzeige spielt die Bahn aus der Meldung `geschoss` ab (Oberfläche)
-+ Angekündigte Angriffe als lange Aktionen der Gegner (`dauer: { schritte: 2 }`, eigener Text der Ankündigung), gezielt aufs Feld, damit Ninkasi ausweichen kann; `unterbrechbar: true`: Schaden bricht die lange Aktion eines Gegners ab
-+ Baustein `angreifen { profil? }` für Konter aus Auslösern, ohne Zeitkosten
-+ Auslöser mit `wenn` (Bedingungen wie an Modifikatoren), z.B. Bossphasen: bei `nach_schaden`, wenn LP unter 50 %, Zustand setzen
+Entschieden: Vorgabe für Paare ohne Angabe ist feind, die Tabelle nennt Abweichungen; Zorn trifft das angegriffene Wesen und Genossen, die die Angreiferin sehen, nicht die ganze Fraktion; Wahrnehmung nach Brogue mit Heimlichkeit als Modifikatorziel für Skills; Hinterhalt trifft sicher und kritisch, mehr Schaden über Modifikatoren mit `gegenueber_ahnungslos`; Lärm über Weglänge, Gelände dämpft nach `laermdaempfung`; die Nutzung von Fähigkeiten steht an der KI des Wesens; keine Gelegenheitsangriffe; keine Mehrfeld-Wesen, Bossphasen über Auslöser mit Bedingungen; mit `abstandHalten` wartet ein Wesen auf genau dem Abstand, statt zu pendeln; die KI schont Verbündete bei allen Zielarten und Mustern; `unterbrechbar` gilt auch für Ninkasi
 
 Offen, Version 0.16.0 (Bewegung, Verschieben, Werfen):
 
@@ -123,6 +115,8 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 + Licht in der Wahrnehmung (Brogue: Heimlichkeitsweite im Licht doppelt, im Dunkeln halb), Spüren ohne Licht, Umherziehen wacher Wesen; siehe Wahrnehmung und Licht in [Architektur.md](Architektur.md)
 + Ruf bei ganzen Fraktionen (Spieldesign in [Grundlagen.md](Grundlagen.md))
 + Anzeige von Wachzustand und Heimlichkeitsweite (Oberfläche)
++ Die Anzeige spielt die Bahn aus der Meldung `geschoss` ab (Oberfläche, aus 0.15.0 verschoben); die Zielfelder angekündigter Angriffe werden schon markiert
++ Tile für den Fernkämpfer-Test (bisher nur Zeichen F), falls er im Spiel bleibt
 
 ## 8. Gelände, Feldschichten, Ebenen
 

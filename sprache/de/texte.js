@@ -11,6 +11,10 @@ export default {
     geschlecht: "n",
     einzahl: { nom: "Essigbakterium", gen: "Essigbakteriums", dat: "Essigbakterium", akk: "Essigbakterium" },
   },
+  "wesen.fernkaempfer_test": {
+    geschlecht: "m",
+    einzahl: { nom: "Fernkämpfer-Test", gen: "Fernkämpfer-Tests", dat: "Fernkämpfer-Test", akk: "Fernkämpfer-Test" },
+  },
   "gegenstand.bier": {
     geschlecht: "n",
     einzahl: { nom: "Bier", gen: "Biers", dat: "Bier", akk: "Bier" },
@@ -64,6 +68,11 @@ export default {
   "log.abgelehnt.zu_weit": "Zu weit weg.",
   "log.abgelehnt.keine_sichtlinie": "Etwas ist im Weg.",
   "log.abgelehnt.unbekannt": "Unbekannter Befehl.",
+
+  // Fähigkeiten (Testgegner, vorläufig)
+  "faehigkeit.saeurespucke": "Säurespucke",
+  "faehigkeit.saeureschwall": "Säureschwall",
+  "faehigkeit.saeureschwall.ankuendigung": "{wer.nom} bläht sich auf und zielt. Gleich kommt ein Schwall.",
 
   // Fraktionen
   "fraktion.ninkasi": "Ninkasi",

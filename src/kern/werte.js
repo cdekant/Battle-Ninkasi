@@ -44,9 +44,15 @@ function bedingungErfuellt(spiel, entitaet, { bedingung, ...parameter }, umstaen
   return holen("modifikatorbedingungen", bedingung)(spiel, entitaet, parameter, umstaende);
 }
 
+// Ob alle Bedingungen einer Liste [{ bedingung, ...parameter }] gelten (wenn an Modifikatoren, Auslösern und
+// der KI, voraussetzungen an Fähigkeiten); eine leere oder fehlende Liste gilt immer
+export function bedingungenErfuellt(spiel, entitaet, liste, umstaende = {}) {
+  return (liste || []).every((bedingung) => bedingungErfuellt(spiel, entitaet, bedingung, umstaende));
+}
+
 function modifikatorGilt(spiel, entitaet, modifikator, umstaende) {
   if (modifikator.tag !== undefined && !(umstaende.tags || []).includes(modifikator.tag)) return false;
-  return (modifikator.wenn || []).every((bedingung) => bedingungErfuellt(spiel, entitaet, bedingung, umstaende));
+  return bedingungenErfuellt(spiel, entitaet, modifikator.wenn, umstaende);
 }
 
 // Schutz gegen Abfragen, die sich über Bedingungen oder Quellen selbst wieder aufrufen
