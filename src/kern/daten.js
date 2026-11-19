@@ -348,7 +348,53 @@ function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
       if (gegenstand.wurf.reichweite === 0) fehler.push(`${ort}.wurf: reichweite muss eine ganze Zahl >= 1 sein`);
     }
   }
+  pruefeVerschleiss(daten, gegenstand, ort, fehler);
+  // Fluch und Unbekanntes, siehe systeme/ausruestung.js und systeme/kennen.js
+  pruefeParameter(daten, { verflucht: "wahrheitswert?" }, gegenstand, ort, fehler);
+  if (gegenstand.verflucht && !gegenstand.ausruestung) fehler.push(`${ort}: verflucht wirkt nur an Ausrüstung`);
+  if (gegenstand.unbekannt !== undefined) {
+    const unbekannt = gegenstand.unbekannt;
+    if (!istObjekt(unbekannt) || !daten.etiketten?.[unbekannt.gruppe]) fehler.push(`${ort}: unbekannt muss { gruppe, schwierigkeit } mit einer Gruppe aus daten/etiketten.js sein`);
+    else if (!istZahlAbNull(unbekannt.schwierigkeit)) fehler.push(`${ort}.unbekannt: schwierigkeit muss eine ganze Zahl >= 0 sein`);
+  }
   if (!daten.zeichen.gegenstaende[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js`);
+}
+
+// Verderben und Haltbarkeit, siehe systeme/verschleiss.js
+function pruefeVerschleiss(daten, gegenstand, ort, fehler) {
+  const verdirbt = gegenstand.verdirbt;
+  if (verdirbt !== undefined) {
+    if (!istObjekt(verdirbt) || !(istGanzzahl(verdirbt.nach) && verdirbt.nach > 0) || !daten.gegenstaende[verdirbt.wird]) {
+      fehler.push(`${ort}: verdirbt muss { nach > 0, wird: Gegenstand } sein`);
+    } else if (gegenstand.stapelbar && !daten.gegenstaende[verdirbt.wird].stapelbar) {
+      fehler.push(`${ort}.verdirbt: ein Stapel verdirbt als Ganzes, "${verdirbt.wird}" muss darum stapelbar sein`);
+    }
+  }
+  const haltbarkeit = gegenstand.haltbarkeit;
+  if (haltbarkeit !== undefined) {
+    if (!istObjekt(haltbarkeit) || !(istGanzzahl(haltbarkeit.hoechstens) && haltbarkeit.hoechstens > 0) || !daten.gegenstaende[haltbarkeit.wirdZu]) {
+      fehler.push(`${ort}: haltbarkeit muss { hoechstens > 0, wirdZu: Gegenstand } sein`);
+    }
+    if (!gegenstand.ausruestung) fehler.push(`${ort}: haltbarkeit nutzt sich nur an Ausrüstung ab`);
+    if (gegenstand.stapelbar) fehler.push(`${ort}: ein Gegenstand mit haltbarkeit ist nicht stapelbar`);
+  }
+}
+
+// Etiketten unbekannter Gegenstände: { gruppe: [Textschlüssel] }, je Gruppe mindestens so viele wie Typen
+function pruefeEtiketten(daten, sprache, fehler) {
+  for (const [gruppe, etiketten] of Object.entries(daten.etiketten || {})) {
+    const ort = `etiketten.${gruppe}`;
+    if (!istTextliste(etiketten) || new Set(etiketten).size !== etiketten.length) {
+      fehler.push(`${ort} muss eine Liste verschiedener Textschlüssel sein`);
+      continue;
+    }
+    for (const schluessel of etiketten) {
+      pruefeText(sprache.texte, schluessel, ort, fehler);
+      pruefeNomen(sprache, schluessel, fehler);
+    }
+    const typen = Object.values(daten.gegenstaende).filter((gegenstand) => !gegenstand.abstrakt && gegenstand.unbekannt?.gruppe === gruppe).length;
+    if (typen > etiketten.length) fehler.push(`${ort}: ${typen} unbekannte Gegenstände, aber nur ${etiketten.length} Etiketten`);
+  }
 }
 
 // Menge eines Schritts, siehe mengeBestimmen in kern/bausteine.js
@@ -719,6 +765,7 @@ export function vorbereiten(rohdaten, sprache = {}) {
   for (const [name, faehigkeit] of Object.entries(daten.faehigkeiten || {})) pruefeFaehigkeit(daten, sprache, name, faehigkeit, fehler);
   for (const [name, wesen] of Object.entries(daten.wesen)) pruefeWesen(daten, sprache, name, wesen, fehler);
   for (const [name, gegenstand] of Object.entries(daten.gegenstaende)) pruefeGegenstand(daten, sprache, name, gegenstand, fehler);
+  pruefeEtiketten(daten, sprache, fehler);
   for (const [name, falle] of Object.entries(daten.fallen || {})) pruefeFalle(daten, sprache, name, falle, fehler);
   for (const [name, ebene] of Object.entries(daten.ebenen)) pruefeEbene(daten, name, ebene, fehler);
   pruefeAbfolge(daten, fehler);

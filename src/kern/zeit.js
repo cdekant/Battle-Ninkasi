@@ -96,8 +96,9 @@ export function akteurEntfernen(zustand, akteurId) {
   entfernenWo(zustand, (eintrag) => eintrag.art === "akteur" && eintrag.akteurId === akteurId);
 }
 
-export function gebundeneEreignisseEntfernen(zustand, entitaetId) {
-  entfernenWo(zustand, (eintrag) => eintrag.gebundenAn === entitaetId);
+// Entfernt die an eine Entität gebundenen Zeitereignisse, mit ereignistyp nur die dieses Typs
+export function gebundeneEreignisseEntfernen(zustand, entitaetId, ereignistyp = null) {
+  entfernenWo(zustand, (eintrag) => eintrag.gebundenAn === entitaetId && (ereignistyp === null || eintrag.ereignistyp === ereignistyp));
 }
 
 // Nimmt alle Einträge heraus, auf die trifftZu passt, und gibt sie zurück (Wechsel der Ebene, systeme/ebenen.js)

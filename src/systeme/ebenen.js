@@ -60,6 +60,7 @@ function ebeneZurueckholen(spiel, tiefe) {
       instanz.beginn += vergangen;
       if (instanz.ende !== null) instanz.ende += vergangen;
     }
+    if (entitaet.verdirbtUm !== undefined) entitaet.verdirbtUm += vergangen; // das Verderben ruht mit (systeme/verschleiss.js)
     zustand.entitaeten[id] = entitaet;
   }
   for (const eintrag of abgelegt.warteschlange) eintrag.zeit += vergangen;

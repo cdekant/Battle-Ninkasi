@@ -1,5 +1,6 @@
 // Ausrüstung (Aufbau siehe src/systeme/ausruestung.js); alle Zahlen vorläufig.
 // Waffen in den Händen ersetzen die Faust; Kupferteile bilden ein Set (traegt_tag kupfer, anzahl 2).
+// Haltbarkeit (src/systeme/verschleiss.js): Säure frisst an Rüstung, angefressen schützt sie weniger, bei 0 bleiben Reste.
 const KUPFERSET = { ziel: "willenskraft", art: "plus", betrag: 10, wenn: [{ bedingung: "traegt_tag", tag: "kupfer", anzahl: 2 }] };
 
 export default {
@@ -18,15 +19,15 @@ export default {
     },
   },
   lederschuerze: {
-    text: "gegenstand.lederschuerze", aufhebbar: true, gewicht: 2000,
+    text: "gegenstand.lederschuerze", aufhebbar: true, gewicht: 2000, haltbarkeit: { hoechstens: 20, wirdZu: "lederfetzen" },
     ausruestung: { platz: "brust", modifikatoren: [{ ziel: "ruestung", art: "plus", betrag: 2 }, { ziel: "ausweichen", art: "plus", betrag: -5 }] },
   },
   kupferhelm: {
-    text: "gegenstand.kupferhelm", aufhebbar: true, gewicht: 1500, tags: ["kupfer"],
+    text: "gegenstand.kupferhelm", aufhebbar: true, gewicht: 1500, tags: ["kupfer"], haltbarkeit: { hoechstens: 30, wirdZu: "kupferschrott" },
     ausruestung: { platz: "kopf", modifikatoren: [{ ziel: "ruestung", art: "plus", betrag: 1 }, KUPFERSET] },
   },
   lederhose: {
-    text: "gegenstand.lederhose", aufhebbar: true, gewicht: 1500,
+    text: "gegenstand.lederhose", aufhebbar: true, gewicht: 1500, haltbarkeit: { hoechstens: 20, wirdZu: "lederfetzen" },
     ausruestung: { platz: "beine", modifikatoren: [{ ziel: "ruestung", art: "plus", betrag: 1 }] },
   },
   hopfenkette: {
@@ -37,4 +38,7 @@ export default {
     text: "gegenstand.kupferring", aufhebbar: true, gewicht: 20, tags: ["kupfer"],
     ausruestung: { platz: "finger", modifikatoren: [{ ziel: "willenskraft", art: "plus", betrag: 5 }, KUPFERSET] },
   },
+  // Reste zerfressener Rüstung; Ballast, später vielleicht Material
+  lederfetzen: { text: "gegenstand.lederfetzen", aufhebbar: true, stapelbar: true, gewicht: 300 },
+  kupferschrott: { text: "gegenstand.kupferschrott", aufhebbar: true, stapelbar: true, gewicht: 500 },
 };

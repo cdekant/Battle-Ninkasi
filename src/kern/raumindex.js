@@ -10,6 +10,7 @@
 // Vormerkungen für die Zustandsprüfungen nach einem Vorgang (kern/vorgang.js), ebenfalls neben dem Zustand:
 //   lageOffen:     IDs, deren Lage zu prüfen ist (versetzt, Zustände geändert; systeme/verschieben.js)
 //   todOffen:      IDs, bei denen ein Wert auf 0 gefallen ist (kern/werte.js; systeme/tod.js)
+//   kaputtOffen:   IDs von Gegenständen, deren Haltbarkeit auf 0 gefallen ist (systeme/verschleiss.js)
 // Jede Änderung einer Position läuft über positionSetzen; Erzeugen und Entfernen tragen selbst ein und aus.
 // indexPruefen vergleicht mit einem frisch aufgebauten Index (Bot, Tests).
 
@@ -80,7 +81,7 @@ function austragen(index, entitaet) {
 }
 
 function aufbauen(zustand) {
-  const index = { felder: new Map(), zellen: new Map(), mitPosition: [], traegerinnen: [], fallen: [], lageOffen: [], todOffen: [] };
+  const index = { felder: new Map(), zellen: new Map(), mitPosition: [], traegerinnen: [], fallen: [], lageOffen: [], todOffen: [], kaputtOffen: [] };
   // Object.values liefert ganzzahlige Schlüssel aufsteigend, die Listen entstehen also schon sortiert
   for (const entitaet of Object.values(zustand.entitaeten)) eintragen(index, entitaet);
   return index;
@@ -106,6 +107,7 @@ export function entitaetAusIndexNehmen(zustand, entitaet) {
   austragen(index, entitaet);
   herausnehmen(index.lageOffen, entitaet.id);
   herausnehmen(index.todOffen, entitaet.id);
+  herausnehmen(index.kaputtOffen, entitaet.id);
 }
 
 // Setzt die Position einer Entität (feld null: keine Position mehr, z.B. aufgehoben); merkt die Lage zur Prüfung vor
@@ -199,6 +201,19 @@ export function todOffenEntnehmen(zustand) {
   const index = indexVon(zustand);
   const offen = index.todOffen;
   index.todOffen = [];
+  return offen;
+}
+
+// Merkt einen Gegenstand für die Prüfung auf kaputt vor (seine Haltbarkeit ist auf 0 gefallen)
+export function kaputtVormerken(zustand, gegenstand) {
+  einfuegen(indexVon(zustand).kaputtOffen, gegenstand.id);
+}
+
+// Nimmt die zur Prüfung auf kaputt vorgemerkten IDs heraus (aufsteigend)
+export function kaputtOffenEntnehmen(zustand) {
+  const index = indexVon(zustand);
+  const offen = index.kaputtOffen;
+  index.kaputtOffen = [];
   return offen;
 }
 

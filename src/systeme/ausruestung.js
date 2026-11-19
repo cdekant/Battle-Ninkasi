@@ -11,11 +11,18 @@
 // Befehle: { art: "anlegen", gegenstandId } legt an; ist der Platz voll, legt derselbe Befehl die ältesten Gegenstände
 //   dort ab, bis genug frei ist (tauschen), und kostet beides (aktionen.anlegen plus je aktionen.ablegen);
 //   { art: "ablegen", gegenstandId }. Ablehnungen: nicht_im_gepaeck, nicht_anlegbar, schon_angelegt, kein_platz,
-//   nicht_angelegt. Haken gegenstand_benutzt mit art "anlegen" bzw. "ablegen".
+//   nicht_angelegt, verflucht. Haken gegenstand_benutzt mit art "anlegen" bzw. "ablegen".
+// Fluch: verflucht: true am Gegenstand; angelegt lässt er sich weder ablegen noch fallen lassen, werfen oder beim
+//   Anlegen wegtauschen (Ablehnung verflucht); bekannt wird der Fluch erst beim Anlegen (fluchBekannt, Meldung
+//   fluch_entdeckt). Baustein fluch_aufheben nimmt die Flüche der angelegten Gegenstände des Ziels.
+// Haltbarkeit (systeme/verschleiss.js): ein angefressener Gegenstand wirkt schwächer, seine Vorteile sinken im
+//   Verhältnis der Haltbarkeit (haltbarkeitProzent), Nachteile bleiben voll.
 
 import { anmelden } from "../kern/register.js";
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
 import { entitaetMitId } from "../kern/zustand.js";
+import { modifikatorSkaliert } from "../kern/werte.js";
+import { bausteinAnmelden } from "../kern/bausteine.js";
 
 export function ausgeruestete(spiel, wesen) {
   return (wesen.ausgeruestet || []).map((id) => entitaetMitId(spiel.zustand, id)).filter(Boolean);
@@ -26,6 +33,21 @@ export function istAngelegt(wesen, gegenstandId) {
 }
 
 const belegtVon = (gegenstand) => gegenstand.ausruestung.belegt ?? 1;
+
+// Ob ein Fluch das Wesen hindert, den Gegenstand loszuwerden (nur angelegt wirkt er)
+export function fluchHindert(spiel, wesen, gegenstandId) {
+  return istAngelegt(wesen, gegenstandId) && Boolean(entitaetMitId(spiel.zustand, gegenstandId)?.verflucht);
+}
+
+// Haltbarkeit in Prozent des Höchstwerts, abgerundet; ohne Haltbarkeit 100
+export function haltbarkeitProzent(gegenstand) {
+  const haltbarkeit = gegenstand.haltbarkeit;
+  if (!haltbarkeit) return 100;
+  return Math.floor(((haltbarkeit.aktuell ?? haltbarkeit.hoechstens) * 100) / haltbarkeit.hoechstens);
+}
+
+// Vorteil heißt: plus und prozent über 0, mal über 100; nur Vorteile sinken mit der Haltbarkeit
+const istVorteil = ({ art, betrag }) => ((art === "plus" || art === "prozent") && betrag > 0) || (art === "mal" && betrag > 100);
 
 // Angelegte Gegenstände auf einem Platz, in der Reihenfolge des Anlegens (älteste zuerst)
 function aufDemPlatz(spiel, wesen, platz) {
@@ -64,7 +86,9 @@ anmelden("befehle", "anlegen", {
     const gegenstand = entitaetMitId(spiel.zustand, befehl.gegenstandId);
     if (!gegenstand?.ausruestung) return "nicht_anlegbar";
     if (istAngelegt(akteur, gegenstand.id)) return "schon_angelegt";
-    return zuTauschen(spiel, akteur, gegenstand) ? null : "kein_platz";
+    const weg = zuTauschen(spiel, akteur, gegenstand);
+    if (!weg) return "kein_platz";
+    return weg.some((angelegt) => angelegt.verflucht) ? "verflucht" : null;
   },
   ausfuehren(spiel, akteur, befehl) {
     const gegenstand = entitaetMitId(spiel.zustand, befehl.gegenstandId);
@@ -73,6 +97,11 @@ anmelden("befehle", "anlegen", {
     if (!akteur.ausgeruestet) akteur.ausgeruestet = [];
     akteur.ausgeruestet.push(gegenstand.id);
     melden(spiel, "angelegt", { wer: bezugAuf(akteur), was: bezugAuf(gegenstand) });
+    // ein Fluch zeigt sich erst, wenn es zu spät ist (Vorbild NetHack)
+    if (gegenstand.verflucht && !gegenstand.fluchBekannt) {
+      gegenstand.fluchBekannt = true;
+      melden(spiel, "fluch_entdeckt", { wer: bezugAuf(akteur), was: bezugAuf(gegenstand) });
+    }
     benutztMelden(spiel, akteur, gegenstand, "anlegen");
     const aktionen = spiel.daten.aktionen;
     return { aktion: "anlegen", grundkosten: aktionen.anlegen + weg.length * aktionen.ablegen };
@@ -81,7 +110,8 @@ anmelden("befehle", "anlegen", {
 
 anmelden("befehle", "ablegen", {
   pruefen(spiel, akteur, befehl) {
-    return istAngelegt(akteur, befehl.gegenstandId) ? null : "nicht_angelegt";
+    if (!istAngelegt(akteur, befehl.gegenstandId)) return "nicht_angelegt";
+    return fluchHindert(spiel, akteur, befehl.gegenstandId) ? "verflucht" : null;
   },
   ausfuehren(spiel, akteur, befehl) {
     abnehmen(spiel, akteur, entitaetMitId(spiel.zustand, befehl.gegenstandId));
@@ -89,15 +119,31 @@ anmelden("befehle", "ablegen", {
   },
 });
 
-// Modifikatoren der angelegten Gegenstände
+// Modifikatoren der angelegten Gegenstände; angefressene geben weniger Vorteil (Skalierung wie bei den Zuständen)
 anmelden("modifikatorquellen", "ausruestung", (spiel, wesen) => {
   if (!wesen.ausgeruestet?.length) return [];
   const ergebnis = [];
   for (const gegenstand of ausgeruestete(spiel, wesen)) {
-    for (const modifikator of gegenstand.ausruestung.modifikatoren || []) ergebnis.push({ ...modifikator, quelle: `ausruestung:${gegenstand.id}` });
+    const prozent = haltbarkeitProzent(gegenstand);
+    for (const modifikator of gegenstand.ausruestung.modifikatoren || []) {
+      const wirksam = prozent < 100 && istVorteil(modifikator) ? modifikatorSkaliert(modifikator, prozent) : modifikator;
+      ergebnis.push({ ...wirksam, quelle: `ausruestung:${gegenstand.id}` });
+    }
   }
   return ergebnis;
 });
+
+// Nimmt die Flüche aller angelegten Gegenstände des Ziels (Weihwasser, Segen einer Nebengottheit); Meldung fluch_aufgehoben
+bausteinAnmelden("fluch_aufheben", {}, (spiel, kontext) => {
+  const ziel = entitaetMitId(spiel.zustand, kontext.zielId);
+  if (!ziel) return;
+  for (const gegenstand of ausgeruestete(spiel, ziel)) {
+    if (!gegenstand.verflucht) continue;
+    delete gegenstand.verflucht;
+    delete gegenstand.fluchBekannt;
+    melden(spiel, "fluch_aufgehoben", { wer: bezugAuf(ziel), was: bezugAuf(gegenstand) });
+  }
+}, { brauchtZiel: true });
 
 // Die Angriffsprofile angelegter Waffen in der Reihenfolge des Anlegens oder null ohne Waffe
 export function waffenprofile(spiel, wesen) {

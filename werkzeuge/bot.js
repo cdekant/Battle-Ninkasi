@@ -50,6 +50,14 @@ function invariantenPruefen(spiel) {
     if (entitaet.anzahl !== undefined && !(Number.isInteger(entitaet.anzahl) && entitaet.anzahl >= 1)) throw new Error(`#${entitaet.id} mit Anzahl ${entitaet.anzahl}`);
     if (entitaet.ladungen?.aktuell !== undefined && !(entitaet.ladungen.aktuell >= 1 && entitaet.ladungen.aktuell <= entitaet.ladungen.hoechstens)) throw new Error(`#${entitaet.id} mit ${entitaet.ladungen.aktuell} Ladungen`);
     for (const angelegtId of entitaet.ausgeruestet || []) if (!entitaet.inventar?.includes(angelegtId)) throw new Error(`#${entitaet.id} hat #${angelegtId} angelegt, aber nicht im Gepäck`);
+    // Verschleiß und Unbekanntes (src/systeme/verschleiss.js, src/systeme/kennen.js)
+    const haltbarkeit = entitaet.haltbarkeit?.aktuell;
+    if (haltbarkeit !== undefined && !(Number.isInteger(haltbarkeit) && haltbarkeit >= 1 && haltbarkeit <= entitaet.haltbarkeit.hoechstens)) throw new Error(`#${entitaet.id} mit Haltbarkeit ${haltbarkeit} nach dem Vorgang`);
+    if (entitaet.verdirbt) {
+      if (!(entitaet.verdirbtUm >= zustand.zeit)) throw new Error(`#${entitaet.id} hätte um ${entitaet.verdirbtUm} verderben sollen`);
+      if (!zustand.warteschlange.some((eintrag) => eintrag.gebundenAn === entitaet.id && eintrag.ereignistyp === "verderben" && eintrag.zeit === entitaet.verdirbtUm)) throw new Error(`#${entitaet.id} verdirbt ohne Zeitereignis`);
+    }
+    if (entitaet.etikett !== undefined && zustand.wissen?.erkannt.includes(entitaet.typ)) throw new Error(`#${entitaet.id} trägt ein Etikett, obwohl ${entitaet.typ} erkannt ist`);
   }
   for (const eintrag of zustand.warteschlange) {
     if (eintrag.gebundenAn !== undefined && !zustand.entitaeten[eintrag.gebundenAn]) throw new Error(`Zeitereignis gebunden an fehlende #${eintrag.gebundenAn}`);

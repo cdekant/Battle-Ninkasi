@@ -23,6 +23,7 @@ import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 import { aktionAbbrechen, laufendeAktionVorDemZug } from "../systeme/laufendeAktionen.js";
 import { wahrnehmen } from "../systeme/wahrnehmung.js";
 import { lastZuschlag } from "../systeme/inventar.js";
+import { etikettenZuordnen } from "../systeme/kennen.js";
 
 // Rohdaten prüfen und vorbereiten; wirft Datenfehler mit allen Meldungen.
 // sprache: { texte, nomenPruefen? } (siehe kern/daten.js)
@@ -36,6 +37,8 @@ export function neuesSpiel(daten, startwert) {
   const zustand = neuerZustand(startwert >>> 0);
   const spiel = { daten, zustand, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
   zustand.zufallszustand = zufallErzeugen(startwertAbleiten(zustand.startwert, "spiel"));
+  // vor der ersten Ebene, damit schon ihre Gegenstände ihr Etikett tragen (systeme/kennen.js)
+  etikettenZuordnen(spiel);
 
   // Ninkasi beginnt auf der Treppe hinauf der Starttiefe (oder in der Mitte des ersten Raums, der dort liegt)
   zustand.tiefe = daten.starttiefe;

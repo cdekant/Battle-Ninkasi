@@ -20,6 +20,7 @@ const ARTEN = [
   "gefahren",           // Gefahrenprüfungen: (vorher, nachher) => true bei neuer Gefahr; Lage aus systeme/gefahr.js
   "zustandspruefungen", // Prüfungen nach jedem Vorgang: (spiel) => true, wenn sie etwas verändert haben
   "laufendeaktionen",   // Arten langer Aktionen: { schrittkosten, abschliessen, abbrechen } (systeme/laufendeAktionen.js)
+  "beimErzeugen",       // nach dem Erzeugen jeder Entität: (zustand, entitaet) => void, z.B. Verderben einplanen, Etikett
 ];
 
 export const RANG_VORGABE = 100;

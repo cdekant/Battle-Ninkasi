@@ -13,7 +13,7 @@
 //   Vor jedem einzelnen Angriff läuft der Haken vor_angriff; ein Abbruch lässt diesen Angriff aus.
 // Zugriff auf die Profile nur über angriffeVon: angelegte Waffen ersetzen die eigenen Profile (systeme/ausruestung.js).
 // Kampfwerte am Wesen: kampfwerte: { ausweichen?, willenskraft?, blocken?, ruestung?, kritchance?, heimlichkeit? } als Punkte
-//   (Vorgabe 0, heimlichkeit siehe systeme/wahrnehmung.js, entdecken siehe systeme/fallen.js),
+//   (Vorgabe 0, heimlichkeit siehe systeme/wahrnehmung.js, entdecken siehe systeme/fallen.js, kennerschaft siehe systeme/kennen.js),
 //   abgefragt über Modifikatoren mit gleichnamigem Ziel; widerstaende: { saeure: 100, feuer: -50 }; immun: ["psi"]
 // Punkte werden über einen Halbwert zu Anteilen, die sich 100 % nur annähern: punkte / (punkte + halbwert).
 //   Trefferchance: genauigkeit / (genauigkeit + verteidigung + grundverteidigung)
@@ -36,7 +36,7 @@ import { istAhnungslos, laermMachen } from "./wahrnehmung.js";
 import { abstand } from "../welt/karte.js";
 import { waffenprofile } from "./ausruestung.js";
 
-export const KAMPFWERTE = ["ausweichen", "willenskraft", "blocken", "ruestung", "kritchance", "heimlichkeit", "entdecken"];
+export const KAMPFWERTE = ["ausweichen", "willenskraft", "blocken", "ruestung", "kritchance", "heimlichkeit", "entdecken", "kennerschaft"];
 export const VERTEIDIGUNGEN = ["ausweichen", "willenskraft"];
 export const MARKER = ["verfehlt_nie", "unblockbar", "ignoriert_ruestung"];
 

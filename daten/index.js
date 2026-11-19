@@ -18,6 +18,7 @@ import schichten from "./schichten.js";
 import wurfgegenstaende from "./wurfgegenstaende.js";
 import populationen from "./populationen.js";
 import ausruestung from "./ausruestung.js";
+import etiketten from "./etiketten.js";
 
 export default {
   wesen: { ...ninkasi, ...gegner },
@@ -34,6 +35,7 @@ export default {
   gelaende,
   ebenen,
   populationen,
+  etiketten,
   // Tiefen von oben nach unten: 0 ist der Hub, das Spiel beginnt in starttiefe (src/welt/ebene.js, src/systeme/ebenen.js)
   abfolge: ["hub", "keller", "keller", "keller"],
   starttiefe: 1,

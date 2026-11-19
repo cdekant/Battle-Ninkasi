@@ -13,9 +13,9 @@ export function erstelleTexte(texte, grammatik) {
     return texte[schluessel];
   }
 
-  // Hauptwort einer Entität im gewünschten Fall und mit gewünschtem Artikel
+  // Hauptwort einer Entität im gewünschten Fall und mit gewünschtem Artikel; unbekannte Gegenstände mit ihrem Etikett
   function nomenForm(bezug, fall = "nom", artikel = "bestimmt") {
-    const eintrag = rohtext(bezug.text);
+    const eintrag = rohtext(bezug.etikett ?? bezug.text);
     if (typeof eintrag === "string") return eintrag;
     return grammatik.nomen(eintrag, fall, artikel);
   }

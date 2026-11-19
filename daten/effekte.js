@@ -3,18 +3,19 @@ export default {
   faustschlag: {
     schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "1W6+2" }],
   },
+  // Säure frisst an angelegter Rüstung (Baustein abnutzen, src/systeme/verschleiss.js)
   biss_klein: {
-    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "1W4" }],
+    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "1W4" }, { baustein: "abnutzen", menge: 1 }],
   },
   // Fähigkeiten des Testgegners fernkaempfer_test (daten/faehigkeiten.js); vorläufig
   saeurespritzer: {
     schritte: [{ baustein: "trefferwurf", genauigkeit: 70, effekt: "saeurespritzer_treffer" }],
   },
   saeurespritzer_treffer: {
-    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "1W4+1" }],
+    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "1W4+1" }, { baustein: "abnutzen", menge: 1 }],
   },
   saeureschwall: {
-    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "2W4" }],
+    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "2W4" }, { baustein: "abnutzen", menge: 2 }],
   },
   // Waffen (daten/ausruestung.js); vorläufig
   kellenschlag: {
@@ -27,6 +28,7 @@ export default {
   saeureduese: {
     schritte: [
       { baustein: "schaden", art: "saeure", wuerfel: "2W4" },
+      { baustein: "abnutzen", menge: 2 },
       { baustein: "oberflaeche_setzen", art: "saeure", menge: 4, muster: { art: "kreis", radius: 1 } },
     ],
   },
@@ -62,6 +64,12 @@ export default {
   // Rückschlag einer Psi-Fähigkeit auf die Wirkende (daten/risiken.js); vorläufig
   psi_rueckschlag: {
     schritte: [{ baustein: "schaden", art: "psi", wuerfel: "1W6" }],
+  },
+  sauerbier_trinken: {
+    schritte: [
+      { baustein: "heilen", wertName: "lp", menge: 5 },
+      { baustein: "wert_aendern", wertName: "pegel", menge: 30 },
+    ],
   },
   bier_trinken: {
     schritte: [

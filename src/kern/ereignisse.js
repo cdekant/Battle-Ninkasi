@@ -28,7 +28,10 @@ export function melden(spiel, art, daten = {}) {
   for (const hoerer of spiel.hoerer) hoerer(meldung);
 }
 
-// Kurzbezug auf eine Entität für Meldungen, bleibt gültig, auch wenn die Entität entfernt wird
+// Kurzbezug auf eine Entität für Meldungen, bleibt gültig, auch wenn die Entität entfernt wird;
+// ein unbekannter Gegenstand trägt sein Etikett mit (systeme/kennen.js), die Anzeige nennt dann dieses
 export function bezugAuf(entitaet) {
-  return { id: entitaet.id, typ: entitaet.typ, text: entitaet.text };
+  const bezug = { id: entitaet.id, typ: entitaet.typ, text: entitaet.text };
+  if (entitaet.etikett !== undefined) bezug.etikett = entitaet.etikett;
+  return bezug;
 }

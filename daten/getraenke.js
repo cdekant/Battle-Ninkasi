@@ -1,9 +1,15 @@
 // Getränke und ihre Behälter (Stapel, Ladungen, wirdZu, gewicht in Gramm: src/systeme/inventar.js); Zahlen vorläufig
+// Verderben (verdirbt: { nach, wird }, src/systeme/verschleiss.js): 50000 Zeiteinheiten sind 500 Weltticks
 export default {
-  // eine Halbe; die Flasche bleibt
+  // eine Halbe; die Flasche bleibt; mit der Zeit wird sie sauer
   bier: {
     text: "gegenstand.bier", aufhebbar: true, stapelbar: true, gewicht: 900,
-    trinkbar: { effekt: "bier_trinken" }, wirdZu: "leere_flasche",
+    trinkbar: { effekt: "bier_trinken" }, wirdZu: "leere_flasche", verdirbt: { nach: 50000, wird: "sauerbier" },
+  },
+  // verdorbenes Bier, schon halb Essig: trinkbar, aber kein Vergnügen
+  sauerbier: {
+    text: "gegenstand.sauerbier", aufhebbar: true, stapelbar: true, gewicht: 900,
+    trinkbar: { effekt: "sauerbier_trinken" }, wirdZu: "leere_flasche",
   },
   // 10 Liter in 20 Schlucken zu einer Halben, 2 kg Holz: voll 12 kg
   bierfass: {

@@ -23,3 +23,5 @@ import "./ebenen.js";
 import "./modifikatoren.js";
 import "./laufendeAktionen.js";
 import "./faehigkeiten.js";
+import "./verschleiss.js";
+import "./kennen.js";

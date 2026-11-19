@@ -11,6 +11,7 @@
 import { anmelden } from "../kern/register.js";
 import { entitaetMitId, entitaetEntfernen, positionSetzen } from "../kern/zustand.js";
 import { einenAbnehmen } from "./inventar.js";
+import { fluchHindert } from "./ausruestung.js";
 import { effektAnwenden } from "../kern/effekte.js";
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
 import { zielAufloesen } from "./zielauswahl.js";
@@ -30,6 +31,7 @@ anmelden("befehle", "werfen", {
   pruefen(spiel, akteur, befehl) {
     const gegenstand = geworfenerGegenstand(spiel, akteur, befehl);
     if (!gegenstand) return "nichts_zu_werfen";
+    if (fluchHindert(spiel, akteur, gegenstand.id)) return "verflucht";
     const aufloesung = wurfbahn(spiel, akteur, gegenstand, befehl.ziel);
     return aufloesung.ok ? null : aufloesung.grund;
   },

@@ -125,20 +125,18 @@ Offener Rest:
 
 ## 9. Gegenstände
 
-Status: in Arbeit; umgesetzt in Version 0.21.0 (Plätze, anlegen und ablegen mit Tauschen, Modifikatorquelle `ausruestung`, Waffen statt Faust, Sets mit `traegt_tag`, Auslöser an der Ausrüstung, Haken `gegenstand_benutzt`, Inventarfenster) und 0.22.0 (Stapel, Ladungen, Behälter mit `wirdZu`, Gewicht und Last in Stufen, Befehl `fallenlassen`, Bierfass), beschrieben in [Architektur.md](Architektur.md) (Inventar, Ausrüstung)
+Status: umgesetzt bis auf den offenen Rest, in den Versionen 0.21.0 (Plätze, anlegen und ablegen mit Tauschen, Modifikatorquelle `ausruestung`, Waffen statt Faust, Sets mit `traegt_tag`, Auslöser an der Ausrüstung, Haken `gegenstand_benutzt`, Inventarfenster), 0.22.0 (Stapel, Ladungen, Behälter mit `wirdZu`, Gewicht und Last in Stufen, Befehl `fallenlassen`, Bierfass) und 0.23.0 (Verderben mit gemitteltem Zeitpunkt in Stapeln, Haltbarkeit mit Baustein `abnutzen` und Zustandsprüfung `kaputt`, angefressen schwächer, Fluch mit `fluch_aufheben`, Unbekanntes mit Etiketten je Lauf, Vertrautheit und Kampfwert `kennerschaft`, Register `beimErzeugen`), beschrieben in [Architektur.md](Architektur.md) (Inventar, Ausrüstung, Verschleiß, Unbekanntes)
 
-Entschieden: Aufteilung in 0.21.0, 0.22.0 und 0.23.0; Plätze Kopf, Brust, Beine, Hals und zwei Finger für Rüstung und Schmuck, zwei Hände für Waffen; ein voller Platz wird in einem Befehl getauscht; Waffen ersetzen die Faust; Flüche sind unbekannt bis zum Anlegen; Biersorten sind ein eigenes Thema, 0.23.0 baut nur die Mechanik für Unbekanntes; Bier wird zur leeren Flasche, der Ballast ist gewollt; Tragkraft 20 kg als Startwert, Modifikatoren durch Skills offen; Fallenlassen nimmt den ganzen Stapel; Bierfass mit 20 Schlucken zu einer Halben
-
-Offen, Version 0.23.0 (Haltbarkeit, Verderben, Fluch, Unbekanntes):
-
-+ Verderben `verdirbt: { nach, wird }` als Zeitereignis am Gegenstand (Bier wird sauer), ruht in verlassenen Ebenen mit
-+ Haltbarkeit der Ausrüstung, Säure nagt daran; bei 0 kaputt als Zustandsprüfung wie der Tod
-+ Fluch: verflucht lässt sich nicht ablegen, unbekannt bis zum Anlegen
-+ Unbekannte Gegenstände nach Brogue: je Lauf zufällig zugeordnete Etiketten, Probieren erkennt und kostet, das Wissen gilt für den Lauf; Erkennen später über Sinnlichkeit und Braukunde (Skills), bis dahin ein Kampfwert `kennerschaft`; die Biersorten selbst sind Spieldesign
+Entschieden: Aufteilung in 0.21.0, 0.22.0 und 0.23.0; Plätze Kopf, Brust, Beine, Hals und zwei Finger für Rüstung und Schmuck, zwei Hände für Waffen; ein voller Platz wird in einem Befehl getauscht; Waffen ersetzen die Faust; Flüche sind unbekannt bis zum Anlegen; Biersorten sind ein eigenes Thema, 0.23.0 baut nur die Mechanik für Unbekanntes; Bier wird zur leeren Flasche, der Ballast ist gewollt; Tragkraft 20 kg als Startwert, Modifikatoren durch Skills offen; Fallenlassen nimmt den ganzen Stapel; Bierfass mit 20 Schlucken zu einer Halben; fließen Stapel zusammen, verdirbt der ganze Stapel zum nach Anzahl gewichteten Durchschnitt; abgenutzt wird nur über Effekte (Säure), nicht durch Zuschlagen oder Getroffenwerden, verbraucht werden nur Ladungen; angefressen wirkt ein Gegenstand schwächer (Vorteile im Verhältnis der Haltbarkeit, Nachteile voll), damit sich der Wechsel zu anderer Rüstung irgendwann lohnt; kaputt wird ein Gegenstand zu `wirdZu`, er verschwindet nicht; Trinken erkennt sofort, Ausrüstung über eine mit der Benutzung steigende Chance, Aufheben nur mit Kennerschaft
 
 Offener Rest:
 
-+ Tiles für die Ausrüstung (bisher nur Zeichen)
++ Tiles für die Ausrüstung, Sauerbier, Lederfetzen und Kupferschrott (bisher nur Zeichen)
++ Angefressene Waffen: wie sie schwächer werden (z.B. weniger Schaden), braucht einen Eingriff in die Schadensrechnung; bisher nagt die Säure nur an Rüstung, Waffen haben keine Haltbarkeit
++ Reparieren (z.B. im Hub) und Verwertung der Reste (Lederfetzen, Kupferschrott) als Material
++ Flüche und unbekannte Gegenstände im Spielinhalt: die Biersorten nutzen die Gruppe `biere` (Spieldesign in [Grundlagen.md](Grundlagen.md)), ein Gegenstand mit `fluch_aufheben` (Weihwasser, Segen einer Nebengottheit)
++ Kennerschaft aus Sinnlichkeit und Braukunde (Skillsystem in [Charakter.md](Charakter.md))
++ Verderben weiterer Dinge (Zutaten, Leichen) und ob das Bierfass verdirbt; die Anzeige der Restzeit (z.B. "frisch", "bald sauer")
 + Waffen mit Muster (Rundumschlag, Speer) im Spielinhalt
 + Mehrzahlwörter in der Grammatik (z.B. Holzpantinen), bisher nur Einzahl
 + Das Inventarfenster im Browser ausprobieren: die Tastenlogik ist getestet, die Darstellung in der Seitenleiste nicht
@@ -151,7 +149,7 @@ Status: offen, jeweils erst Spieldesign in [Grundlagen.md](Grundlagen.md) entsch
 
 + Gunst der Nebengottheiten als Wert mit Geboten und Tabus (Vorbild DCSS)
 + Fallen, Türen, Schlüssel, Hebel, Themenräume (Vorbild Brogue "Machines"); Struktur für Rätsel, die EP bringen
-+ Druck gegen endloses Rasten: Nahrungsuhr, Nachrücken oder Verderben; LP regenerieren immer, Pegelabbau und Psi-Schwund allein sind kein Druck
++ Druck gegen endloses Rasten: Nahrungsuhr, Nachrücken oder Verderben (seit 0.23.0 wird Bier sauer); LP regenerieren immer, Pegelabbau und Psi-Schwund allein sind kein Druck
 + Telepathie (Psi-Gedankenlesen als Wahrnehmungsart "Wesen durch Wände") und Unsichtbarkeit
 + Filmriss als Mechanik: Zeitsprung, verlorene Erinnerung an erkundete Felder
 + Untersuchen mit Beschreibung und Gefahreneinschätzung, Vorschau der Trefferchance ohne Spiel-Zufall

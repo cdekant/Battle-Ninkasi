@@ -80,6 +80,20 @@ export class Log {
         if (hatSchluessel(schluessel)) this.zeile(text(schluessel), "leise");
         return;
       }
+      // Verschleiß und Flüche nur an Ninkasis Sachen; was anderswo verdirbt, bleibt still
+      case "verdorben":
+      case "kaputt":
+        if (meldung.traegerin?.id === this.spielerinId) this.zeile(text(`log.${meldung.art}`, meldung), "schlimm");
+        return;
+      case "abgenutzt":
+        if (meldung.wer.id === this.spielerinId) this.zeile(text("log.abgenutzt", meldung), "schlimm");
+        return;
+      case "fluch_entdeckt":
+        if (meldung.wer.id === this.spielerinId) this.zeile(text("log.fluch_entdeckt", meldung), "schlimm");
+        return;
+      case "fluch_aufgehoben":
+        if (meldung.wer.id === this.spielerinId) this.zeile(text("log.fluch_aufgehoben", meldung), "gut");
+        return;
       default: {
         const schluessel = `log.${meldung.art}`;
         if (hatSchluessel(schluessel)) this.zeile(text(schluessel, meldung));

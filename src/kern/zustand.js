@@ -7,6 +7,7 @@
 
 import { werteAusDaten } from "./werte.js";
 import { akteurEntfernen, gebundeneEreignisseEntfernen } from "./zeit.js";
+import { alle } from "./register.js";
 import { entitaetIndexieren, entitaetAusIndexNehmen, idsAufFeld, idsImUmkreis, idsMitPosition } from "./raumindex.js";
 
 export { positionSetzen } from "./raumindex.js";
@@ -27,6 +28,7 @@ export function neuerZustand(startwert) {
     abgelegteEbenen: {}, // verlassene Ebenen nach Tiefe, sie ruhen bis zur Rückkehr (systeme/ebenen.js)
     sichtbareFelder: [], // Feldindizes, die Ninkasi gerade sieht (aufsteigend)
     zufallszustand: null, // Zustand des Spiel-Zufalls
+    wissen: null, // was Ninkasi in diesem Lauf über unbekannte Gegenstände weiß (systeme/kennen.js)
   };
 }
 
@@ -36,6 +38,8 @@ export function entitaetErzeugen(zustand, komponenten) {
   if (entitaet.position) entitaet.position = { x: entitaet.position.x, y: entitaet.position.y };
   zustand.entitaeten[id] = entitaet;
   entitaetIndexieren(zustand, entitaet);
+  // Systeme ergänzen, was eine neue Entität braucht (Register "beimErzeugen"), auch für abgespaltene Stapel
+  for (const [, handler] of alle("beimErzeugen")) handler(zustand, entitaet);
   return entitaet;
 }
 

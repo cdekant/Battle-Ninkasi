@@ -7,7 +7,14 @@ import { beziehungZwischen, urheberVon } from "../systeme/fraktionen.js";
 import { hoechstwert } from "../kern/werte.js";
 import { optimalerPegel } from "../systeme/stoffwechsel.js";
 import { promilleText, leistenanteil, TEILSTRICHE } from "./pegelanzeige.js";
-import { istAngelegt } from "../systeme/ausruestung.js";
+import { istAngelegt, haltbarkeitProzent } from "../systeme/ausruestung.js";
+
+// Stufen der Anzeige angefressener Gegenstände, die schlimmste zuerst (unter so viel Prozent der Haltbarkeit)
+const VERSCHLEISS_STUFEN = [
+  { unter: 25, text: "ui.zerfressen" },
+  { unter: 50, text: "ui.stark_angefressen" },
+  { unter: 75, text: "ui.angefressen" },
+];
 import { anzahlVon, ladungenVon, lastVon, tragkraftVon, lastZuschlag } from "../systeme/inventar.js";
 import { BUCHSTABEN } from "../eingabe/inventar.js";
 
@@ -51,6 +58,15 @@ export class Oberflaeche {
     const werte = ninkasi.werte;
     const sichtbareFelder = new Set(zustand.sichtbareFelder);
 
+    // Zusatz für angefressene und als verflucht bekannte Gegenstände (systeme/verschleiss.js, systeme/ausruestung.js)
+    const verschleissText = (gegenstand) => {
+      const prozent = haltbarkeitProzent(gegenstand);
+      const stufe = VERSCHLEISS_STUFEN.find((eintrag) => prozent < eintrag.unter);
+      const angefressen = stufe ? ` <span class="schlimm">(${text(stufe.text)}, ${prozent} %)</span>` : "";
+      const verflucht = gegenstand.fluchBekannt ? ` <span class="schlimm">(${text("ui.verflucht")})</span>` : "";
+      return angefressen + verflucht;
+    };
+
     // Gepäck je Gegenstand; offen mit Buchstaben, angelegt markiert
     const gegenstaende = ninkasi.inventar.map((id) => entitaetMitId(zustand, id)).filter(Boolean);
     const gepaeckZeilen = gegenstaende.map((gegenstand, stelle) => {
@@ -59,7 +75,7 @@ export class Oberflaeche {
       const gewaehlt = fenster?.gewaehlt === gegenstand.id ? ' class="gewaehlt"' : "";
       const anzahl = anzahlVon(gegenstand) > 1 ? ` x ${anzahlVon(gegenstand)}` : "";
       const ladungen = gegenstand.ladungen ? ` (${ladungenVon(gegenstand)}/${gegenstand.ladungen.hoechstens})` : "";
-      return `<li${gewaehlt}>${buchstabe}${nomenForm(gegenstand, "nom", "ohne")}${anzahl}${ladungen}${angelegt}</li>`;
+      return `<li${gewaehlt}>${buchstabe}${nomenForm(gegenstand, "nom", "ohne")}${anzahl}${ladungen}${verschleissText(gegenstand)}${angelegt}</li>`;
     });
     // offen immer mit Hinweis, auch bei leerem Gepäck, sonst sähe das Öffnen aus, als geschähe nichts
     const hinweisSchluessel = !gegenstaende.length ? "ui.inventar_leer" : fenster?.gewaehlt === null ? "ui.inventar_waehlen" : "ui.inventar_handeln";

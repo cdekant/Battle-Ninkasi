@@ -8,6 +8,8 @@
 //                     hoechstens); Trinken nimmt eine Ladung
 //   wirdZu: Typ       was nach dem letzten Gebrauch bleibt (leere Flasche, leeres Fass), kommt ins Gepäck
 //   gewicht           in Gramm, mit Ladungen zuzüglich gewichtJe je Ladung; die Last ist die Summe über das Gepäck
+//   verdirbt: { nach, wird }  nach so vielen Zeiteinheiten wird der Gegenstand zu wird (systeme/verschleiss.js); der
+//                     Zeitpunkt steht in verdirbtUm, fließen Stapel zusammen, gilt ihr nach Anzahl gewichteter Durchschnitt
 // Tragkraft: wesen.tragkraft, sonst regeln.tragen.tragkraft, mit Modifikatoren auf "tragkraft"; Überladung verteuert das
 //   Bewegen in Stufen (regeln.tragen.stufen: [{ ab: Prozent der Tragkraft, kosten: Prozent mehr }]), verboten ist nichts.
 
@@ -16,6 +18,22 @@ import { entitaetenAuf, entitaetMitId, entitaetEntfernen, entitaetErzeugen, enti
 import { effektAnwenden } from "../kern/effekte.js";
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
 import { modifiziert } from "../kern/werte.js";
+import { ereignisEinreihen, gebundeneEreignisseEntfernen } from "../kern/zeit.js";
+import { erkennen, beimAufhebenErkennen } from "./kennen.js";
+import { fluchHindert } from "./ausruestung.js";
+
+// Verderben: ein Gegenstand mit verdirbt bekommt beim Erzeugen seinen Zeitpunkt und ein gebundenes Zeitereignis
+// (Handler in systeme/verschleiss.js); ein abgespaltener Teil eines Stapels behält den Zeitpunkt
+export function verderbenEinplanen(zustand, gegenstand) {
+  gebundeneEreignisseEntfernen(zustand, gegenstand.id, "verderben");
+  ereignisEinreihen(zustand, gegenstand.verdirbtUm, "verderben", { gegenstandId: gegenstand.id }, gegenstand.id);
+}
+
+anmelden("beimErzeugen", "verderben", (zustand, entitaet) => {
+  if (!entitaet.verdirbt) return;
+  entitaet.verdirbtUm ??= zustand.zeit + entitaet.verdirbt.nach;
+  verderbenEinplanen(zustand, entitaet);
+});
 
 export const anzahlVon = (gegenstand) => gegenstand.anzahl ?? 1;
 export const ladungenVon = (gegenstand) => (gegenstand.ladungen ? gegenstand.ladungen.aktuell ?? gegenstand.ladungen.hoechstens : null);
@@ -49,10 +67,21 @@ export function lastZuschlag(spiel, traegerin) {
   return zuschlag;
 }
 
-// Komponenten, in denen zwei Gegenstände gleich sein müssen, um einen Stapel zu bilden
+// Komponenten, in denen zwei Gegenstände gleich sein müssen, um einen Stapel zu bilden; der Zeitpunkt des Verderbens
+// zählt nicht, er wird gemittelt
 function stapelkennung(gegenstand) {
-  const { id, anzahl, getragenVon, position, ...rest } = gegenstand;
+  const { id, anzahl, getragenVon, position, verdirbtUm, ...rest } = gegenstand;
   return JSON.stringify(rest);
+}
+
+// Gewichteter Durchschnitt der Zeitpunkte des Verderbens, abgerundet; die Restzeit aller Stücke bleibt so in Summe gleich
+function verderbenMitteln(zustand, stapel, hinzu) {
+  if (stapel.verdirbtUm === undefined || hinzu.verdirbtUm === undefined) return;
+  const anzahlStapel = anzahlVon(stapel), anzahlHinzu = anzahlVon(hinzu);
+  const mittel = Math.floor((stapel.verdirbtUm * anzahlStapel + hinzu.verdirbtUm * anzahlHinzu) / (anzahlStapel + anzahlHinzu));
+  if (mittel === stapel.verdirbtUm) return;
+  stapel.verdirbtUm = mittel;
+  verderbenEinplanen(zustand, stapel);
 }
 
 // Legt einen Gegenstand ins Gepäck; ein stapelbarer fließt in einen gleichen Stapel (der aufgenommene verschwindet dann).
@@ -64,6 +93,7 @@ export function insInventar(spiel, traegerin, gegenstand) {
     const stapel = (traegerin.inventar || []).map((id) => entitaetMitId(spiel.zustand, id))
       .find((kandidat) => kandidat && kandidat.id !== gegenstand.id && stapelkennung(kandidat) === kennung && !(traegerin.ausgeruestet || []).includes(kandidat.id));
     if (stapel) {
+      verderbenMitteln(spiel.zustand, stapel, gegenstand);
       stapel.anzahl = anzahlVon(stapel) + anzahlVon(gegenstand);
       entitaetEntfernen(spiel.zustand, gegenstand.id);
       return stapel;
@@ -109,9 +139,10 @@ anmelden("befehle", "aufheben", {
   },
   ausfuehren(spiel, akteur) {
     const gegenstand = aufhebbarHier(spiel, akteur);
-    const bezug = bezugAuf(gegenstand), anzahl = anzahlVon(gegenstand);
+    const bezug = bezugAuf(gegenstand), anzahl = anzahlVon(gegenstand), typ = gegenstand.typ;
     insInventar(spiel, akteur, gegenstand);
     melden(spiel, "aufgehoben", { wer: bezugAuf(akteur), was: bezug, anzahl });
+    beimAufhebenErkennen(spiel, akteur, typ);
     return "aufheben";
   },
 });
@@ -140,6 +171,8 @@ anmelden("befehle", "trinken", {
       entitaetEntfernen(spiel.zustand, getrunken.id);
       rueckstandAblegen(spiel, akteur, getrunken);
     }
+    // wer trinkt, merkt, was es war (Vorbild Brogue); erkannt vor der Wirkung, damit deren Meldungen den Namen tragen
+    erkennen(spiel, akteur, typ);
     effektAnwenden(spiel, effekt, { quelleId: akteur.id, zielId: akteur.id, ursache: "trinken", mittel: { art: "gegenstand", name: typ } });
     return "trinken";
   },
@@ -147,7 +180,8 @@ anmelden("befehle", "trinken", {
 
 anmelden("befehle", "fallenlassen", {
   pruefen(spiel, akteur, befehl) {
-    return imGepaeck(akteur, befehl.gegenstandId) ? null : "nicht_im_gepaeck";
+    if (!imGepaeck(akteur, befehl.gegenstandId)) return "nicht_im_gepaeck";
+    return fluchHindert(spiel, akteur, befehl.gegenstandId) ? "verflucht" : null;
   },
   ausfuehren(spiel, akteur, befehl) {
     const gegenstand = entitaetMitId(spiel.zustand, befehl.gegenstandId);

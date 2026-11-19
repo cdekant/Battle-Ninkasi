@@ -18,10 +18,10 @@ import { vorgangAbschliessen } from "../src/kern/vorgang.js";
 // Spiel mit einer Karte aus Zeilen ("#" Wand, "." Boden), alles erkundet.
 // optionen: { gelaende: zusätzliches Testgelände (z.B. Abgrund mit eigener kennung), schichten: { oberflaechen, gase },
 //            effekte: Testeffekte, zustaende: Testzustände, wesen: Testwesen (zum Beschwören), faehigkeiten, risiken,
-//            gegenstaende: Testgegenstände, regeln: Abweichungen der Regelwerte, startwert }
+//            gegenstaende: Testgegenstände, etiketten: Etiketten unbekannter Gegenstände, regeln: Abweichungen der Regelwerte, startwert }
 // Abweichend von daten/regeln.js ist die Grundverteidigung 0: Genauigkeit 100 gegen ein Wesen ohne Ausweichen trifft sicher,
 // Genauigkeit 0 verfehlt sicher, beides ohne zu würfeln.
-export function miniSpiel(kartenzeilen, { gelaende: testgelaende = {}, schichten = { oberflaechen: {}, gase: {} }, fraktionen: fraktionsdaten = fraktionen, effekte = {}, zustaende = {}, wesen: wesensdaten = {}, faehigkeiten = {}, risiken = {}, gegenstaende = {}, regeln: regelAbweichungen = {}, startwert = 1 } = {}) {
+export function miniSpiel(kartenzeilen, { gelaende: testgelaende = {}, schichten = { oberflaechen: {}, gase: {} }, fraktionen: fraktionsdaten = fraktionen, effekte = {}, zustaende = {}, wesen: wesensdaten = {}, faehigkeiten = {}, risiken = {}, gegenstaende = {}, etiketten = {}, regeln: regelAbweichungen = {}, startwert = 1 } = {}) {
   const zustand = neuerZustand(startwert);
   zustand.zufallszustand = zufallErzeugen(startwert);
   const breite = kartenzeilen[0].length, hoehe = kartenzeilen.length;
@@ -41,7 +41,7 @@ export function miniSpiel(kartenzeilen, { gelaende: testgelaende = {}, schichten
     schichten: { ...regeln.schichten, ...regelAbweichungen.schichten },
     feuer: { ...regeln.feuer, ...regelAbweichungen.feuer },
   };
-  return { zustand, daten: { gelaende: { ...gelaende, ...testgelaende }, schichten, aktionen, fraktionen: fraktionsdaten, effekte, schadensarten, zustaende, wesen: wesensdaten, faehigkeiten, risiken, gegenstaende, regeln: testregeln }, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
+  return { zustand, daten: { gelaende: { ...gelaende, ...testgelaende }, schichten, aktionen, fraktionen: fraktionsdaten, effekte, schadensarten, zustaende, wesen: wesensdaten, faehigkeiten, risiken, gegenstaende, etiketten, regeln: testregeln }, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
 }
 
 // Rohdaten mit eigenen Testeinträgen (alle mit "test" im Namen) für Tests der Datenprüfung: die Tests bauen ihre

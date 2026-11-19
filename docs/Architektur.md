@@ -42,8 +42,9 @@ Stand: 2026-11-18
 + Kurven sind Daten: Stützpunkte `[[stelle, wert], ...]`, dazwischen linear und ganzzahlig, außerhalb gleichbleibend (`src/kern/kurven.js`); z.B. Regeneration über dem Pegel
 + Stoffwechsel (`src/systeme/stoffwechsel.js`): Komponente mit Abbau des Pegels, Schwellen und je Wert einer Kurve der Regeneration über dem Pegel (Hundertstel je Welttick); negative Kurvenwerte sind Schwund, für jeden Wert möglich, Schwund der LP kann töten
 + Skills, Schriftrollen, Items und Zustände passen den Stoffwechsel über Modifikatoren an: `regeneration.<wert>` auf positive Raten, `schwund.<wert>` auf den Betrag negativer Raten, `kurvenverschiebung.<wert>` verschiebt die Kurve nach rechts (z.B. Optimum der LP nach oben), `abbau.pegel` auf den Abbau
-+ Der gesamte Zustand ist reine Daten und als JSON serialisierbar (keine Funktionen, keine DOM-Objekte); dazu gehören die Tiefe der aktuellen Ebene (`tiefe`) und die verlassenen Ebenen (`abgelegteEbenen`, siehe Ebenen)
++ Der gesamte Zustand ist reine Daten und als JSON serialisierbar (keine Funktionen, keine DOM-Objekte); dazu gehören die Tiefe der aktuellen Ebene (`tiefe`), die verlassenen Ebenen (`abgelegteEbenen`, siehe Ebenen) und das Wissen des Laufs über unbekannte Gegenstände (`wissen`, siehe Unbekanntes)
 + Positionen ändern sich nur über `positionSetzen` (`src/kern/raumindex.js`), damit der räumliche Index stimmt; Wesen bewegt `versetzen` (siehe Bewegung)
++ Nach dem Erzeugen jeder Entität laufen die Handler des Registers `beimErzeugen` (`(zustand, entitaet) => void`), auch für einen abgespaltenen Teil eines Stapels; so planen Gegenstände ihr Verderben ein und bekommen ihr Etikett
 
 ## Zeitmodell
 
@@ -111,7 +112,7 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Eine Angriffsaktion führt alle Profile nacheinander in der Reihenfolge der Daten aus, jedes mit eigenem Trefferwurf und, mit `muster`, eigener Zielauswahl; ein Profil mit `chance` (Prozent) wird nur so oft mitgenommen, kommt keines zum Zug, greift das erste; wessen Lebenswert schon bei 0 liegt, wird von weiteren Profilen derselben Aktion nicht mehr angegriffen (Vorbild sind Monster mit mehreren Angriffen in DCSS)
 + Zeitkosten je Profil (`kosten`, Vorgabe `aktionen.nahkampf`), z.B. Dolch 70, Fasshammer 150; die Aktion kostet so viel wie ihr langsamstes Profil, Modifikatoren auf `kosten.nahkampf` und `kosten.alle` wirken darauf; ein schnelles Wesen greift so gegen ein langsames öfter an (Vorbild Waffenverzögerung in DCSS)
 + Vor jedem einzelnen Angriff läuft der Haken `vor_angriff` mit dem Namen des Profils (`angriff`); ein Abbruch lässt diesen Angriff aus, z.B. Furcht oder eine Ladehemmung
-+ Kampfwerte am Wesen: `kampfwerte: { ausweichen, willenskraft, blocken, ruestung, kritchance, heimlichkeit, entdecken }`, Vorgabe je 0 (Heimlichkeit siehe Wahrnehmung, Entdecken siehe Gelände), abgefragt über Modifikatoren mit gleichnamigem Ziel, nie unter 0 (`kampfwert`); dazu `widerstaende: { saeure: 100, feuer: -50 }` und `immun: ["psi"]`
++ Kampfwerte am Wesen: `kampfwerte: { ausweichen, willenskraft, blocken, ruestung, kritchance, heimlichkeit, entdecken, kennerschaft }`, Vorgabe je 0 (Heimlichkeit siehe Wahrnehmung, Entdecken siehe Gelände, Kennerschaft siehe Unbekanntes), abgefragt über Modifikatoren mit gleichnamigem Ziel, nie unter 0 (`kampfwert`); dazu `widerstaende: { saeure: 100, feuer: -50 }` und `immun: ["psi"]`
   + `ausweichen`: Verteidigung gegen körperliche Angriffe und Geschosse
   + `willenskraft`: Verteidigung gegen Psi (und Magie, wo die Daten es sagen)
   + `blocken`: fängt einen schon gelungenen Treffer ganz ab (Schild, Schleimhülle)
@@ -171,7 +172,7 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Ein neuer Grundbaustein ist nur für eine wirklich neue Mechanik nötig
 + Benannte Verhaltensmodule (Code) für alles, was sich nicht aus Bausteinen zusammensetzen lässt: KI-Muster wie Zweiteilung, Sprossung, Myzelwachstum, Phagen-Befall, Bossphasen; die Daten verweisen nur darauf, z.B. `ki: "sprossung"` mit Parametern
 + Grundbausteine, Verhaltensmodule und Zielmuster werden in Registern angemeldet; auch Mods können dort eigene anmelden
-+ Erweiterbar ist grundsätzlich alles über Register (`src/kern/register.js`): Befehlsarten, Grundbausteine, Verhaltensmodule, Modifikatorquellen, Befehlsveränderer, Zielmuster, Handler der Weltuhr, Zeitereignisse, interne Haken, Gefahrenprüfungen, Zustandsprüfungen und Arten langer Aktionen; Systeme und Verhaltensmodule melden sich beim Import an, die Reihenfolge der Anmeldung ist fest; `abmelden` entfernt einen Eintrag wieder (Tests, Mods)
++ Erweiterbar ist grundsätzlich alles über Register (`src/kern/register.js`): Befehlsarten, Grundbausteine, Verhaltensmodule, Modifikatorquellen, Befehlsveränderer, Zielmuster, Handler der Weltuhr, Zeitereignisse, interne Haken, Gefahrenprüfungen, Zustandsprüfungen, Arten langer Aktionen und Handler beim Erzeugen von Entitäten; Systeme und Verhaltensmodule melden sich beim Import an, die Reihenfolge der Anmeldung ist fest; `abmelden` entfernt einen Eintrag wieder (Tests, Mods)
 + Kontext eines Effekts: `{ quelleId, urheberId, urheberFraktion, zielId, ursprung, zielfeld, ursache, kettentiefe, mittel, tags, kritisch, werte }` (`src/kern/effekte.js`); die Quelle wirkt unmittelbar (Wesen, Fass, Geschoss, Falle), der Urheberin wird die Wirkung zugerechnet (EP, Zorn, Todesursache), Vorgabe ist die Quelle, bei Beschworenen deren Beschwörerin (`beschworenVon`); ihre Fraktion bleibt erhalten, auch wenn sie schon entfernt ist
 + `ursprung` ist das Feld, von dem Muster ausgehen (Vorgabe Position der Quelle), `zielfeld` das anvisierte Feld (Vorgabe Position des Ziels); `zielId` kann null sein, dann wirkt der Effekt auf ein Feld
 + `mittel`: `{ art: "angriff" | "faehigkeit" | "gegenstand" | "zustand" | "falle" | "gelaende", name }`; `tags` z.B. `["feuer", "magie"]` für Modifikatoren und gebundene EP, die Tags eines Effekts (`tags` in den Daten) kommen dazu
@@ -201,13 +202,14 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + In Betrieb: `vor_schaden` (Schadensart und Menge, Menge ändern oder abbrechen; Ränge der Schadensrechnung siehe Kampfwerte), `nach_schaden` (bei Schaden über 0), `nach_treffer` (mit `kritisch`), `verfehlt` (mit `grund`), `vor_tod`, `nach_tod`, `nach_wertaenderung`, `zustand_beginnt`, `zustand_endet`, `vor_befehl` (Befehl ersetzen oder abbrechen), `vor_angriff` (einzelnen Angriff abbrechen), `verlaesst_feld` und `betritt_feld` (siehe Bewegung)
 + `zug_ende` (`akteurId`, Quelle und Ziel die Akteurin) nach jeder Aktion, z.B. Fallen entdecken
 + `gegenstand_benutzt` (`gegenstandId`, `art`) beim Trinken, Werfen, Anlegen und Ablegen
++ Meldungen der Gegenstände: `verdorben` und `kaputt` (`was`, `wird`, `traegerin`), `abgenutzt` (`wer`, `was`, `menge`, `prozent`), `fluch_entdeckt` und `fluch_aufgehoben` (`wer`, `was`), `erkannt` (`wer`, `vorher` mit dem Etikett, `was`); das Log zeigt sie nur für Ninkasis Sachen
 + Reserviert für den Ausbau ([Systemausbau.md](Systemausbau.md)): `zug_beginn`
 + Kontext der Haken mit Beteiligten: `{ quelleId, urheberId, zielId, ursache, kettentiefe, mittel, tags, kritisch }`, dazu je Haken weitere Felder (`menge`, `position`)
 + Handler laufen nach Rang (kleiner zuerst, Vorgabe 100), bei gleichem Rang nach Anmeldung; so ist die Reihenfolge ausdrücklich geregelt, wenn Handler den Kontext verändern
 + Setzt ein Handler `kontext.abgebrochen = true`, laufen die weiteren Handler nicht mehr (z.B. Schild fängt den Treffer ab, Tod verhindert)
 + Meldungen nach außen ("Treffer", "Krit", "getrunken", "Tod") sind rein lesend; Anzeige, Log, schwebende Zahlen und Sound hängen sich daran
 + Für die Anzeige von Flächen und Geschossen: `flaeche` (`felder`) und `geschoss` (`bahn`, `aufschlag`), das Abspielen der Bahn folgt später (siehe [Systemausbau.md](Systemausbau.md)); `aktion_beginnt` nennt bei Fähigkeiten auch `faehigkeit`, `ankuendigung` und `felder`
-+ Meldungen verweisen auf Entitäten über Bezüge (`{ id, typ, text }`), die auch nach dem Entfernen der Entität gültig bleiben; die Felder `art` und `zeit` sind reserviert
++ Meldungen verweisen auf Entitäten über Bezüge (`{ id, typ, text, etikett? }`), die auch nach dem Entfernen der Entität gültig bleiben; ein unbekannter Gegenstand trägt sein Etikett mit, die Anzeige nennt dann dieses, alte Log-Zeilen ändern sich beim Erkennen nicht; die Felder `art` und `zeit` sind reserviert
 + Wertänderungen laufen über eine gemeinsame Funktion, die den Haken "nach_wertaenderung" auslöst (z.B. für Pegelschwellen); sie nimmt den Ursprung `{ urheberId, ursache, mittel, kettentiefe }` mit; sinkt der Lebenswert, merkt sich das Wesen den Ursprung als `letzterVerlust`, zugerechnet der Urheberin (ein Wurf zählt für die Werferin, nicht für die Flasche)
 + Was auf Meldungen reagiert, darf weder den Zustand ändern noch den Spiel-Zufall benutzen
 
@@ -215,8 +217,8 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 
 + Vorbild sind die "state-based actions" von Magic: The Gathering: Getötet wird nicht mitten in einer Wirkung, sondern an festen Punkten
 + Ein Vorgang ist ein ausgeführter Befehl, ein Handler der Weltuhr oder ein Zeitereignis; danach läuft `vorgangAbschliessen` (`src/kern/vorgang.js`): abwechselnd alle Zustandsprüfungen und der nächste vorgemerkte Auslöser, bis nichts mehr ansteht
-+ Zustandsprüfungen sind ein Register (`zustandspruefungen`), die erste ist der Tod (`src/systeme/tod.js`), dann die Lage (siehe Bewegung); später z.B. Gegenstände mit Haltbarkeit 0 oder der Filmriss
-+ Geprüft wird nur, was vorgemerkt ist (siehe Leistung): beim Tod Entitäten, bei denen ein Wert über `wertAendern` auf 0 gefallen ist, bei der Lage versetzte Wesen und solche mit geänderten Zuständen; im Spiel läuft jede Änderung eines Werts über `wertAendern`, auch in Tests
++ Zustandsprüfungen sind ein Register (`zustandspruefungen`), die erste ist der Tod (`src/systeme/tod.js`), dann die Lage (siehe Bewegung), dann kaputte Gegenstände (siehe Verschleiß); später z.B. der Filmriss
++ Geprüft wird nur, was vorgemerkt ist (siehe Leistung): beim Tod Entitäten, bei denen ein Wert über `wertAendern` auf 0 gefallen ist, bei der Lage versetzte Wesen und solche mit geänderten Zuständen, bei kaputt Gegenstände, deren Haltbarkeit auf 0 gefallen ist; im Spiel läuft jede Änderung eines Werts über `wertAendern`, auch in Tests
 + Folge: Eine Flächenwirkung trifft alle Ziele, auch wenn das erste schon tot ist; mehrere Tode im selben Vorgang laufen nach Entitäts-ID
 + Es stirbt, wessen Lebenswert bei 0 liegt; der Lebenswert ist ein Datenfeld (`lebenswert`, Vorgabe `lp`), z.B. der Zusammenhalt eines Biofilms
 + Ablauf je Wesen: Haken `vor_tod` (Abbruch verhindert den Tod, aber nur, wenn der Lebenswert danach über 0 liegt, sonst stirbt es trotzdem), Meldung `tod` mit Urheberin, Ursache und Mittel aus `letzterVerlust`, Haken `nach_tod` mit der letzten Position, Hinterlassenschaft, Entfernen
@@ -296,7 +298,7 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Spiel-RNG: eigener Generator sfc32 (`src/kern/zufall.js`), nur ganze Zahlen, Zustand aus vier 32-Bit-Zahlen im Spielzustand; jede Änderung am Verfahren ändert die Zahlenfolge
 + rot.js hat einen eigenen, globalen RNG; er wird nur für die Dungeon-Erzeugung benutzt und vorher mit einem abgeleiteten Startwert gesetzt
 + Fallstrick: Die Kartengeneratoren von rot.js (Digger, Uniform) brechen nach einer Zeitgrenze ab (`timeLimit`, gemessen mit `Date.now()`); sie wird deshalb immer auf `Infinity` gesetzt
-+ Abgeleitete Startwerte: Spiel-RNG (`"spiel"`), Grundriss (`"ebene.<name>"`) und Inhalt einer Ebene (`"ebene.<name>.inhalt"`) haben eigene Quellen, damit die Ebene nicht vom Spielverlauf abhängt
++ Abgeleitete Startwerte: Spiel-RNG (`"spiel"`), Grundriss (`"ebene.<name>"`) und Inhalt einer Ebene (`"ebene.<name>.inhalt"`) haben eigene Quellen, damit die Ebene nicht vom Spielverlauf abhängt; ebenso die Etiketten unbekannter Gegenstände (`"etiketten"`)
 + Jede Änderung an Code oder Daten macht alte Spielstände ungültig; passen Version oder Prüfsumme nicht, gibt es eine klare Meldung
 + Nebennutzen: Spielstand als Fehlerbericht, Aufzeichnungen zum Anschauen, "Seed des Tages", automatische Tests
 
@@ -492,27 +494,55 @@ Vorläufige Ideen, noch nicht umgesetzt:
 
 + Vorbilder: NetHack (Last in Stufen, jede bremst mehr), Brogue und DCSS (Stapel gleicher Gegenstände)
 + Code in `src/systeme/inventar.js`: Befehle `aufheben`, `trinken`, `fallenlassen { gegenstandId }` (der ganze Stapel aufs eigene Feld, Angelegtes wird dabei abgelegt, Meldung `fallengelassen`, Zeitkosten `aktionen.fallenlassen`)
-+ Stapel: `stapelbar: true` am Gegenstand, `anzahl` an der Entität (Vorgabe 1); beim Aufheben fließt ein Gegenstand in einen Stapel, der in allen übrigen Komponenten gleich ist (`insInventar`), so stapeln sich z.B. verdorbene und frische Biere später nicht; Trinken, Werfen und Material für Fähigkeiten nehmen einen (`einenAbnehmen` spaltet dafür einen ab), Fallenlassen den ganzen Stapel; auf dem Boden fließt nichts zusammen
++ Stapel: `stapelbar: true` am Gegenstand, `anzahl` an der Entität (Vorgabe 1); beim Aufheben fließt ein Gegenstand in einen Stapel, der in allen übrigen Komponenten gleich ist (`insInventar`), so stapeln sich z.B. Sauerbier und Bier nicht; nur der Zeitpunkt des Verderbens zählt nicht, er wird gemittelt (siehe Verschleiß); Trinken, Werfen und Material für Fähigkeiten nehmen einen (`einenAbnehmen` spaltet dafür einen ab), Fallenlassen den ganzen Stapel; auf dem Boden fließt nichts zusammen
 + Ladungen: `ladungen: { hoechstens, gewichtJe? }`, der Stand in `ladungen.aktuell` (Vorgabe `hoechstens`); Trinken nimmt eine Ladung; ein Gegenstand mit Ladungen stapelt sich nicht
 + Behälter: `wirdZu: Typ` kommt nach dem letzten Gebrauch ins Gepäck (Bier zu leerer Flasche, Bierfass zu Fass), Grundlage für das Brauen
 + Gewicht `gewicht` in Gramm, mit Ladungen zuzüglich `gewichtJe` je Ladung; die Last ist die Summe über das Gepäck, Angelegtes eingeschlossen (`lastVon`)
 + Tragkraft `tragkraft` am Wesen, sonst `regeln.tragen.tragkraft` (20 kg), mit Modifikatoren auf `tragkraft` (Skills folgen mit dem Skillsystem); Überladung nach `regeln.tragen.stufen` (ab 100 % Bewegen +25 %, ab 150 % +100 %), verboten ist nichts; der Zuschlag wirkt in `zeitkosten` (`src/kern/spiel.js`) nur aufs Bewegen und nach allen Modifikatoren
 + Anzeige: das Gepäck zeigt Stapel (x 3), Ladungen (19/20), Angelegtes und die Last (Last 3,2 / 20 kg, rot "überladen"); im Inventarfenster F fallen lassen
-+ Im Spielinhalt (Zahlen vorläufig): Bier 900 g, stapelbar, wird zur leeren Flasche (400 g, stapelbar); Bierfass mit 20 Schlucken zu einer Halben, 2 kg Holz und 500 g je Schluck, voll 12 kg, wird zum Fass; Brandflasche 900 g, stapelbar; Ausrüstung von 20 g (Kupferring) bis 6 kg (Fasshammer)
++ Im Spielinhalt (Zahlen vorläufig): Bier 900 g, stapelbar, wird zur leeren Flasche (400 g, stapelbar) und verdirbt zu Sauerbier; Bierfass mit 20 Schlucken zu einer Halben, 2 kg Holz und 500 g je Schluck, voll 12 kg, wird zum Fass; Brandflasche 900 g, stapelbar; Ausrüstung von 20 g (Kupferring) bis 6 kg (Fasshammer)
 
 ## Ausrüstung
 
-+ Vorbilder: Brogue (wenige Plätze), DCSS (Tauschen in einem Befehl), NetHack (Flüche, unbekannt bis zum Anlegen, folgt mit 0.23.0), Caves of Qud (Ereignisse laufen auch durch die Ausrüstung der Trägerin)
++ Vorbilder: Brogue (wenige Plätze), DCSS (Tauschen in einem Befehl), NetHack (Flüche, unbekannt bis zum Anlegen), Caves of Qud (Ereignisse laufen auch durch die Ausrüstung der Trägerin)
 + Plätze am Wesen: `plaetze: { hand: 2, kopf: 1, brust: 1, beine: 1, hals: 1, finger: 2 }` (Ninkasi); die Namen stehen in `regeln.ausruestung.plaetze`; Waffen in den Händen, Rüstung und Schmuck an Kopf, Brust, Beinen, Hals und zwei Fingern
 + Gegenstand: `ausruestung: { platz, belegt?, angriffe?, modifikatoren?, ausloeser? }` und `tags` am Gegenstand; `belegt` (Vorgabe 1) zählt die Stellen, ein Zweihänder belegt beide Hände (`src/systeme/ausruestung.js`)
 + Angelegt ist, was in `ausgeruestet: [IDs]` steht; der Gegenstand bleibt im Inventar; `ausDemInventarNehmen` (`src/kern/zustand.js`) nimmt ihn aus beidem (Trinken, Werfen, Fallenlassen, Entfernen), beim Tod fällt alles mit dem Inventar zu Boden; angelegte Gegenstände stapeln sich nicht und sind kein Material
-+ Befehle `anlegen { gegenstandId }` und `ablegen { gegenstandId }`; ist der Platz voll, legt derselbe Befehl die ältesten Gegenstände dort ab, bis genug frei ist, und kostet beides (`aktionen.anlegen` plus je `aktionen.ablegen`); Ablehnungen `nicht_im_gepaeck`, `nicht_anlegbar`, `schon_angelegt`, `kein_platz`, `nicht_angelegt`; Meldungen `angelegt`, `abgelegt`
++ Befehle `anlegen { gegenstandId }` und `ablegen { gegenstandId }`; ist der Platz voll, legt derselbe Befehl die ältesten Gegenstände dort ab, bis genug frei ist, und kostet beides (`aktionen.anlegen` plus je `aktionen.ablegen`); Ablehnungen `nicht_im_gepaeck`, `nicht_anlegbar`, `schon_angelegt`, `kein_platz`, `nicht_angelegt`, `verflucht`; Meldungen `angelegt`, `abgelegt`
 + Modifikatoren angelegter Gegenstände wirken über die Modifikatorquelle `ausruestung` (Quelle `ausruestung:<id>`), z.B. Rüstung und der Abzug aufs Ausweichen bei schwerer Rüstung; Sets über die Bedingung `traegt_tag { tag, anzahl }` an einem gewöhnlichen Modifikator
 + Waffen: angelegte Gegenstände mit `angriffe` ersetzen die eigenen Profile des Wesens (die Faust), zwei Waffen sind zwei Profile, die Aktion kostet so viel wie das langsamste (`angriffeVon` in `src/systeme/kampf.js`)
 + Auslöser an der Ausrüstung gelten für die Trägerin, nach ihren eigenen und denen ihrer Zustände (siehe Auslöser)
++ Fluch: `verflucht: true` am Gegenstand; angelegt lässt er sich weder ablegen noch fallen lassen, werfen oder beim Anlegen eines anderen wegtauschen (Ablehnung `verflucht`); bekannt wird der Fluch erst beim Anlegen (`fluchBekannt`, Meldung `fluch_entdeckt`, im Gepäck "verflucht"); beim Tod fällt er mit allem anderen; der Baustein `fluch_aufheben` nimmt die Flüche aller angelegten Gegenstände des Ziels (Meldung `fluch_aufgehoben`), einen Gegenstand dafür gibt es noch nicht
++ Angefressene Ausrüstung wirkt schwächer (siehe Verschleiß): die Vorteile ihrer Modifikatoren (`plus` und `prozent` über 0, `mal` über 100) sinken im Verhältnis der Haltbarkeit (`haltbarkeitProzent`, skaliert wie bei den Zuständen), Nachteile bleiben voll; eine zerfressene Platte schützt kaum noch und bleibt doch schwer
 + Haken `gegenstand_benutzt` mit `gegenstandId` und `art` (`trinken`, `werfen`, `anlegen`, `ablegen`)
 + Inventarfenster in der Seitenleiste (`src/eingabe/inventar.js`, reine Tastenlogik, Zustand nur in der Anzeige): I öffnet, A bis Z wählt, dann T trinken, A anlegen oder ablegen, Esc zurück oder zu; Angelegtes ist im Gepäck markiert; Werfen bekommt mit dem Zielmodus eine Taste
-+ Im Spielinhalt (Zahlen vorläufig, `daten/ausruestung.js`): Schöpfkelle (Hand, flink), Fasshammer (beide Hände, langsam, Ausweichen -5), Lederschürze (Brust, Rüstung 2, Ausweichen -5), Kupferhelm (Kopf), Lederhose (Beine), Hopfenkette (Hals, LP-Regeneration +20 %), zwei Kupferringe (Finger); Kupferhelm und Kupferringe bilden ein Set (Willenskraft)
++ Im Spielinhalt (Zahlen vorläufig, `daten/ausruestung.js`): Schöpfkelle (Hand, flink), Fasshammer (beide Hände, langsam, Ausweichen -5), Lederschürze (Brust, Rüstung 2, Ausweichen -5), Kupferhelm (Kopf), Lederhose (Beine), Hopfenkette (Hals, LP-Regeneration +20 %), zwei Kupferringe (Finger); Kupferhelm und Kupferringe bilden ein Set (Willenskraft); Lederschürze und Lederhose (Haltbarkeit 20, werden zu Lederfetzen) und Kupferhelm (30, wird zu Kupferschrott) nutzen sich unter Säure ab
+
+## Verschleiß
+
++ Code in `src/systeme/verschleiss.js`; Vorbilder NetHack (Säure frisst in Stufen, angefressen schützt weniger) und Brogue (Säure greift Rüstung an)
++ Verderben: `verdirbt: { nach, wird }` am Gegenstand; beim Erzeugen bekommt er den Zeitpunkt `verdirbtUm` und ein gebundenes Zeitereignis `verderben` (`verderbenEinplanen` in `src/systeme/inventar.js`); zur Zeit wird er zum Typ `wird`, am selben Ort oder im selben Gepäck, mit derselben Anzahl (`gegenstandErsetzen`, Meldung `verdorben`)
++ Stapel: fließen zwei zusammen, gilt der nach Anzahl gewichtete Durchschnitt beider Zeitpunkte, abgerundet; die Restzeit aller Stücke bleibt so in Summe gleich, dafür verdirbt der Stapel auf einmal; ein abgespaltenes Stück behält den Zeitpunkt und bekommt sein eigenes Zeitereignis; die Datenprüfung verlangt, dass ein stapelbarer Gegenstand zu einem stapelbaren verdirbt
++ Auf verlassenen Ebenen ruht das Verderben mit (`verdirbtUm` rückt wie die Zeitereignisse nach), was Ninkasi trägt, verdirbt weiter
++ Haltbarkeit: `haltbarkeit: { hoechstens, wirdZu }` an Ausrüstung (beides Pflicht, nicht stapelbar), der Stand in `haltbarkeit.aktuell` (Vorgabe `hoechstens`)
++ Abgenutzt wird nur über den Baustein `abnutzen { platz?, wuerfel | menge }`, nicht durch Gebrauch (Zuschlagen, Getroffenwerden): er trifft einen angelegten Gegenstand des Ziels mit Haltbarkeit, mit `platz` nur dort, sonst zufällig einen davon (Meldung `abgenutzt`)
++ Bei 0 ist der Gegenstand kaputt: die Zustandsprüfung `kaputt` nach Tod und Lage macht ihn zu `wirdZu`, abgelegt und ins Gepäck der Trägerin (Meldung `kaputt`); er verschwindet also nie ganz
++ Anzeige im Gepäck: unter 75 % "angefressen", unter 50 % "stark angefressen", unter 25 % "zerfressen", jeweils mit dem Prozentwert
++ Im Spielinhalt (Zahlen vorläufig): Bier verdirbt nach 50000 Zeiteinheiten (500 Weltticks) zu Sauerbier (LP +5, Pegel +0,3 ‰ statt +20 und +0,5 ‰); das Bierfass verdirbt nicht; Biss der Essigbakterien und Säurespritzer nutzen 1 ab, Säureschwall und Säuredüse 2
+
+## Unbekanntes
+
++ Code in `src/systeme/kennen.js`; Vorbild Brogue: je Lauf zufällig zugeordnete Etiketten, erkannt wird immer die ganze Art, das Wissen gilt für den Lauf
++ Am Typ: `unbekannt: { gruppe, schwierigkeit }`; Etiketten je Gruppe in `daten/etiketten.js` (Textschlüssel mit Hauptwort, je Gruppe mindestens so viele wie Typen)
++ Beim Spielstart, vor der ersten Ebene, ordnet `etikettenZuordnen` jedem unbekannten Typ ein Etikett seiner Gruppe zu, mit dem abgeleiteten Zufall `"etiketten"`; das Wissen steht im Zustand: `wissen: { etiketten: { typ: etikett }, erkannt: [typ], vertrautheit: { typ: Zahl } }`
++ Ein Gegenstand eines noch nicht erkannten Typs bekommt beim Erzeugen `etikett`; Bezüge und Anzeige nennen dann das Etikett (siehe Ereignisse); beim Erkennen verlieren alle Gegenstände dieses Typs ihr Etikett, auch auf verlassenen Ebenen (Meldung `erkannt`)
++ Nur Ninkasi erkennt; Gegner verraten nichts
++ Trinken erkennt sofort, die Wirkung spürt man
++ Benutzen erhöht die Vertrautheit der Art: je Welttick, in dem Rüstung oder Schmuck angelegt ist, und je Angriff mit einem Profil einer Waffe (Haken `vor_angriff`); mit jeder Erhöhung ein Wurf `(vertrautheit + kennerschaft) / (vertrautheit + kennerschaft + schwierigkeit)`, dieselbe Form wie die Kampfwerte, die Chance nähert sich mit der Zeit 100 %; Schwierigkeit 0 erkennt beim ersten Mal
++ Aufheben: ein Wurf `kennerschaft / (kennerschaft + schwierigkeit)`, ohne Kennerschaft keiner
++ `kennerschaft` ist ein Kampfwert (Vorgabe 0, Modifikatoren mit gleichnamigem Ziel); später speisen ihn Sinnlichkeit und Braukunde (Skills, [Charakter.md](Charakter.md))
++ Fluch und Art sind getrennt: der Fluch zeigt sich beim Anlegen (siehe Ausrüstung), die Art erst durch Vertrautheit
++ Im Spielinhalt noch ohne unbekannte Gegenstände; die Gruppe `biere` (Tonkrug, Steinkrug, Bügelflasche, Henkelflasche, Bocksbeutel) wartet auf die Biersorten
 
 ## Ebenen
 
@@ -597,12 +627,12 @@ Vorläufige Ideen, noch nicht umgesetzt:
 + `package.json`: nur `"type": "module"` und `"private": true`, damit Node alle `.js`-Dateien als ES-Module liest; keine Abhängigkeiten, kein Build
 + `src/version.js`: Versionsnummer
 + `src/kern/`: Spiel und Eingangstür für Befehle (`spiel.js`), Zustand und Entitäten, räumlicher Index, Zeit, Zufall, Ereignisse und Katalog der Haken, Auslöser, Abschluss eines Vorgangs, Werte und Modifikatoren, Kurven, Effekte, Grundbausteine, Register, Datenprüfung
-+ `src/systeme/`: Bewegung, Kampf (Trefferwurf, Schadensrechnung), Fraktionen, Wahrnehmung, Sicht, Stoffwechsel, Inventar, Gefahrenprüfung, Tod, Zielauswahl samt Zielmustern, Bausteine mit Zielauswahl, Zustände, Befehlsveränderer, Beschwörung, Verschieben und Lage, Werfen, veränderliches Gelände und Türen, Fallen, Feldschichten und Feuer, Ebenen und Treppen, Ausrüstung, Stapel, Ladungen und Last, Bedingungen der Modifikatoren und Auren, Fähigkeiten, lange Aktionen, später Brauen, Handel u.a.
++ `src/systeme/`: Bewegung, Kampf (Trefferwurf, Schadensrechnung), Fraktionen, Wahrnehmung, Sicht, Stoffwechsel, Inventar, Gefahrenprüfung, Tod, Zielauswahl samt Zielmustern, Bausteine mit Zielauswahl, Zustände, Befehlsveränderer, Beschwörung, Verschieben und Lage, Werfen, veränderliches Gelände und Türen, Fallen, Feldschichten und Feuer, Ebenen und Treppen, Ausrüstung und Flüche, Stapel, Ladungen und Last, Verschleiß (Verderben, Haltbarkeit), Unbekanntes, Bedingungen der Modifikatoren und Auren, Fähigkeiten, lange Aktionen, später Brauen, Handel u.a.
 + `src/ki/`: Verhaltensmodule (`abwarten`, `jagen`, `fliehen`), ihre Zielwahl, Schrittwahl und die Wahl der Fähigkeiten
 + `src/welt/`: Dungeon-Erzeugung mit Treppen und Population nach Tiefe, Zugriff auf die Karte und die Feldschichten, Wegfindung, Geometrie (Linie, Sichtlinie, Flugbahn, Kreis, Kegel)
 + `src/anzeige/`: Renderer, Tilebilder (Pixeldaten zu Bildern), Kamera, Oberfläche, Anzeige des Pegels, Log, Effekte, Textzugriff und Grammatik
 + `src/eingabe/`: Belegung, Übersetzung in Befehle, Maus und Klickregeln, Reise, Rasten, Erkunden, Vorgaben der Einstellungen
-+ `daten/`: Inhalte als JS-Datendateien, gesammelt in `daten/index.js`; `daten/zustaende.js` die Zustände; `daten/faehigkeiten.js` die Fähigkeiten, `daten/risiken.js` ihre Risikotabellen; `daten/regeln.js` hält Regelwerte für das Balancing (z.B. Kettengrenze der Auslöser, Halbwerte des Kampfs); `daten/schadensarten.js` die Schadensarten; `daten/fraktionen.js` die Fraktionen und ihre Beziehungen; `daten/zeichen.js` ist das Tileset aus Zeichen, Ersatz, wo kein Tile aus `grafik/` passt
++ `daten/`: Inhalte als JS-Datendateien, gesammelt in `daten/index.js`; `daten/zustaende.js` die Zustände; `daten/faehigkeiten.js` die Fähigkeiten, `daten/risiken.js` ihre Risikotabellen; `daten/regeln.js` hält Regelwerte für das Balancing (z.B. Kettengrenze der Auslöser, Halbwerte des Kampfs); `daten/schadensarten.js` die Schadensarten; `daten/fraktionen.js` die Fraktionen und ihre Beziehungen; `daten/etiketten.js` die Etiketten unbekannter Gegenstände; `daten/zeichen.js` ist das Tileset aus Zeichen, Ersatz, wo kein Tile aus `grafik/` passt
 + `grafik/`: Palette und Tiles als Pixeldaten, unter der Grafiklizenz, dazu die Vorschauseite `vorschau.html`; siehe [Tileset.md](Tileset.md)
 + `sprache/de/`, `sprache/en/`: Texte (`texte.js`) und Grammatikregeln (`grammatik.js`) als Daten
 + `lib/`: Bibliotheken (rot.js) samt ihrer Lizenzdateien
