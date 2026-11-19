@@ -6,6 +6,7 @@ import { modifiziert, hoechstwert, werteAusDaten, modifikatorenAufgeschluesselt 
 import { anmelden, abmelden } from "../src/kern/register.js";
 import { zustandSetzen } from "../src/systeme/zustaende.js";
 import { nahkampf } from "../src/systeme/kampf.js";
+import { positionSetzen } from "../src/kern/zustand.js";
 
 const KARTE = ["########", "#......#", "########"];
 const KARTE_MIT_WAND = ["#######", "#..#..#", "#######"];
@@ -85,7 +86,7 @@ test("Aura: wirkt im Kreis auf die gewählten Wesen, nicht auf die Trägerin, un
   assert.equal(modifiziert(spiel, ferneHefe, "trefferchance", 50), 50, "dx = 3 liegt außerhalb von Radius 2");
   assert.equal(modifiziert(spiel, feindin, "trefferchance", 50), 50);
   assert.equal(modifiziert(spiel, mutterhefe, "trefferchance", 50), 50);
-  naheHefe.position = { x: 5, y: 1 };
+  positionSetzen(spiel.zustand, naheHefe, { x: 5, y: 1 });
   assert.equal(modifiziert(spiel, naheHefe, "trefferchance", 50), 50, "außer Reichweite gelaufen");
   mutterhefe.auren[0].selbst = true;
   assert.equal(modifiziert(spiel, mutterhefe, "trefferchance", 50), 60);

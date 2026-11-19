@@ -9,6 +9,7 @@ import { holen } from "../src/kern/register.js";
 import { effektAnwenden } from "../src/kern/effekte.js";
 import { vorgangAbschliessen } from "../src/kern/vorgang.js";
 import { angekuendigteFelder } from "../src/anzeige/ankuendigungen.js";
+import { positionSetzen } from "../src/kern/zustand.js";
 
 const RAUM = [
   "###########",
@@ -59,9 +60,9 @@ test("Die KI setzt eine Fähigkeit im Abstandsbereich ein, sonst jagt sie wie ge
   const { spiel, ninkasi } = aufstellen();
   const spuckerin = schuetze(spiel, 5, 2, [{ name: "spucke", abstandAb: 2, abstandBis: 4 }]);
   assert.deepEqual(entscheiden(spiel, spuckerin), { art: "faehigkeit", faehigkeit: "spucke", ziel: { id: ninkasi.id } });
-  spuckerin.position = { x: 2, y: 2 };
+  positionSetzen(spiel.zustand, spuckerin, { x: 2, y: 2 });
   assert.deepEqual(entscheiden(spiel, spuckerin), { art: "bewegen", dx: -1, dy: 0, angreifen: true }, "zu nah: Nahkampf");
-  spuckerin.position = { x: 8, y: 2 };
+  positionSetzen(spiel.zustand, spuckerin, { x: 8, y: 2 });
   assert.equal(entscheiden(spiel, spuckerin).art, "bewegen", "zu weit: kommt näher");
 });
 
@@ -116,13 +117,13 @@ test("abstandHalten: zu nah zurückweichen, auf Abstand warten, weiter weg nähe
   const { spiel, ninkasi } = aufstellen();
   const schuetzin = schuetze(spiel, 3, 2, [], { abstandHalten: 3 });
   assert.deepEqual(entscheiden(spiel, schuetzin), { art: "bewegen", dx: 1, dy: -1 }, "weg von Ninkasi");
-  schuetzin.position = { x: 4, y: 2 };
+  positionSetzen(spiel.zustand, schuetzin, { x: 4, y: 2 });
   assert.deepEqual(entscheiden(spiel, schuetzin), { art: "warten" });
-  schuetzin.position = { x: 7, y: 2 };
+  positionSetzen(spiel.zustand, schuetzin, { x: 7, y: 2 });
   assert.equal(entscheiden(spiel, schuetzin).dx, -1);
   // in der Ecke: kein Feld weiter weg, dann wie sonst (Nahkampf)
-  ninkasi.position = { x: 8, y: 2 };
-  schuetzin.position = { x: 9, y: 1 };
+  positionSetzen(spiel.zustand, ninkasi, { x: 8, y: 2 });
+  positionSetzen(spiel.zustand, schuetzin, { x: 9, y: 1 });
   wesen(spiel, 9, 2, "verderber", 10);
   wesen(spiel, 8, 1, "verderber", 10);
   assert.deepEqual(entscheiden(spiel, schuetzin), { art: "bewegen", dx: -1, dy: 1, angreifen: true });

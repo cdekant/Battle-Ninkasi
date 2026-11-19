@@ -9,7 +9,7 @@
 // Am Aufschlag entsteht Lärm (regeln.wahrnehmung.laermWurf): Wache gehen ihm nach, so taugt ein Wurf als Ablenkung.
 
 import { anmelden } from "../kern/register.js";
-import { entitaetMitId, entitaetEntfernen } from "../kern/zustand.js";
+import { entitaetMitId, entitaetEntfernen, positionSetzen } from "../kern/zustand.js";
 import { effektAnwenden } from "../kern/effekte.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { zielAufloesen } from "./zielauswahl.js";
@@ -50,7 +50,7 @@ anmelden("befehle", "werfen", {
         ursache: "wurf", mittel: { art: "gegenstand", name: gegenstand.typ },
       });
     } else {
-      gegenstand.position = aufschlag;
+      positionSetzen(spiel.zustand, gegenstand, aufschlag);
       melden(spiel, "gelandet", { was: bezugAuf(gegenstand), feld: aufschlag });
     }
     laermMachen(spiel, aufschlag, spiel.daten.regeln.wahrnehmung.laermWurf, akteur.id);

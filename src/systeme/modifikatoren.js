@@ -20,8 +20,9 @@
 // Quelle der Modifikatoren: "aura:<id der Trägerin>" bzw. "aura:zustand:<nummer>".
 
 import { anmelden } from "../kern/register.js";
-import { alleEntitaeten, fraktionVon } from "../kern/zustand.js";
+import { fraktionVon } from "../kern/zustand.js";
 import { modifikatorSkaliert, hatWert } from "../kern/werte.js";
+import { traegerinnenIds } from "../kern/raumindex.js";
 import { inReichweite, sichtlinieFrei } from "../welt/geometrie.js";
 import { trifftZu } from "./zielauswahl.js";
 import { staerkeProzent } from "./zustaende.js";
@@ -78,8 +79,9 @@ function auraErreicht(spiel, traegerin, aura, entitaet) {
 anmelden("modifikatorquellen", "auren", (spiel, entitaet) => {
   if (!entitaet.position) return [];
   const ergebnis = [];
-  for (const traegerin of alleEntitaeten(spiel.zustand)) {
-    if (!traegerin.position || (!traegerin.auren && !traegerin.zustaende)) continue;
+  const entitaeten = spiel.zustand.entitaeten;
+  for (const traegerinId of traegerinnenIds(spiel.zustand)) {
+    const traegerin = entitaeten[traegerinId];
     for (const { aura, prozent, quelle } of aurenVon(spiel, traegerin)) {
       if (!auraErreicht(spiel, traegerin, aura, entitaet)) continue;
       for (const modifikator of aura.modifikatoren) ergebnis.push({ ...modifikatorSkaliert(modifikator, prozent), quelle });

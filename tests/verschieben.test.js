@@ -8,7 +8,7 @@ import { akteurEinreihen } from "../src/kern/zeit.js";
 import { holen } from "../src/kern/register.js";
 import { effektAnwenden } from "../src/kern/effekte.js";
 import { vorgangAbschliessen } from "../src/kern/vorgang.js";
-import { bewegungVon } from "../src/kern/zustand.js";
+import { bewegungVon, positionSetzen } from "../src/kern/zustand.js";
 import { weg } from "../src/welt/wege.js";
 import { zustandSetzen } from "../src/systeme/zustaende.js";
 
@@ -64,11 +64,11 @@ test("Bewegungsarten: Gelände mit passierbarFuer, phasend durch Wände, nicht d
   assert.equal(bewegenPruefen(spiel, laeuferin, 1, 0), null);
   const schwebende = wesen(spiel, 2, 1, "feinde", 10, { bewegung: "schwebend" });
   assert.equal(bewegenPruefen(spiel, schwebende, 1, 0), null, "schwebend über Wasser");
-  schwebende.position = { x: 3, y: 1 };
+  positionSetzen(spiel.zustand, schwebende, { x: 3, y: 1 });
   assert.equal(bewegenPruefen(spiel, schwebende, -1, 0), "wand", "schwebend nicht über den Abgrund");
   schwebende.bewegung = "phasend";
   assert.equal(bewegenPruefen(spiel, schwebende, 1, 0), null, "phasend in die Wand");
-  schwebende.position = { x: 4, y: 1 };
+  positionSetzen(spiel.zustand, schwebende, { x: 4, y: 1 });
   assert.equal(bewegenPruefen(spiel, schwebende, 1, 0), "wand", "undurchdringlicher Fels");
 });
 
@@ -89,7 +89,7 @@ test("Unbeweglich: kein Schritt, aber Angriff; die KI greift nur an, was daneben
   assert.equal(bewegenPruefen(spiel, totem, 1, 0), "unbeweglich");
   const jagen = holen("ki", "jagen");
   assert.deepEqual(jagen(spiel, totem, totem.ki), { art: "warten" });
-  ninkasi.position = { x: 4, y: 2 };
+  positionSetzen(spiel.zustand, ninkasi, { x: 4, y: 2 });
   assert.deepEqual(jagen(spiel, totem, totem.ki), { art: "bewegen", dx: 1, dy: 0, angreifen: true });
   assert.equal(bewegenPruefen(spiel, totem, 1, 0), null, "Angriff durch Hineinlaufen");
   wirken(spiel, "schubs", ninkasi, totem);

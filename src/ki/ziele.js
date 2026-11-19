@@ -1,11 +1,11 @@
 // Zielwahl für Verhaltensmodule: das nächste sichtbare Wesen, das nach trifft ein Ziel ist.
 // Sehen siehe systeme/sicht.js (sieht), trifft siehe systeme/zielauswahl.js, aus Sicht des Wesens selbst.
 
-import { alleEntitaeten, fraktionVon } from "../kern/zustand.js";
+import { fraktionVon } from "../kern/zustand.js";
 import { lebenswertName } from "../kern/werte.js";
 import { abstandQuadrat } from "../welt/geometrie.js";
 import { trifftZu } from "../systeme/zielauswahl.js";
-import { sieht } from "../systeme/sicht.js";
+import { sieht, kandidatenInSicht } from "../systeme/sicht.js";
 
 function lebt(entitaet) {
   const lebenswert = entitaet.werte?.[lebenswertName(entitaet)];
@@ -20,7 +20,7 @@ export function istZielFuer(spiel, betrachter, kandidat, trifft) {
 // passt (freiwillig): weitere Bedingung an den Kandidaten, z.B. innerhalb der Spurweite
 export function naechstesSichtbaresZiel(spiel, betrachter, trifft = "feinde", passt = () => true) {
   let bestes = null, besterAbstand = Infinity;
-  for (const kandidat of alleEntitaeten(spiel.zustand)) {
+  for (const kandidat of kandidatenInSicht(spiel, betrachter)) {
     if (!kandidat.position || !lebt(kandidat) || !istZielFuer(spiel, betrachter, kandidat, trifft)) continue;
     if (!sieht(spiel, betrachter, kandidat) || !passt(kandidat)) continue;
     const kandidatAbstand = abstandQuadrat(betrachter.position, kandidat.position);

@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import "../src/kern/spiel.js"; // meldet Bausteine, Systeme und Auslöser an
 import { miniSpiel, wesen, spielerinSetzen, gegenstandTragen, meldungenMitschneiden, hakenFuerTest } from "./hilfen.js";
-import { effektAnwenden } from "../src/kern/effekte.js";
+import { effektAnwenden, wertAendern } from "../src/kern/effekte.js";
 import { vorgangAbschliessen } from "../src/kern/vorgang.js";
 import { anmelden, holen } from "../src/kern/register.js";
 import { entitaetEntfernen } from "../src/kern/zustand.js";
@@ -120,10 +120,10 @@ test("Ein eigener Lebenswert ersetzt die LP", () => {
     lebenswert: "zusammenhalt",
     werte: werteAusDaten({ lp: { grundwert: 10 }, zusammenhalt: { grundwert: 3 } }),
   });
-  biofilm.werte.lp.aktuell = 0;
+  wertAendern(spiel, biofilm, "lp", -10);
   vorgangAbschliessen(spiel);
   assert.ok(spiel.zustand.entitaeten[biofilm.id], "LP bei 0 töten nicht, wenn ein anderer Lebenswert gilt");
-  biofilm.werte.zusammenhalt.aktuell = 0;
+  wertAendern(spiel, biofilm, "zusammenhalt", -3);
   vorgangAbschliessen(spiel);
   assert.equal(spiel.zustand.entitaeten[biofilm.id], undefined);
 });

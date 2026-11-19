@@ -29,6 +29,7 @@
 
 import { anmelden, holen } from "../kern/register.js";
 import { alleEntitaeten, fraktionVon } from "../kern/zustand.js";
+import { zustaendeGeaendert } from "../kern/raumindex.js";
 import { ereignisEinreihen } from "../kern/zeit.js";
 import { hakenAusloesen, melden, bezugAuf } from "../kern/ereignisse.js";
 import { effektAnwenden, wertAendern } from "../kern/effekte.js";
@@ -117,6 +118,7 @@ function neueInstanz(spiel, traegerin, name, angaben, ende) {
   if (definition.ki) instanz.ki = { ...structuredClone(definition.ki), letzteBekanntePosition: null, bedrohungId: angaben.urheberId };
   if (!traegerin.zustaende) traegerin.zustaende = [];
   traegerin.zustaende.push(instanz);
+  zustaendeGeaendert(zustand, traegerin);
   if (ende !== null) ereignisEinreihen(zustand, ende, "zustand_ende", { traegerinId: traegerin.id, nummer: instanz.nummer }, traegerin.id);
   melden(spiel, "zustand_beginnt", { wer: bezugAuf(traegerin), zustand: name, staerke: instanz.staerke });
   hakenAusloesen(spiel, "zustand_beginnt", hakenKontext(traegerin, instanz, angaben.kettentiefe));
@@ -172,6 +174,7 @@ export function zustandSetzen(spiel, traegerin, name, angaben = {}) {
 export function zustandBeenden(spiel, traegerin, instanz, grund, kettentiefe = 0) {
   if (!traegerin.zustaende?.includes(instanz)) return;
   traegerin.zustaende = traegerin.zustaende.filter((andere) => andere !== instanz);
+  zustaendeGeaendert(spiel.zustand, traegerin);
   if (traegerin.zustaende.length === 0) delete traegerin.zustaende;
   melden(spiel, "zustand_endet", { wer: bezugAuf(traegerin), zustand: instanz.name, grund });
   hakenAusloesen(spiel, "zustand_endet", hakenKontext(traegerin, instanz, kettentiefe, { grund }));

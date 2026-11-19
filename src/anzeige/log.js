@@ -51,6 +51,10 @@ export class Log {
         // angekündigte Angriffe: eigener Text der Fähigkeit, sonst still
         if (meldung.ankuendigung && hatSchluessel(meldung.ankuendigung)) this.zeile(text(meldung.ankuendigung, meldung), meldung.wer.id === this.spielerinId ? "" : "schlimm");
         return;
+      case "population_voll":
+        // ausdrücklicher Hinweis statt stillschweigend, auch auf der Konsole für die Entwicklung
+        console.warn(`Obergrenze der Population erreicht (${meldung.hoechstWesen}), ${meldung.ausgefallen} Wesen entstehen nicht`);
+        return this.zeile(text("log.population_voll", meldung), "hinweis");
       case "risiko": {
         const schluessel = `log.risiko.${meldung.ausgang}`;
         if (hatSchluessel(schluessel)) this.zeile(text(schluessel, meldung), "schlimm");

@@ -33,6 +33,7 @@ export function miniSpiel(kartenzeilen, { gelaende: testgelaende = {}, fraktione
     wahrnehmung: { ...regeln.wahrnehmung, ...regelAbweichungen.wahrnehmung },
     bewegung: { ...regeln.bewegung, ...regelAbweichungen.bewegung },
     werfen: { ...regeln.werfen, ...regelAbweichungen.werfen },
+    population: { ...regeln.population, ...regelAbweichungen.population },
   };
   return { zustand, daten: { gelaende: { ...gelaende, ...testgelaende }, aktionen, fraktionen: fraktionsdaten, effekte, schadensarten, zustaende, wesen: wesensdaten, faehigkeiten, risiken, gegenstaende, regeln: testregeln }, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
 }

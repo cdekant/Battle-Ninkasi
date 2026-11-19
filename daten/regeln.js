@@ -24,6 +24,10 @@ export default {
   bewegung: {
     beimFestsitzen: "eingeklemmt", // Effekt auf ein Wesen in Gelände, das es nicht betreten kann, ohne eigenes beimFestsitzen
   },
+  // Population, siehe src/systeme/beschwoerung.js und src/welt/ebene.js
+  population: {
+    hoechstWesen: 500, // mehr Wesen entstehen nicht (Beschwören, Erzeugen der Ebene), Meldung population_voll
+  },
   // Werfen, siehe src/systeme/werfen.js
   werfen: {
     reichweite: 6, // ohne wurf.reichweite am Gegenstand

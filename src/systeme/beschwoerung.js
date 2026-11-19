@@ -4,12 +4,13 @@
 //                 (Vorgabe 1); sie bekommen die Fraktion der Urheberin und beschworenVon (ihnen Zugerechnetes
 //                 geht an die Beschwörerin), handeln nach einer Aktion Wartezeit und tragen den Zustand
 //                 (Quelle ist die Beschwörerin, dauer für den Zustand), z.B. mit gebundenAnQuelle und
-//                 beimEnde "verschwinden"
+//                 beimEnde "verschwinden"; höchstens bis zur Obergrenze regeln.population.hoechstWesen, darüber
+//                 entsteht nichts und es kommt die Meldung "population_voll"
 //   verschwinden: entfernt das Ziel ohne Tod: keine Meldung "tod", kein nach_tod, keine Hinterlassenschaft;
 //                 Zustände, die an das Ziel als Quelle gebunden sind, enden; wirkt nicht auf Ninkasi
 
 import { bausteinAnmelden } from "../kern/bausteine.js";
-import { entitaetAusDatensatz, entitaetEntfernen } from "../kern/zustand.js";
+import { entitaetAusDatensatz, entitaetEntfernen, anzahlWesen } from "../kern/zustand.js";
 import { akteurEinreihen } from "../kern/zeit.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { betretbarFuer } from "../welt/karte.js";
@@ -25,7 +26,10 @@ bausteinAnmelden("beschwoeren", { wesen: "wesen", anzahl: "ganzzahl?", muster: "
   const freieFelder = musterFelder(spiel, parameter.muster ?? { art: "angrenzend" }, auswahl)
     .filter((feld) => betretbarFuer(spiel, feld.x, feld.y, bewegung) && wesenAufFeld(spiel, feld).length === 0);
   const urheber = zustand.entitaeten[kontext.urheberId];
-  for (const feld of freieFelder.slice(0, parameter.anzahl ?? 1)) {
+  const gewuenscht = Math.min(freieFelder.length, parameter.anzahl ?? 1);
+  const platz = Math.max(0, spiel.daten.regeln.population.hoechstWesen - anzahlWesen(zustand));
+  if (gewuenscht > platz) melden(spiel, "population_voll", { wesen: parameter.wesen, hoechstWesen: spiel.daten.regeln.population.hoechstWesen, ausgefallen: gewuenscht - platz });
+  for (const feld of freieFelder.slice(0, Math.min(gewuenscht, platz))) {
     const beschworen = entitaetAusDatensatz(zustand, parameter.wesen, spiel.daten.wesen[parameter.wesen], feld);
     if (kontext.urheberFraktion != null) beschworen.fraktion = kontext.urheberFraktion;
     if (kontext.urheberId != null) beschworen.beschworenVon = kontext.urheberId;

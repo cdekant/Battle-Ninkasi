@@ -17,6 +17,8 @@ import { reiseBeginnen, naechsterReiseschritt } from "../src/eingabe/reise.js";
 import { rastenBeginnen, naechsterRastschritt } from "../src/eingabe/rasten.js";
 import { erkundenBeginnen, naechsterErkundungsschritt } from "../src/eingabe/erkunden.js";
 import einstellungen from "../src/eingabe/einstellungen.js";
+import { indexPruefen } from "../src/kern/raumindex.js";
+import { warteschlangeGueltig } from "../src/kern/zeit.js";
 
 const [anzahlLaeufe = 20, hoechsteBefehlszahl = 3000, ersterStartwert = 1] = process.argv.slice(2).map(Number);
 const daten = datenLaden(rohdaten, { texte, nomenPruefen: erstelleGrammatik(grammatikDe).pruefen });
@@ -49,6 +51,10 @@ function invariantenPruefen(spiel) {
     if (eintrag.gebundenAn !== undefined && !zustand.entitaeten[eintrag.gebundenAn]) throw new Error(`Zeitereignis gebunden an fehlende #${eintrag.gebundenAn}`);
   }
   if (spiel.anstehendeAusloeser.length) throw new Error("Auslöser nach Abschluss des Vorgangs noch vorgemerkt");
+  // Leistung (kern/raumindex.js, kern/zeit.js): der Index stimmt mit dem Zustand überein, die Warteschlange ist ein Heap
+  const abweichungen = indexPruefen(zustand);
+  if (abweichungen.length) throw new Error(`Räumlicher Index weicht ab: ${abweichungen.join("; ")}`);
+  if (!warteschlangeGueltig(zustand)) throw new Error("Warteschlange ist kein gültiger Heap");
 }
 
 function zufallsbefehl(botZufall, spiel) {

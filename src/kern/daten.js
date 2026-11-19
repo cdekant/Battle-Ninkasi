@@ -198,6 +198,7 @@ function pruefeRegeln(daten, regeln, fehler) {
   if (!istObjekt(regeln.bewegung)) fehler.push("regeln.bewegung fehlt");
   else pruefeParameter(daten, { beimFestsitzen: "effekt" }, regeln.bewegung, "regeln.bewegung", fehler);
   if (!istGanzzahl(regeln.werfen?.reichweite) || regeln.werfen.reichweite < 1) fehler.push("regeln.werfen.reichweite muss eine ganze Zahl >= 1 sein");
+  if (!istGanzzahl(regeln.population?.hoechstWesen) || regeln.population.hoechstWesen < 1) fehler.push("regeln.population.hoechstWesen muss eine ganze Zahl >= 1 sein");
   if (!regeln.kampf) return fehler.push("regeln.kampf fehlt");
   for (const [feld, untergrenze] of Object.entries(KAMPFREGELN)) {
     const wert = regeln.kampf[feld];
@@ -532,6 +533,10 @@ function pruefeEbene(daten, name, ebene, fehler) {
   for (const gegner of ebene.gegner || []) {
     if (!daten.wesen[gegner.typ] || daten.wesen[gegner.typ].abstrakt) fehler.push(`${ort}: Gegner "${gegner.typ}" gibt es nicht`);
   }
+  // ausdrücklich statt stillschweigend: mit Ninkasi mehr Wesen, als die Obergrenze der Population zulässt
+  const bestellt = 1 + (ebene.gegner || []).reduce((summe, gegner) => summe + (istGanzzahl(gegner.anzahl) ? gegner.anzahl : 0), 0);
+  const hoechstWesen = daten.regeln?.population?.hoechstWesen;
+  if (istGanzzahl(hoechstWesen) && bestellt > hoechstWesen) fehler.push(`${ort}: ${bestellt} Wesen mit Ninkasi, mehr als regeln.population.hoechstWesen (${hoechstWesen})`);
   for (const gegenstand of ebene.gegenstaende || []) {
     if (!daten.gegenstaende[gegenstand.typ]) fehler.push(`${ort}: Gegenstand "${gegenstand.typ}" gibt es nicht`);
   }

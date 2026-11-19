@@ -7,6 +7,7 @@ import { werteAusDaten, modifikatorHinzufuegen } from "../src/kern/werte.js";
 import { effektAnwenden } from "../src/kern/effekte.js";
 import { zustandSetzen } from "../src/systeme/zustaende.js";
 import { zuegeBisBereit, risikoWuerfeln } from "../src/systeme/faehigkeiten.js";
+import { positionSetzen } from "../src/kern/zustand.js";
 
 const KARTE = [
   "##########",
@@ -81,7 +82,7 @@ test("Fähigkeit: Gründe der Ablehnung", () => {
   assert.equal(pruefen(spiel, hexe, benutzen("spucke", { id: feind.id })), "zu_wenig_mp");
   hexe.werte.mp.aktuell = 100;
   assert.equal(pruefen(spiel, hexe, benutzen("spucke", { id: feind.id })), null);
-  feind.position = { x: 8, y: 2 };
+  positionSetzen(spiel.zustand, feind, { x: 8, y: 2 });
   assert.equal(pruefen(spiel, hexe, benutzen("spucke", { id: feind.id })), "zu_weit");
   hexe.werte.pegel.aktuell = 80;
   assert.equal(pruefen(spiel, hexe, benutzen("nuechtern")), "voraussetzung");

@@ -12,7 +12,7 @@
 //   laermdaempfung (ohne Angabe undurchlässig); wer innerhalb der Lautstärke liegt, hört ihn.
 
 import { anmelden } from "../kern/register.js";
-import { alleEntitaeten, fraktionVon } from "../kern/zustand.js";
+import { entitaetenImUmkreis, fraktionVon } from "../kern/zustand.js";
 import { modifiziert, lebenswertName } from "../kern/werte.js";
 import { mitProzentChance } from "../kern/zufall.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
@@ -20,7 +20,7 @@ import { bausteinAnmelden } from "../kern/bausteine.js";
 import { abstand, aufDerKarte, feldIndex, passierbar, gelaendeAuf } from "../welt/karte.js";
 import { ACHT_RICHTUNGEN } from "../welt/geometrie.js";
 import { trifftZu } from "./zielauswahl.js";
-import { sieht } from "./sicht.js";
+import { sieht, kandidatenInSicht } from "./sicht.js";
 
 export const WACHZUSTAENDE = ["schlaeft", "wach", "jagt"];
 
@@ -51,7 +51,7 @@ const lebt = (entitaet) => (entitaet.werte?.[lebenswertName(entitaet)]?.aktuell 
 // Sichtbare feindliche Ziele nach Abstand, bei Gleichstand nach ID
 function sichtbareFeinde(spiel, wesen) {
   const urheber = { id: wesen.id, fraktion: fraktionVon(wesen) ?? null };
-  return alleEntitaeten(spiel.zustand)
+  return kandidatenInSicht(spiel, wesen)
     .filter((kandidat) => kandidat.id !== wesen.id && kandidat.position && lebt(kandidat)
       && trifftZu(spiel, "feinde", urheber, kandidat) && sieht(spiel, wesen, kandidat))
     .sort((erstes, zweites) => abstand(wesen.position, erstes.position) - abstand(wesen.position, zweites.position) || erstes.id - zweites.id);
@@ -123,7 +123,8 @@ export function laermMachen(spiel, ursprung, lautstaerke, urheberId = null) {
   const ebene = spiel.zustand.ebene;
   const erreicht = laermFelder(spiel, ursprung, lautstaerke);
   melden(spiel, "laerm", { ursprung: { x: ursprung.x, y: ursprung.y }, lautstaerke });
-  for (const wesen of alleEntitaeten(spiel.zustand)) {
+  // jedes Feld kostet mindestens 1, weiter als die Lautstärke (Schachbrett) trägt Lärm also nie
+  for (const wesen of entitaetenImUmkreis(spiel.zustand, ursprung, lautstaerke)) {
     if (!wesen.ki || !wesen.position || wesen.id === urheberId) continue;
     if (!erreicht.has(feldIndex(ebene, wesen.position.x, wesen.position.y))) continue;
     const vorher = wachzustandVon(wesen);

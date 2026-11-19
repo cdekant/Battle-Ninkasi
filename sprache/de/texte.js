@@ -52,6 +52,7 @@ export default {
   "log.geworfen": "{wer.nom} wirft {was.akk}.",
   "log.zerbrochen": "{was.nom} zerbricht.",
   "log.gelandet": "{was.nom} landet auf dem Boden.",
+  "log.population_voll": "Hinweis: Die Ebene ist voll ({hoechstWesen} Wesen), {ausgefallen} weitere entstehen nicht.",
   "log.verpufft": "{wer.nom} verliert den Faden. Die Wirkung verpufft.",
   "log.aktion_unterbrochen": "Etwas stört. Weitermachen mit [Leertaste], jede andere Taste bricht ab.",
   "log.aktion_abgebrochen": "{wer.nom} bricht ab.",

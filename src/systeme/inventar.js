@@ -3,7 +3,7 @@
 // Getragene Gegenstände haben keine Position, sondern getragenVon; die Trägerin führt sie in inventar.
 
 import { anmelden } from "../kern/register.js";
-import { entitaetenAuf, entitaetMitId, entitaetEntfernen } from "../kern/zustand.js";
+import { entitaetenAuf, entitaetMitId, entitaetEntfernen, positionSetzen } from "../kern/zustand.js";
 import { effektAnwenden } from "../kern/effekte.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 
@@ -18,7 +18,7 @@ anmelden("befehle", "aufheben", {
   },
   ausfuehren(spiel, akteur) {
     const gegenstand = aufhebbarHier(spiel, akteur);
-    delete gegenstand.position;
+    positionSetzen(spiel.zustand, gegenstand, null);
     gegenstand.getragenVon = akteur.id;
     akteur.inventar.push(gegenstand.id);
     melden(spiel, "aufgehoben", { wer: bezugAuf(akteur), was: bezugAuf(gegenstand) });

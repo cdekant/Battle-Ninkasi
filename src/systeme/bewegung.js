@@ -5,7 +5,7 @@
 // ein unbewegliches Wesen greift an, bewegt sich aber nicht und lässt sich nicht verschieben (systeme/verschieben.js).
 
 import { anmelden } from "../kern/register.js";
-import { entitaetenAuf, bewegungVon } from "../kern/zustand.js";
+import { entitaetenAuf, bewegungVon, positionSetzen } from "../kern/zustand.js";
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
 import { betretbar } from "../welt/karte.js";
 import { istWesen, feindlich, nahkampf, kannAngreifen } from "./kampf.js";
@@ -18,7 +18,7 @@ export function istUnbeweglich(wesen) {
   return bewegungVon(wesen) === "unbeweglich";
 }
 
-// Setzt ein Wesen auf ein Feld; alle Bewegungen laufen hierüber (später auch der räumliche Index, Punkt 7).
+// Setzt ein Wesen auf ein Feld; alle Bewegungen laufen hierüber, die Position selbst über positionSetzen (kern/raumindex.js).
 // Haken verlaesst_feld und betritt_feld mit dem Feld als position und der art (VERSETZARTEN); Quelle ist, wer das
 // Wesen bewegt (optionen.urheberId, Vorgabe das Wesen selbst). Wird ein Wesen von einer anderen Urheberin versetzt,
 // bricht eine lange Aktion ab, die "versetzt" in unterbrechbar nennt (systeme/laufendeAktionen.js).
@@ -26,7 +26,7 @@ export function istUnbeweglich(wesen) {
 export function versetzen(spiel, wesen, feld, art, { urheberId = wesen.id, kettentiefe = 0 } = {}) {
   const beteiligte = { quelleId: urheberId, urheberId, zielId: wesen.id, ursache: "bewegung", kettentiefe, art };
   hakenAusloesen(spiel, "verlaesst_feld", { ...beteiligte, position: { x: wesen.position.x, y: wesen.position.y } });
-  wesen.position = { x: feld.x, y: feld.y };
+  positionSetzen(spiel.zustand, wesen, feld);
   if (wesen.id === spiel.zustand.spielerinId) {
     sichtfeldAktualisieren(spiel);
     for (const gegenstand of entitaetenAuf(spiel.zustand, feld.x, feld.y)) {

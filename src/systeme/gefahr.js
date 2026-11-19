@@ -4,7 +4,7 @@
 // Neue Prüfungen meldet man im Register "gefahren" an.
 
 import { anmelden, hat, holen } from "../kern/register.js";
-import { alleEntitaeten, spielerin } from "../kern/zustand.js";
+import { entitaetenMitPosition, spielerin } from "../kern/zustand.js";
 import { feindlich } from "./kampf.js";
 import { istSichtbar } from "./sicht.js";
 
@@ -12,7 +12,7 @@ import { istSichtbar } from "./sicht.js";
 export function sichtbareFeinde(spiel) {
   const zustand = spiel.zustand;
   const ninkasi = spielerin(zustand);
-  return alleEntitaeten(zustand)
+  return entitaetenMitPosition(zustand)
     .filter((entitaet) => entitaet.position && feindlich(spiel, ninkasi, entitaet) && istSichtbar(zustand, entitaet.position.x, entitaet.position.y))
     .map((entitaet) => entitaet.id);
 }

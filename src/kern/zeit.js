@@ -3,6 +3,9 @@
 // gebundenAn: ID einer Entität; wird sie entfernt, entfällt das Zeitereignis mit ihr
 // Gleichstand: zuerst Weltuhr, dann Zeitereignisse (nach Einreihung),
 // dann Akteure nach Erzeugungsreihenfolge (Entitäts-ID).
+// Die Warteschlange ist ein binärer Heap im Array (bleibt JSON): der erste Eintrag liegt vorn, Einreihen und
+// Entnehmen kosten log n. Die Ordnung ist vollständig (die Einreihungsnummer ist eindeutig), die Reihenfolge der
+// Entnahme hängt also nicht vom Aufbau des Heaps ab. Wer die Warteschlange liest, darf sie nicht umordnen.
 
 export const WELTTICK = 100;
 
@@ -15,9 +18,43 @@ function vergleichen(eintragA, eintragB) {
   return eintragA.einreihungsnummer - eintragB.einreihungsnummer;
 }
 
+function tauschen(heap, erste, zweite) {
+  const zwischen = heap[erste];
+  heap[erste] = heap[zweite];
+  heap[zweite] = zwischen;
+}
+
+function aufsteigen(heap, stelle) {
+  while (stelle > 0) {
+    const eltern = (stelle - 1) >> 1;
+    if (vergleichen(heap[stelle], heap[eltern]) >= 0) return;
+    tauschen(heap, stelle, eltern);
+    stelle = eltern;
+  }
+}
+
+function absinken(heap, stelle) {
+  for (;;) {
+    const links = 2 * stelle + 1, rechts = links + 1;
+    let kleinste = stelle;
+    if (links < heap.length && vergleichen(heap[links], heap[kleinste]) < 0) kleinste = links;
+    if (rechts < heap.length && vergleichen(heap[rechts], heap[kleinste]) < 0) kleinste = rechts;
+    if (kleinste === stelle) return;
+    tauschen(heap, stelle, kleinste);
+    stelle = kleinste;
+  }
+}
+
+// Baut den Heap aus einem beliebig geordneten Array neu auf (nach dem Herausfiltern von Einträgen)
+function heapAufbauen(heap) {
+  for (let stelle = (heap.length >> 1) - 1; stelle >= 0; stelle--) absinken(heap, stelle);
+  return heap;
+}
+
 export function einreihen(zustand, eintrag) {
   eintrag.einreihungsnummer = zustand.einreihungszaehler++;
   zustand.warteschlange.push(eintrag);
+  aufsteigen(zustand.warteschlange, zustand.warteschlange.length - 1);
 }
 
 export function akteurEinreihen(zustand, akteurId, verzoegerung) {
@@ -31,33 +68,43 @@ export function ereignisEinreihen(zustand, zeitpunkt, ereignistyp, daten = {}, g
   einreihen(zustand, eintrag);
 }
 
-function indexDesErstenEintrags(zustand) {
-  const warteschlange = zustand.warteschlange;
-  let bester = -1;
-  for (let i = 0; i < warteschlange.length; i++) {
-    if (bester < 0 || vergleichen(warteschlange[i], warteschlange[bester]) < 0) bester = i;
-  }
-  return bester;
-}
-
 export function ersterEintrag(zustand) {
-  const position = indexDesErstenEintrags(zustand);
-  return position < 0 ? null : zustand.warteschlange[position];
+  return zustand.warteschlange[0] ?? null;
 }
 
 // Nimmt den ersten Eintrag heraus und stellt die Uhr auf seinen Zeitpunkt
 export function ersterEintragEntnehmen(zustand) {
-  const position = indexDesErstenEintrags(zustand);
-  if (position < 0) return null;
-  const [eintrag] = zustand.warteschlange.splice(position, 1);
+  const heap = zustand.warteschlange;
+  if (!heap.length) return null;
+  const eintrag = heap[0];
+  const letzter = heap.pop();
+  if (heap.length) {
+    heap[0] = letzter;
+    absinken(heap, 0);
+  }
   zustand.zeit = eintrag.zeit;
   return eintrag;
 }
 
+// Entfernen ist selten (Tod, Entfernen einer Entität): filtern und den Heap neu aufbauen, nur wenn sich etwas ändert
+function entfernenWo(zustand, trifftZu) {
+  if (!zustand.warteschlange.some(trifftZu)) return;
+  zustand.warteschlange = heapAufbauen(zustand.warteschlange.filter((eintrag) => !trifftZu(eintrag)));
+}
+
 export function akteurEntfernen(zustand, akteurId) {
-  zustand.warteschlange = zustand.warteschlange.filter((eintrag) => !(eintrag.art === "akteur" && eintrag.akteurId === akteurId));
+  entfernenWo(zustand, (eintrag) => eintrag.art === "akteur" && eintrag.akteurId === akteurId);
 }
 
 export function gebundeneEreignisseEntfernen(zustand, entitaetId) {
-  zustand.warteschlange = zustand.warteschlange.filter((eintrag) => eintrag.gebundenAn !== entitaetId);
+  entfernenWo(zustand, (eintrag) => eintrag.gebundenAn === entitaetId);
+}
+
+// Ob die Warteschlange ein gültiger Heap ist (Bot, Tests)
+export function warteschlangeGueltig(zustand) {
+  const heap = zustand.warteschlange;
+  for (let stelle = 1; stelle < heap.length; stelle++) {
+    if (vergleichen(heap[stelle], heap[(stelle - 1) >> 1]) < 0) return false;
+  }
+  return true;
 }

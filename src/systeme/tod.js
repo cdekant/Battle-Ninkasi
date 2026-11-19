@@ -1,6 +1,8 @@
 // Tod als Zustandsprüfung (siehe docs/Architektur.md, Tod und Zustandsprüfung).
 // Nach jedem Vorgang stirbt jedes Wesen, dessen Lebenswert (Daten: lebenswert, Vorgabe "lp") bei 0 liegt,
-// in fester Reihenfolge nach Entitäts-ID. Ablauf je Wesen:
+// in fester Reihenfolge nach Entitäts-ID. Geprüft werden nur Wesen, bei denen seit der letzten Prüfung ein Wert auf 0
+// gefallen ist (vorgemerkt in kern/werte.js, kern/raumindex.js); im Spiel läuft jede Änderung über wertAendern.
+// Ablauf je Wesen:
 //   1. Haken "vor_tod": Abbruch verhindert den Tod, aber nur, wenn der Lebenswert danach über 0 liegt
 //   2. Meldung "tod" mit Urheber, Ursache und Mittel (aus letzterVerlust, siehe kern/effekte.js)
 //   3. Haken "nach_tod" mit der letzten Position, hier hängen Auslöser (Sporen, Säurespritzer)
@@ -8,7 +10,8 @@
 //   5. Entfernen samt Akteur und gebundenen Zeitereignissen; bei Ninkasi ist das Spiel vorbei, sie bleibt im Zustand
 
 import { anmelden } from "../kern/register.js";
-import { alleEntitaeten, entitaetMitId, entitaetEntfernen } from "../kern/zustand.js";
+import { entitaetMitId, entitaetEntfernen, positionSetzen } from "../kern/zustand.js";
+import { todOffenEntnehmen } from "../kern/raumindex.js";
 import { akteurEntfernen } from "../kern/zeit.js";
 import { lebenswertName } from "../kern/werte.js";
 import { hakenAusloesen, melden, bezugAuf } from "../kern/ereignisse.js";
@@ -25,7 +28,7 @@ function hinterlassenschaftVerteilen(spiel, entitaet) {
     if (!gegenstand) continue;
     if (regel === "fallen_lassen" && entitaet.position) {
       delete gegenstand.getragenVon;
-      gegenstand.position = { x: entitaet.position.x, y: entitaet.position.y };
+      positionSetzen(spiel.zustand, gegenstand, entitaet.position);
     } else {
       entitaetEntfernen(spiel.zustand, gegenstandId);
     }
@@ -64,8 +67,9 @@ export function sterben(spiel, entitaet) {
 anmelden("zustandspruefungen", "tod", (spiel) => {
   const zustand = spiel.zustand;
   let jemandGestorben = false;
-  for (const entitaet of alleEntitaeten(zustand)) {
-    if (!zustand.entitaeten[entitaet.id] || !istTot(entitaet)) continue;
+  for (const entitaetId of todOffenEntnehmen(zustand)) {
+    const entitaet = zustand.entitaeten[entitaetId];
+    if (!entitaet || !istTot(entitaet)) continue;
     if (entitaet.id === zustand.spielerinId && zustand.vorbei) continue;
     if (sterben(spiel, entitaet)) jemandGestorben = true;
   }

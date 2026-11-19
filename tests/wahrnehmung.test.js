@@ -7,6 +7,7 @@ import { modifikatorHinzufuegen } from "../src/kern/werte.js";
 import { nahkampf } from "../src/systeme/kampf.js";
 import { heimlichkeitsweite, wahrnehmen, istAhnungslos, laermFelder, laermMachen } from "../src/systeme/wahrnehmung.js";
 import { feldIndex } from "../src/welt/karte.js";
+import { positionSetzen } from "../src/kern/zustand.js";
 
 const RAUM = [
   "#############",
@@ -46,7 +47,7 @@ test("Bemerken: nur innerhalb der Weite und mit der Chance", () => {
   assert.equal(nah.ki.wachzustand, "jagt");
   sicher.ninkasi.letzteAktion = "warten";
   const fern = schlaefer(sicher.spiel, 5, 2);
-  fern.position = { x: 6, y: 1 };
+  positionSetzen(sicher.spiel.zustand, fern, { x: 6, y: 1 });
   wahrnehmen(sicher.spiel, fern);
   assert.equal(fern.ki.wachzustand, "schlaeft", "Abstand 5 jenseits der halbierten Weite 4");
   const nie = aufstellen({ bemerkenChance: 0 });

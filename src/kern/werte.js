@@ -13,6 +13,7 @@
 //   dann mindestens (der höchste), dann hoechstens (der niedrigste, gewinnt also); setzen zählt als beides.
 
 import { anmelden, alle, holen } from "./register.js";
+import { todVormerken } from "./raumindex.js";
 
 export const MODIFIKATORARTEN = ["plus", "prozent", "mal", "mindestens", "hoechstens", "setzen"];
 
@@ -132,6 +133,8 @@ export function wertBegrenztAendern(spiel, entitaet, wertName, aenderung) {
   const wert = entitaet.werte[wertName];
   const vorher = wert.aktuell;
   wert.aktuell = Math.max(0, Math.min(hoechstwert(spiel, entitaet, wertName), vorher + aenderung));
+  // ein Wert bei 0 kann der Lebenswert sein: für die Prüfung des Todes nach dem Vorgang vormerken (systeme/tod.js)
+  if (wert.aktuell <= 0 && aenderung < 0 && spiel.zustand) todVormerken(spiel.zustand, entitaet);
   return wert.aktuell - vorher;
 }
 

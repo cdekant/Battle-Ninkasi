@@ -14,7 +14,7 @@
 //                  (vom Ursprung zum Zielfeld), mit zufaellig: true auf ein zufälliges freies Feld der Ebene;
 //                  ist das Zielfeld besetzt oder nicht betretbar, auf das nächste freie (Breitensuche)
 // Unbewegliche Wesen lassen sich mit keinem dieser Bausteine bewegen. Frei heißt: betretbar und ohne anderes Wesen.
-// Lage (Zustandsprüfung nach jedem Vorgang): steht ein lebendes Wesen auf einem Feld, das es mit seiner wirksamen
+// Lage (Zustandsprüfung nach jedem Vorgang, nur für vorgemerkte Wesen, kern/raumindex.js): steht ein lebendes Wesen auf einem Feld, das es mit seiner wirksamen
 // Bewegungsart nicht betreten kann (Phasen endet in der Wand, Levitation über dem Abgrund, hineingestoßen), wirkt
 // beimFestsitzen des Geländes (Vorgabe regeln.bewegung.beimFestsitzen) auf das Wesen; lebt es danach noch, wird es
 // auf das nächste freie Feld gedrückt (Meldung "herausgedrueckt"). Gibt es kein freies Feld, passiert nichts.
@@ -24,7 +24,8 @@ import { bausteinAnmelden, mengeBestimmen } from "../kern/bausteine.js";
 import { effektAnwenden } from "../kern/effekte.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { zufallsGanzzahl } from "../kern/zufall.js";
-import { alleEntitaeten, istWesen, bewegungVon } from "../kern/zustand.js";
+import { istWesen, bewegungVon } from "../kern/zustand.js";
+import { lageOffenEntnehmen } from "../kern/raumindex.js";
 import { lebenswertName } from "../kern/werte.js";
 import { aufDerKarte, betretbar, betretbarFuer, fest, gelaendeAuf, gelaendeName } from "../welt/karte.js";
 import { gleichesFeld, linie, verlaengerung, wesenAufFeld } from "../welt/geometrie.js";
@@ -158,8 +159,10 @@ const lebt = (wesen) => (wesen.werte?.[lebenswertName(wesen)]?.aktuell ?? 1) > 0
 anmelden("zustandspruefungen", "lage", (spiel) => {
   const zustand = spiel.zustand;
   let geaendert = false;
-  for (const wesen of alleEntitaeten(zustand)) {
-    if (!zustand.entitaeten[wesen.id] || !wesen.position || !istWesen(wesen) || !lebt(wesen)) continue;
+  // nur Wesen, die seit der letzten Prüfung versetzt wurden oder deren Zustände sich geändert haben (kern/raumindex.js)
+  for (const wesenId of lageOffenEntnehmen(zustand)) {
+    const wesen = zustand.entitaeten[wesenId];
+    if (!wesen || !wesen.position || !istWesen(wesen) || !lebt(wesen)) continue;
     if (betretbar(spiel, wesen, wesen.position)) continue;
     if (wesen.id === zustand.spielerinId && zustand.vorbei) continue;
     const bewegung = bewegungVon(wesen);

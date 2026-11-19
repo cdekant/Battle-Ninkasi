@@ -3,9 +3,13 @@
 //   { id, typ, text, position: {x, y}, werte, fraktion, ki, sicht, angriffe, inventar, trinkbar, zustaende, ... }
 // Entitäten liegen in einem Objekt mit ganzzahligen Schlüsseln; JavaScript durchläuft solche
 // Schlüssel aufsteigend, die Reihenfolge ist also fest (Erzeugungsreihenfolge).
+// Positionen ändern sich nur über positionSetzen (kern/raumindex.js), damit der räumliche Index stimmt.
 
 import { werteAusDaten } from "./werte.js";
 import { akteurEntfernen, gebundeneEreignisseEntfernen } from "./zeit.js";
+import { entitaetIndexieren, entitaetAusIndexNehmen, idsAufFeld, idsImUmkreis, idsMitPosition } from "./raumindex.js";
+
+export { positionSetzen } from "./raumindex.js";
 
 export function neuerZustand(startwert) {
   return {
@@ -27,7 +31,9 @@ export function neuerZustand(startwert) {
 export function entitaetErzeugen(zustand, komponenten) {
   const id = zustand.naechsteId++;
   const entitaet = { id, ...komponenten };
+  if (entitaet.position) entitaet.position = { x: entitaet.position.x, y: entitaet.position.y };
   zustand.entitaeten[id] = entitaet;
+  entitaetIndexieren(zustand, entitaet);
   return entitaet;
 }
 
@@ -54,9 +60,27 @@ export function alleEntitaeten(zustand) {
   return Object.values(zustand.entitaeten);
 }
 
-// Entitäten auf einem Feld (nur solche mit Position, also nicht getragene)
+// Zahl der Wesen im Zustand (für die Obergrenze der Population, regeln.population)
+export function anzahlWesen(zustand) {
+  let anzahl = 0;
+  for (const entitaet of Object.values(zustand.entitaeten)) if (istWesen(entitaet)) anzahl++;
+  return anzahl;
+}
+
+// Entitäten mit Position, nach ID (aus dem räumlichen Index)
+export function entitaetenMitPosition(zustand) {
+  return idsMitPosition(zustand).map((id) => zustand.entitaeten[id]);
+}
+
+// Entitäten mit Position im Quadrat um die Mitte (Schachbrett-Abstand höchstens radius), nach ID; Grundlage für
+// Sicht, Bemerken und Lärm: wer weiter weg ist, kommt gar nicht erst in Frage
+export function entitaetenImUmkreis(zustand, mitte, radius) {
+  return idsImUmkreis(zustand, mitte, radius).map((id) => zustand.entitaeten[id]);
+}
+
+// Entitäten auf einem Feld (nur solche mit Position, also nicht getragene), nach ID
 export function entitaetenAuf(zustand, x, y) {
-  return alleEntitaeten(zustand).filter((entitaet) => entitaet.position && entitaet.position.x === x && entitaet.position.y === y);
+  return idsAufFeld(zustand, x, y).map((id) => zustand.entitaeten[id]);
 }
 
 // Entfernt eine Entität samt ihrem Platz in der Warteschlange, ihren gebundenen Zeitereignissen
@@ -70,6 +94,7 @@ export function entitaetEntfernen(zustand, id) {
     if (traegerin && traegerin.inventar) traegerin.inventar = traegerin.inventar.filter((getragenId) => getragenId !== id);
   }
   for (const getragenId of entitaet.inventar || []) entitaetEntfernen(zustand, getragenId);
+  entitaetAusIndexNehmen(zustand, entitaet);
   delete zustand.entitaeten[id];
   akteurEntfernen(zustand, id);
   gebundeneEreignisseEntfernen(zustand, id);

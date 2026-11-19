@@ -16,6 +16,7 @@
   --pp-hell: #3af2ff;
   --gut: #8fbf4a;
   --schlimm: #e5533d;
+  --hinweis: #3af2ff;
   --log-zeile: 1.35em;
   font-family: "Segoe UI", "DejaVu Sans", system-ui, sans-serif;
   font-size: 15px;
@@ -97,6 +98,7 @@ html, body {
 #log.offen { height: 40vh; overflow-y: auto; }
 #log .gut { color: var(--gut); }
 #log .schlimm { color: var(--schlimm); }
+#log .hinweis { color: var(--hinweis); font-weight: bold; }
 
 #fehler {
   position: fixed;

@@ -5,7 +5,8 @@
 import RNG from "../../lib/rot/rng.js";
 import Digger from "../../lib/rot/map/digger.js";
 import { startwertAbleiten, zufallErzeugen, zufallsGanzzahl } from "../kern/zufall.js";
-import { entitaetAusDatensatz } from "../kern/zustand.js";
+import { entitaetAusDatensatz, anzahlWesen } from "../kern/zustand.js";
+import { melden } from "../kern/ereignisse.js";
 
 export function ebeneErzeugen(spiel, ebenenName) {
   const zustand = spiel.zustand;
@@ -54,12 +55,22 @@ export function ebeneErzeugen(spiel, ebenenName) {
     return freieFelder.splice(gezogen, 1)[0];
   };
 
+  // Gegner höchstens bis zur Obergrenze der Population (regeln.population.hoechstWesen)
+  const hoechstWesen = spiel.daten.regeln.population.hoechstWesen;
+  let wesen = anzahlWesen(zustand), ausgefallen = 0;
   for (const gegnerEintrag of ebenendaten.gegner || []) {
     for (let i = 0; i < gegnerEintrag.anzahl; i++) {
+      if (wesen >= hoechstWesen) {
+        ausgefallen++;
+        continue;
+      }
       const feld = freiesFeldZiehen();
-      if (feld) entitaetAusDatensatz(zustand, gegnerEintrag.typ, spiel.daten.wesen[gegnerEintrag.typ], feld);
+      if (!feld) continue;
+      entitaetAusDatensatz(zustand, gegnerEintrag.typ, spiel.daten.wesen[gegnerEintrag.typ], feld);
+      wesen++;
     }
   }
+  if (ausgefallen) melden(spiel, "population_voll", { wesen: null, hoechstWesen, ausgefallen });
   for (const gegenstandEintrag of ebenendaten.gegenstaende || []) {
     for (let i = 0; i < gegenstandEintrag.anzahl; i++) {
       const feld = freiesFeldZiehen();
