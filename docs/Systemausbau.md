@@ -95,19 +95,13 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 ## 7. Fernkampf, Fraktionen, Wahrnehmung, viele Gegner
 
-Status: in Arbeit; umgesetzt in Version 0.14.0 (Fraktionen als Daten mit Zorn, Wahrnehmung mit Wachzustand, Heimlichkeit, Bemerken, Lärm und Hinterhalt) und 0.15.0 (die KI nutzt Fähigkeiten und hält Abstand, schont Verbündete, `ueberVerbuendete`, angekündigte und unterbrechbare lange Aktionen, Baustein `angreifen`, Auslöser mit `wenn`, Testgegner Fernkämpfer-Test), beschrieben in [Architektur.md](Architektur.md) (Fraktionen, Wahrnehmung, KI, Kampfwerte, Fähigkeiten, Lange Aktionen, Auslöser, Zielauswahl)
+Status: in Arbeit; umgesetzt in Version 0.14.0 (Fraktionen als Daten mit Zorn, Wahrnehmung mit Wachzustand, Heimlichkeit, Bemerken, Lärm und Hinterhalt), 0.15.0 (die KI nutzt Fähigkeiten und hält Abstand, schont Verbündete, `ueberVerbuendete`, angekündigte und unterbrechbare lange Aktionen, Baustein `angreifen`, Auslöser mit `wenn`, Testgegner Fernkämpfer-Test) und 0.16.0 (Bewegungsarten mit `passierbarFuer` und `phasend`, `versetzen` mit den Haken `betritt_feld` und `verlaesst_feld`, Stoßen, Ziehen, Tauschen, Teleportieren, Lageprüfung, Werfen, `unterbrechbar` als Liste), beschrieben in [Architektur.md](Architektur.md) (Fraktionen, Wahrnehmung, KI, Bewegung, Kampfwerte, Fähigkeiten, Lange Aktionen, Auslöser, Zielauswahl)
 
-Entschieden: Vorgabe für Paare ohne Angabe ist feind, die Tabelle nennt Abweichungen; Zorn trifft das angegriffene Wesen und Genossen, die die Angreiferin sehen, nicht die ganze Fraktion; Wahrnehmung nach Brogue mit Heimlichkeit als Modifikatorziel für Skills; Hinterhalt trifft sicher und kritisch, mehr Schaden über Modifikatoren mit `gegenueber_ahnungslos`; Lärm über Weglänge, Gelände dämpft nach `laermdaempfung`; die Nutzung von Fähigkeiten steht an der KI des Wesens; keine Gelegenheitsangriffe; keine Mehrfeld-Wesen, Bossphasen über Auslöser mit Bedingungen; mit `abstandHalten` wartet ein Wesen auf genau dem Abstand, statt zu pendeln; die KI schont Verbündete bei allen Zielarten und Mustern; `unterbrechbar` gilt auch für Ninkasi
-
-Offen, Version 0.16.0 (Bewegung, Verschieben, Werfen):
-
-+ Bewegungsarten (`laufend`, `unbeweglich`, `fliegend`, `schwebend`), Gelände mit `passierbarFuer`, Wegfindung je Bewegungsart
-+ Bausteine `stossen { weite }` (Aufprall an Wand oder Wesen: stumpfer Schaden je verbliebenem Feld), `ziehen { weite }`, `tauschen`, `teleportieren { muster | zufaellig }` mit festen Kollisionsregeln
-+ Befehl `werfen { gegenstandId, ziel }` entlang der Flugbahn; mit `wurf: { effekt }` zerbricht der Gegenstand und wirkt, sonst landet er auf dem Feld
+Entschieden: Vorgabe für Paare ohne Angabe ist feind, die Tabelle nennt Abweichungen; Zorn trifft das angegriffene Wesen und Genossen, die die Angreiferin sehen, nicht die ganze Fraktion; Wahrnehmung nach Brogue mit Heimlichkeit als Modifikatorziel für Skills; Hinterhalt trifft sicher und kritisch, mehr Schaden über Modifikatoren mit `gegenueber_ahnungslos`; Lärm über Weglänge, Gelände dämpft nach `laermdaempfung`; die Nutzung von Fähigkeiten steht an der KI des Wesens; keine Gelegenheitsangriffe; keine Mehrfeld-Wesen, Bossphasen über Auslöser mit Bedingungen; mit `abstandHalten` wartet ein Wesen auf genau dem Abstand, statt zu pendeln; die KI schont Verbündete bei allen Zielarten und Mustern; `unterbrechbar` gilt auch für Ninkasi und nennt die Gründe (`schaden`, `versetzt`); `schwebend` heißt knapp über dem Boden, `fliegend` überquert alles, beides nur über `passierbarFuer`; `phasend` geht durch Wände, endet es darin, entscheidet die Lageprüfung mit `beimFestsitzen`; Aufprall nur an festem Gelände, Wesen und Kartenrand, die Menge steht am Baustein
 
 Offen, Version 0.17.0 (viele Gegner):
 
-+ `positionSetzen` statt direkter Zuweisung, darauf ein räumlicher Index im `zwischenspeicher` (aus dem Zustand ableitbar, nicht gespeichert) für Auren, `entitaetenAuf` und Zielwahl
++ Ein räumlicher Index an `versetzen` (seit 0.16.0 der eine Weg, Wesen zu bewegen; Gegenstände und Erzeugen kommen dazu) im `zwischenspeicher` (aus dem Zustand ableitbar, nicht gespeichert) für Auren, `entitaetenAuf` und Zielwahl
 + Warteschlange als Heap mit fester Reihenfolge, Obergrenze der Population als Regelwert
 
 Offener Rest, wird mit den genannten Punkten umgesetzt:
@@ -115,6 +109,7 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 + Licht in der Wahrnehmung (Brogue: Heimlichkeitsweite im Licht doppelt, im Dunkeln halb), Spüren ohne Licht, Umherziehen wacher Wesen; siehe Wahrnehmung und Licht in [Architektur.md](Architektur.md)
 + Ruf bei ganzen Fraktionen (Spieldesign in [Grundlagen.md](Grundlagen.md))
 + Anzeige von Wachzustand und Heimlichkeitsweite (Oberfläche)
++ Zielmodus der Oberfläche für Werfen und Fähigkeiten (Taste, Auswahl des Gegenstands bzw. der Fähigkeit, Ziel per Maus und Tastatur, Vorschau aus `zielAufloesen`); Werfen gibt es seit 0.16.0 nur in Logik, Tests und Bot
 + Die Anzeige spielt die Bahn aus der Meldung `geschoss` ab (Oberfläche, aus 0.15.0 verschoben); die Zielfelder angekündigter Angriffe werden schon markiert
 + Tile für den Fernkämpfer-Test (bisher nur Zeichen F), falls er im Spiel bleibt
 

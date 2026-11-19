@@ -14,16 +14,18 @@ export const HAKENKATALOG = {
   nach_wertaenderung: { inBetrieb: true, ausloeserErlaubt: false }, // { entitaet, wertName, vorher, nachher }
   vor_befehl: { inBetrieb: true, ausloeserErlaubt: false },       // { akteurId, befehl }; Handler ersetzen befehl oder brechen ab (dann warten)
   zustand_beginnt: { inBetrieb: true, ausloeserErlaubt: true },   // + zustand, nummer; Ziel ist die Trägerin
-  zustand_endet: { inBetrieb: true, ausloeserErlaubt: true },
-  vor_angriff: { inBetrieb: true, ausloeserErlaubt: false },       // + angriff (Name des Profils); Abbruch lässt diesen einzelnen Angriff aus     // + zustand, nummer, grund ("abgelaufen" | "entfernt" | "quelle_tot")
+  zustand_endet: { inBetrieb: true, ausloeserErlaubt: true },     // + zustand, nummer, grund ("abgelaufen" | "entfernt" | "quelle_tot")
+  vor_angriff: { inBetrieb: true, ausloeserErlaubt: false },       // + angriff (Name des Profils); Abbruch lässt diesen einzelnen Angriff aus
+  // Ziel ist das bewegte Wesen, Quelle wer es bewegt (bei einem Schritt es selbst); + position (das Feld), art
+  // ("schritt" | "stoss" | "zug" | "tausch" | "teleport" | "herausgedrueckt"), siehe systeme/bewegung.js
+  verlaesst_feld: { inBetrieb: true, ausloeserErlaubt: true },
+  betritt_feld: { inBetrieb: true, ausloeserErlaubt: true },
   // reserviert, siehe docs/Systemausbau.md
   zug_beginn: { inBetrieb: false, ausloeserErlaubt: true },
   zug_ende: { inBetrieb: false, ausloeserErlaubt: true },
-  betritt_feld: { inBetrieb: false, ausloeserErlaubt: true },
-  verlaesst_feld: { inBetrieb: false, ausloeserErlaubt: true },
   gegenstand_benutzt: { inBetrieb: false, ausloeserErlaubt: true },
 };
 
-// Auslöser in den Daten: { bei, rolle?, ziel?, effekt, chance?, daempfung? }
+// Auslöser in den Daten: { bei, rolle?, ziel?, effekt, chance?, daempfung?, wenn? }
 export const AUSLOESER_ROLLEN = ["quelle", "ziel"]; // welche Rolle die Trägerin im Ereignis haben muss
 export const AUSLOESER_ZIELE = ["selbst", "quelle", "ziel", "feld"]; // worauf der Effekt wirkt

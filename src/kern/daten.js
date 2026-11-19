@@ -13,6 +13,8 @@ import { KAMPFWERTE } from "../systeme/kampf.js";
 import { FAEHIGKEITSARTEN } from "../systeme/faehigkeiten.js";
 import { BEZIEHUNGEN } from "../systeme/fraktionen.js";
 import { WACHZUSTAENDE } from "../systeme/wahrnehmung.js";
+import { UNTERBRECHUNGSGRUENDE } from "../systeme/laufendeAktionen.js";
+import { BEWEGUNGSARTEN } from "../welt/karte.js";
 
 const istObjekt = (wert) => wert && typeof wert === "object" && !Array.isArray(wert);
 
@@ -92,6 +94,7 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
     if (!istTextliste(wesen.faehigkeiten)) fehler.push(`${ort}: faehigkeiten muss eine Liste von Namen sein`);
     else for (const faehigkeit of wesen.faehigkeiten) if (!daten.faehigkeiten?.[faehigkeit]) fehler.push(`${ort}: Fähigkeit "${faehigkeit}" gibt es nicht`);
   }
+  pruefeParameter(daten, { bewegung: BEWEGUNGSARTEN }, wesen, ort, fehler);
   if (wesen.ki) pruefeKi(daten, wesen.ki, `${ort}.ki`, fehler, istTextliste(wesen.faehigkeiten) ? wesen.faehigkeiten : []);
   if (wesen.stoffwechsel) pruefeStoffwechsel(wesen, ort, fehler);
   if (wesen.sicht && !istGanzzahl(wesen.sicht.reichweite)) fehler.push(`${ort}: sicht.reichweite muss eine ganze Zahl sein`);
@@ -172,7 +175,7 @@ function pruefeAusloeser(daten, liste, ort, fehler) {
 // Regelwerte des Kampfs: Untergrenze je Feld
 const KAMPFREGELN = { grundverteidigung: 0, halbwertWiderstand: 1, halbwertBlocken: 1, halbwertKritchance: 1, kritfaktor: 100, mindestschadenNachRuestung: 0 };
 
-function pruefeRegeln(regeln, fehler) {
+function pruefeRegeln(daten, regeln, fehler) {
   const ausloeser = regeln?.ausloeser;
   if (!ausloeser) return fehler.push("regeln.ausloeser fehlt");
   if (!istProzent(ausloeser.daempfungProStufe)) fehler.push("regeln.ausloeser.daempfungProStufe muss eine ganze Zahl von 0 bis 100 sein");
@@ -184,7 +187,7 @@ function pruefeRegeln(regeln, fehler) {
   const wahrnehmung = regeln.wahrnehmung;
   if (!wahrnehmung) fehler.push("regeln.wahrnehmung fehlt");
   else {
-    for (const feld of ["heimlichkeitVorgabe", "heimlichkeitMindestens", "spurFaktor", "laermNahkampf"]) {
+    for (const feld of ["heimlichkeitVorgabe", "heimlichkeitMindestens", "spurFaktor", "laermNahkampf", "laermWurf"]) {
       if (!istZahlAbNull(wahrnehmung[feld])) fehler.push(`regeln.wahrnehmung.${feld} muss eine ganze Zahl >= 0 sein`);
     }
     if (!istProzent(wahrnehmung.bemerkenChance)) fehler.push("regeln.wahrnehmung.bemerkenChance muss eine ganze Zahl von 0 bis 100 sein");
@@ -192,6 +195,9 @@ function pruefeRegeln(regeln, fehler) {
       fehler.push("regeln.wahrnehmung.heimlichkeitNachAktion muss { aktion: Prozent } sein");
     }
   }
+  if (!istObjekt(regeln.bewegung)) fehler.push("regeln.bewegung fehlt");
+  else pruefeParameter(daten, { beimFestsitzen: "effekt" }, regeln.bewegung, "regeln.bewegung", fehler);
+  if (!istGanzzahl(regeln.werfen?.reichweite) || regeln.werfen.reichweite < 1) fehler.push("regeln.werfen.reichweite muss eine ganze Zahl >= 1 sein");
   if (!regeln.kampf) return fehler.push("regeln.kampf fehlt");
   for (const [feld, untergrenze] of Object.entries(KAMPFREGELN)) {
     const wert = regeln.kampf[feld];
@@ -232,6 +238,14 @@ function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
   pruefeText(sprache.texte, gegenstand.text, ort, fehler);
   pruefeNomen(sprache, gegenstand.text, fehler);
   if (gegenstand.trinkbar) pruefeEffektVerweis(daten, gegenstand.trinkbar.effekt, `${ort}.trinkbar`, fehler);
+  // Werfen, siehe systeme/werfen.js
+  if (gegenstand.wurf !== undefined) {
+    if (!istObjekt(gegenstand.wurf)) fehler.push(`${ort}: wurf muss ein Objekt { effekt?, reichweite? } sein`);
+    else {
+      pruefeParameter(daten, { effekt: "effekt?", reichweite: "ganzzahl?" }, gegenstand.wurf, `${ort}.wurf`, fehler);
+      if (gegenstand.wurf.reichweite === 0) fehler.push(`${ort}.wurf: reichweite muss eine ganze Zahl >= 1 sein`);
+    }
+  }
   if (!daten.zeichen.gegenstaende[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js`);
 }
 
@@ -352,7 +366,11 @@ function pruefeFaehigkeit(daten, sprache, name, faehigkeit, fehler) {
     else pruefeBedingungen(daten, faehigkeit.voraussetzungen, `${ort}.voraussetzungen`, fehler);
   }
   if (faehigkeit.dauer !== undefined && !(istObjekt(faehigkeit.dauer) && istGanzzahl(faehigkeit.dauer.schritte) && faehigkeit.dauer.schritte > 0)) fehler.push(`${ort}: dauer muss { schritte } mit einer ganzen Zahl > 0 sein`);
-  pruefeParameter(daten, { beimAbbruch: "effekt?", unterbrechbar: "wahrheitswert?" }, faehigkeit, ort, fehler);
+  pruefeParameter(daten, { beimAbbruch: "effekt?" }, faehigkeit, ort, fehler);
+  const unterbrechbar = faehigkeit.unterbrechbar;
+  if (unterbrechbar !== undefined && unterbrechbar !== true && unterbrechbar !== false && !(istTextliste(unterbrechbar) && unterbrechbar.every((grund) => UNTERBRECHUNGSGRUENDE.includes(grund)))) {
+    fehler.push(`${ort}: unterbrechbar muss true, false oder eine Liste aus ${UNTERBRECHUNGSGRUENDE.join(", ")} sein`);
+  }
   if (faehigkeit.ankuendigung !== undefined) pruefeText(sprache.texte, faehigkeit.ankuendigung, `${ort}.ankuendigung`, fehler);
   if ((faehigkeit.ankuendigung !== undefined || faehigkeit.unterbrechbar !== undefined) && faehigkeit.dauer === undefined) fehler.push(`${ort}: ankuendigung und unterbrechbar gibt es nur mit dauer`);
   if (faehigkeit.risiko !== undefined && !daten.risiken?.[faehigkeit.risiko]) fehler.push(`${ort}: Risikotabelle "${faehigkeit.risiko}" gibt es nicht`);
@@ -486,7 +504,7 @@ function pruefeZustand(daten, sprache, name, zustand, fehler) {
   pruefeText(sprache.texte, zustand.text, ort, fehler);
   if (zustand.dauer !== undefined && !(istGanzzahl(zustand.dauer) && zustand.dauer > 0)) fehler.push(`${ort}: dauer muss eine ganze Zahl > 0 sein`);
   if (zustand.hoechstStapel !== undefined && !(istGanzzahl(zustand.hoechstStapel) && zustand.hoechstStapel > 0)) fehler.push(`${ort}: hoechstStapel muss eine ganze Zahl > 0 sein`);
-  const felder = { stapel: STAPELREGELN, jeTick: "effekt?", beimBeginn: "effekt?", beimEnde: "effekt?", gebundenAnQuelle: "wahrheitswert?", handlungsunfaehig: "wahrheitswert?", fraktion: "text?" };
+  const felder = { stapel: STAPELREGELN, jeTick: "effekt?", beimBeginn: "effekt?", beimEnde: "effekt?", gebundenAnQuelle: "wahrheitswert?", handlungsunfaehig: "wahrheitswert?", fraktion: "text?", bewegung: BEWEGUNGSARTEN };
   pruefeParameter(daten, felder, zustand, ort, fehler);
   if (zustand.ki !== undefined) pruefeKi(daten, zustand.ki, `${ort}.ki`, fehler);
   if (zustand.befehl !== undefined) {
@@ -544,12 +562,18 @@ export function vorbereiten(rohdaten, sprache = {}) {
   for (const [name, gelaende] of Object.entries(daten.gelaende)) {
     if (typeof gelaende.kennung !== "string" || gelaende.kennung.length !== 1) fehler.push(`gelaende.${name}: kennung muss genau ein Zeichen sein`);
     if (gelaende.laermdaempfung !== undefined && !istZahlAbNull(gelaende.laermdaempfung)) fehler.push(`gelaende.${name}: laermdaempfung muss eine ganze Zahl >= 0 sein`);
+    // Bewegungsarten, siehe welt/karte.js
+    pruefeParameter(daten, { passierbar: "wahrheitswert?", undurchdringlich: "wahrheitswert?", beimFestsitzen: "effekt?" }, gelaende, `gelaende.${name}`, fehler);
+    const passierbarFuer = gelaende.passierbarFuer;
+    if (passierbarFuer !== undefined && !(istTextliste(passierbarFuer) && passierbarFuer.every((art) => BEWEGUNGSARTEN.includes(art)))) {
+      fehler.push(`gelaende.${name}: passierbarFuer muss eine Liste aus ${BEWEGUNGSARTEN.join(", ")} sein`);
+    }
     if (!daten.zeichen.gelaende[name]) fehler.push(`gelaende.${name}: kein Zeichen in daten/zeichen.js`);
   }
   for (const [aktion, kosten] of Object.entries(daten.aktionen)) {
     if (!istGanzzahl(kosten) || kosten <= 0) fehler.push(`aktionen.${aktion}: Kosten müssen eine ganze Zahl > 0 sein`);
   }
-  pruefeRegeln(daten.regeln, fehler);
+  pruefeRegeln(daten, daten.regeln, fehler);
   if (!daten.wesen.ninkasi) fehler.push("wesen.ninkasi fehlt");
   return { daten, fehler };
 }

@@ -18,7 +18,8 @@
 //   beimAbbruch:     Effekt auf die Wirkende, wenn eine lange Aktion abgebrochen wird
 //   ankuendigung:    Textschlüssel für den Beginn einer langen Aktion (angekündigter Angriff); die Meldung
 //                    "aktion_beginnt" nennt dazu faehigkeit, ankuendigung und die Zielfelder (felder) beim Beginn
-//   unterbrechbar:   true, Schaden bricht die lange Aktion ab (systeme/laufendeAktionen.js)
+//   unterbrechbar:   Liste der Gründe, die die lange Aktion abbrechen: "schaden", "versetzt"; true heißt ["schaden"]
+//                    (systeme/laufendeAktionen.js)
 // Befehl: { art: "faehigkeit", faehigkeit, ziel?: { x, y } | { id } | { dx, dy } }
 // Wesen kennen ihre Fähigkeiten als Liste: faehigkeiten: ["name"]; Abklingen über den Zugzähler zuege (kern/spiel.js)
 //   abklingendBis: { name: zugnummer } ab diesem Stand des Zugzählers wieder bereit
@@ -217,7 +218,7 @@ function faehigkeitAusfuehren(spiel, wesen, name, zielangabe) {
     const aufloesung = definition.ziel ? zielAufloesen(spiel, wesen, definition.ziel, zielangabe) : null;
     const meldungszusatz = { faehigkeit: name, ankuendigung: definition.ankuendigung ?? null, felder: aufloesung?.ok ? aufloesung.felder : [] };
     const aktion = { art: "faehigkeit", schritteGesamt: definition.dauer.schritte, faehigkeit: name, ziel };
-    if (definition.unterbrechbar) aktion.unterbrechbar = true;
+    if (definition.unterbrechbar) aktion.unterbrechbar = definition.unterbrechbar === true ? ["schaden"] : [...definition.unterbrechbar];
     return aktionBeginnen(spiel, wesen, aktion, meldungszusatz);
   }
   faehigkeitWirken(spiel, wesen, name, definition, zielangabe);

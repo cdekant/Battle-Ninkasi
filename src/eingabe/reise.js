@@ -4,22 +4,23 @@
 // Reise: { ziel: { x, y }, lage, schrittzahl }
 // Später: automatisches Erkunden ist dieselbe Reise mit anderer Zielwahl.
 
-import { spielerin, entitaetenAuf, istWesen } from "../kern/zustand.js";
-import { feldIndex, passierbar } from "../welt/karte.js";
+import { spielerin, entitaetenAuf, istWesen, bewegungVon } from "../kern/zustand.js";
+import { feldIndex, betretbar } from "../welt/karte.js";
 import { naechstesWegfeld } from "../welt/wege.js";
 import { lageErfassen, sichtbareFeinde, gefahrPruefen } from "../systeme/gefahr.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 
-const WEG_OPTIONEN = { nurErkundet: true };
+// Wege nur über Erkundetes, nach Ninkasis wirksamer Bewegungsart
+const wegOptionen = (spiel) => ({ nurErkundet: true, bewegung: bewegungVon(spielerin(spiel.zustand)) });
 
 // Gibt { reise } oder { grund } zurück; grund: "kein_weg" | "feinde_in_sicht" | "vorbei"
 export function reiseBeginnen(spiel, ziel, einstellungen) {
   const zustand = spiel.zustand;
   if (zustand.vorbei) return { grund: "vorbei" };
   const ebene = zustand.ebene;
-  if (!ebene.erkundet[feldIndex(ebene, ziel.x, ziel.y)] || !passierbar(spiel, ziel.x, ziel.y)) return { grund: "kein_weg" };
+  if (!ebene.erkundet[feldIndex(ebene, ziel.x, ziel.y)] || !betretbar(spiel, spielerin(zustand), ziel)) return { grund: "kein_weg" };
   if (!einstellungen.reiseTrotzFeinden && sichtbareFeinde(spiel).length) return { grund: "feinde_in_sicht" };
-  if (!naechstesWegfeld(spiel, spielerin(zustand).position, ziel, WEG_OPTIONEN)) return { grund: "kein_weg" };
+  if (!naechstesWegfeld(spiel, spielerin(zustand).position, ziel, wegOptionen(spiel))) return { grund: "kein_weg" };
   return { reise: { ziel: { x: ziel.x, y: ziel.y }, lage: lageErfassen(spiel), schrittzahl: 0 } };
 }
 
@@ -49,7 +50,7 @@ export function naechsterReiseschritt(spiel, reise, einstellungen) {
   const halt = unterwegsPruefen(spiel, reise, einstellungen.reiseHalt);
   if (halt) return { halt };
 
-  const naechstesFeld = naechstesWegfeld(spiel, position, reise.ziel, WEG_OPTIONEN);
+  const naechstesFeld = naechstesWegfeld(spiel, position, reise.ziel, wegOptionen(spiel));
   if (!naechstesFeld) return { halt: "kein_weg" };
   if (entitaetenAuf(zustand, naechstesFeld.x, naechstesFeld.y).some(istWesen)) return { halt: "versperrt" };
   reise.schrittzahl++;

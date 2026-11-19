@@ -3,17 +3,18 @@
 // Wie die Reise, nur mit anderer Zielwahl; jeder Schritt ist ein gewöhnlicher Befehl "bewegen".
 // Ablauf: { lage, schrittzahl }
 
-import { spielerin, entitaetenAuf, istWesen } from "../kern/zustand.js";
+import { spielerin, entitaetenAuf, istWesen, bewegungVon } from "../kern/zustand.js";
 import { naechstesWegfeld, naechstesFeldMit, amRandDesErkundeten } from "../welt/wege.js";
 import { lageErfassen, sichtbareFeinde } from "../systeme/gefahr.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 import { unterwegsPruefen } from "./reise.js";
 
-const WEG_OPTIONEN = { nurErkundet: true };
+// Wege nur über Erkundetes, nach Ninkasis wirksamer Bewegungsart
+const wegOptionen = (spiel) => ({ nurErkundet: true, bewegung: bewegungVon(spielerin(spiel.zustand)) });
 
 function naechstesRandfeld(spiel) {
   const position = spielerin(spiel.zustand).position;
-  return naechstesFeldMit(spiel, position, (x, y) => amRandDesErkundeten(spiel, x, y), WEG_OPTIONEN);
+  return naechstesFeldMit(spiel, position, (x, y) => amRandDesErkundeten(spiel, x, y), wegOptionen(spiel));
 }
 
 // Gibt { ablauf } oder { grund } zurück; grund: "vorbei" | "feinde_in_sicht" | "alles_erkundet"
@@ -35,7 +36,7 @@ export function naechsterErkundungsschritt(spiel, ablauf, einstellungen) {
   const ziel = naechstesRandfeld(spiel);
   if (!ziel) return { halt: "alles_erkundet" };
   const position = spielerin(zustand).position;
-  const naechstesFeld = naechstesWegfeld(spiel, position, ziel, WEG_OPTIONEN);
+  const naechstesFeld = naechstesWegfeld(spiel, position, ziel, wegOptionen(spiel));
   if (!naechstesFeld) return { halt: "kein_weg" };
   if (entitaetenAuf(zustand, naechstesFeld.x, naechstesFeld.y).some(istWesen)) return { halt: "versperrt" };
   ablauf.schrittzahl++;

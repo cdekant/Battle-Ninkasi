@@ -5,7 +5,8 @@
 //   faehigkeiten?, abstandHalten? }
 // Sieht es seine Beute, setzt es zuerst eine passende Fähigkeit ein (ki/faehigkeitenwahl.js). Mit abstandHalten: n
 // weicht es zurück, solange die Beute näher als n steht (in die Ecke gedrängt greift es normal an), wartet auf
-// genau n Feldern und kommt bei mehr näher (Abstand nach Schachbrett).
+// genau n Feldern und kommt bei mehr näher (Abstand nach Schachbrett). Wege nach der eigenen Bewegungsart; ein
+// unbewegliches Wesen setzt Fähigkeiten ein, greift an, wer daneben steht, und wartet sonst.
 // Wachzustand (systeme/wahrnehmung.js): schlaeft wartet; wach geht nur Lärm nach; jagt verfolgt Ziele innerhalb der
 // Spurweite und wird wieder wach, wenn es an der letzten bekannten Position niemanden mehr findet.
 
@@ -18,6 +19,14 @@ import { spurweite } from "../systeme/wahrnehmung.js";
 import { abstand } from "../welt/karte.js";
 import { faehigkeitWaehlen } from "./faehigkeitenwahl.js";
 import { schrittWeg } from "./schritte.js";
+import { bewegungVon } from "../kern/zustand.js";
+import { istUnbeweglich } from "../systeme/bewegung.js";
+
+// Unbeweglich: greift die Beute an, wenn sie daneben steht, sonst wartet es
+function angriffDaneben(spiel, jaeger, beute, trifft) {
+  if (!beute || abstand(jaeger.position, beute.position) !== 1 || !istZielFuer(spiel, jaeger, beute, trifft)) return abwarten();
+  return { art: "bewegen", dx: beute.position.x - jaeger.position.x, dy: beute.position.y - jaeger.position.y, angreifen: true };
+}
 
 // Befehl, um den Abstand zur Beute zu halten, oder null (dann jagt es wie sonst)
 function abstandWahren(spiel, jaeger, beute, gewuenschterAbstand) {
@@ -52,7 +61,8 @@ anmelden("ki", "jagen", (spiel, jaeger, ki) => {
     return abwarten();
   }
 
-  const naechstesFeld = naechstesWegfeld(spiel, position, ziel);
+  if (istUnbeweglich(jaeger)) return angriffDaneben(spiel, jaeger, beute, trifft);
+  const naechstesFeld = naechstesWegfeld(spiel, position, ziel, { bewegung: bewegungVon(jaeger) });
   if (!naechstesFeld) return abwarten();
   const befehl = { art: "bewegen", dx: naechstesFeld.x - position.x, dy: naechstesFeld.y - position.y };
   const wesenImWeg = wesenAufFeld(spiel, naechstesFeld)[0];

@@ -12,7 +12,7 @@ import { bausteinAnmelden } from "../kern/bausteine.js";
 import { entitaetAusDatensatz, entitaetEntfernen } from "../kern/zustand.js";
 import { akteurEinreihen } from "../kern/zeit.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
-import { passierbar } from "../welt/karte.js";
+import { betretbarFuer } from "../welt/karte.js";
 import { wesenAufFeld } from "../welt/geometrie.js";
 import { musterFelder } from "./zielauswahl.js";
 import { zustandSetzen, quelleEntfaellt } from "./zustaende.js";
@@ -21,8 +21,9 @@ bausteinAnmelden("beschwoeren", { wesen: "wesen", anzahl: "ganzzahl?", muster: "
   if (!kontext.ursprung) return;
   const zustand = spiel.zustand;
   const auswahl = { ursprung: kontext.ursprung, zielpunkt: kontext.zielfeld ?? kontext.ursprung, quelleId: kontext.quelleId };
+  const bewegung = spiel.daten.wesen[parameter.wesen].bewegung ?? "laufend";
   const freieFelder = musterFelder(spiel, parameter.muster ?? { art: "angrenzend" }, auswahl)
-    .filter((feld) => passierbar(spiel, feld.x, feld.y) && wesenAufFeld(spiel, feld).length === 0);
+    .filter((feld) => betretbarFuer(spiel, feld.x, feld.y, bewegung) && wesenAufFeld(spiel, feld).length === 0);
   const urheber = zustand.entitaeten[kontext.urheberId];
   for (const feld of freieFelder.slice(0, parameter.anzahl ?? 1)) {
     const beschworen = entitaetAusDatensatz(zustand, parameter.wesen, spiel.daten.wesen[parameter.wesen], feld);

@@ -1,7 +1,8 @@
 // Lange Aktionen (siehe docs/Architektur.md, Lange Aktionen): Rituale, später Brauen, laufen über mehrere Schritte.
 // Komponente an der Akteurin:
 //   laufendeAktion: { art, schritteGesamt, schritteErledigt, unterbrochen: null | Grund, lage, unterbrechbar?, ...Daten der Art }
-//   unterbrechbar: true heißt, Schaden (Haken nach_schaden) bricht die Aktion ab, Grund "schaden"; für jedes Wesen
+//   unterbrechbar: Liste der Gründe, die die Aktion sofort abbrechen, für jedes Wesen (UNTERBRECHUNGSGRUENDE):
+//     "schaden" (Haken nach_schaden), "versetzt" (von einer anderen Urheberin bewegt, systeme/bewegung.js)
 // Register "laufendeaktionen": art -> {
 //   schrittkosten(spiel, akteur, aktion) => { aktion, grundkosten?, umstaende? }  Zeitkosten eines Schritts
 //   abschliessen(spiel, akteur, aktion)          nach dem letzten Schritt
@@ -17,6 +18,8 @@ import { anmelden, holen } from "../kern/register.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { lageErfassen, gefahrPruefen } from "./gefahr.js";
 import { istHandlungsunfaehig } from "./zustaende.js";
+
+export const UNTERBRECHUNGSGRUENDE = ["schaden", "versetzt"];
 
 const istSpielerin = (spiel, akteur) => akteur.id === spiel.zustand.spielerinId;
 const eintragVon = (aktion) => holen("laufendeaktionen", aktion.art);
@@ -57,7 +60,7 @@ export function aktionAbbrechen(spiel, akteur, grund) {
 // Schaden bricht eine unterbrechbare lange Aktion ab
 anmelden("haken", "nach_schaden", (spiel, kontext) => {
   const getroffen = spiel.zustand.entitaeten[kontext.zielId];
-  if (getroffen?.laufendeAktion?.unterbrechbar) aktionAbbrechen(spiel, getroffen, "schaden");
+  if (getroffen?.laufendeAktion?.unterbrechbar?.includes("schaden")) aktionAbbrechen(spiel, getroffen, "schaden");
 });
 
 // Vor dem Zug einer Akteurin mit laufender Aktion: Abbruch bei Handlungsunfähigkeit, Pause bei Gefahr (nur Ninkasi).

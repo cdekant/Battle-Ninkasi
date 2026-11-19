@@ -19,6 +19,7 @@
 //   befehl: { veraenderer, ...parameter }  verändert jeden Befehl der Trägerin (Register "befehlsveraenderer")
 //   ki: { modul, ...parameter }            überlagert die KI, bei Ninkasi übernimmt sie die KI für die Dauer
 //   fraktion: "urheber" | "eigene" | Name  überlagert die Fraktion ("eigene": mit allen verfeindet)
+//   bewegung: Bewegungsart                  überlagert die Bewegungsart (Levitation, Phasen; welt/karte.js)
 //   Fraktion und KI werden beim Beginn in die Instanz geschrieben; es gilt die jüngste Überlagerung
 // Instanz an der Entität: zustaende: [{ nummer, name, quelleId, urheberId, urheberFraktion, beginn, ende, staerke, stapel }]
 // Takt: Weltuhr (je Welttick, solange zeit < ende); Hast und Verlangsamung der Trägerin ändern daran nichts.
@@ -112,6 +113,7 @@ function neueInstanz(spiel, traegerin, name, angaben, ende) {
     const nachArt = { urheber: angaben.urheberFraktion, eigene: `eigene:${instanz.nummer}` };
     instanz.fraktion = definition.fraktion in nachArt ? nachArt[definition.fraktion] : definition.fraktion;
   }
+  if (definition.bewegung !== undefined) instanz.bewegung = definition.bewegung;
   if (definition.ki) instanz.ki = { ...structuredClone(definition.ki), letzteBekanntePosition: null, bedrohungId: angaben.urheberId };
   if (!traegerin.zustaende) traegerin.zustaende = [];
   traegerin.zustaende.push(instanz);

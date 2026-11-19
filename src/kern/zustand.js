@@ -97,6 +97,11 @@ export function kiVon(entitaet) {
   return juengsteUeberlagerung(entitaet, "ki");
 }
 
+// Wirksame Bewegungsart (siehe welt/karte.js): die des jüngsten überlagernden Zustands, sonst die eigene, Vorgabe "laufend"
+export function bewegungVon(entitaet) {
+  return juengsteUeberlagerung(entitaet, "bewegung") ?? "laufend";
+}
+
 export function spielerin(zustand) {
   return entitaetMitId(zustand, zustand.spielerinId);
 }

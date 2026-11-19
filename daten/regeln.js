@@ -18,6 +18,15 @@ export default {
     bemerkenChance: 25, // Prozent je Zug für ein Wesen innerhalb der Weite, das noch nichts bemerkt hat
     spurFaktor: 3, // ein jagendes Wesen verliert die Spur jenseits dieses Vielfachen der Weite
     laermNahkampf: 6, // Lautstärke eines Nahkampfs (Kosten der Ausbreitung, freies Feld 1)
+    laermWurf: 4, // Lautstärke am Aufschlag eines geworfenen Gegenstands
+  },
+  // Bewegung, siehe src/systeme/verschieben.js
+  bewegung: {
+    beimFestsitzen: "eingeklemmt", // Effekt auf ein Wesen in Gelände, das es nicht betreten kann, ohne eigenes beimFestsitzen
+  },
+  // Werfen, siehe src/systeme/werfen.js
+  werfen: {
+    reichweite: 6, // ohne wurf.reichweite am Gegenstand
   },
   // Lange Aktionen (Rituale, Brauen), siehe src/systeme/laufendeAktionen.js:
   // Gefahrenprüfungen (Register "gefahren"), die Ninkasi unterbrechen und fragen

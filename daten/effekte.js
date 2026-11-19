@@ -16,6 +16,10 @@ export default {
   saeureschwall: {
     schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "2W4" }],
   },
+  // Wer in Gelände festsitzt, das er nicht betreten kann (src/systeme/verschieben.js, regeln.bewegung); vorläufig
+  eingeklemmt: {
+    schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "2W6" }],
+  },
   // Rückschlag einer Psi-Fähigkeit auf die Wirkende (daten/risiken.js); vorläufig
   psi_rueckschlag: {
     schritte: [{ baustein: "schaden", art: "psi", wuerfel: "1W6" }],

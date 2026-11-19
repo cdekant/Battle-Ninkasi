@@ -38,7 +38,7 @@ test("Auslöser: Haken, Rolle, Ziel, Prozente und Effekt werden geprüft", () =>
   const erwartet = [
     [{ ...gueltig, bei: "gibt_es_nicht" }, "nicht im Katalog"],
     [{ ...gueltig, bei: "vor_schaden" }, "keine Auslöser erlaubt"],
-    [{ ...gueltig, bei: "betritt_feld" }, "noch nicht ausgelöst"],
+    [{ ...gueltig, bei: "zug_beginn" }, "noch nicht ausgelöst"],
     [{ ...gueltig, rolle: "zuschauer" }, "rolle"],
     [{ ...gueltig, ziel: "nachbarin" }, "ziel"],
     [{ ...gueltig, chance: 150 }, "chance"],
@@ -336,4 +336,35 @@ test("KI mit Fähigkeiten, Ankündigung und Unterbrechbarkeit werden geprüft", 
   assert.ok(mitGegner(() => ({}), ohneDauer).some((meldung) => meldung.includes("nur mit dauer")));
   assert.ok(mitGegner(() => ({}), { ...ohneDauer, dauer: { schritte: 2 }, ziel: { art: "geschoss", ueberVerbuendete: "ja" } }).some((meldung) => meldung.includes("ueberVerbuendete")));
   assert.deepEqual(mitGegner(() => ({}), { ...ohneDauer, dauer: { schritte: 2 } }), []);
+});
+
+test("Bewegungsarten, Gelände, Würfe, Unterbrechungsgründe und Regeln der Bewegung werden geprüft", () => {
+  const pruefen = (aendern) => {
+    const daten = structuredClone(rohdaten);
+    aendern(daten);
+    return vorbereiten(daten).fehler;
+  };
+  const erwartet = [
+    [(daten) => { daten.wesen.ninkasi.bewegung = "kriechend"; }, "bewegung muss eines von"],
+    [(daten) => { daten.zustaende.test = { text: "t", bewegung: "hüpfend" }; }, "bewegung muss eines von"],
+    [(daten) => { daten.gelaende.boden.passierbarFuer = ["tauchend"]; }, "passierbarFuer"],
+    [(daten) => { daten.gelaende.wand.undurchdringlich = "ja"; }, "undurchdringlich"],
+    [(daten) => { daten.gelaende.wand.beimFestsitzen = "gibt_es_nicht"; }, 'Effekt "gibt_es_nicht"'],
+    [(daten) => { daten.gegenstaende.bier.wurf = { effekt: "gibt_es_nicht" }; }, 'Effekt "gibt_es_nicht"'],
+    [(daten) => { daten.gegenstaende.bier.wurf = { reichweite: 0 }; }, "reichweite"],
+    [(daten) => { daten.faehigkeiten.saeureschwall.unterbrechbar = ["husten"]; }, "unterbrechbar"],
+    [(daten) => { delete daten.regeln.bewegung; }, "regeln.bewegung"],
+    [(daten) => { daten.regeln.werfen = { reichweite: 0 }; }, "regeln.werfen.reichweite"],
+    [(daten) => { delete daten.regeln.wahrnehmung.laermWurf; }, "laermWurf"],
+  ];
+  for (const [aendern, teilDerMeldung] of erwartet) {
+    assert.ok(pruefen(aendern).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
+  }
+  const gueltig = pruefen((daten) => {
+    daten.gelaende.wand.undurchdringlich = false;
+    daten.gelaende.wand.passierbarFuer = ["phasend"];
+    daten.gegenstaende.bier.wurf = { effekt: "biss_klein", reichweite: 4 };
+    daten.faehigkeiten.saeureschwall.unterbrechbar = ["schaden", "versetzt"];
+  });
+  assert.deepEqual(gueltig, []);
 });

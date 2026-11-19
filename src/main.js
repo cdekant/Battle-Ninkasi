@@ -11,7 +11,7 @@ import vorgaben from "./eingabe/einstellungen.js";
 import { datenLaden, neuesSpiel, befehlGeben } from "./kern/spiel.js";
 import { hoererAnmelden } from "./kern/ereignisse.js";
 import { startwertAbleiten } from "./kern/zufall.js";
-import { spielerin } from "./kern/zustand.js";
+import { spielerin, bewegungVon } from "./kern/zustand.js";
 import { weg } from "./welt/wege.js";
 import { erstelleTexte } from "./anzeige/texte.js";
 import { erstelleGrammatik } from "./anzeige/grammatik.js";
@@ -101,7 +101,7 @@ function zeichnen() {
   folgen(kamera, ninkasi.position, ansicht, spiel.zustand.ebene);
   // Wegvorschau zum Feld unter dem Zeiger, nur über erkundete Felder
   const vorschauZeigen = feldUnterZeiger && !laufenderAblauf && !spiel.zustand.vorbei;
-  const wegvorschau = vorschauZeigen ? weg(spiel, ninkasi.position, feldUnterZeiger, { nurErkundet: true }) || [] : [];
+  const wegvorschau = vorschauZeigen ? weg(spiel, ninkasi.position, feldUnterZeiger, { nurErkundet: true, bewegung: bewegungVon(ninkasi) }) || [] : [];
   renderer.zeichnen(spiel, kamera, ansicht, einstellungen.zoom, { zeiger: feldUnterZeiger, weg: wegvorschau, gefahr: angekuendigteFelder(spiel) });
   oberflaeche.anzeigen(spiel);
 }

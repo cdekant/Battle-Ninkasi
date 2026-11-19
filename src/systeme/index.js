@@ -13,6 +13,8 @@ import "./zielbausteine.js";
 import "./zustaende.js";
 import "./befehlsveraenderer.js";
 import "./beschwoerung.js";
+import "./verschieben.js";
+import "./werfen.js";
 import "./modifikatoren.js";
 import "./laufendeAktionen.js";
 import "./faehigkeiten.js";

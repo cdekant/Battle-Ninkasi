@@ -57,6 +57,11 @@ function zufallsbefehl(botZufall, spiel) {
   if (wurf <= 5) return { art: "warten" };
   if (wurf <= 10) return { art: "aufheben" };
   if (wurf <= 13 && ninkasi.werte.lp.aktuell < 70) return { art: "trinken", gegenstandId: erstesGetraenk(spiel.zustand, ninkasi) };
+  if (wurf <= 15 && ninkasi.inventar?.length) {
+    // Wurf auf ein Feld in der Nähe; abgelehnte Ziele (zu weit, nicht sichtbar) prüfen die Ablehnung gleich mit
+    const ziel = { x: ninkasi.position.x + zufallsGanzzahl(botZufall, -5, 5), y: ninkasi.position.y + zufallsGanzzahl(botZufall, -5, 5) };
+    return { art: "werfen", gegenstandId: ninkasi.inventar[0], ziel };
+  }
   return { art: "bewegen", dx: zufallsGanzzahl(botZufall, -1, 1), dy: zufallsGanzzahl(botZufall, -1, 1) };
 }
 
@@ -97,6 +102,8 @@ let anzahlTode = 0, anzahlFehler = 0;
 const reisenNachHaltegrund = {};
 // Fähigkeiten der Gegner: gewirkt, lange Aktionen begonnen und abgebrochen
 const gegnerfaehigkeiten = { gewirkt: 0, begonnen: 0, abgebrochen: 0 };
+// Würfe Ninkasis
+let anzahlWuerfe = 0;
 console.log("Startwert  Befehle  Zeit     LP   MP   PP  Pegel  Getötet  Biere  Ergebnis");
 for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe; startwert++) {
   try {
@@ -105,6 +112,7 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
     hoererAnmelden(spiel, (meldung) => {
       if (meldung.art === "tod" && meldung.opfer.id !== spiel.zustand.spielerinId) getoetet++;
       if (meldung.art === "getrunken") getrunkeneBiere++;
+      if (meldung.art === "geworfen") anzahlWuerfe++;
       if (meldung.wer?.id === spiel.zustand.spielerinId) return;
       if (meldung.art === "faehigkeit") gegnerfaehigkeiten.gewirkt++;
       if (meldung.art === "aktion_beginnt") gegnerfaehigkeiten.begonnen++;
@@ -138,6 +146,6 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
 }
 const haltegruende = Object.entries(reisenNachHaltegrund).map(([grund, anzahl]) => `${grund} ${anzahl}`).join(", ");
 console.log(`\nAbläufe nach Haltegrund: ${haltegruende}`);
-console.log(`Fähigkeiten der Gegner: ${gegnerfaehigkeiten.gewirkt} gewirkt, ${gegnerfaehigkeiten.begonnen} lange Aktionen begonnen, ${gegnerfaehigkeiten.abgebrochen} abgebrochen`);
+console.log(`Fähigkeiten der Gegner: ${gegnerfaehigkeiten.gewirkt} gewirkt, ${gegnerfaehigkeiten.begonnen} lange Aktionen begonnen, ${gegnerfaehigkeiten.abgebrochen} abgebrochen; ${anzahlWuerfe} Würfe Ninkasis`);
 console.log(`${anzahlLaeufe} Läufe, ${anzahlTode} tot, ${anzahlFehler} Fehler`);
 process.exitCode = anzahlFehler ? 1 : 0;

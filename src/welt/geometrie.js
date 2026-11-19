@@ -74,6 +74,16 @@ export function wesenAufFeld(spiel, feld) {
   return entitaetenAuf(spiel.zustand, feld.x, feld.y).filter(istWesen);
 }
 
+// Die ersten anzahl Felder hinter "durch" auf der Linie von "von" durch "durch" hinaus (Stoßrichtung); auch außerhalb der Karte
+export function verlaengerung(von, durch, anzahl) {
+  if (gleichesFeld(von, durch) || anzahl <= 0) return [];
+  const schritte = linie(von, durch).length - 1;
+  // die verlängerte Linie geht genau durch "durch", wie bei der Flugbahn mit ueberZielHinaus
+  const faktor = Math.ceil((schritte + anzahl) / schritte);
+  const fern = { x: von.x + (durch.x - von.x) * faktor, y: von.y + (durch.y - von.y) * faktor };
+  return linie(von, fern).slice(schritte + 1, schritte + 1 + anzahl);
+}
+
 // Bahn eines Geschosses von "von" in Richtung "nach", ohne das Startfeld.
 // optionen: { reichweite, durchdringend, ueberZielHinaus, ueberspringen }
 //   ohne ueberZielHinaus endet die Bahn am Ziel, sonst erst an der Reichweite (Maß wie beim Kreis)

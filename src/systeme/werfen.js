@@ -1,0 +1,59 @@
+// Befehl "werfen" (siehe docs/Architektur.md, Bewegung): einen getragenen Gegenstand entlang der Flugbahn werfen.
+// Befehl: { art: "werfen", gegenstandId, ziel: { x, y } | { id } }
+// Die Bahn ist die eines Geschosses (zielAufloesen mit Zielart geschoss): sie endet am ersten Wesen oder vor der Wand.
+// Reichweite: wurf.reichweite am Gegenstand, sonst regeln.werfen.reichweite. Zeitkosten: aktionen.werfen.
+// Daten am Gegenstand: wurf: { effekt?, reichweite? }
+//   mit effekt zerbricht der Gegenstand am Aufschlag (Meldung "zerbrochen") und der Effekt wirkt dort: Ziel ist das
+//   getroffene Wesen, sonst wirkt er nur aufs Feld (Ursache "wurf"); ob er treffen muss, sagen seine Daten (trefferwurf)
+//   ohne effekt landet der Gegenstand auf dem Aufschlagfeld (Meldung "gelandet")
+// Am Aufschlag entsteht Lärm (regeln.wahrnehmung.laermWurf): Wache gehen ihm nach, so taugt ein Wurf als Ablenkung.
+
+import { anmelden } from "../kern/register.js";
+import { entitaetMitId, entitaetEntfernen } from "../kern/zustand.js";
+import { effektAnwenden } from "../kern/effekte.js";
+import { melden, bezugAuf } from "../kern/ereignisse.js";
+import { zielAufloesen } from "./zielauswahl.js";
+import { laermMachen } from "./wahrnehmung.js";
+
+function geworfenerGegenstand(spiel, akteur, befehl) {
+  if (!Number.isInteger(befehl.gegenstandId) || !(akteur.inventar || []).includes(befehl.gegenstandId)) return null;
+  return entitaetMitId(spiel.zustand, befehl.gegenstandId);
+}
+
+function wurfbahn(spiel, akteur, gegenstand, zielangabe) {
+  const reichweite = gegenstand.wurf?.reichweite ?? spiel.daten.regeln.werfen.reichweite;
+  return zielAufloesen(spiel, akteur, { art: "geschoss", reichweite }, zielangabe);
+}
+
+anmelden("befehle", "werfen", {
+  pruefen(spiel, akteur, befehl) {
+    const gegenstand = geworfenerGegenstand(spiel, akteur, befehl);
+    if (!gegenstand) return "nichts_zu_werfen";
+    const aufloesung = wurfbahn(spiel, akteur, gegenstand, befehl.ziel);
+    return aufloesung.ok ? null : aufloesung.grund;
+  },
+  ausfuehren(spiel, akteur, befehl) {
+    const gegenstand = geworfenerGegenstand(spiel, akteur, befehl);
+    const { bahn } = wurfbahn(spiel, akteur, gegenstand, befehl.ziel);
+    const aufschlag = { x: bahn.aufschlag.x, y: bahn.aufschlag.y };
+    const getroffenId = bahn.getroffene[0] ?? null;
+    akteur.inventar = akteur.inventar.filter((id) => id !== gegenstand.id);
+    delete gegenstand.getragenVon;
+    melden(spiel, "geworfen", { wer: bezugAuf(akteur), was: bezugAuf(gegenstand) });
+    melden(spiel, "geschoss", { quelle: bezugAuf(akteur), bahn: bahn.felder, aufschlag });
+    if (gegenstand.wurf?.effekt) {
+      // erst entfernen, damit der Gegenstand nicht von seiner eigenen Wirkung getroffen wird
+      entitaetEntfernen(spiel.zustand, gegenstand.id);
+      melden(spiel, "zerbrochen", { was: bezugAuf(gegenstand), feld: aufschlag });
+      effektAnwenden(spiel, gegenstand.wurf.effekt, {
+        quelleId: akteur.id, zielId: getroffenId, ursprung: aufschlag, zielfeld: aufschlag,
+        ursache: "wurf", mittel: { art: "gegenstand", name: gegenstand.typ },
+      });
+    } else {
+      gegenstand.position = aufschlag;
+      melden(spiel, "gelandet", { was: bezugAuf(gegenstand), feld: aufschlag });
+    }
+    laermMachen(spiel, aufschlag, spiel.daten.regeln.wahrnehmung.laermWurf, akteur.id);
+    return "werfen";
+  },
+});
