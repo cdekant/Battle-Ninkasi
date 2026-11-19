@@ -16,7 +16,7 @@
 //   kritisch:    true, wenn ein Trefferwurf kritisch war (systeme/kampf.js); verschachtelte Effekte erben es
 //   werte:       Ablage zwischen Schritten, über alle Verschachtelungen eines Effekts geteilt
 //                (summeSchaden, anzahlZiele, getroffeneIds, sprungnummer)
-// Ein Baustein mit brauchtZiel wird übersprungen, wenn das Ziel fehlt; der Effekt läuft weiter.
+// Ein Baustein mit brauchtZiel wird übersprungen, wenn das Ziel (bei auf: "quelle" die Quelle) fehlt; der Effekt läuft weiter.
 // Getötet wird hier nicht: Fällt der Lebenswert auf 0, stirbt das Wesen in der Zustandsprüfung
 // nach dem Vorgang (systeme/tod.js); dafür merkt sich das Wesen, wem der Verlust zuzurechnen ist.
 
@@ -59,7 +59,8 @@ export function effektAnwenden(spiel, effektName, kontext) {
   const vollerKontext = kontextVervollstaendigen(spiel, kontext, effekt);
   for (const schritt of effekt.schritte) {
     const baustein = holen("bausteine", schritt.baustein);
-    if (baustein.brauchtZiel && !spiel.zustand.entitaeten[vollerKontext.zielId]) continue;
+    const wirktAufId = schritt.auf === "quelle" ? vollerKontext.quelleId : vollerKontext.zielId;
+    if (baustein.brauchtZiel && !spiel.zustand.entitaeten[wirktAufId]) continue;
     baustein(spiel, vollerKontext, schritt);
   }
 }

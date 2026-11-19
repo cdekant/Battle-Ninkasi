@@ -33,9 +33,8 @@ Status: umgesetzt in Version 0.5.0, beschrieben in [Architektur.md](Architektur.
 
 Offener Rest, wird mit den genannten Punkten umgesetzt:
 
-+ Befehl `faehigkeit` mit Zielangabe, Zielmodus und Tooltip der Anzeige auf Grundlage von `zielAufloesen` (Punkt 6)
++ Zielmodus und Tooltip der Anzeige auf Grundlage von `zielAufloesen` (Oberfläche); den Befehl `faehigkeit` gibt es seit 0.12.0
 + Vorschau je Wesen "sicher" oder "vielleicht" getroffen; seit 0.10.0 liefert `trefferanteil` die Chance ohne Würfeln, offen ist die Anzeige (Punkt 6)
-+ Wirkung auf die Quelle innerhalb eines Effekts, z.B. Vampirbiss (Schaden am Ziel, Heilung am Angreifer); bisher nur über einen Effekt mit der Quelle als Ziel (Lebensraub-Nova); möglicher Parameter `auf: "quelle"` an den Mengenbausteinen
 + Sichtlinie und Flugbahn für die KI (Punkt 7); nach dem Anspielen prüfen, ob Ersatzlinien oder symmetrischer Schattenwurf für das Sichtfeld nötig sind
 + Waffen mit Muster (Rundumschlag, Speer) im Spielinhalt (Punkt 9), Animation der Meldungen `geschoss` und `flaeche` in der Anzeige
 
@@ -49,7 +48,6 @@ Offener Rest:
 
 + Anzeige der Zustände an Ninkasi und an Gegnern (Oberfläche, Log-Texte zu `zustand_beginnt`, `zustand_endet`, `abgewichen`, `beschworen`, `verschwindet`); mit dem großen Punkt Oberfläche
 + Torkeln aus dem Pegel: eine Schwelle des Stoffwechsels setzt einen Zustand (Spieldesign in [Grundlagen.md](Grundlagen.md))
-+ Wer bei Verwirrung Zauber oder Fernkampf benutzt, trifft womöglich ein anderes Ziel: eigener Veränderer mit dem Befehl `faehigkeit` (Punkt 6)
 + Ob gebundene EP für Tötungen durch Beschworene in den Skill der Beschwörung fließen: Spieldesign in [Charakter.md](Charakter.md)
 
 ## 4. Modifikatoren
@@ -62,7 +60,7 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 + Modifikatorquellen `ausruestung` (Punkt 9) und `skills` (mit dem Skillsystem in [Charakter.md](Charakter.md))
 + Bedingung für Sets aus Gegenständen, z.B. zwei Kupfer-Items (Punkt 9)
-+ Tags in weiteren Abfragen: Kosten und Tags der Fähigkeiten (Punkt 6); Schadensarten und Widerstände seit 0.10.0
++ Tags in weiteren Abfragen: Schadensarten und Widerstände seit 0.10.0, Verbrauch, Zeit und Abklingzeit der Fähigkeiten seit 0.12.0
 + Räumlicher Index für die Suche nach Auren (Punkt 7); seit 0.9.0 braucht der Bot etwa ein Viertel länger
 + Anzeige der Aufschlüsselung (`modifikatorenAufgeschluesselt`) in der Oberfläche
 
@@ -83,13 +81,22 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 ## 6. Fähigkeiten und lange Aktionen
 
-Status: offen
+Status: in Arbeit; umgesetzt in Version 0.12.0 (Datentyp Fähigkeit, Befehl `faehigkeit`, Verbrauch, Material, Abklingzeit, Voraussetzungen, Risikotabellen, aufrechterhaltene Zauber mit Unterhalt, dazu `auf: "quelle"` und der Veränderer `ziel_verfehlen`), beschrieben in [Architektur.md](Architektur.md) (Fähigkeiten, Zustände)
 
-+ Datentyp Fähigkeit für Magie, Psi, Fernkampf und körpereigene Aktionen: Kosten (MP, PP, Pegel, Material, Zeit), Abklingzeit, Voraussetzungen (Skillstufe, Mindestpegel, nüchtern), Zielart (selbst, Einzelziel, Feld, Richtung, Muster), Reichweite, Wirkung, Tags
-+ Psi: Risikotabelle (Fehlschlag, Rückschlag, Glimmer) abhängig vom Pegel
-+ Magie: Unterhaltskosten je Tick für aufrechterhaltene Zauber, Kanalisieren über mehrere Schritte (Rituale)
-+ Befehl mit Ziel: `{ art: "faehigkeit", faehigkeitId, ziel: {x, y} | zielId }`; der Zielmodus ist Anzeige-Zustand
-+ Laufende Aktion als Komponente am Akteur, unterbrechbar über die Gefahrenprüfung: Brauen, Ritual, Rasten bis voll, Auto-Erkunden
+Entschieden: Modifikatorziele `verbrauch.<wert>` für Vorräte, `kosten.*` bleibt die Zeit; Abklingzeit in eigenen Zügen der Wirkenden (schneller Handelnde haben Fähigkeiten in Weltzeit früher zurück); Psi-Risiko als Mechanismus mit vorläufigen Zahlen, die Folgen von Rückschlag und Glimmer sind Spieldesign; Rituale und Brauen laufen in der Logik, Rasten und Auto-Erkunden in der Eingabe wie die Reise; beim Abbruch einer langen Aktion sind die Kosten verloren, `beimAbbruch` wirkt
+
+Offen, nächste Version 0.13.0:
+
++ Lange Aktionen in der Logik: eine Fähigkeit mit `dauer: { schritte }` startet die Komponente `laufendeAktion`; ist die Akteurin dran, führt die Logik den nächsten Schritt ohne Eingabe aus, jeder Schritt kostet `zeit`, nach dem letzten wirkt die Wirkung; aufgezeichnet wird nur der startende Befehl
++ Unterbrechung über die Gefahrenprüfungen nach jedem Schritt: die Aktion pausiert, Befehl `fortsetzen` macht weiter, jeder andere Befehl bricht ab (`beimAbbruch`, Kosten bleiben bezahlt)
++ Rasten bis voll und Auto-Erkunden in der Eingabe wie die Reise, jeder Schritt ein gewöhnlicher Befehl
+
+Offener Rest, wird mit den genannten Punkten umgesetzt:
+
++ Zielmodus und Tooltip der Anzeige auf Grundlage von `zielAufloesen`, Belegung für Fähigkeiten; mit dem großen Punkt Oberfläche
++ Gegner benutzen Fähigkeiten (Auswahl in der KI) und kündigen Angriffe an (Punkt 7)
++ Folgen von Rückschlag und Glimmer (Spieldesign in [Grundlagen.md](Grundlagen.md))
++ Passive Fähigkeiten sind Modifikatoren und Auslöser aus Skills und Ausrüstung (Modifikatorquellen `skills`, `ausruestung`)
 
 ## 7. Fernkampf, Fraktionen, Wahrnehmung, viele Gegner
 

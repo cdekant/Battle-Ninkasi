@@ -7,9 +7,10 @@ import { istWuerfelausdruck } from "./zufall.js";
 import { kurvenfehler } from "./kurven.js";
 import { HAKENKATALOG, AUSLOESER_ROLLEN, AUSLOESER_ZIELE } from "./hakenkatalog.js";
 import { HINTERLASSENSCHAFT_REGELN, MODIFIKATORARTEN } from "./werte.js";
-import { TRIFFT_ARTEN } from "../systeme/zielauswahl.js";
+import { TRIFFT_ARTEN, ZIELARTEN } from "../systeme/zielauswahl.js";
 import { STAPELREGELN, VERLAEUFE } from "../systeme/zustaende.js";
 import { KAMPFWERTE } from "../systeme/kampf.js";
+import { FAEHIGKEITSARTEN } from "../systeme/faehigkeiten.js";
 
 const istObjekt = (wert) => wert && typeof wert === "object" && !Array.isArray(wert);
 
@@ -84,6 +85,10 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
   if (wesen.angriff !== undefined) fehler.push(`${ort}: angriff gibt es nicht mehr, Angriffe stehen als Liste in angriffe`);
   if (wesen.angriffe !== undefined) pruefeAngriffe(daten, wesen.angriffe, ort, fehler);
   pruefeKampfwerte(daten, wesen, ort, fehler);
+  if (wesen.faehigkeiten !== undefined) {
+    if (!istTextliste(wesen.faehigkeiten)) fehler.push(`${ort}: faehigkeiten muss eine Liste von Namen sein`);
+    else for (const faehigkeit of wesen.faehigkeiten) if (!daten.faehigkeiten?.[faehigkeit]) fehler.push(`${ort}: Fähigkeit "${faehigkeit}" gibt es nicht`);
+  }
   if (wesen.ki) pruefeKi(daten, wesen.ki, `${ort}.ki`, fehler);
   if (wesen.stoffwechsel) pruefeStoffwechsel(wesen, ort, fehler);
   if (wesen.sicht && !istGanzzahl(wesen.sicht.reichweite)) fehler.push(`${ort}: sicht.reichweite muss eine ganze Zahl sein`);
@@ -273,12 +278,81 @@ function pruefeModifikatoren(daten, liste, ort, fehler) {
       fehler.push(`${stelle}: wenn muss eine Liste sein`);
       return;
     }
-    modifikator.wenn.forEach((bedingung, bedingungsnummer) => {
-      const bedingungsstelle = `${stelle}.wenn[${bedingungsnummer}]`;
-      if (!hat("modifikatorbedingungen", bedingung?.bedingung)) fehler.push(`${bedingungsstelle}: Bedingung "${bedingung?.bedingung}" ist nicht angemeldet`);
-      else pruefeParameter(daten, holen("modifikatorbedingungen", bedingung.bedingung).parameter || {}, bedingung, bedingungsstelle, fehler);
-    });
+    pruefeBedingungen(daten, modifikator.wenn, `${stelle}.wenn`, fehler);
   });
+}
+
+// Bedingungen aus dem Register "modifikatorbedingungen": [{ bedingung, ...parameter }] (wenn, voraussetzungen)
+function pruefeBedingungen(daten, liste, ort, fehler) {
+  liste.forEach((bedingung, nummer) => {
+    const stelle = `${ort}[${nummer}]`;
+    if (!hat("modifikatorbedingungen", bedingung?.bedingung)) fehler.push(`${stelle}: Bedingung "${bedingung?.bedingung}" ist nicht angemeldet`);
+    else pruefeParameter(daten, holen("modifikatorbedingungen", bedingung.bedingung).parameter || {}, bedingung, stelle, fehler);
+  });
+}
+
+// Vorräte als { wertName: ganze Zahl >= 0 } (verbrauch, unterhalt)
+function pruefeVorratsmengen(mengen, ort, fehler) {
+  if (!istObjekt(mengen)) return fehler.push(`${ort} muss ein Objekt { wert: menge } sein`);
+  for (const [wertName, menge] of Object.entries(mengen)) {
+    if (!istZahlAbNull(menge)) fehler.push(`${ort}.${wertName} muss eine ganze Zahl >= 0 sein`);
+  }
+}
+
+// Zielart wie in zielAufloesen (systeme/zielauswahl.js)
+function pruefeZielart(daten, zielart, ort, fehler) {
+  if (!istObjekt(zielart) || !ZIELARTEN.includes(zielart.art)) return fehler.push(`${ort}: art muss eines von ${ZIELARTEN.join(", ")} sein`);
+  const felder = { reichweite: "ganzzahl?", brauchtSichtlinie: "wahrheitswert?", ohneUrheber: "wahrheitswert?", durchdringend: "wahrheitswert?", ueberZielHinaus: "wahrheitswert?", trifft: TRIFFT_ARTEN };
+  pruefeParameter(daten, felder, zielart, ort, fehler);
+  if (zielart.muster !== undefined) pruefeMuster(daten, zielart.muster, `${ort}.muster`, fehler);
+}
+
+// Fähigkeiten, siehe systeme/faehigkeiten.js
+function pruefeFaehigkeit(daten, sprache, name, faehigkeit, fehler) {
+  const ort = `faehigkeiten.${name}`;
+  pruefeText(sprache.texte, faehigkeit.text, ort, fehler);
+  const art = faehigkeit.art ?? "aktiv";
+  if (!FAEHIGKEITSARTEN.includes(art)) fehler.push(`${ort}: art muss eines von ${FAEHIGKEITSARTEN.join(", ")} sein`);
+  if (faehigkeit.tags !== undefined && !istTextliste(faehigkeit.tags)) fehler.push(`${ort}: tags muss eine Liste von Texten sein`);
+  if (faehigkeit.verbrauch !== undefined) pruefeVorratsmengen(faehigkeit.verbrauch, `${ort}: verbrauch`, fehler);
+  if (faehigkeit.zeit !== undefined && !(istGanzzahl(faehigkeit.zeit) && faehigkeit.zeit > 0)) fehler.push(`${ort}: zeit muss eine ganze Zahl > 0 sein`);
+  if (faehigkeit.zeit === undefined && daten.aktionen.faehigkeit === undefined) fehler.push(`${ort}: ohne zeit braucht es aktionen.faehigkeit`);
+  if (faehigkeit.abklingzeit !== undefined && !istZahlAbNull(faehigkeit.abklingzeit)) fehler.push(`${ort}: abklingzeit muss eine ganze Zahl >= 0 sein`);
+  if (faehigkeit.material !== undefined) {
+    if (!Array.isArray(faehigkeit.material)) fehler.push(`${ort}: material muss eine Liste sein`);
+    else faehigkeit.material.forEach((eintrag, nummer) => {
+      if (!daten.gegenstaende[eintrag?.typ]) fehler.push(`${ort}.material[${nummer}]: Gegenstand "${eintrag?.typ}" gibt es nicht`);
+      if (!(istGanzzahl(eintrag?.anzahl) && eintrag.anzahl > 0)) fehler.push(`${ort}.material[${nummer}]: anzahl muss eine ganze Zahl > 0 sein`);
+    });
+  }
+  if (faehigkeit.voraussetzungen !== undefined) {
+    if (!Array.isArray(faehigkeit.voraussetzungen)) fehler.push(`${ort}: voraussetzungen muss eine Liste sein`);
+    else pruefeBedingungen(daten, faehigkeit.voraussetzungen, `${ort}.voraussetzungen`, fehler);
+  }
+  if (faehigkeit.risiko !== undefined && !daten.risiken?.[faehigkeit.risiko]) fehler.push(`${ort}: Risikotabelle "${faehigkeit.risiko}" gibt es nicht`);
+  if (art === "aktiv") {
+    if (faehigkeit.ziel === undefined) fehler.push(`${ort}: ziel fehlt`);
+    else pruefeZielart(daten, faehigkeit.ziel, `${ort}.ziel`, fehler);
+    pruefeParameter(daten, { wirkung: "effekt" }, faehigkeit, ort, fehler);
+  } else if (art === "aufrecht") {
+    pruefeParameter(daten, { zustand: "zustand" }, faehigkeit, ort, fehler);
+  }
+}
+
+// Risikotabellen: [{ name, chance: Kurve, wirkt, effekt? }]
+function pruefeRisiken(daten, fehler) {
+  for (const [name, tabelle] of Object.entries(daten.risiken || {})) {
+    const ort = `risiken.${name}`;
+    if (!Array.isArray(tabelle) || tabelle.length === 0) {
+      fehler.push(`${ort}: muss eine Liste mit mindestens einem Ausgang sein`);
+      continue;
+    }
+    tabelle.forEach((ausgang, nummer) => {
+      const stelle = `${ort}[${nummer}]`;
+      pruefeParameter(daten, { name: "text", wirkt: "wahrheitswert", effekt: "effekt?" }, ausgang, stelle, fehler);
+      fehler.push(...kurvenfehler(ausgang.chance, `${stelle}.chance`));
+    });
+  }
 }
 
 // Auren: [{ reichweite, trifft, selbst?, sichtlinie?, modifikatoren }], siehe systeme/modifikatoren.js
@@ -375,6 +449,7 @@ function pruefeZustand(daten, sprache, name, zustand, fehler) {
   if (zustand.modifikatoren !== undefined) pruefeModifikatoren(daten, zustand.modifikatoren, `${ort}.modifikatoren`, fehler);
   if (zustand.auren !== undefined) pruefeAuren(daten, zustand.auren, ort, fehler);
   if (zustand.ausloeser !== undefined) pruefeAusloeser(daten, zustand.ausloeser, ort, fehler);
+  if (zustand.unterhalt !== undefined) pruefeVorratsmengen(zustand.unterhalt, `${ort}: unterhalt`, fehler);
 }
 
 function pruefeEbene(daten, name, ebene, fehler) {
@@ -406,6 +481,8 @@ export function vorbereiten(rohdaten, sprache = {}) {
   for (const [name, effekt] of Object.entries(daten.effekte)) pruefeEffekt(daten, name, effekt, fehler);
   pruefeEffektKreise(daten, fehler);
   for (const [name, zustand] of Object.entries(daten.zustaende)) pruefeZustand(daten, sprache, name, zustand, fehler);
+  pruefeRisiken(daten, fehler);
+  for (const [name, faehigkeit] of Object.entries(daten.faehigkeiten || {})) pruefeFaehigkeit(daten, sprache, name, faehigkeit, fehler);
   for (const [name, wesen] of Object.entries(daten.wesen)) pruefeWesen(daten, sprache, name, wesen, fehler);
   for (const [name, gegenstand] of Object.entries(daten.gegenstaende)) pruefeGegenstand(daten, sprache, name, gegenstand, fehler);
   for (const [name, ebene] of Object.entries(daten.ebenen)) pruefeEbene(daten, name, ebene, fehler);

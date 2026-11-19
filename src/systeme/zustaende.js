@@ -13,6 +13,8 @@
 //   modifikatoren: [{ ziel, art, betrag }], betrag je Stärke 1, mit dem Verlauf skaliert (siehe modifikatorSkaliert)
 //   jeTick, beimBeginn, beimEnde: Effekte auf die Trägerin; Mengen mit mitStaerke skalieren mit der Stärke
 //   gebundenAnQuelle: endet mit dem Tod oder Verschwinden der Quelle (aufrechterhaltener Zauber, Beschworene)
+//   unterhalt: { mp: 2 } kostet die Trägerin je Welttick, vor jeTick; Modifikatoren auf unterhalt.<wert> mit den Tags;
+//              reicht ein Vorrat nicht, endet der Zustand mit dem Grund "unterhalt" (aufrechterhaltene Zauber)
 //   handlungsunfaehig: true  die Trägerin muss warten (Ninkasi: jede Eingabe wird zu warten, siehe kern/spiel.js)
 //   befehl: { veraenderer, ...parameter }  verändert jeden Befehl der Trägerin (Register "befehlsveraenderer")
 //   ki: { modul, ...parameter }            überlagert die KI, bei Ninkasi übernimmt sie die KI für die Dauer
@@ -28,10 +30,10 @@ import { anmelden, holen } from "../kern/register.js";
 import { alleEntitaeten, fraktionVon } from "../kern/zustand.js";
 import { ereignisEinreihen } from "../kern/zeit.js";
 import { hakenAusloesen, melden, bezugAuf } from "../kern/ereignisse.js";
-import { effektAnwenden } from "../kern/effekte.js";
+import { effektAnwenden, wertAendern } from "../kern/effekte.js";
 import { bausteinAnmelden } from "../kern/bausteine.js";
 import { wertAufKurve } from "../kern/kurven.js";
-import { modifikatorSkaliert } from "../kern/werte.js";
+import { modifikatorSkaliert, modifiziert, hatWert } from "../kern/werte.js";
 
 export const STAPELREGELN = ["erneuern", "aufaddieren", "staerkster", "einzeln"];
 
@@ -164,7 +166,7 @@ export function zustandSetzen(spiel, traegerin, name, angaben = {}) {
   return instanz;
 }
 
-// Beendet eine Instanz; grund: "abgelaufen" | "entfernt" | "quelle_tot"
+// Beendet eine Instanz; grund: "abgelaufen" | "entfernt" | "quelle_tot" | "unterhalt"
 export function zustandBeenden(spiel, traegerin, instanz, grund, kettentiefe = 0) {
   if (!traegerin.zustaende?.includes(instanz)) return;
   traegerin.zustaende = traegerin.zustaende.filter((andere) => andere !== instanz);
@@ -185,13 +187,29 @@ anmelden("zeitereignisse", "zustand_ende", (spiel, { traegerinId, nummer }) => {
   zustandBeenden(spiel, traegerin, instanz, "abgelaufen");
 });
 
-// Je Welttick: jeTick; Entitäten nach ID, Zustände in ihrer Reihenfolge
+// Unterhalt einer Instanz bezahlen; false, wenn ein Vorrat nicht reicht (dann wird nichts abgezogen)
+function unterhaltBezahlen(spiel, traegerin, instanz) {
+  const definition = definitionVon(spiel, instanz.name);
+  if (!definition.unterhalt) return true;
+  const umstaende = { tags: definition.tags || [] };
+  const kosten = Object.entries(definition.unterhalt).map(([wertName, menge]) => [wertName, Math.max(0, modifiziert(spiel, traegerin, `unterhalt.${wertName}`, menge, umstaende))]);
+  if (kosten.some(([wertName, menge]) => menge > 0 && (!hatWert(traegerin, wertName) || traegerin.werte[wertName].aktuell < menge))) return false;
+  const ursprung = { urheberId: instanz.urheberId, ursache: "zustand", mittel: { art: "zustand", name: instanz.name }, kettentiefe: 0 };
+  for (const [wertName, menge] of kosten) if (menge > 0) wertAendern(spiel, traegerin, wertName, -menge, ursprung);
+  return true;
+}
+
+// Je Welttick: Unterhalt, dann jeTick; Entitäten nach ID, Zustände in ihrer Reihenfolge
 anmelden("welttick", "zustaende", (spiel) => {
   const zustand = spiel.zustand;
   for (const traegerin of alleEntitaeten(zustand)) {
     for (const instanz of [...(traegerin.zustaende || [])]) {
       if (!zustand.entitaeten[traegerin.id] || !traegerin.zustaende?.includes(instanz)) continue;
       if (instanz.ende !== null && zustand.zeit >= instanz.ende) continue;
+      if (!unterhaltBezahlen(spiel, traegerin, instanz)) {
+        zustandBeenden(spiel, traegerin, instanz, "unterhalt");
+        continue;
+      }
       zustandsEffekt(spiel, traegerin, instanz, definitionVon(spiel, instanz.name).jeTick, 0);
     }
   }

@@ -12,3 +12,4 @@ import "./zustaende.js";
 import "./befehlsveraenderer.js";
 import "./beschwoerung.js";
 import "./modifikatoren.js";
+import "./faehigkeiten.js";

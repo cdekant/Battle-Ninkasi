@@ -75,15 +75,22 @@ function befehlVeraendern(spiel, akteur, befehl) {
   return kontext.befehl;
 }
 
-function befehlAusfuehren(spiel, akteur, befehl) {
+// Führt einen gültigen Befehl aus, schließt den Vorgang ab und reiht die Akteurin wieder ein; gibt die Zeitkosten zurück
+// (exportiert für Tests, im Spiel nur über befehlGeben und die KI)
+export function befehlAusfuehren(spiel, akteur, befehl) {
   const wirksamerBefehl = befehlVeraendern(spiel, akteur, befehl);
-  // ausfuehren gibt die Aktionsart zurück oder { aktion, grundkosten }
+  // ausfuehren gibt die Aktionsart zurück oder { aktion, grundkosten?, umstaende? }
   const ergebnis = holen("befehle", wirksamerBefehl.art).ausfuehren(spiel, akteur, wirksamerBefehl);
-  const { aktion, grundkosten } = typeof ergebnis === "string" ? { aktion: ergebnis } : ergebnis;
+  const { aktion, grundkosten, umstaende = {} } = typeof ergebnis === "string" ? { aktion: ergebnis } : ergebnis;
+  // Zugzähler: jede ausgeführte Aktion zählt als ein eigener Zug (Abklingzeit der Fähigkeiten)
+  akteur.zuege = (akteur.zuege ?? 0) + 1;
   vorgangAbschliessen(spiel);
   const zustand = spiel.zustand;
   const akteurNochImSpiel = entitaetMitId(zustand, akteur.id) && !(akteur.id === zustand.spielerinId && zustand.vorbei);
-  if (akteurNochImSpiel) akteurEinreihen(zustand, akteur.id, zeitkosten(spiel, akteur, aktion, {}, grundkosten));
+  if (!akteurNochImSpiel) return null;
+  const kosten = zeitkosten(spiel, akteur, aktion, umstaende, grundkosten);
+  akteurEinreihen(zustand, akteur.id, kosten);
+  return kosten;
 }
 
 // Die Eingangstür: einziger Weg, wie Entscheidungen der Spielerin in die Logik gelangen.

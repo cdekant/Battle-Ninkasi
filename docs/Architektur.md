@@ -49,6 +49,7 @@ Stand: 2026-11-18
 + Ein einziger Zeitstrahl in ganzzahligen Zeiteinheiten
 + Aktionskosten statt Runden: Jede Aktion kostet Zeit, Standard 100; wer an der Reihe ist, bestimmt die Warteschlange nach Zeitpunkt
 + Kosten je Aktionsart verschieden (Bewegen, Nahkampf, Fernkampf, Trinken, Psi, Magie, Brauen u.a.); Modifikatoren zielen auf eine Aktionsart oder auf alle
++ Zugzähler: Jede ausgeführte Aktion erhöht `zuege` der Akteurin um eins, gleich wie viel Zeit sie kostet; daran misst sich die Abklingzeit der Fähigkeiten, wer schneller handelt, hat sie in Weltzeit früher zurück
 + Prozentuale Änderungen werden einheitlich gerundet; Rundungsfehler liegen bei etwa 1% und werden hingenommen
 + Die Warteschlange enthält drei Arten von Einträgen:
   + Akteure (Ninkasi, Gegner, Verbündete), die nach dem Handeln mit ihren Aktionskosten wieder eingereiht werden
@@ -80,7 +81,7 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 
 ## Modifikatoren
 
-+ Modifikator: `{ ziel, art, betrag, quelle, tag?, wenn? }`, z.B. `{ ziel: "kosten.bewegen", art: "prozent", betrag: -5 }`; Ziele sind Namen wie `lp`, `genauigkeit`, `ausweichen`, `ruestung`, `ruestung.<art>`, `widerstand`, `schaden`, `kritfaktor` (siehe Kampfwerte), `reichweiteSicht`, `kosten.<aktion>`, `kosten.alle`, `regeneration.<wert>`, `schwund.<wert>`, `kurvenverschiebung.<wert>`, `abbau.pegel`
++ Modifikator: `{ ziel, art, betrag, quelle, tag?, wenn? }`, z.B. `{ ziel: "kosten.bewegen", art: "prozent", betrag: -5 }`; Ziele sind Namen wie `lp`, `genauigkeit`, `ausweichen`, `ruestung`, `ruestung.<art>`, `widerstand`, `schaden`, `kritfaktor` (siehe Kampfwerte), `reichweiteSicht`, `kosten.<aktion>`, `kosten.alle`, `verbrauch.<wert>`, `verbrauch.alle`, `abklingzeit`, `unterhalt.<wert>` (siehe Fähigkeiten), `regeneration.<wert>`, `schwund.<wert>`, `kurvenverschiebung.<wert>`, `abbau.pegel`
 + Arten: `plus`, `prozent`, `mal` (Betrag in Prozent, `150` heißt x1,5), `mindestens`, `hoechstens`, `setzen` (zählt als `mindestens` und `hoechstens` mit demselben Betrag); alle Beträge ganzzahlig
 + Verrechnung (`verrechnet` in `src/kern/werte.js`, Vorbild "increased" und "more" in Path of Exile): (Basiswert + Summe aller `plus`) x (100 + Summe aller `prozent`) / 100 x jedes `mal` / 100, ganzzahlig gerechnet und einmal am Ende gerundet, die Reihenfolge der Modifikatoren spielt also keine Rolle; danach hebt `mindestens` (der höchste) und senkt `hoechstens` (der niedrigste), bei Widerspruch gewinnt `hoechstens` (Blindheit schlägt Fernsicht)
 + Prozente addieren sich, zehnmal +5 % sind +50 %; nur `mal` multipliziert, und nur dort, wo die Daten es ausdrücklich sagen; so wachsen Werte nicht unbemerkt exponentiell, Spielraum für Boni zwischen Quellen (Vorschlag in [Charakter.md](Charakter.md)) gibt `mal`
@@ -127,6 +128,24 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Marker als Tags an Angriff oder Effekt: `verfehlt_nie` (kein Trefferwurf), `unblockbar` (kein Blocken; künftige Ersatzwirkungen wie ein Schild, der den Treffer abfängt, sollen ihn ebenso achten), `ignoriert_ruestung`
 + Meldung `schaden` mit `schadensart`, `kritisch`, `ruestungAbzug`, `widerstanden` und `immun`; das Log zeigt die Art und eigene Zeilen für Krit, Immunität und Blocken
 
+## Fähigkeiten
+
++ Vorbilder: Tales of Maj'Eyal (aktive Talente mit Kosten und Abklingzeit, aufrechterhaltene mit gebundenem Vorrat), DCSS (Fehlschlag und Folgen eines Zaubers), Caves of Qud (Glimmer: geistige Macht lockt Jäger an)
++ Fähigkeiten sind Daten (`daten/faehigkeiten.js`), umgesetzt in `src/systeme/faehigkeiten.js`; Wesen kennen sie als Liste `faehigkeiten: ["name"]`, im Spielinhalt gibt es noch keine (wie bei den Zuständen erst nach dem Systemausbau)
++ Aufbau: `{ text, art?, tags?, verbrauch?, material?, zeit?, abklingzeit?, voraussetzungen?, ziel?, wirkung?, zustand?, risiko? }`
+  + `art`: `aktiv` (Vorgabe) wirkt einmal; `aufrecht` setzt `zustand` an der Wirkenden, erneutes Benutzen beendet ihn ohne Kosten; den laufenden Preis trägt der Zustand als `unterhalt` (siehe Zustände)
+  + `verbrauch: { mp, pp, pegel, ... }` aus den Vorräten, Modifikatoren auf `verbrauch.<wert>` und `verbrauch.alle` mit den Tags der Fähigkeit (`kosten.*` bleibt der Zeit vorbehalten)
+  + `material: [{ typ, anzahl }]` aus dem Inventar, wird verbraucht
+  + `zeit`: Grundkosten, Vorgabe `aktionen.faehigkeit`; Modifikatoren auf `kosten.faehigkeit` und `kosten.alle` mit den Tags
+  + `abklingzeit`: eigene Züge der Wirkenden (Zugzähler, siehe Zeitmodell), Modifikatoren auf `abklingzeit`; am Wesen `abklingendBis: { name: zugnummer }`
+  + `voraussetzungen`: Bedingungen aus dem Register `modifikatorbedingungen`, z.B. `pegel_unter` (nüchtern), `pegel_ab`; später die Skillstufe
+  + `ziel`: Zielart wie in `zielAufloesen` (siehe Zielauswahl); die Wirkung trifft mit `muster` jede betroffene Entität, bei durchdringendem Geschoss jedes Wesen der Bahn, sonst einmal das Ziel oder das Feld; Meldungen `geschoss` bzw. `flaeche`
+  + `wirkung`: benannter Effekt mit Ursache `faehigkeit` und Mittel `{ art: "faehigkeit", name }`
++ Befehl `{ art: "faehigkeit", faehigkeit, ziel?: { x, y } | { id } | { dx, dy } }`; Gründe der Ablehnung: `nicht_gelernt`, `abklingend`, `voraussetzung`, `zu_wenig_<wert>`, `material_fehlt` und die der Zielauswahl; Ablauf: Verbrauch und Material bezahlen, Abklingzeit setzen, Meldung `faehigkeit`, Risiko würfeln, wirken
++ Risikotabellen (`daten/risiken.js`): `[{ name, chance, wirkt, effekt? }]`, die Chance jedes Ausgangs ist eine Kurve über den Pegel der Wirkenden; ein Wurf von 1 bis 100, die Ausgänge liegen hintereinander, sind alle Chancen 0, wird nicht gewürfelt; `wirkt: false` heißt, die Fähigkeit selbst wirkt nicht, der Verbrauch ist in jedem Fall bezahlt; `effekt` trifft die Wirkende (Ursache `risiko`); Meldung `risiko`
++ Vorläufige Tabelle `psi`: Fehlschlag nüchtern 30 %, bei 1,5 ‰ am seltensten (5 %), darüber wieder steigend; Rückschlag ab 3 ‰ bis 20 % bei 8 ‰ (Effekt `psi_rueckschlag`); dass Psi mit dem Pegel stärker wirkt, geht über Modifikatoren mit `pegel_ab` und dem Tag `psi`
++ Glimmer (Psi lockt Gegner an) wäre ein Wert `glimmer`, den Psi-Fähigkeiten über `wert_aendern` erhöhen; seine Folgen sind Spieldesign ([Grundlagen.md](Grundlagen.md))
+
 ## Effektsystem
 
 + Zwei Schichten, wie Lego: Der Code liefert die Steine, die Daten bauen daraus
@@ -141,10 +160,10 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + `mittel`: `{ art: "angriff" | "faehigkeit" | "gegenstand" | "zustand" | "falle" | "gelaende", name }`; `tags` z.B. `["feuer", "magie"]` für Modifikatoren und gebundene EP, die Tags eines Effekts (`tags` in den Daten) kommen dazu
 + `werte` ist eine Ablage zwischen Schritten, über alle Verschachtelungen eines Effekts geteilt: `schaden` zählt den tatsächlichen Verlust in `summeSchaden`, `fuer_jedes_ziel` schreibt `anzahlZiele`, `springen` schreibt `getroffeneIds` und `sprungnummer`
 + `kritisch` setzt ein kritischer Trefferwurf, verschachtelte Effekte erben es (siehe Kampfwerte)
-+ Mengen der Bausteine `schaden` (mit Pflichtfeld `art`), `heilen`, `wert_aendern`: `wuerfel`, feste `menge` oder `menge: { aus: "summeSchaden", prozent: 50 }` aus der Ablage (Lebensraub); dazu `teilen: "anzahlZiele"` (verteilter Schaden) und `prozentJeSprung` (Abschwächung je Sprung einer Kette)
++ Mengen der Bausteine `schaden` (mit Pflichtfeld `art`), `heilen`, `wert_aendern`: `wuerfel`, feste `menge` oder `menge: { aus: "summeSchaden", prozent: 50 }` aus der Ablage (Lebensraub); mit `auf: "quelle"` wirkt ein Schritt auf die Quelle statt auf das Ziel (Vampirbiss: Schaden am Ziel, Heilung an der Angreiferin); dazu `teilen: "anzahlZiele"` (verteilter Schaden) und `prozentJeSprung` (Abschwächung je Sprung einer Kette)
 + Bausteine erklären, ob sie ein Wesen brauchen (`brauchtZiel`); ein Schritt ohne Ziel wird übersprungen, der Effekt läuft weiter
 + Bausteine beschreiben ihre Parameter für die Datenprüfung: `text`, `ganzzahl`, `wahrheitswert`, `effekt`, `muster`, mit `?` freiwillig, eine Liste nennt die erlaubten Werte; benannte Effekte dürfen sich nicht im Kreis aufrufen
-+ Eine Befehlsart besteht aus `pruefen` (Grund der Ablehnung oder nichts) und `ausfuehren` (gibt die Aktionsart für die Zeitkosten zurück, oder `{ aktion, grundkosten }`, wenn die Grundkosten abweichen, z.B. beim Nahkampf aus den Angriffsprofilen); Gegner benutzen dieselben Befehlsarten, ihre Befehle werden aber nicht aufgezeichnet
++ Eine Befehlsart besteht aus `pruefen` (Grund der Ablehnung oder nichts) und `ausfuehren` (gibt die Aktionsart für die Zeitkosten zurück, oder `{ aktion, grundkosten?, umstaende? }`, wenn die Grundkosten abweichen, z.B. beim Nahkampf aus den Angriffsprofilen, oder Tags für die Modifikatoren der Zeit mitkommen, z.B. bei Fähigkeiten); Gegner benutzen dieselben Befehlsarten, ihre Befehle werden aber nicht aufgezeichnet
 + Vor dem Ausführen läuft jeder Befehl, von Ninkasi wie von der KI, durch den Haken `vor_befehl`; Zustände verändern ihn dort (Torkeln, Verwirrung), ein abgebrochener oder ungültig gewordener Befehl wird zu warten; aufgezeichnet wird der ursprüngliche Befehl
 + `bewegen` greift durch Hineinlaufen Feinde an, mit `angreifen: true` jedes Wesen (gezielter Angriff, Rausch, Verwirrung)
 
@@ -210,10 +229,11 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Modifikatoren gelten je Stärke 1 und skalieren mit Stärke und Verlauf zur Zeit der Abfrage (`modifikatorSkaliert`): `plus` und `prozent` im Betrag, `mal` im Anteil über 100 (`mal 150` bei Stärke 50 % wird `mal 125`), Grenzen gar nicht; die Modifikatorquelle `zustaende` liefert sie mit der Quelle `zustand:<nummer>`, endet der Zustand, entfallen sie ohne Nachführen
 + `jeTick`, `beimBeginn`, `beimEnde` wirken auf die Trägerin mit Ursprung an ihrer Position, zugerechnet der Urheberin, Ursache `zustand`, Mittel `{ art: "zustand", name }`, Tags des Zustands; Mengen mit `mitStaerke: true` skalieren mit der Stärke (`werte.staerkeProzent`, 100 = Stärke 1)
 + Bausteine `zustand_setzen { zustand, dauer?, staerke? }` und `zustand_entfernen { zustand? , tag? }` auf das Ziel
-+ Haken `zustand_beginnt` und `zustand_endet` (mit `grund`: `abgelaufen`, `entfernt`, `quelle_tot`), Meldungen gleichen Namens
++ Haken `zustand_beginnt` und `zustand_endet` (mit `grund`: `abgelaufen`, `entfernt`, `quelle_tot`, `unterhalt`), Meldungen gleichen Namens
++ `unterhalt: { mp: 2 }` kostet die Trägerin je Welttick, vor `jeTick`; Modifikatoren auf `unterhalt.<wert>` mit den Tags des Zustands; reicht ein Vorrat nicht, endet der Zustand mit dem Grund `unterhalt` (aufrechterhaltene Zauber)
 + `gebundenAnQuelle: true`: der Zustand endet mit dem Tod oder Verschwinden der Quelle (aufrechterhaltener Zauber, Beschworene)
 + `handlungsunfaehig: true` (Betäubung, Lähmung, Filmriss): die Trägerin muss warten; bei Ninkasi wird jede Eingabe angenommen, aufgezeichnet, mit der Meldung `handlungsunfaehig` ("Leider nicht möglich") beantwortet und als warten ausgeführt, je Eingabe vergeht eine Aktion; eine Reise hält an
-+ `befehl: { veraenderer, ...parameter }` verändert jeden Befehl der Trägerin über das Register `befehlsveraenderer` (`src/systeme/befehlsveraenderer.js`); mitgeliefert ist `abweichen { chance, freundeAngreifen? }` für Torkeln und Verwirrung: ein Schritt geht mit der Chance, skaliert mit der Stärke, auf ein zufälliges anderes freies Nachbarfeld (im Gang also zurück), gibt es keins, wie gewollt; ein Feind dort wird angegriffen, ein Verbündeter nur mit `freundeAngreifen`, sonst zählt sein Feld nicht als frei
++ `befehl: { veraenderer, ...parameter }` verändert jeden Befehl der Trägerin über das Register `befehlsveraenderer` (`src/systeme/befehlsveraenderer.js`); mitgeliefert sind `ziel_verfehlen { chance }` für Verwirrung beim Befehl `faehigkeit` (das Ziel rutscht auf ein anderes Wesen daneben, ein Feld auf ein Nachbarfeld, eine Richtung um 45°, nur auf Ziele, die der Befehl zulässt) und `abweichen { chance, freundeAngreifen? }` für Torkeln und Verwirrung: ein Schritt geht mit der Chance, skaliert mit der Stärke, auf ein zufälliges anderes freies Nachbarfeld (im Gang also zurück), gibt es keins, wie gewollt; ein Feind dort wird angegriffen, ein Verbündeter nur mit `freundeAngreifen`, sonst zählt sein Feld nicht als frei
 + `ki: { modul, ...parameter }` überlagert die KI (Furcht mit `fliehen`, Rausch mit `jagen` und `trifft: "wesen"`); bei Ninkasi übernimmt die KI für die Dauer, das Spiel wartet dann nicht auf Eingaben
 + `fraktion` überlagert die Fraktion: `"urheber"` (Psi-Kontrolle), `"eigene"` (Zwietracht, mit allen verfeindet) oder ein Fraktionsname
 + Fraktion und KI werden beim Beginn in die Instanz geschrieben; `fraktionVon` und `kiVon` (`src/kern/zustand.js`) liefern die des jüngsten überlagernden Zustands, sonst die eigene; nach dem Ende gilt von selbst wieder der ursprüngliche Stand, die eigene KI behält ihr Gedächtnis
@@ -414,12 +434,12 @@ Vorläufige Ideen, noch nicht umgesetzt:
 + `package.json`: nur `"type": "module"` und `"private": true`, damit Node alle `.js`-Dateien als ES-Module liest; keine Abhängigkeiten, kein Build
 + `src/version.js`: Versionsnummer
 + `src/kern/`: Spiel und Eingangstür für Befehle (`spiel.js`), Zustand und Entitäten, Zeit, Zufall, Ereignisse und Katalog der Haken, Auslöser, Abschluss eines Vorgangs, Werte und Modifikatoren, Kurven, Effekte, Grundbausteine, Register, Datenprüfung
-+ `src/systeme/`: Bewegung, Kampf (Trefferwurf, Schadensrechnung), Sicht, Stoffwechsel, Inventar, Gefahrenprüfung, Tod, Zielauswahl samt Zielmustern, Bausteine mit Zielauswahl, Zustände, Befehlsveränderer, Beschwörung, Bedingungen der Modifikatoren und Auren, später Brauen, Handel u.a.
++ `src/systeme/`: Bewegung, Kampf (Trefferwurf, Schadensrechnung), Sicht, Stoffwechsel, Inventar, Gefahrenprüfung, Tod, Zielauswahl samt Zielmustern, Bausteine mit Zielauswahl, Zustände, Befehlsveränderer, Beschwörung, Bedingungen der Modifikatoren und Auren, Fähigkeiten, später Brauen, Handel u.a.
 + `src/ki/`: Verhaltensmodule (`abwarten`, `jagen`, `fliehen`) und ihre Zielwahl
 + `src/welt/`: Dungeon-Erzeugung, Zugriff auf die Karte, Wegfindung, Geometrie (Linie, Sichtlinie, Flugbahn, Kreis, Kegel)
 + `src/anzeige/`: Renderer, Tilebilder (Pixeldaten zu Bildern), Kamera, Oberfläche, Anzeige des Pegels, Log, Effekte, Textzugriff und Grammatik
 + `src/eingabe/`: Belegung, Übersetzung in Befehle, Maus und Klickregeln, Reise, Vorgaben der Einstellungen
-+ `daten/`: Inhalte als JS-Datendateien, gesammelt in `daten/index.js`; `daten/zustaende.js` die Zustände; `daten/regeln.js` hält Regelwerte für das Balancing (z.B. Kettengrenze der Auslöser, Halbwerte des Kampfs); `daten/schadensarten.js` die Schadensarten; `daten/zeichen.js` ist das Tileset aus Zeichen, Ersatz, wo kein Tile aus `grafik/` passt
++ `daten/`: Inhalte als JS-Datendateien, gesammelt in `daten/index.js`; `daten/zustaende.js` die Zustände; `daten/faehigkeiten.js` die Fähigkeiten, `daten/risiken.js` ihre Risikotabellen; `daten/regeln.js` hält Regelwerte für das Balancing (z.B. Kettengrenze der Auslöser, Halbwerte des Kampfs); `daten/schadensarten.js` die Schadensarten; `daten/zeichen.js` ist das Tileset aus Zeichen, Ersatz, wo kein Tile aus `grafik/` passt
 + `grafik/`: Palette und Tiles als Pixeldaten, unter der Grafiklizenz, dazu die Vorschauseite `vorschau.html`; siehe [Tileset.md](Tileset.md)
 + `sprache/de/`, `sprache/en/`: Texte (`texte.js`) und Grammatikregeln (`grammatik.js`) als Daten
 + `lib/`: Bibliotheken (rot.js) samt ihrer Lizenzdateien

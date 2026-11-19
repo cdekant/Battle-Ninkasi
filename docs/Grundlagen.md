@@ -112,7 +112,7 @@ Stand: 2026-11-18
 + Ob die MP-Regeneration bei hohem Pegel auf null sinkt oder nur immer langsamer wird
 + Wofür der Brand gut ist: PP direkt füllen oder nur über den Pegel wirken
 + Ab welcher Schwelle "nüchtern" für Meditieren und Schriftrollen gilt
-+ Worin das Risiko von Psi besteht (Fehlschlag, Kontrollverlust, Rückschlag)
++ Worin das Risiko von Psi besteht (Fehlschlag, Kontrollverlust, Rückschlag); der Mechanismus (Risikotabellen über den Pegel) steht seit 0.12.0, siehe Fähigkeiten in [Architektur.md](Architektur.md)
 + Magie im Detail: welche Wirkungen über die Zeit (Schaden, Flächen, Segen und Fluch, Beschwörung)
 + Pegel im Detail: Schwellen, Risiken, Aktionen mit Mindestpegel
 + Ausdauer: ob überhaupt, Zuordnung zu Gewandtheit oder Körperlichkeit, Verhältnis zu einer Nahrungsuhr

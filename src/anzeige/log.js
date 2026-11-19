@@ -45,6 +45,13 @@ export class Log {
         const art = meldung.schadensart && hatSchluessel(`schaden.${meldung.schadensart}`) ? text(`schaden.${meldung.schadensart}`) : "?";
         return this.zeile(text(schluessel, { ...meldung, art }), meldung.ziel.id === this.spielerinId ? "schlimm" : "");
       }
+      case "faehigkeit":
+        return this.zeile(text("log.faehigkeit", { ...meldung, faehigkeit: hatSchluessel(meldung.text) ? text(meldung.text) : meldung.faehigkeit }));
+      case "risiko": {
+        const schluessel = `log.risiko.${meldung.ausgang}`;
+        if (hatSchluessel(schluessel)) this.zeile(text(schluessel, meldung), "schlimm");
+        return;
+      }
       case "verfehlt":
         return this.zeile(text(meldung.grund === "geblockt" ? "log.geblockt" : "log.verfehlt", meldung));
       case "geheilt":

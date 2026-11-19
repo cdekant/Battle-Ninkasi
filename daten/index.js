@@ -10,6 +10,8 @@ import ebenen from "./ebenen.js";
 import zeichen from "./zeichen.js";
 import regeln from "./regeln.js";
 import zustaende from "./zustaende.js";
+import faehigkeiten from "./faehigkeiten.js";
+import risiken from "./risiken.js";
 
 export default {
   wesen: { ...ninkasi, ...gegner },
@@ -17,6 +19,8 @@ export default {
   effekte,
   schadensarten,
   zustaende,
+  faehigkeiten,
+  risiken,
   aktionen,
   gelaende,
   ebenen,

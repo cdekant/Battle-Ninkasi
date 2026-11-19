@@ -16,6 +16,7 @@ import { prozentVon, prozentWiederholt, geteiltGerundet } from "./werte.js";
 // Menge eines Schritts:
 //   wuerfel: "1W6+2" | menge: 5 | menge: { aus: "summeSchaden", prozent?: 50 } (aus der Ablage kontext.werte)
 //   teilen: "anzahlZiele"   teilt durch einen Wert der Ablage (verteilter Schaden), wenn er über 1 liegt
+//   auf: "quelle"         wirkt auf die Quelle statt auf das Ziel (schaden, heilen, wert_aendern)
 //   prozentJeSprung: 70     je Sprung einer Kette (werte.sprungnummer) bleiben so viele Prozent
 //   mitStaerke: true        skaliert mit der Stärke eines Zustands (werte.staerkeProzent, 100 = Stärke 1)
 export function mengeBestimmen(spiel, kontext, parameter) {
@@ -36,14 +37,19 @@ export function bausteinAnmelden(name, parameterBeschreibung, funktion, { brauch
   anmelden("bausteine", name, funktion);
 }
 
-const MENGE = { wuerfel: "wuerfel|menge" };
+const MENGE = { wuerfel: "wuerfel|menge", auf: ["ziel", "quelle"] };
+
+// auf: "quelle" lässt einen Schritt auf die Quelle statt auf das Ziel wirken (Vampirbiss: Schaden am Ziel,
+// Heilung an der Angreiferin); die Ablage kontext.werte bleibt dieselbe
+const wirkkontext = (kontext, parameter) => (parameter.auf === "quelle" ? { ...kontext, zielId: kontext.quelleId } : kontext);
 
 // Schaden an den LP des Ziels; Parameter: art (Schadensart aus daten/schadensarten.js), Menge siehe mengeBestimmen
 // Haken "vor_schaden" darf die Menge ändern oder abbrechen (Treffer abgefangen), "nach_schaden" folgt bei Schaden > 0.
 // Die Schadensrechnung (Angreifer, Krit, Rüstung, Widerstand) hängt mit festen Rängen an vor_schaden (systeme/kampf.js).
 // Der tatsächliche Verlust kommt in die Ablage (werte.summeSchaden), z.B. für Lebensraub.
 // Getötet wird erst in der Zustandsprüfung nach dem Vorgang (systeme/tod.js).
-bausteinAnmelden("schaden", { art: "schadensart", ...MENGE }, (spiel, kontext, parameter) => {
+bausteinAnmelden("schaden", { art: "schadensart", ...MENGE }, (spiel, kontextDesSchritts, parameter) => {
+  const kontext = wirkkontext(kontextDesSchritts, parameter);
   const zustand = spiel.zustand;
   const ziel = zustand.entitaeten[kontext.zielId];
   if (!ziel || !ziel.werte || !ziel.werte.lp) return;
@@ -62,7 +68,8 @@ bausteinAnmelden("schaden", { art: "schadensart", ...MENGE }, (spiel, kontext, p
 }, { brauchtZiel: true });
 
 // Heilt einen Wert (Standard LP); Parameter: wertName, Menge siehe mengeBestimmen
-bausteinAnmelden("heilen", { wertName: "text?", ...MENGE }, (spiel, kontext, parameter) => {
+bausteinAnmelden("heilen", { wertName: "text?", ...MENGE }, (spiel, kontextDesSchritts, parameter) => {
+  const kontext = wirkkontext(kontextDesSchritts, parameter);
   const ziel = spiel.zustand.entitaeten[kontext.zielId];
   const wertName = parameter.wertName || "lp";
   if (!ziel || !ziel.werte || !ziel.werte[wertName]) return;
@@ -71,7 +78,8 @@ bausteinAnmelden("heilen", { wertName: "text?", ...MENGE }, (spiel, kontext, par
 }, { brauchtZiel: true });
 
 // Ändert einen beliebigen Wert um eine Menge (auch negativ); Parameter: wertName, Menge siehe mengeBestimmen
-bausteinAnmelden("wert_aendern", { wertName: "text", ...MENGE }, (spiel, kontext, parameter) => {
+bausteinAnmelden("wert_aendern", { wertName: "text", ...MENGE }, (spiel, kontextDesSchritts, parameter) => {
+  const kontext = wirkkontext(kontextDesSchritts, parameter);
   const ziel = spiel.zustand.entitaeten[kontext.zielId];
   if (!ziel || !ziel.werte || !ziel.werte[parameter.wertName]) return;
   const geaendert = wertAendern(spiel, ziel, parameter.wertName, mengeBestimmen(spiel, kontext, parameter), ursprungAus(kontext));

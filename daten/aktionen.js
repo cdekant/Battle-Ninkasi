@@ -6,4 +6,5 @@ export default {
   warten: 100,
   aufheben: 100,
   trinken: 100,
+  faehigkeit: 100, // Vorgabe, wenn eine Fähigkeit keine eigene zeit nennt
 };

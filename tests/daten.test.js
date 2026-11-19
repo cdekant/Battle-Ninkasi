@@ -234,3 +234,45 @@ test("Modifikatoren, Tags und Auren an Wesen und Zuständen werden geprüft", ()
   daten.zustaende = { test: { text: "test", auren: [{ ...aura, trifft: "niemand" }] } };
   assert.ok(vorbereiten(daten).fehler.some((meldung) => meldung.includes("zustaende.test.auren[0]")));
 });
+
+test("Fähigkeiten, Risikotabellen und Unterhalt werden geprüft", () => {
+  const mitFaehigkeit = (faehigkeit, zusatz = {}) => {
+    const daten = structuredClone(rohdaten);
+    daten.faehigkeiten = { test: faehigkeit };
+    Object.assign(daten, zusatz);
+    return vorbereiten(daten).fehler;
+  };
+  const gueltig = {
+    text: "wesen.ninkasi", tags: ["psi"], verbrauch: { pp: 5, pegel: 10 }, material: [{ typ: "bier", anzahl: 1 }], zeit: 150, abklingzeit: 3,
+    voraussetzungen: [{ bedingung: "pegel_ab", wert: 100 }], risiko: "psi", ziel: { art: "geschoss", reichweite: 6, trifft: "wesen" }, wirkung: "biss_klein",
+  };
+  assert.deepEqual(mitFaehigkeit(gueltig), []);
+  assert.deepEqual(mitFaehigkeit({ text: "wesen.ninkasi", art: "aufrecht", zustand: "test" }, { zustaende: { test: { text: "wesen.ninkasi", unterhalt: { mp: 2 } } } }), []);
+  const erwartet = [
+    [{ ...gueltig, text: undefined }, "Textschlüssel"],
+    [{ ...gueltig, art: "passiv" }, "art muss"],
+    [{ ...gueltig, verbrauch: { mp: -1 } }, "verbrauch.mp"],
+    [{ ...gueltig, material: [{ typ: "hopfen", anzahl: 1 }] }, 'Gegenstand "hopfen"'],
+    [{ ...gueltig, material: [{ typ: "bier", anzahl: 0 }] }, "anzahl"],
+    [{ ...gueltig, zeit: 0 }, "zeit"],
+    [{ ...gueltig, abklingzeit: -2 }, "abklingzeit"],
+    [{ ...gueltig, voraussetzungen: [{ bedingung: "betrunken" }] }, 'Bedingung "betrunken"'],
+    [{ ...gueltig, risiko: "chaos" }, 'Risikotabelle "chaos"'],
+    [{ ...gueltig, ziel: undefined }, "ziel fehlt"],
+    [{ ...gueltig, ziel: { art: "kegel" } }, "ziel: art muss"],
+    [{ ...gueltig, ziel: { art: "feld", muster: { art: "spirale" } } }, "nicht angemeldet"],
+    [{ ...gueltig, wirkung: undefined }, "wirkung fehlt"],
+    [{ text: "wesen.ninkasi", art: "aufrecht", zustand: "gibt_es_nicht" }, 'Zustand "gibt_es_nicht"'],
+  ];
+  for (const [faehigkeit, teilDerMeldung] of erwartet) {
+    assert.ok(mitFaehigkeit(faehigkeit).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
+  }
+  assert.ok(mitNinkasi(() => ({ faehigkeiten: ["fliegen"] })).some((meldung) => meldung.includes('Fähigkeit "fliegen"')));
+  const kaputteRisiken = { risiken: { psi: [{ name: "fehlschlag", chance: [[10, 5], [5, 1]] }] } };
+  const fehler = mitFaehigkeit(gueltig, kaputteRisiken);
+  assert.ok(fehler.some((meldung) => meldung.includes("risiken.psi[0]: wirkt fehlt")));
+  assert.ok(fehler.some((meldung) => meldung.includes("aufsteigen")));
+  const daten = structuredClone(rohdaten);
+  daten.zustaende = { test: { text: "wesen.ninkasi", unterhalt: { mp: "viel" } } };
+  assert.ok(vorbereiten(daten).fehler.some((meldung) => meldung.includes("unterhalt.mp")));
+});
