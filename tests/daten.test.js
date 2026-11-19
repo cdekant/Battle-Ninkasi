@@ -94,6 +94,43 @@ test("Effekte dürfen sich nicht im Kreis aufrufen", () => {
   assert.ok(kreise.some((meldung) => meldung.includes("ping > pong > ping")));
 });
 
+test("Kampfwerte, Widerstände, Immunität, Schadensarten und Regeln des Kampfs werden geprüft", () => {
+  const gueltig = { kampfwerte: { ausweichen: 10, ruestung: 2 }, widerstaende: { saeure: 100, feuer: -50 }, immun: ["psi"] };
+  assert.deepEqual(mitNinkasi(() => gueltig), []);
+  const erwartet = [
+    [{ kampfwerte: { tarnung: 3 } }, "kampfwerte.tarnung"],
+    [{ kampfwerte: { ruestung: -1 } }, "kampfwerte.ruestung"],
+    [{ widerstaende: { kaelte: 50 } }, "widerstaende.kaelte"],
+    [{ widerstaende: { feuer: 1.5 } }, "widerstaende.feuer"],
+    [{ immun: ["laerm"] }, 'Schadensart "laerm"'],
+    [{ angriff: { genauigkeit: 80 } }, "effekt"],
+    [{ angriff: { effekt: "faustschlag" } }, "genauigkeit fehlt"],
+    [{ angriff: { genauigkeit: 80, effekt: "faustschlag", tags: "unblockbar" } }, "angriff.tags"],
+  ];
+  for (const [abweichung, teilDerMeldung] of erwartet) {
+    assert.ok(mitNinkasi(() => abweichung).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
+  }
+  const mitEffekt = (schritt) => {
+    const daten = structuredClone(rohdaten);
+    daten.effekte.test = { schritte: [schritt] };
+    return vorbereiten(daten).fehler;
+  };
+  assert.ok(mitEffekt({ baustein: "schaden", menge: 3 }).some((meldung) => meldung.includes("art fehlt")));
+  assert.ok(mitEffekt({ baustein: "schaden", art: "laerm", menge: 3 }).some((meldung) => meldung.includes('Schadensart "laerm"')));
+  assert.deepEqual(mitEffekt({ baustein: "trefferwurf", genauigkeit: 90, gegen: "willenskraft", effekt: "biss_klein", sonst: "faustschlag" }), []);
+  assert.ok(mitEffekt({ baustein: "trefferwurf", genauigkeit: 90, gegen: "ruestung", effekt: "biss_klein" }).some((meldung) => meldung.includes("gegen")));
+  const ohneText = structuredClone(rohdaten);
+  ohneText.schadensarten.kaelte = { ruestung: "ja" };
+  const fehler = vorbereiten(ohneText).fehler;
+  assert.ok(fehler.some((meldung) => meldung.includes("schadensarten.kaelte: Textschlüssel")));
+  assert.ok(fehler.some((meldung) => meldung.includes("schadensarten.kaelte: ruestung")));
+  const schiefeRegeln = structuredClone(rohdaten);
+  schiefeRegeln.regeln.kampf.kritfaktor = 90;
+  assert.ok(vorbereiten(schiefeRegeln).fehler.some((meldung) => meldung.includes("regeln.kampf.kritfaktor")));
+  delete schiefeRegeln.regeln.kampf;
+  assert.ok(vorbereiten(schiefeRegeln).fehler.some((meldung) => meldung.includes("regeln.kampf fehlt")));
+});
+
 test("Angriff mit Muster und trifft wird geprüft", () => {
   const mitAngriff = (zusatz) => mitNinkasi((ninkasi) => ({ angriff: { ...ninkasi.angriff, ...zusatz } }));
   assert.deepEqual(mitAngriff({ muster: { art: "linie", laenge: 2 }, trifft: "feinde" }), []);

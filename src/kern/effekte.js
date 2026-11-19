@@ -1,7 +1,7 @@
 // Effektsystem (siehe docs/Architektur.md, Effektsystem)
 // Zusammengesetzte Effekte sind Daten: { schritte: [ { baustein: "schaden", wuerfel: "1W6" }, ... ], tags? }
 // Grundbausteine sind Code im Register "bausteine", siehe bausteine.js und systeme/zielbausteine.js.
-// Kontext: { quelleId, urheberId, urheberFraktion, zielId, ursprung, zielfeld, ursache, kettentiefe, mittel, tags, werte }
+// Kontext: { quelleId, urheberId, urheberFraktion, zielId, ursprung, zielfeld, ursache, kettentiefe, mittel, tags, kritisch, werte }
 //   quelleId:    wirkt unmittelbar (Wesen, Fass, Geschoss, Falle)
 //   urheberId:   wird die Wirkung zugerechnet (EP, Zorn, Todesursache), Vorgabe die Quelle, bei Beschworenen
 //                deren Beschwörerin (beschworenVon);
@@ -13,6 +13,7 @@
 //   kettentiefe: 0 für Befehle und Welt, je Auslöser eine Stufe mehr (siehe kern/ausloeser.js)
 //   mittel:      { art: "angriff" | "faehigkeit" | "gegenstand" | "zustand" | "falle" | "gelaende", name } oder null
 //   tags:        z.B. ["feuer", "magie"]; die Tags des Effekts kommen dazu
+//   kritisch:    true, wenn ein Trefferwurf kritisch war (systeme/kampf.js); verschachtelte Effekte erben es
 //   werte:       Ablage zwischen Schritten, über alle Verschachtelungen eines Effekts geteilt
 //                (summeSchaden, anzahlZiele, getroffeneIds, sprungnummer)
 // Ein Baustein mit brauchtZiel wird übersprungen, wenn das Ziel fehlt; der Effekt läuft weiter.
@@ -47,6 +48,7 @@ export function kontextVervollstaendigen(spiel, kontext, effekt = {}) {
     kettentiefe: kontext.kettentiefe ?? 0,
     mittel: kontext.mittel ?? null,
     tags,
+    kritisch: kontext.kritisch ?? false,
     werte: kontext.werte ?? {},
   };
 }
@@ -72,6 +74,7 @@ export function beteiligteAus(kontext) {
     kettentiefe: kontext.kettentiefe ?? 0,
     mittel: kontext.mittel ?? null,
     tags: kontext.tags ?? [],
+    kritisch: kontext.kritisch ?? false,
   };
 }
 

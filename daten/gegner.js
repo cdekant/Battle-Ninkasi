@@ -11,6 +11,6 @@ export default {
     vorlage: "bakterium",
     text: "wesen.essigbakterium",
     werte: { lp: { grundwert: 15 } },
-    angriff: { trefferchance: 70, effekt: "biss_klein" },
+    angriff: { genauigkeit: 70, effekt: "biss_klein" },
   },
 };

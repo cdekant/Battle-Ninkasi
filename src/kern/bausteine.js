@@ -1,7 +1,7 @@
 // Grundbausteine des Effektsystems: kleine, stabile Funktionen (spiel, kontext, parameter).
 // Neue Bausteine nur für wirklich neue Mechanik; Mods melden eigene im Register an.
 // Jeder Baustein beschreibt seine Parameter in "parameter" für die Datenprüfung (kern/daten.js):
-//   "text", "ganzzahl", "wahrheitswert", "effekt", "muster", "zustand", mit "?" am Ende freiwillig;
+//   "text", "ganzzahl", "wahrheitswert", "effekt", "muster", "zustand", "wesen", "schadensart", mit "?" am Ende freiwillig;
 //   eine Liste nennt die erlaubten Werte (freiwillig); "wuerfel|menge" siehe mengeBestimmen
 // brauchtZiel: der Baustein wirkt auf ein Wesen und wird ohne Ziel übersprungen.
 // Bausteine mit Zielauswahl (fuer_jedes_ziel, auf_feld, geschoss, springen) stehen in systeme/zielbausteine.js,
@@ -38,23 +38,27 @@ export function bausteinAnmelden(name, parameterBeschreibung, funktion, { brauch
 
 const MENGE = { wuerfel: "wuerfel|menge" };
 
-// Schaden an den LP des Ziels; Parameter siehe mengeBestimmen
+// Schaden an den LP des Ziels; Parameter: art (Schadensart aus daten/schadensarten.js), Menge siehe mengeBestimmen
 // Haken "vor_schaden" darf die Menge ändern oder abbrechen (Treffer abgefangen), "nach_schaden" folgt bei Schaden > 0.
+// Die Schadensrechnung (Angreifer, Krit, Rüstung, Widerstand) hängt mit festen Rängen an vor_schaden (systeme/kampf.js).
 // Der tatsächliche Verlust kommt in die Ablage (werte.summeSchaden), z.B. für Lebensraub.
 // Getötet wird erst in der Zustandsprüfung nach dem Vorgang (systeme/tod.js).
-bausteinAnmelden("schaden", MENGE, (spiel, kontext, parameter) => {
+bausteinAnmelden("schaden", { art: "schadensart", ...MENGE }, (spiel, kontext, parameter) => {
   const zustand = spiel.zustand;
   const ziel = zustand.entitaeten[kontext.zielId];
   if (!ziel || !ziel.werte || !ziel.werte.lp) return;
   const beteiligte = beteiligteAus(kontext);
-  const hakenKontext = hakenAusloesen(spiel, "vor_schaden", { ...beteiligte, menge: mengeBestimmen(spiel, kontext, parameter), abgebrochen: false });
+  const hakenKontext = hakenAusloesen(spiel, "vor_schaden", { ...beteiligte, schadensart: parameter.art ?? null, menge: mengeBestimmen(spiel, kontext, parameter), abgebrochen: false });
   if (hakenKontext.abgebrochen) return;
   const schadenspunkte = Math.max(0, hakenKontext.menge);
   const quelle = zustand.entitaeten[kontext.quelleId];
   const verlust = -wertAendern(spiel, ziel, "lp", -schadenspunkte, ursprungAus(kontext));
   if (kontext.werte) kontext.werte.summeSchaden = (kontext.werte.summeSchaden ?? 0) + verlust;
-  melden(spiel, "schaden", { quelle: quelle ? bezugAuf(quelle) : null, ziel: bezugAuf(ziel), menge: schadenspunkte, ursache: kontext.ursache });
-  if (schadenspunkte > 0) hakenAusloesen(spiel, "nach_schaden", { ...beteiligte, menge: schadenspunkte });
+  melden(spiel, "schaden", {
+    quelle: quelle ? bezugAuf(quelle) : null, ziel: bezugAuf(ziel), menge: schadenspunkte, ursache: kontext.ursache, schadensart: hakenKontext.schadensart,
+    kritisch: beteiligte.kritisch, ruestungAbzug: hakenKontext.ruestungAbzug ?? 0, widerstanden: hakenKontext.widerstanden ?? 0, immun: Boolean(hakenKontext.immun),
+  });
+  if (schadenspunkte > 0) hakenAusloesen(spiel, "nach_schaden", { ...beteiligte, schadensart: hakenKontext.schadensart, menge: schadenspunkte });
 }, { brauchtZiel: true });
 
 // Heilt einen Wert (Standard LP); Parameter: wertName, Menge siehe mengeBestimmen

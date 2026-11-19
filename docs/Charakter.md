@@ -36,6 +36,7 @@ Stand: 2026-11-18
 + Braukunde: die Weisheit dieser Welt, Brauen ist heiliges Wissen; Brauen, Alchemie, Mikroorganismen, Kreaturen verstehen, göttliche Gaben
 + Sinnlichkeit ist die schwerste Eigenschaft, Ausgleich über das Balancing
 + Vorräte und Eigenschaften: LP zu Körperlichkeit, MP zu Klugheit und Braukunde, PP zu Sinnlichkeit, Pegel zu Trinkfestigkeit, Ausdauer (Option) zu Gewandtheit oder Körperlichkeit
++ Vorschlag, noch nicht bestätigt: Eigenschaften speisen Kampfwerte (siehe [Architektur.md](Architektur.md), Kampfwerte), z.B. Gewandtheit `ausweichen`, Sinnlichkeit oder Klugheit `willenskraft`, Trinkfestigkeit `widerstand` gegen Gift und Alkohol
 + Vorschlag, noch nicht bestätigt: Trinkfestigkeit hebt die Schwellen des Pegels, beschleunigt seinen Abbau und verschiebt das Optimum der LP-Regeneration nach oben (über die Modifikatoren `abbau.pegel` und `kurvenverschiebung.lp`)
 + Skills, Schriftrollen und Items wirken auf Regeneration und Schwund über Modifikatoren, siehe Stoffwechsel in [Architektur.md](Architektur.md)
 

@@ -13,6 +13,7 @@ Grobskizze, auszuarbeiten.
 + Wesen und Gegenstände sind Hauptwörter: Geschlecht (`m`, `f`, `n`), bei Eigennamen `eigenname: true`, und alle vier Fälle der Einzahl ohne Artikel, z.B. `{ geschlecht: "n", einzahl: { nom: "Essigbakterium", gen: "Essigbakteriums", dat: "Essigbakterium", akk: "Essigbakterium" } }`; unregelmäßige Beugung (des Bären) steht so ausgeschrieben in den Fällen
 + Die Artikel kommen als Tabelle nach Art, Geschlecht und Fall aus `sprache/de/grammatik.js`; den Code dazu liefert `src/anzeige/grammatik.js`; Eigennamen stehen ohne Artikel, ihr Geschlecht dient später den Fürwörtern
 + Platzhalter für Hauptwörter: `{ziel.akk}` mit bestimmtem Artikel (Standard: Nominativ, bestimmt), `{was.nom.ein}` mit unbestimmtem, `{wer.gen.ohne}` ohne Artikel
++ Schadensarten stehen als einfache Wörter unter `schaden.<art>` (z.B. `schaden.saeure`: "Säure"); das Log setzt sie als `{art}` ein
 + Jede Sprache bekommt ihre eigene Regeltabelle; Sprachen mit Sonderregeln (englisch a/an) bekommen zusätzlich eigenen Code
 + Später: Mehrzahl (`mehrzahl` mit den vier Fällen, Artikel für `p`), Adjektivendungen für Affixe (ein verfluchtes Braupaddel)
 + Die Datenprüfung meldet Textschlüssel aus den Daten, die in der Sprachdatei fehlen, und unvollständige Hauptwörter (Geschlecht, Fälle); fehlende Schlüssel aus dem Code erscheinen als `[schluessel]` und als Warnung in der Konsole

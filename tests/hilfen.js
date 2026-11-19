@@ -4,6 +4,7 @@
 import gelaende from "../daten/gelaende.js";
 import regeln from "../daten/regeln.js";
 import aktionen from "../daten/aktionen.js";
+import schadensarten from "../daten/schadensarten.js";
 import { neuerZustand, entitaetErzeugen } from "../src/kern/zustand.js";
 import { werteAusDaten } from "../src/kern/werte.js";
 import { zufallErzeugen } from "../src/kern/zufall.js";
@@ -14,13 +15,19 @@ import { vorgangAbschliessen } from "../src/kern/vorgang.js";
 
 // Spiel mit einer Karte aus Zeilen ("#" Wand, "." Boden), alles erkundet.
 // optionen: { effekte: Testeffekte, zustaende: Testzustände, wesen: Testwesen (zum Beschwören), regeln: Abweichungen der Regelwerte, startwert }
+// Abweichend von daten/regeln.js ist die Grundverteidigung 0: Genauigkeit 100 gegen ein Wesen ohne Ausweichen trifft sicher,
+// Genauigkeit 0 verfehlt sicher, beides ohne zu würfeln.
 export function miniSpiel(kartenzeilen, { effekte = {}, zustaende = {}, wesen: wesensdaten = {}, regeln: regelAbweichungen = {}, startwert = 1 } = {}) {
   const zustand = neuerZustand(startwert);
   zustand.zufallszustand = zufallErzeugen(startwert);
   const breite = kartenzeilen[0].length, hoehe = kartenzeilen.length;
   zustand.ebene = { name: "test", breite, hoehe, felder: kartenzeilen, erkundet: new Array(breite * hoehe).fill(1) };
-  const testregeln = { ...regeln, ausloeser: { ...regeln.ausloeser, ...regelAbweichungen.ausloeser } };
-  return { zustand, daten: { gelaende, aktionen, effekte, zustaende, wesen: wesensdaten, regeln: testregeln }, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
+  const testregeln = {
+    ...regeln,
+    ausloeser: { ...regeln.ausloeser, ...regelAbweichungen.ausloeser },
+    kampf: { ...regeln.kampf, grundverteidigung: 0, ...regelAbweichungen.kampf },
+  };
+  return { zustand, daten: { gelaende, aktionen, effekte, schadensarten, zustaende, wesen: wesensdaten, regeln: testregeln }, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
 }
 
 // Wesen mit Position, Fraktion und LP; weitere Komponenten (ausloeser, angriff, beimTod ...) über zusatz

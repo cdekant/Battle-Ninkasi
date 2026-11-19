@@ -28,7 +28,7 @@ const ZUSTAENDE = {
 };
 
 const WESEN = {
-  bierhefe: { text: "wesen.bierhefe", fraktion: "hefen", werte: { lp: { grundwert: 5 } }, ki: { modul: "jagen", letzteBekanntePosition: null }, angriff: { trefferchance: 100, effekt: "toedlich" } },
+  bierhefe: { text: "wesen.bierhefe", fraktion: "hefen", werte: { lp: { grundwert: 5 } }, ki: { modul: "jagen", letzteBekanntePosition: null }, angriff: { genauigkeit: 100, effekt: "toedlich" } },
   geisterspeer: { text: "wesen.geisterspeer", fraktion: "geister", werte: { lp: { grundwert: 1 } }, ki: { modul: "jagen", letzteBekanntePosition: null } },
 };
 

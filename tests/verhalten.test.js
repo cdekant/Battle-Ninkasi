@@ -35,7 +35,7 @@ const ZUSTAENDE = {
 };
 
 const spielBauen = (karte = RAUM) => miniSpiel(karte, { effekte: EFFEKTE, zustaende: ZUSTAENDE });
-const ANGRIFF = { trefferchance: 100, effekt: "stoss" };
+const ANGRIFF = { genauigkeit: 100, effekt: "stoss" };
 const bakterium = (spiel, x, y, zusatz = {}) =>
   wesen(spiel, x, y, "verderber", 10, { ki: { modul: "jagen", letzteBekanntePosition: null }, sicht: { reichweite: 6 }, angriff: ANGRIFF, ...zusatz });
 

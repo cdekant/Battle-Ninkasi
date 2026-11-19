@@ -40,8 +40,13 @@ export class Log {
       case "tod":
         if (meldung.opfer.id === this.spielerinId) return this.zeile(text("log.tod_ninkasi"), "schlimm");
         return this.zeile(text("log.tod", meldung), "gut");
-      case "schaden":
-        return this.zeile(text("log.schaden", meldung), meldung.ziel.id === this.spielerinId ? "schlimm" : "");
+      case "schaden": {
+        const schluessel = meldung.immun ? "log.schaden_immun" : meldung.kritisch ? "log.schaden_kritisch" : "log.schaden";
+        const art = meldung.schadensart && hatSchluessel(`schaden.${meldung.schadensart}`) ? text(`schaden.${meldung.schadensart}`) : "?";
+        return this.zeile(text(schluessel, { ...meldung, art }), meldung.ziel.id === this.spielerinId ? "schlimm" : "");
+      }
+      case "verfehlt":
+        return this.zeile(text(meldung.grund === "geblockt" ? "log.geblockt" : "log.verfehlt", meldung));
       case "geheilt":
       case "wert_geaendert": {
         if (meldung.menge === 0) return;

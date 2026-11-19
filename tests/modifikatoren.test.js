@@ -45,18 +45,18 @@ test("wert_unter_prozent misst am Grundwert, so kann ein Modifikator auf denselb
   assert.equal(hoechstwert(spiel, verzweifelte, "lp"), 100);
 });
 
-test("gegenueber_tag: Trefferchance nur gegen Bakterien, im Nahkampf über die Umstände", () => {
+test("gegenueber_tag: Genauigkeit nur gegen Bakterien, im Nahkampf über die Umstände", () => {
   const spiel = miniSpiel(KARTE, { effekte: { biss: { schritte: [{ baustein: "schaden", menge: 1 }] } } });
   const jaegerin = wesen(spiel, 1, 1, "ninkasi", 10, {
-    angriff: { trefferchance: 0, effekt: "biss" },
-    modifikatoren: [bonus(100, { wenn: [{ bedingung: "gegenueber_tag", tag: "bakterium" }] })],
+    angriff: { genauigkeit: 0, effekt: "biss" },
+    modifikatoren: [bonus(100, { ziel: "genauigkeit", wenn: [{ bedingung: "gegenueber_tag", tag: "bakterium" }] })],
   });
   const hefe = wesen(spiel, 2, 1, "feinde", 10, { tags: ["hefe"] });
   const bakterium = wesen(spiel, 3, 1, "feinde", 10, { tags: ["bakterium", "essig"] });
-  assert.equal(modifiziert(spiel, jaegerin, "trefferchance", 0, { gegenueberId: bakterium.id }), 100);
+  assert.equal(modifiziert(spiel, jaegerin, "genauigkeit", 0, { gegenueberId: bakterium.id }), 100);
   nahkampf(spiel, jaegerin, hefe);
   nahkampf(spiel, jaegerin, bakterium);
-  assert.equal(hefe.werte.lp.aktuell, 10, "Trefferchance 0 verfehlt immer");
+  assert.equal(hefe.werte.lp.aktuell, 10, "Genauigkeit 0 verfehlt immer");
   assert.equal(bakterium.werte.lp.aktuell, 9);
 });
 

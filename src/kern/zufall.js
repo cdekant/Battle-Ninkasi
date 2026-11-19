@@ -54,6 +54,14 @@ export function mitProzentChance(zufallszustand, prozent) {
   return zufallsGanzzahl(zufallszustand, 1, 100) <= prozent;
 }
 
+// true mit einer Wahrscheinlichkeit von zaehler / nenner (ganze Zahlen, nenner > 0), exakt ohne Rundung;
+// sichere Fälle (zaehler <= 0 oder >= nenner) würfeln nicht
+export function mitAnteil(zufallszustand, zaehler, nenner) {
+  if (zaehler <= 0) return false;
+  if (zaehler >= nenner) return true;
+  return zufallsGanzzahl(zufallszustand, 0, nenner - 1) < zaehler;
+}
+
 // Würfelausdruck wie "2W6", "1W6+2", "1W4-1", "5"
 export function wuerfeln(zufallszustand, ausdruck) {
   const treffer = /^\s*(?:(\d+)\s*[wWdD]\s*(\d+))?\s*([+-]\s*\d+)?\s*$/.exec(String(ausdruck));

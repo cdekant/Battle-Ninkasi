@@ -18,8 +18,11 @@ export default {
 
   // Log
   "log.willkommen": "Ninkasi erwacht in einem feuchten Keller. Nüchtern. Das muss sich ändern.",
-  "log.schaden": "{quelle.nom} trifft {ziel.akk}: {menge} Schaden.",
+  "log.schaden": "{quelle.nom} trifft {ziel.akk}: {menge} Schaden ({art}).",
+  "log.schaden_kritisch": "{quelle.nom} trifft {ziel.akk} kritisch: {menge} Schaden ({art}).",
+  "log.schaden_immun": "{quelle.nom} trifft {ziel.akk}, doch {art} richtet nichts aus.",
   "log.verfehlt": "{quelle.nom} verfehlt {ziel.akk}.",
+  "log.geblockt": "{ziel.nom} blockt den Angriff {quelle.gen}.",
   "log.tod": "{opfer.nom} zerplatzt zu saurem Matsch.",
   "log.tod_ninkasi": "Ninkasi stirbt. Ausgerechnet nüchterner als ihr lieb war. [Eingabe] für einen neuen Lauf.",
   "log.liegt_hier": "Hier liegt {was.nom.ein}.",
@@ -38,6 +41,18 @@ export default {
   "log.abgelehnt.nicht_trinkbar": "Das ist nicht trinkbar, so verzweifelt ist sie noch nicht.",
   "log.abgelehnt.ungueltig": "Das geht so nicht.",
   "log.abgelehnt.unbekannt": "Unbekannter Befehl.",
+
+  // Schadensarten (Platzhalter {art} im Log)
+  "schaden.stumpf": "stumpf",
+  "schaden.schnitt": "Schnitt",
+  "schaden.saeure": "Säure",
+  "schaden.lauge": "Lauge",
+  "schaden.feuer": "Feuer",
+  "schaden.elektrisch": "Strom",
+  "schaden.alkohol": "Alkohol",
+  "schaden.gift": "Gift",
+  "schaden.psi": "Psi",
+  "schaden.magie": "Magie",
 
   // Reise per Maus (nur Anzeige, keine Spielereignisse); "angekommen" und "abgebrochen" bleiben stumm
   "reise.kein_weg": "Dorthin kennt Ninkasi keinen Weg.",

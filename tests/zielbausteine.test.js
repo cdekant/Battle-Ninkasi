@@ -158,7 +158,7 @@ test("Auslöser mit Ziel feld: Sporen um die letzte Position treffen die Feinde 
 
 test("Nahkampf mit Muster: Rundumschlag trifft alle angrenzenden Wesen, Speer zwei Felder in Linie", () => {
   const spiel = spielBauen();
-  const ninkasi = wesen(spiel, 5, 3, "ninkasi", 10, { angriff: { trefferchance: 100, effekt: "stich", muster: { art: "angrenzend" } } });
+  const ninkasi = wesen(spiel, 5, 3, "ninkasi", 10, { angriff: { genauigkeit: 100, effekt: "stich", muster: { art: "angrenzend" } } });
   const [osten, norden, sueden] = [[6, 3], [5, 2], [5, 4]].map(([x, y]) => wesen(spiel, x, y, "verderber"));
   const freundin = wesen(spiel, 4, 3, "ninkasi");
   const fern = wesen(spiel, 7, 3, "verderber");

@@ -2,13 +2,13 @@
 // Nur Haken aus diesem Katalog lassen sich anmelden und auslösen; Mods ergänzen hier eigene.
 //   inBetrieb:        die Logik löst den Haken schon aus (sonst reserviert für einen späteren Ausbau)
 //   ausloeserErlaubt: Auslöser aus Daten dürfen daran hängen (nur Haken "danach", nie "davor")
-// Kontext der Haken mit Beteiligten: { quelleId, urheberId, zielId, ursache, kettentiefe, mittel, tags, ... }
+// Kontext der Haken mit Beteiligten: { quelleId, urheberId, zielId, ursache, kettentiefe, mittel, tags, kritisch, ... }
 
 export const HAKENKATALOG = {
-  vor_schaden: { inBetrieb: true, ausloeserErlaubt: false },      // + menge; Handler ändern menge oder brechen ab
-  nach_schaden: { inBetrieb: true, ausloeserErlaubt: true },      // + menge (> 0)
-  nach_treffer: { inBetrieb: true, ausloeserErlaubt: true },
-  verfehlt: { inBetrieb: true, ausloeserErlaubt: true },
+  vor_schaden: { inBetrieb: true, ausloeserErlaubt: false },      // + schadensart, menge; Handler ändern menge oder brechen ab (Ränge siehe systeme/kampf.js)
+  nach_schaden: { inBetrieb: true, ausloeserErlaubt: true },      // + schadensart, menge (> 0)
+  nach_treffer: { inBetrieb: true, ausloeserErlaubt: true },      // kritisch im Kontext
+  verfehlt: { inBetrieb: true, ausloeserErlaubt: true },          // + grund ("ausgewichen" | "geblockt")
   vor_tod: { inBetrieb: true, ausloeserErlaubt: false },          // Abbruch verhindert den Tod, wenn der Lebenswert wieder über 0 liegt
   nach_tod: { inBetrieb: true, ausloeserErlaubt: true },          // + position des Opfers
   nach_wertaenderung: { inBetrieb: true, ausloeserErlaubt: false }, // { entitaet, wertName, vorher, nachher }

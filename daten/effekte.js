@@ -1,10 +1,10 @@
 // Zusammengesetzte Effekte aus Grundbausteinen (src/kern/bausteine.js)
 export default {
   faustschlag: {
-    schritte: [{ baustein: "schaden", wuerfel: "1W6+2" }],
+    schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "1W6+2" }],
   },
   biss_klein: {
-    schritte: [{ baustein: "schaden", wuerfel: "1W4" }],
+    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "1W4" }],
   },
   bier_trinken: {
     schritte: [

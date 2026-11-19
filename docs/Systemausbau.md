@@ -1,6 +1,6 @@
 # Battle Ninkasi - Systemausbau
 
-Stand: 2026-11-18
+Stand: 2026-11-19
 
 Arbeitsliste der Strukturen, die Logik und Datenmodell noch brauchen, damit Fernkampf, Flächenwirkung, Effekte über Zeit, Magie, Psi, Nahkampf und viele Gegner überwiegend als Daten abbildbar sind. Grundlage ist eine Prüfung von Doku und Code mit Stand 0.3.0. Die Begriffe (Wirkungsarten, Effektsystem, Register, Zeitmodell) stehen in [Architektur.md](Architektur.md).
 
@@ -34,7 +34,7 @@ Status: umgesetzt in Version 0.5.0, beschrieben in [Architektur.md](Architektur.
 Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 + Befehl `faehigkeit` mit Zielangabe, Zielmodus und Tooltip der Anzeige auf Grundlage von `zielAufloesen` (Punkt 6)
-+ Vorschau je Wesen "sicher" oder "vielleicht" getroffen, sobald Trefferwurf und Ausweichen für Flächen gelten (Punkt 5)
++ Vorschau je Wesen "sicher" oder "vielleicht" getroffen; seit 0.10.0 liefert `trefferanteil` die Chance ohne Würfeln, offen ist die Anzeige (Punkt 6)
 + Wirkung auf die Quelle innerhalb eines Effekts, z.B. Vampirbiss (Schaden am Ziel, Heilung am Angreifer); bisher nur über einen Effekt mit der Quelle als Ziel (Lebensraub-Nova); möglicher Parameter `auf: "quelle"` an den Mengenbausteinen
 + Sichtlinie und Flugbahn für die KI (Punkt 7); nach dem Anspielen prüfen, ob Ersatzlinien oder symmetrischer Schattenwurf für das Sichtfeld nötig sind
 + Waffen mit Muster (Rundumschlag, Speer) im Spielinhalt (Punkt 9), Animation der Meldungen `geschoss` und `flaeche` in der Anzeige
@@ -62,20 +62,30 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 + Modifikatorquellen `ausruestung` (Punkt 9) und `skills` (mit dem Skillsystem in [Charakter.md](Charakter.md))
 + Bedingung für Sets aus Gegenständen, z.B. zwei Kupfer-Items (Punkt 9)
-+ Tags in weiteren Abfragen: Schadensarten an Effekten und Widerstände (Punkt 5), Kosten und Tags der Fähigkeiten (Punkt 6)
++ Tags in weiteren Abfragen: Kosten und Tags der Fähigkeiten (Punkt 6); Schadensarten und Widerstände seit 0.10.0
 + Räumlicher Index für die Suche nach Auren (Punkt 7); seit 0.9.0 braucht der Bot etwa ein Viertel länger
 + Anzeige der Aufschlüsselung (`modifikatorenAufgeschluesselt`) in der Oberfläche
 
 ## 5. Kampfwerte
 
-Status: offen
+Status: umgesetzt in Version 0.10.0 (Schadensarten, Widerstand, Immunität, Rüstung, Ausweichen, Willenskraft, Blocken, Krit, Marker, Baustein `trefferwurf`), beschrieben in [Architektur.md](Architektur.md) (Kampfwerte)
 
-+ Schadensarten (z.B. stumpf, Säure, Feuer, Alkohol, geistig) als Daten
-+ Widerstand, Immunität und Verwundbarkeit je Schadensart über Modifikatoren; wichtigster Hebel für die Vielfalt der Mikroorganismen
-+ Verteidigung des Ziels im Trefferwurf (Ausweichen), Rüstung als Abzug im Haken `vor_schaden`
-+ Krit als Mechanik (die Anzeige plant Krit-Zahlen schon ein)
-+ Marker am Angriff: unblockbar, verfehlt nie, ignoriert Rüstung
-+ Mehrere Angriffe je Wesen (Biss und Sporenstoß) und Waffen mit eigenem Angriffsprofil statt einer einzigen Komponente `angriff`
+Entschieden: Kampfwerte sind Punkte, die über einen Halbwert zu Anteilen werden, die sich 100 % nur annähern (Trefferchance, Blocken, Kritchance, Widerstand); Trefferchance als Verhältnis von Genauigkeit zu Verteidigung plus Grundverteidigung, ohne harte Grenzen; Rüstung als fester Abzug mit Mindestschaden 1; Verwundbarkeit nähert sich dem doppelten Schaden; Immunität als eigener Sonderfall; Kritfaktor x1,5 als Regelwert, nach oben offen; `art` am Baustein `schaden` ist Pflicht; Durchschaubarkeit kommt aus der Anzeige der errechneten Prozentzahl, nicht aus der Formel
+
+Offener Rest, Teil der nächsten Version 0.11.0:
+
++ Angriffsprofile statt einer einzigen Komponente `angriff`: `angriffe: [{ name, genauigkeit, effekt, kosten?, chance?, tags?, kritchance?, muster?, trifft? }]`, abgefragt nur über `angriffeVon(spiel, wesen)`, damit Waffen (Punkt 9) ihr Profil einbringen können
++ Eine Angriffsaktion führt alle Profile nacheinander aus, in der Reihenfolge der Daten, jedes mit eigenem Wurf; ein Profil mit `chance` wird nur in so vielen Prozent der Aktionen mitgenommen
++ Zeitkosten je Profil (`kosten`, Vorgabe `kosten.nahkampf`), z.B. Dolch 70 und Fasshammer 150; die Aktion kostet so viel wie ihr langsamstes Profil (Vorbild ist die Waffenverzögerung in DCSS, die ein Skill senken kann)
++ Haken `vor_angriff` in Betrieb nehmen (vor dem Trefferwurf, darf abbrechen)
+
+Offener Rest, wird mit den genannten Punkten umgesetzt:
+
++ Angekündigte Angriffe: ein Wesen wählt aus seinem Portfolio einen Angriff, setzt sich einen Zustand "holt aus" mit Meldung im Log und führt ihn aus, wenn es wieder dran ist; wer das Log liest, kann ausweichen (Vorbild Brogue, DCSS); braucht die Auswahl der KI und Fähigkeiten mit Ziel (Punkte 6 und 7)
++ Abzug der Rüstung auf das Ausweichen in den Daten der Rüstung, später womöglich über das Gewicht (Punkt 9)
++ Ersatzwirkungen (Rest aus Punkt 1) achten den Marker `unblockbar`
++ Anzeige: schwebende Krit-Zahlen, Trefferchance in Tooltip und Untersuchen; mit dem großen Punkt Oberfläche
++ Zuordnung der Eigenschaften zu Kampfwerten (Gewandtheit zu Ausweichen, Trinkfestigkeit zu Widerstand gegen Gift): Skillsystem in [Charakter.md](Charakter.md)
 
 ## 6. Fähigkeiten und lange Aktionen
 

@@ -9,6 +9,7 @@ import { HAKENKATALOG, AUSLOESER_ROLLEN, AUSLOESER_ZIELE } from "./hakenkatalog.
 import { HINTERLASSENSCHAFT_REGELN, MODIFIKATORARTEN } from "./werte.js";
 import { TRIFFT_ARTEN } from "../systeme/zielauswahl.js";
 import { STAPELREGELN, VERLAEUFE } from "../systeme/zustaende.js";
+import { KAMPFWERTE } from "../systeme/kampf.js";
 
 const istObjekt = (wert) => wert && typeof wert === "object" && !Array.isArray(wert);
 
@@ -81,11 +82,11 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
     if (wertDaten.anfangswert !== undefined && (!istGanzzahl(wertDaten.anfangswert) || wertDaten.anfangswert < 0)) fehler.push(`${ort}: werte.${wertName}.anfangswert muss eine ganze Zahl >= 0 sein`);
   }
   if (wesen.angriff) {
-    if (!istGanzzahl(wesen.angriff.trefferchance)) fehler.push(`${ort}: angriff.trefferchance muss eine ganze Zahl sein`);
-    pruefeEffektVerweis(daten, wesen.angriff.effekt, `${ort}.angriff`, fehler);
+    pruefeParameter(daten, { genauigkeit: "ganzzahl", effekt: "effekt", kritchance: "ganzzahl?", trifft: TRIFFT_ARTEN }, wesen.angriff, `${ort}.angriff`, fehler);
     if (wesen.angriff.muster !== undefined) pruefeMuster(daten, wesen.angriff.muster, `${ort}.angriff.muster`, fehler);
-    pruefeParameter(daten, { trifft: TRIFFT_ARTEN }, wesen.angriff, `${ort}.angriff`, fehler);
+    if (wesen.angriff.tags !== undefined && !istTextliste(wesen.angriff.tags)) fehler.push(`${ort}: angriff.tags muss eine Liste von Texten sein`);
   }
+  pruefeKampfwerte(daten, wesen, ort, fehler);
   if (wesen.ki) pruefeKi(daten, wesen.ki, `${ort}.ki`, fehler);
   if (wesen.stoffwechsel) pruefeStoffwechsel(wesen, ort, fehler);
   if (wesen.sicht && !istGanzzahl(wesen.sicht.reichweite)) fehler.push(`${ort}: sicht.reichweite muss eine ganze Zahl sein`);
@@ -98,6 +99,28 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
   if (wesen.modifikatoren !== undefined) pruefeModifikatoren(daten, wesen.modifikatoren, `${ort}.modifikatoren`, fehler);
   if (wesen.auren !== undefined) pruefeAuren(daten, wesen.auren, ort, fehler);
   if (!daten.zeichen.wesen[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js`);
+}
+
+// Kampfwerte, Widerstände und Immunität, siehe systeme/kampf.js
+function pruefeKampfwerte(daten, wesen, ort, fehler) {
+  if (wesen.kampfwerte !== undefined) {
+    if (!istObjekt(wesen.kampfwerte)) fehler.push(`${ort}: kampfwerte muss ein Objekt sein`);
+    else for (const [name, punkte] of Object.entries(wesen.kampfwerte)) {
+      if (!KAMPFWERTE.includes(name)) fehler.push(`${ort}: kampfwerte.${name} gibt es nicht (${KAMPFWERTE.join(", ")})`);
+      else if (!istZahlAbNull(punkte)) fehler.push(`${ort}: kampfwerte.${name} muss eine ganze Zahl >= 0 sein`);
+    }
+  }
+  if (wesen.widerstaende !== undefined) {
+    if (!istObjekt(wesen.widerstaende)) fehler.push(`${ort}: widerstaende muss ein Objekt sein`);
+    else for (const [art, punkte] of Object.entries(wesen.widerstaende)) {
+      if (!daten.schadensarten?.[art]) fehler.push(`${ort}: widerstaende.${art}: Schadensart gibt es nicht`);
+      else if (!istGanzzahl(punkte)) fehler.push(`${ort}: widerstaende.${art} muss eine ganze Zahl sein`);
+    }
+  }
+  if (wesen.immun !== undefined) {
+    if (!istTextliste(wesen.immun)) fehler.push(`${ort}: immun muss eine Liste von Schadensarten sein`);
+    else for (const art of wesen.immun) if (!daten.schadensarten?.[art]) fehler.push(`${ort}: immun: Schadensart "${art}" gibt es nicht`);
+  }
 }
 
 const istProzent = (wert) => istGanzzahl(wert) && wert >= 0 && wert <= 100;
@@ -120,11 +143,29 @@ function pruefeAusloeser(daten, liste, ort, fehler) {
   });
 }
 
+// Regelwerte des Kampfs: Untergrenze je Feld
+const KAMPFREGELN = { grundverteidigung: 0, halbwertWiderstand: 1, halbwertBlocken: 1, halbwertKritchance: 1, kritfaktor: 100, mindestschadenNachRuestung: 0 };
+
 function pruefeRegeln(regeln, fehler) {
   const ausloeser = regeln?.ausloeser;
   if (!ausloeser) return fehler.push("regeln.ausloeser fehlt");
   if (!istProzent(ausloeser.daempfungProStufe)) fehler.push("regeln.ausloeser.daempfungProStufe muss eine ganze Zahl von 0 bis 100 sein");
   if (!istGanzzahl(ausloeser.hoechsteKettentiefe) || ausloeser.hoechsteKettentiefe < 0) fehler.push("regeln.ausloeser.hoechsteKettentiefe muss eine ganze Zahl >= 0 sein");
+  if (!regeln.kampf) return fehler.push("regeln.kampf fehlt");
+  for (const [feld, untergrenze] of Object.entries(KAMPFREGELN)) {
+    const wert = regeln.kampf[feld];
+    if (!istGanzzahl(wert) || wert < untergrenze) fehler.push(`regeln.kampf.${feld} muss eine ganze Zahl >= ${untergrenze} sein`);
+  }
+}
+
+// Schadensarten: { text, ruestung? }
+function pruefeSchadensarten(daten, sprache, fehler) {
+  if (!istObjekt(daten.schadensarten)) return fehler.push("schadensarten fehlen");
+  for (const [name, schadensart] of Object.entries(daten.schadensarten)) {
+    const ort = `schadensarten.${name}`;
+    pruefeText(sprache.texte, schadensart.text, ort, fehler);
+    pruefeParameter(daten, { ruestung: "wahrheitswert?" }, schadensart, ort, fehler);
+  }
 }
 
 // Stoffwechsel: braucht den Wert pegel, Kurven nur für vorhandene Werte (siehe systeme/stoffwechsel.js)
@@ -171,7 +212,7 @@ function pruefeMenge(schritt, ort, fehler) {
 const istZahlAbNull = (wert) => istGanzzahl(wert) && wert >= 0;
 
 // Parameter nach Beschreibung (siehe kern/bausteine.js): "text", "ganzzahl", "wahrheitswert", "effekt",
-// "muster", "zustand", "wesen", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
+// "muster", "zustand", "wesen", "schadensart", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
 function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
   for (const [feld, typ] of Object.entries(beschreibung)) {
     const wert = werte[feld];
@@ -195,6 +236,7 @@ function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
     else if (grundtyp === "effekt") pruefeEffektVerweis(daten, wert, `${ort}.${feld}`, fehler);
     else if (grundtyp === "muster") pruefeMuster(daten, wert, `${ort}.${feld}`, fehler);
     else if (grundtyp === "zustand" && !daten.zustaende?.[wert]) fehler.push(`${ort}.${feld}: Zustand "${wert}" gibt es nicht`);
+    else if (grundtyp === "schadensart" && !daten.schadensarten?.[wert]) fehler.push(`${ort}.${feld}: Schadensart "${wert}" gibt es nicht`);
     else if (grundtyp === "wesen" && (!daten.wesen?.[wert] || daten.wesen[wert].abstrakt)) fehler.push(`${ort}.${feld}: Wesen "${wert}" gibt es nicht`);
   }
 }
@@ -346,6 +388,7 @@ export function vorbereiten(rohdaten, sprache = {}) {
   daten.gegenstaende = vorlagenAufloesen(rohdaten.gegenstaende, "gegenstaende", fehler);
   daten.zustaende = vorlagenAufloesen(rohdaten.zustaende || {}, "zustaende", fehler);
 
+  pruefeSchadensarten(daten, sprache, fehler);
   for (const [name, effekt] of Object.entries(daten.effekte)) pruefeEffekt(daten, name, effekt, fehler);
   pruefeEffektKreise(daten, fehler);
   for (const [name, zustand] of Object.entries(daten.zustaende)) pruefeZustand(daten, sprache, name, zustand, fehler);
