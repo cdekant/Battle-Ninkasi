@@ -16,6 +16,7 @@ import { schichtAuf, schichtenVon } from "../src/welt/schichten.js";
 import { oberflaecheSetzen, gasSetzen, entzuenden, gefahrenMeiden } from "../src/systeme/schichten.js";
 import { sichtfeldAktualisieren } from "../src/systeme/sicht.js";
 import { vorbereiten } from "../src/kern/daten.js";
+import { rohdatenMitTesteintraegen } from "./hilfen.js";
 
 const GELAENDE = {
   holz: { kennung: "=", passierbar: false, durchsichtig: false, brennbar: 100, brenndauer: 2, verbrenntZu: "boden" },
@@ -167,25 +168,26 @@ test("Wege meiden Feuer und Gefährliches; die Ebene stellt Gärbottiche ins Rau
 
   const daten = datenLaden(rohdaten, { texte });
   const echt = neuesSpiel(daten, 4);
-  assert.equal((echt.zustand.ebene.felder.join("").match(/O/g) || []).length, 3);
+  const bestellt = rohdaten.ebenen.keller.gelaendeObjekte.find((objekt) => objekt.gelaende === "gaerbottich")?.anzahl ?? 0;
+  assert.equal((echt.zustand.ebene.felder.join("").match(/O/g) || []).length, bestellt, "so viele, wie die Ebene bestellt");
   assert.deepEqual(echt.zustand.ebene.schichten, { oberflaeche: {}, gas: {}, feuer: {} });
 });
 
 test("Datenprüfung: Schichten, Stufen, Gelände mit Quelle und Brennbarkeit, Regeln für Feuer", () => {
   const pruefen = (aendern) => {
-    const daten = structuredClone(rohdaten);
+    const daten = rohdatenMitTesteintraegen();
     aendern(daten);
     return vorbereiten(daten).fehler;
   };
   const erwartet = [
-    [(daten) => { daten.schichten.oberflaechen.saeure.brennbar = 150; }, "brennbar"],
-    [(daten) => { daten.schichten.oberflaechen.brand.verbrenntZu = "glut"; }, 'Oberfläche "glut"'],
-    [(daten) => { daten.schichten.gase.co2.stufen[1].ab = 10; }, "ab muss aufsteigen"],
-    [(daten) => { daten.schichten.gase.co2.stufen[0].wenn = [{ bedingung: "mondphase" }]; }, "nicht angemeldet"],
-    [(daten) => { delete daten.zeichen.schichten.rauch; }, "kein Zeichen"],
-    [(daten) => { daten.gelaende.gaerbottich.quelle = { gas: "lachgas", menge: 3 }; }, 'Gas "lachgas"'],
-    [(daten) => { daten.gelaende.tuer_zu.verbrenntZu = "kohle"; }, 'Gelände "kohle"'],
-    [(daten) => { daten.ebenen.keller.gelaendeObjekte = [{ gelaende: "thron", anzahl: 1 }]; }, 'Gelände "thron"'],
+    [(daten) => { daten.schichten.oberflaechen.testoberflaeche.brennbar = 150; }, "brennbar"],
+    [(daten) => { daten.schichten.oberflaechen.testoberflaeche.verbrenntZu = "glut"; }, 'Oberfläche "glut"'],
+    [(daten) => { daten.schichten.gase.testgas.stufen[1].ab = 10; }, "ab muss aufsteigen"],
+    [(daten) => { daten.schichten.gase.testgas.stufen[0].wenn = [{ bedingung: "mondphase" }]; }, "nicht angemeldet"],
+    [(daten) => { delete daten.zeichen.schichten.testgas; }, "kein Zeichen"],
+    [(daten) => { daten.gelaende.testquelle.quelle = { gas: "lachgas", menge: 3 }; }, 'Gas "lachgas"'],
+    [(daten) => { daten.gelaende.testquelle.verbrenntZu = "kohle"; }, 'Gelände "kohle"'],
+    [(daten) => { daten.ebenen.testebene.gelaendeObjekte = [{ gelaende: "thron", anzahl: 1 }]; }, 'Gelände "thron"'],
     [(daten) => { delete daten.regeln.feuer; }, "regeln.feuer"],
     [(daten) => { daten.effekte.test = { schritte: [{ baustein: "oberflaeche_setzen", art: "lava", menge: 1 }] }; }, 'Oberfläche "lava"'],
   ];

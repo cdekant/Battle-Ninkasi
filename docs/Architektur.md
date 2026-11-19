@@ -414,7 +414,7 @@ Vorläufige Ideen, noch nicht umgesetzt:
 
 + Vorgabe für die Bewegung: Ziffernblock, acht Richtungen, 5 für Warten
 + Die Belegung ist frei änderbar, siehe Datenfluss; sie umfasst Tasten, Maustasten und das Mausrad (`src/eingabe/belegung.js`)
-+ Weitere Tasten: Leertaste setzt eine unterbrochene lange Aktion fort (`fortsetzen`), R rastet bis voll, O erkundet automatisch, I öffnet das Inventarfenster (siehe Ausrüstung), <> nimmt die Treppe
++ Weitere Tasten: Leertaste setzt eine unterbrochene lange Aktion fort (`fortsetzen`), R rastet bis voll, O erkundet automatisch, I öffnet das Inventarfenster (siehe Ausrüstung und Inventar), <> nimmt die Treppe
 + Einstellungen (Zoom, Reise, Rasten) haben Vorgaben in `src/eingabe/einstellungen.js`; der Browser speichert nur Abweichungen davon
 
 ## Maus, Reise, Rasten und Erkunden
@@ -488,12 +488,24 @@ Vorläufige Ideen, noch nicht umgesetzt:
 + Anzeige: farbige Überlagerung auf sichtbaren Feldern, Oberfläche und Feuer unter den Entitäten, Gas darüber mit der Menge zunehmend deckend; Farben in `zeichen.schichten`; Tiles folgen
 + Im Spielinhalt (Zahlen vorläufig): die Säuredüse hinterlässt Säure (verätzt 1W3 je Tick, trocknet); drei Gärbottiche je Ebene im Inneren der Räume (Gelände-Objekte, sperren keinen Durchgang) geben CO2 ab, das sich hinter geschlossenen Türen sammelt; drei Brandflaschen je Ebene zerspringen beim Wurf zu Hochprozentigem und entzünden es; Feuer 1W6, Rauch ab 40 undurchsichtig, ab 60 Husten; Benommenheit und Ersticken sind vorläufig Giftschaden, bis es Zustände im Spielinhalt gibt
 
+## Inventar
+
++ Vorbilder: NetHack (Last in Stufen, jede bremst mehr), Brogue und DCSS (Stapel gleicher Gegenstände)
++ Code in `src/systeme/inventar.js`: Befehle `aufheben`, `trinken`, `fallenlassen { gegenstandId }` (der ganze Stapel aufs eigene Feld, Angelegtes wird dabei abgelegt, Meldung `fallengelassen`, Zeitkosten `aktionen.fallenlassen`)
++ Stapel: `stapelbar: true` am Gegenstand, `anzahl` an der Entität (Vorgabe 1); beim Aufheben fließt ein Gegenstand in einen Stapel, der in allen übrigen Komponenten gleich ist (`insInventar`), so stapeln sich z.B. verdorbene und frische Biere später nicht; Trinken, Werfen und Material für Fähigkeiten nehmen einen (`einenAbnehmen` spaltet dafür einen ab), Fallenlassen den ganzen Stapel; auf dem Boden fließt nichts zusammen
++ Ladungen: `ladungen: { hoechstens, gewichtJe? }`, der Stand in `ladungen.aktuell` (Vorgabe `hoechstens`); Trinken nimmt eine Ladung; ein Gegenstand mit Ladungen stapelt sich nicht
++ Behälter: `wirdZu: Typ` kommt nach dem letzten Gebrauch ins Gepäck (Bier zu leerer Flasche, Bierfass zu Fass), Grundlage für das Brauen
++ Gewicht `gewicht` in Gramm, mit Ladungen zuzüglich `gewichtJe` je Ladung; die Last ist die Summe über das Gepäck, Angelegtes eingeschlossen (`lastVon`)
++ Tragkraft `tragkraft` am Wesen, sonst `regeln.tragen.tragkraft` (20 kg), mit Modifikatoren auf `tragkraft` (Skills folgen mit dem Skillsystem); Überladung nach `regeln.tragen.stufen` (ab 100 % Bewegen +25 %, ab 150 % +100 %), verboten ist nichts; der Zuschlag wirkt in `zeitkosten` (`src/kern/spiel.js`) nur aufs Bewegen und nach allen Modifikatoren
++ Anzeige: das Gepäck zeigt Stapel (x 3), Ladungen (19/20), Angelegtes und die Last (Last 3,2 / 20 kg, rot "überladen"); im Inventarfenster F fallen lassen
++ Im Spielinhalt (Zahlen vorläufig): Bier 900 g, stapelbar, wird zur leeren Flasche (400 g, stapelbar); Bierfass mit 20 Schlucken zu einer Halben, 2 kg Holz und 500 g je Schluck, voll 12 kg, wird zum Fass; Brandflasche 900 g, stapelbar; Ausrüstung von 20 g (Kupferring) bis 6 kg (Fasshammer)
+
 ## Ausrüstung
 
 + Vorbilder: Brogue (wenige Plätze), DCSS (Tauschen in einem Befehl), NetHack (Flüche, unbekannt bis zum Anlegen, folgt mit 0.23.0), Caves of Qud (Ereignisse laufen auch durch die Ausrüstung der Trägerin)
 + Plätze am Wesen: `plaetze: { hand: 2, kopf: 1, brust: 1, beine: 1, hals: 1, finger: 2 }` (Ninkasi); die Namen stehen in `regeln.ausruestung.plaetze`; Waffen in den Händen, Rüstung und Schmuck an Kopf, Brust, Beinen, Hals und zwei Fingern
 + Gegenstand: `ausruestung: { platz, belegt?, angriffe?, modifikatoren?, ausloeser? }` und `tags` am Gegenstand; `belegt` (Vorgabe 1) zählt die Stellen, ein Zweihänder belegt beide Hände (`src/systeme/ausruestung.js`)
-+ Angelegt ist, was in `ausgeruestet: [IDs]` steht; der Gegenstand bleibt im Inventar; `ausDemInventarNehmen` (`src/kern/zustand.js`) nimmt ihn aus beidem (Trinken, Werfen, Entfernen), beim Tod fällt alles mit dem Inventar zu Boden
++ Angelegt ist, was in `ausgeruestet: [IDs]` steht; der Gegenstand bleibt im Inventar; `ausDemInventarNehmen` (`src/kern/zustand.js`) nimmt ihn aus beidem (Trinken, Werfen, Fallenlassen, Entfernen), beim Tod fällt alles mit dem Inventar zu Boden; angelegte Gegenstände stapeln sich nicht und sind kein Material
 + Befehle `anlegen { gegenstandId }` und `ablegen { gegenstandId }`; ist der Platz voll, legt derselbe Befehl die ältesten Gegenstände dort ab, bis genug frei ist, und kostet beides (`aktionen.anlegen` plus je `aktionen.ablegen`); Ablehnungen `nicht_im_gepaeck`, `nicht_anlegbar`, `schon_angelegt`, `kein_platz`, `nicht_angelegt`; Meldungen `angelegt`, `abgelegt`
 + Modifikatoren angelegter Gegenstände wirken über die Modifikatorquelle `ausruestung` (Quelle `ausruestung:<id>`), z.B. Rüstung und der Abzug aufs Ausweichen bei schwerer Rüstung; Sets über die Bedingung `traegt_tag { tag, anzahl }` an einem gewöhnlichen Modifikator
 + Waffen: angelegte Gegenstände mit `angriffe` ersetzen die eigenen Profile des Wesens (die Faust), zwei Waffen sind zwei Profile, die Aktion kostet so viel wie das langsamste (`angriffeVon` in `src/systeme/kampf.js`)
@@ -533,7 +545,7 @@ Vorläufige Ideen, noch nicht umgesetzt:
 + Ninkasi: 100 LP, 100 MP, 0 von 100 PP, Pegel 0 (nach oben offen), Sichtweite 8, Nahkampf 1W6+2 stumpf mit Genauigkeit 80 (80 % gegen ein Wesen ohne Ausweichen)
 + Essigbakterium: 15 LP, Biss 1W4 mit 70%, Verhaltensmodul "jagen" (sieht es Ninkasi, folgt es ihr, sonst geht es zur letzten bekannten Position und wartet)
 + Fernkämpfer-Test (ab 0.15.0, Zeichen F, noch ohne Tile): Testgegner für die KI mit Fähigkeiten, 10 LP, hält 3 Felder Abstand, Säurespucke (Geschoss über Verbündete, Abklingzeit 3) und angekündigter Säureschwall (Kreis mit Radius 1 auf das Feld beim Beginn, 3 Schritte, durch Schaden unterbrechbar, 30 %); Zahlen vorläufig
-+ Bier: aufheben mit G, trinken mit T; +20 LP, Pegel +0,5 ‰
++ Bier: aufheben mit G, trinken mit T; +20 LP, Pegel +0,5 ‰; die Flasche bleibt; ein Bierfass mit 20 Schlucken je Ebene
 + Stoffwechsel je Welttick, Zahlen vorläufig in `daten/ninkasi.js`: LP 0,3 nüchtern, 0,8 bei 1,5 ‰, darüber abnehmend; MP 0,8 nüchtern, 0 ab 3 ‰; PP Schwund 0,3 nüchtern, Stillstand von 0,5 bis 1,5 ‰, dann steigend bis 1,0 bei 4 ‰; danach Abbau des Pegels um 0,01 ‰
 + Schwellen 0,5, 1, 2 und 3 ‰ werden angezeigt und gemeldet, haben aber noch keine Wirkung; die Leiste zeigt zusätzlich das Optimum der LP
 + Alle Aktionen kosten 100
@@ -570,6 +582,7 @@ Vorläufige Ideen, noch nicht umgesetzt:
 + Arena-Simulationen: Ninkasi mit Ausrüstung und Skills X gegen Gegner Y, tausendfach; Ergebnis: Siegquote, verbrauchte LP, Zeit bis zum Sieg
 + Statistiken über erzeugte Dungeons je Startwert: Items, Getränke, Gegner pro Ebene, Weglängen
 + Dumme Bots mit zufälligen Befehlen als einfacher Test auf Abstürze und ungültige Zustände
++ Tests der Datenprüfung bauen ihre Fehler in eigene Testeinträge (`rohdatenMitTesteintraegen` in `tests/hilfen.js`, alle mit "test" im Namen), nicht in den Spielinhalt; Erwartungen an den Inhalt (z.B. wie viele Fallen eine Ebene hat) leiten sie aus den Daten ab; so lässt sich jeder Inhalt ändern oder löschen, ohne dass ein Test bricht
 + Messung der Leistung bei vielen Gegnern mit `node werkzeuge/messung.js`, siehe Leistung
 + Ausgabe als Tabellen, Auswertung und Diagramme mit Python
 
@@ -584,7 +597,7 @@ Vorläufige Ideen, noch nicht umgesetzt:
 + `package.json`: nur `"type": "module"` und `"private": true`, damit Node alle `.js`-Dateien als ES-Module liest; keine Abhängigkeiten, kein Build
 + `src/version.js`: Versionsnummer
 + `src/kern/`: Spiel und Eingangstür für Befehle (`spiel.js`), Zustand und Entitäten, räumlicher Index, Zeit, Zufall, Ereignisse und Katalog der Haken, Auslöser, Abschluss eines Vorgangs, Werte und Modifikatoren, Kurven, Effekte, Grundbausteine, Register, Datenprüfung
-+ `src/systeme/`: Bewegung, Kampf (Trefferwurf, Schadensrechnung), Fraktionen, Wahrnehmung, Sicht, Stoffwechsel, Inventar, Gefahrenprüfung, Tod, Zielauswahl samt Zielmustern, Bausteine mit Zielauswahl, Zustände, Befehlsveränderer, Beschwörung, Verschieben und Lage, Werfen, veränderliches Gelände und Türen, Fallen, Feldschichten und Feuer, Ebenen und Treppen, Ausrüstung, Bedingungen der Modifikatoren und Auren, Fähigkeiten, lange Aktionen, später Brauen, Handel u.a.
++ `src/systeme/`: Bewegung, Kampf (Trefferwurf, Schadensrechnung), Fraktionen, Wahrnehmung, Sicht, Stoffwechsel, Inventar, Gefahrenprüfung, Tod, Zielauswahl samt Zielmustern, Bausteine mit Zielauswahl, Zustände, Befehlsveränderer, Beschwörung, Verschieben und Lage, Werfen, veränderliches Gelände und Türen, Fallen, Feldschichten und Feuer, Ebenen und Treppen, Ausrüstung, Stapel, Ladungen und Last, Bedingungen der Modifikatoren und Auren, Fähigkeiten, lange Aktionen, später Brauen, Handel u.a.
 + `src/ki/`: Verhaltensmodule (`abwarten`, `jagen`, `fliehen`), ihre Zielwahl, Schrittwahl und die Wahl der Fähigkeiten
 + `src/welt/`: Dungeon-Erzeugung mit Treppen und Population nach Tiefe, Zugriff auf die Karte und die Feldschichten, Wegfindung, Geometrie (Linie, Sichtlinie, Flugbahn, Kreis, Kegel)
 + `src/anzeige/`: Renderer, Tilebilder (Pixeldaten zu Bildern), Kamera, Oberfläche, Anzeige des Pegels, Log, Effekte, Textzugriff und Grammatik

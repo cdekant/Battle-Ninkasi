@@ -145,19 +145,32 @@ test("Inventarfenster: wählen, handeln, zurück und schließen", () => {
   assert.deepEqual(inventarTaste({ gewaehlt: bier.id }, "KeyT", spiel).befehl, { art: "trinken", gegenstandId: bier.id });
 });
 
+// Ein eigener Testgegenstand für die Datenprüfung, damit der Spielinhalt (daten/ausruestung.js) frei änderbar bleibt
+const TESTAUSRUESTUNG = {
+  text: "gegenstand.testausruestung", aufhebbar: true, tags: ["test"],
+  ausruestung: {
+    platz: "hand", belegt: 2,
+    angriffe: [{ name: "testhieb", genauigkeit: 50, effekt: "faustschlag" }],
+    modifikatoren: [{ ziel: "ruestung", art: "plus", betrag: 1, wenn: [{ bedingung: "traegt_tag", tag: "test", anzahl: 2 }] }],
+  },
+};
+
 test("Datenprüfung: Plätze an Wesen und Gegenständen, Waffenprofile, Modifikatoren der Ausrüstung", () => {
   const pruefen = (aendern) => {
     const daten = structuredClone(rohdaten);
-    aendern(daten);
+    daten.gegenstaende.testausruestung = structuredClone(TESTAUSRUESTUNG);
+    daten.zeichen.gegenstaende.testausruestung = { zeichen: ")", farbe: "#ffffff" };
+    aendern(daten, daten.gegenstaende.testausruestung);
     return vorbereiten(daten).fehler;
   };
+  assert.deepEqual(pruefen(() => {}), [], "der Testgegenstand selbst ist fehlerfrei");
   const erwartet = [
-    [(daten) => { daten.gegenstaende.lederhose.ausruestung.platz = "schwanz"; }, "platz muss eines von"],
-    [(daten) => { daten.gegenstaende.fasshammer.ausruestung.belegt = 0; }, "belegt"],
-    [(daten) => { daten.gegenstaende.schoepfkelle.ausruestung.angriffe = []; }, "mindestens einem Profil"],
-    [(daten) => { daten.gegenstaende.kupferring.ausruestung.modifikatoren = [{ ziel: "ruestung" }]; }, "braucht ziel, art"],
+    [(daten, testgegenstand) => { testgegenstand.ausruestung.platz = "schwanz"; }, "platz muss eines von"],
+    [(daten, testgegenstand) => { testgegenstand.ausruestung.belegt = 0; }, "belegt"],
+    [(daten, testgegenstand) => { testgegenstand.ausruestung.angriffe = []; }, "mindestens einem Profil"],
+    [(daten, testgegenstand) => { testgegenstand.ausruestung.modifikatoren = [{ ziel: "ruestung" }]; }, "braucht ziel, art"],
+    [(daten, testgegenstand) => { testgegenstand.tags = "test"; }, "tags muss eine Liste"],
     [(daten) => { daten.wesen.ninkasi.plaetze = { fluegel: 2 }; }, 'Platz "fluegel"'],
-    [(daten) => { daten.gegenstaende.kupferring.tags = "kupfer"; }, "tags muss eine Liste"],
     [(daten) => { delete daten.regeln.ausruestung; }, "regeln.ausruestung.plaetze"],
   ];
   for (const [aendern, teilDerMeldung] of erwartet) assert.ok(pruefen(aendern).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);

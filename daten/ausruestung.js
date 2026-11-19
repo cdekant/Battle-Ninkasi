@@ -5,12 +5,12 @@ const KUPFERSET = { ziel: "willenskraft", art: "plus", betrag: 10, wenn: [{ bedi
 export default {
   // flink und handlich: ein Hieb mit dem Schöpfer
   schoepfkelle: {
-    text: "gegenstand.schoepfkelle", aufhebbar: true,
+    text: "gegenstand.schoepfkelle", aufhebbar: true, gewicht: 400,
     ausruestung: { platz: "hand", angriffe: [{ name: "schoepfkelle", genauigkeit: 85, effekt: "kellenschlag", kosten: 90 }] },
   },
   // schwer, langsam, zweihändig
   fasshammer: {
-    text: "gegenstand.fasshammer", aufhebbar: true,
+    text: "gegenstand.fasshammer", aufhebbar: true, gewicht: 6000,
     ausruestung: {
       platz: "hand", belegt: 2,
       angriffe: [{ name: "fasshammer", genauigkeit: 70, effekt: "hammerschlag", kosten: 150 }],
@@ -18,23 +18,23 @@ export default {
     },
   },
   lederschuerze: {
-    text: "gegenstand.lederschuerze", aufhebbar: true,
+    text: "gegenstand.lederschuerze", aufhebbar: true, gewicht: 2000,
     ausruestung: { platz: "brust", modifikatoren: [{ ziel: "ruestung", art: "plus", betrag: 2 }, { ziel: "ausweichen", art: "plus", betrag: -5 }] },
   },
   kupferhelm: {
-    text: "gegenstand.kupferhelm", aufhebbar: true, tags: ["kupfer"],
+    text: "gegenstand.kupferhelm", aufhebbar: true, gewicht: 1500, tags: ["kupfer"],
     ausruestung: { platz: "kopf", modifikatoren: [{ ziel: "ruestung", art: "plus", betrag: 1 }, KUPFERSET] },
   },
   lederhose: {
-    text: "gegenstand.lederhose", aufhebbar: true,
+    text: "gegenstand.lederhose", aufhebbar: true, gewicht: 1500,
     ausruestung: { platz: "beine", modifikatoren: [{ ziel: "ruestung", art: "plus", betrag: 1 }] },
   },
   hopfenkette: {
-    text: "gegenstand.hopfenkette", aufhebbar: true,
+    text: "gegenstand.hopfenkette", aufhebbar: true, gewicht: 100,
     ausruestung: { platz: "hals", modifikatoren: [{ ziel: "regeneration.lp", art: "prozent", betrag: 20 }] },
   },
   kupferring: {
-    text: "gegenstand.kupferring", aufhebbar: true, tags: ["kupfer"],
+    text: "gegenstand.kupferring", aufhebbar: true, gewicht: 20, tags: ["kupfer"],
     ausruestung: { platz: "finger", modifikatoren: [{ ziel: "willenskraft", art: "plus", betrag: 5 }, KUPFERSET] },
   },
 };

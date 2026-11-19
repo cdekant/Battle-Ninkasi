@@ -9,7 +9,8 @@
 // Am Aufschlag entsteht Lärm (regeln.wahrnehmung.laermWurf): Wache gehen ihm nach, so taugt ein Wurf als Ablenkung.
 
 import { anmelden } from "../kern/register.js";
-import { entitaetMitId, entitaetEntfernen, positionSetzen, ausDemInventarNehmen } from "../kern/zustand.js";
+import { entitaetMitId, entitaetEntfernen, positionSetzen } from "../kern/zustand.js";
+import { einenAbnehmen } from "./inventar.js";
 import { effektAnwenden } from "../kern/effekte.js";
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
 import { zielAufloesen } from "./zielauswahl.js";
@@ -33,12 +34,12 @@ anmelden("befehle", "werfen", {
     return aufloesung.ok ? null : aufloesung.grund;
   },
   ausfuehren(spiel, akteur, befehl) {
-    const gegenstand = geworfenerGegenstand(spiel, akteur, befehl);
-    const { bahn } = wurfbahn(spiel, akteur, gegenstand, befehl.ziel);
+    const imGepaeck = geworfenerGegenstand(spiel, akteur, befehl);
+    const { bahn } = wurfbahn(spiel, akteur, imGepaeck, befehl.ziel);
+    // vom Stapel einer, sonst der Gegenstand selbst; auch eine angelegte Waffe lässt sich werfen
+    const gegenstand = einenAbnehmen(spiel, akteur, imGepaeck);
     const aufschlag = { x: bahn.aufschlag.x, y: bahn.aufschlag.y };
     const getroffenId = bahn.getroffene[0] ?? null;
-    ausDemInventarNehmen(akteur, gegenstand.id); // auch eine angelegte Waffe lässt sich werfen
-    delete gegenstand.getragenVon;
     melden(spiel, "geworfen", { wer: bezugAuf(akteur), was: bezugAuf(gegenstand) });
     hakenAusloesen(spiel, "gegenstand_benutzt", { quelleId: akteur.id, zielId: akteur.id, gegenstandId: gegenstand.id, art: "werfen", kettentiefe: 0 });
     melden(spiel, "geschoss", { quelle: bezugAuf(akteur), bahn: bahn.felder, aufschlag });

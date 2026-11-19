@@ -46,6 +46,10 @@ function invariantenPruefen(spiel) {
     const lebenswert = entitaet.werte?.[entitaet.lebenswert || "lp"];
     if (lebenswert && lebenswert.aktuell <= 0 && entitaet.id !== zustand.spielerinId) throw new Error(`#${entitaet.id} mit Lebenswert 0 noch im Spiel`);
     if (entitaet.getragenVon !== undefined && !zustand.entitaeten[entitaet.getragenVon]?.inventar?.includes(entitaet.id)) throw new Error(`#${entitaet.id} getragen von fehlender Trägerin`);
+    // Stapel, Ladungen und Ausrüstung (src/systeme/inventar.js, src/systeme/ausruestung.js)
+    if (entitaet.anzahl !== undefined && !(Number.isInteger(entitaet.anzahl) && entitaet.anzahl >= 1)) throw new Error(`#${entitaet.id} mit Anzahl ${entitaet.anzahl}`);
+    if (entitaet.ladungen?.aktuell !== undefined && !(entitaet.ladungen.aktuell >= 1 && entitaet.ladungen.aktuell <= entitaet.ladungen.hoechstens)) throw new Error(`#${entitaet.id} mit ${entitaet.ladungen.aktuell} Ladungen`);
+    for (const angelegtId of entitaet.ausgeruestet || []) if (!entitaet.inventar?.includes(angelegtId)) throw new Error(`#${entitaet.id} hat #${angelegtId} angelegt, aber nicht im Gepäck`);
   }
   for (const eintrag of zustand.warteschlange) {
     if (eintrag.gebundenAn !== undefined && !zustand.entitaeten[eintrag.gebundenAn]) throw new Error(`Zeitereignis gebunden an fehlende #${eintrag.gebundenAn}`);
@@ -63,6 +67,10 @@ function zufallsbefehl(botZufall, spiel) {
   if (wurf <= 5) return { art: "warten" };
   if (wurf <= 10) return { art: "aufheben" };
   if (wurf <= 13 && ninkasi.werte.lp.aktuell < 70) return { art: "trinken", gegenstandId: erstesGetraenk(spiel.zustand, ninkasi) };
+  if (wurf === 17 && ninkasi.inventar?.length) {
+    // etwas fallen lassen, damit Gepäck und Boden in Bewegung bleiben
+    return { art: "fallenlassen", gegenstandId: ninkasi.inventar[zufallsGanzzahl(botZufall, 0, ninkasi.inventar.length - 1)] };
+  }
   const anlegbare = (ninkasi.inventar || []).filter((id) => spiel.zustand.entitaeten[id]?.ausruestung);
   if (wurf >= 14 && wurf <= 16 && anlegbare.length) {
     // Ausrüstung an- oder ablegen (tauscht bei vollem Platz)

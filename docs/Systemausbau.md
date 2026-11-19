@@ -125,16 +125,9 @@ Offener Rest:
 
 ## 9. Gegenstände
 
-Status: in Arbeit; umgesetzt in Version 0.21.0 (Plätze, anlegen und ablegen mit Tauschen, Modifikatorquelle `ausruestung`, Waffen statt Faust, Sets mit `traegt_tag`, Auslöser an der Ausrüstung, Haken `gegenstand_benutzt`, Inventarfenster), beschrieben in [Architektur.md](Architektur.md) (Ausrüstung)
+Status: in Arbeit; umgesetzt in Version 0.21.0 (Plätze, anlegen und ablegen mit Tauschen, Modifikatorquelle `ausruestung`, Waffen statt Faust, Sets mit `traegt_tag`, Auslöser an der Ausrüstung, Haken `gegenstand_benutzt`, Inventarfenster) und 0.22.0 (Stapel, Ladungen, Behälter mit `wirdZu`, Gewicht und Last in Stufen, Befehl `fallenlassen`, Bierfass), beschrieben in [Architektur.md](Architektur.md) (Inventar, Ausrüstung)
 
-Entschieden: Aufteilung in 0.21.0, 0.22.0 und 0.23.0; Plätze Kopf, Brust, Beine, Hals und zwei Finger für Rüstung und Schmuck, zwei Hände für Waffen; ein voller Platz wird in einem Befehl getauscht; Waffen ersetzen die Faust; Flüche sind unbekannt bis zum Anlegen; Biersorten sind ein eigenes Thema, 0.23.0 baut nur die Mechanik für Unbekanntes
-
-Offen, Version 0.22.0 (Stapel, Ladungen, Behälter, Gewicht):
-
-+ Stapel: `stapelbar` und `anzahl`; Gleiches fließt beim Aufheben zusammen, Trinken, Werfen und Fallenlassen nehmen einen
-+ Ladungen `ladungen: { aktuell, hoechstens }` (Fass mit Schlucken), Behälter über `wirdZu` nach dem letzten Schluck (leere Flasche, Fass, für das Brauen)
-+ Gewicht in Gramm, Tragkraft aus den Regeln mit Modifikatoren auf `tragkraft` (später Körperlichkeit); Überladung bremst in Stufen nach NetHack (ab 100 % Bewegen +25 %, ab 150 % +100 %)
-+ Befehl `fallenlassen`, im Inventarfenster
+Entschieden: Aufteilung in 0.21.0, 0.22.0 und 0.23.0; Plätze Kopf, Brust, Beine, Hals und zwei Finger für Rüstung und Schmuck, zwei Hände für Waffen; ein voller Platz wird in einem Befehl getauscht; Waffen ersetzen die Faust; Flüche sind unbekannt bis zum Anlegen; Biersorten sind ein eigenes Thema, 0.23.0 baut nur die Mechanik für Unbekanntes; Bier wird zur leeren Flasche, der Ballast ist gewollt; Tragkraft 20 kg als Startwert, Modifikatoren durch Skills offen; Fallenlassen nimmt den ganzen Stapel; Bierfass mit 20 Schlucken zu einer Halben
 
 Offen, Version 0.23.0 (Haltbarkeit, Verderben, Fluch, Unbekanntes):
 
@@ -149,6 +142,8 @@ Offener Rest:
 + Waffen mit Muster (Rundumschlag, Speer) im Spielinhalt
 + Mehrzahlwörter in der Grammatik (z.B. Holzpantinen), bisher nur Einzahl
 + Das Inventarfenster im Browser ausprobieren: die Tastenlogik ist getestet, die Darstellung in der Seitenleiste nicht
++ Fallenlassen einer Teilmenge (Abfrage der Anzahl), bisher immer der ganze Stapel
++ Leere Flaschen werfen (Köder, zerbrechen zu Scherben) und befüllen (mit dem Brausystem)
 
 ## 10. Weitere Systeme aus gängigen Roguelikes
 

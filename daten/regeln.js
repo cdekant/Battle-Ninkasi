@@ -50,6 +50,11 @@ export default {
   ausruestung: {
     plaetze: ["hand", "kopf", "brust", "beine", "hals", "finger"],
   },
+  // Tragen, siehe src/systeme/inventar.js; Skills auf "tragkraft" folgen mit dem Skillsystem
+  tragen: {
+    tragkraft: 20000, // in Gramm, ohne eigene tragkraft am Wesen
+    stufen: [{ ab: 100, kosten: 25 }, { ab: 150, kosten: 100 }], // ab Prozent der Tragkraft kostet Bewegen so viel mehr
+  },
   // Werfen, siehe src/systeme/werfen.js
   werfen: {
     reichweite: 6, // ohne wurf.reichweite am Gegenstand

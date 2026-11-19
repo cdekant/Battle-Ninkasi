@@ -17,6 +17,9 @@ export default {
   },
   gegenstaende: {
     bier: { zeichen: "!", farbe: "#e0952b" },
+    bierfass: { zeichen: "&", farbe: "#a07a4a" },
+    leere_flasche: { zeichen: "!", farbe: "#8c7a63" },
+    leeres_fass: { zeichen: "&", farbe: "#6b5a44" },
     brandflasche: { zeichen: "!", farbe: "#e5533d" },
     schoepfkelle: { zeichen: ")", farbe: "#b8b8b8" },
     fasshammer: { zeichen: ")", farbe: "#8c7a63" },

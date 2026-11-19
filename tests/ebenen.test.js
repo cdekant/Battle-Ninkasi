@@ -14,6 +14,7 @@ import { eintraegeFuerTiefe } from "../src/welt/ebene.js";
 import { ebeneWechseln } from "../src/systeme/ebenen.js";
 import { zustandSetzen } from "../src/systeme/zustaende.js";
 import { vorbereiten } from "../src/kern/daten.js";
+import { rohdatenMitTesteintraegen } from "./hilfen.js";
 
 const DATEN = datenLaden(rohdaten, { texte });
 const treppeUnter = (spiel) => { const { x, y } = spielerin(spiel.zustand).position; return gelaendeAuf(spiel, x, y)?.treppe ?? null; };
@@ -24,7 +25,7 @@ test("Das Spiel beginnt in der Starttiefe auf der Treppe hinauf", () => {
   assert.equal(spiel.zustand.tiefe, 1);
   assert.equal(spiel.zustand.ebene.name, "keller");
   assert.equal(treppeUnter(spiel), "auf");
-  assert.ok(gegnerIds(spiel).length >= 16);
+  assert.ok(gegnerIds(spiel).length >= rohdaten.ebenen.keller.population.anzahl[0], "mindestens so viele, wie die Ebene bestellt");
 });
 
 test("Hinauf in den Hub und zurück: die verlassene Ebene ruht und kommt unverändert wieder", () => {
@@ -91,13 +92,13 @@ test("Treppe: nur auf einer Treppe, nur für Ninkasi, nicht über die Abfolge hi
 });
 
 test("Population: gewichtet nach Tiefe, Rudel beieinander, Gegner aus der Tiefe, Affixe", () => {
-  const tabelle = rohdaten.populationen.keller;
-  assert.deepEqual(eintraegeFuerTiefe(tabelle, 1).map((eintrag) => eintrag.gewicht), [10, 2]);
-  assert.deepEqual(eintraegeFuerTiefe(tabelle, 3).map((eintrag) => eintrag.gewicht), [10, 5]);
+  const tabelle = [{ typ: "a", gewicht: 10, tiefe: [1, 3] }, { typ: "b", gewicht: 2, tiefe: [1, 1] }, { typ: "c", gewicht: 5, tiefe: [2, 3] }];
+  assert.deepEqual(eintraegeFuerTiefe(tabelle, 1).map((eintrag) => eintrag.typ), ["a", "b"]);
+  assert.deepEqual(eintraegeFuerTiefe(tabelle, 3).map((eintrag) => eintrag.typ), ["a", "c"]);
 
-  const roh = structuredClone(rohdaten);
+  const roh = rohdatenMitTesteintraegen();
   roh.zustaende = { ...roh.zustaende, zaeh: { text: "zustand.zaeh" } };
-  roh.populationen = { test: [{ typ: "fernkaempfer_test", gewicht: 1, tiefe: [3, 3], rudel: [3, 3], affixe: [{ zustand: "zaeh", chance: 100 }] }] };
+  roh.populationen = { ...roh.populationen, test: [{ typ: "testwesen", gewicht: 1, tiefe: [3, 3], rudel: [3, 3], affixe: [{ zustand: "zaeh", chance: 100 }] }] };
   roh.ebenen.keller.population = { tabelle: "test", anzahl: [6, 6] };
   roh.regeln.population.tieferChance = 100;
   roh.regeln.population.tieferBis = 2;
@@ -112,21 +113,21 @@ test("Population: gewichtet nach Tiefe, Rudel beieinander, Gegner aus der Tiefe,
 
 test("Datenprüfung: Abfolge, Starttiefe, feste Karte, Population und Tabellen", () => {
   const pruefen = (aendern) => {
-    const daten = structuredClone(rohdaten);
+    const daten = rohdatenMitTesteintraegen();
     aendern(daten);
     return vorbereiten(daten).fehler;
   };
   const erwartet = [
     [(daten) => { daten.abfolge = ["hub", "atlantis"]; }, 'Ebene "atlantis"'],
     [(daten) => { daten.starttiefe = 9; }, "starttiefe"],
-    [(daten) => { daten.ebenen.hub.karte = ["###", "#?#", "###"]; }, "unbekannte Kennungen ?"],
-    [(daten) => { daten.ebenen.hub.karte = ["###", "#.", "###"]; }, "gleich langer Zeilen"],
-    [(daten) => { daten.ebenen.keller.population.tabelle = "zoo"; }, 'Tabelle "zoo"'],
-    [(daten) => { daten.ebenen.keller.population.anzahl = [9, 3]; }, "anzahl muss [min, max]"],
-    [(daten) => { daten.populationen.keller[0].tiefe = [3]; }, "tiefe muss [von, bis]"],
-    [(daten) => { daten.populationen.keller[0].gewicht = 0; }, "gewicht"],
-    [(daten) => { daten.populationen.keller[0].affixe = [{ zustand: "gibt_es_nicht", chance: 10 }]; }, 'Zustand "gibt_es_nicht"'],
-    [(daten) => { daten.gelaende.treppe_ab.treppe = "seitwaerts"; }, "treppe muss"],
+    [(daten) => { daten.ebenen.testkarte.karte = ["###", "#?#", "###"]; }, "unbekannte Kennungen ?"],
+    [(daten) => { daten.ebenen.testkarte.karte = ["###", "#.", "###"]; }, "gleich langer Zeilen"],
+    [(daten) => { daten.ebenen.testebene.population.tabelle = "zoo"; }, 'Tabelle "zoo"'],
+    [(daten) => { daten.ebenen.testebene.population.anzahl = [9, 3]; }, "anzahl muss [min, max]"],
+    [(daten) => { daten.populationen.testtabelle[0].tiefe = [3]; }, "tiefe muss [von, bis]"],
+    [(daten) => { daten.populationen.testtabelle[0].gewicht = 0; }, "gewicht"],
+    [(daten) => { daten.populationen.testtabelle[0].affixe = [{ zustand: "gibt_es_nicht", chance: 10 }]; }, 'Zustand "gibt_es_nicht"'],
+    [(daten) => { daten.gelaende.testgelaende.treppe = "seitwaerts"; }, "treppe muss"],
     [(daten) => { daten.regeln.population.tieferChance = 120; }, "tieferChance"],
   ];
   for (const [aendern, teilDerMeldung] of erwartet) assert.ok(pruefen(aendern).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);

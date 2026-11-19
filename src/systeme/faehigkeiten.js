@@ -36,6 +36,7 @@ import { wertAufKurve } from "../kern/kurven.js";
 import { zielAufloesen, entitaetenAufFeldern } from "./zielauswahl.js";
 import { zustandSetzen, zustandBeenden } from "./zustaende.js";
 import { aktionBeginnen } from "./laufendeAktionen.js";
+import { anzahlVon, einenAbnehmen } from "./inventar.js";
 
 export const FAEHIGKEITSARTEN = ["aktiv", "aufrecht"];
 
@@ -77,14 +78,20 @@ export function voraussetzungenErfuellt(spiel, wesen, definition) {
   return bedingungenErfuellt(spiel, wesen, definition.voraussetzungen, umstaendeVon(definition));
 }
 
-// Gegenstände für das Material, je Eintrag die IDs in der Reihenfolge des Inventars, oder null, wenn etwas fehlt
+// Material: je Eintrag so viele Stück aus dem Gepäck (Stapel zählen mit ihrer Anzahl), in der Reihenfolge des Inventars;
+// gibt [{ id, stueck }] zurück oder null, wenn etwas fehlt; angelegte Gegenstände sind kein Material
 function materialAuswaehlen(spiel, wesen, definition) {
   const gewaehlt = [];
   for (const { typ, anzahl } of definition.material || []) {
-    // angelegte Gegenstände sind kein Material
-    const passende = (wesen.inventar || []).filter((id) => entitaetMitId(spiel.zustand, id)?.typ === typ && !gewaehlt.includes(id) && !(wesen.ausgeruestet || []).includes(id));
-    if (passende.length < anzahl) return null;
-    gewaehlt.push(...passende.slice(0, anzahl));
+    let offen = anzahl;
+    for (const id of wesen.inventar || []) {
+      const gegenstand = entitaetMitId(spiel.zustand, id);
+      if (offen <= 0 || gegenstand?.typ !== typ || (wesen.ausgeruestet || []).includes(id)) continue;
+      const stueck = Math.min(offen, anzahlVon(gegenstand));
+      gewaehlt.push({ id, stueck });
+      offen -= stueck;
+    }
+    if (offen > 0) return null;
   }
   return gewaehlt;
 }
@@ -117,9 +124,8 @@ function kostenBezahlen(spiel, wesen, name, definition) {
   for (const [wertName, menge] of Object.entries(verbrauchVon(spiel, wesen, definition))) {
     if (menge > 0) wertAendern(spiel, wesen, wertName, -menge, ursprung);
   }
-  for (const id of materialAuswaehlen(spiel, wesen, definition)) {
-    wesen.inventar = wesen.inventar.filter((getragen) => getragen !== id);
-    entitaetEntfernen(spiel.zustand, id);
+  for (const { id, stueck } of materialAuswaehlen(spiel, wesen, definition)) {
+    for (let i = 0; i < stueck; i++) entitaetEntfernen(spiel.zustand, einenAbnehmen(spiel, wesen, entitaetMitId(spiel.zustand, id)).id);
   }
 }
 

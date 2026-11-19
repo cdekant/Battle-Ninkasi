@@ -1,6 +1,7 @@
 // Hilfen für Unittests: kleine Spiele aus Testkarten, ohne Dungeon-Erzeugung.
 // Keine Testdatei (Endung nicht .test.js), wird von node --test nicht ausgeführt.
 
+import rohdaten from "../daten/index.js";
 import gelaende from "../daten/gelaende.js";
 import regeln from "../daten/regeln.js";
 import aktionen from "../daten/aktionen.js";
@@ -36,10 +37,50 @@ export function miniSpiel(kartenzeilen, { gelaende: testgelaende = {}, schichten
     werfen: { ...regeln.werfen, ...regelAbweichungen.werfen },
     population: { ...regeln.population, ...regelAbweichungen.population },
     fallen: { ...regeln.fallen, ...regelAbweichungen.fallen },
+    tragen: { ...regeln.tragen, ...regelAbweichungen.tragen },
     schichten: { ...regeln.schichten, ...regelAbweichungen.schichten },
     feuer: { ...regeln.feuer, ...regelAbweichungen.feuer },
   };
   return { zustand, daten: { gelaende: { ...gelaende, ...testgelaende }, schichten, aktionen, fraktionen: fraktionsdaten, effekte, schadensarten, zustaende, wesen: wesensdaten, faehigkeiten, risiken, gegenstaende, regeln: testregeln }, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
+}
+
+// Rohdaten mit eigenen Testeinträgen (alle mit "test" im Namen) für Tests der Datenprüfung: die Tests bauen ihre
+// Fehler in diese Einträge ein, nicht in den Spielinhalt, der sich so frei ändern und löschen lässt.
+// Texte prüft vorbereiten ohne Sprachdaten nicht; Zeichen schon, darum stehen sie mit dabei.
+export function rohdatenMitTesteintraegen() {
+  const daten = structuredClone(rohdaten);
+  const zeichen = (bereich, name) => { daten.zeichen[bereich] ??= {}; daten.zeichen[bereich][name] = { zeichen: "?", farbe: "#ffffff" }; };
+  daten.effekte.testeffekt = { schritte: [{ baustein: "schaden", art: "stumpf", menge: 1 }] };
+  daten.fraktionen.testfraktion = { text: "fraktion.testfraktion" };
+  daten.gelaende.testgelaende = { kennung: "§", passierbar: false, durchsichtig: false };
+  daten.gelaende.testtuer = { kennung: "¤", passierbar: false, durchsichtig: false, tuer: { offen: "boden" } };
+  daten.gelaende.testquelle = { kennung: "¦", passierbar: false, durchsichtig: true, quelle: { gas: "testgas", menge: 1 }, brennbar: 10, verbrenntZu: "boden" };
+  for (const name of ["testgelaende", "testtuer", "testquelle"]) zeichen("gelaende", name);
+  daten.fallen.testfalle = { text: "falle.testfalle", falle: { tarnung: 10, effekt: "testeffekt" } };
+  zeichen("fallen", "testfalle");
+  daten.schichten.oberflaechen.testoberflaeche = { text: "oberflaeche.test", brennbar: 50, verbrenntZu: "testoberflaeche" };
+  daten.schichten.gase.testgas = { text: "gas.test", abbau: 1, stufen: [{ ab: 10, effekt: "testeffekt" }, { ab: 20, effekt: "testeffekt" }] };
+  zeichen("schichten", "testoberflaeche");
+  zeichen("schichten", "testgas");
+  daten.faehigkeiten.testfaehigkeit = { text: "faehigkeit.test", dauer: { schritte: 2 }, unterbrechbar: true, ziel: { art: "selbst" }, wirkung: "testeffekt" };
+  daten.faehigkeiten.testgeschoss = { text: "faehigkeit.testgeschoss", ziel: { art: "geschoss", reichweite: 3 }, wirkung: "testeffekt" };
+  daten.wesen.testwesen = {
+    text: "wesen.testwesen", fraktion: "testfraktion", werte: { lp: { grundwert: 5 } },
+    faehigkeiten: ["testgeschoss", "testfaehigkeit"],
+    ki: { modul: "jagen", letzteBekanntePosition: null, faehigkeiten: [{ name: "testgeschoss" }, { name: "testfaehigkeit" }] },
+  };
+  zeichen("wesen", "testwesen");
+  daten.wesen.testvorlage = { abstrakt: true, fraktion: "testfraktion" };
+  daten.gegenstaende.testgegenstand = { text: "gegenstand.testgegenstand", aufhebbar: true };
+  zeichen("gegenstaende", "testgegenstand");
+  daten.populationen.testtabelle = [{ typ: "testwesen", gewicht: 1, tiefe: [1, 1] }];
+  daten.ebenen.testebene = {
+    breite: 20, hoehe: 20, gelaende: { wand: "wand", boden: "boden" }, digger: {},
+    population: { tabelle: "testtabelle", anzahl: [1, 2] }, fallen: [{ typ: "testfalle", anzahl: 1 }],
+    gelaendeObjekte: [{ gelaende: "testquelle", anzahl: 1 }], tuerChance: 10,
+  };
+  daten.ebenen.testkarte = { karte: ["###", "#.#", "###"] };
+  return daten;
 }
 
 // Wesen mit Position, Fraktion und LP; weitere Komponenten (ausloeser, angriff, beimTod ...) über zusatz

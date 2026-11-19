@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import "../src/kern/spiel.js"; // meldet Bausteine, Systeme und Verhaltensmodule an
 import rohdaten from "../daten/index.js";
 import { vorbereiten } from "../src/kern/daten.js";
+import { rohdatenMitTesteintraegen } from "./hilfen.js";
 
 function mitNinkasi(abweichung) {
   const daten = structuredClone(rohdaten);
@@ -10,8 +11,9 @@ function mitNinkasi(abweichung) {
   return vorbereiten(daten).fehler;
 }
 
-test("Die mitgelieferten Daten sind fehlerfrei", () => {
+test("Die mitgelieferten Daten sind fehlerfrei, die Testeinträge auch", () => {
   assert.deepEqual(vorbereiten(structuredClone(rohdaten)).fehler, []);
+  assert.deepEqual(vorbereiten(rohdatenMitTesteintraegen()).fehler, []);
 });
 
 test("Ein offener Wert braucht einen Anfangswert", () => {
@@ -190,7 +192,7 @@ test("Zustände: Felder, Verweise und Kreise über Beginn und Ende werden geprü
 
 test("Verhalten in Zuständen und Beschwören werden geprüft", () => {
   const mitZustand = (zustand, effekte = {}) => {
-    const daten = structuredClone(rohdaten);
+    const daten = rohdatenMitTesteintraegen();
     daten.zustaende = { test: { text: "test", ...zustand } };
     Object.assign(daten.effekte, effekte);
     return vorbereiten(daten).fehler;
@@ -209,8 +211,8 @@ test("Verhalten in Zuständen und Beschwören werden geprüft", () => {
     assert.ok(mitZustand(zustand).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
   }
   const rufen = (wesen) => ({ rufen: { schritte: [{ baustein: "beschwoeren", wesen }] } });
-  assert.deepEqual(mitZustand({}, rufen("essigbakterium")), []);
-  assert.ok(mitZustand({}, rufen("bakterium")).some((meldung) => meldung.includes('Wesen "bakterium"')), "abstrakte Vorlage");
+  assert.deepEqual(mitZustand({}, rufen("testwesen")), []);
+  assert.ok(mitZustand({}, rufen("testvorlage")).some((meldung) => meldung.includes('Wesen "testvorlage"')), "abstrakte Vorlage");
   assert.ok(mitZustand({}, rufen("drache")).some((meldung) => meldung.includes('Wesen "drache"')));
 });
 
@@ -289,18 +291,18 @@ test("Fähigkeiten, Risikotabellen und Unterhalt werden geprüft", () => {
 
 test("Fraktionen, Wachzustand, Lärmdämpfung und Regeln der Wahrnehmung werden geprüft", () => {
   const mitDaten = (aendern) => {
-    const daten = structuredClone(rohdaten);
+    const daten = rohdatenMitTesteintraegen();
     aendern(daten);
     return vorbereiten(daten).fehler;
   };
-  assert.deepEqual(mitDaten((daten) => { daten.fraktionen.ninkasi.beziehungen = { verderber: "neutral" }; }), []);
+  assert.deepEqual(mitDaten((daten) => { daten.fraktionen.testfraktion.beziehungen = { ninkasi: "neutral" }; }), []);
   const erwartet = [
-    [(daten) => { daten.fraktionen.ninkasi.beziehungen = { drachen: "feind" }; }, 'Fraktion "drachen"'],
-    [(daten) => { daten.fraktionen.ninkasi.beziehungen = { verderber: "freundlich" }; }, "beziehungen.verderber"],
-    [(daten) => { delete daten.fraktionen.verderber.text; }, "fraktionen.verderber: Textschlüssel"],
-    [(daten) => { daten.wesen.essigbakterium.fraktion = "piraten"; }, 'Fraktion "piraten"'],
-    [(daten) => { daten.wesen.essigbakterium.ki = { modul: "jagen", wachzustand: "doest" }; }, "wachzustand"],
-    [(daten) => { daten.gelaende.wand.laermdaempfung = -1; }, "laermdaempfung"],
+    [(daten) => { daten.fraktionen.testfraktion.beziehungen = { drachen: "feind" }; }, 'Fraktion "drachen"'],
+    [(daten) => { daten.fraktionen.testfraktion.beziehungen = { ninkasi: "freundlich" }; }, "beziehungen.ninkasi"],
+    [(daten) => { delete daten.fraktionen.testfraktion.text; }, "fraktionen.testfraktion: Textschlüssel"],
+    [(daten) => { daten.wesen.testwesen.fraktion = "piraten"; }, 'Fraktion "piraten"'],
+    [(daten) => { daten.wesen.testwesen.ki = { modul: "jagen", wachzustand: "doest" }; }, "wachzustand"],
+    [(daten) => { daten.gelaende.testgelaende.laermdaempfung = -1; }, "laermdaempfung"],
     [(daten) => { daten.regeln.fraktionen.beziehungVorgabe = "egal"; }, "beziehungVorgabe"],
     [(daten) => { daten.regeln.wahrnehmung.bemerkenChance = 120; }, "bemerkenChance"],
     [(daten) => { daten.regeln.wahrnehmung.heimlichkeitNachAktion = { warten: "halb" }; }, "heimlichkeitNachAktion"],
@@ -308,15 +310,15 @@ test("Fraktionen, Wachzustand, Lärmdämpfung und Regeln der Wahrnehmung werden 
   for (const [aendern, teilDerMeldung] of erwartet) {
     assert.ok(mitDaten(aendern).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
   }
-  assert.deepEqual(mitDaten((daten) => { daten.wesen.essigbakterium.ki = { modul: "jagen", wachzustand: "schlaeft", letzteBekanntePosition: null }; }), []);
+  assert.deepEqual(mitDaten((daten) => { daten.wesen.testwesen.ki = { modul: "jagen", wachzustand: "schlaeft", letzteBekanntePosition: null }; }), []);
 });
 
 test("KI mit Fähigkeiten, Ankündigung und Unterbrechbarkeit werden geprüft", () => {
   const mitGegner = (abweichung, faehigkeit = null) => {
-    const daten = structuredClone(rohdaten);
+    const daten = rohdatenMitTesteintraegen();
     if (faehigkeit) daten.faehigkeiten.test = faehigkeit;
-    const gegner = daten.wesen.fernkaempfer_test;
-    daten.wesen.fernkaempfer_test = { ...gegner, ...abweichung(gegner) };
+    const gegner = daten.wesen.testwesen;
+    daten.wesen.testwesen = { ...gegner, ...abweichung(gegner) };
     return vorbereiten(daten).fehler;
   };
   const mitKi = (ki) => mitGegner((gegner) => ({ ki: { ...gegner.ki, ...ki } }));
@@ -324,15 +326,15 @@ test("KI mit Fähigkeiten, Ankündigung und Unterbrechbarkeit werden geprüft", 
     [{ abstandHalten: 0 }, "abstandHalten"],
     [{ faehigkeiten: "spucke" }, "faehigkeiten muss eine Liste"],
     [{ faehigkeiten: [{ name: "gibt_es_nicht" }] }, 'Fähigkeit "gibt_es_nicht" gibt es nicht'],
-    [{ faehigkeiten: [{ name: "saeurespucke", chance: 120 }] }, "chance"],
-    [{ faehigkeiten: [{ name: "saeurespucke", abstandAb: -1 }] }, "abstandAb"],
-    [{ faehigkeiten: [{ name: "saeurespucke", wenn: [{ bedingung: "mondphase" }] }] }, "nicht angemeldet"],
+    [{ faehigkeiten: [{ name: "testgeschoss", chance: 120 }] }, "chance"],
+    [{ faehigkeiten: [{ name: "testgeschoss", abstandAb: -1 }] }, "abstandAb"],
+    [{ faehigkeiten: [{ name: "testgeschoss", wenn: [{ bedingung: "mondphase" }] }] }, "nicht angemeldet"],
   ];
   for (const [ki, teilDerMeldung] of erwartet) assert.ok(mitKi(ki).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
-  const unbekannt = mitGegner(() => ({ faehigkeiten: ["saeurespucke"] }));
-  assert.ok(unbekannt.some((meldung) => meldung.includes('kennt die Fähigkeit "saeureschwall" nicht')));
+  const unbekannt = mitGegner(() => ({ faehigkeiten: ["testgeschoss"] }));
+  assert.ok(unbekannt.some((meldung) => meldung.includes('kennt die Fähigkeit "testfaehigkeit" nicht')));
 
-  const ohneDauer = { text: "wesen.ninkasi", ankuendigung: "wesen.ninkasi", unterbrechbar: true, ziel: { art: "selbst" }, wirkung: "biss_klein" };
+  const ohneDauer = { text: "wesen.ninkasi", ankuendigung: "wesen.ninkasi", unterbrechbar: true, ziel: { art: "selbst" }, wirkung: "testeffekt" };
   assert.ok(mitGegner(() => ({}), ohneDauer).some((meldung) => meldung.includes("nur mit dauer")));
   assert.ok(mitGegner(() => ({}), { ...ohneDauer, dauer: { schritte: 2 }, ziel: { art: "geschoss", ueberVerbuendete: "ja" } }).some((meldung) => meldung.includes("ueberVerbuendete")));
   assert.deepEqual(mitGegner(() => ({}), { ...ohneDauer, dauer: { schritte: 2 } }), []);
@@ -340,19 +342,19 @@ test("KI mit Fähigkeiten, Ankündigung und Unterbrechbarkeit werden geprüft", 
 
 test("Bewegungsarten, Gelände, Würfe, Unterbrechungsgründe und Regeln der Bewegung werden geprüft", () => {
   const pruefen = (aendern) => {
-    const daten = structuredClone(rohdaten);
+    const daten = rohdatenMitTesteintraegen();
     aendern(daten);
     return vorbereiten(daten).fehler;
   };
   const erwartet = [
     [(daten) => { daten.wesen.ninkasi.bewegung = "kriechend"; }, "bewegung muss eines von"],
     [(daten) => { daten.zustaende.test = { text: "t", bewegung: "hüpfend" }; }, "bewegung muss eines von"],
-    [(daten) => { daten.gelaende.boden.passierbarFuer = ["tauchend"]; }, "passierbarFuer"],
-    [(daten) => { daten.gelaende.wand.undurchdringlich = "ja"; }, "undurchdringlich"],
-    [(daten) => { daten.gelaende.wand.beimFestsitzen = "gibt_es_nicht"; }, 'Effekt "gibt_es_nicht"'],
-    [(daten) => { daten.gegenstaende.bier.wurf = { effekt: "gibt_es_nicht" }; }, 'Effekt "gibt_es_nicht"'],
-    [(daten) => { daten.gegenstaende.bier.wurf = { reichweite: 0 }; }, "reichweite"],
-    [(daten) => { daten.faehigkeiten.saeureschwall.unterbrechbar = ["husten"]; }, "unterbrechbar"],
+    [(daten) => { daten.gelaende.testgelaende.passierbarFuer = ["tauchend"]; }, "passierbarFuer"],
+    [(daten) => { daten.gelaende.testgelaende.undurchdringlich = "ja"; }, "undurchdringlich"],
+    [(daten) => { daten.gelaende.testgelaende.beimFestsitzen = "gibt_es_nicht"; }, 'Effekt "gibt_es_nicht"'],
+    [(daten) => { daten.gegenstaende.testgegenstand.wurf = { effekt: "gibt_es_nicht" }; }, 'Effekt "gibt_es_nicht"'],
+    [(daten) => { daten.gegenstaende.testgegenstand.wurf = { reichweite: 0 }; }, "reichweite"],
+    [(daten) => { daten.faehigkeiten.testfaehigkeit.unterbrechbar = ["husten"]; }, "unterbrechbar"],
     [(daten) => { delete daten.regeln.bewegung; }, "regeln.bewegung"],
     [(daten) => { daten.regeln.werfen = { reichweite: 0 }; }, "regeln.werfen.reichweite"],
     [(daten) => { delete daten.regeln.wahrnehmung.laermWurf; }, "laermWurf"],
@@ -361,10 +363,10 @@ test("Bewegungsarten, Gelände, Würfe, Unterbrechungsgründe und Regeln der Bew
     assert.ok(pruefen(aendern).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
   }
   const gueltig = pruefen((daten) => {
-    daten.gelaende.wand.undurchdringlich = false;
-    daten.gelaende.wand.passierbarFuer = ["phasend"];
-    daten.gegenstaende.bier.wurf = { effekt: "biss_klein", reichweite: 4 };
-    daten.faehigkeiten.saeureschwall.unterbrechbar = ["schaden", "versetzt"];
+    daten.gelaende.testgelaende.undurchdringlich = false;
+    daten.gelaende.testgelaende.passierbarFuer = ["phasend"];
+    daten.gegenstaende.testgegenstand.wurf = { effekt: "testeffekt", reichweite: 4 };
+    daten.faehigkeiten.testfaehigkeit.unterbrechbar = ["schaden", "versetzt"];
   });
   assert.deepEqual(gueltig, []);
 });

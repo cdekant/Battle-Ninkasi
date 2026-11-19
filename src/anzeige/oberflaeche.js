@@ -8,6 +8,7 @@ import { hoechstwert } from "../kern/werte.js";
 import { optimalerPegel } from "../systeme/stoffwechsel.js";
 import { promilleText, leistenanteil, TEILSTRICHE } from "./pegelanzeige.js";
 import { istAngelegt } from "../systeme/ausruestung.js";
+import { anzahlVon, ladungenVon, lastVon, tragkraftVon, lastZuschlag } from "../systeme/inventar.js";
 import { BUCHSTABEN } from "../eingabe/inventar.js";
 
 function balken(beschriftung, aktuellerWert, hoechsterWert, cssKlasse) {
@@ -56,10 +57,17 @@ export class Oberflaeche {
       const buchstabe = fenster ? `<span class="buchstabe">${BUCHSTABEN[stelle] ?? " "})</span> ` : "";
       const angelegt = istAngelegt(ninkasi, gegenstand.id) ? ` <span class="leise">(${text("ui.angelegt")})</span>` : "";
       const gewaehlt = fenster?.gewaehlt === gegenstand.id ? ' class="gewaehlt"' : "";
-      return `<li${gewaehlt}>${buchstabe}${nomenForm(gegenstand, "nom", "ohne")}${angelegt}</li>`;
+      const anzahl = anzahlVon(gegenstand) > 1 ? ` x ${anzahlVon(gegenstand)}` : "";
+      const ladungen = gegenstand.ladungen ? ` (${ladungenVon(gegenstand)}/${gegenstand.ladungen.hoechstens})` : "";
+      return `<li${gewaehlt}>${buchstabe}${nomenForm(gegenstand, "nom", "ohne")}${anzahl}${ladungen}${angelegt}</li>`;
     });
-    const hinweis = fenster ? `<li class="hinweis">${text(fenster.gewaehlt === null ? "ui.inventar_waehlen" : "ui.inventar_handeln")}</li>` : "";
-    const gepaeckHtml = gepaeckZeilen.length ? gepaeckZeilen.join("") + hinweis : `<li class="leise">${text("ui.leer")}</li>`;
+    // offen immer mit Hinweis, auch bei leerem Gepäck, sonst sähe das Öffnen aus, als geschähe nichts
+    const hinweisSchluessel = !gegenstaende.length ? "ui.inventar_leer" : fenster?.gewaehlt === null ? "ui.inventar_waehlen" : "ui.inventar_handeln";
+    const hinweis = fenster ? `<li class="hinweis">${text(hinweisSchluessel)}</li>` : "";
+    const kilo = (gramm) => (gramm / 1000).toFixed(1).replace(".", ",");
+    const ueberladen = lastZuschlag(spiel, ninkasi) ? ` <span class="schlimm">${text("ui.ueberladen")}</span>` : "";
+    const lastZeile = `<div class="leise">${text("ui.last")} ${kilo(lastVon(spiel, ninkasi))} / ${kilo(tragkraftVon(spiel, ninkasi))} kg${ueberladen}</div>`;
+    const gepaeckHtml = (gepaeckZeilen.length ? gepaeckZeilen.join("") : `<li class="leise">${text("ui.leer")}</li>`) + hinweis;
 
     const sichtbareGegner = Object.values(zustand.entitaeten).filter((entitaet) =>
       entitaet.position && entitaet.fraktion !== undefined && entitaet.id !== ninkasi.id
@@ -77,8 +85,9 @@ export class Oberflaeche {
       ${balken(text("ui.pp"), werte.pp.aktuell, hoechstwert(spiel, ninkasi, "pp"), "pp")}
       <h2>${text("ui.pegel")}</h2>
       ${pegelLeiste(text("ui.promille"), werte.pegel.aktuell, ninkasi.stoffwechsel.schwellen || [], optimalerPegel(spiel, ninkasi, "lp"))}
-      <h2>${text("ui.gepaeck")}</h2>
-      <ul>${gepaeckHtml}</ul>
+      <h2${fenster ? ' class="offen"' : ""}>${text(fenster ? "ui.inventar" : "ui.gepaeck")}</h2>
+      ${lastZeile}
+      <ul class="gepaeck${fenster ? " offen" : ""}">${gepaeckHtml}</ul>
       <h2>${text("ui.in_sicht")}</h2>
       <ul class="gegner">${gegnerHtml}</ul>
       <div class="fuss">

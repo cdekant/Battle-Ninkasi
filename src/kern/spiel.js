@@ -14,7 +14,7 @@ import { neuerZustand, entitaetMitId, alleEntitaeten, spielerin, kiVon, entitaet
 import { zufallErzeugen, startwertAbleiten } from "./zufall.js";
 import { WELTTICK, einreihen, ersterEintrag, ersterEintragEntnehmen, akteurEinreihen } from "./zeit.js";
 import { holen, hat, alle as alleImRegister } from "./register.js";
-import { modifiziert } from "./werte.js";
+import { modifiziert, prozentVon } from "./werte.js";
 import { melden, bezugAuf, hakenAusloesen } from "./ereignisse.js";
 import { vorgangAbschliessen } from "./vorgang.js";
 import { ebeneErzeugen } from "../welt/ebene.js";
@@ -22,6 +22,7 @@ import { sichtfeldAktualisieren } from "../systeme/sicht.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 import { aktionAbbrechen, laufendeAktionVorDemZug } from "../systeme/laufendeAktionen.js";
 import { wahrnehmen } from "../systeme/wahrnehmung.js";
+import { lastZuschlag } from "../systeme/inventar.js";
 
 // Rohdaten prüfen und vorbereiten; wirft Datenfehler mit allen Meldungen.
 // sprache: { texte, nomenPruefen? } (siehe kern/daten.js)
@@ -52,9 +53,12 @@ export function neuesSpiel(daten, startwert) {
 
 // Zeitkosten einer Aktion für eine Entität, mit Modifikatoren für die Aktion und für alle; umstaende siehe kern/werte.js
 // grundkosten: abweichende Grundkosten (z.B. eines Angriffsprofils), Vorgabe aus daten/aktionen.js
+// Überladung (systeme/inventar.js lastZuschlag) verteuert das Bewegen danach um ihre Prozent.
 export function zeitkosten(spiel, entitaet, aktion, umstaende = {}, grundkosten = spiel.daten.aktionen[aktion]) {
   if (grundkosten === undefined) throw new Error(`Keine Kosten für Aktion "${aktion}" in daten/aktionen.js`);
-  return Math.max(1, modifiziert(spiel, entitaet, [`kosten.${aktion}`, "kosten.alle"], grundkosten, umstaende));
+  const kosten = modifiziert(spiel, entitaet, [`kosten.${aktion}`, "kosten.alle"], grundkosten, umstaende);
+  const zuschlag = aktion === "bewegen" ? lastZuschlag(spiel, entitaet) : 0;
+  return Math.max(1, zuschlag ? prozentVon(kosten, 100 + zuschlag) : kosten);
 }
 
 // Ninkasi wartet auf eine Eingabe, außer ein Zustand gibt ihr eine KI (Furcht, Rausch, Psi-Kontrolle)

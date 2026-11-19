@@ -20,7 +20,7 @@ export default {
     digger: { dugPercentage: 0.35, roomWidth: [4, 12], roomHeight: [3, 7], corridorLength: [3, 10] },
     population: { tabelle: "keller", anzahl: [16, 20] }, // Wesen je Ebene, nach Tiefe gezogen (daten/populationen.js)
     gegenstaende: [
-      { typ: "bier", anzahl: 10 }, { typ: "brandflasche", anzahl: 3 },
+      { typ: "bier", anzahl: 10 }, { typ: "bierfass", anzahl: 1 }, { typ: "brandflasche", anzahl: 3 },
       { typ: "schoepfkelle", anzahl: 1 }, { typ: "fasshammer", anzahl: 1 }, { typ: "lederschuerze", anzahl: 1 },
       { typ: "kupferhelm", anzahl: 1 }, { typ: "lederhose", anzahl: 1 }, { typ: "hopfenkette", anzahl: 1 }, { typ: "kupferring", anzahl: 2 },
     ],

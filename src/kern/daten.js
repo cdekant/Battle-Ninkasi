@@ -94,7 +94,7 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
     if (!istTextliste(wesen.faehigkeiten)) fehler.push(`${ort}: faehigkeiten muss eine Liste von Namen sein`);
     else for (const faehigkeit of wesen.faehigkeiten) if (!daten.faehigkeiten?.[faehigkeit]) fehler.push(`${ort}: Fähigkeit "${faehigkeit}" gibt es nicht`);
   }
-  pruefeParameter(daten, { bewegung: BEWEGUNGSARTEN, tueren: ["oeffnen", "nicht"] }, wesen, ort, fehler);
+  pruefeParameter(daten, { bewegung: BEWEGUNGSARTEN, tueren: ["oeffnen", "nicht"], tragkraft: "ganzzahl?" }, wesen, ort, fehler);
   if (wesen.plaetze !== undefined) {
     const plaetze = daten.regeln?.ausruestung?.plaetze || [];
     if (!istObjekt(wesen.plaetze)) fehler.push(`${ort}: plaetze muss ein Objekt { platz: anzahl } sein`);
@@ -214,6 +214,11 @@ function pruefeRegeln(daten, regeln, fehler) {
   if (!istObjekt(regeln.feuer)) fehler.push("regeln.feuer fehlt");
   else pruefeParameter(daten, { brennen: "effekt", dauer: "ganzzahl", rauch: "gas?", rauchMenge: "ganzzahl" }, regeln.feuer, "regeln.feuer", fehler);
   if (!istTextliste(regeln.ausruestung?.plaetze)) fehler.push("regeln.ausruestung.plaetze muss eine Liste von Namen sein");
+  const tragen = regeln.tragen;
+  if (!istZahlAbNull(tragen?.tragkraft)) fehler.push("regeln.tragen.tragkraft muss eine ganze Zahl >= 0 sein");
+  if (!Array.isArray(tragen?.stufen) || !tragen.stufen.every((stufe, nummer) => istZahlAbNull(stufe?.ab) && istZahlAbNull(stufe?.kosten) && (nummer === 0 || stufe.ab > tragen.stufen[nummer - 1].ab))) {
+    fehler.push("regeln.tragen.stufen muss eine Liste [{ ab, kosten }] mit aufsteigendem ab sein");
+  }
   if (!istObjekt(regeln.fallen)) fehler.push("regeln.fallen fehlt");
   else pruefeParameter(daten, { entdeckenVorgabe: "ganzzahl", reichweite: "ganzzahl" }, regeln.fallen, "regeln.fallen", fehler);
   if (!regeln.kampf) return fehler.push("regeln.kampf fehlt");
@@ -313,6 +318,15 @@ function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
   pruefeNomen(sprache, gegenstand.text, fehler);
   if (gegenstand.trinkbar) pruefeEffektVerweis(daten, gegenstand.trinkbar.effekt, `${ort}.trinkbar`, fehler);
   if (gegenstand.tags !== undefined && !istTextliste(gegenstand.tags)) fehler.push(`${ort}: tags muss eine Liste von Texten sein`);
+  // Stapel, Ladungen, Behälter, Gewicht, siehe systeme/inventar.js
+  pruefeParameter(daten, { stapelbar: "wahrheitswert?", gewicht: "ganzzahl?" }, gegenstand, ort, fehler);
+  if (gegenstand.wirdZu !== undefined && !daten.gegenstaende[gegenstand.wirdZu]) fehler.push(`${ort}: wirdZu: Gegenstand "${gegenstand.wirdZu}" gibt es nicht`);
+  if (gegenstand.ladungen !== undefined) {
+    const ladungen = gegenstand.ladungen;
+    if (!istObjekt(ladungen) || !(istGanzzahl(ladungen.hoechstens) && ladungen.hoechstens > 0)) fehler.push(`${ort}: ladungen muss { hoechstens > 0, gewichtJe? } sein`);
+    else pruefeParameter(daten, { gewichtJe: "ganzzahl?" }, ladungen, `${ort}.ladungen`, fehler);
+    if (gegenstand.stapelbar) fehler.push(`${ort}: ein Gegenstand mit ladungen ist nicht stapelbar`);
+  }
   // Ausrüstung, siehe systeme/ausruestung.js
   if (gegenstand.ausruestung !== undefined) {
     const ausruestung = gegenstand.ausruestung;

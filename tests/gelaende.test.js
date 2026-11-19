@@ -18,6 +18,7 @@ import { gelaendeSetzen } from "../src/systeme/gelaende.js";
 import { entdeckenChance, fallenMeiden } from "../src/systeme/fallen.js";
 import { sichtfeldAktualisieren } from "../src/systeme/sicht.js";
 import { vorbereiten } from "../src/kern/daten.js";
+import { rohdatenMitTesteintraegen } from "./hilfen.js";
 
 // "|" Gitter (Geschosse ja, Sicht nein), "o" Glas (Sicht ja, Geschosse nein), "h"/"H" Hebel
 const GELAENDE = {
@@ -167,27 +168,27 @@ test("Die Ebene bekommt Türen an Raumzugängen und Fallen, wiederholbar je Star
   };
   const erste = zaehlen(9), zweite = zaehlen(9);
   assert.ok(erste.tueren > 0);
-  assert.equal(erste.fallen, 12);
+  assert.equal(erste.fallen, rohdaten.ebenen.keller.fallen.reduce((summe, eintrag) => summe + eintrag.anzahl, 0), "so viele, wie die Ebene bestellt");
   assert.equal(erste.felder, zweite.felder);
 });
 
 test("Datenprüfung: Türen, Zerstörbares, Hebel, Gitter, Fallen, tueren am Wesen, Regeln der Fallen", () => {
   const pruefen = (aendern) => {
-    const daten = structuredClone(rohdaten);
+    const daten = rohdatenMitTesteintraegen();
     aendern(daten);
     return vorbereiten(daten).fehler;
   };
   const erwartet = [
-    [(daten) => { daten.gelaende.tuer_zu.tuer = { offen: "gibt_es_nicht" }; }, 'Gelände "gibt_es_nicht"'],
-    [(daten) => { daten.gelaende.tuer_zu.tuer = { auf: "tuer_offen" }; }, "tuer muss"],
-    [(daten) => { daten.gelaende.wand.zerstoerbar = { wird: "lava" }; }, 'Gelände "lava"'],
-    [(daten) => { daten.gelaende.wand.beimBenutzen = "gibt_es_nicht"; }, 'Effekt "gibt_es_nicht"'],
-    [(daten) => { daten.gelaende.wand.geschossdurchlaessig = "ja"; }, "geschossdurchlaessig"],
-    [(daten) => { daten.fallen.saeureduese.falle.tarnung = -1; }, "tarnung"],
-    [(daten) => { daten.fallen.saeureduese.falle.ausloesenFuer = ["kriechend"]; }, "ausloesenFuer"],
-    [(daten) => { delete daten.zeichen.fallen.saeureduese; }, "kein Zeichen"],
-    [(daten) => { daten.ebenen.keller.fallen = [{ typ: "gibt_es_nicht", anzahl: 1 }]; }, 'Falle "gibt_es_nicht"'],
-    [(daten) => { daten.ebenen.keller.tuerChance = 150; }, "tuerChance"],
+    [(daten) => { daten.gelaende.testtuer.tuer = { offen: "gibt_es_nicht" }; }, 'Gelände "gibt_es_nicht"'],
+    [(daten) => { daten.gelaende.testtuer.tuer = { auf: "boden" }; }, "tuer muss"],
+    [(daten) => { daten.gelaende.testgelaende.zerstoerbar = { wird: "lava" }; }, 'Gelände "lava"'],
+    [(daten) => { daten.gelaende.testgelaende.beimBenutzen = "gibt_es_nicht"; }, 'Effekt "gibt_es_nicht"'],
+    [(daten) => { daten.gelaende.testgelaende.geschossdurchlaessig = "ja"; }, "geschossdurchlaessig"],
+    [(daten) => { daten.fallen.testfalle.falle.tarnung = -1; }, "tarnung"],
+    [(daten) => { daten.fallen.testfalle.falle.ausloesenFuer = ["kriechend"]; }, "ausloesenFuer"],
+    [(daten) => { delete daten.zeichen.fallen.testfalle; }, "kein Zeichen"],
+    [(daten) => { daten.ebenen.testebene.fallen = [{ typ: "gibt_es_nicht", anzahl: 1 }]; }, 'Falle "gibt_es_nicht"'],
+    [(daten) => { daten.ebenen.testebene.tuerChance = 150; }, "tuerChance"],
     [(daten) => { daten.wesen.ninkasi.tueren = "eintreten"; }, "tueren"],
     [(daten) => { delete daten.regeln.fallen; }, "regeln.fallen"],
   ];

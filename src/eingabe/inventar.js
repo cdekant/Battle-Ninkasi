@@ -2,7 +2,8 @@
 // Fenster-Zustand der Anzeige (nicht im Spielzustand): null (zu) oder { gewaehlt: null | gegenstandId }.
 //   zu:                 Taste I öffnet
 //   offen, nichts gewählt: A bis Z wählt den Gegenstand an dieser Stelle des Gepäcks, Esc oder I schließt
-//   offen, gewählt:     T trinken, A anlegen oder ablegen (je nachdem), Esc zurück zur Auswahl
+//   offen, gewählt:     T trinken, A anlegen oder ablegen (je nachdem), F fallen lassen (der ganze Stapel),
+//                       Esc zurück zur Auswahl
 // Werfen bekommt erst mit dem Zielmodus eine Taste (siehe docs/Systemausbau.md).
 
 import { spielerin, entitaetMitId } from "../kern/zustand.js";
@@ -28,6 +29,7 @@ export function inventarTaste(fenster, tastencode, spiel) {
   }
   const ninkasi = spielerin(spiel.zustand);
   if (buchstabe === "t") return { fenster: null, befehl: { art: "trinken", gegenstandId: fenster.gewaehlt } };
+  if (buchstabe === "f") return { fenster: null, befehl: { art: "fallenlassen", gegenstandId: fenster.gewaehlt } };
   if (buchstabe === "a") {
     const art = istAngelegt(ninkasi, fenster.gewaehlt) ? "ablegen" : "anlegen";
     return { fenster: null, befehl: { art, gegenstandId: fenster.gewaehlt } };

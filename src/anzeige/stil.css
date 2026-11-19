@@ -64,8 +64,11 @@ html, body {
 #seitenleiste ul { list-style: none; margin: 0; padding: 0; }
 #seitenleiste li { margin: 2px 0; }
 #seitenleiste li.gewaehlt { color: var(--bier); }
+#seitenleiste h2.offen { color: var(--hinweis); }
+#seitenleiste ul.gepaeck.offen { outline: 1px solid var(--hinweis); outline-offset: 4px; }
 #seitenleiste li.hinweis { color: var(--hinweis); font-size: 0.85em; margin-top: 6px; }
 #seitenleiste .buchstabe { color: var(--kupfer); font-family: monospace; }
+#seitenleiste .schlimm { color: var(--schlimm); }
 
 .wert { margin: 6px 0; }
 .wert-kopf { display: flex; justify-content: space-between; font-size: 0.9em; }
