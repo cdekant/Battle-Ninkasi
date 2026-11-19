@@ -45,8 +45,8 @@ export function neuesSpiel(daten, startwert) {
 }
 
 // Zeitkosten einer Aktion für eine Entität, mit Modifikatoren für die Aktion und für alle; umstaende siehe kern/werte.js
-export function zeitkosten(spiel, entitaet, aktion, umstaende = {}) {
-  const grundkosten = spiel.daten.aktionen[aktion];
+// grundkosten: abweichende Grundkosten (z.B. eines Angriffsprofils), Vorgabe aus daten/aktionen.js
+export function zeitkosten(spiel, entitaet, aktion, umstaende = {}, grundkosten = spiel.daten.aktionen[aktion]) {
   if (grundkosten === undefined) throw new Error(`Keine Kosten für Aktion "${aktion}" in daten/aktionen.js`);
   return Math.max(1, modifiziert(spiel, entitaet, [`kosten.${aktion}`, "kosten.alle"], grundkosten, umstaende));
 }
@@ -77,11 +77,13 @@ function befehlVeraendern(spiel, akteur, befehl) {
 
 function befehlAusfuehren(spiel, akteur, befehl) {
   const wirksamerBefehl = befehlVeraendern(spiel, akteur, befehl);
-  const aktion = holen("befehle", wirksamerBefehl.art).ausfuehren(spiel, akteur, wirksamerBefehl);
+  // ausfuehren gibt die Aktionsart zurück oder { aktion, grundkosten }
+  const ergebnis = holen("befehle", wirksamerBefehl.art).ausfuehren(spiel, akteur, wirksamerBefehl);
+  const { aktion, grundkosten } = typeof ergebnis === "string" ? { aktion: ergebnis } : ergebnis;
   vorgangAbschliessen(spiel);
   const zustand = spiel.zustand;
   const akteurNochImSpiel = entitaetMitId(zustand, akteur.id) && !(akteur.id === zustand.spielerinId && zustand.vorbei);
-  if (akteurNochImSpiel) akteurEinreihen(zustand, akteur.id, zeitkosten(spiel, akteur, aktion));
+  if (akteurNochImSpiel) akteurEinreihen(zustand, akteur.id, zeitkosten(spiel, akteur, aktion, {}, grundkosten));
 }
 
 // Die Eingangstür: einziger Weg, wie Entscheidungen der Spielerin in die Logik gelangen.

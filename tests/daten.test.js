@@ -103,9 +103,6 @@ test("Kampfwerte, Widerstände, Immunität, Schadensarten und Regeln des Kampfs 
     [{ widerstaende: { kaelte: 50 } }, "widerstaende.kaelte"],
     [{ widerstaende: { feuer: 1.5 } }, "widerstaende.feuer"],
     [{ immun: ["laerm"] }, 'Schadensart "laerm"'],
-    [{ angriff: { genauigkeit: 80 } }, "effekt"],
-    [{ angriff: { effekt: "faustschlag" } }, "genauigkeit fehlt"],
-    [{ angriff: { genauigkeit: 80, effekt: "faustschlag", tags: "unblockbar" } }, "angriff.tags"],
   ];
   for (const [abweichung, teilDerMeldung] of erwartet) {
     assert.ok(mitNinkasi(() => abweichung).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
@@ -131,12 +128,27 @@ test("Kampfwerte, Widerstände, Immunität, Schadensarten und Regeln des Kampfs 
   assert.ok(vorbereiten(schiefeRegeln).fehler.some((meldung) => meldung.includes("regeln.kampf fehlt")));
 });
 
-test("Angriff mit Muster und trifft wird geprüft", () => {
-  const mitAngriff = (zusatz) => mitNinkasi((ninkasi) => ({ angriff: { ...ninkasi.angriff, ...zusatz } }));
-  assert.deepEqual(mitAngriff({ muster: { art: "linie", laenge: 2 }, trifft: "feinde" }), []);
-  assert.ok(mitAngriff({ muster: { art: "angrenzend", durchWaende: 1 } }).some((meldung) => meldung.includes("durchWaende")));
-  assert.ok(mitAngriff({ muster: "angrenzend" }).some((meldung) => meldung.includes("angriff.muster")));
-  assert.ok(mitAngriff({ trifft: "niemand" }).some((meldung) => meldung.includes("trifft")));
+test("Angriffsprofile werden geprüft", () => {
+  const mitAngriff = (zusatz) => mitNinkasi((ninkasi) => ({ angriffe: [{ ...ninkasi.angriffe[0], ...zusatz }] }));
+  assert.deepEqual(mitAngriff({ muster: { art: "linie", laenge: 2 }, trifft: "feinde", kosten: 70, chance: 30, tags: ["unblockbar"], kritchance: 5 }), []);
+  const erwartet = [
+    [{ muster: { art: "angrenzend", durchWaende: 1 } }, "durchWaende"],
+    [{ muster: "angrenzend" }, "angriffe[0].muster"],
+    [{ trifft: "niemand" }, "trifft"],
+    [{ name: undefined }, "name fehlt"],
+    [{ genauigkeit: undefined }, "genauigkeit fehlt"],
+    [{ effekt: "gibt_es_nicht" }, "Effekt"],
+    [{ kosten: 0 }, "kosten"],
+    [{ chance: 150 }, "chance"],
+    [{ tags: "unblockbar" }, "angriffe[0]: tags"],
+  ];
+  for (const [zusatz, teilDerMeldung] of erwartet) {
+    assert.ok(mitAngriff(zusatz).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
+  }
+  const faust = rohdaten.wesen.ninkasi.angriffe[0];
+  assert.ok(mitNinkasi(() => ({ angriffe: [faust, faust] })).some((meldung) => meldung.includes("doppelt")));
+  assert.ok(mitNinkasi(() => ({ angriffe: [] })).some((meldung) => meldung.includes("mindestens einem Profil")));
+  assert.ok(mitNinkasi(() => ({ angriff: faust })).some((meldung) => meldung.includes("angriff gibt es nicht mehr")));
 });
 
 test("Zustände: Felder, Verweise und Kreise über Beginn und Ende werden geprüft", () => {

@@ -1,6 +1,6 @@
 // Spielzustand und Entitäten. Der gesamte Zustand ist reine Daten (JSON-serialisierbar).
 // Eine Entität ist eine ID plus Komponenten, z.B.
-//   { id, typ, text, position: {x, y}, werte, fraktion, ki, sicht, angriff, inventar, trinkbar, zustaende, ... }
+//   { id, typ, text, position: {x, y}, werte, fraktion, ki, sicht, angriffe, inventar, trinkbar, zustaende, ... }
 // Entitäten liegen in einem Objekt mit ganzzahligen Schlüsseln; JavaScript durchläuft solche
 // Schlüssel aufsteigend, die Reihenfolge ist also fest (Erzeugungsreihenfolge).
 

@@ -6,7 +6,7 @@ import { anmelden } from "../kern/register.js";
 import { entitaetenAuf } from "../kern/zustand.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { passierbar } from "../welt/karte.js";
-import { istWesen, feindlich, nahkampf } from "./kampf.js";
+import { istWesen, feindlich, nahkampf, kannAngreifen } from "./kampf.js";
 import { sichtfeldAktualisieren } from "./sicht.js";
 
 function zielfeld(akteur, befehl) {
@@ -25,7 +25,7 @@ anmelden("befehle", "bewegen", {
     if (befehl.angreifen !== undefined && typeof befehl.angreifen !== "boolean") return "ungueltig";
     const { x, y } = zielfeld(akteur, befehl);
     const anderesWesen = wesenAuf(spiel, x, y);
-    if (anderesWesen) return akteur.angriff && (feindlich(akteur, anderesWesen) || befehl.angreifen === true) ? null : "besetzt";
+    if (anderesWesen) return kannAngreifen(spiel, akteur) && (feindlich(akteur, anderesWesen) || befehl.angreifen === true) ? null : "besetzt";
     if (!passierbar(spiel, x, y)) return "wand";
     return null;
   },
@@ -33,8 +33,7 @@ anmelden("befehle", "bewegen", {
     const { x, y } = zielfeld(akteur, befehl);
     const anderesWesen = wesenAuf(spiel, x, y);
     if (anderesWesen) {
-      nahkampf(spiel, akteur, anderesWesen);
-      return "nahkampf";
+      return { aktion: "nahkampf", grundkosten: nahkampf(spiel, akteur, anderesWesen) };
     }
     akteur.position = { x, y };
     if (akteur.id === spiel.zustand.spielerinId) {

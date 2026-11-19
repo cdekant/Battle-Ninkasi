@@ -1,10 +1,17 @@
 // Kampf (siehe docs/Architektur.md, Kampfwerte): Trefferwurf, Blocken, Krit, Nahkampf und die Schadensrechnung
 // über Rüstung, Widerstand und Immunität.
 //
-// Angriff in den Daten: angriff: { genauigkeit: 80, effekt: "faustschlag", tags?, kritchance?, muster?, trifft? }
+// Angriffsprofile in den Daten: angriffe: [{ name, genauigkeit, effekt, kosten?, chance?, tags?, kritchance?, muster?, trifft? }]
+//   Eine Angriffsaktion führt die Profile nacheinander in der Reihenfolge der Daten aus, jedes mit eigenem Wurf;
+//   ein Profil mit chance (Prozent) wird nur so oft mitgenommen, kommt keines zum Zug, das erste.
+//   kosten: Zeitkosten des Profils (Vorgabe aktionen.nahkampf); die Aktion kostet so viel wie ihr langsamstes Profil,
+//   Modifikatoren auf kosten.nahkampf und kosten.alle wirken darauf.
 //   muster (siehe systeme/zielauswahl.js) vom Angreifer in Richtung des Ziels, z.B. Rundumschlag
 //   { art: "angrenzend" } oder Speer { art: "linie", laenge: 2 }; jedes getroffene Wesen bekommt einen
-//   eigenen Trefferwurf, in der Reihenfolge der Felder; trifft Vorgabe "wesen", der Angreifer nie selbst
+//   eigenen Trefferwurf, in der Reihenfolge der Felder; trifft Vorgabe "wesen", der Angreifer nie selbst.
+//   Wessen Lebenswert schon bei 0 liegt, wird von weiteren Profilen derselben Aktion nicht mehr angegriffen.
+//   Vor jedem einzelnen Angriff läuft der Haken vor_angriff; ein Abbruch lässt diesen Angriff aus.
+// Zugriff auf die Profile nur über angriffeVon, damit später Waffen ihr Profil einbringen können (Punkt 9).
 // Kampfwerte am Wesen: kampfwerte: { ausweichen?, willenskraft?, blocken?, ruestung?, kritchance? } als Punkte (Vorgabe 0),
 //   abgefragt über Modifikatoren mit gleichnamigem Ziel; widerstaende: { saeure: 100, feuer: -50 }; immun: ["psi"]
 // Punkte werden über einen Halbwert zu Anteilen, die sich 100 % nur annähern: punkte / (punkte + halbwert).
@@ -13,8 +20,8 @@
 // Marker als Tags an Angriff oder Effekt: verfehlt_nie, unblockbar, ignoriert_ruestung
 // Regelwerte in daten/regeln.js (kampf).
 
-import { mitAnteil } from "../kern/zufall.js";
-import { modifiziert } from "../kern/werte.js";
+import { mitAnteil, mitProzentChance } from "../kern/zufall.js";
+import { modifiziert, lebenswertName } from "../kern/werte.js";
 import { effektAnwenden, beteiligteAus } from "../kern/effekte.js";
 import { bausteinAnmelden } from "../kern/bausteine.js";
 import { anmelden } from "../kern/register.js";
@@ -76,30 +83,61 @@ export function trefferwurf(spiel, wurf) {
 
 const tagsDesEffekts = (spiel, effektName) => spiel.daten.effekte?.[effektName]?.tags || [];
 
-function angriffsziele(spiel, angreifer, ziel) {
-  const angriff = angreifer.angriff;
-  if (!angriff.muster) return [ziel];
+// Die Angriffsprofile eines Wesens; einziger Zugriff, später kommen hier die Profile der Waffen dazu
+export function angriffeVon(spiel, wesen) {
+  return wesen.angriffe || [];
+}
+
+export function kannAngreifen(spiel, wesen) {
+  return angriffeVon(spiel, wesen).length > 0;
+}
+
+// Grundkosten eines Profils in Zeiteinheiten
+export function kostenDesProfils(spiel, profil) {
+  return profil.kosten ?? spiel.daten.aktionen.nahkampf;
+}
+
+// Welche Profile eine Aktion ausführt: ohne chance immer, sonst nach Wurf; kommt keines zum Zug, das erste
+function profileDerAktion(spiel, profile) {
+  const gewaehlt = profile.filter((profil) => profil.chance === undefined || mitProzentChance(spiel.zustand.zufallszustand, profil.chance));
+  return gewaehlt.length > 0 ? gewaehlt : profile.slice(0, 1);
+}
+
+function angriffsziele(spiel, angreifer, profil, ziel) {
+  if (!profil.muster) return [ziel];
   const auswahl = { ursprung: { ...angreifer.position }, zielpunkt: { ...ziel.position }, quelleId: angreifer.id };
-  const felder = musterFelder(spiel, angriff.muster, auswahl);
-  return entitaetenAufFeldern(spiel, felder, { trifft: angriff.trifft ?? "wesen", urheberId: angreifer.id, urheberFraktion: fraktionVon(angreifer), ohneUrheber: true });
+  const felder = musterFelder(spiel, profil.muster, auswahl);
+  return entitaetenAufFeldern(spiel, felder, { trifft: profil.trifft ?? "wesen", urheberId: angreifer.id, urheberFraktion: fraktionVon(angreifer), ohneUrheber: true });
 }
 
+const lebenswertUeberNull = (wesen) => (wesen.werte?.[lebenswertName(wesen)]?.aktuell ?? 0) > 0;
+
+// Angriffsaktion gegen ein Ziel mit allen Profilen; gibt die Grundkosten zurück (das langsamste ausgeführte Profil)
 export function nahkampf(spiel, angreifer, ziel) {
-  if (!angreifer.angriff) return;
-  for (const getroffenes of angriffsziele(spiel, angreifer, ziel)) {
-    if (spiel.zustand.entitaeten[getroffenes.id]) einzelangriff(spiel, angreifer, getroffenes);
-  }
+  const profile = angriffeVon(spiel, angreifer);
+  if (profile.length === 0) return spiel.daten.aktionen.nahkampf;
+  const ausgefuehrt = profileDerAktion(spiel, profile);
+  ausgefuehrt.forEach((profil, nummer) => {
+    for (const getroffenes of angriffsziele(spiel, angreifer, profil, ziel)) {
+      if (!spiel.zustand.entitaeten[getroffenes.id]) continue;
+      if (nummer > 0 && !lebenswertUeberNull(getroffenes)) continue;
+      einzelangriff(spiel, angreifer, profil, getroffenes);
+    }
+  });
+  return Math.max(...ausgefuehrt.map((profil) => kostenDesProfils(spiel, profil)));
 }
 
-function einzelangriff(spiel, angreifer, ziel) {
-  const angriff = angreifer.angriff;
-  const tags = [...(angriff.tags || [])];
-  for (const tag of tagsDesEffekts(spiel, angriff.effekt)) if (!tags.includes(tag)) tags.push(tag);
-  const { ergebnis, kritisch } = trefferwurf(spiel, { quelle: angreifer, ziel, genauigkeit: angriff.genauigkeit, tags, kritchance: angriff.kritchance });
-  const mittel = { art: "angriff", name: angriff.effekt };
-  const beteiligte = { quelleId: angreifer.id, urheberId: angreifer.beschworenVon ?? angreifer.id, zielId: ziel.id, ursache: "nahkampf", kettentiefe: 0, mittel, tags, kritisch };
+function einzelangriff(spiel, angreifer, profil, ziel) {
+  const tags = [...(profil.tags || [])];
+  for (const tag of tagsDesEffekts(spiel, profil.effekt)) if (!tags.includes(tag)) tags.push(tag);
+  const mittel = { art: "angriff", name: profil.name };
+  const urheberId = angreifer.beschworenVon ?? angreifer.id;
+  const vorher = hakenAusloesen(spiel, "vor_angriff", { quelleId: angreifer.id, urheberId, zielId: ziel.id, ursache: "nahkampf", kettentiefe: 0, mittel, tags, angriff: profil.name, abgebrochen: false });
+  if (vorher.abgebrochen) return;
+  const { ergebnis, kritisch } = trefferwurf(spiel, { quelle: angreifer, ziel, genauigkeit: profil.genauigkeit, tags, kritchance: profil.kritchance });
+  const beteiligte = { quelleId: angreifer.id, urheberId, zielId: ziel.id, ursache: "nahkampf", kettentiefe: 0, mittel, tags, kritisch };
   if (ergebnis === "treffer") {
-    effektAnwenden(spiel, angriff.effekt, beteiligte);
+    effektAnwenden(spiel, profil.effekt, beteiligte);
     hakenAusloesen(spiel, "nach_treffer", { ...beteiligte });
   } else {
     melden(spiel, "verfehlt", { quelle: bezugAuf(angreifer), ziel: bezugAuf(ziel), grund: ergebnis });

@@ -23,7 +23,7 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 + Ersatzwirkungen aus Daten (z.B. "Phönixbier verhindert einmal den Tod", "Schild fängt einen Treffer ab"): eigener Typ, der sofort am Haken "davor" wirkt und sich verbrauchen kann; mit den Zuständen (Punkt 3)
 + Auslöser auch an Skills (mit dem Skillsystem) und an Ausrüstung und Inventar der Trägerin nach dem Vorbild der Kaskade in Caves of Qud (Punkt 9)
-+ Die reservierten Haken des Katalogs in Betrieb nehmen: `zug_beginn`, `zug_ende` (Punkt 3, sobald etwas sie braucht), `vor_angriff` (Punkt 5), `betritt_feld`, `verlaesst_feld` (Punkt 8), `gegenstand_benutzt` (Punkt 9)
++ Die reservierten Haken des Katalogs in Betrieb nehmen: `zug_beginn`, `zug_ende` (Punkt 3, sobald etwas sie braucht), `betritt_feld`, `verlaesst_feld` (Punkt 8), `gegenstand_benutzt` (Punkt 9)
 + Index im `zwischenspeicher`, welche Entitäten Auslöser für einen Haken tragen (Vorbild "WantEvent" in Caves of Qud); erst nötig, wenn mehr als die Beteiligten gefragt werden
 + Erster Auslöser im Spielinhalt (z.B. Säurespritzer des Essigbakteriums beim Tod): Spieldesign, noch nicht entschieden
 
@@ -68,21 +68,15 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 ## 5. Kampfwerte
 
-Status: umgesetzt in Version 0.10.0 (Schadensarten, Widerstand, Immunität, Rüstung, Ausweichen, Willenskraft, Blocken, Krit, Marker, Baustein `trefferwurf`), beschrieben in [Architektur.md](Architektur.md) (Kampfwerte)
+Status: umgesetzt in Version 0.10.0 (Schadensarten, Widerstand, Immunität, Rüstung, Ausweichen, Willenskraft, Blocken, Krit, Marker, Baustein `trefferwurf`) und 0.11.0 (Angriffsprofile mit Zeitkosten, `vor_angriff`), beschrieben in [Architektur.md](Architektur.md) (Kampfwerte)
 
-Entschieden: Kampfwerte sind Punkte, die über einen Halbwert zu Anteilen werden, die sich 100 % nur annähern (Trefferchance, Blocken, Kritchance, Widerstand); Trefferchance als Verhältnis von Genauigkeit zu Verteidigung plus Grundverteidigung, ohne harte Grenzen; Rüstung als fester Abzug mit Mindestschaden 1; Verwundbarkeit nähert sich dem doppelten Schaden; Immunität als eigener Sonderfall; Kritfaktor x1,5 als Regelwert, nach oben offen; `art` am Baustein `schaden` ist Pflicht; Durchschaubarkeit kommt aus der Anzeige der errechneten Prozentzahl, nicht aus der Formel
-
-Offener Rest, Teil der nächsten Version 0.11.0:
-
-+ Angriffsprofile statt einer einzigen Komponente `angriff`: `angriffe: [{ name, genauigkeit, effekt, kosten?, chance?, tags?, kritchance?, muster?, trifft? }]`, abgefragt nur über `angriffeVon(spiel, wesen)`, damit Waffen (Punkt 9) ihr Profil einbringen können
-+ Eine Angriffsaktion führt alle Profile nacheinander aus, in der Reihenfolge der Daten, jedes mit eigenem Wurf; ein Profil mit `chance` wird nur in so vielen Prozent der Aktionen mitgenommen
-+ Zeitkosten je Profil (`kosten`, Vorgabe `kosten.nahkampf`), z.B. Dolch 70 und Fasshammer 150; die Aktion kostet so viel wie ihr langsamstes Profil (Vorbild ist die Waffenverzögerung in DCSS, die ein Skill senken kann)
-+ Haken `vor_angriff` in Betrieb nehmen (vor dem Trefferwurf, darf abbrechen)
+Entschieden: Kampfwerte sind Punkte, die über einen Halbwert zu Anteilen werden, die sich 100 % nur annähern (Trefferchance, Blocken, Kritchance, Widerstand); Trefferchance als Verhältnis von Genauigkeit zu Verteidigung plus Grundverteidigung, ohne harte Grenzen; Rüstung als fester Abzug mit Mindestschaden 1; Verwundbarkeit nähert sich dem doppelten Schaden; Immunität als eigener Sonderfall; Kritfaktor x1,5 als Regelwert, nach oben offen; `art` am Baustein `schaden` ist Pflicht; mehrere Angriffe laufen in einer Aktion nacheinander, die Aktion kostet so viel wie ihr langsamstes Profil; Durchschaubarkeit kommt aus der Anzeige der errechneten Prozentzahl, nicht aus der Formel
 
 Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 + Angekündigte Angriffe: ein Wesen wählt aus seinem Portfolio einen Angriff, setzt sich einen Zustand "holt aus" mit Meldung im Log und führt ihn aus, wenn es wieder dran ist; wer das Log liest, kann ausweichen (Vorbild Brogue, DCSS); braucht die Auswahl der KI und Fähigkeiten mit Ziel (Punkte 6 und 7)
 + Abzug der Rüstung auf das Ausweichen in den Daten der Rüstung, später womöglich über das Gewicht (Punkt 9)
++ Waffen bringen ihr Angriffsprofil über `angriffeVon` ein und ersetzen oder ergänzen die Faust; zwei Waffen sind zwei Profile (Punkt 9)
 + Ersatzwirkungen (Rest aus Punkt 1) achten den Marker `unblockbar`
 + Anzeige: schwebende Krit-Zahlen, Trefferchance in Tooltip und Untersuchen; mit dem großen Punkt Oberfläche
 + Zuordnung der Eigenschaften zu Kampfwerten (Gewandtheit zu Ausweichen, Trinkfestigkeit zu Widerstand gegen Gift): Skillsystem in [Charakter.md](Charakter.md)

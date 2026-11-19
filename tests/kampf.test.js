@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import "../src/kern/spiel.js"; // meldet Bausteine und Systeme an
-import { miniSpiel, wesen, meldungenMitschneiden } from "./hilfen.js";
+import { miniSpiel, wesen, meldungenMitschneiden, hakenFuerTest } from "./hilfen.js";
+import { holen } from "../src/kern/register.js";
+import { zeitkosten } from "../src/kern/spiel.js";
 import { effektAnwenden } from "../src/kern/effekte.js";
 import { modifikatorHinzufuegen } from "../src/kern/werte.js";
 import { zufallErzeugen, mitAnteil } from "../src/kern/zufall.js";
@@ -74,18 +75,18 @@ test("Gegen Willenskraft: der Baustein trefferwurf wirkt sonst den Ersatz", () =
 });
 
 test("Blocken fängt einen gelungenen Treffer ab, unblockbar umgeht es", () => {
-  const { spiel, quelle, ziel } = aufstellen({ angreifer: { angriff: { genauigkeit: 100, effekt: "hieb" } }, ziel: { kampfwerte: { blocken: SEHR_VIEL } } });
+  const { spiel, quelle, ziel } = aufstellen({ angreifer: { angriffe: [{ name: "hieb", genauigkeit: 100, effekt: "hieb" }] }, ziel: { kampfwerte: { blocken: SEHR_VIEL } } });
   const meldungen = meldungenMitschneiden(spiel);
   nahkampf(spiel, quelle, ziel);
   assert.equal(ziel.werte.lp.aktuell, 100);
   assert.equal(meldungen.find((meldung) => meldung.art === "verfehlt").grund, "geblockt");
-  quelle.angriff.tags = ["unblockbar"];
+  quelle.angriffe[0].tags = ["unblockbar"];
   nahkampf(spiel, quelle, ziel);
   assert.equal(ziel.werte.lp.aktuell, 90);
 });
 
 test("Krit: Faktor aus den Regeln, über Modifikatoren nach oben offen, vor der Rüstung", () => {
-  const kritisch = { angriff: { genauigkeit: 100, effekt: "hieb" }, kampfwerte: { kritchance: SEHR_VIEL } };
+  const kritisch = { angriffe: [{ name: "hieb", genauigkeit: 100, effekt: "hieb" }], kampfwerte: { kritchance: SEHR_VIEL } };
   const { spiel, quelle, ziel } = aufstellen({ angreifer: kritisch });
   const meldungen = meldungenMitschneiden(spiel);
   nahkampf(spiel, quelle, ziel);
@@ -100,7 +101,7 @@ test("Krit: Faktor aus den Regeln, über Modifikatoren nach oben offen, vor der 
 });
 
 test("Ohne Kritchance kein Krit", () => {
-  const { spiel, quelle, ziel } = aufstellen({ angreifer: { angriff: { genauigkeit: 100, effekt: "hieb" } } });
+  const { spiel, quelle, ziel } = aufstellen({ angreifer: { angriffe: [{ name: "hieb", genauigkeit: 100, effekt: "hieb" }] } });
   for (let i = 0; i < 5; i++) nahkampf(spiel, quelle, ziel);
   assert.equal(ziel.werte.lp.aktuell, 50);
 });
@@ -146,4 +147,58 @@ test("Schaden des Angreifers: Tags der Schadensart und des Mittels, Reihenfolge 
   assert.equal(schadenDurch("hieb", { angreifer: { modifikatoren: feuerbonus } }).verlust, 10);
   const alles = { angreifer: { modifikatoren: [{ ziel: "schaden", art: "plus", betrag: 10, quelle: "a" }] }, ziel: { kampfwerte: { ruestung: 4 }, widerstaende: { stumpf: 100 } } };
   assert.equal(schadenDurch("hieb", alles).verlust, 8, "(20 - 4) / 2");
+});
+
+const BISS = { name: "biss", genauigkeit: 100, effekt: "klaps" };
+const STOSS = { name: "stoss", genauigkeit: 100, effekt: "hieb" };
+
+test("Angriffsprofile: alle nacheinander in einer Aktion, jedes mit eigenem Wurf und Mittel", () => {
+  const { spiel, quelle, ziel } = aufstellen({ angreifer: { angriffe: [BISS, STOSS] } });
+  const meldungen = meldungenMitschneiden(spiel);
+  nahkampf(spiel, quelle, ziel);
+  assert.equal(ziel.werte.lp.aktuell, 88);
+  assert.equal(meldungen.filter((meldung) => meldung.art === "schaden").length, 2);
+  assert.deepEqual(ziel.letzterVerlust.mittel, { art: "angriff", name: "stoss" });
+});
+
+test("chance je Profil; kommt keines zum Zug, greift das erste", () => {
+  const selten = aufstellen({ angreifer: { angriffe: [BISS, { ...STOSS, chance: 0 }] } });
+  nahkampf(selten.spiel, selten.quelle, selten.ziel);
+  assert.equal(selten.ziel.werte.lp.aktuell, 98, "nur der Biss");
+  const nurSelten = aufstellen({ angreifer: { angriffe: [{ ...STOSS, chance: 0 }, { ...BISS, chance: 0 }] } });
+  nahkampf(nurSelten.spiel, nurSelten.quelle, nurSelten.ziel);
+  assert.equal(nurSelten.ziel.werte.lp.aktuell, 90, "das erste Profil");
+});
+
+test("Zeitkosten: die Aktion kostet so viel wie ihr langsamstes Profil, Modifikatoren wirken darauf", () => {
+  const { spiel, quelle, ziel } = aufstellen({ angreifer: { angriffe: [{ ...BISS, kosten: 70 }, { ...STOSS, kosten: 150 }] } });
+  assert.equal(nahkampf(spiel, quelle, ziel), 150);
+  const flink = aufstellen({ angreifer: { angriffe: [{ ...BISS, kosten: 70 }] } });
+  const ergebnis = holen("befehle", "bewegen").ausfuehren(flink.spiel, flink.quelle, { art: "bewegen", dx: 1, dy: 0 });
+  assert.deepEqual(ergebnis, { aktion: "nahkampf", grundkosten: 70 });
+  modifikatorHinzufuegen(flink.quelle, { ziel: "kosten.nahkampf", art: "prozent", betrag: -10, quelle: "test" });
+  assert.equal(zeitkosten(flink.spiel, flink.quelle, ergebnis.aktion, {}, ergebnis.grundkosten), 63);
+  const ohneKosten = aufstellen({ angreifer: { angriffe: [BISS] } });
+  assert.equal(nahkampf(ohneKosten.spiel, ohneKosten.quelle, ohneKosten.ziel), ohneKosten.spiel.daten.aktionen.nahkampf);
+});
+
+test("Weitere Profile lassen ein Ziel ohne Lebenswert aus", () => {
+  const { spiel, quelle, ziel } = aufstellen({ angreifer: { angriffe: [{ ...STOSS, effekt: "hieb" }, BISS] } });
+  ziel.werte.lp.aktuell = 10;
+  const meldungen = meldungenMitschneiden(spiel);
+  nahkampf(spiel, quelle, ziel);
+  assert.equal(ziel.werte.lp.aktuell, 0);
+  assert.equal(meldungen.filter((meldung) => meldung.art === "schaden").length, 1);
+});
+
+test("vor_angriff: ein Abbruch lässt den einzelnen Angriff aus", (t) => {
+  const { spiel, quelle, ziel } = aufstellen({ angreifer: { angriffe: [BISS, STOSS] } });
+  const gesehen = [];
+  hakenFuerTest(t, "vor_angriff", (spiel, kontext) => {
+    gesehen.push(kontext.angriff);
+    if (kontext.angriff === "stoss") kontext.abgebrochen = true;
+  });
+  nahkampf(spiel, quelle, ziel);
+  assert.deepEqual(gesehen, ["biss", "stoss"]);
+  assert.equal(ziel.werte.lp.aktuell, 98);
 });

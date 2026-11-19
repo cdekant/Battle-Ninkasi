@@ -112,13 +112,13 @@ test("Nahkampf löst nach_treffer und verfehlt aus", () => {
     { bei: "nach_treffer", rolle: "quelle", effekt: "freude" },
     { bei: "verfehlt", rolle: "quelle", effekt: "doppeldornen" },
   ];
-  const sicher = wesen(spiel, 1, 1, "ninkasi", 20, { ausloeser, angriff: { genauigkeit: 100, effekt: "stoss" } });
+  const sicher = wesen(spiel, 1, 1, "ninkasi", 20, { ausloeser, angriffe: [{ name: "stoss", genauigkeit: 100, effekt: "stoss" }] });
   sicher.werte.lp.aktuell = 10;
   const ziel = wesen(spiel, 2, 1, "feinde", 20);
   nahkampf(spiel, sicher, ziel);
   vorgangAbschliessen(spiel);
   assert.equal(sicher.werte.lp.aktuell, 11);
-  sicher.angriff.genauigkeit = 0;
+  sicher.angriffe[0].genauigkeit = 0;
   nahkampf(spiel, sicher, ziel);
   vorgangAbschliessen(spiel);
   assert.equal(sicher.werte.lp.aktuell, 9);

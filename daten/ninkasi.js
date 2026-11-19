@@ -10,7 +10,7 @@ export default {
       pegel: { anfangswert: 0 }, // in Hundertstel Promille (100 = 1 ‰), ohne Grundwert nach oben offen
     },
     sicht: { reichweite: 8 },
-    angriff: { genauigkeit: 80, effekt: "faustschlag" }, // gegen Ausweichen 0 und Grundverteidigung 20: 80 %
+    angriffe: [{ name: "faust", genauigkeit: 80, effekt: "faustschlag" }], // gegen Ausweichen 0 und Grundverteidigung 20: 80 %
     inventar: [],
     // Stoffwechsel, siehe src/systeme/stoffwechsel.js; alle Zahlen vorläufig.
     // Kurven: [Pegel in Hundertstel Promille, Hundertstel je Welttick], negativ ist Schwund.

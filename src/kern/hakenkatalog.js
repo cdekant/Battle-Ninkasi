@@ -14,11 +14,11 @@ export const HAKENKATALOG = {
   nach_wertaenderung: { inBetrieb: true, ausloeserErlaubt: false }, // { entitaet, wertName, vorher, nachher }
   vor_befehl: { inBetrieb: true, ausloeserErlaubt: false },       // { akteurId, befehl }; Handler ersetzen befehl oder brechen ab (dann warten)
   zustand_beginnt: { inBetrieb: true, ausloeserErlaubt: true },   // + zustand, nummer; Ziel ist die Trägerin
-  zustand_endet: { inBetrieb: true, ausloeserErlaubt: true },     // + zustand, nummer, grund ("abgelaufen" | "entfernt" | "quelle_tot")
+  zustand_endet: { inBetrieb: true, ausloeserErlaubt: true },
+  vor_angriff: { inBetrieb: true, ausloeserErlaubt: false },       // + angriff (Name des Profils); Abbruch lässt diesen einzelnen Angriff aus     // + zustand, nummer, grund ("abgelaufen" | "entfernt" | "quelle_tot")
   // reserviert, siehe docs/Systemausbau.md
   zug_beginn: { inBetrieb: false, ausloeserErlaubt: true },
   zug_ende: { inBetrieb: false, ausloeserErlaubt: true },
-  vor_angriff: { inBetrieb: false, ausloeserErlaubt: false },
   betritt_feld: { inBetrieb: false, ausloeserErlaubt: true },
   verlaesst_feld: { inBetrieb: false, ausloeserErlaubt: true },
   gegenstand_benutzt: { inBetrieb: false, ausloeserErlaubt: true },

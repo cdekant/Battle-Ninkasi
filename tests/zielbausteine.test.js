@@ -158,13 +158,13 @@ test("Auslöser mit Ziel feld: Sporen um die letzte Position treffen die Feinde 
 
 test("Nahkampf mit Muster: Rundumschlag trifft alle angrenzenden Wesen, Speer zwei Felder in Linie", () => {
   const spiel = spielBauen();
-  const ninkasi = wesen(spiel, 5, 3, "ninkasi", 10, { angriff: { genauigkeit: 100, effekt: "stich", muster: { art: "angrenzend" } } });
+  const ninkasi = wesen(spiel, 5, 3, "ninkasi", 10, { angriffe: [{ name: "rundumschlag", genauigkeit: 100, effekt: "stich", muster: { art: "angrenzend" } }] });
   const [osten, norden, sueden] = [[6, 3], [5, 2], [5, 4]].map(([x, y]) => wesen(spiel, x, y, "verderber"));
   const freundin = wesen(spiel, 4, 3, "ninkasi");
   const fern = wesen(spiel, 7, 3, "verderber");
   nahkampf(spiel, ninkasi, osten);
   assert.deepEqual(lp(ninkasi, osten, norden, sueden, freundin, fern), [10, 6, 6, 6, 6, 10]);
-  ninkasi.angriff.muster = { art: "linie", laenge: 2 };
+  ninkasi.angriffe[0].muster = { art: "linie", laenge: 2 };
   nahkampf(spiel, ninkasi, osten);
   assert.deepEqual(lp(osten, fern, norden), [2, 6, 6]);
 });

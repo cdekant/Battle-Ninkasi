@@ -35,14 +35,14 @@ const ZUSTAENDE = {
 };
 
 const spielBauen = (karte = RAUM) => miniSpiel(karte, { effekte: EFFEKTE, zustaende: ZUSTAENDE });
-const ANGRIFF = { genauigkeit: 100, effekt: "stoss" };
+const ANGRIFFE = [{ name: "stoss", genauigkeit: 100, effekt: "stoss" }];
 const bakterium = (spiel, x, y, zusatz = {}) =>
-  wesen(spiel, x, y, "verderber", 10, { ki: { modul: "jagen", letzteBekanntePosition: null }, sicht: { reichweite: 6 }, angriff: ANGRIFF, ...zusatz });
+  wesen(spiel, x, y, "verderber", 10, { ki: { modul: "jagen", letzteBekanntePosition: null }, sicht: { reichweite: 6 }, angriffe: ANGRIFFE, ...zusatz });
 
 // Ninkasi ist am Zug
 function ninkasiAmZug(spiel, x, y, zusatz = {}) {
   const ninkasi = spielerinSetzen(spiel, x, y);
-  Object.assign(ninkasi, { angriff: ANGRIFF, sicht: { reichweite: 6 } }, zusatz);
+  Object.assign(ninkasi, { angriffe: ANGRIFFE, sicht: { reichweite: 6 } }, zusatz);
   akteurEinreihen(spiel.zustand, ninkasi.id, 0);
   allesSichtbar(spiel);
   return ninkasi;

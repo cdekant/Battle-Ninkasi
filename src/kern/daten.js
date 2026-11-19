@@ -81,11 +81,8 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
     }
     if (wertDaten.anfangswert !== undefined && (!istGanzzahl(wertDaten.anfangswert) || wertDaten.anfangswert < 0)) fehler.push(`${ort}: werte.${wertName}.anfangswert muss eine ganze Zahl >= 0 sein`);
   }
-  if (wesen.angriff) {
-    pruefeParameter(daten, { genauigkeit: "ganzzahl", effekt: "effekt", kritchance: "ganzzahl?", trifft: TRIFFT_ARTEN }, wesen.angriff, `${ort}.angriff`, fehler);
-    if (wesen.angriff.muster !== undefined) pruefeMuster(daten, wesen.angriff.muster, `${ort}.angriff.muster`, fehler);
-    if (wesen.angriff.tags !== undefined && !istTextliste(wesen.angriff.tags)) fehler.push(`${ort}: angriff.tags muss eine Liste von Texten sein`);
-  }
+  if (wesen.angriff !== undefined) fehler.push(`${ort}: angriff gibt es nicht mehr, Angriffe stehen als Liste in angriffe`);
+  if (wesen.angriffe !== undefined) pruefeAngriffe(daten, wesen.angriffe, ort, fehler);
   pruefeKampfwerte(daten, wesen, ort, fehler);
   if (wesen.ki) pruefeKi(daten, wesen.ki, `${ort}.ki`, fehler);
   if (wesen.stoffwechsel) pruefeStoffwechsel(wesen, ort, fehler);
@@ -99,6 +96,23 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
   if (wesen.modifikatoren !== undefined) pruefeModifikatoren(daten, wesen.modifikatoren, `${ort}.modifikatoren`, fehler);
   if (wesen.auren !== undefined) pruefeAuren(daten, wesen.auren, ort, fehler);
   if (!daten.zeichen.wesen[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js`);
+}
+
+// Angriffsprofile, siehe systeme/kampf.js
+function pruefeAngriffe(daten, angriffe, ort, fehler) {
+  if (!Array.isArray(angriffe) || angriffe.length === 0) return fehler.push(`${ort}: angriffe muss eine Liste mit mindestens einem Profil sein`);
+  const namen = new Set();
+  angriffe.forEach((profil, nummer) => {
+    const stelle = `${ort}.angriffe[${nummer}]`;
+    if (!istObjekt(profil)) return fehler.push(`${stelle}: Profil muss ein Objekt sein`);
+    pruefeParameter(daten, { name: "text", genauigkeit: "ganzzahl", effekt: "effekt", kritchance: "ganzzahl?", trifft: TRIFFT_ARTEN }, profil, stelle, fehler);
+    if (namen.has(profil.name)) fehler.push(`${stelle}: name "${profil.name}" kommt doppelt vor`);
+    namen.add(profil.name);
+    if (profil.kosten !== undefined && !(istGanzzahl(profil.kosten) && profil.kosten > 0)) fehler.push(`${stelle}: kosten muss eine ganze Zahl > 0 sein`);
+    if (profil.chance !== undefined && !istProzent(profil.chance)) fehler.push(`${stelle}: chance muss eine ganze Zahl von 0 bis 100 sein`);
+    if (profil.muster !== undefined) pruefeMuster(daten, profil.muster, `${stelle}.muster`, fehler);
+    if (profil.tags !== undefined && !istTextliste(profil.tags)) fehler.push(`${stelle}: tags muss eine Liste von Texten sein`);
+  });
 }
 
 // Kampfwerte, Widerstände und Immunität, siehe systeme/kampf.js

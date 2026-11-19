@@ -48,7 +48,7 @@ test("wert_unter_prozent misst am Grundwert, so kann ein Modifikator auf denselb
 test("gegenueber_tag: Genauigkeit nur gegen Bakterien, im Nahkampf über die Umstände", () => {
   const spiel = miniSpiel(KARTE, { effekte: { biss: { schritte: [{ baustein: "schaden", menge: 1 }] } } });
   const jaegerin = wesen(spiel, 1, 1, "ninkasi", 10, {
-    angriff: { genauigkeit: 0, effekt: "biss" },
+    angriffe: [{ name: "biss", genauigkeit: 0, effekt: "biss" }],
     modifikatoren: [bonus(100, { ziel: "genauigkeit", wenn: [{ bedingung: "gegenueber_tag", tag: "bakterium" }] })],
   });
   const hefe = wesen(spiel, 2, 1, "feinde", 10, { tags: ["hefe"] });
