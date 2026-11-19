@@ -14,6 +14,8 @@ import { erstesGetraenk } from "../src/systeme/inventar.js";
 import { hoererAnmelden } from "../src/kern/ereignisse.js";
 import { hoechstwert } from "../src/kern/werte.js";
 import { reiseBeginnen, naechsterReiseschritt } from "../src/eingabe/reise.js";
+import { rastenBeginnen, naechsterRastschritt } from "../src/eingabe/rasten.js";
+import { erkundenBeginnen, naechsterErkundungsschritt } from "../src/eingabe/erkunden.js";
 import einstellungen from "../src/eingabe/einstellungen.js";
 
 const [anzahlLaeufe = 20, hoechsteBefehlszahl = 3000, ersterStartwert = 1] = process.argv.slice(2).map(Number);
@@ -58,7 +60,20 @@ function zufallsbefehl(botZufall, spiel) {
   return { art: "bewegen", dx: zufallsGanzzahl(botZufall, -1, 1), dy: zufallsGanzzahl(botZufall, -1, 1) };
 }
 
-// Reise zu einem zufälligen erkundeten Feld, wie per Mausklick; gibt den Haltegrund zurück
+// Ablauf der Eingabe aus Einzelbefehlen (Reise, Rasten, Erkunden), wie im Browser; gibt den Haltegrund zurück
+function ablaufLaufenLassen(spiel, beginn, naechsterSchritt) {
+  if (beginn.grund) return beginn.grund;
+  const ablauf = beginn.reise ?? beginn.ablauf;
+  for (let schritt = 0; schritt < 1500; schritt++) {
+    const ergebnis = naechsterSchritt(spiel, ablauf, einstellungen);
+    if (ergebnis.halt) return ergebnis.halt;
+    if (!befehlGeben(spiel, ergebnis.befehl).ok) return "abgelehnt";
+    invariantenPruefen(spiel);
+  }
+  return "zu_lang";
+}
+
+// Reise zu einem zufälligen erkundeten Feld, wie per Mausklick
 function reisen(botZufall, spiel) {
   const ebene = spiel.zustand.ebene;
   const erkundeteFelder = [];
@@ -67,15 +82,15 @@ function reisen(botZufall, spiel) {
     if (erkundet && passierbar(spiel, x, y)) erkundeteFelder.push({ x, y });
   });
   const ziel = erkundeteFelder[zufallsGanzzahl(botZufall, 0, erkundeteFelder.length - 1)];
-  const beginn = reiseBeginnen(spiel, ziel, einstellungen);
-  if (beginn.grund) return beginn.grund;
-  for (let schritt = 0; schritt < 500; schritt++) {
-    const reiseschritt = naechsterReiseschritt(spiel, beginn.reise, einstellungen);
-    if (reiseschritt.halt) return reiseschritt.halt;
-    if (!befehlGeben(spiel, reiseschritt.befehl).ok) return "abgelehnt";
-    invariantenPruefen(spiel);
-  }
-  return "zu_lang";
+  return ablaufLaufenLassen(spiel, reiseBeginnen(spiel, ziel, einstellungen), naechsterReiseschritt);
+}
+
+// Ein zufälliger Ablauf: meist Reise, sonst Erkunden oder Rasten; gibt "art:haltegrund" zurück
+function ablaufWaehlen(botZufall, spiel) {
+  const wurf = zufallsGanzzahl(botZufall, 1, 5);
+  if (wurf === 4) return `erkunden:${ablaufLaufenLassen(spiel, erkundenBeginnen(spiel, einstellungen), naechsterErkundungsschritt)}`;
+  if (wurf === 5) return `rasten:${ablaufLaufenLassen(spiel, rastenBeginnen(spiel, einstellungen), naechsterRastschritt)}`;
+  return `reise:${reisen(botZufall, spiel)}`;
 }
 
 let anzahlTode = 0, anzahlFehler = 0;
@@ -92,7 +107,7 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
     const botZufall = zufallErzeugen(startwert);
     while (spiel.befehle.length < hoechsteBefehlszahl && !spiel.zustand.vorbei) {
       if (zufallsGanzzahl(botZufall, 1, 100) <= 3) {
-        const haltegrund = reisen(botZufall, spiel);
+        const haltegrund = ablaufWaehlen(botZufall, spiel);
         reisenNachHaltegrund[haltegrund] = (reisenNachHaltegrund[haltegrund] || 0) + 1;
         continue;
       }
@@ -116,6 +131,6 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
   }
 }
 const haltegruende = Object.entries(reisenNachHaltegrund).map(([grund, anzahl]) => `${grund} ${anzahl}`).join(", ");
-console.log(`\nReisen nach Haltegrund: ${haltegruende}`);
+console.log(`\nAbläufe nach Haltegrund: ${haltegruende}`);
 console.log(`${anzahlLaeufe} Läufe, ${anzahlTode} tot, ${anzahlFehler} Fehler`);
 process.exitCode = anzahlFehler ? 1 : 0;

@@ -19,6 +19,7 @@ const ARTEN = [
   "haken",              // interne Haken, Listen je Name: (spiel, kontext) => void
   "gefahren",           // Gefahrenprüfungen: (vorher, nachher) => true bei neuer Gefahr; Lage aus systeme/gefahr.js
   "zustandspruefungen", // Prüfungen nach jedem Vorgang: (spiel) => true, wenn sie etwas verändert haben
+  "laufendeaktionen",   // Arten langer Aktionen: { schrittkosten, abschliessen, abbrechen } (systeme/laufendeAktionen.js)
 ];
 
 export const RANG_VORGABE = 100;

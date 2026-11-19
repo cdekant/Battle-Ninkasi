@@ -6,5 +6,8 @@ export default {
   reisePause: 30,             // Millisekunden zwischen zwei Schritten einer Reise (nur Anzeige)
   reiseTrotzFeinden: false,   // false: keine Reise, solange Feinde in Sicht sind
   // Gründe, aus denen eine Reise anhält: Gefahrenprüfungen (Register "gefahren") und "gegenstand"
-  reiseHalt: ["gegner_in_sicht", "schaden", "gegenstand"],
+  reiseHalt: ["gegner_in_sicht", "schaden", "gegenstand"], // gilt auch für das Auto-Erkunden
+  rastenBis: ["lp", "mp"],    // Rasten endet, wenn diese Vorräte voll sind
+  rastenHalt: ["gegner_in_sicht", "schaden"],
+  rastenHoechstens: 1000,     // höchstens so viele Schritte warten
 };

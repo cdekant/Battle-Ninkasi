@@ -12,4 +12,5 @@ import "./zustaende.js";
 import "./befehlsveraenderer.js";
 import "./beschwoerung.js";
 import "./modifikatoren.js";
+import "./laufendeAktionen.js";
 import "./faehigkeiten.js";

@@ -23,6 +23,8 @@ import { Log } from "./anzeige/log.js";
 import { uebersetzen } from "./eingabe/eingabe.js";
 import { feldAnPixel, klickDeuten } from "./eingabe/maus.js";
 import { reiseBeginnen, naechsterReiseschritt } from "./eingabe/reise.js";
+import { rastenBeginnen, naechsterRastschritt } from "./eingabe/rasten.js";
+import { erkundenBeginnen, naechsterErkundungsschritt } from "./eingabe/erkunden.js";
 
 const SPEICHERSCHLUESSEL_EINSTELLUNGEN = "battle-ninkasi.einstellungen";
 const RAD_PAUSE_MS = 150; // zwischen zwei Zoomschritten per Rad
@@ -87,8 +89,9 @@ const log = new Log(document.getElementById("log"), texte);
 let kamera = neueKamera();
 let spiel;
 let feldUnterZeiger = null;
-let laufendeReise = null;
-let reiseZeitgeber = null;
+// Laufender Ablauf aus Einzelbefehlen (Reise, Rasten, Erkunden): { zustand, naechsterSchritt }
+let laufenderAblauf = null;
+let ablaufZeitgeber = null;
 let letzterRadZoom = 0;
 
 function zeichnen() {
@@ -96,44 +99,44 @@ function zeichnen() {
   const ninkasi = spielerin(spiel.zustand);
   folgen(kamera, ninkasi.position, ansicht, spiel.zustand.ebene);
   // Wegvorschau zum Feld unter dem Zeiger, nur über erkundete Felder
-  const vorschauZeigen = feldUnterZeiger && !laufendeReise && !spiel.zustand.vorbei;
+  const vorschauZeigen = feldUnterZeiger && !laufenderAblauf && !spiel.zustand.vorbei;
   const wegvorschau = vorschauZeigen ? weg(spiel, ninkasi.position, feldUnterZeiger, { nurErkundet: true }) || [] : [];
   renderer.zeichnen(spiel, kamera, ansicht, einstellungen.zoom, { zeiger: feldUnterZeiger, weg: wegvorschau });
   oberflaeche.anzeigen(spiel);
 }
 
-function reiseMelden(grund) {
+function ablaufMelden(grund) {
   const schluessel = `reise.${grund}`;
   if (texte.hatSchluessel(schluessel)) log.zeile(texte.text(schluessel), "leise");
 }
 
-function reiseBeenden(grund) {
-  clearTimeout(reiseZeitgeber);
-  reiseZeitgeber = null;
-  laufendeReise = null;
-  if (grund) reiseMelden(grund);
+function ablaufBeenden(grund) {
+  clearTimeout(ablaufZeitgeber);
+  ablaufZeitgeber = null;
+  laufenderAblauf = null;
+  if (grund) ablaufMelden(grund);
   zeichnen();
 }
 
-function reiseTakt() {
-  reiseZeitgeber = null;
-  if (!laufendeReise) return;
-  const schritt = naechsterReiseschritt(spiel, laufendeReise, einstellungen);
-  if (schritt.halt) return reiseBeenden(schritt.halt);
-  if (!befehlGeben(spiel, schritt.befehl).ok) return reiseBeenden("abgelehnt");
+function ablaufTakt() {
+  ablaufZeitgeber = null;
+  if (!laufenderAblauf) return;
+  const schritt = laufenderAblauf.naechsterSchritt(spiel, laufenderAblauf.zustand, einstellungen);
+  if (schritt.halt) return ablaufBeenden(schritt.halt);
+  if (!befehlGeben(spiel, schritt.befehl).ok) return ablaufBeenden("abgelehnt");
   zeichnen();
-  reiseZeitgeber = setTimeout(reiseTakt, einstellungen.reisePause);
+  ablaufZeitgeber = setTimeout(ablaufTakt, einstellungen.reisePause);
 }
 
-function reiseStarten(ziel) {
-  const ergebnis = reiseBeginnen(spiel, ziel, einstellungen);
-  if (ergebnis.grund) return reiseMelden(ergebnis.grund);
-  laufendeReise = ergebnis.reise;
-  reiseTakt();
+// beginn: Ergebnis von reiseBeginnen, rastenBeginnen oder erkundenBeginnen ({ grund } oder { reise | ablauf })
+function ablaufStarten(beginn, naechsterSchritt) {
+  if (beginn.grund) return ablaufMelden(beginn.grund);
+  laufenderAblauf = { zustand: beginn.reise ?? beginn.ablauf, naechsterSchritt };
+  ablaufTakt();
 }
 
 function starten(startwert) {
-  if (laufendeReise) reiseBeenden(null);
+  if (laufenderAblauf) ablaufBeenden(null);
   spiel = neuesSpiel(daten, startwert);
   window.spiel = spiel; // zum Nachsehen in der Konsole
   kamera = neueKamera();
@@ -162,10 +165,10 @@ function befehlGebenUndZeichnen(befehl) {
 }
 
 window.addEventListener("keydown", (tastenereignis) => {
-  // Während einer Reise bricht jede Taste ab und wird dabei geschluckt
-  if (laufendeReise) {
+  // Während eines Ablaufs (Reise, Rasten, Erkunden) bricht jede Taste ab und wird dabei geschluckt
+  if (laufenderAblauf) {
     tastenereignis.preventDefault();
-    return reiseBeenden("abgebrochen");
+    return ablaufBeenden("abgebrochen");
   }
   const ergebnis = uebersetzen(tastenereignis, belegung, spiel);
   if (!ergebnis) return;
@@ -173,6 +176,8 @@ window.addEventListener("keydown", (tastenereignis) => {
   if (ergebnis.anzeige === "zoom_rein") return zoomen(1);
   if (ergebnis.anzeige === "zoom_raus") return zoomen(-1);
   if (ergebnis.anzeige === "log_umschalten") return log.umschalten();
+  if (ergebnis.anzeige === "rasten") return ablaufStarten(rastenBeginnen(spiel, einstellungen), naechsterRastschritt);
+  if (ergebnis.anzeige === "erkunden") return ablaufStarten(erkundenBeginnen(spiel, einstellungen), naechsterErkundungsschritt);
   if (ergebnis.anzeige === "neustart") {
     if (spiel.zustand.vorbei) starten(zufaelligerStartwert());
     return;
@@ -193,13 +198,13 @@ kartenCanvas.addEventListener("mouseleave", () => {
 });
 
 kartenCanvas.addEventListener("mousedown", (mausereignis) => {
-  if (laufendeReise) return reiseBeenden("abgebrochen");
+  if (laufenderAblauf) return ablaufBeenden("abgebrochen");
   if (belegung.maus[mausereignis.button] !== "handeln" || spiel.zustand.vorbei) return;
   mausereignis.preventDefault();
   const ergebnis = klickDeuten(spiel, feldAnPixel(mausereignis.offsetX, mausereignis.offsetY, kamera, einstellungen.zoom));
   if (!ergebnis) return;
   if (ergebnis.befehl) befehlGebenUndZeichnen(ergebnis.befehl);
-  else if (ergebnis.reise) reiseStarten(ergebnis.reise);
+  else if (ergebnis.reise) ablaufStarten(reiseBeginnen(spiel, ergebnis.reise, einstellungen), naechsterReiseschritt);
 });
 
 kartenCanvas.addEventListener("wheel", (radereignis) => {

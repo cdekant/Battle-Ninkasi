@@ -81,20 +81,15 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 ## 6. Fähigkeiten und lange Aktionen
 
-Status: in Arbeit; umgesetzt in Version 0.12.0 (Datentyp Fähigkeit, Befehl `faehigkeit`, Verbrauch, Material, Abklingzeit, Voraussetzungen, Risikotabellen, aufrechterhaltene Zauber mit Unterhalt, dazu `auf: "quelle"` und der Veränderer `ziel_verfehlen`), beschrieben in [Architektur.md](Architektur.md) (Fähigkeiten, Zustände)
+Status: umgesetzt in Version 0.12.0 (Datentyp Fähigkeit, Befehl `faehigkeit`, Verbrauch, Material, Abklingzeit, Voraussetzungen, Risikotabellen, aufrechterhaltene Zauber mit Unterhalt, dazu `auf: "quelle"` und der Veränderer `ziel_verfehlen`) und 0.13.0 (lange Aktionen mit Unterbrechung und `fortsetzen`, Rasten und Auto-Erkunden in der Eingabe), beschrieben in [Architektur.md](Architektur.md) (Fähigkeiten, Lange Aktionen, Zustände, Maus, Reise, Rasten und Erkunden)
 
-Entschieden: Modifikatorziele `verbrauch.<wert>` für Vorräte, `kosten.*` bleibt die Zeit; Abklingzeit in eigenen Zügen der Wirkenden (schneller Handelnde haben Fähigkeiten in Weltzeit früher zurück); Psi-Risiko als Mechanismus mit vorläufigen Zahlen, die Folgen von Rückschlag und Glimmer sind Spieldesign; Rituale und Brauen laufen in der Logik, Rasten und Auto-Erkunden in der Eingabe wie die Reise; beim Abbruch einer langen Aktion sind die Kosten verloren, `beimAbbruch` wirkt
-
-Offen, nächste Version 0.13.0:
-
-+ Lange Aktionen in der Logik: eine Fähigkeit mit `dauer: { schritte }` startet die Komponente `laufendeAktion`; ist die Akteurin dran, führt die Logik den nächsten Schritt ohne Eingabe aus, jeder Schritt kostet `zeit`, nach dem letzten wirkt die Wirkung; aufgezeichnet wird nur der startende Befehl
-+ Unterbrechung über die Gefahrenprüfungen nach jedem Schritt: die Aktion pausiert, Befehl `fortsetzen` macht weiter, jeder andere Befehl bricht ab (`beimAbbruch`, Kosten bleiben bezahlt)
-+ Rasten bis voll und Auto-Erkunden in der Eingabe wie die Reise, jeder Schritt ein gewöhnlicher Befehl
+Entschieden: Modifikatorziele `verbrauch.<wert>` für Vorräte, `kosten.*` bleibt die Zeit; Abklingzeit in eigenen Zügen der Wirkenden (schneller Handelnde haben Fähigkeiten in Weltzeit früher zurück); Psi-Risiko als Mechanismus mit vorläufigen Zahlen, die Folgen von Rückschlag und Glimmer sind Spieldesign; Rituale und Brauen laufen in der Logik, Rasten und Auto-Erkunden in der Eingabe wie die Reise; beim Abbruch einer langen Aktion sind die Kosten verloren, `beimAbbruch` wirkt; die Gründe zur Unterbrechung stehen in den Regeln, weil sie das Nachspielen bestimmen
 
 Offener Rest, wird mit den genannten Punkten umgesetzt:
 
-+ Zielmodus und Tooltip der Anzeige auf Grundlage von `zielAufloesen`, Belegung für Fähigkeiten; mit dem großen Punkt Oberfläche
-+ Gegner benutzen Fähigkeiten (Auswahl in der KI) und kündigen Angriffe an (Punkt 7)
++ Zielmodus und Tooltip der Anzeige auf Grundlage von `zielAufloesen`, Belegung für Fähigkeiten, Anzeige einer laufenden Aktion (Fortschritt); mit dem großen Punkt Oberfläche
++ Gegner benutzen Fähigkeiten (Auswahl in der KI), kündigen Angriffe an und lassen sich bei langen Aktionen durch Schaden unterbrechen (Punkt 7)
++ Brauen als eigene Art langer Aktion (Register `laufendeaktionen`), sobald das Brausystem entworfen ist ([Grundlagen.md](Grundlagen.md))
 + Folgen von Rückschlag und Glimmer (Spieldesign in [Grundlagen.md](Grundlagen.md))
 + Passive Fähigkeiten sind Modifikatoren und Auslöser aus Skills und Ausrüstung (Modifikatorquellen `skills`, `ausruestung`)
 

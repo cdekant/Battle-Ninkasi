@@ -5,6 +5,11 @@ export default {
     daempfungProStufe: 50, // Prozent der Chance, die je Kettenstufe erhalten bleibt
     hoechsteKettentiefe: 5, // tiefer wird nichts mehr ausgelöst
   },
+  // Lange Aktionen (Rituale, Brauen), siehe src/systeme/laufendeAktionen.js:
+  // Gefahrenprüfungen (Register "gefahren"), die Ninkasi unterbrechen und fragen
+  laufendeAktionen: {
+    unterbrechen: ["gegner_in_sicht", "schaden"],
+  },
   // Kampf, siehe src/systeme/kampf.js; alle Zahlen vorläufig
   // Halbwert: so viele Punkte ergeben 50 %, mehr Punkte nähern sich 100 % nur an
   kampf: {

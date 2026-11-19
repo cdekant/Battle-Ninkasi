@@ -12,6 +12,10 @@
 //                    Geschoss auf jedes Wesen der Bahn, sonst einmal auf das Ziel (oder das Feld)
 //   zustand:         bei "aufrecht" der Zustand, meist mit unterhalt (MP je Welttick, siehe systeme/zustaende.js)
 //   risiko:          Name einer Risikotabelle (daten/risiken.js), gewürfelt vor der Wirkung
+//   dauer:           { schritte } lange Aktion (Ritual, Kanalisieren): bezahlt wird am Anfang, jeder Schritt kostet zeit,
+//                    Risiko und Wirkung kommen nach dem letzten Schritt (siehe systeme/laufendeAktionen.js); das Ziel
+//                    wird dann neu aufgelöst, passt es nicht mehr, verpufft die Wirkung (Meldung "verpufft")
+//   beimAbbruch:     Effekt auf die Wirkende, wenn eine lange Aktion abgebrochen wird
 // Befehl: { art: "faehigkeit", faehigkeit, ziel?: { x, y } | { id } | { dx, dy } }
 // Wesen kennen ihre Fähigkeiten als Liste: faehigkeiten: ["name"]; Abklingen über den Zugzähler zuege (kern/spiel.js)
 //   abklingendBis: { name: zugnummer } ab diesem Stand des Zugzählers wieder bereit
@@ -27,6 +31,7 @@ import { zufallsGanzzahl } from "../kern/zufall.js";
 import { wertAufKurve } from "../kern/kurven.js";
 import { zielAufloesen, entitaetenAufFeldern } from "./zielauswahl.js";
 import { zustandSetzen, zustandBeenden } from "./zustaende.js";
+import { aktionBeginnen } from "./laufendeAktionen.js";
 
 export const FAEHIGKEITSARTEN = ["aktiv", "aufrecht"];
 
@@ -141,6 +146,10 @@ function wirkungsziele(spiel, wesen, zielart, aufloesung) {
 function wirkungAnwenden(spiel, wesen, name, definition, zielangabe) {
   const zielart = definition.ziel;
   const aufloesung = zielAufloesen(spiel, wesen, zielart, zielangabe);
+  if (!aufloesung.ok) {
+    melden(spiel, "verpufft", { wer: bezugAuf(wesen), faehigkeit: name, grund: aufloesung.grund });
+    return;
+  }
   if (aufloesung.bahn) melden(spiel, "geschoss", { quelle: bezugAuf(wesen), bahn: aufloesung.bahn.felder, aufschlag: aufloesung.bahn.aufschlag });
   else if (zielart.muster) melden(spiel, "flaeche", { quelle: bezugAuf(wesen), felder: aufloesung.felder });
   const grundkontext = {
@@ -154,9 +163,43 @@ function wirkungAnwenden(spiel, wesen, name, definition, zielangabe) {
   }
 }
 
+// Zeitkosten einer Fähigkeit bzw. eines Schritts ihrer langen Aktion
+function zeitergebnis(spiel, definition) {
+  return { aktion: "faehigkeit", grundkosten: definition.zeit ?? spiel.daten.aktionen.faehigkeit, umstaende: umstaendeVon(definition) };
+}
+
+// Risiko und Wirkung, sofort oder nach dem letzten Schritt einer langen Aktion
+function faehigkeitWirken(spiel, wesen, name, definition, zielangabe) {
+  melden(spiel, "faehigkeit", { wer: bezugAuf(wesen), faehigkeit: name, text: definition.text });
+  const ausgang = definition.risiko ? risikoWuerfeln(spiel, wesen, definition.risiko) : null;
+  if (ausgang) {
+    melden(spiel, "risiko", { wer: bezugAuf(wesen), faehigkeit: name, ausgang: ausgang.name });
+    if (ausgang.effekt) {
+      const position = wesen.position ? { ...wesen.position } : null;
+      effektAnwenden(spiel, ausgang.effekt, { quelleId: wesen.id, zielId: wesen.id, ursprung: position, zielfeld: position, ursache: "risiko", mittel: { art: "faehigkeit", name }, tags: [...tagsVon(definition)] });
+    }
+    if (!ausgang.wirkt) return;
+  }
+  if (definition.art === "aufrecht") zustandSetzen(spiel, wesen, definition.zustand, { quelleId: wesen.id, urheberId: wesen.id });
+  else wirkungAnwenden(spiel, wesen, name, definition, zielangabe);
+}
+
+anmelden("laufendeaktionen", "faehigkeit", {
+  schrittkosten: (spiel, akteur, aktion) => zeitergebnis(spiel, faehigkeitVon(spiel, aktion.faehigkeit)),
+  abschliessen(spiel, akteur, aktion) {
+    faehigkeitWirken(spiel, akteur, aktion.faehigkeit, faehigkeitVon(spiel, aktion.faehigkeit), aktion.ziel);
+  },
+  abbrechen(spiel, akteur, aktion) {
+    const definition = faehigkeitVon(spiel, aktion.faehigkeit);
+    if (!definition.beimAbbruch) return;
+    const position = akteur.position ? { ...akteur.position } : null;
+    effektAnwenden(spiel, definition.beimAbbruch, { quelleId: akteur.id, zielId: akteur.id, ursprung: position, zielfeld: position, ursache: "abbruch", mittel: { art: "faehigkeit", name: aktion.faehigkeit }, tags: [...tagsVon(definition)] });
+  },
+});
+
 function faehigkeitAusfuehren(spiel, wesen, name, zielangabe) {
   const definition = faehigkeitVon(spiel, name);
-  const ergebnis = { aktion: "faehigkeit", grundkosten: definition.zeit ?? spiel.daten.aktionen.faehigkeit, umstaende: umstaendeVon(definition) };
+  const ergebnis = zeitergebnis(spiel, definition);
   if (definition.art === "aufrecht") {
     const instanz = aufrechteInstanz(wesen, definition);
     if (instanz) {
@@ -166,18 +209,11 @@ function faehigkeitAusfuehren(spiel, wesen, name, zielangabe) {
   }
   kostenBezahlen(spiel, wesen, name, definition);
   abklingenLassen(spiel, wesen, name, definition);
-  melden(spiel, "faehigkeit", { wer: bezugAuf(wesen), faehigkeit: name, text: definition.text });
-  const ausgang = definition.risiko ? risikoWuerfeln(spiel, wesen, definition.risiko) : null;
-  if (ausgang) {
-    melden(spiel, "risiko", { wer: bezugAuf(wesen), faehigkeit: name, ausgang: ausgang.name });
-    if (ausgang.effekt) {
-      const position = wesen.position ? { ...wesen.position } : null;
-      effektAnwenden(spiel, ausgang.effekt, { quelleId: wesen.id, zielId: wesen.id, ursprung: position, zielfeld: position, ursache: "risiko", mittel: { art: "faehigkeit", name }, tags: [...tagsVon(definition)] });
-    }
-    if (!ausgang.wirkt) return ergebnis;
+  if (definition.dauer) {
+    const ziel = zielangabe === undefined ? null : structuredClone(zielangabe);
+    return aktionBeginnen(spiel, wesen, { art: "faehigkeit", schritteGesamt: definition.dauer.schritte, faehigkeit: name, ziel });
   }
-  if (definition.art === "aufrecht") zustandSetzen(spiel, wesen, definition.zustand, { quelleId: wesen.id, urheberId: wesen.id });
-  else wirkungAnwenden(spiel, wesen, name, definition, zielangabe);
+  faehigkeitWirken(spiel, wesen, name, definition, zielangabe);
   return ergebnis;
 }
 

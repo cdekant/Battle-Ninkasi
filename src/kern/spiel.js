@@ -20,6 +20,7 @@ import { vorgangAbschliessen } from "./vorgang.js";
 import { ebeneErzeugen } from "../welt/ebene.js";
 import { sichtfeldAktualisieren } from "../systeme/sicht.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
+import { aktionAbbrechen, laufendeAktionVorDemZug } from "../systeme/laufendeAktionen.js";
 
 // Rohdaten prüfen und vorbereiten; wirft Datenfehler mit allen Meldungen.
 // sprache: { texte, nomenPruefen? } (siehe kern/daten.js)
@@ -52,8 +53,12 @@ export function zeitkosten(spiel, entitaet, aktion, umstaende = {}, grundkosten 
 }
 
 // Ninkasi wartet auf eine Eingabe, außer ein Zustand gibt ihr eine KI (Furcht, Rausch, Psi-Kontrolle)
+// oder eine lange Aktion läuft ohne Unterbrechung weiter
 function wartetAufEingabe(zustand, eintrag) {
-  return Boolean(eintrag && eintrag.art === "akteur" && eintrag.akteurId === zustand.spielerinId && !kiVon(spielerin(zustand)));
+  if (!eintrag || eintrag.art !== "akteur" || eintrag.akteurId !== zustand.spielerinId) return false;
+  const ninkasi = spielerin(zustand);
+  const aktionLaeuft = ninkasi.laufendeAktion && !ninkasi.laufendeAktion.unterbrochen;
+  return !kiVon(ninkasi) && !aktionLaeuft;
 }
 
 export function spielerinAmZug(spiel) {
@@ -79,6 +84,8 @@ function befehlVeraendern(spiel, akteur, befehl) {
 // (exportiert für Tests, im Spiel nur über befehlGeben und die KI)
 export function befehlAusfuehren(spiel, akteur, befehl) {
   const wirksamerBefehl = befehlVeraendern(spiel, akteur, befehl);
+  // jeder andere Befehl als "fortsetzen" bricht eine laufende Aktion ab
+  if (akteur.laufendeAktion && wirksamerBefehl.art !== "fortsetzen") aktionAbbrechen(spiel, akteur, "befehl");
   // ausfuehren gibt die Aktionsart zurück oder { aktion, grundkosten?, umstaende? }
   const ergebnis = holen("befehle", wirksamerBefehl.art).ausfuehren(spiel, akteur, wirksamerBefehl);
   const { aktion, grundkosten, umstaende = {} } = typeof ergebnis === "string" ? { aktion: ergebnis } : ergebnis;
@@ -128,7 +135,21 @@ export function warteschlangeAbarbeiten(spiel) {
   let schleifenschutz = 0;
   while (!zustand.vorbei) {
     const eintrag = ersterEintrag(zustand);
-    if (!eintrag || wartetAufEingabe(zustand, eintrag)) return;
+    if (!eintrag) return;
+    // lange Aktion: die Logik führt den nächsten Schritt selbst aus, sofern nichts unterbricht
+    const akteurMitAktion = eintrag.art === "akteur" ? entitaetMitId(zustand, eintrag.akteurId) : null;
+    if (akteurMitAktion?.laufendeAktion) {
+      const weiter = laufendeAktionVorDemZug(spiel, akteurMitAktion);
+      vorgangAbschliessen(spiel);
+      if (zustand.vorbei) return;
+      if (weiter) {
+        ersterEintragEntnehmen(zustand);
+        befehlAusfuehren(spiel, akteurMitAktion, { art: "fortsetzen" });
+        if (++schleifenschutz > 1000000) throw new Error("Warteschlange läuft endlos");
+        continue;
+      }
+    }
+    if (wartetAufEingabe(zustand, eintrag)) return;
     ersterEintragEntnehmen(zustand);
     if (eintrag.art === "weltuhr") {
       for (const [, handler] of alleImRegister("welttick")) {

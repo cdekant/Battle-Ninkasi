@@ -27,6 +27,7 @@ export function miniSpiel(kartenzeilen, { effekte = {}, zustaende = {}, wesen: w
     ...regeln,
     ausloeser: { ...regeln.ausloeser, ...regelAbweichungen.ausloeser },
     kampf: { ...regeln.kampf, grundverteidigung: 0, ...regelAbweichungen.kampf },
+    laufendeAktionen: { ...regeln.laufendeAktionen, ...regelAbweichungen.laufendeAktionen },
   };
   return { zustand, daten: { gelaende, aktionen, effekte, schadensarten, zustaende, wesen: wesensdaten, faehigkeiten, risiken, gegenstaende, regeln: testregeln }, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
 }

@@ -13,6 +13,7 @@ export default {
     Numpad5: { art: "warten" },
     KeyG: { art: "aufheben" },
     KeyT: { art: "trinken" }, // Gegenstand wählt die Eingabe: erstes Getränk im Gepäck
+    Space: { art: "fortsetzen" }, // unterbrochene lange Aktion weiterführen
   },
   anzeige: {
     NumpadAdd: "zoom_rein",
@@ -25,6 +26,8 @@ export default {
     Enter: "neustart",
     NumpadEnter: "neustart",
     Escape: "reise_abbrechen",
+    KeyR: "rasten",   // bis LP und MP voll sind
+    KeyO: "erkunden", // automatisch erkunden
   },
   // Maustasten nach MouseEvent.button (0 links, 1 Mitte, 2 rechts); Rad: Zoom oder nichts
   maus: {

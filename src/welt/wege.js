@@ -5,7 +5,7 @@
 // Später: Kosten je Gelände (Fallen meiden) gelten dann für KI und Spielerin zugleich.
 
 import AStar from "../../lib/rot/path/astar.js";
-import { passierbar, feldIndex } from "./karte.js";
+import { passierbar, feldIndex, aufDerKarte } from "./karte.js";
 import { entitaetenAuf } from "../kern/zustand.js";
 import { istWesen } from "../systeme/kampf.js";
 
@@ -31,4 +31,34 @@ export function weg(spiel, start, ziel, { nurErkundet = false, wesenMeiden = fal
 export function naechstesWegfeld(spiel, start, ziel, optionen) {
   const wegfelder = weg(spiel, start, ziel, optionen);
   return wegfelder && wegfelder.length ? wegfelder[0] : null;
+}
+
+const NACHBARN = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
+
+// Nächstes begehbares Feld (Breitensuche in Schritten, ohne den Start), für das passt(x, y) gilt; null, wenn keins.
+// Nachbarn in fester Reihenfolge, bei gleichem Abstand gewinnt das zuerst gefundene. nurErkundet wie bei weg.
+export function naechstesFeldMit(spiel, start, passt, { nurErkundet = false } = {}) {
+  const ebene = spiel.zustand.ebene;
+  const besucht = new Set([feldIndex(ebene, start.x, start.y)]);
+  const warteliste = [start];
+  for (let kopf = 0; kopf < warteliste.length; kopf++) {
+    const feld = warteliste[kopf];
+    for (const [dx, dy] of NACHBARN) {
+      const x = feld.x + dx, y = feld.y + dy;
+      if (!aufDerKarte(ebene, x, y)) continue;
+      const index = feldIndex(ebene, x, y);
+      if (besucht.has(index)) continue;
+      besucht.add(index);
+      if (!passierbar(spiel, x, y) || (nurErkundet && !ebene.erkundet[index])) continue;
+      if (passt(x, y)) return { x, y };
+      warteliste.push({ x, y });
+    }
+  }
+  return null;
+}
+
+// Erkundetes Feld mit einem unerkundeten Nachbarn: dort geht es weiter ins Unbekannte
+export function amRandDesErkundeten(spiel, x, y) {
+  const ebene = spiel.zustand.ebene;
+  return NACHBARN.some(([dx, dy]) => aufDerKarte(ebene, x + dx, y + dy) && !ebene.erkundet[feldIndex(ebene, x + dx, y + dy)]);
 }

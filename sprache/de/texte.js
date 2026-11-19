@@ -35,6 +35,9 @@ export default {
   "log.faehigkeit": "{wer.nom}: {faehigkeit}!",
   "log.risiko.fehlschlag": "{wer.nom} greift ins Leere. Der Gedanke zerfasert.",
   "log.risiko.rueckschlag": "Der Gedanke schlägt zurück. {wer.nom} taumelt.",
+  "log.verpufft": "{wer.nom} verliert den Faden. Die Wirkung verpufft.",
+  "log.aktion_unterbrochen": "Etwas stört. Weitermachen mit [Leertaste], jede andere Taste bricht ab.",
+  "log.aktion_abgebrochen": "{wer.nom} bricht ab.",
   "log.handlungsunfaehig": "Leider nicht möglich. Ninkasi kann sich nicht rühren.",
   "log.nuechtern": "Stocknüchtern. Der Kopf wird klar, der Geist leer.",
   "log.abgelehnt.wand": "Die Wand gibt nicht nach.",
@@ -51,6 +54,7 @@ export default {
   "log.abgelehnt.zu_wenig_lp": "Zu wenig LP.",
   "log.abgelehnt.zu_wenig_pegel": "Dafür ist sie zu nüchtern.",
   "log.abgelehnt.material_fehlt": "Es fehlt an Zutaten.",
+  "log.abgelehnt.nichts_laufend": "Da gibt es nichts fortzusetzen.",
   "log.abgelehnt.kein_ziel": "Da ist niemand.",
   "log.abgelehnt.nicht_sichtbar": "Ninkasi sieht dort nichts.",
   "log.abgelehnt.zu_weit": "Zu weit weg.",
@@ -69,12 +73,16 @@ export default {
   "schaden.psi": "Psi",
   "schaden.magie": "Magie",
 
-  // Reise per Maus (nur Anzeige, keine Spielereignisse); "angekommen" und "abgebrochen" bleiben stumm
+  // Reise per Maus, Rasten und Erkunden (nur Anzeige, keine Spielereignisse); "angekommen" und "abgebrochen" bleiben stumm
   "reise.kein_weg": "Dorthin kennt Ninkasi keinen Weg.",
   "reise.feinde_in_sicht": "Mit Feinden in Sicht wird nicht spaziert.",
   "reise.gegner_in_sicht": "Etwas regt sich. Ninkasi bleibt stehen.",
   "reise.schaden": "Autsch. Schluss mit dem Ausflug.",
   "reise.versperrt": "Da steht jemand im Weg.",
+  "reise.schon_voll": "Ausgeruht ist sie schon.",
+  "reise.voll": "Ausgeruht.",
+  "reise.zu_lang": "Genug gerastet, es tut sich nichts mehr.",
+  "reise.alles_erkundet": "Hier gibt es nichts mehr zu entdecken.",
 
   // Oberfläche
   "ui.lp": "LP",

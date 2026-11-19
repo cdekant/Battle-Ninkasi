@@ -247,6 +247,10 @@ test("Fähigkeiten, Risikotabellen und Unterhalt werden geprüft", () => {
     voraussetzungen: [{ bedingung: "pegel_ab", wert: 100 }], risiko: "psi", ziel: { art: "geschoss", reichweite: 6, trifft: "wesen" }, wirkung: "biss_klein",
   };
   assert.deepEqual(mitFaehigkeit(gueltig), []);
+  assert.deepEqual(mitFaehigkeit({ ...gueltig, dauer: { schritte: 3 }, beimAbbruch: "biss_klein" }), []);
+  const regeln = structuredClone(rohdaten.regeln);
+  regeln.laufendeAktionen.unterbrechen = ["schaden", "erdbeben"];
+  assert.ok(mitFaehigkeit(gueltig, { regeln }).some((meldung) => meldung.includes('Gefahrenprüfung "erdbeben"')));
   assert.deepEqual(mitFaehigkeit({ text: "wesen.ninkasi", art: "aufrecht", zustand: "test" }, { zustaende: { test: { text: "wesen.ninkasi", unterhalt: { mp: 2 } } } }), []);
   const erwartet = [
     [{ ...gueltig, text: undefined }, "Textschlüssel"],
@@ -263,6 +267,9 @@ test("Fähigkeiten, Risikotabellen und Unterhalt werden geprüft", () => {
     [{ ...gueltig, ziel: { art: "feld", muster: { art: "spirale" } } }, "nicht angemeldet"],
     [{ ...gueltig, wirkung: undefined }, "wirkung fehlt"],
     [{ text: "wesen.ninkasi", art: "aufrecht", zustand: "gibt_es_nicht" }, 'Zustand "gibt_es_nicht"'],
+    [{ ...gueltig, dauer: { schritte: 0 } }, "dauer"],
+    [{ ...gueltig, dauer: 3 }, "dauer"],
+    [{ ...gueltig, beimAbbruch: "gibt_es_nicht" }, "beimAbbruch"],
   ];
   for (const [faehigkeit, teilDerMeldung] of erwartet) {
     assert.ok(mitFaehigkeit(faehigkeit).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);

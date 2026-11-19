@@ -24,6 +24,20 @@ export function reiseBeginnen(spiel, ziel, einstellungen) {
   return { reise: { ziel: { x: ziel.x, y: ziel.y }, lage: lageErfassen(spiel), schrittzahl: 0 } };
 }
 
+// Prüfung nach jedem Schritt eines Ablaufs (Reise, Erkunden, Rasten); ablauf: { lage, schrittzahl }.
+// Gibt den Haltegrund zurück (Gefahrenprüfung oder "gegenstand", je nach haltgruende) oder null und merkt die Lage.
+export function unterwegsPruefen(spiel, ablauf, haltgruende) {
+  if (ablauf.schrittzahl === 0) return null;
+  const lageJetzt = lageErfassen(spiel);
+  const gefahr = gefahrPruefen(ablauf.lage, lageJetzt, haltgruende);
+  if (gefahr) return gefahr;
+  ablauf.lage = lageJetzt;
+  const position = spielerin(spiel.zustand).position;
+  const gegenstandHier = entitaetenAuf(spiel.zustand, position.x, position.y).some((entitaet) => entitaet.aufhebbar);
+  if (haltgruende.includes("gegenstand") && gegenstandHier) return "gegenstand";
+  return null;
+}
+
 // Gibt { befehl } oder { halt } zurück; halt: "angekommen", "vorbei", "kein_weg", "versperrt", "handlungsunfaehig",
 // "gegenstand" oder der Name einer Gefahrenprüfung
 export function naechsterReiseschritt(spiel, reise, einstellungen) {
@@ -33,14 +47,8 @@ export function naechsterReiseschritt(spiel, reise, einstellungen) {
   const position = spielerin(zustand).position;
   if (position.x === reise.ziel.x && position.y === reise.ziel.y) return { halt: "angekommen" };
 
-  if (reise.schrittzahl > 0) {
-    const lageJetzt = lageErfassen(spiel);
-    const gefahr = gefahrPruefen(reise.lage, lageJetzt, einstellungen.reiseHalt);
-    if (gefahr) return { halt: gefahr };
-    reise.lage = lageJetzt;
-    const gegenstandHier = entitaetenAuf(zustand, position.x, position.y).some((entitaet) => entitaet.aufhebbar);
-    if (einstellungen.reiseHalt.includes("gegenstand") && gegenstandHier) return { halt: "gegenstand" };
-  }
+  const halt = unterwegsPruefen(spiel, reise, einstellungen.reiseHalt);
+  if (halt) return { halt };
 
   const naechstesFeld = naechstesWegfeld(spiel, position, reise.ziel, WEG_OPTIONEN);
   if (!naechstesFeld) return { halt: "kein_weg" };

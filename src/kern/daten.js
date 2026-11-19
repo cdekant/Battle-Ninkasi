@@ -170,6 +170,9 @@ function pruefeRegeln(regeln, fehler) {
   if (!ausloeser) return fehler.push("regeln.ausloeser fehlt");
   if (!istProzent(ausloeser.daempfungProStufe)) fehler.push("regeln.ausloeser.daempfungProStufe muss eine ganze Zahl von 0 bis 100 sein");
   if (!istGanzzahl(ausloeser.hoechsteKettentiefe) || ausloeser.hoechsteKettentiefe < 0) fehler.push("regeln.ausloeser.hoechsteKettentiefe muss eine ganze Zahl >= 0 sein");
+  const unterbrechen = regeln.laufendeAktionen?.unterbrechen;
+  if (!istTextliste(unterbrechen)) fehler.push("regeln.laufendeAktionen.unterbrechen muss eine Liste von Gefahrenprüfungen sein");
+  else for (const name of unterbrechen) if (!hat("gefahren", name)) fehler.push(`regeln.laufendeAktionen.unterbrechen: Gefahrenprüfung "${name}" ist nicht angemeldet`);
   if (!regeln.kampf) return fehler.push("regeln.kampf fehlt");
   for (const [feld, untergrenze] of Object.entries(KAMPFREGELN)) {
     const wert = regeln.kampf[feld];
@@ -329,6 +332,8 @@ function pruefeFaehigkeit(daten, sprache, name, faehigkeit, fehler) {
     if (!Array.isArray(faehigkeit.voraussetzungen)) fehler.push(`${ort}: voraussetzungen muss eine Liste sein`);
     else pruefeBedingungen(daten, faehigkeit.voraussetzungen, `${ort}.voraussetzungen`, fehler);
   }
+  if (faehigkeit.dauer !== undefined && !(istObjekt(faehigkeit.dauer) && istGanzzahl(faehigkeit.dauer.schritte) && faehigkeit.dauer.schritte > 0)) fehler.push(`${ort}: dauer muss { schritte } mit einer ganzen Zahl > 0 sein`);
+  pruefeParameter(daten, { beimAbbruch: "effekt?" }, faehigkeit, ort, fehler);
   if (faehigkeit.risiko !== undefined && !daten.risiken?.[faehigkeit.risiko]) fehler.push(`${ort}: Risikotabelle "${faehigkeit.risiko}" gibt es nicht`);
   if (art === "aktiv") {
     if (faehigkeit.ziel === undefined) fehler.push(`${ort}: ziel fehlt`);
