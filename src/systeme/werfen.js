@@ -9,9 +9,9 @@
 // Am Aufschlag entsteht Lärm (regeln.wahrnehmung.laermWurf): Wache gehen ihm nach, so taugt ein Wurf als Ablenkung.
 
 import { anmelden } from "../kern/register.js";
-import { entitaetMitId, entitaetEntfernen, positionSetzen } from "../kern/zustand.js";
+import { entitaetMitId, entitaetEntfernen, positionSetzen, ausDemInventarNehmen } from "../kern/zustand.js";
 import { effektAnwenden } from "../kern/effekte.js";
-import { melden, bezugAuf } from "../kern/ereignisse.js";
+import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
 import { zielAufloesen } from "./zielauswahl.js";
 import { laermMachen } from "./wahrnehmung.js";
 
@@ -37,9 +37,10 @@ anmelden("befehle", "werfen", {
     const { bahn } = wurfbahn(spiel, akteur, gegenstand, befehl.ziel);
     const aufschlag = { x: bahn.aufschlag.x, y: bahn.aufschlag.y };
     const getroffenId = bahn.getroffene[0] ?? null;
-    akteur.inventar = akteur.inventar.filter((id) => id !== gegenstand.id);
+    ausDemInventarNehmen(akteur, gegenstand.id); // auch eine angelegte Waffe lässt sich werfen
     delete gegenstand.getragenVon;
     melden(spiel, "geworfen", { wer: bezugAuf(akteur), was: bezugAuf(gegenstand) });
+    hakenAusloesen(spiel, "gegenstand_benutzt", { quelleId: akteur.id, zielId: akteur.id, gegenstandId: gegenstand.id, art: "werfen", kettentiefe: 0 });
     melden(spiel, "geschoss", { quelle: bezugAuf(akteur), bahn: bahn.felder, aufschlag });
     if (gegenstand.wurf?.effekt) {
       // erst entfernen, damit der Gegenstand nicht von seiner eigenen Wirkung getroffen wird

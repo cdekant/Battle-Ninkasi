@@ -95,6 +95,14 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
     else for (const faehigkeit of wesen.faehigkeiten) if (!daten.faehigkeiten?.[faehigkeit]) fehler.push(`${ort}: Fähigkeit "${faehigkeit}" gibt es nicht`);
   }
   pruefeParameter(daten, { bewegung: BEWEGUNGSARTEN, tueren: ["oeffnen", "nicht"] }, wesen, ort, fehler);
+  if (wesen.plaetze !== undefined) {
+    const plaetze = daten.regeln?.ausruestung?.plaetze || [];
+    if (!istObjekt(wesen.plaetze)) fehler.push(`${ort}: plaetze muss ein Objekt { platz: anzahl } sein`);
+    else for (const [platz, anzahl] of Object.entries(wesen.plaetze)) {
+      if (!plaetze.includes(platz)) fehler.push(`${ort}.plaetze: Platz "${platz}" steht nicht in regeln.ausruestung.plaetze`);
+      if (!istZahlAbNull(anzahl)) fehler.push(`${ort}.plaetze.${platz} muss eine ganze Zahl >= 0 sein`);
+    }
+  }
   if (wesen.ki) pruefeKi(daten, wesen.ki, `${ort}.ki`, fehler, istTextliste(wesen.faehigkeiten) ? wesen.faehigkeiten : []);
   if (wesen.stoffwechsel) pruefeStoffwechsel(wesen, ort, fehler);
   if (wesen.sicht && !istGanzzahl(wesen.sicht.reichweite)) fehler.push(`${ort}: sicht.reichweite muss eine ganze Zahl sein`);
@@ -205,6 +213,7 @@ function pruefeRegeln(daten, regeln, fehler) {
   else pruefeParameter(daten, { hoechstOberflaeche: "ganzzahl", hoechstGas: "ganzzahl" }, regeln.schichten, "regeln.schichten", fehler);
   if (!istObjekt(regeln.feuer)) fehler.push("regeln.feuer fehlt");
   else pruefeParameter(daten, { brennen: "effekt", dauer: "ganzzahl", rauch: "gas?", rauchMenge: "ganzzahl" }, regeln.feuer, "regeln.feuer", fehler);
+  if (!istTextliste(regeln.ausruestung?.plaetze)) fehler.push("regeln.ausruestung.plaetze muss eine Liste von Namen sein");
   if (!istObjekt(regeln.fallen)) fehler.push("regeln.fallen fehlt");
   else pruefeParameter(daten, { entdeckenVorgabe: "ganzzahl", reichweite: "ganzzahl" }, regeln.fallen, "regeln.fallen", fehler);
   if (!regeln.kampf) return fehler.push("regeln.kampf fehlt");
@@ -303,6 +312,20 @@ function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
   pruefeText(sprache.texte, gegenstand.text, ort, fehler);
   pruefeNomen(sprache, gegenstand.text, fehler);
   if (gegenstand.trinkbar) pruefeEffektVerweis(daten, gegenstand.trinkbar.effekt, `${ort}.trinkbar`, fehler);
+  if (gegenstand.tags !== undefined && !istTextliste(gegenstand.tags)) fehler.push(`${ort}: tags muss eine Liste von Texten sein`);
+  // Ausrüstung, siehe systeme/ausruestung.js
+  if (gegenstand.ausruestung !== undefined) {
+    const ausruestung = gegenstand.ausruestung;
+    if (!istObjekt(ausruestung)) fehler.push(`${ort}: ausruestung muss ein Objekt { platz, ... } sein`);
+    else {
+      const plaetze = daten.regeln?.ausruestung?.plaetze || [];
+      if (!plaetze.includes(ausruestung.platz)) fehler.push(`${ort}.ausruestung: platz muss eines von ${plaetze.join(", ")} sein`);
+      if (ausruestung.belegt !== undefined && !(istGanzzahl(ausruestung.belegt) && ausruestung.belegt > 0)) fehler.push(`${ort}.ausruestung: belegt muss eine ganze Zahl > 0 sein`);
+      if (ausruestung.angriffe !== undefined) pruefeAngriffe(daten, ausruestung.angriffe, `${ort}.ausruestung`, fehler);
+      if (ausruestung.modifikatoren !== undefined) pruefeModifikatoren(daten, ausruestung.modifikatoren, `${ort}.ausruestung.modifikatoren`, fehler);
+      if (ausruestung.ausloeser !== undefined) pruefeAusloeser(daten, ausruestung.ausloeser, `${ort}.ausruestung`, fehler);
+    }
+  }
   // Werfen, siehe systeme/werfen.js
   if (gegenstand.wurf !== undefined) {
     if (!istObjekt(gegenstand.wurf)) fehler.push(`${ort}: wurf muss ein Objekt { effekt?, reichweite? } sein`);

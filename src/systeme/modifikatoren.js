@@ -10,6 +10,7 @@
 //   gegenueber_ahnungslos {}        das Gegenüber ist ahnungslos (Hinterhalt, systeme/wahrnehmung.js)
 //   hat_tag { tag }                 die Entität trägt den Tag (tags in den Daten)
 //   ohne_tag { tag }                die Entität trägt den Tag nicht, z.B. Gas wirkt nur auf Wesen ohne "anaerob"
+//   traegt_tag { tag, anzahl? }     mindestens anzahl (Vorgabe 1) angelegte Gegenstände tragen den Tag (Sets)
 //   hat_zustand { zustand }         die Entität trägt den Zustand
 //   ohne_zustand { zustand }        die Entität trägt den Zustand nicht, z.B. damit eine Bossphase nur einmal beginnt
 //
@@ -57,6 +58,11 @@ bedingungAnmelden("gegenueber_ahnungslos", {}, (spiel, entitaet, parameter, umst
 bedingungAnmelden("hat_tag", { tag: "text" }, (spiel, entitaet, parameter) => Boolean(entitaet.tags?.includes(parameter.tag)));
 
 bedingungAnmelden("ohne_tag", { tag: "text" }, (spiel, entitaet, parameter) => !entitaet.tags?.includes(parameter.tag));
+
+bedingungAnmelden("traegt_tag", { tag: "text", anzahl: "ganzzahl?" }, (spiel, entitaet, parameter) => {
+  const mitTag = (entitaet.ausgeruestet || []).filter((id) => spiel.zustand.entitaeten[id]?.tags?.includes(parameter.tag)).length;
+  return mitTag >= (parameter.anzahl ?? 1);
+});
 
 const traegtZustand = (entitaet, name) => (entitaet.zustaende || []).some((instanz) => instanz.name === name);
 

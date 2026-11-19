@@ -11,7 +11,7 @@
 //   eigenen Trefferwurf, in der Reihenfolge der Felder; trifft Vorgabe "wesen", der Angreifer nie selbst.
 //   Wessen Lebenswert schon bei 0 liegt, wird von weiteren Profilen derselben Aktion nicht mehr angegriffen.
 //   Vor jedem einzelnen Angriff läuft der Haken vor_angriff; ein Abbruch lässt diesen Angriff aus.
-// Zugriff auf die Profile nur über angriffeVon, damit später Waffen ihr Profil einbringen können (Punkt 9).
+// Zugriff auf die Profile nur über angriffeVon: angelegte Waffen ersetzen die eigenen Profile (systeme/ausruestung.js).
 // Kampfwerte am Wesen: kampfwerte: { ausweichen?, willenskraft?, blocken?, ruestung?, kritchance?, heimlichkeit? } als Punkte
 //   (Vorgabe 0, heimlichkeit siehe systeme/wahrnehmung.js, entdecken siehe systeme/fallen.js),
 //   abgefragt über Modifikatoren mit gleichnamigem Ziel; widerstaende: { saeure: 100, feuer: -50 }; immun: ["psi"]
@@ -34,6 +34,7 @@ import { musterFelder, entitaetenAufFeldern } from "./zielauswahl.js";
 import { beziehungZwischen, urheberVon } from "./fraktionen.js";
 import { istAhnungslos, laermMachen } from "./wahrnehmung.js";
 import { abstand } from "../welt/karte.js";
+import { waffenprofile } from "./ausruestung.js";
 
 export const KAMPFWERTE = ["ausweichen", "willenskraft", "blocken", "ruestung", "kritchance", "heimlichkeit", "entdecken"];
 export const VERTEIDIGUNGEN = ["ausweichen", "willenskraft"];
@@ -92,8 +93,9 @@ export function trefferwurf(spiel, wurf) {
 const tagsDesEffekts = (spiel, effektName) => spiel.daten.effekte?.[effektName]?.tags || [];
 
 // Die Angriffsprofile eines Wesens; einziger Zugriff, später kommen hier die Profile der Waffen dazu
+// Angelegte Waffen ersetzen die eigenen Profile (die Faust), siehe systeme/ausruestung.js
 export function angriffeVon(spiel, wesen) {
-  return wesen.angriffe || [];
+  return waffenprofile(spiel, wesen) ?? wesen.angriffe ?? [];
 }
 
 export function kannAngreifen(spiel, wesen) {

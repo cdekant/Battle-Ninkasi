@@ -1,11 +1,14 @@
 // Seitenleiste: LP, MP, PP, Pegel als logarithmische Leiste mit Schwellen, Gepäck, sichtbare Gegner, Startwert.
-// Liest den Zustand nur.
+// Liest den Zustand nur. Das Gepäck ist zugleich das Inventarfenster (eingabe/inventar.js): offen zeigt es Buchstaben,
+// den gewählten Gegenstand und die Tasten der Handlungen; Angelegtes ist immer markiert.
 
 import { spielerin, entitaetMitId } from "../kern/zustand.js";
 import { beziehungZwischen, urheberVon } from "../systeme/fraktionen.js";
 import { hoechstwert } from "../kern/werte.js";
 import { optimalerPegel } from "../systeme/stoffwechsel.js";
 import { promilleText, leistenanteil, TEILSTRICHE } from "./pegelanzeige.js";
+import { istAngelegt } from "../systeme/ausruestung.js";
+import { BUCHSTABEN } from "../eingabe/inventar.js";
 
 function balken(beschriftung, aktuellerWert, hoechsterWert, cssKlasse) {
   const fuellungProzent = hoechsterWert > 0 ? Math.round((aktuellerWert / hoechsterWert) * 100) : 0;
@@ -39,22 +42,24 @@ export class Oberflaeche {
     this.version = version;
   }
 
-  anzeigen(spiel) {
+  // fenster: Zustand des Inventarfensters (null oder { gewaehlt }), siehe eingabe/inventar.js
+  anzeigen(spiel, fenster = null) {
     const { text, nomenForm } = this.texte;
     const zustand = spiel.zustand;
     const ninkasi = spielerin(zustand);
     const werte = ninkasi.werte;
     const sichtbareFelder = new Set(zustand.sichtbareFelder);
 
-    // Gepäck nach Typ zusammengefasst
-    const anzahlNachText = {};
-    for (const id of ninkasi.inventar) {
-      const gegenstand = entitaetMitId(zustand, id);
-      if (gegenstand) anzahlNachText[gegenstand.text] = (anzahlNachText[gegenstand.text] || 0) + 1;
-    }
-    const gepaeckHtml = Object.keys(anzahlNachText).length
-      ? Object.entries(anzahlNachText).map(([textSchluessel, anzahl]) => `<li>${nomenForm({ text: textSchluessel }, "nom", "ohne")} x ${anzahl}</li>`).join("")
-      : `<li class="leise">${text("ui.leer")}</li>`;
+    // Gepäck je Gegenstand; offen mit Buchstaben, angelegt markiert
+    const gegenstaende = ninkasi.inventar.map((id) => entitaetMitId(zustand, id)).filter(Boolean);
+    const gepaeckZeilen = gegenstaende.map((gegenstand, stelle) => {
+      const buchstabe = fenster ? `<span class="buchstabe">${BUCHSTABEN[stelle] ?? " "})</span> ` : "";
+      const angelegt = istAngelegt(ninkasi, gegenstand.id) ? ` <span class="leise">(${text("ui.angelegt")})</span>` : "";
+      const gewaehlt = fenster?.gewaehlt === gegenstand.id ? ' class="gewaehlt"' : "";
+      return `<li${gewaehlt}>${buchstabe}${nomenForm(gegenstand, "nom", "ohne")}${angelegt}</li>`;
+    });
+    const hinweis = fenster ? `<li class="hinweis">${text(fenster.gewaehlt === null ? "ui.inventar_waehlen" : "ui.inventar_handeln")}</li>` : "";
+    const gepaeckHtml = gepaeckZeilen.length ? gepaeckZeilen.join("") + hinweis : `<li class="leise">${text("ui.leer")}</li>`;
 
     const sichtbareGegner = Object.values(zustand.entitaeten).filter((entitaet) =>
       entitaet.position && entitaet.fraktion !== undefined && entitaet.id !== ninkasi.id

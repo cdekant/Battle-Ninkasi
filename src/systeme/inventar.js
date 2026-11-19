@@ -3,9 +3,9 @@
 // Getragene Gegenstände haben keine Position, sondern getragenVon; die Trägerin führt sie in inventar.
 
 import { anmelden } from "../kern/register.js";
-import { entitaetenAuf, entitaetMitId, entitaetEntfernen, positionSetzen } from "../kern/zustand.js";
+import { entitaetenAuf, entitaetMitId, entitaetEntfernen, positionSetzen, ausDemInventarNehmen } from "../kern/zustand.js";
 import { effektAnwenden } from "../kern/effekte.js";
-import { melden, bezugAuf } from "../kern/ereignisse.js";
+import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
 
 function aufhebbarHier(spiel, akteur) {
   return entitaetenAuf(spiel.zustand, akteur.position.x, akteur.position.y).find((entitaet) => entitaet.aufhebbar) || null;
@@ -35,8 +35,9 @@ anmelden("befehle", "trinken", {
   },
   ausfuehren(spiel, akteur, befehl) {
     const gegenstand = entitaetMitId(spiel.zustand, befehl.gegenstandId);
-    akteur.inventar = akteur.inventar.filter((id) => id !== gegenstand.id);
+    ausDemInventarNehmen(akteur, gegenstand.id);
     melden(spiel, "getrunken", { wer: bezugAuf(akteur), was: bezugAuf(gegenstand) });
+    hakenAusloesen(spiel, "gegenstand_benutzt", { quelleId: akteur.id, zielId: akteur.id, gegenstandId: gegenstand.id, art: "trinken", kettentiefe: 0 });
     entitaetEntfernen(spiel.zustand, gegenstand.id);
     effektAnwenden(spiel, gegenstand.trinkbar.effekt, { quelleId: akteur.id, zielId: akteur.id, ursache: "trinken", mittel: { art: "gegenstand", name: gegenstand.typ } });
     return "trinken";

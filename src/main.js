@@ -26,6 +26,7 @@ import { feldAnPixel, klickDeuten } from "./eingabe/maus.js";
 import { reiseBeginnen, naechsterReiseschritt } from "./eingabe/reise.js";
 import { rastenBeginnen, naechsterRastschritt } from "./eingabe/rasten.js";
 import { erkundenBeginnen, naechsterErkundungsschritt } from "./eingabe/erkunden.js";
+import { inventarTaste } from "./eingabe/inventar.js";
 
 const SPEICHERSCHLUESSEL_EINSTELLUNGEN = "battle-ninkasi.einstellungen";
 const RAD_PAUSE_MS = 150; // zwischen zwei Zoomschritten per Rad
@@ -94,6 +95,8 @@ let feldUnterZeiger = null;
 let laufenderAblauf = null;
 let ablaufZeitgeber = null;
 let letzterRadZoom = 0;
+// Inventarfenster: null oder { gewaehlt } (eingabe/inventar.js), reine Anzeige, nicht im Spielzustand
+let inventarFenster = null;
 
 function zeichnen() {
   const ansicht = renderer.ansicht(einstellungen.zoom);
@@ -103,7 +106,7 @@ function zeichnen() {
   const vorschauZeigen = feldUnterZeiger && !laufenderAblauf && !spiel.zustand.vorbei;
   const wegvorschau = vorschauZeigen ? weg(spiel, ninkasi.position, feldUnterZeiger, { nurErkundet: true, bewegung: bewegungVon(ninkasi) }) || [] : [];
   renderer.zeichnen(spiel, kamera, ansicht, einstellungen.zoom, { zeiger: feldUnterZeiger, weg: wegvorschau, gefahr: angekuendigteFelder(spiel) });
-  oberflaeche.anzeigen(spiel);
+  oberflaeche.anzeigen(spiel, inventarFenster);
 }
 
 function ablaufMelden(grund) {
@@ -138,6 +141,7 @@ function ablaufStarten(beginn, naechsterSchritt) {
 
 function starten(startwert) {
   if (laufenderAblauf) ablaufBeenden(null);
+  inventarFenster = null;
   spiel = neuesSpiel(daten, startwert);
   window.spiel = spiel; // zum Nachsehen in der Konsole
   kamera = neueKamera();
@@ -171,9 +175,22 @@ window.addEventListener("keydown", (tastenereignis) => {
     tastenereignis.preventDefault();
     return ablaufBeenden("abgebrochen");
   }
+  // Inventarfenster offen: es bekommt jede Taste
+  if (inventarFenster) {
+    tastenereignis.preventDefault();
+    const { fenster, befehl } = inventarTaste(inventarFenster, tastenereignis.code, spiel);
+    inventarFenster = fenster;
+    if (befehl) return befehlGebenUndZeichnen(befehl);
+    return zeichnen();
+  }
   const ergebnis = uebersetzen(tastenereignis, belegung, spiel);
   if (!ergebnis) return;
   tastenereignis.preventDefault();
+  if (ergebnis.anzeige === "inventar") {
+    if (spiel.zustand.vorbei) return;
+    inventarFenster = { gewaehlt: null };
+    return zeichnen();
+  }
   if (ergebnis.anzeige === "zoom_rein") return zoomen(1);
   if (ergebnis.anzeige === "zoom_raus") return zoomen(-1);
   if (ergebnis.anzeige === "log_umschalten") return log.umschalten();

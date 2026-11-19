@@ -46,6 +46,10 @@ export default {
     rauch: "rauch", // Gas, das ein Feuer je Welttick erzeugt
     rauchMenge: 20,
   },
+  // Ausrüstung, siehe src/systeme/ausruestung.js: die Namen der Plätze, die Wesen und Gegenstände nennen dürfen
+  ausruestung: {
+    plaetze: ["hand", "kopf", "brust", "beine", "hals", "finger"],
+  },
   // Werfen, siehe src/systeme/werfen.js
   werfen: {
     reichweite: 6, // ohne wurf.reichweite am Gegenstand

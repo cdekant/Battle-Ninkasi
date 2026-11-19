@@ -17,10 +17,11 @@ import fallen from "./fallen.js";
 import schichten from "./schichten.js";
 import wurfgegenstaende from "./wurfgegenstaende.js";
 import populationen from "./populationen.js";
+import ausruestung from "./ausruestung.js";
 
 export default {
   wesen: { ...ninkasi, ...gegner },
-  gegenstaende: { ...getraenke, ...wurfgegenstaende },
+  gegenstaende: { ...getraenke, ...wurfgegenstaende, ...ausruestung },
   schichten,
   fallen,
   effekte,

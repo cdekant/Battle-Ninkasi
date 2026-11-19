@@ -22,8 +22,8 @@ Status: umgesetzt in Version 0.4.0, beschrieben in [Architektur.md](Architektur.
 Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 + Ersatzwirkungen aus Daten (z.B. "Phönixbier verhindert einmal den Tod", "Schild fängt einen Treffer ab"): eigener Typ, der sofort am Haken "davor" wirkt und sich verbrauchen kann; mit den Zuständen (Punkt 3)
-+ Auslöser auch an Skills (mit dem Skillsystem) und an Ausrüstung und Inventar der Trägerin nach dem Vorbild der Kaskade in Caves of Qud (Punkt 9)
-+ Die reservierten Haken des Katalogs in Betrieb nehmen: `zug_beginn` (Punkt 3, sobald etwas ihn braucht), `gegenstand_benutzt` (Punkt 9); `betritt_feld` und `verlaesst_feld` sind seit 0.16.0 in Betrieb, `zug_ende` seit 0.18.0
++ Auslöser auch an Skills (mit dem Skillsystem) und am Inventar der Trägerin, das nicht angelegt ist (die Ausrüstung ist seit 0.21.0 Teil der Kaskade)
++ Die reservierten Haken des Katalogs in Betrieb nehmen: `zug_beginn` (Punkt 3, sobald etwas ihn braucht); `betritt_feld` und `verlaesst_feld` sind seit 0.16.0 in Betrieb, `zug_ende` seit 0.18.0, `gegenstand_benutzt` seit 0.21.0
 + Index im `zwischenspeicher`, welche Entitäten Auslöser für einen Haken tragen (Vorbild "WantEvent" in Caves of Qud); erst nötig, wenn mehr als die Beteiligten gefragt werden
 + Erster Auslöser im Spielinhalt (z.B. Säurespritzer des Essigbakteriums beim Tod): Spieldesign, noch nicht entschieden
 
@@ -58,10 +58,8 @@ Entschieden: Verrechnung nach dem Vorbild "increased" und "more" (Prozente addie
 
 Offener Rest, wird mit den genannten Punkten umgesetzt:
 
-+ Modifikatorquellen `ausruestung` (Punkt 9) und `skills` (mit dem Skillsystem in [Charakter.md](Charakter.md))
-+ Bedingung für Sets aus Gegenständen, z.B. zwei Kupfer-Items (Punkt 9)
++ Modifikatorquelle `skills` (mit dem Skillsystem in [Charakter.md](Charakter.md)); `ausruestung` seit 0.21.0
 + Tags in weiteren Abfragen: Schadensarten und Widerstände seit 0.10.0, Verbrauch, Zeit und Abklingzeit der Fähigkeiten seit 0.12.0
-+ Räumlicher Index für die Suche nach Auren (Punkt 7); seit 0.9.0 braucht der Bot etwa ein Viertel länger
 + Anzeige der Aufschlüsselung (`modifikatorenAufgeschluesselt`) in der Oberfläche
 
 ## 5. Kampfwerte
@@ -72,9 +70,6 @@ Entschieden: Kampfwerte sind Punkte, die über einen Halbwert zu Anteilen werden
 
 Offener Rest, wird mit den genannten Punkten umgesetzt:
 
-+ Angekündigte Angriffe: ein Wesen wählt aus seinem Portfolio einen Angriff, setzt sich einen Zustand "holt aus" mit Meldung im Log und führt ihn aus, wenn es wieder dran ist; wer das Log liest, kann ausweichen (Vorbild Brogue, DCSS); braucht die Auswahl der KI und Fähigkeiten mit Ziel (Punkte 6 und 7)
-+ Abzug der Rüstung auf das Ausweichen in den Daten der Rüstung, später womöglich über das Gewicht (Punkt 9)
-+ Waffen bringen ihr Angriffsprofil über `angriffeVon` ein und ersetzen oder ergänzen die Faust; zwei Waffen sind zwei Profile (Punkt 9)
 + Ersatzwirkungen (Rest aus Punkt 1) achten den Marker `unblockbar`
 + Anzeige: schwebende Krit-Zahlen, Trefferchance in Tooltip und Untersuchen; mit dem großen Punkt Oberfläche
 + Zuordnung der Eigenschaften zu Kampfwerten (Gewandtheit zu Ausweichen, Trinkfestigkeit zu Widerstand gegen Gift): Skillsystem in [Charakter.md](Charakter.md)
@@ -130,13 +125,30 @@ Offener Rest:
 
 ## 9. Gegenstände
 
-Status: offen
+Status: in Arbeit; umgesetzt in Version 0.21.0 (Plätze, anlegen und ablegen mit Tauschen, Modifikatorquelle `ausruestung`, Waffen statt Faust, Sets mit `traegt_tag`, Auslöser an der Ausrüstung, Haken `gegenstand_benutzt`, Inventarfenster), beschrieben in [Architektur.md](Architektur.md) (Ausrüstung)
 
-+ Stapel, Ladungen, Behälter (leere Flasche, Fass)
-+ Ausrüstung mit Slots, Befehle `anlegen` und `ablegen`, Modifikatoren mit dem Gegenstand als Quelle (siehe Punkt 4)
-+ Gewicht und Tragkraft (Körperlichkeit "Tragen")
-+ Haltbarkeit und Verderben (Bier wird sauer), Fluch
-+ Unidentifizierte Gegenstände: unbekannte Biere mit Etiketten, Probieren kostet, Sinnlichkeit oder Braukunde erkennt
+Entschieden: Aufteilung in 0.21.0, 0.22.0 und 0.23.0; Plätze Kopf, Brust, Beine, Hals und zwei Finger für Rüstung und Schmuck, zwei Hände für Waffen; ein voller Platz wird in einem Befehl getauscht; Waffen ersetzen die Faust; Flüche sind unbekannt bis zum Anlegen; Biersorten sind ein eigenes Thema, 0.23.0 baut nur die Mechanik für Unbekanntes
+
+Offen, Version 0.22.0 (Stapel, Ladungen, Behälter, Gewicht):
+
++ Stapel: `stapelbar` und `anzahl`; Gleiches fließt beim Aufheben zusammen, Trinken, Werfen und Fallenlassen nehmen einen
++ Ladungen `ladungen: { aktuell, hoechstens }` (Fass mit Schlucken), Behälter über `wirdZu` nach dem letzten Schluck (leere Flasche, Fass, für das Brauen)
++ Gewicht in Gramm, Tragkraft aus den Regeln mit Modifikatoren auf `tragkraft` (später Körperlichkeit); Überladung bremst in Stufen nach NetHack (ab 100 % Bewegen +25 %, ab 150 % +100 %)
++ Befehl `fallenlassen`, im Inventarfenster
+
+Offen, Version 0.23.0 (Haltbarkeit, Verderben, Fluch, Unbekanntes):
+
++ Verderben `verdirbt: { nach, wird }` als Zeitereignis am Gegenstand (Bier wird sauer), ruht in verlassenen Ebenen mit
++ Haltbarkeit der Ausrüstung, Säure nagt daran; bei 0 kaputt als Zustandsprüfung wie der Tod
++ Fluch: verflucht lässt sich nicht ablegen, unbekannt bis zum Anlegen
++ Unbekannte Gegenstände nach Brogue: je Lauf zufällig zugeordnete Etiketten, Probieren erkennt und kostet, das Wissen gilt für den Lauf; Erkennen später über Sinnlichkeit und Braukunde (Skills), bis dahin ein Kampfwert `kennerschaft`; die Biersorten selbst sind Spieldesign
+
+Offener Rest:
+
++ Tiles für die Ausrüstung (bisher nur Zeichen)
++ Waffen mit Muster (Rundumschlag, Speer) im Spielinhalt
++ Mehrzahlwörter in der Grammatik (z.B. Holzpantinen), bisher nur Einzahl
++ Das Inventarfenster im Browser ausprobieren: die Tastenlogik ist getestet, die Darstellung in der Seitenleiste nicht
 
 ## 10. Weitere Systeme aus gängigen Roguelikes
 

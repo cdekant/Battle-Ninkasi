@@ -63,6 +63,9 @@ html, body {
 #seitenleiste h2 { margin: 18px 0 6px; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--leise); }
 #seitenleiste ul { list-style: none; margin: 0; padding: 0; }
 #seitenleiste li { margin: 2px 0; }
+#seitenleiste li.gewaehlt { color: var(--bier); }
+#seitenleiste li.hinweis { color: var(--hinweis); font-size: 0.85em; margin-top: 6px; }
+#seitenleiste .buchstabe { color: var(--kupfer); font-family: monospace; }
 
 .wert { margin: 6px 0; }
 .wert-kopf { display: flex; justify-content: space-between; font-size: 0.9em; }

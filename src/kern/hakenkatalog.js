@@ -21,9 +21,10 @@ export const HAKENKATALOG = {
   verlaesst_feld: { inBetrieb: true, ausloeserErlaubt: true },
   betritt_feld: { inBetrieb: true, ausloeserErlaubt: true },
   zug_ende: { inBetrieb: true, ausloeserErlaubt: true },         // { akteurId }, Quelle und Ziel die Akteurin; nach ihrer Aktion
+  // + gegenstandId, art ("trinken" | "werfen" | "anlegen" | "ablegen"); Quelle und Ziel die Benutzerin
+  gegenstand_benutzt: { inBetrieb: true, ausloeserErlaubt: true },
   // reserviert, siehe docs/Systemausbau.md
   zug_beginn: { inBetrieb: false, ausloeserErlaubt: true },
-  gegenstand_benutzt: { inBetrieb: false, ausloeserErlaubt: true },
 };
 
 // Auslöser in den Daten: { bei, rolle?, ziel?, effekt, chance?, daempfung?, wenn? }

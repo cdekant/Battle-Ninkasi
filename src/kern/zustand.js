@@ -85,6 +85,12 @@ export function entitaetenAuf(zustand, x, y) {
   return idsAufFeld(zustand, x, y).map((id) => zustand.entitaeten[id]);
 }
 
+// Nimmt einen Gegenstand aus dem Inventar einer Trägerin und, falls angelegt, aus ihrer Ausrüstung (systeme/ausruestung.js)
+export function ausDemInventarNehmen(traegerin, gegenstandId) {
+  if (traegerin.inventar) traegerin.inventar = traegerin.inventar.filter((id) => id !== gegenstandId);
+  if (traegerin.ausgeruestet) traegerin.ausgeruestet = traegerin.ausgeruestet.filter((id) => id !== gegenstandId);
+}
+
 // Entfernt eine Entität samt ihrem Platz in der Warteschlange, ihren gebundenen Zeitereignissen
 // und allem, was sie trägt; ist sie selbst getragen, verschwindet sie aus dem Inventar der Trägerin.
 // Wer Getragenes behalten will (z.B. fallen lassen beim Tod), muss es vorher herausnehmen.
@@ -93,7 +99,7 @@ export function entitaetEntfernen(zustand, id) {
   if (!entitaet) return;
   if (entitaet.getragenVon !== undefined) {
     const traegerin = zustand.entitaeten[entitaet.getragenVon];
-    if (traegerin && traegerin.inventar) traegerin.inventar = traegerin.inventar.filter((getragenId) => getragenId !== id);
+    if (traegerin) ausDemInventarNehmen(traegerin, id);
   }
   for (const getragenId of entitaet.inventar || []) entitaetEntfernen(zustand, getragenId);
   entitaetAusIndexNehmen(zustand, entitaet);

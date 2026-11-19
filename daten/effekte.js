@@ -16,6 +16,13 @@ export default {
   saeureschwall: {
     schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "2W4" }],
   },
+  // Waffen (daten/ausruestung.js); vorläufig
+  kellenschlag: {
+    schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "1W8+2" }],
+  },
+  hammerschlag: {
+    schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "2W6+3" }],
+  },
   // Fallen (daten/fallen.js); vorläufig
   saeureduese: {
     schritte: [

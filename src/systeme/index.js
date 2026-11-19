@@ -5,6 +5,7 @@ import "./wahrnehmung.js";
 import "./kampf.js";
 import "./bewegung.js";
 import "./inventar.js";
+import "./ausruestung.js";
 import "./stoffwechsel.js";
 import "./gefahr.js";
 import "./tod.js";

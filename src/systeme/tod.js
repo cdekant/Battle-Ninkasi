@@ -34,6 +34,7 @@ function hinterlassenschaftVerteilen(spiel, entitaet) {
     }
   }
   if (entitaet.inventar) entitaet.inventar = [];
+  if (entitaet.ausgeruestet) entitaet.ausgeruestet = [];
 }
 
 // Gibt true zurück, wenn das Wesen gestorben ist

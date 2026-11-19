@@ -63,6 +63,12 @@ function zufallsbefehl(botZufall, spiel) {
   if (wurf <= 5) return { art: "warten" };
   if (wurf <= 10) return { art: "aufheben" };
   if (wurf <= 13 && ninkasi.werte.lp.aktuell < 70) return { art: "trinken", gegenstandId: erstesGetraenk(spiel.zustand, ninkasi) };
+  const anlegbare = (ninkasi.inventar || []).filter((id) => spiel.zustand.entitaeten[id]?.ausruestung);
+  if (wurf >= 14 && wurf <= 16 && anlegbare.length) {
+    // Ausrüstung an- oder ablegen (tauscht bei vollem Platz)
+    const id = anlegbare[zufallsGanzzahl(botZufall, 0, anlegbare.length - 1)];
+    return { art: (ninkasi.ausgeruestet || []).includes(id) ? "ablegen" : "anlegen", gegenstandId: id };
+  }
   if (wurf <= 15 && ninkasi.inventar?.length) {
     // Wurf auf ein Feld in der Nähe; abgelehnte Ziele (zu weit, nicht sichtbar) prüfen die Ablehnung gleich mit
     const ziel = { x: ninkasi.position.x + zufallsGanzzahl(botZufall, -5, 5), y: ninkasi.position.y + zufallsGanzzahl(botZufall, -5, 5) };
@@ -129,7 +135,7 @@ const reisenNachHaltegrund = {};
 // Fähigkeiten der Gegner: gewirkt, lange Aktionen begonnen und abgebrochen
 const gegnerfaehigkeiten = { gewirkt: 0, begonnen: 0, abgebrochen: 0 };
 // Würfe Ninkasis
-let anzahlWuerfe = 0;
+let anzahlWuerfe = 0, anzahlAngelegt = 0;
 console.log("Startwert  Befehle  Zeit     LP   MP   PP  Pegel  Getötet  Biere  Ergebnis");
 for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe; startwert++) {
   try {
@@ -139,6 +145,7 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
       if (meldung.art === "tod" && meldung.opfer.id !== spiel.zustand.spielerinId) getoetet++;
       if (meldung.art === "getrunken") getrunkeneBiere++;
       if (meldung.art === "geworfen") anzahlWuerfe++;
+      if (meldung.art === "angelegt") anzahlAngelegt++;
       if (meldung.wer?.id === spiel.zustand.spielerinId) return;
       if (meldung.art === "faehigkeit") gegnerfaehigkeiten.gewirkt++;
       if (meldung.art === "aktion_beginnt") gegnerfaehigkeiten.begonnen++;
@@ -172,6 +179,6 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
 }
 const haltegruende = Object.entries(reisenNachHaltegrund).map(([grund, anzahl]) => `${grund} ${anzahl}`).join(", ");
 console.log(`\nAbläufe nach Haltegrund: ${haltegruende}`);
-console.log(`Fähigkeiten der Gegner: ${gegnerfaehigkeiten.gewirkt} gewirkt, ${gegnerfaehigkeiten.begonnen} lange Aktionen begonnen, ${gegnerfaehigkeiten.abgebrochen} abgebrochen; ${anzahlWuerfe} Würfe Ninkasis`);
+console.log(`Fähigkeiten der Gegner: ${gegnerfaehigkeiten.gewirkt} gewirkt, ${gegnerfaehigkeiten.begonnen} lange Aktionen begonnen, ${gegnerfaehigkeiten.abgebrochen} abgebrochen; ${anzahlAngelegt} Mal angelegt, ${anzahlWuerfe} Würfe Ninkasis`);
 console.log(`${anzahlLaeufe} Läufe, ${anzahlTode} tot, ${anzahlFehler} Fehler`);
 process.exitCode = anzahlFehler ? 1 : 0;

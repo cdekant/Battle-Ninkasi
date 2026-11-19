@@ -81,7 +81,8 @@ export function voraussetzungenErfuellt(spiel, wesen, definition) {
 function materialAuswaehlen(spiel, wesen, definition) {
   const gewaehlt = [];
   for (const { typ, anzahl } of definition.material || []) {
-    const passende = (wesen.inventar || []).filter((id) => entitaetMitId(spiel.zustand, id)?.typ === typ && !gewaehlt.includes(id));
+    // angelegte Gegenstände sind kein Material
+    const passende = (wesen.inventar || []).filter((id) => entitaetMitId(spiel.zustand, id)?.typ === typ && !gewaehlt.includes(id) && !(wesen.ausgeruestet || []).includes(id));
     if (passende.length < anzahl) return null;
     gewaehlt.push(...passende.slice(0, anzahl));
   }

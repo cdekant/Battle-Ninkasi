@@ -29,6 +29,7 @@ export default {
     Escape: "reise_abbrechen",
     KeyR: "rasten",   // bis LP und MP voll sind
     KeyO: "erkunden", // automatisch erkunden
+    KeyI: "inventar", // Inventarfenster öffnen (eingabe/inventar.js)
   },
   // Maustasten nach MouseEvent.button (0 links, 1 Mitte, 2 rechts); Rad: Zoom oder nichts
   maus: {

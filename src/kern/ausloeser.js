@@ -13,7 +13,8 @@
 // Vorgang leer); abgearbeitet werden sie nacheinander in der Reihenfolge des Vormerkens, siehe
 // kern/vorgang.js. Ihre Effekte laufen eine Kettenstufe tiefer; ab der höchsten Kettentiefe wird nichts
 // mehr vorgemerkt. Gefragt werden die beteiligten Entitäten (Quelle, dann Ziel), je Entität zuerst
-// ihre eigenen Auslöser, dann die ihrer Zustände in deren Reihenfolge (Daten: zustaende.<name>.ausloeser).
+// ihre eigenen Auslöser, dann die ihrer Zustände in deren Reihenfolge (Daten: zustaende.<name>.ausloeser), dann die
+// ihrer angelegten Gegenstände in der Reihenfolge des Anlegens (ausruestung.ausloeser, Kaskade nach Caves of Qud).
 
 import { anmelden } from "./register.js";
 import { HAKENKATALOG, AUSLOESER_ROLLEN } from "./hakenkatalog.js";
@@ -44,6 +45,10 @@ function ausloeserDer(spiel, entitaet) {
   for (const instanz of entitaet.zustaende || []) {
     const liste = spiel.daten.zustaende?.[instanz.name]?.ausloeser || [];
     liste.forEach((ausloeser, nummer) => ergebnis.push({ ausloeser, schluessel: `${entitaet.id}:z${instanz.nummer}:${nummer}` }));
+  }
+  for (const gegenstandId of entitaet.ausgeruestet || []) {
+    const liste = spiel.zustand.entitaeten[gegenstandId]?.ausruestung?.ausloeser || [];
+    liste.forEach((ausloeser, nummer) => ergebnis.push({ ausloeser, schluessel: `${entitaet.id}:g${gegenstandId}:${nummer}` }));
   }
   return ergebnis;
 }

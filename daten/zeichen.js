@@ -18,6 +18,13 @@ export default {
   gegenstaende: {
     bier: { zeichen: "!", farbe: "#e0952b" },
     brandflasche: { zeichen: "!", farbe: "#e5533d" },
+    schoepfkelle: { zeichen: ")", farbe: "#b8b8b8" },
+    fasshammer: { zeichen: ")", farbe: "#8c7a63" },
+    lederschuerze: { zeichen: "[", farbe: "#8c5a33" },
+    kupferhelm: { zeichen: "[", farbe: "#c87533" },
+    lederhose: { zeichen: "[", farbe: "#a07a4a" },
+    hopfenkette: { zeichen: "\"", farbe: "#8fbf4a" },
+    kupferring: { zeichen: "=", farbe: "#c87533" },
   },
   // Feldschichten: Farbe der Überlagerung, bei Gas mit der Menge zunehmend deckend (src/anzeige/renderer.js)
   schichten: {
