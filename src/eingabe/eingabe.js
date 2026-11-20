@@ -1,20 +1,20 @@
-// Übersetzt Tastendrücke über die Belegung in Befehle oder Anzeige-Aktionen.
+// Übersetzt Tastendrücke über Belegung und Aktionskatalog (eingabe/aktionskatalog.js) in Aktionen und Befehle.
 // Liest den Zustand nur, um Befehle zu vervollständigen (z.B. welches Getränk).
 
 import { spielerin } from "../kern/zustand.js";
 import { erstesGetraenk } from "../systeme/inventar.js";
+import { aktionDerTaste, befehlDerAktion } from "./aktionskatalog.js";
 
-// Gibt { befehl } oder { anzeige } oder null zurück
+// Gibt { aktion, befehl? } oder null zurück; befehl nur bei Aktionen mit Vorlage
 export function uebersetzen(tastenereignis, belegung, spiel) {
   if (tastenereignis.ctrlKey || tastenereignis.altKey || tastenereignis.metaKey) return null;
-  const tastencode = tastenereignis.code;
-  if (belegung.anzeige[tastencode]) return { anzeige: belegung.anzeige[tastencode] };
-  const vorlage = belegung.befehle[tastencode];
-  if (!vorlage) return null;
-  const befehl = structuredClone(vorlage);
+  const aktion = aktionDerTaste(belegung, tastenereignis.code, tastenereignis.key);
+  if (!aktion) return null;
+  const befehl = befehlDerAktion(aktion);
+  if (!befehl) return { aktion };
   if (befehl.art === "trinken" && befehl.gegenstandId === undefined) {
     const getraenkId = erstesGetraenk(spiel.zustand, spielerin(spiel.zustand));
     if (getraenkId !== null) befehl.gegenstandId = getraenkId;
   }
-  return { befehl };
+  return { aktion, befehl };
 }

@@ -6,6 +6,7 @@
 
 import { spielerin } from "../kern/zustand.js";
 import { BUCHSTABEN, buchstabeDerTaste } from "./inventar.js";
+import { fensterartAnmelden } from "./fenster.js";
 
 // Name der Fähigkeit an einer Stelle der Liste oder null
 export function faehigkeitAnStelle(spiel, stelle) {
@@ -21,3 +22,11 @@ export function faehigkeitenTaste(fenster, tastencode, spiel, zeichen) {
   const name = faehigkeitAnStelle(spiel, BUCHSTABEN.indexOf(buchstabe));
   return name ? { fenster: null, auswahl: { zweck: "faehigkeit", faehigkeit: name } } : { fenster };
 }
+
+// Als Fensterart im Fensterstapel (eingabe/fenster.js); Zustand {}
+fensterartAnmelden("faehigkeiten", {
+  taste(zustand, taste, { spiel }) {
+    const { fenster, auswahl } = faehigkeitenTaste(zustand, taste.code, spiel, taste.zeichen);
+    return { zustand: fenster, ...(auswahl && { auswahl }) };
+  },
+});

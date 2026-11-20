@@ -7,8 +7,11 @@ Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaf
 ## Charaktererstellung
 
 + Alle sechs Eigenschaften starten bei 10, die Spielerin verteilt 20 Punkte, höchstens 20 je Eigenschaft (vorläufig, Regelwerte in `regeln.lernen`)
++ Die Charaktererstellung erscheint vor jedem Lauf als Fenster über der Karte, vorbelegt mit der letzten Verteilung (seit 0.27.0, siehe Fenster in [Architektur.md](Architektur.md))
 + Keine festen Startskills: Ninkasi beginnt mit einem Startguthaben freier EP (vorläufig 300) und verteilt es selbst
 + Makel gehören zur Charaktererstellung: Nachteil gegen zusätzliche Punkte
++ Idee, noch nicht bestätigt: Vorzüge als Gegenstück, Vorteil gegen Punkte
++ Idee, noch nicht bestätigt: Makel und Vorzüge werden vor der Punkteverteilung gewählt, die zu verteilenden Punkte ergeben sich daraus (Grundpunkte + Makel - Vorzüge); die Oberfläche rechnet sie an einer Stelle (`punkteZuVerteilen` in `src/eingabe/erstellung.js`), der Hilfetext nennt sie über Platzhalter statt einer festen Zahl
 + Beispiele für Makel: Blindheit (Sichtweite stark eingeschränkt), dysfunktionale Alkoholdehydrogenase
 + Weitere Makel, auszuarbeiten: Aldehyd-Dehydrogenase-Mangel (Acetaldehyd, Flush, Katerschaden), Zöliakie (Gerste und Weizen schaden), Gicht (Purine im Bier lösen Anfälle aus)
 + Vorschlag, noch nicht bestätigt: Makel dürfen zweischneidig sein, Nachteil mit verstecktem Vorteil
@@ -81,7 +84,8 @@ Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaf
 + Voraussetzungen innerhalb eines Sets ergeben sich aus der Regel: Experten-Skill verlangt Grundskill 3, Meister-Skill Grundskill 4 und Experte 3, göttliches Niveau Grundskill 5, Experte 4 und Meister 3
 + Darüber hinaus kann jeder Skill beliebige andere Skills voraussetzen, auch aus anderen Sets, z.B. Zweihandspezialisierung die allgemeine Waffenfertigkeit, Anstürmen die körperliche Grundfertigkeit, Schildschlag-Schaden die Schildgrundfertigkeit; alle Voraussetzungen müssen erfüllt sein (eine Oder-Gruppe ist später möglich)
 + Die Skills bilden so einen Graphen; die Datenprüfung erkennt Kreise und unbekannte Namen, das Skillfenster zeigt die Abhängigkeiten
-+ Optional `freischaltung`: Ein Skill wird erst durch ein Fundstück lernbar (Braubücher, Rezepturen)
++ Optional `freischaltung`: Ein besonderer Skill, den man unterwegs findet, wird erst durch das Fundstück lernbar; bis dahin zeigt ihn das Skillfenster nicht. Braubücher und Rezepturen lehren eher Rezepte und Fähigkeiten als Skills
++ Alle gewöhnlichen Skills sind im Skillfenster immer sichtbar, solche mit fehlenden Voraussetzungen ausgegraut: Der Katalog ist die Grundlage zum Planen von Builds
 + Keine künstliche Begrenzung göttlicher Niveaus: Das Balancing sorgt dafür, dass pro komplettem Lauf implizit nur eine gewisse Anzahl erreichbar ist
 
 ### Kosten
@@ -160,7 +164,9 @@ Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaf
 ## Offen
 
 + Ausnahmen von der Regel "keine Fähigkeiten direkt durch Skills"
-+ Übersicht der Skills in der Oberfläche (Filter, Suche, Gruppierung nach Skill-Set, Abhängigkeiten als Graph)
++ Übersicht der Skills in der Oberfläche: Liste nach Set und Tier mit Voraussetzungen und "ermöglicht" seit 0.27.0 (siehe Fenster in [Architektur.md](Architektur.md)); offen sind Filter, Suche und ein Graph der Abhängigkeiten, wenn der Katalog groß ist
++ Idee, noch nicht bestätigt: zufällige besondere Skills mit zufälligen Kombinationen, als Fundstück freigeschaltet
++ Idee, noch nicht bestätigt: Zielstufe je Skill wie in DCSS, eingehende freie EP fließen von selbst dorthin (Mechanik, nicht Oberfläche)
 + Ob Fähigkeitsquellen verbraucht werden oder dauerhaft lehren, flexibel pro Quelle regelbar, später entscheiden
 + Währung bei Händlern (Gold, Alkohol, Tausch)
 + Nachrückende Gegner: ob, wie oft, mit welchem EP-Faktor

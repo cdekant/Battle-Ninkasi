@@ -161,8 +161,8 @@ Entschieden: zwei Versionen, 0.24.0 Zielmodus und 0.25.0 Untersuchen und Zustän
 
 Offener Rest:
 
-+ Schema der Oberfläche als Entwurf in [Oberflaeche.md](Oberflaeche.md), Entscheidungen getroffen (dort am Ende), Umsetzung in 0.27.0 und 0.28.0
-+ Inventarfenster, Zielmodus, Untersuchen und Tooltip im Browser ausprobieren (die Tasten- und Beschreibungslogik ist getestet, die Darstellung nur ohne Browser erzeugt)
++ Schema der Oberfläche in [Oberflaeche.md](Oberflaeche.md): seit 0.27.0 Aktionskatalog, Fensterstapel, Charakterfenster, Charaktererstellung und Hilfe (siehe Fenster in [Architektur.md](Architektur.md)); 0.28.0 neues Layout mit Bedienzeile (Schnellleiste und Knöpfe), Log in Spalten, Minikarte, Esc-Kette, Spielmenü, Einstellungen und vi-Belegung
++ Alle Fenster (Inventar, Fähigkeiten, Charakter, Erstellung, Hilfe), Zielmodus, Untersuchen und Tooltip im Browser ausprobieren (die Tasten- und Beschreibungslogik ist getestet, die Darstellung nur ohne Browser erzeugt)
 + Gehörter Lärm kommt im jetzigen Inhalt kaum vor (im Bot 0 Mal), weil fast nur Kämpfe mit Ninkasi Lärm machen; mit Kämpfen unter Gegnern, Beschworenen und Fallen nachprüfen
 
 Später:
@@ -185,11 +185,13 @@ Entschieden: Animationen halten die Eingabe auf, bis alle Meldungen seit Ninkasi
 
 ## 13. Skillsystem
 
-Status: Mechanik umgesetzt in 0.26.0 (Eigenschaften, Skills, Lernpunkte, freie und gebundene EP, Beitragsbuch, Topf je Abstammungslinie, Anforderungen, Risiko ohne Skill, Ausbau), beschrieben in [Architektur.md](Architektur.md) (Skills und Lernen), Spieldesign in [Charakter.md](Charakter.md); im Spielinhalt nur vorläufige Skills (Zähigkeit, Nahkampf, Ausweichen)
+Status: Mechanik umgesetzt in 0.26.0 (Eigenschaften, Skills, Lernpunkte, freie und gebundene EP, Beitragsbuch, Topf je Abstammungslinie, Anforderungen, Risiko ohne Skill, Ausbau), Skillfenster und Charaktererstellung in 0.27.0, beschrieben in [Architektur.md](Architektur.md) (Skills und Lernen, Fenster), Spieldesign in [Charakter.md](Charakter.md); im Spielinhalt nur vorläufige Skills (Zähigkeit, Nahkampf, Ausweichen)
 
 Offen:
 
-+ 0.27.0: Skillfenster (Sets, Tiers, Abhängigkeiten, Kosten in EP, Verteilen freier EP), Eigenschaften und freie EP in der Seitenleiste, Charaktererstellung mit Punkteverteilung (die Logik nimmt die Verteilung schon als Startoption)
++ Skillfenster, Charaktererstellung und die Tasten zum Verteilen der EP im Browser ausprobieren (die Tastenlogik ist getestet, die Darstellung nur ohne Browser erzeugt)
++ Idee: Zielstufe je Skill wie in DCSS, eingehende freie EP fließen von selbst dorthin
++ Makel und Vorzüge in der Charaktererstellung, mit ihrem Katalog, gewählt vor der Punkteverteilung; dann rechnen `punkteZuVerteilen` (Oberfläche) und `eigenschaftenPruefen` (Logik, bisher fest `eigenschaftPunkte`) mit den gewählten Makeln und Vorzügen als Startoption
 + Skillkatalog als eigene Sitzung, danach Kennerschaft, Nachtsicht und Fernsicht als Skills
 + Anfangsbalance: Der Bot misst je Lauf von 3000 Befehlen rund 1200 EP aus Erkundung und nur rund 55 aus Gegnern (Tiefe 1, vorläufige Zahlen); das Verhältnis von `epJeFeld` zu den `ep` der Gegner ist vor dem Katalog festzulegen
 + Gewichtung `anteil` (nach Schadensanteil) zum Vergleich mit `erste`

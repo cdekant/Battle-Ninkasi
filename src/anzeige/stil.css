@@ -1,4 +1,4 @@
-/* Oberfläche: Karte links, Seitenleiste rechts (etwa 400 px), Log unten (5 Zeilen, aufklappbar).
+/* Oberfläche: Karte links, Seitenleiste rechts (etwa 400 px), Log unten (5 Zeilen, aufklappbar), Fenster über der Karte.
    Farben vorläufig: Biertöne, Kupfer, Stein, dazu Signalfarben. */
 
 :root {
@@ -66,6 +66,59 @@ html, body {
 #tooltip .leise { color: var(--leise); }
 #tooltip .schlimm { color: var(--schlimm); }
 
+/* Fenster über der Karte (eingabe/fenster.js, anzeige/fenster.js): Titel, Kopf, Liste links, Einzelheiten rechts, Fuß */
+#fenster {
+  position: absolute;
+  inset: 4% 6%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  pointer-events: none;
+  z-index: 5;
+}
+#fenster[hidden] { display: none; }
+.fenster-rahmen {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 1100px);
+  max-height: 100%;
+  background: rgba(26, 21, 16, 0.97);
+  border: 1px solid var(--kupfer);
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.6);
+}
+.fenster-rahmen.schmal { width: min(100%, 600px); }
+.fenster-rahmen p.thema { margin: 4px 0; max-width: 70em; }
+.fenster-rahmen h1 { margin: 0; padding: 10px 16px; font-size: 1.2em; color: var(--bier); border-bottom: 1px solid var(--linie); letter-spacing: 0.04em; }
+.fenster-rahmen h2 { margin: 0 0 6px; font-size: 1.05em; color: var(--bier); }
+.fenster-rahmen h3 { margin: 14px 0 4px; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--leise); }
+.fenster-rahmen ul { list-style: none; margin: 0; padding: 0; }
+.fenster-rahmen li { margin: 2px 0; }
+.fenster-rahmen li.gewaehlt { color: var(--bier); background: rgba(224, 168, 58, 0.1); }
+.fenster-rahmen p { margin: 0 0 10px; line-height: 1.45; }
+.fenster-kopf { padding: 8px 16px; border-bottom: 1px solid var(--linie); }
+.fenster-inhalt { display: flex; gap: 24px; padding: 12px 16px; min-height: 0; overflow: hidden; flex: 1; }
+.fenster-liste { flex: 1 1 50%; overflow-y: auto; }
+.fenster-details { flex: 1 1 50%; overflow-y: auto; border-left: 1px solid var(--linie); padding-left: 20px; }
+.fenster-fuss { padding: 6px 16px; border-top: 1px solid var(--linie); color: var(--hinweis); font-size: 0.85em; }
+.fenster-rahmen .buchstabe { color: var(--kupfer); font-family: monospace; }
+.fenster-rahmen .leise { color: var(--leise); }
+.fenster-rahmen .gut { color: var(--gut); }
+.fenster-rahmen .schlimm { color: var(--schlimm); }
+.fenster-rahmen li.set { margin-top: 10px; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--leise); }
+.fenster-rahmen li.set:first-child { margin-top: 0; }
+.fenster-rahmen li.gesperrt { opacity: 0.5; }
+.fenster-rahmen .stufe { color: var(--bier); letter-spacing: 0.1em; }
+.fenster-rahmen .eingabe { color: var(--hinweis); margin-left: 12px; }
+.fenster-rahmen ul.eigenschaften { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px 24px; margin-bottom: 6px; }
+.fenster-rahmen ul.eigenschaften li { display: flex; justify-content: space-between; }
+.fenster-rahmen ul.hilfe li { display: flex; gap: 12px; }
+.fenster-rahmen ul.hilfe .tasten { min-width: 9em; color: var(--kupfer); font-family: monospace; }
+.fenster-rahmen ul.erstellung li { display: grid; grid-template-columns: 10em 1fr 2.5em; gap: 12px; align-items: center; padding: 2px 4px; }
+.fenster-rahmen ul.erstellung .balken { height: 8px; margin: 0; }
+.fenster-rahmen ul.erstellung .balken .fuellung { display: block; background: var(--kupfer); }
+.fenster-rahmen .wert-zahl { font-variant-numeric: tabular-nums; text-align: right; }
+
 #seitenleiste {
   grid-column: 2;
   grid-row: 1 / span 2;
@@ -88,6 +141,8 @@ html, body {
 #seitenleiste .schlimm { color: var(--schlimm); }
 #seitenleiste li.einzug { padding-left: 1em; font-size: 0.9em; }
 #seitenleiste .zusatz { font-size: 0.8em; margin-top: -2px; }
+#seitenleiste .freie-ep { margin: 8px 0; }
+#seitenleiste .last { margin-top: 12px; }
 
 .wert { margin: 6px 0; }
 .wert-kopf { display: flex; justify-content: space-between; font-size: 0.9em; }

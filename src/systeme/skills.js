@@ -138,15 +138,81 @@ function lernfaktor(wesen, definition) {
   return 2 * eigenschaftGrundwert(wesen, definition.primaer) + eigenschaftGrundwert(wesen, definition.sekundaer);
 }
 
-// EP, die ein Skill bis zur höchsten Stufe noch aufnimmt (aufgerundet)
-export function epBisHoechststufe(spiel, wesen, name) {
+// Lerntempo in Prozent: 100 bei der durchschnittlichen Ninkasi (2 x primär + sekundär = bezugswert)
+export function lerntempoProzent(spiel, wesen, definition) {
+  return Math.round((lernfaktor(wesen, definition) * 100) / lernregeln(spiel).bezugswert);
+}
+
+// EP, die ein Skill bis zu einer Stufe (1 bis 5) noch aufnimmt (aufgerundet); 0, wenn sie erreicht ist
+export function epBisStufe(spiel, wesen, name, stufe) {
   const definition = skillVon(spiel, name);
   const faktor = lernfaktor(wesen, definition);
   const { lernpunkte, rest } = lernstandVon(wesen, name);
-  const offen = schwellenVon(spiel, definition)[HOECHSTE_STUFE - 1] - lernpunkte;
+  const offen = schwellenVon(spiel, definition)[Math.min(stufe, HOECHSTE_STUFE) - 1] - lernpunkte;
   if (offen <= 0) return 0;
   if (faktor <= 0) return Infinity;
   return Math.max(0, Math.ceil((offen * lernregeln(spiel).bezugswert - rest) / faktor));
+}
+
+// EP, die ein Skill bis zur höchsten Stufe noch aufnimmt (aufgerundet)
+export function epBisHoechststufe(spiel, wesen, name) {
+  return epBisStufe(spiel, wesen, name, HOECHSTE_STUFE);
+}
+
+// Lernstand nach ep EP, ohne etwas zu ändern: { aufgenommen, lernpunkte, rest, stufe }; die Rechnung von epAufSkill
+function lernstandNach(spiel, wesen, name, ep) {
+  const definition = skillVon(spiel, name);
+  const faktor = lernfaktor(wesen, definition);
+  const stand = lernstandVon(wesen, name);
+  const aufgenommen = faktor > 0 ? Math.max(0, Math.min(ep, epBisHoechststufe(spiel, wesen, name))) : 0;
+  const bezugswert = lernregeln(spiel).bezugswert;
+  const zaehler = aufgenommen * faktor + stand.rest;
+  let lernpunkte = stand.lernpunkte + Math.floor(zaehler / bezugswert);
+  let rest = zaehler % bezugswert;
+  const hoechst = schwellenVon(spiel, definition)[HOECHSTE_STUFE - 1];
+  if (lernpunkte >= hoechst) {
+    lernpunkte = hoechst;
+    rest = 0;
+  }
+  const stufe = schwellenVon(spiel, definition).filter((schwelle) => lernpunkte >= schwelle).length;
+  return { aufgenommen, lernpunkte, rest, stufe };
+}
+
+// Vorschau des Befehls lernen (Skillfenster): { ok, grund?, ep, stufe, freieEpDanach }; ändert nichts
+export function lernvorschau(spiel, wesen, name, ep) {
+  const grund = skillGesperrt(spiel, wesen, name) ?? (!(ep > 0) ? "ungueltig" : (wesen.freieEp ?? 0) < ep ? "zu_wenig_ep" : null);
+  if (grund) return { ok: false, grund, ep: 0, stufe: stufeVon(spiel, wesen, name), freieEpDanach: wesen.freieEp ?? 0 };
+  const nachher = lernstandNach(spiel, wesen, name, ep);
+  return { ok: true, ep: nachher.aufgenommen, stufe: nachher.stufe, freieEpDanach: wesen.freieEp - nachher.aufgenommen };
+}
+
+// Skills, die diesen voraussetzen (umgekehrte Voraussetzungen), in der Reihenfolge der Daten
+export function ermoeglicht(spiel, name) {
+  return Object.keys(spiel.daten.skills || {}).filter((anderer) => voraussetzungenVon(spiel, anderer).some(({ skill }) => skill === name));
+}
+
+// Übersicht für das Skillfenster: alle Skills, die Ninkasi sehen darf, nach Set (Reihenfolge des ersten Auftretens)
+// und Tier; Skills mit freischaltung erscheinen erst, wenn sie freigeschaltet sind.
+// Je Eintrag: { name, definition, set, tier, stufe, gesperrt (Grund oder null), voraussetzungen: [{ skill, stufe, erfuellt }],
+//   epBisNaechste (0 bei Stufe 5), epBisHoechste, lerntempo }
+export function skillUebersicht(spiel, wesen) {
+  const skills = spiel.daten.skills || {};
+  const setReihenfolge = [];
+  for (const definition of Object.values(skills)) if (!setReihenfolge.includes(definition.set)) setReihenfolge.push(definition.set);
+  return Object.entries(skills)
+    .filter(([name, definition]) => !definition.freischaltung || (wesen.freigeschaltet || []).includes(name))
+    .map(([name, definition]) => {
+      const stufe = stufeVon(spiel, wesen, name);
+      return {
+        name, definition, set: definition.set, tier: definition.tier, stufe,
+        gesperrt: skillGesperrt(spiel, wesen, name),
+        voraussetzungen: voraussetzungenVon(spiel, name).map((voraussetzung) => ({ ...voraussetzung, erfuellt: stufeVon(spiel, wesen, voraussetzung.skill) >= voraussetzung.stufe })),
+        epBisNaechste: stufe >= HOECHSTE_STUFE ? 0 : epBisStufe(spiel, wesen, name, stufe + 1),
+        epBisHoechste: epBisHoechststufe(spiel, wesen, name),
+        lerntempo: lerntempoProzent(spiel, wesen, definition),
+      };
+    })
+    .sort((links, rechts) => setReihenfolge.indexOf(links.set) - setReihenfolge.indexOf(rechts.set) || links.tier - rechts.tier);
 }
 
 // Rechnet EP mit den Grundwerten in diesem Moment in Lernpunkte um und schreibt sie gut; Bruchteile bleiben im rest.
@@ -156,21 +222,11 @@ export function epAufSkill(spiel, wesen, name, ep) {
   if (ep <= 0) return 0;
   if (skillGesperrt(spiel, wesen, name)) return ep;
   const definition = skillVon(spiel, name);
-  const faktor = lernfaktor(wesen, definition);
-  if (faktor <= 0) return ep;
-  const aufgenommen = Math.min(ep, epBisHoechststufe(spiel, wesen, name));
-  const bezugswert = lernregeln(spiel).bezugswert;
+  if (lernfaktor(wesen, definition) <= 0) return ep;
   const stufeVorher = stufeVon(spiel, wesen, name);
+  const { aufgenommen, lernpunkte, rest } = lernstandNach(spiel, wesen, name, ep);
   if (!wesen.skills) wesen.skills = {};
-  const stand = (wesen.skills[name] ??= { lernpunkte: 0, rest: 0 });
-  const zaehler = aufgenommen * faktor + stand.rest;
-  stand.lernpunkte += Math.floor(zaehler / bezugswert);
-  stand.rest = zaehler % bezugswert;
-  const hoechst = schwellenVon(spiel, definition)[HOECHSTE_STUFE - 1];
-  if (stand.lernpunkte >= hoechst) {
-    stand.lernpunkte = hoechst;
-    stand.rest = 0;
-  }
+  wesen.skills[name] = { lernpunkte, rest };
   const stufeNachher = stufeVon(spiel, wesen, name);
   for (let stufe = stufeVorher + 1; stufe <= stufeNachher; stufe++) melden(spiel, "skillstufe", { wer: bezugAuf(wesen), skill: name, text: definition.text, stufe });
   return ep - aufgenommen;

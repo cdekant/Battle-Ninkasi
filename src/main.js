@@ -26,13 +26,21 @@ import { feldAnPixel, klickDeuten } from "./eingabe/maus.js";
 import { reiseBeginnen, naechsterReiseschritt } from "./eingabe/reise.js";
 import { rastenBeginnen, naechsterRastschritt } from "./eingabe/rasten.js";
 import { erkundenBeginnen, naechsterErkundungsschritt } from "./eingabe/erkunden.js";
-import { inventarTaste } from "./eingabe/inventar.js";
-import { faehigkeitenTaste } from "./eingabe/faehigkeiten.js";
+import "./eingabe/inventar.js";
+import "./eingabe/faehigkeiten.js";
+import "./eingabe/hilfe.js";
+import { charakterfensterOeffnen } from "./eingabe/charakter.js";
+import { erstellungOeffnen } from "./eingabe/erstellung.js";
+import { fensterOeffnen, fensterTaste, oberstesFenster } from "./eingabe/fenster.js";
+import { aktionDerTaste } from "./eingabe/aktionskatalog.js";
+import { fensterHtml } from "./anzeige/fenster.js";
+import "./anzeige/charakterfenster.js";
 import { zielmodusBeginnen, zielmodusTaste, zielmodusVorschau, zielmodusBestaetigen, cursorSetzen } from "./eingabe/zielmodus.js";
 import { istSichtbar } from "./systeme/sicht.js";
 import { neueAnimation, geschossEinreihen, laeuftAnimation, aktuellesGeschoss, animationWeiter, animationLeeren } from "./anzeige/animation.js";
 
 const SPEICHERSCHLUESSEL_EINSTELLUNGEN = "battle-ninkasi.einstellungen";
+const SPEICHERSCHLUESSEL_EIGENSCHAFTEN = "battle-ninkasi.eigenschaften"; // letzte Verteilung der Charaktererstellung
 const RAD_PAUSE_MS = 150; // zwischen zwei Zoomschritten per Rad
 const TOOLTIP_ABSTAND = 6; // Pixel zwischen Feld und Tooltip
 
@@ -59,6 +67,18 @@ function einstellungenSpeichern(aktuelleEinstellungen) {
     if (JSON.stringify(wert) !== JSON.stringify(vorgaben[name])) abweichungen[name] = wert;
   }
   try { localStorage.setItem(SPEICHERSCHLUESSEL_EINSTELLUNGEN, JSON.stringify(abweichungen)); } catch { /* ohne Speicher weiter */ }
+}
+
+// Letzte Verteilung der Eigenschaften, Vorbelegung der nächsten Charaktererstellung (geprüft in erstellungOeffnen)
+function letzteEigenschaftenLaden() {
+  try {
+    return JSON.parse(localStorage.getItem(SPEICHERSCHLUESSEL_EIGENSCHAFTEN) || "null");
+  } catch {
+    return null;
+  }
+}
+function letzteEigenschaftenSpeichern(eigenschaften) {
+  try { localStorage.setItem(SPEICHERSCHLUESSEL_EIGENSCHAFTEN, JSON.stringify(eigenschaften)); } catch { /* ohne Speicher weiter */ }
 }
 
 function startwertAusUrl() {
@@ -92,6 +112,7 @@ const renderer = new Renderer(kartenCanvas, daten.zeichen, tilebilder);
 const oberflaeche = new Oberflaeche(document.getElementById("seitenleiste"), texte, VERSION);
 const log = new Log(document.getElementById("log"), texte);
 const tooltipElement = document.getElementById("tooltip");
+const fensterElement = document.getElementById("fenster");
 
 // Anzeige-Zustand, gehört nicht zum Spielzustand
 let kamera = neueKamera();
@@ -101,11 +122,9 @@ let feldUnterZeiger = null;
 let laufenderAblauf = null;
 let ablaufZeitgeber = null;
 let letzterRadZoom = 0;
-// Inventarfenster: null oder { gewaehlt } (eingabe/inventar.js), reine Anzeige, nicht im Spielzustand
-let inventarFenster = null;
-// Fähigkeitenfenster: null oder {} (eingabe/faehigkeiten.js); Zielmodus: null oder { auswahl, zielart, cursor } (eingabe/zielmodus.js),
-// auch zum Untersuchen (auswahl { zweck: "untersuchen" })
-let faehigkeitenFenster = null;
+// Fensterstapel (eingabe/fenster.js): [{ art, zustand }], reine Anzeige, nicht im Spielzustand
+let fensterStapel = [];
+// Zielmodus: null oder { auswahl, zielart, cursor } (eingabe/zielmodus.js), auch zum Untersuchen (auswahl { zweck: "untersuchen" })
 let zielModus = null;
 // Geschossbahnen aus den Meldungen "geschoss", abgespielt im Takt geschossPause (anzeige/animation.js)
 const animation = neueAnimation();
@@ -131,7 +150,10 @@ function zeichnen() {
   renderer.zeichnen(spiel, kamera, ansicht, einstellungen.zoom, {
     zeiger: feldUnterZeiger, weg: wegvorschau, gefahr: angekuendigteFelder(spiel), ziel: zielmarkierung || untersuchmarkierung, geschoss: aktuellesGeschoss(animation),
   });
-  oberflaeche.anzeigen(spiel, { inventar: inventarFenster, faehigkeiten: faehigkeitenFenster, ziel: zielModus && { modus: zielModus, vorschau: zielvorschau } });
+  oberflaeche.anzeigen(spiel, { ziel: zielModus && { modus: zielModus, vorschau: zielvorschau } });
+  const fensterInhalt = fensterHtml({ spiel, daten, texte, belegung }, fensterStapel);
+  fensterElement.hidden = !fensterInhalt;
+  fensterElement.innerHTML = fensterInhalt;
   tooltipZeigen();
 }
 
@@ -227,13 +249,13 @@ function ablaufStarten(beginn, naechsterSchritt) {
   ablaufTakt();
 }
 
-function starten(startwert) {
+// Ein Lauf mit Startoptionen (Charaktererstellung); dieselbe Ebene wie in der Vorschau, die Eigenschaften
+// ändern an der Erzeugung nichts
+function laufBeginnen(startwert, optionen) {
   if (laufenderAblauf) ablaufBeenden(null);
-  inventarFenster = null;
-  faehigkeitenFenster = null;
   zielModus = null;
   animationUeberspringen();
-  spiel = neuesSpiel(daten, startwert);
+  spiel = neuesSpiel(daten, startwert, optionen);
   window.spiel = spiel; // zum Nachsehen in der Konsole
   kamera = neueKamera();
   log.leeren(spiel);
@@ -243,6 +265,25 @@ function starten(startwert) {
   const adresse = new URL(location.href);
   adresse.searchParams.set("seed", String(spiel.zustand.startwert));
   history.replaceState(null, "", adresse);
+  zeichnen();
+}
+
+// Neuer Lauf: erst die Charaktererstellung über der Karte des Laufs, vorbelegt mit der letzten Verteilung
+function starten(startwert) {
+  const erstellung = erstellungOeffnen(daten, letzteEigenschaftenLaden());
+  fensterStapel = fensterOeffnen([], "erstellung", erstellung);
+  laufBeginnen(startwert, { eigenschaften: erstellung.eigenschaften });
+}
+
+// Ergebnis der Charaktererstellung: derselbe Startwert mit der gewählten Verteilung
+function erstellungAbschliessen(startoptionen) {
+  letzteEigenschaftenSpeichern(startoptionen.eigenschaften);
+  laufBeginnen(spiel.zustand.startwert, startoptionen);
+}
+
+function fensterAuf(art, zustand) {
+  if (spiel.zustand.vorbei) return;
+  fensterStapel = fensterOeffnen(fensterStapel, art, zustand);
   zeichnen();
 }
 
@@ -271,20 +312,19 @@ window.addEventListener("keydown", (tastenereignis) => {
     tastenereignis.preventDefault();
     return ablaufBeenden("abgebrochen");
   }
-  // Inventarfenster offen: es bekommt jede Taste
-  if (inventarFenster) {
+  // Offene Fenster bekommen jede Taste (eingabe/fenster.js); ? legt die Hilfe zum obersten Fenster obenauf
+  if (fensterStapel.length) {
     tastenereignis.preventDefault();
-    const { fenster, befehl, auswahl } = inventarTaste(inventarFenster, tastenereignis.code, spiel, tastenereignis.key);
-    inventarFenster = fenster;
+    if (aktionDerTaste(belegung, tastenereignis.code, tastenereignis.key) === "hilfe" && oberstesFenster(fensterStapel).art !== "hilfe") {
+      fensterStapel = fensterOeffnen(fensterStapel, "hilfe", { thema: oberstesFenster(fensterStapel).art });
+      return zeichnen();
+    }
+    const taste = { code: tastenereignis.code, zeichen: tastenereignis.key, umschalt: tastenereignis.shiftKey };
+    const { stapel, befehl, auswahl, grund, start } = fensterTaste(fensterStapel, taste, { spiel, daten });
+    fensterStapel = stapel;
+    if (grund) ablehnungMelden(grund);
+    if (start) return erstellungAbschliessen(start);
     if (befehl) return befehlGebenUndZeichnen(befehl);
-    if (auswahl) return auswahlStarten(auswahl);
-    return zeichnen();
-  }
-  // Fähigkeitenfenster offen: es bekommt jede Taste, die Wahl führt in den Zielmodus
-  if (faehigkeitenFenster) {
-    tastenereignis.preventDefault();
-    const { fenster, auswahl } = faehigkeitenTaste(faehigkeitenFenster, tastenereignis.code, spiel, tastenereignis.key);
-    faehigkeitenFenster = fenster;
     if (auswahl) return auswahlStarten(auswahl);
     return zeichnen();
   }
@@ -296,27 +336,21 @@ window.addEventListener("keydown", (tastenereignis) => {
   const ergebnis = uebersetzen(tastenereignis, belegung, spiel);
   if (!ergebnis) return;
   tastenereignis.preventDefault();
-  if (ergebnis.anzeige === "inventar") {
-    if (spiel.zustand.vorbei) return;
-    inventarFenster = { gewaehlt: null };
-    return zeichnen();
-  }
-  if (ergebnis.anzeige === "faehigkeiten") {
-    if (spiel.zustand.vorbei) return;
-    faehigkeitenFenster = {};
-    return zeichnen();
-  }
-  if (ergebnis.anzeige === "untersuchen") {
+  if (ergebnis.aktion === "inventar") return fensterAuf("inventar", { gewaehlt: null });
+  if (ergebnis.aktion === "faehigkeiten") return fensterAuf("faehigkeiten", {});
+  if (ergebnis.aktion === "charakter") return fensterAuf("charakter", charakterfensterOeffnen());
+  if (ergebnis.aktion === "hilfe") return fensterAuf("hilfe", {});
+  if (ergebnis.aktion === "untersuchen") {
     if (spiel.zustand.vorbei) return;
     zielModus = zielmodusBeginnen(spiel, { zweck: "untersuchen" }).modus;
     return zeichnen();
   }
-  if (ergebnis.anzeige === "zoom_rein") return zoomen(1);
-  if (ergebnis.anzeige === "zoom_raus") return zoomen(-1);
-  if (ergebnis.anzeige === "log_umschalten") return log.umschalten();
-  if (ergebnis.anzeige === "rasten") return ablaufStarten(rastenBeginnen(spiel, einstellungen), naechsterRastschritt);
-  if (ergebnis.anzeige === "erkunden") return ablaufStarten(erkundenBeginnen(spiel, einstellungen), naechsterErkundungsschritt);
-  if (ergebnis.anzeige === "neustart") {
+  if (ergebnis.aktion === "zoom_rein") return zoomen(1);
+  if (ergebnis.aktion === "zoom_raus") return zoomen(-1);
+  if (ergebnis.aktion === "log_umschalten") return log.umschalten();
+  if (ergebnis.aktion === "rasten") return ablaufStarten(rastenBeginnen(spiel, einstellungen), naechsterRastschritt);
+  if (ergebnis.aktion === "erkunden") return ablaufStarten(erkundenBeginnen(spiel, einstellungen), naechsterErkundungsschritt);
+  if (ergebnis.aktion === "neustart") {
     if (spiel.zustand.vorbei) starten(zufaelligerStartwert());
     return;
   }
@@ -338,7 +372,8 @@ kartenCanvas.addEventListener("mouseleave", () => {
 
 kartenCanvas.addEventListener("mousedown", (mausereignis) => {
   if (laufenderAblauf) return ablaufBeenden("abgebrochen");
-  if (belegung.maus[mausereignis.button] !== "handeln" || spiel.zustand.vorbei) return;
+  // ein offenes Fenster liegt über der Karte, der Klick dahinter zählt nicht
+  if (fensterStapel.length || belegung.maus[mausereignis.button] !== "handeln" || spiel.zustand.vorbei) return;
   mausereignis.preventDefault();
   // im Zielmodus bestätigt ein Klick das Feld unter dem Zeiger
   if (zielModus) {

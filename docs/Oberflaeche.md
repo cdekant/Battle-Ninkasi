@@ -55,7 +55,8 @@ Nach Fagerholt und Lorentzon ("Beyond the HUD", 2009): diegetisch (in Geschichte
 Die Darstellung kann weitgehend neu entstehen, die Systeme darunter bleiben:
 
 + Bleibt: Logik und Meldungen, die Auswahl des Wahrnehmbaren (`src/systeme/wahrnehmbar.js`), Vorschau und Untersuchen (`vorschau.js`, `untersuchen.js`), die DOM-freien Kerne der Eingabe (Zielmodus, Inventar- und Fähigkeitenfenster, Reise, Rasten, Erkunden), Pegelanzeige, Texte und Sprachdateien, Renderer und Kamera
-+ Neu: Aufbau der Seite (`index.html`, `stil.css`), `src/anzeige/oberflaeche.js` als Seitenleiste, die Darstellung des Logs (`src/anzeige/log.js` behält die Übersetzung der Meldungen), Fensterstapel, Bedienzeile mit Schnellleiste und Knöpfen, Minikarte, Spielmenü, Einstellungen, Tastenbelegung
++ Umgesetzt in 0.27.0: Aktionskatalog (`src/eingabe/aktionskatalog.js`) mit Belegung Taste zu Aktion, Fensterstapel über der Karte (`src/eingabe/fenster.js`, `src/anzeige/fenster.js`) nach der Grammatik unten, Inventar und Fähigkeiten als Fenster, Charakter und Skills (C), Charaktererstellung vor jedem Lauf, Hilfe (?) aus dem Katalog; die Seitenleiste zeigt freie EP und bis zur Schnellleiste eine Kurzliste der Fähigkeiten, siehe Fenster in [Architektur.md](Architektur.md)
++ Neu: Aufbau der Seite (`index.html`, `stil.css`), `src/anzeige/oberflaeche.js` als Seitenleiste, die Darstellung des Logs (`src/anzeige/log.js` behält die Übersetzung der Meldungen), Bedienzeile mit Schnellleiste und Knöpfen, Minikarte, Spielmenü, Einstellungen, Tastenbelegung
 
 ## Bildschirme
 
@@ -165,6 +166,7 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 + Ein Stapel über der Karte; das oberste bekommt jede Taste zuerst; Fenster kosten keine Spielzeit
 + Grammatik: Titel mit allen Reitern, links eine Liste mit Buchstaben, rechts die Einzelheiten des Gewählten, unten eine Fußzeile mit den gültigen Tasten; Suche mit / in langen Listen (Qud)
 + Bewegung in Listen: Pfeiltasten oder Strg+j/k; ein Buchstabe wählt direkt; Enter bestätigt; Esc schließt
++ Erklärungen stehen nicht im Fenster selbst, sondern in der Hilfe zum Fenster: `?` in einem Fenster zeigt nur den Text zu diesem Fenster und seine Tasten, `?` im Spiel die allgemeine Hilfe mit allen Tasten (seit 0.27.0, Texte zuerst für Charaktererstellung und Charakter); die ganze Belegung steht nie dauerhaft auf dem Schirm, sichtbar ist, was gerade gilt: die Fußzeile des Fensters, der Hinweis "?: Hilfe", ab 0.28.0 die Tasten auf Knöpfen und Plätzen der Bedienzeile
 + Inventar und Ausrüstung
 + Fähigkeiten (mit Belegung der Schnellleiste)
 + Charakter und Skills (0.27.0)

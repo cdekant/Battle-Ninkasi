@@ -10,6 +10,7 @@
 
 import { spielerin, entitaetMitId } from "../kern/zustand.js";
 import { istAngelegt } from "../systeme/ausruestung.js";
+import { fensterartAnmelden } from "./fenster.js";
 
 export const BUCHSTABEN = "abcdefghijklmnopqrstuvwxyz";
 
@@ -48,3 +49,11 @@ export function inventarTaste(fenster, tastencode, spiel, zeichen) {
   }
   return { fenster };
 }
+
+// Als Fensterart im Fensterstapel (eingabe/fenster.js); Zustand { gewaehlt }
+fensterartAnmelden("inventar", {
+  taste(zustand, taste, { spiel }) {
+    const { fenster, befehl, auswahl } = inventarTaste(zustand, taste.code, spiel, taste.zeichen);
+    return { zustand: fenster, ...(befehl && { befehl }), ...(auswahl && { auswahl }) };
+  },
+});

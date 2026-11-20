@@ -16,7 +16,7 @@ import { vorbereiten } from "../src/kern/daten.js";
 import { faehigkeitVon, faehigkeitFuer } from "../src/systeme/faehigkeiten.js";
 import {
   schwellenVon, stufeVon, skillVon, epAufSkill, epBisHoechststufe, skillGesperrt, voraussetzungenVon,
-  eigenschaftGrundwert, eigenschaftWirksam,
+  eigenschaftGrundwert, eigenschaftWirksam, epBisStufe, lernvorschau, ermoeglicht, skillUebersicht, lerntempoProzent,
 } from "../src/systeme/skills.js";
 
 const KARTE = [
@@ -289,4 +289,54 @@ test("Datenprüfung: Skills, Kreise, Tiers je Set, Eigenschaften und Anforderung
   enthaelt(fehlerMit((daten) => { daten.faehigkeiten.testkunst.skill.stufe = 6; }), "stufe muss");
   enthaelt(fehlerMit((daten) => { daten.faehigkeiten.testkunst.ausbau[0].aendert = { art: "aufrecht" }; }), "ausbau und art nicht");
   enthaelt(fehlerMit((daten) => { daten.wesen.essigbakterium.ep = -1; }), "ep");
+});
+
+test("Lesefunktionen des Skillfensters: EP bis zu einer Stufe, Lerntempo, ermöglicht", () => {
+  const { spiel, ninkasi } = aufstellen();
+  assert.equal(epBisStufe(spiel, ninkasi, "kraft_grund", 1), 67, "50 x 40 / 30, aufgerundet");
+  assert.equal(epBisStufe(spiel, ninkasi, "kraft_grund", 5), epBisHoechststufe(spiel, ninkasi, "kraft_grund"));
+  stufeSetzen(ninkasi, "kraft_grund", 60);
+  assert.equal(epBisStufe(spiel, ninkasi, "kraft_grund", 1), 0, "erreicht");
+  assert.equal(epBisStufe(spiel, ninkasi, "kraft_grund", 2), 120, "90 Lernpunkte fehlen");
+  assert.equal(lerntempoProzent(spiel, ninkasi, skillVon(spiel, "kraft_grund")), 75, "10 und 10: drei Viertel des Bezugs");
+  const stark = aufstellen({ eigenschaften: { koerperlichkeit: 20, gewandtheit: 20 } });
+  assert.equal(lerntempoProzent(stark.spiel, stark.ninkasi, skillVon(stark.spiel, "kraft_grund")), 150);
+  assert.deepEqual(ermoeglicht(spiel, "kraft_grund"), ["kraft_experte", "zaeh"]);
+  assert.deepEqual(ermoeglicht(spiel, "zaeh"), []);
+});
+
+test("Lernvorschau rechnet wie epAufSkill und ändert nichts", () => {
+  const { spiel, ninkasi } = aufstellen();
+  ninkasi.freieEp = 500;
+  const vorschau = lernvorschau(spiel, ninkasi, "kraft_grund", 300);
+  assert.deepEqual(ninkasi.skills, {}, "nichts geändert");
+  assert.equal(vorschau.ok, true);
+  assert.equal(vorschau.freieEpDanach, 200);
+  epAufSkill(spiel, ninkasi, "kraft_grund", 300);
+  assert.equal(vorschau.stufe, stufeVon(spiel, ninkasi, "kraft_grund"));
+  const zuViel = lernvorschau(spiel, ninkasi, "kraft_grund", 5000);
+  assert.equal(zuViel.ok, false);
+  assert.equal(zuViel.grund, "zu_wenig_ep");
+  const bisOben = lernvorschau(spiel, ninkasi, "kraft_grund", 500);
+  assert.equal(bisOben.ep, Math.min(500, epBisHoechststufe(spiel, ninkasi, "kraft_grund")), "über Stufe 5 hinaus wird nichts abgebucht");
+  assert.equal(lernvorschau(spiel, ninkasi, "zaeh", 10).ok, true, "Kraft hat jetzt Stufe 2, Zähigkeit ist frei");
+  assert.equal(lernvorschau(spiel, ninkasi, "kraft_experte", 10).grund, "skill_voraussetzung");
+  assert.equal(lernvorschau(spiel, ninkasi, "kraft_grund", 0).grund, "ungueltig");
+});
+
+test("Skillübersicht: nach Set und Tier, Skills mit freischaltung erst nach der Freischaltung", () => {
+  const { spiel, ninkasi } = aufstellen();
+  const namen = () => skillUebersicht(spiel, ninkasi).map((eintrag) => eintrag.name);
+  assert.deepEqual(namen(), ["kraft_grund", "kraft_experte", "zaeh", "stachel"], "geheim fehlt");
+  ninkasi.freigeschaltet.push("geheim");
+  assert.ok(namen().includes("geheim"));
+  const experte = skillUebersicht(spiel, ninkasi).find((eintrag) => eintrag.name === "kraft_experte");
+  assert.equal(experte.gesperrt, "skill_voraussetzung");
+  assert.deepEqual(experte.voraussetzungen, [{ skill: "kraft_grund", stufe: 3, erfuellt: false }]);
+  assert.equal(experte.epBisNaechste, epBisStufe(spiel, ninkasi, "kraft_experte", 1));
+  stufeSetzen(ninkasi, "kraft_grund", 1250);
+  const vollendet = skillUebersicht(spiel, ninkasi).find((eintrag) => eintrag.name === "kraft_grund");
+  assert.equal(vollendet.stufe, 5);
+  assert.equal(vollendet.epBisNaechste, 0);
+  assert.equal(vollendet.gesperrt, "hoechststufe");
 });

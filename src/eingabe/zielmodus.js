@@ -13,6 +13,7 @@ import { istSichtbar } from "../systeme/sicht.js";
 import { beziehungZwischen, urheberVon } from "../systeme/fraktionen.js";
 import { faehigkeitFuer, faehigkeitPruefen } from "../systeme/faehigkeiten.js";
 import { zielvorschau } from "../systeme/vorschau.js";
+import { aktionDerTaste, befehlDerAktion } from "./aktionskatalog.js";
 
 export const TASTEN_BESTAETIGEN = ["Enter", "NumpadEnter"];
 export const TASTE_NAECHSTES_ZIEL = "Tab";
@@ -105,7 +106,7 @@ export function zielmodusTaste(spiel, modus, tastencode, belegung) {
   if (tastencode === TASTE_ABBRECHEN || (tastencode === TASTE_UNTERSUCHEN && istUntersuchen(modus))) return { modus: null };
   if (TASTEN_BESTAETIGEN.includes(tastencode)) return zielmodusBestaetigen(spiel, modus);
   if (tastencode === TASTE_NAECHSTES_ZIEL) return { modus: naechstesZiel(spiel, modus) };
-  const vorlage = belegung.befehle[tastencode];
+  const vorlage = befehlDerAktion(aktionDerTaste(belegung, tastencode));
   if (vorlage?.art === "bewegen") return { modus: cursorSetzen(spiel, modus, { x: modus.cursor.x + vorlage.dx, y: modus.cursor.y + vorlage.dy }) };
   return { modus };
 }

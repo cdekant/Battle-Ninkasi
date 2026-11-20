@@ -129,7 +129,7 @@ test("Untersuchen mit X: Cursor ohne Befehl, Enter bleibt, X und Esc schließen,
   assert.deepEqual(zielmodusTaste(spiel, verschoben, "Tab", belegung).modus.cursor, gegner.position);
   assert.equal(zielmodusTaste(spiel, verschoben, "KeyX", belegung).modus, null);
   assert.equal(zielmodusTaste(spiel, verschoben, "Escape", belegung).modus, null);
-  assert.equal(belegung.anzeige.KeyX, "untersuchen");
+  assert.equal(belegung.tasten.KeyX, "untersuchen");
   // beim Werfen oder Zielen schließt X nicht
   const zielen = { auswahl: { zweck: "faehigkeit", faehigkeit: "x" }, zielart: { art: "feld" }, cursor: { x: 2, y: 2 } };
   assert.notEqual(zielmodusTaste(spiel, zielen, "KeyX", belegung).modus, null);

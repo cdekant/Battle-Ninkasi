@@ -23,9 +23,32 @@ import { indexPruefen } from "../src/kern/raumindex.js";
 import { warteschlangeGueltig } from "../src/kern/zeit.js";
 import { feldBeschreiben, werteAufschluesseln } from "../src/systeme/untersuchen.js";
 import { meldungWahrnehmbar, geraeuschGehoert } from "../src/systeme/wahrnehmbar.js";
+import { charakterfensterOeffnen, charakterTaste } from "../src/eingabe/charakter.js";
+import { erstellungOeffnen, erstellungTaste } from "../src/eingabe/erstellung.js";
+import { fensterOeffnen } from "../src/eingabe/fenster.js";
+import "../src/eingabe/inventar.js";
+import "../src/eingabe/faehigkeiten.js";
+import "../src/eingabe/hilfe.js";
+import { fensterHtml } from "../src/anzeige/fenster.js";
+import "../src/anzeige/charakterfenster.js";
+import { erstelleTexte } from "../src/anzeige/texte.js";
 
 const [anzahlLaeufe = 20, hoechsteBefehlszahl = 3000, ersterStartwert = 1] = process.argv.slice(2).map(Number);
-const daten = datenLaden(rohdaten, { texte, nomenPruefen: erstelleGrammatik(grammatikDe).pruefen });
+const grammatik = erstelleGrammatik(grammatikDe);
+const daten = datenLaden(rohdaten, { texte, nomenPruefen: grammatik.pruefen });
+const anzeigetexte = erstelleTexte(texte, grammatik);
+
+// Fenster wie im Browser zeichnen (ohne DOM): fehlende Texte und Fehler in der Anzeige fallen so auch im Bot auf
+const fehlendeTexte = new Set();
+const warnen = console.warn;
+function fensterZeichnen(spiel, art, zustand) {
+  console.warn = (meldung) => fehlendeTexte.add(meldung);
+  try {
+    fensterHtml({ spiel, daten, texte: anzeigetexte, belegung }, fensterOeffnen([], art, zustand));
+  } finally {
+    console.warn = warnen;
+  }
+}
 
 function invariantenPruefen(spiel) {
   const zustand = spiel.zustand;
@@ -142,6 +165,10 @@ function zufallsbefehl(botZufall, spiel) {
     return { art: "werfen", gegenstandId: ninkasi.inventar[0], ziel };
   }
   if (wurf >= 18 && wurf <= 20 && ninkasi.faehigkeiten?.length) return faehigkeitUeberZielmodus(botZufall, spiel, ninkasi);
+  if (wurf === 22 && ninkasi.freieEp > 0) {
+    const befehl = lernenUeberSkillfenster(botZufall, spiel);
+    if (befehl) return befehl;
+  }
   if (wurf === 21 && ninkasi.freieEp > 0) {
     // freie EP auf einen zufälligen Skill, auch gesperrte, so werden die Ablehnungen mitgeprüft
     const namen = Object.keys(spiel.daten.skills);
@@ -149,6 +176,38 @@ function zufallsbefehl(botZufall, spiel) {
     return { art: "lernen", skill: namen[zufallsGanzzahl(botZufall, 0, namen.length - 1)], ep: zufallsGanzzahl(botZufall, 1, ninkasi.freieEp) };
   }
   return { art: "bewegen", dx: zufallsGanzzahl(botZufall, -1, 1), dy: zufallsGanzzahl(botZufall, -1, 1) };
+}
+
+// Freie EP wie im Browser über das Skillfenster (eingabe/charakter.js): einen Skill wählen, dann Enter, Umschalt+Enter
+// oder eine getippte Zahl; zeichnet das Fenster dabei; null, wenn das Fenster nichts ausgibt (gesperrt, keine EP)
+let anzahlUeberFenster = 0;
+function lernenUeberSkillfenster(botZufall, spiel) {
+  let zustand = charakterfensterOeffnen();
+  for (let schritt = zufallsGanzzahl(botZufall, 0, 4); schritt > 0; schritt--) zustand = charakterTaste(zustand, { code: "ArrowDown" }, spiel).zustand;
+  const art = zufallsGanzzahl(botZufall, 1, 3);
+  if (art === 3) {
+    for (const ziffer of String(zufallsGanzzahl(botZufall, 1, 200))) zustand = charakterTaste(zustand, { code: `Digit${ziffer}`, zeichen: ziffer }, spiel).zustand;
+  }
+  fensterZeichnen(spiel, "charakter", zustand);
+  const ergebnis = charakterTaste(zustand, { code: "Enter", umschalt: art === 2 }, spiel);
+  if (!ergebnis.befehl) return null;
+  anzahlLernbefehle++;
+  anzahlUeberFenster++;
+  return ergebnis.befehl;
+}
+
+// Eigenschaften wie im Browser über die Charaktererstellung (eingabe/erstellung.js): zufällige Pfeiltasten, dann Enter;
+// bleiben Punkte übrig, werden sie reihum vergeben
+function eigenschaftenUeberErstellung(botZufall) {
+  let zustand = erstellungOeffnen(daten, null);
+  const tasten = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
+  for (let schritt = 0; schritt < 40; schritt++) zustand = erstellungTaste(zustand, { code: tasten[zufallsGanzzahl(botZufall, 0, 3)] }, daten).zustand;
+  for (let versuch = 0; versuch < 60; versuch++) {
+    const ergebnis = erstellungTaste(zustand, { code: "Enter" }, daten);
+    if (ergebnis.start) return ergebnis.start.eigenschaften;
+    zustand = erstellungTaste(erstellungTaste(zustand, { code: "ArrowDown" }, daten).zustand, { code: "ArrowRight" }, daten).zustand;
+  }
+  throw new Error("Charaktererstellung kommt nicht zum Start");
 }
 
 // Fähigkeit wie im Browser über den Zielmodus (eingabe/zielmodus.js): ein Ziel per Tab oder ein Feld in der Nähe;
@@ -242,7 +301,9 @@ console.log("Startwert  Befehle  Zeit     LP   MP   PP  Pegel  Getötet  Biere  
 for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe; startwert++) {
   try {
     // jeder zweite Lauf mit eigener Verteilung der Eigenschaften (Startoption, gehört zum Spielstand)
-    const optionen = startwert % 2 === 0 ? { eigenschaften: zufallsEigenschaften(zufallErzeugen(startwert + 1_000_000)) } : {};
+    // jeder vierte über die Tasten der Charaktererstellung
+    const verteilung = startwert % 4 === 0 ? eigenschaftenUeberErstellung(zufallErzeugen(startwert + 2_000_000)) : zufallsEigenschaften(zufallErzeugen(startwert + 1_000_000));
+    const optionen = startwert % 2 === 0 ? { eigenschaften: verteilung } : {};
     const spiel = neuesSpiel(daten, startwert, optionen);
     epBuch = { erwartet: daten.regeln.lernen.startEp };
     let getoetet = 0, getrunkeneBiere = 0;
@@ -293,7 +354,11 @@ const haltegruende = Object.entries(reisenNachHaltegrund).map(([grund, anzahl]) 
 console.log(`\nAbläufe nach Haltegrund: ${haltegruende}`);
 console.log(`Fähigkeiten der Gegner: ${gegnerfaehigkeiten.gewirkt} gewirkt, ${gegnerfaehigkeiten.begonnen} lange Aktionen begonnen, ${gegnerfaehigkeiten.abgebrochen} abgebrochen; ${anzahlAngelegt} Mal angelegt, ${anzahlWuerfe} Würfe Ninkasis, ${ninkasisFaehigkeiten} Fähigkeiten Ninkasis`);
 console.log(`Meldungen für Ninkasi: ${meldungenFuerNinkasi.gezeigt} gezeigt, ${meldungenFuerNinkasi.verborgen} verborgen, ${meldungenFuerNinkasi.gehoert} gehört`);
-console.log(`Lernen: ${anzahlLernbefehle} Lernbefehle, ${anzahlGelernt} angenommen, ${anzahlSkillstufen} Skillstufen erreicht`);
+console.log(`Lernen: ${anzahlLernbefehle} Lernbefehle (${anzahlUeberFenster} über das Skillfenster), ${anzahlGelernt} angenommen, ${anzahlSkillstufen} Skillstufen erreicht`);
+if (fehlendeTexte.size) {
+  console.log(`Fehlende Texte in den Fenstern: ${[...fehlendeTexte].join("; ")}`);
+  anzahlFehler++;
+}
 // Grundlage der Anfangsbalance: was eine Tiefe an EP hergibt, gemittelt über die Läufe (Zahlen der Daten vorläufig)
 const budget = Object.entries(epJeTiefe).sort(([links], [rechts]) => links - rechts)
   .map(([tiefe, { erkundung, gebunden, frei }]) => `Tiefe ${tiefe}: Erkundung ${Math.round(erkundung / anzahlLaeufe)}, gebunden ${Math.round(gebunden / anzahlLaeufe)}, frei aus Beute ${Math.round(frei / anzahlLaeufe)}`)
