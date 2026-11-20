@@ -353,7 +353,7 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 
 + Folgen mit Randabstand: Die Kamera bewegt sich erst, wenn Ninkasi näher als etwa ein Viertel des Ausschnitts an den Rand kommt
 + Am Levelrand bleibt die Kamera stehen, jenseits des Levels ist nichts zu sehen; kleinere Levels stehen mittig
-+ Zunächst feldweises Springen, weiches Scrollen später als reine Anzeige
++ Zunächst feldweises Springen, weiches Scrollen später als reine Anzeige (siehe [Animationen.md](Animationen.md))
 + Umschauen: Karte frei verschieben per Maus oder Taste, ein Anzeige-Zustand
 + Weitere Verhaltensweisen (Zentrieren, Springen) bleiben austauschbar und einstellbar
 

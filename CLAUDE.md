@@ -16,8 +16,9 @@
 + Charakter, Eigenschaften, Skills und EP in [docs/Charakter.md](docs/Charakter.md)
 + Technische Architektur (Datenfluss, Befehle, Zeitmodell, Wirkungsarten, Modifikatoren, Kampfwerte, Fähigkeiten, lange Aktionen, Fraktionen, Effekte, Haken, Tod und Zustandsprüfung, Auslöser, Zustände, Zielauswahl, Wiederholbarkeit, Anzeige, Licht, Wahrnehmung, KI, Bewegung, Gelände, Feldschichten, Ebenen, Inventar, Ausrüstung, Verschleiß, Unbekanntes, Zielmodus, Untersuchen, Leistung) in [docs/Architektur.md](docs/Architektur.md)
 + Sprachdateien, Textkorpus (`sprache/de/korpus/`) und Literaturverzeichnis (`sprache/literatur.json`, Originale in `sprache/Literatur/` nicht im Repo) in [docs/Texte.md](docs/Texte.md)
-+ Tileset: Artstyle-Fibel, Pixeldaten, Vorschau und Ablauf in [docs/Tileset.md](docs/Tileset.md); neue Tiles folgen der Fibel
-+ Arbeitsliste fehlender Strukturen (Reste aus Tod, Zielauswahl, Zuständen, Modifikatoren, Kampfwerten und Fähigkeiten, Fernkampf, Feldschichten, Ebenen, Gegenstände, Oberfläche, Kosmetik) samt bekannter Fehler in [docs/Systemausbau.md](docs/Systemausbau.md); umgesetzte Punkte wandern in die übrige Doku
++ Tileset: Artstyle-Fibel, Pixeldaten, Varianten, Vorschau und Ablauf in [docs/Tileset.md](docs/Tileset.md); neue Tiles folgen der Fibel
++ Animationen: Effektschicht, Kampfanimation und Kamera als Entwurf in [docs/Animationen.md](docs/Animationen.md)
++ Arbeitsliste fehlender Strukturen (Reste aus Tod, Zielauswahl, Zuständen, Modifikatoren, Kampfwerten und Fähigkeiten, Fernkampf, Feldschichten, Ebenen, Gegenstände, Oberfläche, Darstellung) samt bekannter Fehler in [docs/Systemausbau.md](docs/Systemausbau.md); umgesetzte Punkte wandern in die übrige Doku
 + Weitere Dokumentation liegt in `docs/`.
 + CLAUDE.md verweist direkt auf jedes Dokument in `docs/`, nicht nur über Verweise in anderen Dokumenten.
 

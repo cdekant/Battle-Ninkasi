@@ -13,7 +13,7 @@ Verbindliche Regeln für jedes Tile, damit das Tileset wie aus einem Guss wirkt;
 + Draufsicht für den Boden, Figuren und Wände frontal bis leicht von vorn
 + Licht von links oben: Höhen oben links in der hellsten, Schatten unten rechts in der dunkelsten Stufe der eigenen Rampe; kein Licht von rechts, keine Glanzpunkte unten
 + Figuren mit dunklem Rand, Umgebung gedämpft, damit Figuren und Gegenstände sich abheben
-+ Zunächst keine Animation; Flackern von Licht ist ausgenommen, es entsteht in der Lichtkarte, nicht im Tile
++ Zunächst keine Animation; Flackern von Licht ist ausgenommen, es entsteht in der Lichtkarte, nicht im Tile (Entwurf für bewegte Tiles siehe Varianten und Bewegung)
 + Dynamisches Licht kommt zur eingezeichneten Beleuchtung hinzu (Lichtkarte über der Karte, siehe Licht in [Architektur.md](Architektur.md)); Tiles mit leuchtenden Pixeln (Augen, Glut) bekommen dafür später eine Maske
 + Farbwelt: Biertöne, Edelstahl, Kupfer, Stein, dazu Signalfarben (siehe Design in [Grundlagen.md](Grundlagen.md))
 
@@ -109,6 +109,18 @@ Verbindliche Regeln für jedes Tile, damit das Tileset wie aus einem Guss wirkt;
 
 + Vorerst ein einziges Wand-Tile: helle Quader mit Mauerkrone, deutlich heller als der dunkle Boden
 + Später möglich: zwei Ansichten (Oberseite, Vorderseite), der Renderer wählt die Vorderseite, wenn unter der Wand ein begehbares Feld liegt; reine Anzeige, weitere Nachbarschaftsregeln (Ecken, Übergänge) erst bei Bedarf
+
+## Varianten und Bewegung
+
+Entwurf, noch nicht entschieden; ändert die Fibel erst nach Absprache. Gehört zu Punkt 12 in [Systemausbau.md](Systemausbau.md), die Effektschicht steht in [Animationen.md](Animationen.md).
+
++ Ziel: Boden und Wände nicht alle identisch, sondern mit kleinen Variationen, damit die Karte lebendiger wirkt
++ Der Renderer wählt die Variante fest nach Ebene und Feld (Streuwert aus Ebene und Koordinaten), nicht mit dem Spiel-Zufall: gleich nach dem Neuladen, das Nachspielen bleibt unberührt
++ Varianten als eigene Tiles mit Nummer (`boden-01`, `boden-02` ...) und Gewicht, z.B. der schlichte Boden häufig, Riss oder Fleck selten
++ Empfehlung zwei Stufen: Grundvarianten mit kaum sichtbaren Unterschieden (etwa 3 je Geländeart) und seltene Schmuckstücke (Risse, Pfützen, Moos); Schmuck wahlweise als eigene Schicht über dem Boden, dann frei kombinierbar
++ Regeln für die Fibel: dieselbe Palette, kein neuer Blickfang, nahtlos kachelbar (Prüfung in der 3x3-Kachelung der Vorschau); die kleinen Sätze werden wie gewohnt abgeleitet
++ Die Vorderseite der Wand (siehe Wände von vorn) passt in dasselbe Paket
++ Bewegte Tiles (blubbernder Gärbottich, flackerndes Feuer, wogendes Gas): mehrere Bilder je Tile, Takt aus der Effektschicht ([Animationen.md](Animationen.md)); hebt "Zunächst keine Animation" auf
 
 ## Vorschau und Abstimmung
 

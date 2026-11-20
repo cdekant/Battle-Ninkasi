@@ -155,7 +155,7 @@ Status: offen, jeweils erst Spieldesign in [Grundlagen.md](Grundlagen.md) entsch
 
 Status: umgesetzt bis auf den offenen Rest, in den Versionen 0.24.0 (Zielmodus für Werfen und Fähigkeiten mit Vorschau und Trefferchance, Fähigkeitenfenster, Werfen aus dem Inventar, Animation der Geschossbahn, vorläufige `testfaehigkeit` für Ninkasi) und 0.25.0 (Untersuchen mit X und Tooltip, Aufschlüsselung der Werte Ninkasis, Zustände, laufende Aktion, Wachzustand und Heimlichkeitsweite in der Seitenleiste, Log nur mit Wahrnehmbarem, Hören von Lärm außer Sicht, Texte zu Zuständen, Buchstaben nach `KeyboardEvent.key`, vorläufiger `testzustand`), beschrieben in [Architektur.md](Architektur.md) (Zielmodus, Untersuchen, Anzeige, Oberfläche, Eingabe, Wahrnehmung)
 
-Entschieden: zwei Versionen, 0.24.0 Zielmodus und 0.25.0 Untersuchen und Zustände; Tasten W (werfen im Inventarfenster), Z (Fähigkeiten), X (untersuchen); Ninkasi bekommt bis zu ihren eigentlichen Fähigkeiten die vorläufige `testfaehigkeit` (der gleichnamige Testeintrag in `tests/hilfen.js` heißt seitdem `testritual`), dazu den vorläufigen `testzustand`; Kosmetik wie schwebende Zahlen ist ein eigener Punkt (12); das Log zeigt keine Meldungen ohne Sichtkontakt, Lärm außer Sicht hört Ninkasi als vage Zeile mit Richtung; der Tooltip erscheint beim Darüberfahren mit der Maus und folgt beim Untersuchen dem Cursor
+Entschieden: zwei Versionen, 0.24.0 Zielmodus und 0.25.0 Untersuchen und Zustände; Tasten W (werfen im Inventarfenster), Z (Fähigkeiten), X (untersuchen); Ninkasi bekommt bis zu ihren eigentlichen Fähigkeiten die vorläufige `testfaehigkeit` (der gleichnamige Testeintrag in `tests/hilfen.js` heißt seitdem `testritual`), dazu den vorläufigen `testzustand`; Kosmetik wie schwebende Zahlen ist ein eigener Punkt (12, seit dem Entwurf "Darstellung"); das Log zeigt keine Meldungen ohne Sichtkontakt, Lärm außer Sicht hört Ninkasi als vage Zeile mit Richtung; der Tooltip erscheint beim Darüberfahren mit der Maus und folgt beim Untersuchen dem Cursor
 
 Offener Rest:
 
@@ -167,10 +167,12 @@ Später:
 + Vorschau von Wirkungen innerhalb eines Effekts (Brandkreis der Brandflasche, verschachtelte Trefferwürfe) über eine Simulation auf einer Kopie des Zustands (Punkt 10)
 + Blocken in der angezeigten Chance
 
-## 12. Kosmetik
+## 12. Darstellung
 
-Status: offen, reine Anzeige ohne Einfluss auf die Logik
+Status: offen, Entwurf in [Animationen.md](Animationen.md) (Effektschicht, Kampfanimation, Kamera) und [Tileset.md](Tileset.md) (Varianten und Bewegung); reine Anzeige ohne Einfluss auf die Logik
 
-+ Schwebende Zahlen für Schaden, Krit und Heilung
-+ Animation der Meldung `flaeche` (Explosion, Schwall), wie die Geschossbahn über `src/anzeige/animation.js`
++ Gerüst für Effekte im Bildtakt statt `src/anzeige/animation.js`
++ Kampfanimation: schwebende Zahlen für Schaden, Krit und Heilung, Aufblitzen bei Treffern, Explosion und Schwall aus der Meldung `flaeche`, Geschosse
++ Varianten und Schmuck für Boden und Wand, Vorderseite der Wand
++ Bewegte Tiles
 + Weiches Scrollen der Kamera (siehe Kamera in [Architektur.md](Architektur.md))
