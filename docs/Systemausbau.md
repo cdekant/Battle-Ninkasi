@@ -161,7 +161,7 @@ Entschieden: zwei Versionen, 0.24.0 Zielmodus und 0.25.0 Untersuchen und Zustän
 
 Offener Rest:
 
-+ Schema der Oberfläche als Entwurf in [Oberflaeche.md](Oberflaeche.md), erste Entscheidungen getroffen, vier offen (dort am Ende), Umsetzung in 0.27.0 und 0.28.0
++ Schema der Oberfläche als Entwurf in [Oberflaeche.md](Oberflaeche.md), Entscheidungen getroffen (dort am Ende), Umsetzung in 0.27.0 und 0.28.0
 + Inventarfenster, Zielmodus, Untersuchen und Tooltip im Browser ausprobieren (die Tasten- und Beschreibungslogik ist getestet, die Darstellung nur ohne Browser erzeugt)
 + Gehörter Lärm kommt im jetzigen Inhalt kaum vor (im Bot 0 Mal), weil fast nur Kämpfe mit Ninkasi Lärm machen; mit Kämpfen unter Gegnern, Beschworenen und Fallen nachprüfen
 
@@ -180,6 +180,7 @@ Entschieden: Animationen halten die Eingabe auf, bis alle Meldungen seit Ninkasi
 + Kampfanimation: schwebende Zahlen für Schaden, Krit und Heilung, Aufblitzen bei Treffern, Explosion und Schwall aus der Meldung `flaeche`, Geschosse
 + Varianten und Schmuck für Boden und Wand, Vorderseite der Wand
 + Bewegte Tiles
++ Metaeffekte des Pegels und der LP, vorbereitet mit dem Layout (siehe Klassen der Elemente in [Oberflaeche.md](Oberflaeche.md))
 + Weiches Scrollen der Kamera (siehe Kamera in [Architektur.md](Architektur.md))
 
 ## 13. Skillsystem

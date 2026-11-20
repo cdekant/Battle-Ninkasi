@@ -1,6 +1,6 @@
 # Battle Ninkasi - Oberfläche
 
-Stand: 2026-11-20, Entwurf, nicht umgesetzt, erste Entscheidungen getroffen
+Stand: 2026-11-20, Entwurf, nicht umgesetzt, Entscheidungen getroffen
 
 Schema der Oberfläche: Prinzipien, Layout, Leisten, Log, Fenster, Tastatur, Einstellungen. Alles hier ist Anzeige und Eingabe; die Logik kennt weder Fenster noch Leisten und bekommt nur gewöhnliche Befehle. Was heute umgesetzt ist, beschreibt [Architektur.md](Architektur.md) (Anzeige, Oberfläche, Eingabe, Zielmodus, Untersuchen); Bewegung und Effekte stehen in [Animationen.md](Animationen.md), die Arbeitsliste in Punkt 11 von [Systemausbau.md](Systemausbau.md). Entschiedenes und Offenes steht am Ende unter Entscheidungen.
 
@@ -37,7 +37,8 @@ Nach Fagerholt und Lorentzon ("Beyond the HUD", 2009): diegetisch (in Geschichte
 
 + Nicht-diegetisch: fast alles, Leisten, Seitenleiste, Log, Fenster
 + Räumlich: Markierungen auf der Karte (Ankündigungen, Zielvorschau, Wegvorschau, Randmarker, später schwebende Zahlen und Lebensbalken über Wesen)
-+ Meta: Bildschirmeffekte des Pegels (Verschwimmen, Schwanken, Doppelbilder), passend zum Thema, immer abschaltbar; umgesetzt frühestens mit Punkt 12
++ Meta: Bildschirmeffekte, die Ninkasis Zustand spürbar machen, ohne etwas anzuzeigen (bei hohem Pegel Verschwimmen, Schwanken, Doppelbilder; bei wenig LP ein roter Rand); reine Anzeige, umgesetzt mit der Darstellung (Punkt 12)
++ Vorbereitet wird schon mit dem neuen Layout: eine eigene Effektschicht über der Karte und unter der Oberfläche, so dass die Effekte nur die Karte treffen und Texte lesbar bleiben; jeder Effekt hat einen eigenen Schalter in den Einstellungen, "Bewegung reduzieren" schaltet alle bewegten Effekte zugleich ab
 + Diegetisch: zunächst nichts; denkbar sind Rezeptbuch und Etiketten als Gegenstände der Welt
 
 ## Prioritätsstufen
@@ -46,15 +47,15 @@ Nach Fagerholt und Lorentzon ("Beyond the HUD", 2009): diegetisch (in Geschichte
 |:--|:--|:--|
 | Kritisch | Karte, LP, Pegel, angekündigte Angriffe, Gefahr in Sicht | Karte, Kopf der Seitenleiste |
 | Wichtig | MP, PP, Zustände, Schnellleiste mit Abklingzeit, Wesen in Sicht, Zielen und Untersuchen | Seitenleiste, Schnellleiste |
-| Information | Log, Minikarte, laufende Aktion, Heimlichkeit, Tiefe und Zeit | Log, Seitenleiste, Kopfleiste |
-| Hintergrund | Schaltflächen, Hilfe, Version | Kopfleiste, Fenster |
+| Information | Log, Minikarte, laufende Aktion, Heimlichkeit, Tiefe und Zeit | Log, Seitenleiste (Kopf mit Ort und Zeit) |
+| Hintergrund | Knöpfe, Hilfe, Version | Bedienzeile, Fenster |
 
 ## Bestand und Neubeginn
 
 Die Darstellung kann weitgehend neu entstehen, die Systeme darunter bleiben:
 
 + Bleibt: Logik und Meldungen, die Auswahl des Wahrnehmbaren (`src/systeme/wahrnehmbar.js`), Vorschau und Untersuchen (`vorschau.js`, `untersuchen.js`), die DOM-freien Kerne der Eingabe (Zielmodus, Inventar- und Fähigkeitenfenster, Reise, Rasten, Erkunden), Pegelanzeige, Texte und Sprachdateien, Renderer und Kamera
-+ Neu: Aufbau der Seite (`index.html`, `stil.css`), `src/anzeige/oberflaeche.js` als Seitenleiste, die Darstellung des Logs (`src/anzeige/log.js` behält die Übersetzung der Meldungen), Fensterstapel, Kopfleiste, Schnellleiste, Minikarte, Spielmenü, Einstellungen, Tastenbelegung
++ Neu: Aufbau der Seite (`index.html`, `stil.css`), `src/anzeige/oberflaeche.js` als Seitenleiste, die Darstellung des Logs (`src/anzeige/log.js` behält die Übersetzung der Meldungen), Fensterstapel, Bedienzeile mit Schnellleiste und Knöpfen, Minikarte, Spielmenü, Einstellungen, Tastenbelegung
 
 ## Bildschirme
 
@@ -71,10 +72,9 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 
 ```
 +---------------------------------------------------------------+----------------------+
-| Kopfleiste: Tiefe 3 · Zug 1234    [i] [f] [c] [m]             | [Esc] Menü  [?]      |
-+---------------------------------------------------------------+----------------------+
+|                                                               | Tiefe 3 · Zug 1234   |
+|                                                               +----------------------+
 |                                                               | MINIKARTE            |
-|                                                               |                      |
 |                                                               +----------------------+
 |                          KARTE                                | NINKASI              |
 |            (Markierungen, Tooltip, Randmarker)                | LP, MP, PP, Pegel    |
@@ -84,49 +84,54 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 |                                                               | (nur bei Bedarf)     |
 |                                                               +----------------------+
 |                                                               | IN SICHT, GEFÄHRTEN  |
-+---------------------------------------------------------------+                      |
-| Schnellleiste [1]..[0], Nummer der Leiste                     |                      |
 +-------------------------------+-------------------------------+                      |
 | Log Geschehen (8 Zeilen)      | Log Kampf (8 Zeilen)          |                      |
 +-------------------------------+-------------------------------+----------------------+
+| Schnellleiste [1]..[0], Nummer der Leiste                     | [i] [f] [c] [m]      |
+|                                                               | [r] [o] [?] [Esc]    |
++---------------------------------------------------------------+----------------------+
 ```
 
-+ Höhen: Kopfleiste etwa 28 px, Schnellleiste etwa 56 px, Log 8 Zeilen etwa 176 px; für die Karte bleiben etwa 1520x820 px, bei 16 px etwa 95x51 Felder, bei 32 px etwa 47x25
-+ Seitenleiste etwa 400 px; Minikarte oben mit 4 px je Feld (100x40 Felder ergeben 400x160 px), bei größeren Ebenen 3 px oder ein Ausschnitt
++ Höhen: Log 8 Zeilen etwa 176 px, Bedienzeile etwa 56 px; für die Karte bleiben etwa 1520x848 px, bei 16 px etwa 95x53 Felder, bei 32 px etwa 47x26
++ Seitenleiste etwa 400 px; Minikarte mit 4 px je Feld (100x40 Felder ergeben 400x160 px), bei größeren Ebenen 3 px oder ein Ausschnitt
++ Das Log liegt zwischen Karte und Bedienzeile: nah am Geschehen, die Schnellleiste dafür am unteren Rand wie in Diablo, WoW, BG3 und ToME
 
 ### Variante B (umstellbar)
 
 ```
 +------------------+---------------------------------------------+------------------+
-| Kopfleiste über die ganze Breite                                                  |
-+------------------+---------------------------------------------+------------------+
-| MINIKARTE        |                                             | NINKASI          |
-+------------------+                   KARTE                     | ZIELEN           |
-| LOG              |                                             | IN SICHT         |
-| (hoch, etwa      |                                             |                  |
-|  40 Zeilen,      +---------------------------------------------+                  |
-|  einspaltig)     | Schnellleiste                               |                  |
+| MINIKARTE        |                                             | Tiefe 3 · Zug    |
+|                  |                                             +------------------+
++------------------+                   KARTE                     | NINKASI          |
+| LOG              |                                             | ZIELEN           |
+| (hoch, etwa      |                                             | IN SICHT         |
+|  40 Zeilen,      |                                             |                  |
+|  einspaltig)     +---------------------------------------------+------------------+
+|                  | Schnellleiste [1]..[0]                      | [i] [f] [c] [m]  |
+|                  |                                             | [r] [o] [?] [Esc]|
 +------------------+---------------------------------------------+------------------+
 ```
 
-+ Linke und rechte Spalte etwa 360 px; Karte etwa 1200x996 px, bei 16 px etwa 75x62 Felder, bei 32 px etwa 37x31
++ Linke und rechte Spalte etwa 360 px; Karte etwa 1200x1024 px, bei 16 px etwa 75x64 Felder, bei 32 px etwa 37x32
 + Mehr Logzeilen und eine höhere Karte, dafür schmaler; Spalten im Log passen hier nicht, Geschehen und Kampf liegen als Umschalter übereinander
 
 ### Weitere Varianten
 
-+ Log oben wie Brogue und Cogmind
-+ Seitenleiste links
++ Log oben wie Brogue und Cogmind; die Bedienzeile bleibt unten
++ Seitenleiste links; die Knöpfe wandern mit ihr
 + Kompakt für kleine Fenster: Log 3 Zeilen, Wesen in Sicht als Fenster (Vorbild das "modale" Layout von Cogmind)
 
-## Kopfleiste
+## Bedienzeile
 
-+ Links Ort und Zeit (Tiefe, Ebene, Zug)
-+ Mitte klickbare Schaltflächen für die Fenster, jede mit ihrer Taste beschriftet; die Schaltflächen entstehen aus dem Aktionskatalog (siehe Tastatur)
-+ Rechts Spielmenü und Hilfe
++ Am unteren Rand in jeder Variante dieselbe Zeile: links die Schnellleiste unter der Karte, rechts die Knöpfe unten in der Seitenleiste; so bleibt die Handbewegung beim Wechsel des Layouts gleich
++ Knöpfe für die Maus: klickbar, jeder mit Taste und kurzem Wort (z. B. "[i] Gepäck"), in zwei Reihen zu je vier, bei 400 px etwa 96 px je Knopf: Gepäck, Fähigkeiten, Charakter, Karte; Rasten, Erkunden, Hilfe, Menü
++ Die Knöpfe entstehen aus dem Aktionskatalog (siehe Tastatur)
++ Eine Kopfleiste gibt es nicht; Ort und Zeit (Tiefe, Ebene, Zug) stehen im Kopf der Seitenleiste wie bei Brogue, die Karte gewinnt so etwa 28 px Höhe
 
 ## Seitenleiste
 
-+ Minikarte (Variante A): erkundete Felder, Ninkasi, Treppen, bekannte Wesen; Klick reist dorthin; die große Übersichtskarte (Taste m) zeichnet derselbe Renderer
++ Kopf: Ort und Zeit (Tiefe, Ebene, Zug)
++ Minikarte (Variante A, in B oben in der linken Spalte): erkundete Felder, Ninkasi, Treppen, bekannte Wesen; Klick reist dorthin; die große Übersichtskarte (Taste m) zeichnet derselbe Renderer
 + Ninkasi: LP, MP, PP als Balken, Platz für einen vierten Vorrat (Ausdauer, falls sie kommt), Pegel logarithmisch mit Schwellen, Zustände mit Stärke und Restdauer, laufende Aktion, Heimlichkeit, später Helligkeit des eigenen Feldes (Licht)
 + Zielen und Untersuchen: nur sichtbar, solange der Zielmodus offen ist
 + In Sicht: Wesen nach Abstand mit Wachzustand und Zuständen, "wirkt etwas" bei laufender Aktion; darüber Gefährten (Beschworene, Verbündete) mit LP
@@ -192,7 +197,7 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 + Zeichen ohne feste Lage (`:`, `/`, `?`, `<`, `>`) gelten nach dem Zeichen (`KeyboardEvent.key`), weil sie auf der deutschen Tastatur anders liegen
 + Aus neovim übernommen: Modi statt Tastenkombinationen (Normalmodus, Zielmodus mit denselben Richtungstasten, Fenster), `:` öffnet eine Befehlszeile mit Vervollständigung über alle Aktionen des Katalogs, `/` sucht in Listen, `?` zeigt die Hilfe, Esc verlässt jeden Modus
 + Nicht übernommen: Zahlen vor einem Befehl (sie gehören der Schnellleiste); das Laufen mit Umschalt deckt den häufigsten Fall ab
-+ Aktionskatalog: jede Aktion der Oberfläche hat eine ID, einen Text aus der Sprachdatei, eine Vorgabetaste und optional eine Schaltfläche; daraus entstehen Kopfleiste, Hilfe, Befehlszeile, Tooltips und die Seite zur Tastenbelegung
++ Aktionskatalog: jede Aktion der Oberfläche hat eine ID, einen Text aus der Sprachdatei, eine Vorgabetaste und optional eine Schaltfläche; daraus entstehen die Knöpfe der Bedienzeile, Hilfe, Befehlszeile, Tooltips und die Seite zur Tastenbelegung
 + Belegungssätze als Vorgaben zum Wählen: "vi" (Vorgabe) und "Ziffernblock"; eigene Änderungen liegen darüber
 
 Vorschlag für die Vorgabe, Buchstaben nach der deutschen Aufschrift:
@@ -228,7 +233,7 @@ Vorschlag für die Vorgabe, Buchstaben nach der deutschen Aufschrift:
 
 + Klickregeln wie bisher (aufheben, angreifen, reisen), dazu Klick auf Minikarte, Schaltflächen, Plätze der Schnellleiste und Wesen in der Seitenleiste
 + Ziehen belegt die Schnellleiste
-+ Rechtsklick untersucht (offen, siehe Entscheidungen)
++ Rechtsklick auf ein Feld öffnet dessen ausführliche Beschreibung wie Untersuchen mit X, das Kontextmenü des Browsers wird dafür unterdrückt; der linke Klick handelt wie bisher
 + Mausrad zoomt über der Karte und blättert über Listen und Log
 
 ## Gamepad
@@ -246,7 +251,7 @@ Die eigentliche Anbindung (Gamepad-API im Takt von `src/main.js`, Belegung der K
 + Anzeige: Zoom, Größe der Oberfläche, Schriftgröße, Vollbild, Layout (Variante A, B, kompakt), Seitenleiste links oder rechts, Log oben oder unten und seine Zeilen, Minikarte an oder aus, Verzögerung des Tooltips
 + Spiel: Reisetempo, Haltegründe, Bestätigungen, Animationen und Geschossbahn, "sofort auslösen" der Schnellleiste
 + Tasten: Belegungssatz, Belegung jeder Aktion mit Erkennung von Konflikten, Vorgabe wiederherstellen
-+ Barrierefreiheit: Kontrast, Palette für Farbenblinde, Bewegung reduzieren, Metaeffekte des Pegels aus
++ Barrierefreiheit: Kontrast, Palette für Farbenblinde, Bewegung reduzieren (schaltet alle bewegten Effekte ab), jeder Metaeffekt einzeln an oder aus, Stärke der Metaeffekte
 + Später: Ton, Sprache, Gamepad
 + Gespeichert wird wie bisher nur die Abweichung von der Vorgabe (`src/eingabe/einstellungen.js`)
 
@@ -294,14 +299,13 @@ Entschieden am 2026-11-20:
 + vi-Tasten nach Lage (`KeyboardEvent.code`): die Form bleibt, auf der deutschen Tastatur liegt die Diagonale links oben auf Z
 + Umschalten der Leisten mit Umschalt+1 bis 5
 + Vorbelegung des Ziels über eine Angabe `zielvorgabe` ("feind", "gefaehrte", "selbst") in den Daten der Fähigkeit bzw. des Gegenstands, ohne Angabe abgeleitet aus den Tags der Wirkung
-+ Reihenfolge: 0.27.0 Aktionskatalog, Fensterstapel und Skillfenster; 0.28.0 neues Layout mit Kopfleiste, Schnellleiste, Log in Spalten, Minikarte, Esc-Kette, Spielmenü, Einstellungen und vi-Belegung; die Einordnung neben den übrigen Schwerpunkten (Zustände im Inhalt, Licht, Brausystem) wird bei der weiteren Planung abgestimmt
++ Ablage der Schnellleiste: ein eigener Teil `oberflaeche` im Spielstand (Belegung der Leisten, später weitere Anzeigedaten des Laufs); der Spielstand besteht sonst aus Version, Startwert, Startoptionen und Befehlsliste und wird beim Laden nachgespielt, der Teil `oberflaeche` wird mitgespeichert und beim Laden wieder eingesetzt, aber nicht nachgespielt; die Logik liest ihn nie
++ Rechtsklick untersucht (siehe Maus)
++ Metaeffekte als Idee festgehalten und vorbereitet (Effektschicht, Schalter in den Einstellungen), umgesetzt mit der Darstellung (Punkt 12)
++ Reihenfolge: 0.27.0 Aktionskatalog, Fensterstapel und Skillfenster; 0.28.0 neues Layout mit Bedienzeile (Schnellleiste und Knöpfe), Log in Spalten, Minikarte, Esc-Kette, Spielmenü, Einstellungen und vi-Belegung; die Einordnung neben den übrigen Schwerpunkten (Zustände im Inhalt, Licht, Brausystem) wird bei der weiteren Planung abgestimmt
++ Knöpfe für die Maus in einer Bedienzeile am unteren Rand mit der Schnellleiste, unten in der Seitenleiste; keine Kopfleiste (siehe Bedienzeile)
 
-Offen:
-
-1. Schaltflächen für die Maus: klickbare Knöpfe mit Text und Taste (z. B. "[i] Inventar"), damit sich jedes Fenster und jede Hauptaktion auch ohne Kenntnis der Tasten öffnen lässt; Empfehlung als Kopfleiste oben, Alternative eine Knopfreihe unten in der Seitenleiste wie Brogue (Erkunden, Rasten, Suchen, Menü, Inventar)
-2. Ablage der Schnellleiste: der Spielstand besteht aus Version, Startwert, Startoptionen und Befehlsliste und wird beim Laden nachgespielt; die Belegung der Leiste ist kein Befehl und darf das Nachspielen nicht beeinflussen; Empfehlung ein eigener Teil `oberflaeche` im Spielstand, der mitgespeichert und beim Laden einfach wieder eingesetzt, aber nicht nachgespielt wird; Alternative im Browser bei den Einstellungen, dann gälte sie für alle Läufe zugleich
-3. Rechtsklick: die rechte Maustaste auf einem Feld öffnet dessen ausführliche Beschreibung wie Untersuchen mit X (der linke Klick handelt), das Kontextmenü des Browsers wird dafür unterdrückt; Empfehlung so; Alternative ein kleines Kontextmenü am Feld (untersuchen, hinreisen, hierhin werfen, Fähigkeit hierauf)
-4. Metaeffekte des Pegels: Bildschirmeffekte, die Ninkasis Zustand spürbar machen, ohne etwas anzuzeigen, z. B. leichtes Verschwimmen oder Schwanken der Karte bei hohem Pegel, ein roter Rand bei wenig LP; reine Anzeige ohne Einfluss auf die Logik; Empfehlung als Idee festhalten, umsetzen mit Punkt 12 (Darstellung, zurückgestellt), jeder Effekt in den Einstellungen abschaltbar (Bewegungsempfindlichkeit)
+Offen ist derzeit nichts; neue Fragen kommen hierher.
 
 ## Quellen
 
