@@ -135,7 +135,7 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 ## Fähigkeiten
 
 + Vorbilder: Tales of Maj'Eyal (aktive Talente mit Kosten und Abklingzeit, aufrechterhaltene mit gebundenem Vorrat), DCSS (Fehlschlag und Folgen eines Zaubers), Caves of Qud (Glimmer: geistige Macht lockt Jäger an)
-+ Fähigkeiten sind Daten (`daten/faehigkeiten.js`), umgesetzt in `src/systeme/faehigkeiten.js`; Wesen kennen sie als Liste `faehigkeiten: ["name"]`; im Spielinhalt gibt es bisher nur die beiden des Testgegners `fernkaempfer_test` (Säurespucke, Säureschwall), Fähigkeiten für Ninkasi folgen nach dem Systemausbau; wann Gegner sie einsetzen, steht an ihrer KI (siehe KI)
++ Fähigkeiten sind Daten (`daten/faehigkeiten.js`), umgesetzt in `src/systeme/faehigkeiten.js`; Wesen kennen sie als Liste `faehigkeiten: ["name"]`; im Spielinhalt gibt es bisher die beiden des Testgegners `fernkaempfer_test` (Säurespucke, Säureschwall) und die vorläufige `testfaehigkeit` Ninkasis (Kreis mit Radius 1 auf ein Feld bis 6 weit, 10 MP, Trefferwurf je Wesen, sie selbst bleibt verschont), damit sich der Zielmodus ausprobieren lässt; eigentliche Fähigkeiten für Ninkasi folgen nach dem Systemausbau; wann Gegner sie einsetzen, steht an ihrer KI (siehe KI)
 + Aufbau: `{ text, art?, tags?, verbrauch?, material?, zeit?, abklingzeit?, voraussetzungen?, ziel?, wirkung?, zustand?, risiko?, dauer?, beimAbbruch?, ankuendigung?, unterbrechbar? }`
   + `art`: `aktiv` (Vorgabe) wirkt einmal; `aufrecht` setzt `zustand` an der Wirkenden, erneutes Benutzen beendet ihn ohne Kosten; den laufenden Preis trägt der Zustand als `unterhalt` (siehe Zustände)
   + `verbrauch: { mp, pp, pegel, ... }` aus den Vorräten, Modifikatoren auf `verbrauch.<wert>` und `verbrauch.alle` mit den Tags der Fähigkeit (`kosten.*` bleibt der Zeit vorbehalten)
@@ -333,13 +333,13 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Eine Kamera ist immer eingebaut: Ist der Ausschnitt größer als das Level, ist das ganze Level sichtbar, sonst scrollt die Karte; Zoomstufen sind nur Kameraeinstellungen
 + Die Levelgröße ist ein Datenwert, Levels dürfen unterschiedlich groß sein; Ziel: größer als Brogue (79x29)
 + Texte der Oberfläche sind HTML/CSS mit eigenen Schriftgrößen, unabhängig vom Tile-Raster
-+ Markierungen über der Karte: Wegvorschau, Feld unter dem Zeiger und die Zielfelder angekündigter Angriffe sichtbarer Gegner (rötlich, `src/anzeige/ankuendigungen.js`, beim Zeichnen aus `laufendeAktion` berechnet, nicht gespeichert)
++ Markierungen über der Karte: Wegvorschau, Feld unter dem Zeiger, die Zielfelder angekündigter Angriffe sichtbarer Gegner (rötlich, `src/anzeige/ankuendigungen.js`, beim Zeichnen aus `laufendeAktion` berechnet, nicht gespeichert), die Vorschau des Zielmodus und das fliegende Geschoss (siehe Zielmodus)
 
 ## Oberfläche
 
 + Karte auf dem größten Teil des Bildschirms, rechts eine Seitenleiste (etwa 400 px), unten ein Log (4 bis 5 Zeilen, aufklappbar)
 + Sichtbar bei 1080p neben Seitenleiste und Log: bei 16 px etwa 95x57 Felder, bei 32 px etwa 47x28, bei 48 px etwa 31x19, bei 64 px etwa 23x14
-+ Seitenleiste: LP, MP und PP als Balken, Pegel als eigene, auffällige Anzeige in ‰ mit eingezeichneten Schwellen, aktive Zustände, Liste der sichtbaren Gegner (Vorbild: Brogue)
++ Seitenleiste: LP, MP und PP als Balken, Pegel als eigene, auffällige Anzeige in ‰ mit eingezeichneten Schwellen, im Zielmodus das Ziel (siehe Zielmodus), Fähigkeiten mit Verbrauch und Abklingzeit (zugleich das Fähigkeitenfenster), Gepäck (zugleich das Inventarfenster), aktive Zustände, Liste der sichtbaren Gegner (Vorbild: Brogue)
 + Der Pegel ist nach oben offen und wird logarithmisch angezeigt (`src/anzeige/pegelanzeige.js`), in Verdopplungsschritten gleicher Breite (0, 0,5, 1, 2, 4, 8, 16 ‰ ...); eingezeichnet sind Schwellen und das Optimum der LP-Regeneration, daneben steht der genaue Wert (z.B. 2,35 ‰)
 + Inventar, Skillübersicht, Handel und Brauen als Fenster über der Karte; Öffnen und Schließen sind keine Befehle
 + Übersichtskarte per Umschalttaste, gezeichnet vom selben Renderer mit kleinen Feldern (4 bis 8 px); eine Minimap in der Seitenleiste ist später mit demselben Renderer möglich
@@ -416,8 +416,9 @@ Vorläufige Ideen, noch nicht umgesetzt:
 
 + Vorgabe für die Bewegung: Ziffernblock, acht Richtungen, 5 für Warten
 + Die Belegung ist frei änderbar, siehe Datenfluss; sie umfasst Tasten, Maustasten und das Mausrad (`src/eingabe/belegung.js`)
-+ Weitere Tasten: Leertaste setzt eine unterbrochene lange Aktion fort (`fortsetzen`), R rastet bis voll, O erkundet automatisch, I öffnet das Inventarfenster (siehe Ausrüstung und Inventar), <> nimmt die Treppe
-+ Einstellungen (Zoom, Reise, Rasten) haben Vorgaben in `src/eingabe/einstellungen.js`; der Browser speichert nur Abweichungen davon
++ Weitere Tasten: Leertaste setzt eine unterbrochene lange Aktion fort (`fortsetzen`), R rastet bis voll, O erkundet automatisch, I öffnet das Inventarfenster (siehe Ausrüstung und Inventar), Z das Fähigkeitenfenster (siehe Zielmodus), <> nimmt die Treppe
++ Offene Fenster und der Zielmodus bekommen jede Taste, bevor die Belegung greift
++ Einstellungen (Zoom, Reise, Rasten, Geschossbahn) haben Vorgaben in `src/eingabe/einstellungen.js`; der Browser speichert nur Abweichungen davon
 
 ## Maus, Reise, Rasten und Erkunden
 
@@ -431,7 +432,21 @@ Vorläufige Ideen, noch nicht umgesetzt:
 + Rasten und Erkunden sind Abläufe derselben Art (`src/eingabe/rasten.js`, `src/eingabe/erkunden.js`): Schritt für Schritt ein gewöhnlicher Befehl oder ein Haltegrund, ohne Timer und DOM; `src/main.js` taktet alle Abläufe gleich, jede Taste und jeder Klick bricht ab; die Prüfung nach jedem Schritt (`unterwegsPruefen` in `src/eingabe/reise.js`) teilen sich alle drei
 + Rasten wartet, bis die Vorräte aus `rastenBis` (Vorgabe LP und MP) voll sind; beginnt nicht mit Feinden in Sicht oder wenn schon alles voll ist; hält bei `rastenHalt` (neuer Feind, Schaden) und nach höchstens `rastenHoechstens` Schritten, falls sich nichts mehr füllt (z.B. MP bei hohem Pegel)
 + Erkunden geht zum nächsten erkundeten Feld am Rand des Unbekannten (Breitensuche `naechstesFeldMit` in `src/welt/wege.js`, nur über erkundete Felder), bei jedem Schritt neu gewählt; hält wie die Reise (`reiseHalt`) und wenn nichts mehr zu erkunden ist
++ Im Zielmodus setzt die Maus den Cursor, ein Klick bestätigt (siehe Zielmodus)
 + Später auf derselben Grundlage: Tooltips und Umschauen am Feld unter dem Zeiger
+
+## Zielmodus
+
++ Vorbilder: DCSS (Cursor mit Tab zum nächsten Ziel, Vorschau getrennt von der Wirkung), Brogue (Bahn und Fläche vor dem Wurf sichtbar), Into the Breach (die Vorschau sagt, was passiert)
++ Werfen kommt aus dem Inventarfenster (Gegenstand wählen, dann W), Fähigkeiten aus dem Fähigkeitenfenster (Taste Z, auf der deutschen Tastatur Code `KeyY`; A bis Z wählt, Esc schließt; `src/eingabe/faehigkeiten.js`); beide liefern eine Auswahl `{ zweck: "werfen", gegenstandId }` bzw. `{ zweck: "faehigkeit", faehigkeit }`
++ `src/eingabe/zielmodus.js` ist reine Tasten- und Mauslogik ohne DOM wie das Inventarfenster, Zustand nur in der Anzeige: `{ auswahl, zielart, cursor }`; `zielmodusBeginnen` gibt den Modus zurück, bei Fähigkeiten ohne Ziel, mit Zielart `selbst` oder `aufrecht` gleich den Befehl, bei Gründen, die nicht am Ziel liegen (z.B. `abklingend`, `zu_wenig_mp`), den Grund
++ Der Cursor beginnt auf dem nächsten nicht verbündeten Wesen in Sicht (sonst auf Ninkasi); die Bewegungstasten der Belegung schieben ihn, die Maus setzt ihn, Tab springt reihum zu den Wesen in Sicht (nach Abstand, dann ID), Enter oder Klick bestätigt, Esc bricht ab; nennt die Vorschau einen Grund, bleibt der Zielmodus offen und das Log nennt ihn
++ Zielangabe aus dem Cursor nach Zielart: `wesen` die ID des Wesens dort (sonst keine), `richtung` das Vorzeichen des Versatzes, sonst das Feld
++ Vorschau (`src/systeme/vorschau.js`, ändert nichts, würfelt nicht): `zielvorschau(spiel, akteur, auswahl, zielangabe)` gibt `ok`, den Grund (aus der Prüfung des Befehls), die Auflösung aus `zielAufloesen` (Felder, Bahn) und die betroffenen Wesen mit ihrer Trefferchance zurück; Betroffene wie bei der Wirkung (`wirkungsziele` in `src/systeme/faehigkeiten.js`, beim Wurf mit `wurf.effekt` das erste Wesen der Bahn, ohne Effekt niemand), für Ninkasi nur, was sie sieht
++ Trefferchance (`trefferchanceVorschau`): beginnt die Wirkung mit `trefferwurf`, die Prozentzahl aus `trefferanteil` mit den Tags der Wirkung und der Effekte, gegen ein ahnungsloses Ziel 100 % als Hinterhalt; ohne Trefferwurf "sicher"; steckt er nur verschachtelt (z.B. in `fuer_jedes_ziel`), bleibt die Chance offen ("?"), dafür bräuchte es eine Simulation auf einer Kopie des Zustands; Blocken ist nicht eingerechnet
++ Anzeige: der Renderer zeigt die Bahn hell, die Fläche bläulich, die Betroffenen gelb umrandet und den Cursor grün (ginge) oder rot (Grund dagegen); die Seitenleiste nennt oben unter "Zielen", womit gezielt wird, den Grund und die Betroffenen mit Chance; Wirkungen innerhalb eines Effekts (z.B. der Brandkreis der Brandflasche) zeigt die Vorschau nicht
++ Geschossbahn: jede Meldung `geschoss` wird mit den Feldern, die Ninkasi sieht, abgespielt, ein helles Quadrat je Feld im Takt der Einstellung `geschossPause` (30 ms, 0 schaltet ab; `src/anzeige/animation.js` ohne Timer und DOM, den Takt gibt `src/main.js` vor); mehrere Bahnen nacheinander, jede Taste überspringt sie und wirkt trotzdem; der Zustand ist dann schon weiter, die Animation ist reine Anzeige
++ Der Bot benutzt Ninkasis Fähigkeiten über dieselbe Logik (Tab oder Feld in der Nähe), auch mit Zielen, die abgelehnt werden
 
 ## Gefahrenprüfung
 
@@ -453,7 +468,7 @@ Vorläufige Ideen, noch nicht umgesetzt:
   + `tauschen`: Quelle und Ziel tauschen die Plätze, wenn jedes das Feld des anderen betreten kann; Meldung `getauscht`
   + `teleportieren { wer?, muster?, zufaellig? }`: das Ziel (mit `wer: "quelle"` die Quelle, z.B. Blinzeln) aufs Zielfeld, mit `muster` auf ein zufälliges freies Feld des Musters, mit `zufaellig` auf ein zufälliges freies Feld der Ebene; ist das Zielfeld besetzt oder nicht betretbar, aufs nächste freie (Breitensuche); gezogen wird aus einer festen Reihenfolge; Meldung `teleportiert`
 + Lage (Zustandsprüfung nach jedem Vorgang, nach dem Tod): steht ein lebendes Wesen auf einem Feld, das es mit seiner wirksamen Bewegungsart nicht betreten kann (Phasen endet in der Wand, Levitation über dem Abgrund, hineingestoßen), wirkt `beimFestsitzen` des Geländes, sonst `regeln.bewegung.beimFestsitzen` (`eingeklemmt`, 2W6 stumpf, vorläufig); lebt es danach, wird es aufs nächste freie Feld gedrückt; Meldungen `festgesessen` und `herausgedrueckt`; der Sturz in einen Abgrund folgt mit den Ebenen (Punkt 8)
-+ Werfen (`src/systeme/werfen.js`): Befehl `{ art: "werfen", gegenstandId, ziel: { x, y } | { id } }` entlang der Bahn eines Geschosses (bis zum ersten Wesen oder vor die Wand), Reichweite `wurf.reichweite` am Gegenstand, sonst `regeln.werfen.reichweite` (6), Zeitkosten `aktionen.werfen`; mit `wurf: { effekt }` zerbricht der Gegenstand am Aufschlag und der Effekt wirkt dort (Ziel das getroffene Wesen, Ursache `wurf`), sonst landet er auf dem Feld; am Aufschlag entsteht Lärm (`laermWurf` 4), dem Wache nachgehen; Meldungen `geworfen`, `geschoss`, `zerbrochen` bzw. `gelandet`; Gründe der Ablehnung `nichts_zu_werfen` und die der Zielauswahl
++ Werfen (`src/systeme/werfen.js`): Befehl `{ art: "werfen", gegenstandId, ziel: { x, y } | { id } }` entlang der Bahn eines Geschosses (bis zum ersten Wesen oder vor die Wand), Reichweite `wurf.reichweite` am Gegenstand, sonst `regeln.werfen.reichweite` (6), Zeitkosten `aktionen.werfen`; mit `wurf: { effekt }` zerbricht der Gegenstand am Aufschlag und der Effekt wirkt dort (Ziel das getroffene Wesen, Ursache `wurf`), sonst landet er auf dem Feld; am Aufschlag entsteht Lärm (`laermWurf` 4), dem Wache nachgehen; Meldungen `geworfen`, `geschoss`, `zerbrochen` bzw. `gelandet`; Gründe der Ablehnung `nichts_zu_werfen` und die der Zielauswahl; im Browser über das Inventarfenster (W) und den Zielmodus
 + Werfen gibt es bisher nur in Logik, Tests und Bot; der Zielmodus der Oberfläche für Werfen und Fähigkeiten folgt (siehe [Systemausbau.md](Systemausbau.md))
 
 ## Gelände
@@ -515,7 +530,7 @@ Vorläufige Ideen, noch nicht umgesetzt:
 + Fluch: `verflucht: true` am Gegenstand; angelegt lässt er sich weder ablegen noch fallen lassen, werfen oder beim Anlegen eines anderen wegtauschen (Ablehnung `verflucht`); bekannt wird der Fluch erst beim Anlegen (`fluchBekannt`, Meldung `fluch_entdeckt`, im Gepäck "verflucht"); beim Tod fällt er mit allem anderen; der Baustein `fluch_aufheben` nimmt die Flüche aller angelegten Gegenstände des Ziels (Meldung `fluch_aufgehoben`), einen Gegenstand dafür gibt es noch nicht
 + Angefressene Ausrüstung wirkt schwächer (siehe Verschleiß): die Vorteile ihrer Modifikatoren (`plus` und `prozent` über 0, `mal` über 100) sinken im Verhältnis der Haltbarkeit (`haltbarkeitProzent`, skaliert wie bei den Zuständen), Nachteile bleiben voll; eine zerfressene Platte schützt kaum noch und bleibt doch schwer
 + Haken `gegenstand_benutzt` mit `gegenstandId` und `art` (`trinken`, `werfen`, `anlegen`, `ablegen`)
-+ Inventarfenster in der Seitenleiste (`src/eingabe/inventar.js`, reine Tastenlogik, Zustand nur in der Anzeige): I öffnet, A bis Z wählt, dann T trinken, A anlegen oder ablegen, Esc zurück oder zu; Angelegtes ist im Gepäck markiert; Werfen bekommt mit dem Zielmodus eine Taste
++ Inventarfenster in der Seitenleiste (`src/eingabe/inventar.js`, reine Tastenlogik, Zustand nur in der Anzeige): I öffnet, A bis Z wählt, dann T trinken, A anlegen oder ablegen, W werfen (weiter im Zielmodus), F fallen lassen, Esc zurück oder zu; Angelegtes ist im Gepäck markiert
 + Im Spielinhalt (Zahlen vorläufig, `daten/ausruestung.js`): Schöpfkelle (Hand, flink), Fasshammer (beide Hände, langsam, Ausweichen -5), Lederschürze (Brust, Rüstung 2, Ausweichen -5), Kupferhelm (Kopf), Lederhose (Beine), Hopfenkette (Hals, LP-Regeneration +20 %), zwei Kupferringe (Finger); Kupferhelm und Kupferringe bilden ein Set (Willenskraft); Lederschürze und Lederhose (Haltbarkeit 20, werden zu Lederfetzen) und Kupferhelm (30, wird zu Kupferschrott) nutzen sich unter Säure ab
 
 ## Verschleiß
@@ -627,11 +642,11 @@ Vorläufige Ideen, noch nicht umgesetzt:
 + `package.json`: nur `"type": "module"` und `"private": true`, damit Node alle `.js`-Dateien als ES-Module liest; keine Abhängigkeiten, kein Build
 + `src/version.js`: Versionsnummer
 + `src/kern/`: Spiel und Eingangstür für Befehle (`spiel.js`), Zustand und Entitäten, räumlicher Index, Zeit, Zufall, Ereignisse und Katalog der Haken, Auslöser, Abschluss eines Vorgangs, Werte und Modifikatoren, Kurven, Effekte, Grundbausteine, Register, Datenprüfung
-+ `src/systeme/`: Bewegung, Kampf (Trefferwurf, Schadensrechnung), Fraktionen, Wahrnehmung, Sicht, Stoffwechsel, Inventar, Gefahrenprüfung, Tod, Zielauswahl samt Zielmustern, Bausteine mit Zielauswahl, Zustände, Befehlsveränderer, Beschwörung, Verschieben und Lage, Werfen, veränderliches Gelände und Türen, Fallen, Feldschichten und Feuer, Ebenen und Treppen, Ausrüstung und Flüche, Stapel, Ladungen und Last, Verschleiß (Verderben, Haltbarkeit), Unbekanntes, Bedingungen der Modifikatoren und Auren, Fähigkeiten, lange Aktionen, später Brauen, Handel u.a.
++ `src/systeme/`: Bewegung, Kampf (Trefferwurf, Schadensrechnung), Fraktionen, Wahrnehmung, Sicht, Stoffwechsel, Inventar, Gefahrenprüfung, Tod, Zielauswahl samt Zielmustern, Bausteine mit Zielauswahl, Zustände, Befehlsveränderer, Beschwörung, Verschieben und Lage, Werfen, veränderliches Gelände und Türen, Fallen, Feldschichten und Feuer, Ebenen und Treppen, Ausrüstung und Flüche, Stapel, Ladungen und Last, Verschleiß (Verderben, Haltbarkeit), Unbekanntes, Bedingungen der Modifikatoren und Auren, Fähigkeiten, lange Aktionen, Vorschau für den Zielmodus, später Brauen, Handel u.a.
 + `src/ki/`: Verhaltensmodule (`abwarten`, `jagen`, `fliehen`), ihre Zielwahl, Schrittwahl und die Wahl der Fähigkeiten
 + `src/welt/`: Dungeon-Erzeugung mit Treppen und Population nach Tiefe, Zugriff auf die Karte und die Feldschichten, Wegfindung, Geometrie (Linie, Sichtlinie, Flugbahn, Kreis, Kegel)
-+ `src/anzeige/`: Renderer, Tilebilder (Pixeldaten zu Bildern), Kamera, Oberfläche, Anzeige des Pegels, Log, Effekte, Textzugriff und Grammatik
-+ `src/eingabe/`: Belegung, Übersetzung in Befehle, Maus und Klickregeln, Reise, Rasten, Erkunden, Vorgaben der Einstellungen
++ `src/anzeige/`: Renderer, Tilebilder (Pixeldaten zu Bildern), Kamera, Oberfläche, Anzeige des Pegels, Log, angekündigte Angriffe, Animation der Geschossbahn, Textzugriff und Grammatik
++ `src/eingabe/`: Belegung, Übersetzung in Befehle, Maus und Klickregeln, Reise, Rasten, Erkunden, Inventar- und Fähigkeitenfenster, Zielmodus, Vorgaben der Einstellungen
 + `daten/`: Inhalte als JS-Datendateien, gesammelt in `daten/index.js`; `daten/zustaende.js` die Zustände; `daten/faehigkeiten.js` die Fähigkeiten, `daten/risiken.js` ihre Risikotabellen; `daten/regeln.js` hält Regelwerte für das Balancing (z.B. Kettengrenze der Auslöser, Halbwerte des Kampfs); `daten/schadensarten.js` die Schadensarten; `daten/fraktionen.js` die Fraktionen und ihre Beziehungen; `daten/etiketten.js` die Etiketten unbekannter Gegenstände; `daten/zeichen.js` ist das Tileset aus Zeichen, Ersatz, wo kein Tile aus `grafik/` passt
 + `grafik/`: Palette und Tiles als Pixeldaten, unter der Grafiklizenz, dazu die Vorschauseite `vorschau.html`; siehe [Tileset.md](Tileset.md)
 + `sprache/de/`, `sprache/en/`: Texte (`texte.js`) und Grammatikregeln (`grammatik.js`) als Daten

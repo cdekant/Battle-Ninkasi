@@ -62,12 +62,12 @@ export function rohdatenMitTesteintraegen() {
   daten.schichten.gase.testgas = { text: "gas.test", abbau: 1, stufen: [{ ab: 10, effekt: "testeffekt" }, { ab: 20, effekt: "testeffekt" }] };
   zeichen("schichten", "testoberflaeche");
   zeichen("schichten", "testgas");
-  daten.faehigkeiten.testfaehigkeit = { text: "faehigkeit.test", dauer: { schritte: 2 }, unterbrechbar: true, ziel: { art: "selbst" }, wirkung: "testeffekt" };
+  daten.faehigkeiten.testritual = { text: "faehigkeit.test", dauer: { schritte: 2 }, unterbrechbar: true, ziel: { art: "selbst" }, wirkung: "testeffekt" };
   daten.faehigkeiten.testgeschoss = { text: "faehigkeit.testgeschoss", ziel: { art: "geschoss", reichweite: 3 }, wirkung: "testeffekt" };
   daten.wesen.testwesen = {
     text: "wesen.testwesen", fraktion: "testfraktion", werte: { lp: { grundwert: 5 } },
-    faehigkeiten: ["testgeschoss", "testfaehigkeit"],
-    ki: { modul: "jagen", letzteBekanntePosition: null, faehigkeiten: [{ name: "testgeschoss" }, { name: "testfaehigkeit" }] },
+    faehigkeiten: ["testgeschoss", "testritual"],
+    ki: { modul: "jagen", letzteBekanntePosition: null, faehigkeiten: [{ name: "testgeschoss" }, { name: "testritual" }] },
   };
   zeichen("wesen", "testwesen");
   daten.wesen.testvorlage = { abstrakt: true, fraktion: "testfraktion" };

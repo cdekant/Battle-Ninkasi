@@ -1,6 +1,8 @@
-// Seitenleiste: LP, MP, PP, Pegel als logarithmische Leiste mit Schwellen, Gepäck, sichtbare Gegner, Startwert.
-// Liest den Zustand nur. Das Gepäck ist zugleich das Inventarfenster (eingabe/inventar.js): offen zeigt es Buchstaben,
-// den gewählten Gegenstand und die Tasten der Handlungen; Angelegtes ist immer markiert.
+// Seitenleiste: LP, MP, PP, Pegel als logarithmische Leiste mit Schwellen, Zielmodus, Fähigkeiten, Gepäck, sichtbare
+// Gegner, Startwert. Liest den Zustand nur. Das Gepäck ist zugleich das Inventarfenster (eingabe/inventar.js): offen
+// zeigt es Buchstaben, den gewählten Gegenstand und die Tasten der Handlungen; Angelegtes ist immer markiert.
+// Ebenso sind die Fähigkeiten das Fähigkeitenfenster (eingabe/faehigkeiten.js). Im Zielmodus (eingabe/zielmodus.js)
+// steht oben, womit gezielt wird, was dagegen spricht und wen es mit welcher Trefferchance trifft.
 
 import { spielerin, entitaetMitId } from "../kern/zustand.js";
 import { beziehungZwischen, urheberVon } from "../systeme/fraktionen.js";
@@ -17,6 +19,7 @@ const VERSCHLEISS_STUFEN = [
 ];
 import { anzahlVon, ladungenVon, lastVon, tragkraftVon, lastZuschlag } from "../systeme/inventar.js";
 import { BUCHSTABEN } from "../eingabe/inventar.js";
+import { faehigkeitVon, verbrauchVon, zuegeBisBereit } from "../systeme/faehigkeiten.js";
 
 function balken(beschriftung, aktuellerWert, hoechsterWert, cssKlasse) {
   const fuellungProzent = hoechsterWert > 0 ? Math.round((aktuellerWert / hoechsterWert) * 100) : 0;
@@ -50,8 +53,56 @@ export class Oberflaeche {
     this.version = version;
   }
 
-  // fenster: Zustand des Inventarfensters (null oder { gewaehlt }), siehe eingabe/inventar.js
-  anzeigen(spiel, fenster = null) {
+  // Chance aus systeme/vorschau.js als Text
+  chanceText(chance) {
+    const { text } = this.texte;
+    if (chance === null) return text("ui.chance_offen");
+    if (chance.sicher) return text("ui.sicher");
+    return chance.hinterhalt ? `${chance.prozent} % (${text("ui.hinterhalt")})` : `${chance.prozent} %`;
+  }
+
+  // Zielmodus: Auswahl, Grund dagegen, Betroffene mit Chance; ziel = { modus, vorschau } oder null
+  zielHtml(spiel, ziel) {
+    if (!ziel) return "";
+    const { text, nomenForm, hatSchluessel } = this.texte;
+    const zustand = spiel.zustand;
+    const { auswahl } = ziel.modus, vorschau = ziel.vorschau;
+    const gegenstand = auswahl.zweck === "werfen" ? entitaetMitId(zustand, auswahl.gegenstandId) : null;
+    const was = gegenstand ? `${text("ui.werfen")}: ${nomenForm(gegenstand, "akk", "bestimmt")}` : text(faehigkeitVon(spiel, auswahl.faehigkeit)?.text ?? "ui.zielen");
+    const grundSchluessel = `log.abgelehnt.${vorschau.grund}`;
+    const grund = vorschau.ok ? "" : `<li class="schlimm">${hatSchluessel(grundSchluessel) ? text(grundSchluessel) : vorschau.grund}</li>`;
+    const betroffene = vorschau.betroffene.map(({ id, chance }) => {
+      const wesen = entitaetMitId(zustand, id);
+      return `<li>${nomenForm(wesen, "nom", "ohne")} <span class="chance">${this.chanceText(chance)}</span></li>`;
+    });
+    const niemand = vorschau.ok && !betroffene.length ? `<li class="leise">${text("ui.trifft_niemanden")}</li>` : "";
+    return `<h2 class="offen">${text("ui.zielen")}</h2>
+      <ul class="ziel offen"><li class="gewaehlt">${was}</li>${grund}${betroffene.join("")}${niemand}<li class="hinweis">${text("ui.zielen_hinweis")}</li></ul>`;
+  }
+
+  // Fähigkeiten mit Verbrauch und Abklingzeit; offen mit Buchstaben
+  faehigkeitenHtml(spiel, ninkasi, offen) {
+    const namen = ninkasi.faehigkeiten || [];
+    if (!namen.length && !offen) return "";
+    const { text } = this.texte;
+    const zeilen = namen.map((name, stelle) => {
+      const definition = faehigkeitVon(spiel, name);
+      const buchstabe = offen ? `<span class="buchstabe">${BUCHSTABEN[stelle] ?? " "})</span> ` : "";
+      const verbrauch = Object.entries(verbrauchVon(spiel, ninkasi, definition))
+        .filter(([, menge]) => menge > 0)
+        .map(([wertName, menge]) => `${menge} ${text(`ui.${wertName}`)}`).join(", ");
+      const zuege = zuegeBisBereit(ninkasi, name);
+      const abklingend = zuege > 0 ? ` <span class="schlimm">(${text("ui.abklingend", { zuege })})</span>` : "";
+      return `<li>${buchstabe}${text(definition.text)}${verbrauch ? ` <span class="leise">${verbrauch}</span>` : ""}${abklingend}</li>`;
+    });
+    const hinweis = offen ? `<li class="hinweis">${text(namen.length ? "ui.faehigkeiten_waehlen" : "ui.faehigkeiten_keine")}</li>` : "";
+    return `<h2${offen ? ' class="offen"' : ""}>${text("ui.faehigkeiten")}</h2>
+      <ul class="faehigkeiten${offen ? " offen" : ""}">${zeilen.join("")}${hinweis}</ul>`;
+  }
+
+  // fenster: { inventar: null | { gewaehlt } (eingabe/inventar.js), faehigkeiten: null | {} (eingabe/faehigkeiten.js),
+  //            ziel: null | { modus, vorschau } (eingabe/zielmodus.js) }
+  anzeigen(spiel, { inventar: fenster = null, faehigkeiten: faehigkeitenFenster = null, ziel = null } = {}) {
     const { text, nomenForm } = this.texte;
     const zustand = spiel.zustand;
     const ninkasi = spielerin(zustand);
@@ -101,6 +152,8 @@ export class Oberflaeche {
       ${balken(text("ui.pp"), werte.pp.aktuell, hoechstwert(spiel, ninkasi, "pp"), "pp")}
       <h2>${text("ui.pegel")}</h2>
       ${pegelLeiste(text("ui.promille"), werte.pegel.aktuell, ninkasi.stoffwechsel.schwellen || [], optimalerPegel(spiel, ninkasi, "lp"))}
+      ${this.zielHtml(spiel, ziel)}
+      ${this.faehigkeitenHtml(spiel, ninkasi, Boolean(faehigkeitenFenster))}
       <h2${fenster ? ' class="offen"' : ""}>${text(fenster ? "ui.inventar" : "ui.gepaeck")}</h2>
       ${lastZeile}
       <ul class="gepaeck${fenster ? " offen" : ""}">${gepaeckHtml}</ul>

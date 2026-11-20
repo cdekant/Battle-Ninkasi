@@ -1,6 +1,6 @@
 # Battle Ninkasi - Systemausbau
 
-Stand: 2026-11-19
+Stand: 2026-11-20
 
 Arbeitsliste der Strukturen, die Logik und Datenmodell noch brauchen, damit Fernkampf, Flächenwirkung, Effekte über Zeit, Magie, Psi, Nahkampf und viele Gegner überwiegend als Daten abbildbar sind. Grundlage ist eine Prüfung von Doku und Code mit Stand 0.3.0. Die Begriffe (Wirkungsarten, Effektsystem, Register, Zeitmodell) stehen in [Architektur.md](Architektur.md).
 
@@ -13,7 +13,8 @@ Arbeitsliste der Strukturen, die Logik und Datenmodell noch brauchen, damit Fern
 
 ## Bekannte Fehler
 
-+ Zurzeit keine; die drei Fehler aus der Prüfung (Tod durch `wert_aendern`, verwaiste Gegenstände, verwaiste Zeitereignisse) sind mit 0.4.0 behoben
++ Buchstabenwahl in Inventar- und Fähigkeitenfenster nach `KeyboardEvent.code`: auf der deutschen Tastatur sind Y und Z vertauscht (die Taste Z wählt die 25. Stelle, Y die 26.); bei mehr als 24 Einträgen auffällig, Abhilfe über `KeyboardEvent.key` für Buchstaben
++ Die drei Fehler aus der Prüfung (Tod durch `wert_aendern`, verwaiste Gegenstände, verwaiste Zeitereignisse) sind mit 0.4.0 behoben
 
 ## 1. Tod, Haken, Auslöser
 
@@ -33,10 +34,9 @@ Status: umgesetzt in Version 0.5.0, beschrieben in [Architektur.md](Architektur.
 
 Offener Rest, wird mit den genannten Punkten umgesetzt:
 
-+ Zielmodus und Tooltip der Anzeige auf Grundlage von `zielAufloesen` (Oberfläche); den Befehl `faehigkeit` gibt es seit 0.12.0
-+ Vorschau je Wesen "sicher" oder "vielleicht" getroffen; seit 0.10.0 liefert `trefferanteil` die Chance ohne Würfeln, offen ist die Anzeige (Punkt 6)
++ Tooltip der Anzeige auf Grundlage von `zielAufloesen` (Punkt 11); Zielmodus mit Trefferchance je Wesen seit 0.24.0
 + Sichtlinie und Flugbahn für die KI (Punkt 7); nach dem Anspielen prüfen, ob Ersatzlinien oder symmetrischer Schattenwurf für das Sichtfeld nötig sind
-+ Waffen mit Muster (Rundumschlag, Speer) im Spielinhalt (Punkt 9), Animation der Meldungen `geschoss` und `flaeche` in der Anzeige
++ Waffen mit Muster (Rundumschlag, Speer) im Spielinhalt (Punkt 9), Animation der Meldung `flaeche` (Punkt 12, `geschoss` seit 0.24.0)
 
 ## 3. Zustände
 
@@ -46,7 +46,7 @@ Entschieden: Takt ist die Weltuhr; Stapelregel je Zustand, Vorgabe `erneuern`; V
 
 Offener Rest:
 
-+ Anzeige der Zustände an Ninkasi und an Gegnern (Oberfläche, Log-Texte zu `zustand_beginnt`, `zustand_endet`, `abgewichen`, `beschworen`, `verschwindet`); mit dem großen Punkt Oberfläche
++ Anzeige der Zustände an Ninkasi und an Gegnern (Oberfläche, Log-Texte zu `zustand_beginnt`, `zustand_endet`, `abgewichen`, `beschworen`, `verschwindet`); Punkt 11
 + Torkeln aus dem Pegel: eine Schwelle des Stoffwechsels setzt einen Zustand (Spieldesign in [Grundlagen.md](Grundlagen.md))
 + Ob gebundene EP für Tötungen durch Beschworene in den Skill der Beschwörung fließen: Spieldesign in [Charakter.md](Charakter.md)
 
@@ -60,7 +60,7 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 + Modifikatorquelle `skills` (mit dem Skillsystem in [Charakter.md](Charakter.md)); `ausruestung` seit 0.21.0
 + Tags in weiteren Abfragen: Schadensarten und Widerstände seit 0.10.0, Verbrauch, Zeit und Abklingzeit der Fähigkeiten seit 0.12.0
-+ Anzeige der Aufschlüsselung (`modifikatorenAufgeschluesselt`) in der Oberfläche
++ Anzeige der Aufschlüsselung (`modifikatorenAufgeschluesselt`) in der Oberfläche (Punkt 11)
 
 ## 5. Kampfwerte
 
@@ -71,7 +71,7 @@ Entschieden: Kampfwerte sind Punkte, die über einen Halbwert zu Anteilen werden
 Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 + Ersatzwirkungen (Rest aus Punkt 1) achten den Marker `unblockbar`
-+ Anzeige: schwebende Krit-Zahlen, Trefferchance in Tooltip und Untersuchen; mit dem großen Punkt Oberfläche
++ Anzeige: Trefferchance in Tooltip und Untersuchen (Punkt 11, im Zielmodus seit 0.24.0); schwebende Krit-Zahlen (Punkt 12)
 + Zuordnung der Eigenschaften zu Kampfwerten (Gewandtheit zu Ausweichen, Trinkfestigkeit zu Widerstand gegen Gift): Skillsystem in [Charakter.md](Charakter.md)
 
 ## 6. Fähigkeiten und lange Aktionen
@@ -82,7 +82,7 @@ Entschieden: Modifikatorziele `verbrauch.<wert>` für Vorräte, `kosten.*` bleib
 
 Offener Rest, wird mit den genannten Punkten umgesetzt:
 
-+ Zielmodus und Tooltip der Anzeige auf Grundlage von `zielAufloesen`, Belegung für Fähigkeiten, Anzeige einer laufenden Aktion (Fortschritt); mit dem großen Punkt Oberfläche
++ Tooltip und Anzeige einer laufenden Aktion (Fortschritt), Punkt 11; Zielmodus und Belegung für Fähigkeiten (Z) seit 0.24.0
 + Gegner benutzen Fähigkeiten (Auswahl in der KI), kündigen Angriffe an und lassen sich bei langen Aktionen durch Schaden unterbrechen (Punkt 7)
 + Brauen als eigene Art langer Aktion (Register `laufendeaktionen`), sobald das Brausystem entworfen ist ([Grundlagen.md](Grundlagen.md))
 + Folgen von Rückschlag und Glimmer (Spieldesign in [Grundlagen.md](Grundlagen.md))
@@ -98,9 +98,7 @@ Offener Rest:
 
 + Licht in der Wahrnehmung (Brogue: Heimlichkeitsweite im Licht doppelt, im Dunkeln halb), Spüren ohne Licht, Umherziehen wacher Wesen, Spur als Geruch (Brogue folgt der Spielerin über eine Duftkarte um Ecken, passend zu Mikroorganismen, die entlang von Wegen spüren); siehe Wahrnehmung und Licht in [Architektur.md](Architektur.md)
 + Ruf bei ganzen Fraktionen (Spieldesign in [Grundlagen.md](Grundlagen.md))
-+ Anzeige von Wachzustand und Heimlichkeitsweite (Oberfläche)
-+ Zielmodus der Oberfläche für Werfen und Fähigkeiten (Taste, Auswahl des Gegenstands bzw. der Fähigkeit, Ziel per Maus und Tastatur, Vorschau aus `zielAufloesen`); Werfen gibt es seit 0.16.0 nur in Logik, Tests und Bot
-+ Die Anzeige spielt die Bahn aus der Meldung `geschoss` ab (Oberfläche, aus 0.15.0 verschoben); die Zielfelder angekündigter Angriffe werden schon markiert
++ Anzeige von Wachzustand und Heimlichkeitsweite (Punkt 11); Zielmodus für Werfen und Fähigkeiten und die Bahn aus der Meldung `geschoss` seit 0.24.0
 + Tile für den Fernkämpfer-Test (bisher nur Zeichen F), falls er im Spiel bleibt
 
 ## 8. Gelände, Feldschichten, Ebenen
@@ -157,3 +155,31 @@ Status: offen, jeweils erst Spieldesign in [Grundlagen.md](Grundlagen.md) entsch
 + Speichern als Schnappschuss zusätzlich zum Nachspielen, da lange Läufe sonst langsam laden; Mods gehören in die Prüfsumme der Daten
 + Vorschau durch Simulation auf einer Kopie des Zustands (Vorbild Desktop Dungeons), z.B. "wie viel Schaden macht dieser Angriff"; der Zustand ist JSON, die Kopie also billig
 + Leichen als Hinterlassenschaft: gärende Überreste, Nahrung für Mikroorganismen
+
+## 11. Oberfläche
+
+Status: in Arbeit; umgesetzt in Version 0.24.0 (Zielmodus für Werfen und Fähigkeiten mit Vorschau und Trefferchance, Fähigkeitenfenster, Werfen aus dem Inventar, Animation der Geschossbahn, vorläufige `testfaehigkeit` für Ninkasi), beschrieben in [Architektur.md](Architektur.md) (Zielmodus, Oberfläche, Eingabe)
+
+Entschieden: zwei Versionen, 0.24.0 Zielmodus und 0.25.0 Untersuchen und Zustände; Tasten W (werfen im Inventarfenster), Z (Fähigkeiten), X (untersuchen); Ninkasi bekommt bis zu ihren eigentlichen Fähigkeiten die vorläufige `testfaehigkeit` (der gleichnamige Testeintrag in `tests/hilfen.js` heißt seitdem `testritual`); Kosmetik wie schwebende Zahlen ist ein eigener Punkt (12)
+
+Offener Rest, geplant für 0.25.0:
+
++ Untersuchen mit Taste X und Tooltip am Feld unter dem Zeiger: Wesen (LP, Zustände, Wachzustand, Trefferchance in beide Richtungen), Gelände, Feldschichten, Gegenstände
++ Zustände von Ninkasi mit Restdauer in der Seitenleiste, Zustände in der Gegnerliste, Fortschritt einer laufenden Aktion
++ Log-Texte zu `zustand_beginnt`, `zustand_endet`, `abgewichen`, `beschworen`, `verschwindet`
++ Untersuchen von Ninkasi mit der Aufschlüsselung der Modifikatoren (`modifikatorenAufgeschluesselt`)
++ Wachzustand und Heimlichkeitsweite
++ Das Inventarfenster und den Zielmodus im Browser ausprobieren (die Tastenlogik ist getestet, die Darstellung nicht)
+
+Später:
+
++ Vorschau von Wirkungen innerhalb eines Effekts (Brandkreis der Brandflasche, verschachtelte Trefferwürfe) über eine Simulation auf einer Kopie des Zustands (Punkt 10)
++ Blocken in der angezeigten Chance
+
+## 12. Kosmetik
+
+Status: offen, reine Anzeige ohne Einfluss auf die Logik
+
++ Schwebende Zahlen für Schaden, Krit und Heilung
++ Animation der Meldung `flaeche` (Explosion, Schwall), wie die Geschossbahn über `src/anzeige/animation.js`
++ Weiches Scrollen der Kamera (siehe Kamera in [Architektur.md](Architektur.md))

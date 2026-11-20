@@ -60,7 +60,9 @@ export class Renderer {
     pinsel.globalAlpha = 1;
   }
 
-  // markierungen: { zeiger: {x, y} | null, weg: [{x, y}], gefahr: [{x, y}] angekündigte Zielfelder } (reine Anzeige)
+  // markierungen (reine Anzeige): { zeiger: {x, y} | null, weg: [{x, y}], gefahr: [{x, y}] angekündigte Zielfelder,
+  //   ziel: null | { cursor: {x, y}, ok, bahn: [{x, y}], felder: [{x, y}], betroffene: [{x, y}] } Zielmodus,
+  //   geschoss: {x, y} | null Feld der laufenden Geschossanimation }
   zeichnen(spiel, kamera, ansicht, zoom, markierungen = {}) {
     const pinsel = this.pinsel;
     const zustand = spiel.zustand;
@@ -146,10 +148,28 @@ export class Renderer {
     pinsel.globalAlpha = 1;
   }
 
-  markierungenZeichnen(kamera, ansicht, zoom, { zeiger = null, weg = [], gefahr = [] }) {
+  // Rahmen um ein Feld, innen an der Feldgrenze
+  feldRahmen(kamera, zoom, feld, farbe) {
+    const pinsel = this.pinsel;
+    pinsel.strokeStyle = farbe;
+    pinsel.lineWidth = Math.max(1, Math.floor(zoom / 16));
+    const halbeLinienbreite = pinsel.lineWidth / 2;
+    pinsel.strokeRect(
+      (feld.x - kamera.x) * zoom + halbeLinienbreite, (feld.y - kamera.y) * zoom + halbeLinienbreite,
+      zoom - 2 * halbeLinienbreite, zoom - 2 * halbeLinienbreite
+    );
+  }
+
+  markierungenZeichnen(kamera, ansicht, zoom, { zeiger = null, weg = [], gefahr = [], ziel = null, geschoss = null }) {
     const pinsel = this.pinsel;
     const imAusschnitt = (feld) =>
       feld.x - kamera.x >= 0 && feld.y - kamera.y >= 0 && feld.x - kamera.x < ansicht.breite && feld.y - kamera.y < ansicht.hoehe;
+    const flaeche = (felder, farbe) => {
+      pinsel.fillStyle = farbe;
+      for (const feld of felder) {
+        if (imAusschnitt(feld)) pinsel.fillRect((feld.x - kamera.x) * zoom, (feld.y - kamera.y) * zoom, zoom, zoom);
+      }
+    };
     pinsel.fillStyle = "rgba(200, 60, 40, 0.35)";
     for (const feld of gefahr) {
       if (imAusschnitt(feld)) pinsel.fillRect((feld.x - kamera.x) * zoom, (feld.y - kamera.y) * zoom, zoom, zoom);
@@ -158,14 +178,20 @@ export class Renderer {
     for (const feld of weg) {
       if (imAusschnitt(feld)) pinsel.fillRect((feld.x - kamera.x) * zoom, (feld.y - kamera.y) * zoom, zoom, zoom);
     }
-    if (zeiger && imAusschnitt(zeiger)) {
-      pinsel.strokeStyle = "#c87533";
-      pinsel.lineWidth = Math.max(1, Math.floor(zoom / 16));
-      const halbeLinienbreite = pinsel.lineWidth / 2;
-      pinsel.strokeRect(
-        (zeiger.x - kamera.x) * zoom + halbeLinienbreite, (zeiger.y - kamera.y) * zoom + halbeLinienbreite,
-        zoom - 2 * halbeLinienbreite, zoom - 2 * halbeLinienbreite
-      );
+    // Zielmodus: Bahn, Fläche, Betroffene, Cursor grün (ginge) oder rot (Grund dagegen); er ersetzt den Zeiger
+    if (ziel) {
+      flaeche(ziel.bahn, "rgba(242, 230, 200, 0.18)");
+      flaeche(ziel.felder, "rgba(120, 170, 255, 0.30)");
+      for (const feld of ziel.betroffene) if (imAusschnitt(feld)) this.feldRahmen(kamera, zoom, feld, "#f2c14e");
+      if (imAusschnitt(ziel.cursor)) this.feldRahmen(kamera, zoom, ziel.cursor, ziel.ok ? "#7fd36b" : "#d9553b");
+    } else if (zeiger && imAusschnitt(zeiger)) {
+      this.feldRahmen(kamera, zoom, zeiger, "#c87533");
+    }
+    // Geschoss als kleines helles Quadrat in der Feldmitte
+    if (geschoss && imAusschnitt(geschoss)) {
+      const kante = Math.max(2, Math.floor(zoom / 3));
+      pinsel.fillStyle = "#f2e6c8";
+      pinsel.fillRect((geschoss.x - kamera.x) * zoom + (zoom - kante) / 2, (geschoss.y - kamera.y) * zoom + (zoom - kante) / 2, kante, kante);
     }
   }
 }

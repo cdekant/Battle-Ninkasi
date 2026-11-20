@@ -332,7 +332,7 @@ test("KI mit Fähigkeiten, Ankündigung und Unterbrechbarkeit werden geprüft", 
   ];
   for (const [ki, teilDerMeldung] of erwartet) assert.ok(mitKi(ki).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
   const unbekannt = mitGegner(() => ({ faehigkeiten: ["testgeschoss"] }));
-  assert.ok(unbekannt.some((meldung) => meldung.includes('kennt die Fähigkeit "testfaehigkeit" nicht')));
+  assert.ok(unbekannt.some((meldung) => meldung.includes('kennt die Fähigkeit "testritual" nicht')));
 
   const ohneDauer = { text: "wesen.ninkasi", ankuendigung: "wesen.ninkasi", unterbrechbar: true, ziel: { art: "selbst" }, wirkung: "testeffekt" };
   assert.ok(mitGegner(() => ({}), ohneDauer).some((meldung) => meldung.includes("nur mit dauer")));
@@ -354,7 +354,7 @@ test("Bewegungsarten, Gelände, Würfe, Unterbrechungsgründe und Regeln der Bew
     [(daten) => { daten.gelaende.testgelaende.beimFestsitzen = "gibt_es_nicht"; }, 'Effekt "gibt_es_nicht"'],
     [(daten) => { daten.gegenstaende.testgegenstand.wurf = { effekt: "gibt_es_nicht" }; }, 'Effekt "gibt_es_nicht"'],
     [(daten) => { daten.gegenstaende.testgegenstand.wurf = { reichweite: 0 }; }, "reichweite"],
-    [(daten) => { daten.faehigkeiten.testfaehigkeit.unterbrechbar = ["husten"]; }, "unterbrechbar"],
+    [(daten) => { daten.faehigkeiten.testritual.unterbrechbar = ["husten"]; }, "unterbrechbar"],
     [(daten) => { delete daten.regeln.bewegung; }, "regeln.bewegung"],
     [(daten) => { daten.regeln.werfen = { reichweite: 0 }; }, "regeln.werfen.reichweite"],
     [(daten) => { delete daten.regeln.wahrnehmung.laermWurf; }, "laermWurf"],
@@ -366,7 +366,7 @@ test("Bewegungsarten, Gelände, Würfe, Unterbrechungsgründe und Regeln der Bew
     daten.gelaende.testgelaende.undurchdringlich = false;
     daten.gelaende.testgelaende.passierbarFuer = ["phasend"];
     daten.gegenstaende.testgegenstand.wurf = { effekt: "testeffekt", reichweite: 4 };
-    daten.faehigkeiten.testfaehigkeit.unterbrechbar = ["schaden", "versetzt"];
+    daten.faehigkeiten.testritual.unterbrechbar = ["schaden", "versetzt"];
   });
   assert.deepEqual(gueltig, []);
 });

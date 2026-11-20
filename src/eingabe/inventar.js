@@ -3,8 +3,8 @@
 //   zu:                 Taste I öffnet
 //   offen, nichts gewählt: A bis Z wählt den Gegenstand an dieser Stelle des Gepäcks, Esc oder I schließt
 //   offen, gewählt:     T trinken, A anlegen oder ablegen (je nachdem), F fallen lassen (der ganze Stapel),
+//                       W werfen (schließt und gibt die Auswahl für den Zielmodus zurück, eingabe/zielmodus.js),
 //                       Esc zurück zur Auswahl
-// Werfen bekommt erst mit dem Zielmodus eine Taste (siehe docs/Systemausbau.md).
 
 import { spielerin, entitaetMitId } from "../kern/zustand.js";
 import { istAngelegt } from "../systeme/ausruestung.js";
@@ -18,7 +18,7 @@ export function gegenstandAnStelle(spiel, stelle) {
   return id === undefined ? null : entitaetMitId(spiel.zustand, id);
 }
 
-// Verarbeitet eine Taste (KeyboardEvent.code) bei offenem Fenster; gibt { fenster, befehl? } zurück
+// Verarbeitet eine Taste (KeyboardEvent.code) bei offenem Fenster; gibt { fenster, befehl?, auswahl? } zurück
 export function inventarTaste(fenster, tastencode, spiel) {
   if (tastencode === "Escape" || tastencode === "KeyI") return { fenster: fenster.gewaehlt !== null ? { gewaehlt: null } : null };
   const buchstabe = /^Key([A-Z])$/.exec(tastencode)?.[1]?.toLowerCase();
@@ -29,6 +29,7 @@ export function inventarTaste(fenster, tastencode, spiel) {
   }
   const ninkasi = spielerin(spiel.zustand);
   if (buchstabe === "t") return { fenster: null, befehl: { art: "trinken", gegenstandId: fenster.gewaehlt } };
+  if (buchstabe === "w") return { fenster: null, auswahl: { zweck: "werfen", gegenstandId: fenster.gewaehlt } };
   if (buchstabe === "f") return { fenster: null, befehl: { art: "fallenlassen", gegenstandId: fenster.gewaehlt } };
   if (buchstabe === "a") {
     const art = istAngelegt(ninkasi, fenster.gewaehlt) ? "ablegen" : "anlegen";

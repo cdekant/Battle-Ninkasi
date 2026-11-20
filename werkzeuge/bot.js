@@ -16,6 +16,8 @@ import { hoechstwert } from "../src/kern/werte.js";
 import { reiseBeginnen, naechsterReiseschritt } from "../src/eingabe/reise.js";
 import { rastenBeginnen, naechsterRastschritt } from "../src/eingabe/rasten.js";
 import { erkundenBeginnen, naechsterErkundungsschritt } from "../src/eingabe/erkunden.js";
+import { zielmodusBeginnen, zielmodusTaste, zielangabeVon, cursorSetzen } from "../src/eingabe/zielmodus.js";
+import belegung from "../src/eingabe/belegung.js";
 import einstellungen from "../src/eingabe/einstellungen.js";
 import { indexPruefen } from "../src/kern/raumindex.js";
 import { warteschlangeGueltig } from "../src/kern/zeit.js";
@@ -90,7 +92,21 @@ function zufallsbefehl(botZufall, spiel) {
     const ziel = { x: ninkasi.position.x + zufallsGanzzahl(botZufall, -5, 5), y: ninkasi.position.y + zufallsGanzzahl(botZufall, -5, 5) };
     return { art: "werfen", gegenstandId: ninkasi.inventar[0], ziel };
   }
+  if (wurf >= 18 && wurf <= 20 && ninkasi.faehigkeiten?.length) return faehigkeitUeberZielmodus(botZufall, spiel, ninkasi);
   return { art: "bewegen", dx: zufallsGanzzahl(botZufall, -1, 1), dy: zufallsGanzzahl(botZufall, -1, 1) };
+}
+
+// Fähigkeit wie im Browser über den Zielmodus (eingabe/zielmodus.js): ein Ziel per Tab oder ein Feld in der Nähe;
+// den Befehl gibt der Bot auch, wenn die Vorschau einen Grund dagegen nennt, so wird die Ablehnung mitgeprüft
+function faehigkeitUeberZielmodus(botZufall, spiel, ninkasi) {
+  const faehigkeit = ninkasi.faehigkeiten[zufallsGanzzahl(botZufall, 0, ninkasi.faehigkeiten.length - 1)];
+  const beginn = zielmodusBeginnen(spiel, { zweck: "faehigkeit", faehigkeit });
+  if (beginn.befehl) return beginn.befehl;
+  if (!beginn.modus) return { art: "faehigkeit", faehigkeit };
+  let modus = beginn.modus;
+  if (zufallsGanzzahl(botZufall, 1, 2) === 1) modus = zielmodusTaste(spiel, modus, "Tab", belegung).modus;
+  else modus = cursorSetzen(spiel, modus, { x: ninkasi.position.x + zufallsGanzzahl(botZufall, -7, 7), y: ninkasi.position.y + zufallsGanzzahl(botZufall, -7, 7) });
+  return { art: "faehigkeit", faehigkeit, ziel: zielangabeVon(spiel, modus) };
 }
 
 // Ablauf der Eingabe aus Einzelbefehlen (Reise, Rasten, Erkunden), wie im Browser; gibt den Haltegrund zurück
@@ -150,8 +166,8 @@ let anzahlTode = 0, anzahlFehler = 0;
 const reisenNachHaltegrund = {};
 // Fähigkeiten der Gegner: gewirkt, lange Aktionen begonnen und abgebrochen
 const gegnerfaehigkeiten = { gewirkt: 0, begonnen: 0, abgebrochen: 0 };
-// Würfe Ninkasis
-let anzahlWuerfe = 0, anzahlAngelegt = 0;
+// Würfe und Fähigkeiten Ninkasis
+let anzahlWuerfe = 0, anzahlAngelegt = 0, ninkasisFaehigkeiten = 0;
 console.log("Startwert  Befehle  Zeit     LP   MP   PP  Pegel  Getötet  Biere  Ergebnis");
 for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe; startwert++) {
   try {
@@ -162,6 +178,7 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
       if (meldung.art === "getrunken") getrunkeneBiere++;
       if (meldung.art === "geworfen") anzahlWuerfe++;
       if (meldung.art === "angelegt") anzahlAngelegt++;
+      if (meldung.art === "faehigkeit" && meldung.wer.id === spiel.zustand.spielerinId) ninkasisFaehigkeiten++;
       if (meldung.wer?.id === spiel.zustand.spielerinId) return;
       if (meldung.art === "faehigkeit") gegnerfaehigkeiten.gewirkt++;
       if (meldung.art === "aktion_beginnt") gegnerfaehigkeiten.begonnen++;
@@ -195,6 +212,6 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
 }
 const haltegruende = Object.entries(reisenNachHaltegrund).map(([grund, anzahl]) => `${grund} ${anzahl}`).join(", ");
 console.log(`\nAbläufe nach Haltegrund: ${haltegruende}`);
-console.log(`Fähigkeiten der Gegner: ${gegnerfaehigkeiten.gewirkt} gewirkt, ${gegnerfaehigkeiten.begonnen} lange Aktionen begonnen, ${gegnerfaehigkeiten.abgebrochen} abgebrochen; ${anzahlAngelegt} Mal angelegt, ${anzahlWuerfe} Würfe Ninkasis`);
+console.log(`Fähigkeiten der Gegner: ${gegnerfaehigkeiten.gewirkt} gewirkt, ${gegnerfaehigkeiten.begonnen} lange Aktionen begonnen, ${gegnerfaehigkeiten.abgebrochen} abgebrochen; ${anzahlAngelegt} Mal angelegt, ${anzahlWuerfe} Würfe Ninkasis, ${ninkasisFaehigkeiten} Fähigkeiten Ninkasis`);
 console.log(`${anzahlLaeufe} Läufe, ${anzahlTode} tot, ${anzahlFehler} Fehler`);
 process.exitCode = anzahlFehler ? 1 : 0;

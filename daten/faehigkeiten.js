@@ -1,7 +1,13 @@
 // Fähigkeiten: Magie, Psi, Fernkampf und körpereigene Aktionen (Aufbau siehe src/systeme/faehigkeiten.js).
-// Fähigkeiten für Ninkasi folgen, wenn der Systemausbau abgeschlossen ist; die beiden hier gehören dem
-// Testgegner fernkaempfer_test (daten/gegner.js), Zahlen vorläufig.
+// Fähigkeiten für Ninkasi folgen, wenn der Systemausbau abgeschlossen ist; bis dahin kennt sie nur testfaehigkeit,
+// damit sich der Zielmodus im Browser ausprobieren lässt. Saeurespucke und Saeureschwall gehören dem Testgegner
+// fernkaempfer_test (daten/gegner.js). Alle Zahlen vorläufig.
 export default {
+  // Vorläufig für Ninkasi: Fläche auf ein Feld in Sicht, Trefferwurf je Wesen, sie selbst bleibt verschont
+  testfaehigkeit: {
+    text: "faehigkeit.testfaehigkeit", tags: ["magie"], verbrauch: { mp: 10 }, abklingzeit: 2,
+    ziel: { art: "feld", reichweite: 6, muster: { art: "kreis", radius: 1 }, trifft: "wesen", ohneUrheber: true }, wirkung: "testfaehigkeit",
+  },
   // Geschoss über Verbündete hinweg, mit Trefferwurf
   saeurespucke: {
     text: "faehigkeit.saeurespucke", tags: ["koerper"], abklingzeit: 3,

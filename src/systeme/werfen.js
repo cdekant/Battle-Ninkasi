@@ -22,7 +22,7 @@ function geworfenerGegenstand(spiel, akteur, befehl) {
   return entitaetMitId(spiel.zustand, befehl.gegenstandId);
 }
 
-function wurfbahn(spiel, akteur, gegenstand, zielangabe) {
+export function wurfbahn(spiel, akteur, gegenstand, zielangabe) {
   const reichweite = gegenstand.wurf?.reichweite ?? spiel.daten.regeln.werfen.reichweite;
   return zielAufloesen(spiel, akteur, { art: "geschoss", reichweite }, zielangabe);
 }

@@ -7,6 +7,13 @@ export default {
   biss_klein: {
     schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "1W4" }, { baustein: "abnutzen", menge: 1 }],
   },
+  // Vorläufige Fähigkeit Ninkasis (daten/faehigkeiten.js)
+  testfaehigkeit: {
+    schritte: [{ baustein: "trefferwurf", genauigkeit: 70, effekt: "testfaehigkeit_treffer" }],
+  },
+  testfaehigkeit_treffer: {
+    schritte: [{ baustein: "schaden", art: "magie", wuerfel: "1W6+1" }],
+  },
   // Fähigkeiten des Testgegners fernkaempfer_test (daten/faehigkeiten.js); vorläufig
   saeurespritzer: {
     schritte: [{ baustein: "trefferwurf", genauigkeit: 70, effekt: "saeurespritzer_treffer" }],

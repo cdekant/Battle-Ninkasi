@@ -145,7 +145,7 @@ export function risikoWuerfeln(spiel, wesen, tabellenName) {
 }
 
 // Worauf die Wirkung angewandt wird: je betroffene Entität (Muster, durchdringendes Geschoss) oder einmal
-function wirkungsziele(spiel, wesen, zielart, aufloesung) {
+export function wirkungsziele(spiel, wesen, zielart, aufloesung) {
   if (zielart.muster) {
     const optionen = { trifft: zielart.trifft ?? "alle", urheberId: wesen.id, urheberFraktion: fraktionVon(wesen), ohneUrheber: Boolean(zielart.ohneUrheber) };
     return entitaetenAufFeldern(spiel, aufloesung.felder, optionen).map((entitaet) => entitaet.id);

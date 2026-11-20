@@ -27,6 +27,10 @@ import { reiseBeginnen, naechsterReiseschritt } from "./eingabe/reise.js";
 import { rastenBeginnen, naechsterRastschritt } from "./eingabe/rasten.js";
 import { erkundenBeginnen, naechsterErkundungsschritt } from "./eingabe/erkunden.js";
 import { inventarTaste } from "./eingabe/inventar.js";
+import { faehigkeitenTaste } from "./eingabe/faehigkeiten.js";
+import { zielmodusBeginnen, zielmodusTaste, zielmodusVorschau, zielmodusBestaetigen, cursorSetzen } from "./eingabe/zielmodus.js";
+import { istSichtbar } from "./systeme/sicht.js";
+import { neueAnimation, geschossEinreihen, laeuftAnimation, aktuellesGeschoss, animationWeiter, animationLeeren } from "./anzeige/animation.js";
 
 const SPEICHERSCHLUESSEL_EINSTELLUNGEN = "battle-ninkasi.einstellungen";
 const RAD_PAUSE_MS = 150; // zwischen zwei Zoomschritten per Rad
@@ -97,16 +101,76 @@ let ablaufZeitgeber = null;
 let letzterRadZoom = 0;
 // Inventarfenster: null oder { gewaehlt } (eingabe/inventar.js), reine Anzeige, nicht im Spielzustand
 let inventarFenster = null;
+// Fähigkeitenfenster: null oder {} (eingabe/faehigkeiten.js); Zielmodus: null oder { auswahl, zielart, cursor } (eingabe/zielmodus.js)
+let faehigkeitenFenster = null;
+let zielModus = null;
+// Geschossbahnen aus den Meldungen "geschoss", abgespielt im Takt geschossPause (anzeige/animation.js)
+const animation = neueAnimation();
+let animationsZeitgeber = null;
 
 function zeichnen() {
   const ansicht = renderer.ansicht(einstellungen.zoom);
   const ninkasi = spielerin(spiel.zustand);
   folgen(kamera, ninkasi.position, ansicht, spiel.zustand.ebene);
-  // Wegvorschau zum Feld unter dem Zeiger, nur über erkundete Felder
-  const vorschauZeigen = feldUnterZeiger && !laufenderAblauf && !spiel.zustand.vorbei;
+  // Wegvorschau zum Feld unter dem Zeiger, nur über erkundete Felder; im Zielmodus stattdessen dessen Vorschau
+  const vorschauZeigen = feldUnterZeiger && !laufenderAblauf && !zielModus && !spiel.zustand.vorbei;
   const wegvorschau = vorschauZeigen ? weg(spiel, ninkasi.position, feldUnterZeiger, { nurErkundet: true, bewegung: bewegungVon(ninkasi) }) || [] : [];
-  renderer.zeichnen(spiel, kamera, ansicht, einstellungen.zoom, { zeiger: feldUnterZeiger, weg: wegvorschau, gefahr: angekuendigteFelder(spiel) });
-  oberflaeche.anzeigen(spiel, inventarFenster);
+  const zielvorschau = zielModus ? zielmodusVorschau(spiel, zielModus) : null;
+  const zielmarkierung = zielvorschau && {
+    cursor: zielModus.cursor,
+    ok: zielvorschau.ok,
+    bahn: zielvorschau.aufloesung?.bahn?.felder ?? [],
+    felder: zielvorschau.aufloesung?.ok && !zielvorschau.aufloesung.bahn ? zielvorschau.aufloesung.felder : [],
+    betroffene: zielvorschau.betroffene.map(({ id }) => spiel.zustand.entitaeten[id].position),
+  };
+  renderer.zeichnen(spiel, kamera, ansicht, einstellungen.zoom, {
+    zeiger: feldUnterZeiger, weg: wegvorschau, gefahr: angekuendigteFelder(spiel), ziel: zielmarkierung, geschoss: aktuellesGeschoss(animation),
+  });
+  oberflaeche.anzeigen(spiel, { inventar: inventarFenster, faehigkeiten: faehigkeitenFenster, ziel: zielModus && { modus: zielModus, vorschau: zielvorschau } });
+}
+
+// Geschossbahnen: nur die Felder, die Ninkasi gerade sieht; der Takt läuft unabhängig von Reise und Eingabe
+function geschossGemeldet(meldung) {
+  if (meldung.art !== "geschoss" || einstellungen.geschossPause <= 0) return;
+  geschossEinreihen(animation, meldung.bahn.filter((feld) => istSichtbar(spiel.zustand, feld.x, feld.y)));
+}
+function animationTakt() {
+  animationsZeitgeber = null;
+  const weiter = animationWeiter(animation);
+  zeichnen();
+  if (weiter) animationsZeitgeber = setTimeout(animationTakt, einstellungen.geschossPause);
+}
+function animationStarten() {
+  if (animationsZeitgeber || !laeuftAnimation(animation)) return;
+  zeichnen();
+  animationsZeitgeber = setTimeout(animationTakt, einstellungen.geschossPause);
+}
+function animationUeberspringen() {
+  clearTimeout(animationsZeitgeber);
+  animationsZeitgeber = null;
+  animationLeeren(animation);
+}
+
+function ablehnungMelden(grund) {
+  const schluessel = `log.abgelehnt.${grund}`;
+  if (texte.hatSchluessel(schluessel)) log.zeile(texte.text(schluessel), "leise");
+}
+
+// Auswahl aus Inventar (Werfen) oder Fähigkeitenfenster: Zielmodus, sofortiger Befehl oder Grund dagegen
+function auswahlStarten(auswahl) {
+  const beginn = zielmodusBeginnen(spiel, auswahl);
+  if (beginn.befehl) return befehlGebenUndZeichnen(beginn.befehl);
+  if (beginn.grund) ablehnungMelden(beginn.grund);
+  zielModus = beginn.modus ?? null;
+  zeichnen();
+}
+
+// Ergebnis von zielmodusTaste oder zielmodusBestaetigen
+function zielergebnisAnwenden(ergebnis) {
+  zielModus = ergebnis.modus;
+  if (ergebnis.grund) ablehnungMelden(ergebnis.grund);
+  if (ergebnis.befehl) return befehlGebenUndZeichnen(ergebnis.befehl);
+  zeichnen();
 }
 
 function ablaufMelden(grund) {
@@ -129,6 +193,7 @@ function ablaufTakt() {
   if (schritt.halt) return ablaufBeenden(schritt.halt);
   if (!befehlGeben(spiel, schritt.befehl).ok) return ablaufBeenden("abgelehnt");
   zeichnen();
+  animationStarten();
   ablaufZeitgeber = setTimeout(ablaufTakt, einstellungen.reisePause);
 }
 
@@ -142,11 +207,15 @@ function ablaufStarten(beginn, naechsterSchritt) {
 function starten(startwert) {
   if (laufenderAblauf) ablaufBeenden(null);
   inventarFenster = null;
+  faehigkeitenFenster = null;
+  zielModus = null;
+  animationUeberspringen();
   spiel = neuesSpiel(daten, startwert);
   window.spiel = spiel; // zum Nachsehen in der Konsole
   kamera = neueKamera();
   log.leeren(spiel.zustand.spielerinId);
   hoererAnmelden(spiel, log.melden);
+  hoererAnmelden(spiel, geschossGemeldet);
   log.zeile(texte.text("log.willkommen"));
   const adresse = new URL(location.href);
   adresse.searchParams.set("seed", String(spiel.zustand.startwert));
@@ -166,10 +235,14 @@ function zoomen(richtung) {
 
 function befehlGebenUndZeichnen(befehl) {
   befehlGeben(spiel, befehl);
+  if (spiel.zustand.vorbei) zielModus = null;
   zeichnen();
+  animationStarten();
 }
 
 window.addEventListener("keydown", (tastenereignis) => {
+  // Eine laufende Geschossbahn überspringt jede Taste, die Taste wirkt trotzdem
+  if (laeuftAnimation(animation)) animationUeberspringen();
   // Während eines Ablaufs (Reise, Rasten, Erkunden) bricht jede Taste ab und wird dabei geschluckt
   if (laufenderAblauf) {
     tastenereignis.preventDefault();
@@ -178,10 +251,24 @@ window.addEventListener("keydown", (tastenereignis) => {
   // Inventarfenster offen: es bekommt jede Taste
   if (inventarFenster) {
     tastenereignis.preventDefault();
-    const { fenster, befehl } = inventarTaste(inventarFenster, tastenereignis.code, spiel);
+    const { fenster, befehl, auswahl } = inventarTaste(inventarFenster, tastenereignis.code, spiel);
     inventarFenster = fenster;
     if (befehl) return befehlGebenUndZeichnen(befehl);
+    if (auswahl) return auswahlStarten(auswahl);
     return zeichnen();
+  }
+  // Fähigkeitenfenster offen: es bekommt jede Taste, die Wahl führt in den Zielmodus
+  if (faehigkeitenFenster) {
+    tastenereignis.preventDefault();
+    const { fenster, auswahl } = faehigkeitenTaste(faehigkeitenFenster, tastenereignis.code, spiel);
+    faehigkeitenFenster = fenster;
+    if (auswahl) return auswahlStarten(auswahl);
+    return zeichnen();
+  }
+  // Zielmodus: Bewegungstasten zielen, dazu Tab, Enter und Esc (eingabe/zielmodus.js)
+  if (zielModus) {
+    tastenereignis.preventDefault();
+    return zielergebnisAnwenden(zielmodusTaste(spiel, zielModus, tastenereignis.code, belegung));
   }
   const ergebnis = uebersetzen(tastenereignis, belegung, spiel);
   if (!ergebnis) return;
@@ -189,6 +276,11 @@ window.addEventListener("keydown", (tastenereignis) => {
   if (ergebnis.anzeige === "inventar") {
     if (spiel.zustand.vorbei) return;
     inventarFenster = { gewaehlt: null };
+    return zeichnen();
+  }
+  if (ergebnis.anzeige === "faehigkeiten") {
+    if (spiel.zustand.vorbei) return;
+    faehigkeitenFenster = {};
     return zeichnen();
   }
   if (ergebnis.anzeige === "zoom_rein") return zoomen(1);
@@ -207,6 +299,7 @@ kartenCanvas.addEventListener("mousemove", (mausereignis) => {
   const feld = feldAnPixel(mausereignis.offsetX, mausereignis.offsetY, kamera, einstellungen.zoom);
   if (feldUnterZeiger && feldUnterZeiger.x === feld.x && feldUnterZeiger.y === feld.y) return;
   feldUnterZeiger = feld;
+  if (zielModus) zielModus = cursorSetzen(spiel, zielModus, feld);
   zeichnen();
 });
 
@@ -219,6 +312,11 @@ kartenCanvas.addEventListener("mousedown", (mausereignis) => {
   if (laufenderAblauf) return ablaufBeenden("abgebrochen");
   if (belegung.maus[mausereignis.button] !== "handeln" || spiel.zustand.vorbei) return;
   mausereignis.preventDefault();
+  // im Zielmodus bestätigt ein Klick das Feld unter dem Zeiger
+  if (zielModus) {
+    zielModus = cursorSetzen(spiel, zielModus, feldAnPixel(mausereignis.offsetX, mausereignis.offsetY, kamera, einstellungen.zoom));
+    return zielergebnisAnwenden(zielmodusBestaetigen(spiel, zielModus));
+  }
   const ergebnis = klickDeuten(spiel, feldAnPixel(mausereignis.offsetX, mausereignis.offsetY, kamera, einstellungen.zoom));
   if (!ergebnis) return;
   if (ergebnis.befehl) befehlGebenUndZeichnen(ergebnis.befehl);

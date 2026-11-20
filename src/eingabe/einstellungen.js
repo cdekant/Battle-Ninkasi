@@ -4,6 +4,7 @@ export default {
   zoom: 16,
   zoomstufen: [16, 32, 48, 64],
   reisePause: 30,             // Millisekunden zwischen zwei Schritten einer Reise (nur Anzeige)
+  geschossPause: 30,          // Millisekunden je Feld einer Geschossbahn (nur Anzeige), 0 zeigt keine Bahn
   reiseTrotzFeinden: false,   // false: keine Reise, solange Feinde in Sicht sind
   // Gründe, aus denen eine Reise anhält: Gefahrenprüfungen (Register "gefahren") und "gegenstand"
   reiseHalt: ["gegner_in_sicht", "schaden", "gegenstand"], // gilt auch für das Auto-Erkunden
