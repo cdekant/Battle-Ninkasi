@@ -1,14 +1,18 @@
 # Battle Ninkasi - Charakter und Lernen
 
-Stand: 2026-11-18
+Stand: 2026-11-20
+
+Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaft, Skillpunkte unabhängig vom späteren Lerntempo), DCSS (EP fließen in die benutzten Skills, Kosten anzeigen statt Formel), Caves of Qud (Eigenschaften dauerhaft und vorübergehend veränderbar), Tales of Maj'Eyal und Path of Exile (Skills wirken über Tags auch auf künftige Fähigkeiten). Die technische Umsetzung ist Punkt 13 in [Systemausbau.md](Systemausbau.md).
 
 ## Charaktererstellung
 
-+ Spielerin verteilt Punkte auf sechs Eigenschaften
++ Alle sechs Eigenschaften starten bei 10, die Spielerin verteilt 20 Punkte, höchstens 20 je Eigenschaft (vorläufig, Regelwerte in `regeln.lernen`)
++ Keine festen Startskills: Ninkasi beginnt mit einem Startguthaben freier EP (vorläufig 300) und verteilt es selbst
 + Makel gehören zur Charaktererstellung: Nachteil gegen zusätzliche Punkte
 + Beispiele für Makel: Blindheit (Sichtweite stark eingeschränkt), dysfunktionale Alkoholdehydrogenase
 + Weitere Makel, auszuarbeiten: Aldehyd-Dehydrogenase-Mangel (Acetaldehyd, Flush, Katerschaden), Zöliakie (Gerste und Weizen schaden), Gicht (Purine im Bier lösen Anfälle aus)
 + Vorschlag, noch nicht bestätigt: Makel dürfen zweischneidig sein, Nachteil mit verstecktem Vorteil
++ Vorschlag, noch nicht bestätigt: Makel geben wahlweise Eigenschaftspunkte oder EP und dürfen Eigenschaften auch unter 10 senken, für schärfere Profile
 
 ## Startwerte
 
@@ -21,10 +25,26 @@ Stand: 2026-11-18
 ## Eigenschaften
 
 + Sechs Eigenschaften: Körperlichkeit, Trinkfestigkeit, Gewandtheit, Sinnlichkeit, Klugheit, Braukunde
-+ Eigenschaften sind reine Lernwerte: Sie senken die EP-Kosten von Skills
++ Vorbild D&D (sechs Eigenschaften), Weisheit und Intelligenz geschärft zu Lebendigem (Braukunde) und Mechanischem (Klugheit)
++ Eigenschaften haben zwei Aufgaben: Sie bestimmen das Lerntempo der Skills und sind weiche Anforderungen an Gegenstände und Fähigkeiten
++ Eigenschaften speisen keine Kampfwerte direkt; Kampfwerte, Vorräte und Stoffwechsel ändern sich über Skills aus dem Bereich der Eigenschaft (z.B. ein Skill der Trinkfestigkeit hebt die Schwellen des Pegels über `abbau.pegel` und `kurvenverschiebung.lp`)
 + Jeder Skill hat eine primäre und eine sekundäre Eigenschaft (Vorbild: EVE Online)
 + Beispiel: Hohe Körperlichkeit lässt Skills, die LP erhöhen, schneller lernen
-+ Vorbild D&D (sechs Eigenschaften), Weisheit und Intelligenz geschärft zu Lebendigem (Braukunde) und Mechanischem (Klugheit)
+
+### Grundwert und Veränderung
+
++ Grundwert: Wert aus der Erstellung plus dauerhafte Änderungen, z.B. durch ein seltenes Bier oder die Gabe einer Nebengottheit (Baustein `eigenschaft_aendern`)
++ Vorübergehend ändern Ausrüstung, Zustände und Verbrauchsgüter die Eigenschaften über Modifikatoren (Vorbild Caves of Qud), z.B. ein Kraftbier für einige Zeit
++ Das Lerntempo richtet sich nur nach dem Grundwert, ohne Ausrüstung, Zustände und Verbrauchsgüter; sonst lohnte es, vor dem Verteilen freier EP ein Klugheitsbier zu trinken
++ Anforderungen rechnen mit dem vollen Wert samt vorübergehender Boni: Das Kraftbier macht den Zweihänder für eine Weile ohne Abzug nutzbar
++ Eingeschränkte Neuverteilung im Lauf (Vorbild: Remap in EVE) später; sie ändert nur das künftige Lerntempo, siehe Lernpunkte
+
+### Anforderungen
+
++ Gegenstände und Fähigkeiten können eine Anforderung nennen, z.B. Körperlichkeit 15 für einen Zweihänder
++ Weich: Unter der Anforderung bleibt alles nutzbar, mit Abzug je fehlendem Punkt; bei Gegenständen auf Werte wie Genauigkeit oder Schaden, bei Fähigkeiten über die Risikotabelle
++ Hart nur in seltenen Fällen, z.B. göttliche Gaben
++ Grund: Die Eigenschaften stehen nach der Erstellung weitgehend fest; harte Anforderungen sperrten Fundstücke dauerhaft, das verträgt sich nicht mit "der Zufall prägt den Build"
 
 ### Bereiche
 
@@ -36,8 +56,7 @@ Stand: 2026-11-18
 + Braukunde: die Weisheit dieser Welt, Brauen ist heiliges Wissen; Brauen, Alchemie, Mikroorganismen, Kreaturen verstehen, göttliche Gaben
 + Sinnlichkeit ist die schwerste Eigenschaft, Ausgleich über das Balancing
 + Vorräte und Eigenschaften: LP zu Körperlichkeit, MP zu Klugheit und Braukunde, PP zu Sinnlichkeit, Pegel zu Trinkfestigkeit, Ausdauer (Option) zu Gewandtheit oder Körperlichkeit
-+ Vorschlag, noch nicht bestätigt: Eigenschaften speisen Kampfwerte (siehe [Architektur.md](Architektur.md), Kampfwerte), z.B. Gewandtheit `ausweichen`, Sinnlichkeit oder Klugheit `willenskraft`, Trinkfestigkeit `widerstand` gegen Gift und Alkohol
-+ Vorschlag, noch nicht bestätigt: Trinkfestigkeit hebt die Schwellen des Pegels, beschleunigt seinen Abbau und verschiebt das Optimum der LP-Regeneration nach oben (über die Modifikatoren `abbau.pegel` und `kurvenverschiebung.lp`)
++ Kennerschaft (Unbekanntes erkennen) als Skill mit Sinnlichkeit und Braukunde
 + Skills, Schriftrollen und Items wirken auf Regeneration und Schwund über Modifikatoren, siehe Stoffwechsel in [Architektur.md](Architektur.md)
 
 ### Magie und Psi
@@ -54,57 +73,99 @@ Stand: 2026-11-18
 
 + Skills sind keine Fähigkeiten: Zauber, Psi und Waffen profitieren in unterschiedlicher Weise von ihnen
 + So viele Skills wie möglich, Vielfalt durch qualitativ verschiedene Skills
-+ Skill-Sets (z.B. LP) mit vier Tiers: Grund-, Experten-, Meister-Skill, göttliches Skill-Niveau
-+ Höchststufe pro Skill: 5
-+ Voraussetzungen: Experten-Skill verlangt Grundskill 3, Meister-Skill Grundskill 4, göttliches Niveau Grundskill 5
-+ Vorgelagerte Tiers: Meister-Skill zusätzlich Experte 3, göttliches Niveau zusätzlich Experte 4 und Meister 3
+
+### Aufbau
+
++ Skill-Sets (z.B. Zähigkeit für LP) mit vier Tiers: Grund-, Experten-, Meister-Skill, göttliches Skill-Niveau; jeder Tier ist ein eigener Skill mit eigener Wirkung
++ Stufen 0 bis 5 je Skill
++ Voraussetzungen innerhalb eines Sets ergeben sich aus der Regel: Experten-Skill verlangt Grundskill 3, Meister-Skill Grundskill 4 und Experte 3, göttliches Niveau Grundskill 5, Experte 4 und Meister 3
++ Darüber hinaus kann jeder Skill beliebige andere Skills voraussetzen, auch aus anderen Sets, z.B. Zweihandspezialisierung die allgemeine Waffenfertigkeit, Anstürmen die körperliche Grundfertigkeit, Schildschlag-Schaden die Schildgrundfertigkeit; alle Voraussetzungen müssen erfüllt sein (eine Oder-Gruppe ist später möglich)
++ Die Skills bilden so einen Graphen; die Datenprüfung erkennt Kreise und unbekannte Namen, das Skillfenster zeigt die Abhängigkeiten
++ Optional `freischaltung`: Ein Skill wird erst durch ein Fundstück lernbar (Braubücher, Rezepturen)
 + Keine künstliche Begrenzung göttlicher Niveaus: Das Balancing sorgt dafür, dass pro komplettem Lauf implizit nur eine gewisse Anzahl erreichbar ist
-+ Kosten steigen innerhalb eines Skills pro Stufe
-+ Gleich bleibender Ertrag pro Stufe, Boni in Prozent vom Grundwert
+
+### Kosten
+
++ Kosten einer Stufe in Lernpunkten: Stufentabelle × Rang, vorläufig 50, 100, 200, 350, 550 für die Stufen 1 bis 5 (1250 je Skill bei Rang 1)
++ Rang nach Tier: Grund 1, Experte 2, Meister 4, göttlich 8; einzelne Skills dürfen abweichen; ein komplettes Set kostet so rund 19 000 Lernpunkte
++ EP werden beim Eingang in Lernpunkte umgerechnet: Lernpunkte = EP × (2 × primär + sekundär) / 40, mit den Grundwerten der Eigenschaften in diesem Moment; Bruchteile bleiben stehen wie im Zeitmodell
++ Bezug ist die durchschnittliche Ninkasi (Summe 80, im Schnitt 13,3): Sie lernt zum Normalpreis; 10 und 10 lernt 25 % langsamer (Preis 133 %), 20 und 20 um die Hälfte schneller (Preis 67 %), die Spreizung zwischen bestem und schlechtestem Fall ist also etwa 2
++ Weil die Schwellen in Lernpunkten fest stehen, wirkt eine Änderung der Eigenschaften nur auf das, was danach gelernt wird: Stufen gehen nie verloren, auch nicht durch Flüche oder eine Neuverteilung
++ Die Oberfläche zeigt die Kosten in EP ("noch 120 EP bis Stufe 3"), nicht die Formel
+
+### Anfangsbalance
+
++ Ziel festlegen: was eine ausgewogene Ninkasi am Ende eines Laufs erreicht haben soll, z.B. zwei Sets bis Meister und ein göttliches Niveau
++ EP-Budget messen: Der Bot zählt die EP je Ebene aus Erkundung und Bewältigtem
++ Die Stufentabelle danach ausrichten, dass Budget und Ziel zusammenpassen
++ Die Spreizung der Eigenschaften (etwa 2) bleibt dabei fest
++ Alle Stellschrauben sind Regelwerte in `regeln.lernen`: Startwert, Punkte, Höchstwert, Bezugswert, Stufentabelle, Ränge, Startguthaben, Topf der Abstammungslinie
+
+### Wirkung
+
++ Gleich bleibender Ertrag pro Stufe, Boni in Prozent vom Grundwert; innerhalb eines Skills addieren sich die Stufen (fünfmal 5 % sind 25 %)
++ Zwischen verschiedenen Skills multiplizieren sich die Prozente (Vorbild EVE Online): Jeder Skill liefert für seine Prozente einen einzigen `mal`-Modifikator, z.B. `mal 125` auf Stufe 5; feste Beträge (`plus`) bleiben Summen
++ Umstellbar über den Regelwert `regeln.lernen.verrechnung` (`multiplizieren` als Vorgabe, `addieren`), die Daten bleiben gleich; ein später Wechsel verlangt, die bis dahin balancierten Zahlen neu einzustellen
++ Bei Abzügen ist das Multiplizieren milder (zweimal −25 % Zeit ergibt ×0,56), exponentiell wachsen nur steigende Werte wie Schaden und Vorräte; Kampfwerte bleiben über ihren Halbwert unter 100 %
++ Ausrüstung und Zustände addieren sich weiter, `mal` nur, wo ihre Daten es ausdrücklich sagen
++ Tag-System: Fähigkeiten, Angriffe und Effekte tragen Tags, Skills wirken über Modifikatoren mit `tag` auch auf künftige Fähigkeiten, siehe Modifikatoren in [Architektur.md](Architektur.md)
++ Höhere Tiers und Stufen verändern Fähigkeiten qualitativ (z.B. Psi-Teleport nimmt ab Meister ein Ziel mit); die Fähigkeit nennt das selbst in ihrem Ausbau mit der Bedingung Skillstufe
++ Skills können auch Auslöser tragen (z.B. "bei Hinterhalt Blutung")
++ Vorläufige Idee: Nachtsicht (Sehen bei weniger Licht) und Fernsicht (größere Sichtweite) als Skills; Licht und Wahrnehmung siehe [Architektur.md](Architektur.md)
+
+### Fähigkeiten
+
 + Skills geben keine Fähigkeiten direkt: Sie sind Voraussetzung für Fähigkeiten, die Fähigkeit selbst kommt aus dem Dungeon
 + Quellen für Fähigkeiten (auch Psi und Magie): Schriftrollen, HACCP-Aushänge, Loot, Rezepte, Altäre (Braukessel), Händler (wandernd im Dungeon oder im Hub), Nebengottheiten
 + Der Zufall prägt den Build
++ Fundstück ohne passenden Skill: nutzbar, aber mit hohem Fehlschlagrisiko über eine Risikotabelle nach dem fehlenden Skill (Vorbild DCSS)
 + Vorschlag, noch nicht bestätigt: Ausnahmen nur für körpereigene Fähigkeiten ohne mögliches Fundstück (Kopfstoß, Bierfontäne, Rülpser)
-+ Höhere Tiers verändern Fähigkeiten qualitativ (z.B. Psi-Teleport nimmt ein Ziel mit)
-+ Vorschlag, noch nicht bestätigt: Tag-System, Fähigkeiten tragen Tags, Skills wirken auf Tags; technisch seit 0.9.0 möglich über `tag` am Modifikator, siehe Modifikatoren in [Architektur.md](Architektur.md)
-+ Vorschlag, noch nicht bestätigt: Boni innerhalb eines Skill-Sets addieren, zwischen Quellen multiplizieren (Vorbild EVE Online: die Stufen eines Skills addieren sich, verschiedene Skills multiplizieren); technisch: `prozent` addiert sich immer, ein Skill liefert für das Multiplizieren einen einzigen `mal`-Modifikator (z.B. `mal 125` auf Stufe 5), siehe Modifikatoren in [Architektur.md](Architektur.md)
-+ Vorschlag, noch nicht bestätigt: Querlernen auf verwandte Skills (Vorbild: Dungeon Crawl Stone Soup)
-+ Vorschlag, noch nicht bestätigt: fortgeschrittene Skills über Fundstücke freischalten (Braubücher, Rezepturen)
-+ Vorläufige Idee: Nachtsicht (Sehen bei weniger Licht) und Fernsicht (größere Sichtweite) als Skills; Licht und Wahrnehmung siehe [Architektur.md](Architektur.md)
 
 ## Erfahrungspunkte (EP)
 
+### Freie EP
+
 + Freie EP aus Erkundung und Rätseln, die Spielerin verteilt sie selbst
-+ Freie EP lassen sich sparen, etwa bis entscheidende Fundstücke auftauchen
-+ Gebundene EP aus Anwenden und Besiegen, sie fließen direkt in die beteiligten Skills
 + Erkundung: 1 EP pro Feld, das zum ersten Mal wirklich gesehen wird
 + Magisch kartierte Felder gelten als bekannt, bringen EP aber erst beim wirklichen Sehen
-+ Anwenden bringt nur EP bei Wirkung (Treffer, Schaden, Effekt am echten Ziel)
 + Jedes Rätsel bringt seine EP nur einmal
++ Freie EP lassen sich sparen, etwa bis entscheidende Fundstücke auftauchen
++ Freie EP lassen sich jederzeit verteilen, das Lernen kostet keine Spielzeit; Orte, an die das Verteilen gebunden ist (Altar, Hub), kommen vielleicht später, ein Schalter in den Regeln hält das offen
+
+### Gebundene EP
+
++ Gebundene EP gibt nur Bewältigtes, das es je Ebene endlich oft gibt: besiegte Gegner, entschärfte Fallen, geöffnete Schlösser, ein Rezept beim ersten Gelingen, ein Hinterhalt; jedes davon trägt in den Daten einen festen Wert `ep`
++ Die Anwendung selbst bringt keine EP, sie bestimmt, wohin die EP fließen; so bleibt die Menge je Ebene begrenzt und Farmen an harmlosen Zielen bringt nichts
++ Jedes Wesen führt ein Beitragsbuch: welche Lernanlässe Ninkasi an ihm hatte (Wirkung mit den Tags von Angriff, Fähigkeit und Effekt, dazu Ausweichen, Blocken, Rüstung und erlittener Schaden für passive Skills)
++ Gewichtung vorerst nach der ersten erfolgreichen Anwendung: Jeder Lernanlass zählt je Gegner einmal; als Regelwert `regeln.lernen.gewichtung` (`erste`, später zum Vergleich `anteil` nach Schadensanteil)
++ Beim Tod des Gegners teilen sich seine EP auf die Skills auf, deren Lernanlässe im Buch stehen; passen mehrere Skills zum selben Anlass, wird gleich geteilt
++ Stirbt der Gegner durch eine Falle oder eine Verbündete, zählt das Buch trotzdem, sobald Ninkasi beigetragen hat
++ Was kein Skill aufnehmen kann (gesperrt, noch nicht freigeschaltet, auf Stufe 5), wird zu freien EP; verloren geht nichts
++ Querlernen auf verwandte Skills (Vorbild: Dungeon Crawl Stone Soup): ein Skill nennt verwandte Skills und den Anteil, der ihnen zusätzlich zufließt
++ Skills ohne Bezug zu Gegnern lernen über ihre eigenen bewältigbaren Anlässe (Brauen über das erste Gelingen eines Rezepts) oder nur über freie EP
++ Ein Skill hat einen einzigen Zähler in Lernpunkten, gebundene und verteilte freie EP fließen hinein, die Stufe ergibt sich aus den Schwellen
+
+### Begrenzung
+
 + Warten und Regenerieren bringen keine EP
 + Der Pegel beeinflusst das Lernen nicht
 + EP pro Ebene weitgehend begrenzt, Ausnahme: Gegner, die durch Psi erscheinen, bringen EP
-+ Teilende Mikroorganismen: Tochterzellen derselben Mutterzelle bringen stark abfallende EP, entweder als Gefälle nach Generation oder als gemeinsamer Topf pro Abstammungslinie (beide gleichwertig)
++ Keine verminderten EP für schwache oder wiederholte Gegner: Weil nur Bewältigtes EP bringt, ist Farmen ohnehin eingeschränkt; jeder Gegner bringt seinen festen Wert
++ Teilende Mikroorganismen: Die Mutterzelle eröffnet einen gemeinsamen Topf für ihre ganze Abstammungslinie (vorläufig dreimal ihre EP); jede getötete Zelle bringt ihre EP, höchstens was noch im Topf ist; ist er leer, lohnt das Farmen des Essigbakterien-Pools nicht mehr
 + Nachrückende Gegner nicht ausgeschlossen, als eigenes, per Parameter einstellbares System (Rate, Obergrenze, EP-Faktor)
-+ Schwache Gegner bringen verminderte EP, Mechanismus noch offen
 + Vorschlag, noch nicht bestätigt: Varianten durch Affixe vervielfachen die Gegnertypen
 
 ## Offen
 
 + Ausnahmen von der Regel "keine Fähigkeiten direkt durch Skills"
-+ Übersicht der Skills in der Oberfläche (Filter, Suche, Gruppierung nach Skill-Set)
++ Übersicht der Skills in der Oberfläche (Filter, Suche, Gruppierung nach Skill-Set, Abhängigkeiten als Graph)
 + Ob Fähigkeitsquellen verbraucht werden oder dauerhaft lehren, flexibel pro Quelle regelbar, später entscheiden
-+ Fundstück ohne passenden Skill: nur mittragen, bis der Skill reicht, oder vorzeitig nutzbar mit hohem Fehlschlagrisiko
 + Währung bei Händlern (Gold, Alkohol, Tausch)
-+ Mutterzelle: Gefälle nach Generation oder gemeinsamer Topf
 + Nachrückende Gegner: ob, wie oft, mit welchem EP-Faktor
-+ Mechanismus für verminderte EP: Abstand Gegnerstufe zu Skillstufe oder Sättigung pro Gegnertyp
-+ Wo freie EP verteilt werden (sofort oder an bestimmten Orten), zunächst per Schalter
-+ Zuordnung aller Skills zu primärer und sekundärer Eigenschaft, später als eigener Skillkatalog
++ Skillkatalog: alle Skills mit Set, Tier, Rang, primärer und sekundärer Eigenschaft, Wirkung, Lernanlässen und Abhängigkeiten, als eigene Sitzung
++ Höhe des Abzugs je fehlendem Punkt einer Anforderung
++ Ob gebundene EP für Tötungen durch Beschworene in den Skill der Beschwörung fließen
 + Katalog der Makel und ihr Punktwert
-+ Ob passive Skills auch gebundene EP bekommen
-+ Verteilung gebundener EP, wenn mehrere Skills beteiligt sind
-+ Startskills bei der Charaktererstellung
-+ Neuverteilung der Eigenschaften im Lauf (Vorbild: Remap in EVE)
++ Eingeschränkte Neuverteilung der Eigenschaften im Lauf
 + Affixe im Detail
 + Bestiarium und Glossar (Bierbrauen, Mikroorganismen), Tonfall enzyklopädisch-ernsthaft-informativ, eigene Sitzung

@@ -10,7 +10,7 @@ Arbeitsliste der Strukturen, die Logik und Datenmodell noch brauchen, damit Fern
 + Ist ein Punkt umgesetzt, wandert seine Beschreibung nach [Architektur.md](Architektur.md) (bzw. [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md)) und wird hier gestrichen; bleibt nur ein Rest offen, steht hier nur der Rest
 + Status je Punkt: offen, in Arbeit, umgesetzt in Version X
 + Die Reihenfolge ist eine Empfehlung: 1 bis 4 sind Kernarchitektur, danach sind die meisten Systeme Daten plus wenige neue Bausteine
-+ Nächste Schwerpunkte (Stand 2026-11-20): Skillsystem als Spieldesign in [Charakter.md](Charakter.md), bevor Details der Reste angegangen werden (davon hängen die Modifikatorquelle `skills`, Kennerschaft, Nachtsicht und die Zuordnung der Eigenschaften ab); danach Zustände im Spielinhalt (Punkt 3), dann Licht (Punkt 7), vor Inhalt und Balancing, weil es Heimlichkeit und Gefahr verschiebt; das Brausystem in einer eigenen Sitzung; Darstellung (Punkt 12) ist zurückgestellt
++ Nächste Schwerpunkte (Stand 2026-11-20): Skillsystem (Punkt 13, Spieldesign seit 2026-11-20 in [Charakter.md](Charakter.md)), bevor Details der Reste angegangen werden (davon hängen die Modifikatorquelle `skills`, Kennerschaft und Nachtsicht ab); danach Zustände im Spielinhalt (Punkt 3), dann Licht (Punkt 7), vor Inhalt und Balancing, weil es Heimlichkeit und Gefahr verschiebt; das Brausystem in einer eigenen Sitzung; Darstellung (Punkt 12) ist zurückgestellt
 + Licht lässt sich nachreichen: ohne Angabe gilt jedes Feld als hell, das Spiel verhält sich dann wie bisher
 
 ## Bekannte Fehler
@@ -25,7 +25,7 @@ Status: umgesetzt in Version 0.4.0, beschrieben in [Architektur.md](Architektur.
 Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 + Ersatzwirkungen aus Daten (z.B. "Phönixbier verhindert einmal den Tod", "Schild fängt einen Treffer ab"): eigener Typ, der sofort am Haken "davor" wirkt und sich verbrauchen kann; mit den Zuständen (Punkt 3)
-+ Auslöser auch an Skills (mit dem Skillsystem) und am Inventar der Trägerin, das nicht angelegt ist (die Ausrüstung ist seit 0.21.0 Teil der Kaskade)
++ Auslöser auch an Skills (mit dem Skillsystem, Punkt 13) und am Inventar der Trägerin, das nicht angelegt ist (die Ausrüstung ist seit 0.21.0 Teil der Kaskade)
 + Die reservierten Haken des Katalogs in Betrieb nehmen: `zug_beginn` (Punkt 3, sobald etwas ihn braucht); `betritt_feld` und `verlaesst_feld` sind seit 0.16.0 in Betrieb, `zug_ende` seit 0.18.0, `gegenstand_benutzt` seit 0.21.0
 + Index im `zwischenspeicher`, welche Entitäten Auslöser für einen Haken tragen (Vorbild "WantEvent" in Caves of Qud); erst nötig, wenn mehr als die Beteiligten gefragt werden
 + Erster Auslöser im Spielinhalt (z.B. Säurespritzer des Essigbakteriums beim Tod): Spieldesign, noch nicht entschieden
@@ -48,7 +48,7 @@ Entschieden: Takt ist die Weltuhr; Stapelregel je Zustand, Vorgabe `erneuern`; V
 Offener Rest:
 
 + Torkeln aus dem Pegel: eine Schwelle des Stoffwechsels setzt einen Zustand (Spieldesign in [Grundlagen.md](Grundlagen.md))
-+ Ob gebundene EP für Tötungen durch Beschworene in den Skill der Beschwörung fließen: Spieldesign in [Charakter.md](Charakter.md)
++ Ob gebundene EP für Tötungen durch Beschworene in den Skill der Beschwörung fließen: Spieldesign in [Charakter.md](Charakter.md), mit dem Beitragsbuch (Punkt 13)
 
 ## 4. Modifikatoren
 
@@ -58,7 +58,7 @@ Entschieden: Verrechnung nach dem Vorbild "increased" und "more" (Prozente addie
 
 Offener Rest, wird mit den genannten Punkten umgesetzt:
 
-+ Modifikatorquelle `skills` (mit dem Skillsystem in [Charakter.md](Charakter.md)); `ausruestung` seit 0.21.0
++ Modifikatorquelle `skills` (Punkt 13); `ausruestung` seit 0.21.0
 + Tags in weiteren Abfragen: Schadensarten und Widerstände seit 0.10.0, Verbrauch, Zeit und Abklingzeit der Fähigkeiten seit 0.12.0
 
 ## 5. Kampfwerte
@@ -71,7 +71,7 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 + Ersatzwirkungen (Rest aus Punkt 1) achten den Marker `unblockbar`
 + Anzeige: schwebende Krit-Zahlen (Punkt 12); Trefferchance im Zielmodus seit 0.24.0, beim Untersuchen seit 0.25.0
-+ Zuordnung der Eigenschaften zu Kampfwerten (Gewandtheit zu Ausweichen, Trinkfestigkeit zu Widerstand gegen Gift): Skillsystem in [Charakter.md](Charakter.md)
++ Kampfwerte aus Skills (z.B. Ausweichen aus einem Skill der Gewandtheit, Widerstand gegen Gift aus einem der Trinkfestigkeit); Eigenschaften speisen Kampfwerte nicht direkt (entschieden 2026-11-20, [Charakter.md](Charakter.md)), die Zuordnung steht im Skillkatalog
 
 ## 6. Fähigkeiten und lange Aktionen
 
@@ -130,7 +130,7 @@ Offener Rest:
 + Angefressene Waffen: wie sie schwächer werden (z.B. weniger Schaden), braucht einen Eingriff in die Schadensrechnung; bisher nagt die Säure nur an Rüstung, Waffen haben keine Haltbarkeit
 + Reparieren (z.B. im Hub) und Verwertung der Reste (Lederfetzen, Kupferschrott) als Material
 + Flüche und unbekannte Gegenstände im Spielinhalt: die Biersorten nutzen die Gruppe `biere` (Spieldesign in [Grundlagen.md](Grundlagen.md)), ein Gegenstand mit `fluch_aufheben` (Weihwasser, Segen einer Nebengottheit)
-+ Kennerschaft aus Sinnlichkeit und Braukunde (Skillsystem in [Charakter.md](Charakter.md))
++ Kennerschaft als Skill mit Sinnlichkeit und Braukunde (Punkt 13, Skillkatalog)
 + Verderben weiterer Dinge (Zutaten, Leichen) und ob das Bierfass verdirbt; die Anzeige der Restzeit (z.B. "frisch", "bald sauer")
 + Waffen mit Muster (Rundumschlag, Speer) im Spielinhalt
 + Mehrzahlwörter in der Grammatik (z.B. Holzpantinen), bisher nur Einzahl
@@ -180,3 +180,26 @@ Entschieden: Animationen halten die Eingabe auf, bis alle Meldungen seit Ninkasi
 + Varianten und Schmuck für Boden und Wand, Vorderseite der Wand
 + Bewegte Tiles
 + Weiches Scrollen der Kamera (siehe Kamera in [Architektur.md](Architektur.md))
+
+## 13. Skillsystem
+
+Status: Spieldesign entschieden am 2026-11-20 in [Charakter.md](Charakter.md) (Eigenschaften, Skills, EP), Umsetzung offen; vorgesehen sind 0.26.0 für die Mechanik und 0.27.0 für das Skillfenster, der Skillkatalog folgt in einer eigenen Sitzung, bis dahin nur Testeinträge
+
+Entschieden: Skill-Sets mit vier Tiers und Stufen 0 bis 5, dazu beliebige Abhängigkeiten zwischen Skills; Eigenschaften starten bei 10 plus 20 Punkte, höchstens 20; Eigenschaften bestimmen das Lerntempo (nur der Grundwert) und sind weiche Anforderungen (voller Wert, Abzug je fehlendem Punkt), sie speisen keine Kampfwerte; Grundwert änderbar über einen Baustein, vorübergehend über Modifikatoren; EP werden beim Eingang in Lernpunkte umgerechnet, Stufen gehen nie verloren; gebundene EP nur aus Bewältigtem mit festem `ep`, verteilt nach dem Beitragsbuch, je Lernanlass und Gegner zählt die erste erfolgreiche Anwendung; was kein Skill aufnimmt, wird zu freien EP; keine verminderten EP, Tochterzellen teilen einen Topf je Abstammungslinie; freie EP jederzeit verteilbar, ohne Spielzeit; Startguthaben statt Startskills; zwischen Skills multiplizieren, umstellbar per Regelwert; Fundstücke ohne Skill nutzbar mit Risiko
+
+Umriss für 0.26.0 (Datenformate vorläufig, vor der Umsetzung als Plan freizugeben):
+
++ Daten `daten/skills.js`: `{ set, tier, rang?, primaer, sekundaer, voraussetzungen?: [{ skill, stufe }], freischaltung?, jeStufe?: [modifikator], abStufe?: { stufe: { modifikatoren?, ausloeser? } }, lernt?: [{ anlass, tags? }], verwandt?: [{ skill, anteil }] }`; die Abhängigkeiten der Tiers ergänzt die Regel aus `set` und `tier`; Datenprüfung auf Kreise und unbekannte Namen
++ Regelwerte `regeln.lernen`: `eigenschaftStart` 10, `eigenschaftPunkte` 20, `eigenschaftHoechstens` 20, `bezugswert` 40 (für 2 × primär + sekundär), `stufen` [50, 100, 200, 350, 550], `raengeNachTier` [1, 2, 4, 8], `startEp` 300, `verrechnung` (`multiplizieren`, `addieren`), `gewichtung` (`erste`, `anteil`), `topfFaktor` 3, `ort` (`jederzeit`)
++ Komponenten an Ninkasi: `eigenschaften` (Grundwerte), `skills: { name: { lernpunkte, rest } }`, `freieEp`; am Wesen `ep` aus den Daten, Beitragsbuch `beitraege`, Abstammung für den Topf (`topfId`)
++ Modifikatorquelle `skills` (Quelle `skill:<name>`): `jeStufe` mal Stufe, `abStufe` ab Erreichen, Verrechnung nach `regeln.lernen.verrechnung`; Auslöser der Skills in der Kaskade nach denen der Ausrüstung
++ Modifikatorziele `eigenschaft.<name>` für vorübergehende Änderungen; Baustein `eigenschaft_aendern` für den Grundwert
++ Bedingungen `skill_ab { skill, stufe }`, `eigenschaft_ab { eigenschaft, wert }`, `eigenschaft_unter { eigenschaft, wert }` (Eigenschaften mit Modifikatoren; Ausnahme von der Regel, dass Bedingungen nur Rohwerte lesen, oder als vorberechneter Wert, im Plan zu klären)
++ An Fähigkeiten `ausbau: [{ wenn, aendert }]` für qualitative Sprünge; `anforderung: { eigenschaft: wert }` an Fähigkeiten und Gegenständen mit Abzug je fehlendem Punkt
++ Lernanlässe als Register (`lernanlaesse`) an vorhandenen Haken: `wirkung` (Treffer und Effekt mit Tags, Urheberin Ninkasi), `ausgewichen`, `geblockt`, `ruestung`, `schaden_erlitten`; Bewältigen von Fallen, Schlössern und Rezepten folgt mit diesen Systemen
++ Verteilung beim Tod (Haken `tod`): EP des Wesens bzw. aus dem Topf, nach Beitragsbuch geteilt, Querlernen über `verwandt`, Überschuss in `freieEp`
++ Freie EP: Erkundung (1 je zum ersten Mal wirklich gesehenem Feld, Haken nach der Sichtberechnung), Befehl `lernen { skill, ep }` ohne Zeitkosten, Ablehnungsgründe z.B. `voraussetzung`, `nicht_freigeschaltet`, `zu_wenig_ep`, `hoechststufe`
++ Risikotabelle für Fähigkeiten ohne passenden Skill
++ Tests mit Testeinträgen in `tests/hilfen.js`, Bot mit Lernbefehlen, Messung des EP-Budgets je Ebene als Grundlage der Anfangsbalance
+
+0.27.0: Skillfenster (Sets, Tiers, Abhängigkeiten, Kosten in EP, Verteilen freier EP), Eigenschaften und freie EP in der Seitenleiste, Charaktererstellung mit Punkteverteilung
