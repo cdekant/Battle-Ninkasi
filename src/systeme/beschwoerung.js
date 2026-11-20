@@ -5,7 +5,8 @@
 //                 geht an die Beschwörerin), handeln nach einer Aktion Wartezeit und tragen den Zustand
 //                 (Quelle ist die Beschwörerin, dauer für den Zustand), z.B. mit gebundenAnQuelle und
 //                 beimEnde "verschwinden"; höchstens bis zur Obergrenze regeln.population.hoechstWesen, darüber
-//                 entsteht nichts und es kommt die Meldung "population_voll"
+//                 entsteht nichts und es kommt die Meldung "population_voll";
+//                 abstammung: true (Zellteilung) gibt dem neuen Wesen den EP-Topf der Quelle (systeme/lernen.js)
 //   verschwinden: entfernt das Ziel ohne Tod: keine Meldung "tod", kein nach_tod, keine Hinterlassenschaft;
 //                 Zustände, die an das Ziel als Quelle gebunden sind, enden; wirkt nicht auf Ninkasi
 
@@ -17,8 +18,9 @@ import { betretbarFuer } from "../welt/karte.js";
 import { wesenAufFeld } from "../welt/geometrie.js";
 import { musterFelder } from "./zielauswahl.js";
 import { zustandSetzen, quelleEntfaellt } from "./zustaende.js";
+import { topfVon } from "./lernen.js";
 
-bausteinAnmelden("beschwoeren", { wesen: "wesen", anzahl: "ganzzahl?", muster: "muster?", zustand: "zustand?", dauer: "ganzzahl?" }, (spiel, kontext, parameter) => {
+bausteinAnmelden("beschwoeren", { wesen: "wesen", anzahl: "ganzzahl?", muster: "muster?", zustand: "zustand?", dauer: "ganzzahl?", abstammung: "wahrheitswert?" }, (spiel, kontext, parameter) => {
   if (!kontext.ursprung) return;
   const zustand = spiel.zustand;
   const auswahl = { ursprung: kontext.ursprung, zielpunkt: kontext.zielfeld ?? kontext.ursprung, quelleId: kontext.quelleId };
@@ -33,6 +35,8 @@ bausteinAnmelden("beschwoeren", { wesen: "wesen", anzahl: "ganzzahl?", muster: "
     const beschworen = entitaetAusDatensatz(zustand, parameter.wesen, spiel.daten.wesen[parameter.wesen], feld);
     if (kontext.urheberFraktion != null) beschworen.fraktion = kontext.urheberFraktion;
     if (kontext.urheberId != null) beschworen.beschworenVon = kontext.urheberId;
+    const mutter = parameter.abstammung ? zustand.entitaeten[kontext.quelleId] : null;
+    if (mutter) beschworen.topfId = topfVon(spiel, mutter);
     if (beschworen.ki) akteurEinreihen(zustand, beschworen.id, spiel.daten.aktionen?.warten ?? 100);
     melden(spiel, "beschworen", { wer: urheber ? bezugAuf(urheber) : null, was: bezugAuf(beschworen) });
     if (parameter.zustand) {

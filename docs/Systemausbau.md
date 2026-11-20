@@ -10,7 +10,7 @@ Arbeitsliste der Strukturen, die Logik und Datenmodell noch brauchen, damit Fern
 + Ist ein Punkt umgesetzt, wandert seine Beschreibung nach [Architektur.md](Architektur.md) (bzw. [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md)) und wird hier gestrichen; bleibt nur ein Rest offen, steht hier nur der Rest
 + Status je Punkt: offen, in Arbeit, umgesetzt in Version X
 + Die Reihenfolge ist eine Empfehlung: 1 bis 4 sind Kernarchitektur, danach sind die meisten Systeme Daten plus wenige neue Bausteine
-+ Nächste Schwerpunkte (Stand 2026-11-20): Skillsystem (Punkt 13, Spieldesign seit 2026-11-20 in [Charakter.md](Charakter.md)), bevor Details der Reste angegangen werden (davon hängen die Modifikatorquelle `skills`, Kennerschaft und Nachtsicht ab); danach Zustände im Spielinhalt (Punkt 3), dann Licht (Punkt 7), vor Inhalt und Balancing, weil es Heimlichkeit und Gefahr verschiebt; das Brausystem in einer eigenen Sitzung; Darstellung (Punkt 12) ist zurückgestellt
++ Nächste Schwerpunkte (Stand 2026-11-20): Skillsystem (Punkt 13, Mechanik seit 0.26.0, offen Skillfenster und Katalog), bevor Details der Reste angegangen werden (davon hängen Kennerschaft und Nachtsicht ab); danach Zustände im Spielinhalt (Punkt 3), dann Licht (Punkt 7), vor Inhalt und Balancing, weil es Heimlichkeit und Gefahr verschiebt; das Brausystem in einer eigenen Sitzung; Darstellung (Punkt 12) ist zurückgestellt
 + Licht lässt sich nachreichen: ohne Angabe gilt jedes Feld als hell, das Spiel verhält sich dann wie bisher
 
 ## Bekannte Fehler
@@ -183,23 +183,15 @@ Entschieden: Animationen halten die Eingabe auf, bis alle Meldungen seit Ninkasi
 
 ## 13. Skillsystem
 
-Status: Spieldesign entschieden am 2026-11-20 in [Charakter.md](Charakter.md) (Eigenschaften, Skills, EP), Umsetzung offen; vorgesehen sind 0.26.0 für die Mechanik und 0.27.0 für das Skillfenster, der Skillkatalog folgt in einer eigenen Sitzung, bis dahin nur Testeinträge
+Status: Mechanik umgesetzt in 0.26.0 (Eigenschaften, Skills, Lernpunkte, freie und gebundene EP, Beitragsbuch, Topf je Abstammungslinie, Anforderungen, Risiko ohne Skill, Ausbau), beschrieben in [Architektur.md](Architektur.md) (Skills und Lernen), Spieldesign in [Charakter.md](Charakter.md); im Spielinhalt nur vorläufige Skills (Zähigkeit, Nahkampf, Ausweichen)
 
-Entschieden: Skill-Sets mit vier Tiers und Stufen 0 bis 5, dazu beliebige Abhängigkeiten zwischen Skills; Eigenschaften starten bei 10 plus 20 Punkte, höchstens 20; Eigenschaften bestimmen das Lerntempo (nur der Grundwert) und sind weiche Anforderungen (voller Wert, Abzug je fehlendem Punkt), sie speisen keine Kampfwerte; Grundwert änderbar über einen Baustein, vorübergehend über Modifikatoren; EP werden beim Eingang in Lernpunkte umgerechnet, Stufen gehen nie verloren; gebundene EP nur aus Bewältigtem mit festem `ep`, verteilt nach dem Beitragsbuch, je Lernanlass und Gegner zählt die erste erfolgreiche Anwendung; was kein Skill aufnimmt, wird zu freien EP; keine verminderten EP, Tochterzellen teilen einen Topf je Abstammungslinie; freie EP jederzeit verteilbar, ohne Spielzeit; Startguthaben statt Startskills; zwischen Skills multiplizieren, umstellbar per Regelwert; Fundstücke ohne Skill nutzbar mit Risiko
+Offen:
 
-Umriss für 0.26.0 (Datenformate vorläufig, vor der Umsetzung als Plan freizugeben):
-
-+ Daten `daten/skills.js`: `{ set, tier, rang?, primaer, sekundaer, voraussetzungen?: [{ skill, stufe }], freischaltung?, jeStufe?: [modifikator], abStufe?: { stufe: { modifikatoren?, ausloeser? } }, lernt?: [{ anlass, tags? }], verwandt?: [{ skill, anteil }] }`; die Abhängigkeiten der Tiers ergänzt die Regel aus `set` und `tier`; Datenprüfung auf Kreise und unbekannte Namen
-+ Regelwerte `regeln.lernen`: `eigenschaftStart` 10, `eigenschaftPunkte` 20, `eigenschaftHoechstens` 20, `bezugswert` 40 (für 2 × primär + sekundär), `stufen` [50, 100, 200, 350, 550], `raengeNachTier` [1, 2, 4, 8], `startEp` 300, `verrechnung` (`multiplizieren`, `addieren`), `gewichtung` (`erste`, `anteil`), `topfFaktor` 3, `ort` (`jederzeit`)
-+ Komponenten an Ninkasi: `eigenschaften` (Grundwerte), `skills: { name: { lernpunkte, rest } }`, `freieEp`; am Wesen `ep` aus den Daten, Beitragsbuch `beitraege`, Abstammung für den Topf (`topfId`)
-+ Modifikatorquelle `skills` (Quelle `skill:<name>`): `jeStufe` mal Stufe, `abStufe` ab Erreichen, Verrechnung nach `regeln.lernen.verrechnung`; Auslöser der Skills in der Kaskade nach denen der Ausrüstung
-+ Modifikatorziele `eigenschaft.<name>` für vorübergehende Änderungen; Baustein `eigenschaft_aendern` für den Grundwert
-+ Bedingungen `skill_ab { skill, stufe }`, `eigenschaft_ab { eigenschaft, wert }`, `eigenschaft_unter { eigenschaft, wert }` (Eigenschaften mit Modifikatoren; Ausnahme von der Regel, dass Bedingungen nur Rohwerte lesen, oder als vorberechneter Wert, im Plan zu klären)
-+ An Fähigkeiten `ausbau: [{ wenn, aendert }]` für qualitative Sprünge; `anforderung: { eigenschaft: wert }` an Fähigkeiten und Gegenständen mit Abzug je fehlendem Punkt
-+ Lernanlässe als Register (`lernanlaesse`) an vorhandenen Haken: `wirkung` (Treffer und Effekt mit Tags, Urheberin Ninkasi), `ausgewichen`, `geblockt`, `ruestung`, `schaden_erlitten`; Bewältigen von Fallen, Schlössern und Rezepten folgt mit diesen Systemen
-+ Verteilung beim Tod (Haken `tod`): EP des Wesens bzw. aus dem Topf, nach Beitragsbuch geteilt, Querlernen über `verwandt`, Überschuss in `freieEp`
-+ Freie EP: Erkundung (1 je zum ersten Mal wirklich gesehenem Feld, Haken nach der Sichtberechnung), Befehl `lernen { skill, ep }` ohne Zeitkosten, Ablehnungsgründe z.B. `voraussetzung`, `nicht_freigeschaltet`, `zu_wenig_ep`, `hoechststufe`
-+ Risikotabelle für Fähigkeiten ohne passenden Skill
-+ Tests mit Testeinträgen in `tests/hilfen.js`, Bot mit Lernbefehlen, Messung des EP-Budgets je Ebene als Grundlage der Anfangsbalance
-
-0.27.0: Skillfenster (Sets, Tiers, Abhängigkeiten, Kosten in EP, Verteilen freier EP), Eigenschaften und freie EP in der Seitenleiste, Charaktererstellung mit Punkteverteilung
++ 0.27.0: Skillfenster (Sets, Tiers, Abhängigkeiten, Kosten in EP, Verteilen freier EP), Eigenschaften und freie EP in der Seitenleiste, Charaktererstellung mit Punkteverteilung (die Logik nimmt die Verteilung schon als Startoption)
++ Skillkatalog als eigene Sitzung, danach Kennerschaft, Nachtsicht und Fernsicht als Skills
++ Anfangsbalance: Der Bot misst je Lauf von 3000 Befehlen rund 1200 EP aus Erkundung und nur rund 55 aus Gegnern (Tiefe 1, vorläufige Zahlen); das Verhältnis von `epJeFeld` zu den `ep` der Gegner ist vor dem Katalog festzulegen
++ Gewichtung `anteil` (nach Schadensanteil) zum Vergleich mit `erste`
++ Ortsbindung des Verteilens (`regeln.lernen.ort`), falls gewünscht
++ Lernanlässe für das Bewältigen von Fallen, Schlössern und Rezepten, mit diesen Systemen
++ Abzug einer Anforderung nur für den Angriff mit genau dieser Waffe (über Tags der Profile); bisher gilt er für die Trägerin insgesamt
++ Magisch kartierte Felder: eigener Wert in `erkundet`, EP erst beim Sehen

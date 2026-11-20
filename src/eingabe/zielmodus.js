@@ -11,7 +11,7 @@ import { spielerin, entitaetMitId, entitaetenAuf, istWesen } from "../kern/zusta
 import { aufDerKarte } from "../welt/karte.js";
 import { istSichtbar } from "../systeme/sicht.js";
 import { beziehungZwischen, urheberVon } from "../systeme/fraktionen.js";
-import { faehigkeitVon, faehigkeitPruefen } from "../systeme/faehigkeiten.js";
+import { faehigkeitFuer, faehigkeitPruefen } from "../systeme/faehigkeiten.js";
 import { zielvorschau } from "../systeme/vorschau.js";
 
 export const TASTEN_BESTAETIGEN = ["Enter", "NumpadEnter"];
@@ -48,7 +48,7 @@ export function zielmodusBeginnen(spiel, auswahl) {
     if (!gegenstand) return { grund: "nichts_zu_werfen" };
     zielart = { art: "geschoss", reichweite: gegenstand.wurf?.reichweite ?? spiel.daten.regeln.werfen.reichweite };
   } else {
-    const definition = faehigkeitVon(spiel, auswahl.faehigkeit);
+    const definition = faehigkeitFuer(spiel, ninkasi, auswahl.faehigkeit);
     const befehl = { art: "faehigkeit", faehigkeit: auswahl.faehigkeit };
     if (!definition?.ziel || definition.ziel.art === "selbst" || definition.art === "aufrecht") return { befehl };
     const grund = faehigkeitPruefen(spiel, ninkasi, auswahl.faehigkeit, undefined);

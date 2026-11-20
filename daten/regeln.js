@@ -74,4 +74,22 @@ export default {
     kritfaktor: 150, // in Prozent, x1,5; Modifikatoren auf "kritfaktor" heben ihn nach oben offen
     mindestschadenNachRuestung: 1, // Rüstung senkt einen Treffer mit Schaden nicht unter diesen Wert
   },
+  // Eigenschaften, Skills und EP, siehe docs/Charakter.md, src/systeme/skills.js und src/systeme/lernen.js; alle Zahlen vorläufig
+  lernen: {
+    eigenschaftStart: 10, // jede Eigenschaft beginnt hier
+    eigenschaftPunkte: 20, // so viele Punkte verteilt die Spielerin bei der Erstellung
+    eigenschaftHoechstens: 20, // Höchstwert bei der Erstellung; dauerhafte Gaben dürfen darüber heben
+    bezugswert: 40, // Lernpunkte = EP x (2 x primär + sekundär) / bezugswert
+    stufen: [50, 100, 200, 350, 550], // Kosten der Stufen 1 bis 5 in Lernpunkten bei Rang 1
+    raengeNachTier: [1, 2, 4, 8], // Grund, Experte, Meister, göttlich
+    tierVoraussetzungen: [[], [3], [4, 3], [5, 4, 3]], // je Tier die nötigen Stufen der Tiers darunter im selben Set
+    startEp: 300, // Startguthaben freier EP statt Startskills
+    epJeFeld: 1, // freie EP je Feld, das zum ersten Mal gesehen wird
+    verrechnung: "multiplizieren", // Prozente verschiedener Skills: "multiplizieren" (ein mal je Eintrag) oder "addieren"
+    gewichtung: "erste", // Beitragsbuch: jeder Lernanlass zählt je Gegner einmal ("anteil" folgt später)
+    topfFaktor: 3, // ein Topf je Abstammungslinie fasst so viele Male die EP der Mutter
+    ort: "jederzeit", // wo freie EP verteilt werden dürfen; Orte (Altar, Hub) folgen vielleicht später
+    // Abzug je fehlendem Punkt einer Anforderung an angelegter Ausrüstung (ohne eigenes abzugJePunkt)
+    anforderungAbzug: [{ ziel: "genauigkeit", art: "prozent", betrag: -5 }, { ziel: "schaden", art: "prozent", betrag: -5 }],
+  },
 };

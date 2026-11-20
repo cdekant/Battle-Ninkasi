@@ -13,6 +13,8 @@
 //   traegt_tag { tag, anzahl? }     mindestens anzahl (Vorgabe 1) angelegte Gegenstände tragen den Tag (Sets)
 //   hat_zustand { zustand }         die Entität trägt den Zustand
 //   ohne_zustand { zustand }        die Entität trägt den Zustand nicht, z.B. damit eine Bossphase nur einmal beginnt
+// Bedingungen des Skillsystems (skill_ab, eigenschaft_ab, eigenschaft_unter) stehen in systeme/skills.js; die
+// beiden zu Eigenschaften lesen als Ausnahme den wirksamen Wert samt Modifikatoren.
 //
 // Auren (Modifikatorquelle "auren"): an Wesen und Zuständen
 //   auren: [{ reichweite, trifft, selbst?, sichtlinie?, modifikatoren }]
@@ -31,7 +33,7 @@ import { trifftZu } from "./zielauswahl.js";
 import { staerkeProzent } from "./zustaende.js";
 import { istAhnungslos } from "./wahrnehmung.js";
 
-function bedingungAnmelden(name, parameterBeschreibung, funktion) {
+export function bedingungAnmelden(name, parameterBeschreibung, funktion) {
   funktion.parameter = parameterBeschreibung;
   anmelden("modifikatorbedingungen", name, funktion);
 }

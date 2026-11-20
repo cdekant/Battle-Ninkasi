@@ -130,6 +130,20 @@ export class Log {
       }
       case "beschworen":
         return this.zeile(text(meldung.wer ? "log.beschworen" : "log.erschienen", meldung));
+      // Skillsystem (systeme/skills.js, systeme/lernen.js): nur, was Ninkasi selbst lernt
+      case "skillstufe":
+      case "gelernt":
+      case "skill_freigeschaltet":
+        if (meldung.wer.id === this.spielerinId) this.zeile(text(`log.${meldung.art}`, { ...meldung, skill: hatSchluessel(meldung.text) ? text(meldung.text) : meldung.skill }), "gut");
+        return;
+      case "ep_erhalten":
+        if (meldung.ep > 0) this.zeile(text("log.ep_erhalten", meldung), "leise");
+        return;
+      case "eigenschaft_geaendert": {
+        if (meldung.wer.id !== this.spielerinId) return;
+        const eigenschaft = text(this.spiel.daten.eigenschaften?.[meldung.eigenschaft]?.text ?? meldung.eigenschaft);
+        return this.zeile(text("log.eigenschaft_geaendert", { eigenschaft, menge: (meldung.menge > 0 ? "+" : "") + meldung.menge }), meldung.menge > 0 ? "gut" : "schlimm");
+      }
       default: {
         const schluessel = `log.${meldung.art}`;
         if (hatSchluessel(schluessel)) this.zeile(text(schluessel, meldung));

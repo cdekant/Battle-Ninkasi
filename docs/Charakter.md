@@ -2,7 +2,7 @@
 
 Stand: 2026-11-20
 
-Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaft, Skillpunkte unabhängig vom späteren Lerntempo), DCSS (EP fließen in die benutzten Skills, Kosten anzeigen statt Formel), Caves of Qud (Eigenschaften dauerhaft und vorübergehend veränderbar), Tales of Maj'Eyal und Path of Exile (Skills wirken über Tags auch auf künftige Fähigkeiten). Die technische Umsetzung ist Punkt 13 in [Systemausbau.md](Systemausbau.md).
+Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaft, Skillpunkte unabhängig vom späteren Lerntempo), DCSS (EP fließen in die benutzten Skills, Kosten anzeigen statt Formel), Caves of Qud (Eigenschaften dauerhaft und vorübergehend veränderbar), Tales of Maj'Eyal und Path of Exile (Skills wirken über Tags auch auf künftige Fähigkeiten). Die Mechanik ist seit 0.26.0 umgesetzt, mit den hier genannten vorläufigen Zahlen, beschrieben in [Architektur.md](Architektur.md) (Skills und Lernen); offen sind Skillfenster, Charaktererstellung und Skillkatalog (Punkt 13 in [Systemausbau.md](Systemausbau.md)).
 
 ## Charaktererstellung
 
@@ -96,7 +96,7 @@ Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaf
 ### Anfangsbalance
 
 + Ziel festlegen: was eine ausgewogene Ninkasi am Ende eines Laufs erreicht haben soll, z.B. zwei Sets bis Meister und ein göttliches Niveau
-+ EP-Budget messen: Der Bot zählt die EP je Ebene aus Erkundung und Bewältigtem
++ EP-Budget messen: Der Bot zählt die EP je Ebene aus Erkundung und Bewältigtem; erste Messung mit 0.26.0 (zufällige Befehle, vorläufige Zahlen): rund 1200 EP aus Erkundung gegen rund 55 aus Gegnern in Tiefe 1, das Verhältnis ist noch festzulegen
 + Die Stufentabelle danach ausrichten, dass Budget und Ziel zusammenpassen
 + Die Spreizung der Eigenschaften (etwa 2) bleibt dabei fest
 + Alle Stellschrauben sind Regelwerte in `regeln.lernen`: Startwert, Punkte, Höchstwert, Bezugswert, Stufentabelle, Ränge, Startguthaben, Topf der Abstammungslinie
@@ -140,6 +140,8 @@ Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaf
 + Gewichtung vorerst nach der ersten erfolgreichen Anwendung: Jeder Lernanlass zählt je Gegner einmal; als Regelwert `regeln.lernen.gewichtung` (`erste`, später zum Vergleich `anteil` nach Schadensanteil)
 + Beim Tod des Gegners teilen sich seine EP auf die Skills auf, deren Lernanlässe im Buch stehen; passen mehrere Skills zum selben Anlass, wird gleich geteilt
 + Stirbt der Gegner durch eine Falle oder eine Verbündete, zählt das Buch trotzdem, sobald Ninkasi beigetragen hat
++ Beschworene Ninkasis lernen für sie: Ihre Wirkung zählt wie Ninkasis eigene, mit dem Tag `beschworen`, über den ein Skill der Beschwörung lernt
++ Die EP teilen sich zu gleichen Teilen auf die Einträge im Buch, je Eintrag zu gleichen Teilen auf die passenden Skills; so verdrängen viele passive Anlässe einen Angriff nicht und umgekehrt
 + Was kein Skill aufnehmen kann (gesperrt, noch nicht freigeschaltet, auf Stufe 5), wird zu freien EP; verloren geht nichts
 + Querlernen auf verwandte Skills (Vorbild: Dungeon Crawl Stone Soup): ein Skill nennt verwandte Skills und den Anteil, der ihnen zusätzlich zufließt
 + Skills ohne Bezug zu Gegnern lernen über ihre eigenen bewältigbaren Anlässe (Brauen über das erste Gelingen eines Rezepts) oder nur über freie EP
@@ -163,8 +165,7 @@ Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaf
 + Währung bei Händlern (Gold, Alkohol, Tausch)
 + Nachrückende Gegner: ob, wie oft, mit welchem EP-Faktor
 + Skillkatalog: alle Skills mit Set, Tier, Rang, primärer und sekundärer Eigenschaft, Wirkung, Lernanlässen und Abhängigkeiten, als eigene Sitzung
-+ Höhe des Abzugs je fehlendem Punkt einer Anforderung
-+ Ob gebundene EP für Tötungen durch Beschworene in den Skill der Beschwörung fließen
++ Höhe des Abzugs je fehlendem Punkt einer Anforderung (vorläufig je 5 % auf Genauigkeit und Schaden, für die Trägerin insgesamt)
 + Katalog der Makel und ihr Punktwert
 + Eingeschränkte Neuverteilung der Eigenschaften im Lauf
 + Affixe im Detail

@@ -24,6 +24,7 @@ import { aktionAbbrechen, laufendeAktionVorDemZug } from "../systeme/laufendeAkt
 import { wahrnehmen } from "../systeme/wahrnehmung.js";
 import { lastZuschlag } from "../systeme/inventar.js";
 import { etikettenZuordnen } from "../systeme/kennen.js";
+import { lernenEinrichten } from "../systeme/lernen.js";
 
 // Rohdaten prüfen und vorbereiten; wirft Datenfehler mit allen Meldungen.
 // sprache: { texte, nomenPruefen? } (siehe kern/daten.js)
@@ -33,9 +34,11 @@ export function datenLaden(rohdaten, sprache) {
   return daten;
 }
 
-export function neuesSpiel(daten, startwert) {
+// optionen: { eigenschaften? } aus der Charaktererstellung (geprüft in systeme/lernen.js lernenEinrichten);
+// sie gehören zum Spielstand, damit das Nachspielen dieselbe Ninkasi erzeugt
+export function neuesSpiel(daten, startwert, optionen = {}) {
   const zustand = neuerZustand(startwert >>> 0);
-  const spiel = { daten, zustand, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
+  const spiel = { daten, zustand, optionen: structuredClone(optionen), befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
   zustand.zufallszustand = zufallErzeugen(startwertAbleiten(zustand.startwert, "spiel"));
   // vor der ersten Ebene, damit schon ihre Gegenstände ihr Etikett tragen (systeme/kennen.js)
   etikettenZuordnen(spiel);
@@ -45,6 +48,7 @@ export function neuesSpiel(daten, startwert) {
   const { treppeAuf, treppeAb } = ebeneErzeugen(spiel, daten.starttiefe);
   const ninkasi = entitaetAusDatensatz(zustand, "ninkasi", daten.wesen.ninkasi, treppeAuf ?? treppeAb);
   zustand.spielerinId = ninkasi.id;
+  lernenEinrichten(spiel, ninkasi, optionen.eigenschaften);
   for (const entitaet of alleEntitaeten(zustand)) {
     if (entitaet.id === zustand.spielerinId || entitaet.ki) akteurEinreihen(zustand, entitaet.id, 0);
   }
@@ -116,6 +120,24 @@ export function befehlAusfuehren(spiel, akteur, befehl) {
   return kosten;
 }
 
+// Befehlsarten mit ohneZeit (z.B. lernen, systeme/skills.js) kosten keine Spielzeit: kein Zug, kein Zugzähler, kein
+// zug_ende, kein vor_befehl, keine Unterbrechung einer laufenden Aktion; aufgezeichnet werden sie wie alle anderen
+function befehlOhneZeit(befehl) {
+  return Boolean(befehl && typeof befehl.art === "string" && hat("befehle", befehl.art) && holen("befehle", befehl.art).ohneZeit);
+}
+
+function befehlOhneZeitGeben(spiel, ninkasi, befehl) {
+  const grund = befehlPruefen(spiel, ninkasi, befehl);
+  if (grund) {
+    melden(spiel, "abgelehnt", { grund, befehl });
+    return { ok: false, grund };
+  }
+  spiel.befehle.push(structuredClone(befehl));
+  holen("befehle", befehl.art).ausfuehren(spiel, ninkasi, befehl);
+  vorgangAbschliessen(spiel);
+  return { ok: true };
+}
+
 // Die Eingangstür: einziger Weg, wie Entscheidungen der Spielerin in die Logik gelangen.
 // Gibt { ok: true } oder { ok: false, grund } zurück; abgelehnte Befehle kosten nichts.
 // Ist Ninkasi handlungsunfähig, wird jede Eingabe angenommen, aufgezeichnet und als warten ausgeführt
@@ -125,6 +147,7 @@ export function befehlGeben(spiel, befehl) {
   if (zustand.vorbei) return { ok: false, grund: "vorbei" };
   if (!spielerinAmZug(spiel)) return { ok: false, grund: "nicht_am_zug" };
   const ninkasi = spielerin(zustand);
+  if (befehlOhneZeit(befehl)) return befehlOhneZeitGeben(spiel, ninkasi, befehl);
   if (istHandlungsunfaehig(spiel, ninkasi)) {
     spiel.befehle.push(structuredClone(befehl ?? null));
     melden(spiel, "handlungsunfaehig", { wer: bezugAuf(ninkasi) });
@@ -189,14 +212,14 @@ export function warteschlangeAbarbeiten(spiel) {
   }
 }
 
-// Spielstand = Version + Startwert + Befehlsliste; Laden heißt Nachspielen ohne Anzeige
+// Spielstand = Version + Startwert + Startoptionen + Befehlsliste; Laden heißt Nachspielen ohne Anzeige
 export function spielstand(spiel) {
-  return { version: VERSION, startwert: spiel.zustand.startwert, befehle: structuredClone(spiel.befehle) };
+  return { version: VERSION, startwert: spiel.zustand.startwert, optionen: structuredClone(spiel.optionen ?? {}), befehle: structuredClone(spiel.befehle) };
 }
 
 export function nachspielen(daten, stand) {
   if (stand.version !== VERSION) throw new Error(`Spielstand von Version ${stand.version}, dieses Spiel ist ${VERSION}`);
-  const spiel = neuesSpiel(daten, stand.startwert);
+  const spiel = neuesSpiel(daten, stand.startwert, stand.optionen ?? {});
   stand.befehle.forEach((befehl, nummer) => {
     const ergebnis = befehlGeben(spiel, befehl);
     if (!ergebnis.ok) throw new Error(`Spielstand passt nicht: Befehl ${nummer} abgelehnt (${ergebnis.grund})`);

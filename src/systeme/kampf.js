@@ -40,8 +40,9 @@ export const KAMPFWERTE = ["ausweichen", "willenskraft", "blocken", "ruestung", 
 export const VERTEIDIGUNGEN = ["ausweichen", "willenskraft"];
 export const MARKER = ["verfehlt_nie", "unblockbar", "ignoriert_ruestung"];
 
-// Ränge der Schadensrechnung am Haken vor_schaden; Handler ohne Rang (100) liegen zwischen Angreifer und Rüstung
-export const RANG_ANGREIFER = 50, RANG_RUESTUNG = 200, RANG_WIDERSTAND = 300;
+// Ränge der Schadensrechnung am Haken vor_schaden stehen in kern/hakenkatalog.js
+import { RANG_ANGREIFER, RANG_RUESTUNG, RANG_WIDERSTAND } from "../kern/hakenkatalog.js";
+export { RANG_ANGREIFER, RANG_RUESTUNG, RANG_WIDERSTAND };
 
 // Feindlich nach der Beziehung (systeme/fraktionen.js), mit Zorn
 export function feindlich(spiel, erstesWesen, zweitesWesen) {

@@ -8,6 +8,7 @@ import { sichtdurchlaessig } from "../welt/schichten.js";
 import { sichtlinieFrei } from "../welt/geometrie.js";
 import { modifiziert } from "../kern/werte.js";
 import { spielerin, entitaetenMitPosition, entitaetenImUmkreis } from "../kern/zustand.js";
+import { epFuerErkundung } from "./lernen.js";
 
 export function reichweiteSicht(spiel, entitaet) {
   return modifiziert(spiel, entitaet, "reichweiteSicht", entitaet.sicht ? entitaet.sicht.reichweite : 0);
@@ -25,7 +26,14 @@ export function sichtfeldAktualisieren(spiel) {
     if (aufDerKarte(ebene, x, y)) sichtbareFelder.add(feldIndex(ebene, x, y));
   });
   zustand.sichtbareFelder = [...sichtbareFelder].sort((indexA, indexB) => indexA - indexB);
-  for (const index of zustand.sichtbareFelder) ebene.erkundet[index] = 1;
+  // zum ersten Mal gesehene Felder bringen freie EP (systeme/lernen.js); ein später magisch kartiertes Feld
+  // bekommt einen eigenen Wert in erkundet und zählt hier dann erst beim wirklichen Sehen
+  let neuGesehen = 0;
+  for (const index of zustand.sichtbareFelder) {
+    if (ebene.erkundet[index] !== 1) neuGesehen++;
+    ebene.erkundet[index] = 1;
+  }
+  epFuerErkundung(spiel, neuGesehen);
 }
 
 // Menge zur Liste der sichtbaren Felder, neben dem Zustand gehalten; neu gebaut, wenn die Liste ersetzt wurde oder

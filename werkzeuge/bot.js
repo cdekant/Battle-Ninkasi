@@ -71,6 +71,53 @@ function invariantenPruefen(spiel) {
   const abweichungen = indexPruefen(zustand);
   if (abweichungen.length) throw new Error(`Räumlicher Index weicht ab: ${abweichungen.join("; ")}`);
   if (!warteschlangeGueltig(zustand)) throw new Error("Warteschlange ist kein gültiger Heap");
+  lernstandPruefen(spiel);
+}
+
+// Skills und EP (src/systeme/skills.js, src/systeme/lernen.js): ganzzahlig, Stufe höchstens 5, und die freien EP
+// ändern sich nur durch Erkundung (wächst), Lernbefehle und den freien Teil gebundener EP (beides aus den Meldungen)
+let epBuch = null;
+const epJeTiefe = {};
+
+function lernstandPruefen(spiel) {
+  const ninkasi = spielerin(spiel.zustand);
+  const { bezugswert, stufen, raengeNachTier } = spiel.daten.regeln.lernen;
+  if (!(Number.isInteger(ninkasi.freieEp) && ninkasi.freieEp >= 0)) throw new Error(`freie EP ungültig: ${ninkasi.freieEp}`);
+  for (const [name, { lernpunkte, rest }] of Object.entries(ninkasi.skills)) {
+    const definition = spiel.daten.skills[name];
+    const hoechst = stufen.reduce((summe, kosten) => summe + kosten, 0) * (definition.rang ?? raengeNachTier[definition.tier - 1]);
+    if (!(Number.isInteger(lernpunkte) && lernpunkte >= 0 && lernpunkte <= hoechst)) throw new Error(`${name}: Lernpunkte ${lernpunkte}`);
+    if (!(Number.isInteger(rest) && rest >= 0 && rest < bezugswert)) throw new Error(`${name}: Rest ${rest}`);
+  }
+  const erkundung = ninkasi.freieEp - epBuch.erwartet;
+  if (erkundung < 0) throw new Error(`${-erkundung} freie EP verloren`);
+  const tiefe = (epJeTiefe[spiel.zustand.tiefe] ??= { erkundung: 0, gebunden: 0, frei: 0 });
+  tiefe.erkundung += erkundung;
+  epBuch.erwartet = ninkasi.freieEp;
+}
+
+// Lernmeldungen ins Buch; eine Verteilung muss aufgehen
+function lernmeldungBuchen(spiel, meldung) {
+  if (meldung.art === "gelernt") epBuch.erwartet -= meldung.ep;
+  if (meldung.art !== "ep_erhalten") return;
+  const verteilt = meldung.skills.reduce((summe, eintrag) => summe + eintrag.ep, 0) + meldung.frei;
+  if (verteilt !== meldung.ep) throw new Error(`ep_erhalten: ${meldung.ep} EP, verteilt ${verteilt}`);
+  epBuch.erwartet += meldung.frei;
+  const tiefe = (epJeTiefe[spiel.zustand.tiefe] ??= { erkundung: 0, gebunden: 0, frei: 0 });
+  tiefe.gebunden += meldung.ep - meldung.frei;
+  tiefe.frei += meldung.frei;
+}
+
+// Eine zufällige gültige Verteilung der Eigenschaften wie bei der Erstellung
+function zufallsEigenschaften(botZufall) {
+  const { eigenschaftStart, eigenschaftPunkte, eigenschaftHoechstens } = daten.regeln.lernen;
+  const eigenschaften = Object.fromEntries(Object.keys(daten.eigenschaften).map((name) => [name, eigenschaftStart]));
+  const namen = Object.keys(eigenschaften);
+  for (let punkt = 0; punkt < eigenschaftPunkte; punkt++) {
+    const frei = namen.filter((name) => eigenschaften[name] < eigenschaftHoechstens);
+    eigenschaften[frei[zufallsGanzzahl(botZufall, 0, frei.length - 1)]]++;
+  }
+  return eigenschaften;
 }
 
 function zufallsbefehl(botZufall, spiel) {
@@ -95,6 +142,12 @@ function zufallsbefehl(botZufall, spiel) {
     return { art: "werfen", gegenstandId: ninkasi.inventar[0], ziel };
   }
   if (wurf >= 18 && wurf <= 20 && ninkasi.faehigkeiten?.length) return faehigkeitUeberZielmodus(botZufall, spiel, ninkasi);
+  if (wurf === 21 && ninkasi.freieEp > 0) {
+    // freie EP auf einen zufälligen Skill, auch gesperrte, so werden die Ablehnungen mitgeprüft
+    const namen = Object.keys(spiel.daten.skills);
+    anzahlLernbefehle++;
+    return { art: "lernen", skill: namen[zufallsGanzzahl(botZufall, 0, namen.length - 1)], ep: zufallsGanzzahl(botZufall, 1, ninkasi.freieEp) };
+  }
   return { art: "bewegen", dx: zufallsGanzzahl(botZufall, -1, 1), dy: zufallsGanzzahl(botZufall, -1, 1) };
 }
 
@@ -183,14 +236,20 @@ function untersuchen(spiel) {
 }
 
 // Würfe und Fähigkeiten Ninkasis; Meldungen, die das Log zeigt, verbirgt oder als Geräusch hört
-let anzahlWuerfe = 0, anzahlAngelegt = 0, ninkasisFaehigkeiten = 0;
+let anzahlWuerfe = 0, anzahlAngelegt = 0, ninkasisFaehigkeiten = 0, anzahlLernbefehle = 0, anzahlGelernt = 0, anzahlSkillstufen = 0;
 const meldungenFuerNinkasi = { gezeigt: 0, verborgen: 0, gehoert: 0 };
 console.log("Startwert  Befehle  Zeit     LP   MP   PP  Pegel  Getötet  Biere  Ergebnis");
 for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe; startwert++) {
   try {
-    const spiel = neuesSpiel(daten, startwert);
+    // jeder zweite Lauf mit eigener Verteilung der Eigenschaften (Startoption, gehört zum Spielstand)
+    const optionen = startwert % 2 === 0 ? { eigenschaften: zufallsEigenschaften(zufallErzeugen(startwert + 1_000_000)) } : {};
+    const spiel = neuesSpiel(daten, startwert, optionen);
+    epBuch = { erwartet: daten.regeln.lernen.startEp };
     let getoetet = 0, getrunkeneBiere = 0;
     hoererAnmelden(spiel, (meldung) => {
+      lernmeldungBuchen(spiel, meldung);
+      if (meldung.art === "gelernt") anzahlGelernt++;
+      if (meldung.art === "skillstufe") anzahlSkillstufen++;
       if (geraeuschGehoert(spiel, meldung)) meldungenFuerNinkasi.gehoert++;
       else if (meldung.art !== "laerm") meldungenFuerNinkasi[meldungWahrnehmbar(spiel, meldung) ? "gezeigt" : "verborgen"]++;
       if (meldung.art === "tod" && meldung.opfer.id !== spiel.zustand.spielerinId) getoetet++;
@@ -234,5 +293,11 @@ const haltegruende = Object.entries(reisenNachHaltegrund).map(([grund, anzahl]) 
 console.log(`\nAbläufe nach Haltegrund: ${haltegruende}`);
 console.log(`Fähigkeiten der Gegner: ${gegnerfaehigkeiten.gewirkt} gewirkt, ${gegnerfaehigkeiten.begonnen} lange Aktionen begonnen, ${gegnerfaehigkeiten.abgebrochen} abgebrochen; ${anzahlAngelegt} Mal angelegt, ${anzahlWuerfe} Würfe Ninkasis, ${ninkasisFaehigkeiten} Fähigkeiten Ninkasis`);
 console.log(`Meldungen für Ninkasi: ${meldungenFuerNinkasi.gezeigt} gezeigt, ${meldungenFuerNinkasi.verborgen} verborgen, ${meldungenFuerNinkasi.gehoert} gehört`);
+console.log(`Lernen: ${anzahlLernbefehle} Lernbefehle, ${anzahlGelernt} angenommen, ${anzahlSkillstufen} Skillstufen erreicht`);
+// Grundlage der Anfangsbalance: was eine Tiefe an EP hergibt, gemittelt über die Läufe (Zahlen der Daten vorläufig)
+const budget = Object.entries(epJeTiefe).sort(([links], [rechts]) => links - rechts)
+  .map(([tiefe, { erkundung, gebunden, frei }]) => `Tiefe ${tiefe}: Erkundung ${Math.round(erkundung / anzahlLaeufe)}, gebunden ${Math.round(gebunden / anzahlLaeufe)}, frei aus Beute ${Math.round(frei / anzahlLaeufe)}`)
+  .join("; ");
+console.log(`EP je Lauf: ${budget}`);
 console.log(`${anzahlLaeufe} Läufe, ${anzahlTode} tot, ${anzahlFehler} Fehler`);
 process.exitCode = anzahlFehler ? 1 : 0;

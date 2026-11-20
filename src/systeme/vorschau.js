@@ -11,7 +11,7 @@ import { trefferanteil, anteilInProzent, angriffeVon } from "./kampf.js";
 import { istAhnungslos } from "./wahrnehmung.js";
 import { istSichtbar } from "./sicht.js";
 import { zielAufloesen } from "./zielauswahl.js";
-import { faehigkeitVon, faehigkeitPruefen, wirkungsziele } from "./faehigkeiten.js";
+import { faehigkeitFuer, faehigkeitPruefen, wirkungsziele } from "./faehigkeiten.js";
 import { wurfbahn } from "./werfen.js";
 
 const ohneDoppelte = (liste) => [...new Set(liste)];
@@ -76,7 +76,7 @@ function wurfVorschau(spiel, akteur, auswahl, zielangabe) {
 }
 
 function faehigkeitVorschau(spiel, akteur, auswahl, zielangabe) {
-  const definition = faehigkeitVon(spiel, auswahl.faehigkeit);
+  const definition = faehigkeitFuer(spiel, akteur, auswahl.faehigkeit);
   const befehl = { art: "faehigkeit", faehigkeit: auswahl.faehigkeit, ziel: zielangabe };
   const grund = faehigkeitPruefen(spiel, akteur, auswahl.faehigkeit, zielangabe);
   if (!definition?.ziel) return { grund, aufloesung: null, betroffene: [], befehl };

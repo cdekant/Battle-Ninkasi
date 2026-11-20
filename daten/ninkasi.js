@@ -9,8 +9,10 @@ export default {
       pp: { grundwert: 100, anfangswert: 0 }, // Psi-Punkte; Start- und Höchstwert vorläufig
       pegel: { anfangswert: 0 }, // in Hundertstel Promille (100 = 1 ‰), ohne Grundwert nach oben offen
     },
+    // Grundwerte der Eigenschaften (src/systeme/skills.js); vorläufige Verteilung, bis die Charaktererstellung sie wählt
+    eigenschaften: { koerperlichkeit: 14, trinkfestigkeit: 14, gewandtheit: 13, sinnlichkeit: 13, klugheit: 13, braukunde: 13 },
     sicht: { reichweite: 8 },
-    angriffe: [{ name: "faust", genauigkeit: 80, effekt: "faustschlag" }], // gegen Ausweichen 0 und Grundverteidigung 20: 80 %
+    angriffe: [{ name: "faust", genauigkeit: 80, effekt: "faustschlag", tags: ["nahkampf"] }], // gegen Ausweichen 0 und Grundverteidigung 20: 80 %; Tag für den Skill nahkampf_grund
     inventar: [],
     faehigkeiten: ["testfaehigkeit"], // vorläufig, für den Zielmodus (daten/faehigkeiten.js)
     // Plätze für Ausrüstung (src/systeme/ausruestung.js): Waffen in den Händen, Rüstung und Schmuck am Körper

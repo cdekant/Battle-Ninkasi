@@ -15,6 +15,7 @@ import { BEZIEHUNGEN } from "../systeme/fraktionen.js";
 import { WACHZUSTAENDE } from "../systeme/wahrnehmung.js";
 import { UNTERBRECHUNGSGRUENDE } from "../systeme/laufendeAktionen.js";
 import { BEWEGUNGSARTEN } from "../welt/karte.js";
+import { HOECHSTE_STUFE, ANZAHL_TIERS, eigenschaftenPruefen } from "../systeme/skills.js";
 
 const istObjekt = (wert) => wert && typeof wert === "object" && !Array.isArray(wert);
 
@@ -95,6 +96,20 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
     else for (const faehigkeit of wesen.faehigkeiten) if (!daten.faehigkeiten?.[faehigkeit]) fehler.push(`${ort}: Fähigkeit "${faehigkeit}" gibt es nicht`);
   }
   pruefeParameter(daten, { bewegung: BEWEGUNGSARTEN, tueren: ["oeffnen", "nicht"], tragkraft: "ganzzahl?" }, wesen, ort, fehler);
+  // gebundene EP und Eigenschaften, siehe systeme/lernen.js und systeme/skills.js
+  pruefeParameter(daten, { ep: "ganzzahl?" }, wesen, ort, fehler);
+  if (wesen.eigenschaften !== undefined) {
+    if (!istObjekt(wesen.eigenschaften)) fehler.push(`${ort}: eigenschaften muss ein Objekt { eigenschaft: wert } sein`);
+    else if (name === "ninkasi") {
+      const grund = daten.regeln?.lernen ? eigenschaftenPruefen(daten, wesen.eigenschaften) : null;
+      if (grund) fehler.push(`${ort}.eigenschaften: ${grund}`);
+    } else {
+      for (const [eigenschaft, wert] of Object.entries(wesen.eigenschaften)) {
+        if (!daten.eigenschaften?.[eigenschaft]) fehler.push(`${ort}.eigenschaften: Eigenschaft "${eigenschaft}" gibt es nicht`);
+        else if (!(istGanzzahl(wert) && wert >= 1)) fehler.push(`${ort}.eigenschaften.${eigenschaft} muss eine ganze Zahl >= 1 sein`);
+      }
+    }
+  }
   if (wesen.plaetze !== undefined) {
     const plaetze = daten.regeln?.ausruestung?.plaetze || [];
     if (!istObjekt(wesen.plaetze)) fehler.push(`${ort}: plaetze muss ein Objekt { platz: anzahl } sein`);
@@ -221,6 +236,7 @@ function pruefeRegeln(daten, regeln, fehler) {
   }
   if (!istObjekt(regeln.fallen)) fehler.push("regeln.fallen fehlt");
   else pruefeParameter(daten, { entdeckenVorgabe: "ganzzahl", reichweite: "ganzzahl" }, regeln.fallen, "regeln.fallen", fehler);
+  pruefeLernregeln(daten, regeln.lernen, fehler);
   if (!regeln.kampf) return fehler.push("regeln.kampf fehlt");
   for (const [feld, untergrenze] of Object.entries(KAMPFREGELN)) {
     const wert = regeln.kampf[feld];
@@ -338,6 +354,9 @@ function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
       if (ausruestung.angriffe !== undefined) pruefeAngriffe(daten, ausruestung.angriffe, `${ort}.ausruestung`, fehler);
       if (ausruestung.modifikatoren !== undefined) pruefeModifikatoren(daten, ausruestung.modifikatoren, `${ort}.ausruestung.modifikatoren`, fehler);
       if (ausruestung.ausloeser !== undefined) pruefeAusloeser(daten, ausruestung.ausloeser, `${ort}.ausruestung`, fehler);
+      // Anforderungen, siehe systeme/skills.js
+      if (ausruestung.anforderung !== undefined) pruefeAnforderung(daten, ausruestung.anforderung, `${ort}.ausruestung.anforderung`, fehler);
+      if (ausruestung.abzugJePunkt !== undefined) pruefeAnforderungsabzug(daten, ausruestung.abzugJePunkt, `${ort}.ausruestung.abzugJePunkt`, fehler);
     }
   }
   // Werfen, siehe systeme/werfen.js
@@ -415,7 +434,7 @@ function pruefeMenge(schritt, ort, fehler) {
 const istZahlAbNull = (wert) => istGanzzahl(wert) && wert >= 0;
 
 // Parameter nach Beschreibung (siehe kern/bausteine.js): "text", "ganzzahl", "wahrheitswert", "effekt",
-// "muster", "zustand", "wesen", "schadensart", "gelaende", "oberflaeche", "gas", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
+// "muster", "zustand", "wesen", "schadensart", "gelaende", "oberflaeche", "gas", "skill", "eigenschaft", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
 function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
   for (const [feld, typ] of Object.entries(beschreibung)) {
     const wert = werte[feld];
@@ -444,10 +463,14 @@ function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
     else if (grundtyp === "gelaende" && !daten.gelaende?.[wert]) fehler.push(`${ort}.${feld}: Gelände "${wert}" gibt es nicht`);
     else if (grundtyp === "oberflaeche" && !daten.schichten?.oberflaechen?.[wert]) fehler.push(`${ort}.${feld}: Oberfläche "${wert}" gibt es nicht`);
     else if (grundtyp === "gas" && !daten.schichten?.gase?.[wert]) fehler.push(`${ort}.${feld}: Gas "${wert}" gibt es nicht`);
+    else if (grundtyp === "skill" && !daten.skills?.[wert]) fehler.push(`${ort}.${feld}: Skill "${wert}" gibt es nicht`);
+    else if (grundtyp === "eigenschaft" && !daten.eigenschaften?.[wert]) fehler.push(`${ort}.${feld}: Eigenschaft "${wert}" gibt es nicht`);
   }
 }
 
 const istTextliste = (wert) => Array.isArray(wert) && wert.every((eintrag) => typeof eintrag === "string");
+
+const BEDINGUNGEN_MIT_EIGENSCHAFT = ["eigenschaft_ab", "eigenschaft_unter"];
 
 // Modifikatoren: [{ ziel, art, betrag, tag?, wenn? }], siehe kern/werte.js
 function pruefeModifikatoren(daten, liste, ort, fehler) {
@@ -466,6 +489,11 @@ function pruefeModifikatoren(daten, liste, ort, fehler) {
       return;
     }
     pruefeBedingungen(daten, modifikator.wenn, `${stelle}.wenn`, fehler);
+    // eigenschaft_ab und eigenschaft_unter lesen den wirksamen Wert: an einem Modifikator auf eine Eigenschaft fragte er sich selbst ab
+    const liestEigenschaft = modifikator.wenn.some((bedingung) => BEDINGUNGEN_MIT_EIGENSCHAFT.includes(bedingung?.bedingung));
+    if (liestEigenschaft && typeof modifikator.ziel === "string" && modifikator.ziel.startsWith("eigenschaft.")) {
+      fehler.push(`${stelle}: ein Modifikator auf ${modifikator.ziel} darf keine Bedingung auf Eigenschaften haben`);
+    }
   });
 }
 
@@ -525,6 +553,36 @@ function pruefeFaehigkeit(daten, sprache, name, faehigkeit, fehler) {
   if (faehigkeit.ankuendigung !== undefined) pruefeText(sprache.texte, faehigkeit.ankuendigung, `${ort}.ankuendigung`, fehler);
   if ((faehigkeit.ankuendigung !== undefined || faehigkeit.unterbrechbar !== undefined) && faehigkeit.dauer === undefined) fehler.push(`${ort}: ankuendigung und unterbrechbar gibt es nur mit dauer`);
   if (faehigkeit.risiko !== undefined && !daten.risiken?.[faehigkeit.risiko]) fehler.push(`${ort}: Risikotabelle "${faehigkeit.risiko}" gibt es nicht`);
+  // Skill, Anforderung und Ausbau, siehe systeme/faehigkeiten.js
+  if (faehigkeit.skill !== undefined) {
+    if (!istObjekt(faehigkeit.skill)) fehler.push(`${ort}: skill muss { name, stufe, risiko } sein`);
+    else {
+      pruefeParameter(daten, { name: "skill" }, faehigkeit.skill, `${ort}.skill`, fehler);
+      pruefeStufe(faehigkeit.skill.stufe, `${ort}.skill`, fehler);
+      if (!daten.risiken?.[faehigkeit.skill.risiko]) fehler.push(`${ort}.skill: Risikotabelle "${faehigkeit.skill.risiko}" gibt es nicht`);
+    }
+  }
+  if (faehigkeit.anforderung !== undefined) {
+    if (!istObjekt(faehigkeit.anforderung)) fehler.push(`${ort}: anforderung muss { eigenschaften, risiko } sein`);
+    else {
+      pruefeAnforderung(daten, faehigkeit.anforderung.eigenschaften, `${ort}.anforderung.eigenschaften`, fehler);
+      if (!daten.risiken?.[faehigkeit.anforderung.risiko]) fehler.push(`${ort}.anforderung: Risikotabelle "${faehigkeit.anforderung.risiko}" gibt es nicht`);
+    }
+  }
+  if (faehigkeit.ausbau !== undefined) {
+    if (!Array.isArray(faehigkeit.ausbau)) fehler.push(`${ort}: ausbau muss eine Liste [{ wenn, aendert }] sein`);
+    else faehigkeit.ausbau.forEach((eintrag, nummer) => {
+      const stelle = `${ort}.ausbau[${nummer}]`;
+      if (!Array.isArray(eintrag?.wenn)) fehler.push(`${stelle}: wenn muss eine Liste von Bedingungen sein`);
+      else pruefeBedingungen(daten, eintrag.wenn, `${stelle}.wenn`, fehler);
+      if (!istObjekt(eintrag?.aendert)) fehler.push(`${stelle}: aendert muss ein Objekt sein`);
+      else {
+        if (eintrag.aendert.ausbau !== undefined || eintrag.aendert.art !== undefined) fehler.push(`${stelle}: aendert darf ausbau und art nicht ändern`);
+        // das Geänderte muss für sich eine gültige Fähigkeit ergeben
+        pruefeFaehigkeit(daten, sprache, `${name}.ausbau[${nummer}]`, { ...faehigkeit, ...eintrag.aendert, ausbau: undefined }, fehler);
+      }
+    });
+  }
   if (art === "aktiv") {
     if (faehigkeit.ziel === undefined) fehler.push(`${ort}: ziel fehlt`);
     else pruefeZielart(daten, faehigkeit.ziel, `${ort}.ziel`, fehler);
@@ -548,6 +606,142 @@ function pruefeRisiken(daten, fehler) {
       fehler.push(...kurvenfehler(ausgang.chance, `${stelle}.chance`));
     });
   }
+}
+
+// Eigenschaften, Skills und Lernregeln, siehe systeme/skills.js und systeme/lernen.js
+
+const istStufe = (wert) => istGanzzahl(wert) && wert >= 1 && wert <= HOECHSTE_STUFE;
+
+function pruefeStufe(stufe, ort, fehler) {
+  if (!istStufe(stufe)) fehler.push(`${ort}: stufe muss eine ganze Zahl von 1 bis ${HOECHSTE_STUFE} sein`);
+}
+
+// Anforderung { eigenschaft: wert } an Gegenständen und Fähigkeiten
+function pruefeAnforderung(daten, anforderung, ort, fehler) {
+  if (!istObjekt(anforderung)) return fehler.push(`${ort}: muss ein Objekt { eigenschaft: wert } sein`);
+  for (const [eigenschaft, wert] of Object.entries(anforderung)) {
+    if (!daten.eigenschaften?.[eigenschaft]) fehler.push(`${ort}: Eigenschaft "${eigenschaft}" gibt es nicht`);
+    if (!istZahlAbNull(wert)) fehler.push(`${ort}.${eigenschaft} muss eine ganze Zahl >= 0 sein`);
+  }
+}
+
+// Abzug je fehlendem Punkt: Modifikatoren plus oder prozent, nie auf eine Eigenschaft
+function pruefeAnforderungsabzug(daten, liste, ort, fehler) {
+  pruefeModifikatoren(daten, liste, ort, fehler);
+  if (!Array.isArray(liste)) return;
+  liste.forEach((modifikator, nummer) => {
+    if (!["plus", "prozent"].includes(modifikator?.art)) fehler.push(`${ort}[${nummer}]: art muss plus oder prozent sein`);
+    if (typeof modifikator?.ziel === "string" && modifikator.ziel.startsWith("eigenschaft.")) fehler.push(`${ort}[${nummer}]: ein Abzug der Anforderung darf keine Eigenschaft treffen`);
+  });
+}
+
+function pruefeEigenschaften(daten, sprache, fehler) {
+  if (!istObjekt(daten.eigenschaften) || Object.keys(daten.eigenschaften).length === 0) return fehler.push("eigenschaften fehlen (daten/eigenschaften.js)");
+  for (const [name, eigenschaft] of Object.entries(daten.eigenschaften)) pruefeText(sprache.texte, eigenschaft?.text, `eigenschaften.${name}`, fehler);
+}
+
+function pruefeLernregeln(daten, lernen, fehler) {
+  if (!istObjekt(lernen)) return fehler.push("regeln.lernen fehlt");
+  const ort = "regeln.lernen";
+  pruefeParameter(daten, { eigenschaftStart: "ganzzahl", eigenschaftPunkte: "ganzzahl", eigenschaftHoechstens: "ganzzahl", startEp: "ganzzahl", epJeFeld: "ganzzahl", topfFaktor: "ganzzahl" }, lernen, ort, fehler);
+  pruefeParameter(daten, { verrechnung: ["multiplizieren", "addieren"], gewichtung: ["erste"], ort: ["jederzeit"] }, lernen, ort, fehler);
+  for (const feld of ["verrechnung", "gewichtung", "ort"]) if (lernen[feld] === undefined) fehler.push(`${ort}: ${feld} fehlt`);
+  if (!(istGanzzahl(lernen.bezugswert) && lernen.bezugswert > 0)) fehler.push(`${ort}.bezugswert muss eine ganze Zahl > 0 sein`);
+  if (!(Array.isArray(lernen.stufen) && lernen.stufen.length === HOECHSTE_STUFE && lernen.stufen.every((kosten) => istGanzzahl(kosten) && kosten > 0))) {
+    fehler.push(`${ort}.stufen muss ${HOECHSTE_STUFE} ganze Zahlen > 0 enthalten`);
+  }
+  if (!(Array.isArray(lernen.raengeNachTier) && lernen.raengeNachTier.length === ANZAHL_TIERS && lernen.raengeNachTier.every((rang) => istGanzzahl(rang) && rang > 0))) {
+    fehler.push(`${ort}.raengeNachTier muss ${ANZAHL_TIERS} ganze Zahlen > 0 enthalten`);
+  }
+  const tierVoraussetzungen = lernen.tierVoraussetzungen;
+  if (!(Array.isArray(tierVoraussetzungen) && tierVoraussetzungen.length === ANZAHL_TIERS && tierVoraussetzungen.every((liste, tier) => Array.isArray(liste) && liste.length <= tier && liste.every(istStufe)))) {
+    fehler.push(`${ort}.tierVoraussetzungen muss je Tier eine Liste von Stufen der Tiers darunter sein`);
+  }
+  if (lernen.eigenschaftHoechstens < lernen.eigenschaftStart) fehler.push(`${ort}: eigenschaftHoechstens liegt unter eigenschaftStart`);
+  pruefeAnforderungsabzug(daten, lernen.anforderungAbzug ?? "fehlt", `${ort}.anforderungAbzug`, fehler);
+}
+
+// Skills: { text, set, tier, rang?, primaer, sekundaer, voraussetzungen?, freischaltung?, jeStufe?, abStufe?, lernt?, verwandt? }
+function pruefeSkill(daten, sprache, name, skill, fehler) {
+  const ort = `skills.${name}`;
+  if (!istObjekt(skill)) return fehler.push(`${ort}: muss ein Objekt sein`);
+  pruefeText(sprache.texte, skill.text, ort, fehler);
+  if (typeof skill.set !== "string") fehler.push(`${ort}: set fehlt`);
+  if (!(istGanzzahl(skill.tier) && skill.tier >= 1 && skill.tier <= ANZAHL_TIERS)) fehler.push(`${ort}: tier muss eine ganze Zahl von 1 bis ${ANZAHL_TIERS} sein`);
+  if (skill.rang !== undefined && !(istGanzzahl(skill.rang) && skill.rang > 0)) fehler.push(`${ort}: rang muss eine ganze Zahl > 0 sein`);
+  pruefeParameter(daten, { primaer: "eigenschaft", sekundaer: "eigenschaft", freischaltung: "wahrheitswert?" }, skill, ort, fehler);
+  if (skill.voraussetzungen !== undefined) {
+    if (!Array.isArray(skill.voraussetzungen)) fehler.push(`${ort}: voraussetzungen muss eine Liste [{ skill, stufe }] sein`);
+    else skill.voraussetzungen.forEach((voraussetzung, nummer) => {
+      const stelle = `${ort}.voraussetzungen[${nummer}]`;
+      pruefeParameter(daten, { skill: "skill" }, voraussetzung ?? {}, stelle, fehler);
+      pruefeStufe(voraussetzung?.stufe, stelle, fehler);
+    });
+  }
+  if (skill.jeStufe !== undefined) {
+    pruefeModifikatoren(daten, skill.jeStufe, `${ort}.jeStufe`, fehler);
+    if (Array.isArray(skill.jeStufe)) skill.jeStufe.forEach((modifikator, nummer) => {
+      if (!["plus", "prozent"].includes(modifikator?.art)) fehler.push(`${ort}.jeStufe[${nummer}]: art muss plus oder prozent sein`);
+    });
+  }
+  if (skill.abStufe !== undefined) {
+    if (!istObjekt(skill.abStufe)) fehler.push(`${ort}: abStufe muss ein Objekt { stufe: { modifikatoren?, ausloeser? } } sein`);
+    else for (const [stufe, eintrag] of Object.entries(skill.abStufe)) {
+      const stelle = `${ort}.abStufe.${stufe}`;
+      if (!istStufe(Number(stufe))) fehler.push(`${stelle}: die Stufe muss eine ganze Zahl von 1 bis ${HOECHSTE_STUFE} sein`);
+      if (!istObjekt(eintrag)) {
+        fehler.push(`${stelle}: muss { modifikatoren?, ausloeser? } sein`);
+        continue;
+      }
+      if (eintrag.modifikatoren !== undefined) pruefeModifikatoren(daten, eintrag.modifikatoren, `${stelle}.modifikatoren`, fehler);
+      if (eintrag.ausloeser !== undefined) pruefeAusloeser(daten, eintrag.ausloeser, stelle, fehler);
+    }
+  }
+  if (skill.lernt !== undefined) {
+    if (!Array.isArray(skill.lernt)) fehler.push(`${ort}: lernt muss eine Liste [{ anlass, tags? }] sein`);
+    else skill.lernt.forEach((eintrag, nummer) => {
+      const stelle = `${ort}.lernt[${nummer}]`;
+      if (!hat("lernanlaesse", eintrag?.anlass)) fehler.push(`${stelle}: Lernanlass "${eintrag?.anlass}" ist nicht angemeldet`);
+      if (eintrag?.tags !== undefined && !istTextliste(eintrag.tags)) fehler.push(`${stelle}: tags muss eine Liste von Texten sein`);
+    });
+  }
+  if (skill.verwandt !== undefined) {
+    if (!Array.isArray(skill.verwandt)) fehler.push(`${ort}: verwandt muss eine Liste [{ skill, anteil }] sein`);
+    else skill.verwandt.forEach((eintrag, nummer) => {
+      const stelle = `${ort}.verwandt[${nummer}]`;
+      pruefeParameter(daten, { skill: "skill" }, eintrag ?? {}, stelle, fehler);
+      if (eintrag?.skill === name) fehler.push(`${stelle}: ein Skill ist nicht mit sich selbst verwandt`);
+      if (!istProzent(eintrag?.anteil)) fehler.push(`${stelle}: anteil muss eine ganze Zahl von 0 bis 100 sein`);
+    });
+  }
+}
+
+// Je Set jeder Tier höchstens einmal; Voraussetzungen (eigene und die der Tiers) ohne Kreis
+function pruefeSkills(daten, sprache, fehler) {
+  const skills = daten.skills || {};
+  for (const [name, skill] of Object.entries(skills)) pruefeSkill(daten, sprache, name, skill, fehler);
+  const tiersJeSet = {};
+  for (const [name, skill] of Object.entries(skills)) {
+    const belegt = (tiersJeSet[skill.set] ??= {});
+    if (belegt[skill.tier]) fehler.push(`skills.${name}: Set "${skill.set}" hat Tier ${skill.tier} schon (${belegt[skill.tier]})`);
+    else belegt[skill.tier] = name;
+  }
+  const verlangt = (name) => {
+    const skill = skills[name];
+    const ausTiers = Object.entries(tiersJeSet[skill.set] || {}).filter(([tier]) => Number(tier) < skill.tier).map(([, anderer]) => anderer);
+    return [...ausTiers, ...(Array.isArray(skill.voraussetzungen) ? skill.voraussetzungen.map((eintrag) => eintrag?.skill) : [])].filter((anderer) => skills[anderer]);
+  };
+  const fertig = new Set();
+  const besuchen = (name, kette) => {
+    if (fertig.has(name)) return;
+    for (const anderer of verlangt(name)) {
+      const position = kette.indexOf(anderer);
+      if (position >= 0) fehler.push(`skills.${anderer}: Voraussetzungen bilden einen Kreis (${[...kette.slice(position), anderer].join(" > ")})`);
+      else besuchen(anderer, [...kette, anderer]);
+    }
+    fertig.add(name);
+  };
+  for (const name of Object.keys(skills)) besuchen(name, [name]);
 }
 
 // Auren: [{ reichweite, trifft, selbst?, sichtlinie?, modifikatoren }], siehe systeme/modifikatoren.js
@@ -762,6 +956,8 @@ export function vorbereiten(rohdaten, sprache = {}) {
   pruefeEffektKreise(daten, fehler);
   for (const [name, zustand] of Object.entries(daten.zustaende)) pruefeZustand(daten, sprache, name, zustand, fehler);
   pruefeRisiken(daten, fehler);
+  pruefeEigenschaften(daten, sprache, fehler);
+  pruefeSkills(daten, sprache, fehler);
   for (const [name, faehigkeit] of Object.entries(daten.faehigkeiten || {})) pruefeFaehigkeit(daten, sprache, name, faehigkeit, fehler);
   for (const [name, wesen] of Object.entries(daten.wesen)) pruefeWesen(daten, sprache, name, wesen, fehler);
   for (const [name, gegenstand] of Object.entries(daten.gegenstaende)) pruefeGegenstand(daten, sprache, name, gegenstand, fehler);

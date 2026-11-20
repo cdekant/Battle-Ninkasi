@@ -14,9 +14,10 @@
 // kern/vorgang.js. Ihre Effekte laufen eine Kettenstufe tiefer; ab der höchsten Kettentiefe wird nichts
 // mehr vorgemerkt. Gefragt werden die beteiligten Entitäten (Quelle, dann Ziel), je Entität zuerst
 // ihre eigenen Auslöser, dann die ihrer Zustände in deren Reihenfolge (Daten: zustaende.<name>.ausloeser), dann die
-// ihrer angelegten Gegenstände in der Reihenfolge des Anlegens (ausruestung.ausloeser, Kaskade nach Caves of Qud).
+// ihrer angelegten Gegenstände in der Reihenfolge des Anlegens (ausruestung.ausloeser, Kaskade nach Caves of Qud),
+// dann die weiterer Quellen aus dem Register "ausloeserquellen" in Anmeldereihenfolge (Skills, systeme/skills.js).
 
-import { anmelden } from "./register.js";
+import { anmelden, alle } from "./register.js";
 import { HAKENKATALOG, AUSLOESER_ROLLEN } from "./hakenkatalog.js";
 import { effektAnwenden } from "./effekte.js";
 import { mitProzentChance } from "./zufall.js";
@@ -38,7 +39,7 @@ export function wirksameChance(grundchance, kettentiefe, daempfung) {
 
 const feldKopie = (feld) => (feld ? { x: feld.x, y: feld.y } : null);
 
-// Auslöser einer Entität mit festem Schlüssel je Eintrag: eigene, dann die ihrer Zustände
+// Auslöser einer Entität mit festem Schlüssel je Eintrag: eigene, dann die ihrer Zustände, ihrer Ausrüstung und weiterer Quellen
 function ausloeserDer(spiel, entitaet) {
   const ergebnis = [];
   (entitaet.ausloeser || []).forEach((ausloeser, nummer) => ergebnis.push({ ausloeser, schluessel: `${entitaet.id}:${nummer}` }));
@@ -50,6 +51,7 @@ function ausloeserDer(spiel, entitaet) {
     const liste = spiel.zustand.entitaeten[gegenstandId]?.ausruestung?.ausloeser || [];
     liste.forEach((ausloeser, nummer) => ergebnis.push({ ausloeser, schluessel: `${entitaet.id}:g${gegenstandId}:${nummer}` }));
   }
+  for (const [, quelle] of alle("ausloeserquellen")) ergebnis.push(...quelle(spiel, entitaet));
   return ergebnis;
 }
 

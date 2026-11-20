@@ -22,7 +22,7 @@ const VERSCHLEISS_STUFEN = [
 ];
 import { anzahlVon, ladungenVon, lastVon, tragkraftVon, lastZuschlag } from "../systeme/inventar.js";
 import { BUCHSTABEN } from "../eingabe/inventar.js";
-import { faehigkeitVon, verbrauchVon, zuegeBisBereit } from "../systeme/faehigkeiten.js";
+import { faehigkeitVon, faehigkeitFuer, verbrauchVon, zuegeBisBereit } from "../systeme/faehigkeiten.js";
 import { feldBeschreiben, zustaendeVon, laufendeAktionVon, werteAufschluesseln, wesenBeschreiben } from "../systeme/untersuchen.js";
 import { heimlichkeitsweite } from "../systeme/wahrnehmung.js";
 
@@ -228,7 +228,7 @@ export class Oberflaeche {
     if (!namen.length && !offen) return "";
     const { text } = this.texte;
     const zeilen = namen.map((name, stelle) => {
-      const definition = faehigkeitVon(spiel, name);
+      const definition = faehigkeitFuer(spiel, ninkasi, name);
       const buchstabe = offen ? `<span class="buchstabe">${BUCHSTABEN[stelle] ?? " "})</span> ` : "";
       const verbrauch = Object.entries(verbrauchVon(spiel, ninkasi, definition))
         .filter(([, menge]) => menge > 0)

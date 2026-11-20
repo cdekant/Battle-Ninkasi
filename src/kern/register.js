@@ -21,6 +21,8 @@ const ARTEN = [
   "zustandspruefungen", // Prüfungen nach jedem Vorgang: (spiel) => true, wenn sie etwas verändert haben
   "laufendeaktionen",   // Arten langer Aktionen: { schrittkosten, abschliessen, abbrechen } (systeme/laufendeAktionen.js)
   "beimErzeugen",       // nach dem Erzeugen jeder Entität: (zustand, entitaet) => void, z.B. Verderben einplanen, Etikett
+  "ausloeserquellen",   // weitere Auslöser einer Entität nach Zuständen und Ausrüstung: (spiel, entitaet) => [{ ausloeser, schluessel }]
+  "lernanlaesse",       // Lernanlässe der Skills (systeme/lernen.js): { beschreibung }; Daten nennen sie in lernt
 ];
 
 export const RANG_VORGABE = 100;

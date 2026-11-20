@@ -1,6 +1,7 @@
 // Fähigkeiten (siehe docs/Architektur.md, Fähigkeiten): Magie, Psi, Fernkampf und körpereigene Aktionen als Daten.
 // Daten (daten/faehigkeiten.js):
-//   name: { text, art?, tags?, verbrauch?, material?, zeit?, abklingzeit?, voraussetzungen?, ziel?, wirkung?, zustand?, risiko? }
+//   name: { text, art?, tags?, verbrauch?, material?, zeit?, abklingzeit?, voraussetzungen?, ziel?, wirkung?, zustand?, risiko?,
+//           skill?, anforderung?, ausbau? }
 //   art:             "aktiv" (Vorgabe) wirkt einmal; "aufrecht" setzt den Zustand an der Wirkenden, erneutes Benutzen beendet ihn
 //   verbrauch:       { mp: 10, pp: 5, pegel: 20 } Vorräte; Modifikatoren auf verbrauch.<wert> und verbrauch.alle mit den Tags
 //   material:        [{ typ, anzahl }] Gegenstände aus dem Inventar, werden verbraucht
@@ -11,7 +12,14 @@
 //   wirkung:         benannter Effekt; mit muster im Ziel auf jede betroffene Entität, bei durchdringendem
 //                    Geschoss auf jedes Wesen der Bahn, sonst einmal auf das Ziel (oder das Feld)
 //   zustand:         bei "aufrecht" der Zustand, meist mit unterhalt (MP je Welttick, siehe systeme/zustaende.js)
-//   risiko:          Name einer Risikotabelle (daten/risiken.js), gewürfelt vor der Wirkung
+//   risiko:          Name einer Risikotabelle (daten/risiken.js), gewürfelt vor der Wirkung über den Pegel
+//   skill:           { name, stufe, risiko } der Skill, den die Fähigkeit verlangt; die Tabelle risiko wird über die
+//                    fehlenden Stufen gewürfelt (Fundstück ohne passenden Skill, systeme/skills.js)
+//   anforderung:     { eigenschaften: { koerperlichkeit: 15 }, risiko } weiche Anforderung; die Tabelle wird über die
+//                    Summe der fehlenden Punkte (wirksame Werte) gewürfelt
+//                    Reihenfolge der Würfe: skill, anforderung, risiko; der erste Ausgang mit wirkt: false beendet
+//   ausbau:          [{ wenn, aendert }] Ausbau durch Skills: gilt wenn (Bedingungen an der Wirkenden, z.B. skill_ab),
+//                    legt sich aendert flach über die Definition, in Datenreihenfolge (faehigkeitFuer)
 //   dauer:           { schritte } lange Aktion (Ritual, Kanalisieren): bezahlt wird am Anfang, jeder Schritt kostet zeit,
 //                    Risiko und Wirkung kommen nach dem letzten Schritt (siehe systeme/laufendeAktionen.js); das Ziel
 //                    wird dann neu aufgelöst, passt es nicht mehr, verpufft die Wirkung (Meldung "verpufft")
@@ -23,7 +31,7 @@
 // Befehl: { art: "faehigkeit", faehigkeit, ziel?: { x, y } | { id } | { dx, dy } }
 // Wesen kennen ihre Fähigkeiten als Liste: faehigkeiten: ["name"]; Abklingen über den Zugzähler zuege (kern/spiel.js)
 //   abklingendBis: { name: zugnummer } ab diesem Stand des Zugzählers wieder bereit
-// Risikotabelle: [{ name, chance: Kurve über den Pegel in Prozent, wirkt, effekt? }]; ein Wurf, die Ausgänge liegen
+// Risikotabelle: [{ name, chance: Kurve in Prozent, wirkt, effekt? }]; ein Wurf, die Ausgänge liegen
 //   hintereinander; wirkt: false heißt, die Fähigkeit selbst wirkt nicht; der Verbrauch ist in jedem Fall bezahlt.
 
 import { anmelden } from "../kern/register.js";
@@ -37,11 +45,23 @@ import { zielAufloesen, entitaetenAufFeldern } from "./zielauswahl.js";
 import { zustandSetzen, zustandBeenden } from "./zustaende.js";
 import { aktionBeginnen } from "./laufendeAktionen.js";
 import { anzahlVon, einenAbnehmen } from "./inventar.js";
+import { stufeVon, fehlendePunkte } from "./skills.js";
 
 export const FAEHIGKEITSARTEN = ["aktiv", "aufrecht"];
 
 export function faehigkeitVon(spiel, name) {
   return spiel.daten.faehigkeiten?.[name] ?? null;
+}
+
+// Die Definition, wie sie für diese Wirkende gilt: zutreffende Einträge aus ausbau flach darübergelegt
+export function faehigkeitFuer(spiel, wesen, name) {
+  const definition = faehigkeitVon(spiel, name);
+  if (!definition?.ausbau || !wesen) return definition;
+  let ergebnis = definition;
+  for (const { wenn, aendert } of definition.ausbau) {
+    if (bedingungenErfuellt(spiel, wesen, wenn, umstaendeVon(definition))) ergebnis = { ...ergebnis, ...aendert };
+  }
+  return ergebnis;
 }
 
 export function kenntFaehigkeit(wesen, name) {
@@ -103,7 +123,7 @@ function aufrechteInstanz(wesen, definition) {
 
 // null, wenn die Fähigkeit jetzt benutzbar ist, sonst der Grund
 export function faehigkeitPruefen(spiel, wesen, name, zielangabe) {
-  const definition = faehigkeitVon(spiel, name);
+  const definition = faehigkeitFuer(spiel, wesen, name);
   if (!definition || !kenntFaehigkeit(wesen, name)) return "nicht_gelernt";
   if (definition.art === "aufrecht" && aufrechteInstanz(wesen, definition)) return null; // Beenden geht immer
   if (zuegeBisBereit(wesen, name) > 0) return "abklingend";
@@ -129,12 +149,12 @@ function kostenBezahlen(spiel, wesen, name, definition) {
   }
 }
 
-// Würfelt eine Risikotabelle mit dem Pegel der Wirkenden; gibt den Ausgang zurück oder null (nichts passiert)
-export function risikoWuerfeln(spiel, wesen, tabellenName) {
+// Würfelt eine Risikotabelle über x (Vorgabe: der Pegel der Wirkenden); gibt den Ausgang zurück oder null (nichts passiert)
+export function risikoWuerfeln(spiel, wesen, tabellenName, x = undefined) {
   const tabelle = spiel.daten.risiken?.[tabellenName];
   if (!tabelle) throw new Error(`Unbekannte Risikotabelle "${tabellenName}"`);
-  const pegel = hatWert(wesen, "pegel") ? wesen.werte.pegel.aktuell : 0;
-  const chancen = tabelle.map((ausgang) => Math.max(0, wertAufKurve(ausgang.chance, pegel)));
+  const wert = x ?? (hatWert(wesen, "pegel") ? wesen.werte.pegel.aktuell : 0);
+  const chancen = tabelle.map((ausgang) => Math.max(0, wertAufKurve(ausgang.chance, wert)));
   if (chancen.every((chance) => chance === 0)) return null;
   let wurf = zufallsGanzzahl(spiel.zustand.zufallszustand, 1, 100);
   for (let i = 0; i < tabelle.length; i++) {
@@ -142,6 +162,20 @@ export function risikoWuerfeln(spiel, wesen, tabellenName) {
     wurf -= chancen[i];
   }
   return null;
+}
+
+// Fehlende Stufen des verlangten Skills
+export function fehlendeStufen(spiel, wesen, definition) {
+  return definition.skill ? Math.max(0, definition.skill.stufe - stufeVon(spiel, wesen, definition.skill.name)) : 0;
+}
+
+// Die Würfe vor der Wirkung in ihrer Reihenfolge: [{ tabelle, x, wegen }]
+function risikenDer(spiel, wesen, definition) {
+  const liste = [];
+  if (definition.skill) liste.push({ tabelle: definition.skill.risiko, x: fehlendeStufen(spiel, wesen, definition), wegen: "skill" });
+  if (definition.anforderung) liste.push({ tabelle: definition.anforderung.risiko, x: fehlendePunkte(spiel, wesen, definition.anforderung.eigenschaften), wegen: "anforderung" });
+  if (definition.risiko) liste.push({ tabelle: definition.risiko, x: undefined, wegen: "risiko" });
+  return liste;
 }
 
 // Worauf die Wirkung angewandt wird: je betroffene Entität (Muster, durchdringendes Geschoss) oder einmal
@@ -182,9 +216,10 @@ function zeitergebnis(spiel, definition) {
 // Risiko und Wirkung, sofort oder nach dem letzten Schritt einer langen Aktion
 function faehigkeitWirken(spiel, wesen, name, definition, zielangabe) {
   melden(spiel, "faehigkeit", { wer: bezugAuf(wesen), faehigkeit: name, text: definition.text });
-  const ausgang = definition.risiko ? risikoWuerfeln(spiel, wesen, definition.risiko) : null;
-  if (ausgang) {
-    melden(spiel, "risiko", { wer: bezugAuf(wesen), faehigkeit: name, ausgang: ausgang.name });
+  for (const { tabelle, x, wegen } of risikenDer(spiel, wesen, definition)) {
+    const ausgang = risikoWuerfeln(spiel, wesen, tabelle, x);
+    if (!ausgang) continue;
+    melden(spiel, "risiko", { wer: bezugAuf(wesen), faehigkeit: name, ausgang: ausgang.name, wegen });
     if (ausgang.effekt) {
       const position = wesen.position ? { ...wesen.position } : null;
       effektAnwenden(spiel, ausgang.effekt, { quelleId: wesen.id, zielId: wesen.id, ursprung: position, zielfeld: position, ursache: "risiko", mittel: { art: "faehigkeit", name }, tags: [...tagsVon(definition)] });
@@ -196,12 +231,12 @@ function faehigkeitWirken(spiel, wesen, name, definition, zielangabe) {
 }
 
 anmelden("laufendeaktionen", "faehigkeit", {
-  schrittkosten: (spiel, akteur, aktion) => zeitergebnis(spiel, faehigkeitVon(spiel, aktion.faehigkeit)),
+  schrittkosten: (spiel, akteur, aktion) => zeitergebnis(spiel, faehigkeitFuer(spiel, akteur, aktion.faehigkeit)),
   abschliessen(spiel, akteur, aktion) {
-    faehigkeitWirken(spiel, akteur, aktion.faehigkeit, faehigkeitVon(spiel, aktion.faehigkeit), aktion.ziel);
+    faehigkeitWirken(spiel, akteur, aktion.faehigkeit, faehigkeitFuer(spiel, akteur, aktion.faehigkeit), aktion.ziel);
   },
   abbrechen(spiel, akteur, aktion) {
-    const definition = faehigkeitVon(spiel, aktion.faehigkeit);
+    const definition = faehigkeitFuer(spiel, akteur, aktion.faehigkeit);
     if (!definition.beimAbbruch) return;
     const position = akteur.position ? { ...akteur.position } : null;
     effektAnwenden(spiel, definition.beimAbbruch, { quelleId: akteur.id, zielId: akteur.id, ursprung: position, zielfeld: position, ursache: "abbruch", mittel: { art: "faehigkeit", name: aktion.faehigkeit }, tags: [...tagsVon(definition)] });
@@ -209,7 +244,7 @@ anmelden("laufendeaktionen", "faehigkeit", {
 });
 
 function faehigkeitAusfuehren(spiel, wesen, name, zielangabe) {
-  const definition = faehigkeitVon(spiel, name);
+  const definition = faehigkeitFuer(spiel, wesen, name);
   const ergebnis = zeitergebnis(spiel, definition);
   if (definition.art === "aufrecht") {
     const instanz = aufrechteInstanz(wesen, definition);

@@ -5,7 +5,7 @@
 // Kontext der Haken mit Beteiligten: { quelleId, urheberId, zielId, ursache, kettentiefe, mittel, tags, kritisch, ... }
 
 export const HAKENKATALOG = {
-  vor_schaden: { inBetrieb: true, ausloeserErlaubt: false },      // + schadensart, menge; Handler ändern menge oder brechen ab (Ränge siehe systeme/kampf.js)
+  vor_schaden: { inBetrieb: true, ausloeserErlaubt: false },      // + schadensart, menge; Handler ändern menge oder brechen ab (Ränge siehe unten)
   nach_schaden: { inBetrieb: true, ausloeserErlaubt: true },      // + schadensart, menge (> 0)
   nach_treffer: { inBetrieb: true, ausloeserErlaubt: true },      // kritisch im Kontext
   verfehlt: { inBetrieb: true, ausloeserErlaubt: true },          // + grund ("ausgewichen" | "geblockt")
@@ -28,5 +28,9 @@ export const HAKENKATALOG = {
 };
 
 // Auslöser in den Daten: { bei, rolle?, ziel?, effekt, chance?, daempfung?, wenn? }
+// Ränge der Schadensrechnung am Haken vor_schaden (systeme/kampf.js); Handler ohne Rang (100) liegen zwischen Angreifer
+// und Rüstung. Hier im Kern, damit Systeme sie ohne Importkreis über systeme/kampf.js lesen (z.B. systeme/lernen.js).
+export const RANG_ANGREIFER = 50, RANG_RUESTUNG = 200, RANG_WIDERSTAND = 300;
+
 export const AUSLOESER_ROLLEN = ["quelle", "ziel"]; // welche Rolle die Trägerin im Ereignis haben muss
 export const AUSLOESER_ZIELE = ["selbst", "quelle", "ziel", "feld"]; // worauf der Effekt wirkt

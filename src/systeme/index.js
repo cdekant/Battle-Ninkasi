@@ -25,3 +25,5 @@ import "./laufendeAktionen.js";
 import "./faehigkeiten.js";
 import "./verschleiss.js";
 import "./kennen.js";
+import "./skills.js";
+import "./lernen.js";

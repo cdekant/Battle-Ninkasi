@@ -13,7 +13,7 @@ import { mitProzentChance } from "../kern/zufall.js";
 import { bedingungenErfuellt } from "../kern/werte.js";
 import { fraktionVon } from "../kern/zustand.js";
 import { abstand } from "../welt/karte.js";
-import { faehigkeitVon, faehigkeitPruefen } from "../systeme/faehigkeiten.js";
+import { faehigkeitFuer, faehigkeitPruefen } from "../systeme/faehigkeiten.js";
 import { zielAufloesen, trifftZu } from "../systeme/zielauswahl.js";
 
 function zielangabeFuer(wesen, zielart, beute) {
@@ -44,7 +44,7 @@ function eintragPasst(spiel, wesen, eintrag, beute) {
   if (eintrag.abstandAb !== undefined && entfernung < eintrag.abstandAb) return null;
   if (eintrag.abstandBis !== undefined && entfernung > eintrag.abstandBis) return null;
   if (!bedingungenErfuellt(spiel, wesen, eintrag.wenn, { gegenueberId: beute.id })) return null;
-  const definition = faehigkeitVon(spiel, eintrag.name);
+  const definition = faehigkeitFuer(spiel, wesen, eintrag.name);
   if (!definition) return null;
   const zielangabe = zielangabeFuer(wesen, definition.ziel, beute);
   if (zielangabe === null) return null;

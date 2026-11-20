@@ -4,7 +4,7 @@
 
 import { alleEntitaeten } from "../kern/zustand.js";
 import { istSichtbar } from "../systeme/sicht.js";
-import { faehigkeitVon } from "../systeme/faehigkeiten.js";
+import { faehigkeitFuer } from "../systeme/faehigkeiten.js";
 import { zielAufloesen } from "../systeme/zielauswahl.js";
 
 // Felder [{ x, y }] ohne Doppelte, in der Reihenfolge der Wesen nach Entitäts-ID
@@ -16,7 +16,7 @@ export function angekuendigteFelder(spiel) {
     const aktion = wesen.laufendeAktion;
     if (wesen.id === zustand.spielerinId || aktion?.art !== "faehigkeit" || !wesen.position) continue;
     if (!istSichtbar(zustand, wesen.position.x, wesen.position.y)) continue;
-    const definition = faehigkeitVon(spiel, aktion.faehigkeit);
+    const definition = faehigkeitFuer(spiel, wesen, aktion.faehigkeit);
     if (!definition?.ankuendigung || !definition.ziel) continue;
     const aufloesung = zielAufloesen(spiel, wesen, definition.ziel, aktion.ziel ?? undefined);
     if (!aufloesung.ok) continue;

@@ -7,14 +7,14 @@ export default {
   // flink und handlich: ein Hieb mit dem Schöpfer
   schoepfkelle: {
     text: "gegenstand.schoepfkelle", aufhebbar: true, gewicht: 400,
-    ausruestung: { platz: "hand", angriffe: [{ name: "schoepfkelle", genauigkeit: 85, effekt: "kellenschlag", kosten: 90 }] },
+    ausruestung: { platz: "hand", angriffe: [{ name: "schoepfkelle", genauigkeit: 85, effekt: "kellenschlag", kosten: 90, tags: ["nahkampf"] }] },
   },
   // schwer, langsam, zweihändig
   fasshammer: {
     text: "gegenstand.fasshammer", aufhebbar: true, gewicht: 6000,
     ausruestung: {
       platz: "hand", belegt: 2,
-      angriffe: [{ name: "fasshammer", genauigkeit: 70, effekt: "hammerschlag", kosten: 150 }],
+      angriffe: [{ name: "fasshammer", genauigkeit: 70, effekt: "hammerschlag", kosten: 150, tags: ["nahkampf"] }],
       modifikatoren: [{ ziel: "ausweichen", art: "plus", betrag: -5 }],
     },
   },

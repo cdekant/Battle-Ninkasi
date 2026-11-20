@@ -12,6 +12,7 @@ export default {
     vorlage: "bakterium",
     text: "wesen.essigbakterium",
     werte: { lp: { grundwert: 15 } },
+    ep: 10, // gebundene EP beim Tod (src/systeme/lernen.js), vorläufig
     angriffe: [{ name: "biss", genauigkeit: 70, effekt: "biss_klein" }],
   },
 
@@ -20,6 +21,7 @@ export default {
     vorlage: "bakterium",
     text: "wesen.fernkaempfer_test",
     werte: { lp: { grundwert: 10 } },
+    ep: 15,
     angriffe: [{ name: "biss", genauigkeit: 60, effekt: "biss_klein" }],
     faehigkeiten: ["saeurespucke", "saeureschwall"],
     ki: {
