@@ -10,6 +10,8 @@ Arbeitsliste der Strukturen, die Logik und Datenmodell noch brauchen, damit Fern
 + Ist ein Punkt umgesetzt, wandert seine Beschreibung nach [Architektur.md](Architektur.md) (bzw. [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md)) und wird hier gestrichen; bleibt nur ein Rest offen, steht hier nur der Rest
 + Status je Punkt: offen, in Arbeit, umgesetzt in Version X
 + Die Reihenfolge ist eine Empfehlung: 1 bis 4 sind Kernarchitektur, danach sind die meisten Systeme Daten plus wenige neue Bausteine
++ Nächste Schwerpunkte (Stand 2026-11-20): Skillsystem als Spieldesign in [Charakter.md](Charakter.md), bevor Details der Reste angegangen werden (davon hängen die Modifikatorquelle `skills`, Kennerschaft, Nachtsicht und die Zuordnung der Eigenschaften ab); danach Zustände im Spielinhalt (Punkt 3), dann Licht (Punkt 7), vor Inhalt und Balancing, weil es Heimlichkeit und Gefahr verschiebt; das Brausystem in einer eigenen Sitzung; Darstellung (Punkt 12) ist zurückgestellt
++ Licht lässt sich nachreichen: ohne Angabe gilt jedes Feld als hell, das Spiel verhält sich dann wie bisher
 
 ## Bekannte Fehler
 
@@ -169,7 +171,9 @@ Später:
 
 ## 12. Darstellung
 
-Status: offen, Entwurf in [Animationen.md](Animationen.md) (Effektschicht, Kampfanimation, Kamera) und [Tileset.md](Tileset.md) (Varianten und Bewegung); reine Anzeige ohne Einfluss auf die Logik
+Status: zurückgestellt, Entwurf in [Animationen.md](Animationen.md) (Effektschicht, Kampfanimation, Kamera) und [Tileset.md](Tileset.md) (Varianten und Bewegung); reine Anzeige ohne Einfluss auf die Logik
+
+Entschieden: Animationen halten die Eingabe auf, bis alle Meldungen seit Ninkasis letzter Aktion nacheinander abgespielt sind; Reise, Rasten und Erkunden halten dafür an (Schalter im Gerüst); bewegte Tiles laufen auch ohne vergehende Spielzeit und halten nichts auf; Reihenfolge Gerüst, Kampfanimation, bewegte Tiles; Varianten in zwei Stufen, gesondert zurückgestellt
 
 + Gerüst für Effekte im Bildtakt statt `src/anzeige/animation.js`
 + Kampfanimation: schwebende Zahlen für Schaden, Krit und Heilung, Aufblitzen bei Treffern, Explosion und Schwall aus der Meldung `flaeche`, Geschosse

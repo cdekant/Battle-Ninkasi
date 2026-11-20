@@ -1,6 +1,6 @@
 # Battle Ninkasi - Animationen
 
-Stand: 2026-11-20, Entwurf
+Stand: 2026-11-20, Entwurf, zurückgestellt
 
 Konzept für Bewegung und Effekte in der Anzeige: Effektschicht, Kampfanimation, Kamera. Alles hier ist reine Anzeige und berührt weder den Spielzustand noch den Spiel-Zufall; die Logik liefert über ihre Meldungen schon alles Nötige. Grafik (Varianten von Boden und Wand, bewegte Tiles) steht in [Tileset.md](Tileset.md), die Arbeitsliste in Punkt 12 von [Systemausbau.md](Systemausbau.md), Licht in [Architektur.md](Architektur.md) (Licht, Wahrnehmung).
 
@@ -19,11 +19,15 @@ Konzept für Bewegung und Effekte in der Anzeige: Effektschicht, Kampfanimation,
 2. Varianten von Boden und Wand: siehe [Tileset.md](Tileset.md) (Varianten und Schmuck); der Aufwand liegt vor allem in der Grafik und kann neben Teil 1 in der Tilewerkstatt laufen
 3. Bewegte Tiles (siehe [Tileset.md](Tileset.md)), weiches Scrollen der Kamera; Licht gehört wegen der Wahrnehmung nicht hierher
 
-## Offene Fragen
+## Entschieden
 
-1. Halten Animationen die Eingabe auf? Empfehlung nein, wie heute: jede Taste überspringt, die Taste wirkt trotzdem, die Optik bremst das Spiel nie; dagegen Brogue, das kurz wartet, bis eine Explosion durch ist (schöner, aber zäh bei schnellem Spiel)
-2. Reihenfolge Gerüst, Kampfanimation, Varianten, bewegte Tiles, oder die Varianten vorziehen, weil man sie ständig sieht?
-3. Wie weit gehen Varianten? Empfehlung zwei Stufen, siehe [Tileset.md](Tileset.md)
+Der ganze Bereich ist zurückgestellt (Stand 2026-11-20); festgehalten ist, was beim Wiederaufnehmen gilt:
+
++ Animationen halten die Eingabe auf (Vorbild Brogue): Alle Animationen aus den Meldungen seit Ninkasis letzter Aktion laufen vollständig ab, bevor sie wieder handeln kann; auch wenn mehrere Wesen in der Weltzeit dicht hintereinander handeln (die Weltuhr rechnet in Hundertsteln einer Aktion), geht nichts verloren
++ Vorgabe: alles nacheinander in der Reihenfolge der Meldungen; Gleichzeitiges zusammenzufassen wäre eine spätere Einstellung
++ Reise, Rasten und Erkunden: Vorgabe ist anhalten und alles nacheinander abspielen; das Gerüst stellt dafür Schalter bereit (z.B. Animationen unterwegs verkürzen oder überspringen)
++ Bewegte Tiles und Umgebungseffekte (lodernde Kesselfeuer, blubbernde Bottiche, wogendes Gas) laufen im Bildtakt auch dann, wenn keine Spielzeit vergeht; sie halten die Eingabe nie auf, nur Animationen aus Meldungen tun das; ihr Takt und Flackern kommen aus dem kosmetischen Zufall, die Logik bleibt unberührt
++ Reihenfolge: Gerüst, Kampfanimation, bewegte Tiles (alle drei brauchen den Bildtakt des Gerüsts); Varianten von Boden und Wand hängen nicht daran und sind gesondert zurückgestellt (siehe [Tileset.md](Tileset.md))
 
 ## Recherche
 
