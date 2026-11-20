@@ -378,6 +378,7 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Inventar, Skillübersicht, Handel und Brauen als Fenster über der Karte; Öffnen und Schließen sind keine Befehle
 + Übersichtskarte per Umschalttaste, gezeichnet vom selben Renderer mit kleinen Feldern (4 bis 8 px); eine Minimap in der Seitenleiste ist später mit demselben Renderer möglich
 + Alle Elemente sind Anzeige und lassen sich ändern, ohne die Logik zu berühren
++ Dieser Abschnitt beschreibt den umgesetzten Stand; das künftige Schema (Layout, Schnellleiste, Log in Spalten, Fensterstapel, Tastatur nach vi, Einstellungen) steht als Entwurf in [Oberflaeche.md](Oberflaeche.md)
 
 ## Kamera
 

@@ -161,6 +161,7 @@ Entschieden: zwei Versionen, 0.24.0 Zielmodus und 0.25.0 Untersuchen und Zustän
 
 Offener Rest:
 
++ Schema der Oberfläche als Entwurf in [Oberflaeche.md](Oberflaeche.md), Entscheidungen offen (dort am Ende)
 + Inventarfenster, Zielmodus, Untersuchen und Tooltip im Browser ausprobieren (die Tasten- und Beschreibungslogik ist getestet, die Darstellung nur ohne Browser erzeugt)
 + Gehörter Lärm kommt im jetzigen Inhalt kaum vor (im Bot 0 Mal), weil fast nur Kämpfe mit Ninkasi Lärm machen; mit Kämpfen unter Gegnern, Beschworenen und Fallen nachprüfen
 
