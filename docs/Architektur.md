@@ -208,8 +208,8 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Handler laufen nach Rang (kleiner zuerst, Vorgabe 100), bei gleichem Rang nach Anmeldung; so ist die Reihenfolge ausdrücklich geregelt, wenn Handler den Kontext verändern
 + Setzt ein Handler `kontext.abgebrochen = true`, laufen die weiteren Handler nicht mehr (z.B. Schild fängt den Treffer ab, Tod verhindert)
 + Meldungen nach außen ("Treffer", "Krit", "getrunken", "Tod") sind rein lesend; Anzeige, Log, schwebende Zahlen und Sound hängen sich daran
-+ Für die Anzeige von Flächen und Geschossen: `flaeche` (`felder`) und `geschoss` (`bahn`, `aufschlag`), das Abspielen der Bahn folgt später (siehe [Systemausbau.md](Systemausbau.md)); `aktion_beginnt` nennt bei Fähigkeiten auch `faehigkeit`, `ankuendigung` und `felder`
-+ Meldungen verweisen auf Entitäten über Bezüge (`{ id, typ, text, etikett? }`), die auch nach dem Entfernen der Entität gültig bleiben; ein unbekannter Gegenstand trägt sein Etikett mit, die Anzeige nennt dann dieses, alte Log-Zeilen ändern sich beim Erkennen nicht; die Felder `art` und `zeit` sind reserviert
++ Für die Anzeige von Flächen und Geschossen: `flaeche` (`felder`) und `geschoss` (`bahn`, `aufschlag`, abgespielt im Zielmodus, siehe dort); `aktion_beginnt` nennt bei Fähigkeiten auch `faehigkeit`, `ankuendigung` und `felder`
++ Meldungen verweisen auf Entitäten über Bezüge (`{ id, typ, text, etikett?, ort? }`, `ort` die Position zur Zeit der Meldung), die auch nach dem Entfernen der Entität gültig bleiben; ein unbekannter Gegenstand trägt sein Etikett mit, die Anzeige nennt dann dieses, alte Log-Zeilen ändern sich beim Erkennen nicht; die Felder `art` und `zeit` sind reserviert
 + Wertänderungen laufen über eine gemeinsame Funktion, die den Haken "nach_wertaenderung" auslöst (z.B. für Pegelschwellen); sie nimmt den Ursprung `{ urheberId, ursache, mittel, kettentiefe }` mit; sinkt der Lebenswert, merkt sich das Wesen den Ursprung als `letzterVerlust`, zugerechnet der Urheberin (ein Wurf zählt für die Werferin, nicht für die Flasche)
 + Was auf Meldungen reagiert, darf weder den Zustand ändern noch den Spiel-Zufall benutzen
 
@@ -264,6 +264,7 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Beschwören und Verschwinden (`src/systeme/beschwoerung.js`): `beschwoeren { wesen, anzahl?, muster?, zustand?, dauer? }` erzeugt Wesen auf freien Feldern des Musters (Vorgabe angrenzend), mit der Fraktion der Urheberin und `beschworenVon`, eingereiht nach einer Aktion Wartezeit, mit dem Zustand (Quelle die Beschwörerin); `verschwinden` entfernt das Ziel ohne Tod, ohne `nach_tod` und ohne Hinterlassenschaft, nicht bei Ninkasi
 + Beispiel ganz als Daten: `beschworen: { gebundenAnQuelle: true, beimEnde: "verschwinden" }`, mit `dauer` auch eine Beschwörung auf Zeit (Vorbild Brogue: Geisterklingen verschwinden mit dem Goblin-Beschwörer)
 + Die Datenprüfung verfolgt Kreise auch über Zustände: ein Effekt, der einen Zustand setzt, dessen `beimBeginn` ihn wieder aufruft, ist ein Fehler
++ Im Spielinhalt bisher nur der vorläufige `testzustand` (Ausweichen -2 für 5 Züge), den Ninkasis `testfaehigkeit` bei einem Treffer setzt, damit die Anzeige der Zustände etwas zeigt
 
 ## Zielauswahl
 
@@ -334,12 +335,15 @@ Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt di
 + Die Levelgröße ist ein Datenwert, Levels dürfen unterschiedlich groß sein; Ziel: größer als Brogue (79x29)
 + Texte der Oberfläche sind HTML/CSS mit eigenen Schriftgrößen, unabhängig vom Tile-Raster
 + Markierungen über der Karte: Wegvorschau, Feld unter dem Zeiger, die Zielfelder angekündigter Angriffe sichtbarer Gegner (rötlich, `src/anzeige/ankuendigungen.js`, beim Zeichnen aus `laufendeAktion` berechnet, nicht gespeichert), die Vorschau des Zielmodus und das fliegende Geschoss (siehe Zielmodus)
++ Das Log zeigt nur, was Ninkasi wahrnimmt (`meldungWahrnehmbar` in `src/systeme/wahrnehmbar.js`, reine Lesefunktion mit Tests): Meldungen mit ihr als Beteiligter (`wer`, `ziel`, `quelle`, `opfer`, `was`, `mit`, `auf`, `traegerin`, `vorher`), Meldungen, bei denen ein beteiligter Bezug mit `ort` oder ein Feld (`ursprung`, `aufschlag`, `bahn`, `felder`) gerade sichtbar ist, und Meldungen ganz ohne Ort (Pegel, Hinweise); `bemerkt` nur, wenn sie das bemerkende Wesen sieht
++ Hören: Lärm, der Ninkasis Feld erreicht (`spielerinHoert` an der Meldung `laerm`) und dessen Ursprung sie nicht sieht, schreibt das Log als vage Zeile mit grober Richtung (`geraeuschGehoert`, `richtungZu`: acht Himmelsrichtungen), je nach `geraeusch` Kampflärm, Klirren oder ein Geräusch, höchstens eine Zeile je 100 Zeiteinheiten; wer dort was tut, sagt es nicht
++ Texte zu Zuständen: `log.zustand_beginnt` und `log.zustand_endet` allgemein, ein Zustand kann eigene mitbringen (`log.zustand.<name>.beginnt` bzw. `.endet`); dazu `abgewichen`, `beschworen` (ohne Urheberin `log.erschienen`) und `verschwindet`
 
 ## Oberfläche
 
 + Karte auf dem größten Teil des Bildschirms, rechts eine Seitenleiste (etwa 400 px), unten ein Log (4 bis 5 Zeilen, aufklappbar)
 + Sichtbar bei 1080p neben Seitenleiste und Log: bei 16 px etwa 95x57 Felder, bei 32 px etwa 47x28, bei 48 px etwa 31x19, bei 64 px etwa 23x14
-+ Seitenleiste: LP, MP und PP als Balken, Pegel als eigene, auffällige Anzeige in ‰ mit eingezeichneten Schwellen, im Zielmodus das Ziel (siehe Zielmodus), Fähigkeiten mit Verbrauch und Abklingzeit (zugleich das Fähigkeitenfenster), Gepäck (zugleich das Inventarfenster), aktive Zustände, Liste der sichtbaren Gegner (Vorbild: Brogue)
++ Seitenleiste: LP, MP und PP als Balken, Pegel als eigene, auffällige Anzeige in ‰ mit eingezeichneten Schwellen, Heimlichkeitsweite Ninkasis, ihre laufende Aktion ("Schritt 2 von 5") und ihre Zustände mit Stärke und Restdauer in Zügen, im Zielmodus das Ziel bzw. beim Untersuchen das Feld (siehe Zielmodus und Untersuchen), Fähigkeiten mit Verbrauch und Abklingzeit (zugleich das Fähigkeitenfenster), Gepäck (zugleich das Inventarfenster), Liste der sichtbaren Gegner mit Wachzustand (außer `jagt`), Zuständen und "wirkt etwas" bei einer laufenden Aktion (Vorbild: Brogue)
 + Der Pegel ist nach oben offen und wird logarithmisch angezeigt (`src/anzeige/pegelanzeige.js`), in Verdopplungsschritten gleicher Breite (0, 0,5, 1, 2, 4, 8, 16 ‰ ...); eingezeichnet sind Schwellen und das Optimum der LP-Regeneration, daneben steht der genaue Wert (z.B. 2,35 ‰)
 + Inventar, Skillübersicht, Handel und Brauen als Fenster über der Karte; Öffnen und Schließen sind keine Befehle
 + Übersichtskarte per Umschalttaste, gezeichnet vom selben Renderer mit kleinen Feldern (4 bis 8 px); eine Minimap in der Seitenleiste ist später mit demselben Renderer möglich
@@ -392,7 +396,7 @@ Vorläufige Ideen, noch nicht umgesetzt. Licht ist hauptsächlich Spielmechanik,
 + Bemerken: Vor dem Zug eines Wesens mit eigener KI, das nicht jagt, würfelt es für jedes sichtbare feindliche Ziel innerhalb von dessen Heimlichkeitsweite mit `bemerkenChance` (25 %), nach Abstand und ID; Meldung `bemerkt`
 + Wer getroffen, verfehlt oder geschädigt wird, jagt sofort und kennt die Position der Urheberin
 + Ahnungslos ist ein Wesen mit KI, das nicht jagt; Angriffe darauf sind ein Hinterhalt (siehe Kampfwerte)
-+ Lärm (`laermMachen`, Baustein `laerm { lautstaerke }`, Meldung `laerm`): breitet sich aus wie eine Wegsuche mit Kosten, ein passierbares Feld kostet 1, anderes Gelände seine `laermdaempfung` (Wand 8), ohne Angabe dringt nichts durch; wer innerhalb der Lautstärke liegt, hört ihn: Schlafende werden wach (Meldung `aufgewacht`), Wache gehen der Quelle nach, wer jagt, bleibt dabei; jeder Nahkampf macht Lärm (`laermNahkampf` 6)
++ Lärm (`laermMachen`, Baustein `laerm { lautstaerke }`, Meldung `laerm`): breitet sich aus wie eine Wegsuche mit Kosten, ein passierbares Feld kostet 1, anderes Gelände seine `laermdaempfung` (Wand 8), ohne Angabe dringt nichts durch; wer innerhalb der Lautstärke liegt, hört ihn: Schlafende werden wach (Meldung `aufgewacht`), Wache gehen der Quelle nach, wer jagt, bleibt dabei; jeder Nahkampf macht Lärm (`laermNahkampf` 6); die Meldung nennt das Geräusch (`geraeusch`: `nahkampf`, `aufschlag`, `sonstiges`) und ob Ninkasi es hört (`spielerinHoert`, nicht bei eigenem Lärm), siehe Anzeige
 
 Vorläufige Ideen, noch nicht umgesetzt:
 
@@ -416,7 +420,8 @@ Vorläufige Ideen, noch nicht umgesetzt:
 
 + Vorgabe für die Bewegung: Ziffernblock, acht Richtungen, 5 für Warten
 + Die Belegung ist frei änderbar, siehe Datenfluss; sie umfasst Tasten, Maustasten und das Mausrad (`src/eingabe/belegung.js`)
-+ Weitere Tasten: Leertaste setzt eine unterbrochene lange Aktion fort (`fortsetzen`), R rastet bis voll, O erkundet automatisch, I öffnet das Inventarfenster (siehe Ausrüstung und Inventar), Z das Fähigkeitenfenster (siehe Zielmodus), <> nimmt die Treppe
++ Weitere Tasten: Leertaste setzt eine unterbrochene lange Aktion fort (`fortsetzen`), R rastet bis voll, O erkundet automatisch, I öffnet das Inventarfenster (siehe Ausrüstung und Inventar), Z das Fähigkeitenfenster (siehe Zielmodus), X untersucht (siehe Untersuchen), <> nimmt die Treppe
++ Buchstaben in den Fenstern gelten nach dem Zeichen der Taste (`KeyboardEvent.key`, `buchstabeDerTaste` in `src/eingabe/inventar.js`), so passen sie zu jeder Tastaturbelegung; die Belegung selbst nennt physische Tasten (`KeyboardEvent.code`)
 + Offene Fenster und der Zielmodus bekommen jede Taste, bevor die Belegung greift
 + Einstellungen (Zoom, Reise, Rasten, Geschossbahn) haben Vorgaben in `src/eingabe/einstellungen.js`; der Browser speichert nur Abweichungen davon
 
@@ -433,7 +438,7 @@ Vorläufige Ideen, noch nicht umgesetzt:
 + Rasten wartet, bis die Vorräte aus `rastenBis` (Vorgabe LP und MP) voll sind; beginnt nicht mit Feinden in Sicht oder wenn schon alles voll ist; hält bei `rastenHalt` (neuer Feind, Schaden) und nach höchstens `rastenHoechstens` Schritten, falls sich nichts mehr füllt (z.B. MP bei hohem Pegel)
 + Erkunden geht zum nächsten erkundeten Feld am Rand des Unbekannten (Breitensuche `naechstesFeldMit` in `src/welt/wege.js`, nur über erkundete Felder), bei jedem Schritt neu gewählt; hält wie die Reise (`reiseHalt`) und wenn nichts mehr zu erkunden ist
 + Im Zielmodus setzt die Maus den Cursor, ein Klick bestätigt (siehe Zielmodus)
-+ Später auf derselben Grundlage: Tooltips und Umschauen am Feld unter dem Zeiger
++ Der Tooltip zeigt beim Darüberfahren die Kurzfassung des Feldes unter dem Zeiger (siehe Untersuchen)
 
 ## Zielmodus
 
@@ -447,6 +452,17 @@ Vorläufige Ideen, noch nicht umgesetzt:
 + Anzeige: der Renderer zeigt die Bahn hell, die Fläche bläulich, die Betroffenen gelb umrandet und den Cursor grün (ginge) oder rot (Grund dagegen); die Seitenleiste nennt oben unter "Zielen", womit gezielt wird, den Grund und die Betroffenen mit Chance; Wirkungen innerhalb eines Effekts (z.B. der Brandkreis der Brandflasche) zeigt die Vorschau nicht
 + Geschossbahn: jede Meldung `geschoss` wird mit den Feldern, die Ninkasi sieht, abgespielt, ein helles Quadrat je Feld im Takt der Einstellung `geschossPause` (30 ms, 0 schaltet ab; `src/anzeige/animation.js` ohne Timer und DOM, den Takt gibt `src/main.js` vor); mehrere Bahnen nacheinander, jede Taste überspringt sie und wirkt trotzdem; der Zustand ist dann schon weiter, die Animation ist reine Anzeige
 + Der Bot benutzt Ninkasis Fähigkeiten über dieselbe Logik (Tab oder Feld in der Nähe), auch mit Zielen, die abgelehnt werden
+
+## Untersuchen
+
++ Vorbilder: DCSS (Beschreibung mit Trefferchance in beide Richtungen), Brogue (Seitenleiste und Beschreibung des Feldes unter dem Zeiger)
++ Taste X öffnet den Zielmodus mit der Auswahl `{ zweck: "untersuchen" }`: derselbe Cursor (Ziffernblock, Maus, Tab), keine Vorschau, kein Befehl, keine Spielzeit; Enter und Klick tun nichts, Esc oder X schließt
++ `src/systeme/untersuchen.js` (reine Lesefunktionen): `feldBeschreiben(spiel, feld)` gibt nichts für ein nie gesehenes Feld, für ein erkundetes, das Ninkasi gerade nicht sieht, nur das Gelände (erinnert), für ein sichtbares Gelände, Feldschichten mit Menge, Gegenstände, bekannte Fallen und Wesen
++ Wesen (`wesenBeschreiben`): LP, Zustände mit Restdauer (`zustaendeVon`: angefangene Züge zu 100 Zeiteinheiten, unbegrenzt ohne), Wachzustand, laufende Aktion (`laufendeAktionVon`), Trefferchance des ersten Angriffsprofils in beide Richtungen (`nahkampfchanceVorschau` in `src/systeme/vorschau.js`, gegen Ahnungslose 100 % als Hinterhalt, Blocken nicht eingerechnet)
++ Auf Ninkasi zeigt die Seitenleiste dazu die Aufschlüsselung ihrer Werte (`werteAufschluesseln`): Höchstwerte, Genauigkeit des ersten Profils, Kampfwerte und Sichtweite, je mit Grundwert, Wert und jedem Modifikator samt Herkunft (`herkunftVon`: angeboren, Gegenstand, Zustand, Aura); nur Werte, die nicht 0 sind oder Modifikatoren haben; Modifikatoren mit Bedingungen an ein Gegenüber zählen dort nicht
++ Tooltip (`tooltipHtml` in `src/anzeige/oberflaeche.js`, Element `#tooltip` über der Karte): die Kurzfassung des Feldes unter dem Zeiger, beim Untersuchen unter dem Cursor, also auch per Tastatur; rechts neben dem Feld, am rechten Rand links davon; nicht während eines Ablaufs
++ Geländearten haben dafür einen Namen (`text` in `daten/gelaende.js`, die Datenprüfung verlangt ihn)
++ Der Bot untersucht alle zehn Befehle Ninkasis Feld samt Werten, per Tab das nächste Wesen und ein Feld daneben, und zählt, welche Meldungen das Log zeigen, verbergen oder hören würde
 
 ## Gefahrenprüfung
 
@@ -474,6 +490,7 @@ Vorläufige Ideen, noch nicht umgesetzt:
 ## Gelände
 
 + Vorbild Brogue: Türen öffnen sich beim Hindurchgehen und schließen sich von selbst, Fallen sind verborgen, bis man sie entdeckt; Wesen der Ebene kennen ihre Fallen
++ Jede Geländeart hat einen Namen (`text`) für Untersuchen und Tooltip
 + Veränderliches Gelände (`src/systeme/gelaende.js`): `gelaendeSetzen(spiel, feld, name)` ändert ein Feld der Karte (sie bleibt eine Liste von Zeichenketten), meldet `gelaende_geaendert`, berechnet Ninkasis Sichtfeld neu, wenn das Feld in ihrer Sichtweite liegt, und merkt Wesen darauf für die Lageprüfung vor (eine Wand auf ihrem Feld klemmt sie ein, siehe Bewegung)
 + Bausteine `gelaende_setzen { gelaende, muster? }` (Zielfeld oder Felder des Musters) und `gelaende_zerstoeren { muster? }` (Gelände mit `zerstoerbar: { wird }` wird zu `wird`, z.B. eine Tür zu Boden); Parameterart `gelaende` in der Datenprüfung
 + `geschossdurchlaessig` am Gelände: Vorgabe wie `durchsichtig`; ein Gitter ist undurchsichtig, lässt aber Geschosse durch, Glas umgekehrt; die Sichtlinie bleibt davon unberührt
@@ -642,11 +659,11 @@ Vorläufige Ideen, noch nicht umgesetzt:
 + `package.json`: nur `"type": "module"` und `"private": true`, damit Node alle `.js`-Dateien als ES-Module liest; keine Abhängigkeiten, kein Build
 + `src/version.js`: Versionsnummer
 + `src/kern/`: Spiel und Eingangstür für Befehle (`spiel.js`), Zustand und Entitäten, räumlicher Index, Zeit, Zufall, Ereignisse und Katalog der Haken, Auslöser, Abschluss eines Vorgangs, Werte und Modifikatoren, Kurven, Effekte, Grundbausteine, Register, Datenprüfung
-+ `src/systeme/`: Bewegung, Kampf (Trefferwurf, Schadensrechnung), Fraktionen, Wahrnehmung, Sicht, Stoffwechsel, Inventar, Gefahrenprüfung, Tod, Zielauswahl samt Zielmustern, Bausteine mit Zielauswahl, Zustände, Befehlsveränderer, Beschwörung, Verschieben und Lage, Werfen, veränderliches Gelände und Türen, Fallen, Feldschichten und Feuer, Ebenen und Treppen, Ausrüstung und Flüche, Stapel, Ladungen und Last, Verschleiß (Verderben, Haltbarkeit), Unbekanntes, Bedingungen der Modifikatoren und Auren, Fähigkeiten, lange Aktionen, Vorschau für den Zielmodus, später Brauen, Handel u.a.
++ `src/systeme/`: Bewegung, Kampf (Trefferwurf, Schadensrechnung), Fraktionen, Wahrnehmung, Sicht, Stoffwechsel, Inventar, Gefahrenprüfung, Tod, Zielauswahl samt Zielmustern, Bausteine mit Zielauswahl, Zustände, Befehlsveränderer, Beschwörung, Verschieben und Lage, Werfen, veränderliches Gelände und Türen, Fallen, Feldschichten und Feuer, Ebenen und Treppen, Ausrüstung und Flüche, Stapel, Ladungen und Last, Verschleiß (Verderben, Haltbarkeit), Unbekanntes, Bedingungen der Modifikatoren und Auren, Fähigkeiten, lange Aktionen, Vorschau für den Zielmodus, Untersuchen, Wahrnehmbarkeit der Meldungen für das Log, später Brauen, Handel u.a.
 + `src/ki/`: Verhaltensmodule (`abwarten`, `jagen`, `fliehen`), ihre Zielwahl, Schrittwahl und die Wahl der Fähigkeiten
 + `src/welt/`: Dungeon-Erzeugung mit Treppen und Population nach Tiefe, Zugriff auf die Karte und die Feldschichten, Wegfindung, Geometrie (Linie, Sichtlinie, Flugbahn, Kreis, Kegel)
-+ `src/anzeige/`: Renderer, Tilebilder (Pixeldaten zu Bildern), Kamera, Oberfläche, Anzeige des Pegels, Log, angekündigte Angriffe, Animation der Geschossbahn, Textzugriff und Grammatik
-+ `src/eingabe/`: Belegung, Übersetzung in Befehle, Maus und Klickregeln, Reise, Rasten, Erkunden, Inventar- und Fähigkeitenfenster, Zielmodus, Vorgaben der Einstellungen
++ `src/anzeige/`: Renderer, Tilebilder (Pixeldaten zu Bildern), Kamera, Oberfläche mit Tooltip, Anzeige des Pegels, Log, angekündigte Angriffe, Animation der Geschossbahn, Textzugriff und Grammatik
++ `src/eingabe/`: Belegung, Übersetzung in Befehle, Maus und Klickregeln, Reise, Rasten, Erkunden, Inventar- und Fähigkeitenfenster, Zielmodus samt Untersuchen, Vorgaben der Einstellungen
 + `daten/`: Inhalte als JS-Datendateien, gesammelt in `daten/index.js`; `daten/zustaende.js` die Zustände; `daten/faehigkeiten.js` die Fähigkeiten, `daten/risiken.js` ihre Risikotabellen; `daten/regeln.js` hält Regelwerte für das Balancing (z.B. Kettengrenze der Auslöser, Halbwerte des Kampfs); `daten/schadensarten.js` die Schadensarten; `daten/fraktionen.js` die Fraktionen und ihre Beziehungen; `daten/etiketten.js` die Etiketten unbekannter Gegenstände; `daten/zeichen.js` ist das Tileset aus Zeichen, Ersatz, wo kein Tile aus `grafik/` passt
 + `grafik/`: Palette und Tiles als Pixeldaten, unter der Grafiklizenz, dazu die Vorschauseite `vorschau.html`; siehe [Tileset.md](Tileset.md)
 + `sprache/de/`, `sprache/en/`: Texte (`texte.js`) und Grammatikregeln (`grammatik.js`) als Daten

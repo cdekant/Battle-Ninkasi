@@ -52,9 +52,9 @@ export function rohdatenMitTesteintraegen() {
   const zeichen = (bereich, name) => { daten.zeichen[bereich] ??= {}; daten.zeichen[bereich][name] = { zeichen: "?", farbe: "#ffffff" }; };
   daten.effekte.testeffekt = { schritte: [{ baustein: "schaden", art: "stumpf", menge: 1 }] };
   daten.fraktionen.testfraktion = { text: "fraktion.testfraktion" };
-  daten.gelaende.testgelaende = { kennung: "§", passierbar: false, durchsichtig: false };
-  daten.gelaende.testtuer = { kennung: "¤", passierbar: false, durchsichtig: false, tuer: { offen: "boden" } };
-  daten.gelaende.testquelle = { kennung: "¦", passierbar: false, durchsichtig: true, quelle: { gas: "testgas", menge: 1 }, brennbar: 10, verbrenntZu: "boden" };
+  daten.gelaende.testgelaende = { text: "gelaende.testgelaende", kennung: "§", passierbar: false, durchsichtig: false };
+  daten.gelaende.testtuer = { text: "gelaende.testtuer", kennung: "¤", passierbar: false, durchsichtig: false, tuer: { offen: "boden" } };
+  daten.gelaende.testquelle = { text: "gelaende.testquelle", kennung: "¦", passierbar: false, durchsichtig: true, quelle: { gas: "testgas", menge: 1 }, brennbar: 10, verbrenntZu: "boden" };
   for (const name of ["testgelaende", "testtuer", "testquelle"]) zeichen("gelaende", name);
   daten.fallen.testfalle = { text: "falle.testfalle", falle: { tarnung: 10, effekt: "testeffekt" } };
   zeichen("fallen", "testfalle");

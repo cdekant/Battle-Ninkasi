@@ -131,7 +131,7 @@ function profileAusfuehren(spiel, angreifer, ziel, ausgefuehrt, kettentiefe) {
       einzelangriff(spiel, angreifer, profil, getroffenes, kettentiefe);
     }
   });
-  laermMachen(spiel, angreifer.position, spiel.daten.regeln.wahrnehmung.laermNahkampf, angreifer.id);
+  laermMachen(spiel, angreifer.position, spiel.daten.regeln.wahrnehmung.laermNahkampf, angreifer.id, "nahkampf");
 }
 
 // Angriffsaktion gegen ein Ziel mit allen Profilen; gibt die Grundkosten zurück (das langsamste ausgeführte Profil)

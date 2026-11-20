@@ -34,6 +34,7 @@ import { neueAnimation, geschossEinreihen, laeuftAnimation, aktuellesGeschoss, a
 
 const SPEICHERSCHLUESSEL_EINSTELLUNGEN = "battle-ninkasi.einstellungen";
 const RAD_PAUSE_MS = 150; // zwischen zwei Zoomschritten per Rad
+const TOOLTIP_ABSTAND = 6; // Pixel zwischen Feld und Tooltip
 
 const grammatik = erstelleGrammatik(grammatikDe);
 const texte = erstelleTexte(texteDe, grammatik);
@@ -90,6 +91,7 @@ const kartenCanvas = document.getElementById("karte-canvas");
 const renderer = new Renderer(kartenCanvas, daten.zeichen, tilebilder);
 const oberflaeche = new Oberflaeche(document.getElementById("seitenleiste"), texte, VERSION);
 const log = new Log(document.getElementById("log"), texte);
+const tooltipElement = document.getElementById("tooltip");
 
 // Anzeige-Zustand, gehört nicht zum Spielzustand
 let kamera = neueKamera();
@@ -101,7 +103,8 @@ let ablaufZeitgeber = null;
 let letzterRadZoom = 0;
 // Inventarfenster: null oder { gewaehlt } (eingabe/inventar.js), reine Anzeige, nicht im Spielzustand
 let inventarFenster = null;
-// Fähigkeitenfenster: null oder {} (eingabe/faehigkeiten.js); Zielmodus: null oder { auswahl, zielart, cursor } (eingabe/zielmodus.js)
+// Fähigkeitenfenster: null oder {} (eingabe/faehigkeiten.js); Zielmodus: null oder { auswahl, zielart, cursor } (eingabe/zielmodus.js),
+// auch zum Untersuchen (auswahl { zweck: "untersuchen" })
 let faehigkeitenFenster = null;
 let zielModus = null;
 // Geschossbahnen aus den Meldungen "geschoss", abgespielt im Takt geschossPause (anzeige/animation.js)
@@ -123,10 +126,30 @@ function zeichnen() {
     felder: zielvorschau.aufloesung?.ok && !zielvorschau.aufloesung.bahn ? zielvorschau.aufloesung.felder : [],
     betroffene: zielvorschau.betroffene.map(({ id }) => spiel.zustand.entitaeten[id].position),
   };
+  // Untersuchen: nur der Cursor, ohne Bahn und Fläche
+  const untersuchmarkierung = zielModus && !zielvorschau && { cursor: zielModus.cursor, ok: true, bahn: [], felder: [], betroffene: [] };
   renderer.zeichnen(spiel, kamera, ansicht, einstellungen.zoom, {
-    zeiger: feldUnterZeiger, weg: wegvorschau, gefahr: angekuendigteFelder(spiel), ziel: zielmarkierung, geschoss: aktuellesGeschoss(animation),
+    zeiger: feldUnterZeiger, weg: wegvorschau, gefahr: angekuendigteFelder(spiel), ziel: zielmarkierung || untersuchmarkierung, geschoss: aktuellesGeschoss(animation),
   });
   oberflaeche.anzeigen(spiel, { inventar: inventarFenster, faehigkeiten: faehigkeitenFenster, ziel: zielModus && { modus: zielModus, vorschau: zielvorschau } });
+  tooltipZeigen();
+}
+
+// Tooltip: Kurzfassung des Feldes unter dem Zeiger, beim Untersuchen unter dem Cursor (auch per Tastatur);
+// rechts neben dem Feld, am rechten Rand links davon
+function tooltipZeigen() {
+  const untersuchen = zielModus?.auswahl.zweck === "untersuchen";
+  const feld = untersuchen ? zielModus.cursor : feldUnterZeiger;
+  const html = feld && !laufenderAblauf ? oberflaeche.tooltipHtml(spiel, feld) : "";
+  tooltipElement.hidden = !html;
+  if (!html) return;
+  tooltipElement.innerHTML = html;
+  const zoom = einstellungen.zoom;
+  const links = (feld.x - kamera.x + 1) * zoom + TOOLTIP_ABSTAND;
+  const oben = (feld.y - kamera.y) * zoom;
+  const passtRechts = links + tooltipElement.offsetWidth <= kartenCanvas.clientWidth;
+  tooltipElement.style.left = `${passtRechts ? links : Math.max(0, (feld.x - kamera.x) * zoom - TOOLTIP_ABSTAND - tooltipElement.offsetWidth)}px`;
+  tooltipElement.style.top = `${Math.max(0, Math.min(oben, kartenCanvas.clientHeight - tooltipElement.offsetHeight))}px`;
 }
 
 // Geschossbahnen: nur die Felder, die Ninkasi gerade sieht; der Takt läuft unabhängig von Reise und Eingabe
@@ -213,7 +236,7 @@ function starten(startwert) {
   spiel = neuesSpiel(daten, startwert);
   window.spiel = spiel; // zum Nachsehen in der Konsole
   kamera = neueKamera();
-  log.leeren(spiel.zustand.spielerinId);
+  log.leeren(spiel);
   hoererAnmelden(spiel, log.melden);
   hoererAnmelden(spiel, geschossGemeldet);
   log.zeile(texte.text("log.willkommen"));
@@ -251,7 +274,7 @@ window.addEventListener("keydown", (tastenereignis) => {
   // Inventarfenster offen: es bekommt jede Taste
   if (inventarFenster) {
     tastenereignis.preventDefault();
-    const { fenster, befehl, auswahl } = inventarTaste(inventarFenster, tastenereignis.code, spiel);
+    const { fenster, befehl, auswahl } = inventarTaste(inventarFenster, tastenereignis.code, spiel, tastenereignis.key);
     inventarFenster = fenster;
     if (befehl) return befehlGebenUndZeichnen(befehl);
     if (auswahl) return auswahlStarten(auswahl);
@@ -260,7 +283,7 @@ window.addEventListener("keydown", (tastenereignis) => {
   // Fähigkeitenfenster offen: es bekommt jede Taste, die Wahl führt in den Zielmodus
   if (faehigkeitenFenster) {
     tastenereignis.preventDefault();
-    const { fenster, auswahl } = faehigkeitenTaste(faehigkeitenFenster, tastenereignis.code, spiel);
+    const { fenster, auswahl } = faehigkeitenTaste(faehigkeitenFenster, tastenereignis.code, spiel, tastenereignis.key);
     faehigkeitenFenster = fenster;
     if (auswahl) return auswahlStarten(auswahl);
     return zeichnen();
@@ -281,6 +304,11 @@ window.addEventListener("keydown", (tastenereignis) => {
   if (ergebnis.anzeige === "faehigkeiten") {
     if (spiel.zustand.vorbei) return;
     faehigkeitenFenster = {};
+    return zeichnen();
+  }
+  if (ergebnis.anzeige === "untersuchen") {
+    if (spiel.zustand.vorbei) return;
+    zielModus = zielmodusBeginnen(spiel, { zweck: "untersuchen" }).modus;
     return zeichnen();
   }
   if (ergebnis.anzeige === "zoom_rein") return zoomen(1);

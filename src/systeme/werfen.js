@@ -57,7 +57,7 @@ anmelden("befehle", "werfen", {
       positionSetzen(spiel.zustand, gegenstand, aufschlag);
       melden(spiel, "gelandet", { was: bezugAuf(gegenstand), feld: aufschlag });
     }
-    laermMachen(spiel, aufschlag, spiel.daten.regeln.wahrnehmung.laermWurf, akteur.id);
+    laermMachen(spiel, aufschlag, spiel.daten.regeln.wahrnehmung.laermWurf, akteur.id, "aufschlag");
     return "werfen";
   },
 });

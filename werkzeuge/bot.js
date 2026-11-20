@@ -21,6 +21,8 @@ import belegung from "../src/eingabe/belegung.js";
 import einstellungen from "../src/eingabe/einstellungen.js";
 import { indexPruefen } from "../src/kern/raumindex.js";
 import { warteschlangeGueltig } from "../src/kern/zeit.js";
+import { feldBeschreiben, werteAufschluesseln } from "../src/systeme/untersuchen.js";
+import { meldungWahrnehmbar, geraeuschGehoert } from "../src/systeme/wahrnehmbar.js";
 
 const [anzahlLaeufe = 20, hoechsteBefehlszahl = 3000, ersterStartwert = 1] = process.argv.slice(2).map(Number);
 const daten = datenLaden(rohdaten, { texte, nomenPruefen: erstelleGrammatik(grammatikDe).pruefen });
@@ -166,14 +168,31 @@ let anzahlTode = 0, anzahlFehler = 0;
 const reisenNachHaltegrund = {};
 // Fähigkeiten der Gegner: gewirkt, lange Aktionen begonnen und abgebrochen
 const gegnerfaehigkeiten = { gewirkt: 0, begonnen: 0, abgebrochen: 0 };
-// Würfe und Fähigkeiten Ninkasis
+// Untersuchen wie mit Taste X: Ninkasis Feld mit ihren Werten, dann per Tab das nächste Wesen und ein Feld daneben;
+// würfelt nicht, damit der Lauf derselbe bleibt
+function untersuchen(spiel) {
+  const ninkasi = spielerin(spiel.zustand);
+  feldBeschreiben(spiel, ninkasi.position);
+  werteAufschluesseln(spiel, ninkasi);
+  let modus = zielmodusBeginnen(spiel, { zweck: "untersuchen" }).modus;
+  modus = zielmodusTaste(spiel, modus, "Tab", belegung).modus;
+  feldBeschreiben(spiel, modus.cursor);
+  modus = zielmodusTaste(spiel, modus, "Numpad6", belegung).modus;
+  feldBeschreiben(spiel, modus.cursor);
+  if (zielmodusTaste(spiel, modus, "KeyX", belegung).modus !== null) throw new Error("X schließt das Untersuchen nicht");
+}
+
+// Würfe und Fähigkeiten Ninkasis; Meldungen, die das Log zeigt, verbirgt oder als Geräusch hört
 let anzahlWuerfe = 0, anzahlAngelegt = 0, ninkasisFaehigkeiten = 0;
+const meldungenFuerNinkasi = { gezeigt: 0, verborgen: 0, gehoert: 0 };
 console.log("Startwert  Befehle  Zeit     LP   MP   PP  Pegel  Getötet  Biere  Ergebnis");
 for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe; startwert++) {
   try {
     const spiel = neuesSpiel(daten, startwert);
     let getoetet = 0, getrunkeneBiere = 0;
     hoererAnmelden(spiel, (meldung) => {
+      if (geraeuschGehoert(spiel, meldung)) meldungenFuerNinkasi.gehoert++;
+      else if (meldung.art !== "laerm") meldungenFuerNinkasi[meldungWahrnehmbar(spiel, meldung) ? "gezeigt" : "verborgen"]++;
       if (meldung.art === "tod" && meldung.opfer.id !== spiel.zustand.spielerinId) getoetet++;
       if (meldung.art === "getrunken") getrunkeneBiere++;
       if (meldung.art === "geworfen") anzahlWuerfe++;
@@ -193,6 +212,7 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
       }
       befehlGeben(spiel, zufallsbefehl(botZufall, spiel));
       invariantenPruefen(spiel);
+      if (spiel.befehle.length % 10 === 0 && !spiel.zustand.vorbei) untersuchen(spiel);
     }
     const nachgespielt = nachspielen(daten, JSON.parse(JSON.stringify(spielstand(spiel))));
     const zustaendeGleich = JSON.stringify(nachgespielt.zustand) === JSON.stringify(spiel.zustand);
@@ -213,5 +233,6 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
 const haltegruende = Object.entries(reisenNachHaltegrund).map(([grund, anzahl]) => `${grund} ${anzahl}`).join(", ");
 console.log(`\nAbläufe nach Haltegrund: ${haltegruende}`);
 console.log(`Fähigkeiten der Gegner: ${gegnerfaehigkeiten.gewirkt} gewirkt, ${gegnerfaehigkeiten.begonnen} lange Aktionen begonnen, ${gegnerfaehigkeiten.abgebrochen} abgebrochen; ${anzahlAngelegt} Mal angelegt, ${anzahlWuerfe} Würfe Ninkasis, ${ninkasisFaehigkeiten} Fähigkeiten Ninkasis`);
+console.log(`Meldungen für Ninkasi: ${meldungenFuerNinkasi.gezeigt} gezeigt, ${meldungenFuerNinkasi.verborgen} verborgen, ${meldungenFuerNinkasi.gehoert} gehört`);
 console.log(`${anzahlLaeufe} Läufe, ${anzahlTode} tot, ${anzahlFehler} Fehler`);
 process.exitCode = anzahlFehler ? 1 : 0;

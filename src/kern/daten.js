@@ -770,6 +770,7 @@ export function vorbereiten(rohdaten, sprache = {}) {
   for (const [name, ebene] of Object.entries(daten.ebenen)) pruefeEbene(daten, name, ebene, fehler);
   pruefeAbfolge(daten, fehler);
   for (const [name, gelaende] of Object.entries(daten.gelaende)) {
+    pruefeText(sprache.texte, gelaende.text, `gelaende.${name}`, fehler);
     if (typeof gelaende.kennung !== "string" || gelaende.kennung.length !== 1) fehler.push(`gelaende.${name}: kennung muss genau ein Zeichen sein`);
     if (gelaende.laermdaempfung !== undefined && !istZahlAbNull(gelaende.laermdaempfung)) fehler.push(`gelaende.${name}: laermdaempfung muss eine ganze Zahl >= 0 sein`);
     // Bewegungsarten, siehe welt/karte.js

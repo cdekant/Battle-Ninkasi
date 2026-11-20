@@ -1,6 +1,8 @@
 // Zielmodus (siehe docs/Architektur.md, Zielmodus): reine Tasten- und Mauslogik ohne DOM, damit sie testbar ist.
 // Anzeige-Zustand, nicht im Spielzustand: null oder { auswahl, zielart, cursor: { x, y } }
-//   auswahl wie in systeme/vorschau.js: { zweck: "werfen", gegenstandId } oder { zweck: "faehigkeit", faehigkeit }
+//   auswahl wie in systeme/vorschau.js: { zweck: "werfen", gegenstandId } oder { zweck: "faehigkeit", faehigkeit },
+//   dazu { zweck: "untersuchen" } (Taste X): derselbe Cursor ohne Befehl, Enter tut nichts, Esc oder X schließt;
+//   was der Cursor zeigt, beschreibt systeme/untersuchen.js
 //   Bewegungstasten der Belegung verschieben den Cursor, die Maus setzt ihn; Tab springt zum nächsten Ziel in Sicht,
 //   Enter bestätigt (nur, wenn die Vorschau keinen Grund dagegen nennt), Esc bricht ab.
 // Fähigkeiten ohne Ziel oder mit Zielart selbst brauchen keinen Zielmodus, sie werden sofort zum Befehl.
@@ -15,6 +17,9 @@ import { zielvorschau } from "../systeme/vorschau.js";
 export const TASTEN_BESTAETIGEN = ["Enter", "NumpadEnter"];
 export const TASTE_NAECHSTES_ZIEL = "Tab";
 export const TASTE_ABBRECHEN = "Escape";
+export const TASTE_UNTERSUCHEN = "KeyX";
+
+const istUntersuchen = (modus) => modus.auswahl.zweck === "untersuchen";
 
 // Gründe, die nur am Ziel liegen; sie hindern den Beginn des Zielmodus nicht
 const GRUENDE_DES_ZIELS = ["ungueltig", "kein_ziel", "nicht_sichtbar", "zu_weit", "keine_sichtlinie"];
@@ -36,7 +41,9 @@ export function zieleInSicht(spiel) {
 export function zielmodusBeginnen(spiel, auswahl) {
   const ninkasi = spielerin(spiel.zustand);
   let zielart;
-  if (auswahl.zweck === "werfen") {
+  if (auswahl.zweck === "untersuchen") {
+    zielart = { art: "feld" };
+  } else if (auswahl.zweck === "werfen") {
     const gegenstand = (ninkasi.inventar || []).includes(auswahl.gegenstandId) ? entitaetMitId(spiel.zustand, auswahl.gegenstandId) : null;
     if (!gegenstand) return { grund: "nichts_zu_werfen" };
     zielart = { art: "geschoss", reichweite: gegenstand.wurf?.reichweite ?? spiel.daten.regeln.werfen.reichweite };
@@ -67,8 +74,9 @@ export function zielangabeVon(spiel, modus) {
   return { x: cursor.x, y: cursor.y };
 }
 
-// Vorschau zum aktuellen Cursor (systeme/vorschau.js)
+// Vorschau zum aktuellen Cursor (systeme/vorschau.js); beim Untersuchen null
 export function zielmodusVorschau(spiel, modus) {
+  if (istUntersuchen(modus)) return null;
   return zielvorschau(spiel, spielerin(spiel.zustand), modus.auswahl, zielangabeVon(spiel, modus));
 }
 
@@ -78,8 +86,9 @@ export function cursorSetzen(spiel, modus, feld) {
   return { ...modus, cursor: { x: feld.x, y: feld.y } };
 }
 
-// Bestätigen: { modus: null, befehl } oder, wenn die Vorschau einen Grund nennt, { modus, grund }
+// Bestätigen: { modus: null, befehl } oder, wenn die Vorschau einen Grund nennt, { modus, grund }; Untersuchen bleibt offen
 export function zielmodusBestaetigen(spiel, modus) {
+  if (istUntersuchen(modus)) return { modus };
   const vorschau = zielmodusVorschau(spiel, modus);
   return vorschau.ok ? { modus: null, befehl: vorschau.befehl } : { modus, grund: vorschau.grund };
 }
@@ -93,7 +102,7 @@ function naechstesZiel(spiel, modus) {
 
 // Verarbeitet eine Taste (KeyboardEvent.code) im Zielmodus; gibt { modus, befehl?, grund? } zurück
 export function zielmodusTaste(spiel, modus, tastencode, belegung) {
-  if (tastencode === TASTE_ABBRECHEN) return { modus: null };
+  if (tastencode === TASTE_ABBRECHEN || (tastencode === TASTE_UNTERSUCHEN && istUntersuchen(modus))) return { modus: null };
   if (TASTEN_BESTAETIGEN.includes(tastencode)) return zielmodusBestaetigen(spiel, modus);
   if (tastencode === TASTE_NAECHSTES_ZIEL) return { modus: naechstesZiel(spiel, modus) };
   const vorlage = belegung.befehle[tastencode];

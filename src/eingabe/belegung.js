@@ -31,6 +31,7 @@ export default {
     KeyO: "erkunden", // automatisch erkunden
     KeyI: "inventar", // Inventarfenster öffnen (eingabe/inventar.js)
     KeyY: "faehigkeiten", // Taste Z auf deutscher Tastatur: Fähigkeitenfenster (eingabe/faehigkeiten.js)
+    KeyX: "untersuchen",  // Untersuchen mit dem Cursor des Zielmodus (eingabe/zielmodus.js)
   },
   // Maustasten nach MouseEvent.button (0 links, 1 Mitte, 2 rechts); Rad: Zoom oder nichts
   maus: {

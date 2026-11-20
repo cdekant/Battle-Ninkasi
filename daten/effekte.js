@@ -12,7 +12,7 @@ export default {
     schritte: [{ baustein: "trefferwurf", genauigkeit: 70, effekt: "testfaehigkeit_treffer" }],
   },
   testfaehigkeit_treffer: {
-    schritte: [{ baustein: "schaden", art: "magie", wuerfel: "1W6+1" }],
+    schritte: [{ baustein: "schaden", art: "magie", wuerfel: "1W6+1" }, { baustein: "zustand_setzen", zustand: "testzustand" }],
   },
   // Fähigkeiten des Testgegners fernkaempfer_test (daten/faehigkeiten.js); vorläufig
   saeurespritzer: {

@@ -7,7 +7,7 @@
 
 import { holen } from "../kern/register.js";
 import { entitaetMitId, istWesen } from "../kern/zustand.js";
-import { trefferanteil, anteilInProzent } from "./kampf.js";
+import { trefferanteil, anteilInProzent, angriffeVon } from "./kampf.js";
 import { istAhnungslos } from "./wahrnehmung.js";
 import { istSichtbar } from "./sicht.js";
 import { zielAufloesen } from "./zielauswahl.js";
@@ -41,6 +41,17 @@ export function trefferchanceVorschau(spiel, quelle, ziel, effektName, tags = []
   if (quelle && istAhnungslos(ziel)) return { prozent: 100, hinterhalt: true };
   const alleTags = ohneDoppelte([...tags, ...tagsDesEffekts(spiel, effektName), ...tagsDesEffekts(spiel, ersterSchritt.effekt)]);
   const { zaehler, nenner } = trefferanteil(spiel, { quelle, ziel, genauigkeit: ersterSchritt.genauigkeit, gegen: ersterSchritt.gegen, tags: alleTags });
+  return { prozent: anteilInProzent(zaehler, nenner) };
+}
+
+// Chance des ersten Angriffsprofils eines Wesens gegen ein anderes (Untersuchen, systeme/untersuchen.js):
+// { prozent, hinterhalt? } oder null ohne Angriff; die Tags wie in kampf.js (Profil und Effekt)
+export function nahkampfchanceVorschau(spiel, angreifer, ziel) {
+  const profil = angriffeVon(spiel, angreifer)[0];
+  if (!profil) return null;
+  if (istAhnungslos(ziel)) return { prozent: 100, hinterhalt: true };
+  const tags = ohneDoppelte([...(profil.tags || []), ...tagsDesEffekts(spiel, profil.effekt)]);
+  const { zaehler, nenner } = trefferanteil(spiel, { quelle: angreifer, ziel, genauigkeit: profil.genauigkeit, tags });
   return { prozent: anteilInProzent(zaehler, nenner) };
 }
 

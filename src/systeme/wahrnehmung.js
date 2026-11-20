@@ -118,12 +118,18 @@ export function laermFelder(spiel, ursprung, lautstaerke) {
   return new Set(kosten.keys());
 }
 
-// Lärm am Ursprung: Schlafende werden wach, Wache gehen ihm nach; wer jagt, bleibt dabei
-export function laermMachen(spiel, ursprung, lautstaerke, urheberId = null) {
+// Arten von Geräuschen für die Meldung "laerm" (Ninkasi hört sie als vage Zeile im Log, systeme/wahrnehmbar.js)
+export const GERAEUSCHE = ["nahkampf", "aufschlag", "sonstiges"];
+
+// Lärm am Ursprung: Schlafende werden wach, Wache gehen ihm nach; wer jagt, bleibt dabei.
+// Die Meldung sagt mit spielerinHoert, ob der Lärm Ninkasis Feld erreicht (ihr eigener zählt nicht).
+export function laermMachen(spiel, ursprung, lautstaerke, urheberId = null, geraeusch = "sonstiges") {
   if (!ursprung || lautstaerke <= 0) return;
   const ebene = spiel.zustand.ebene;
   const erreicht = laermFelder(spiel, ursprung, lautstaerke);
-  melden(spiel, "laerm", { ursprung: { x: ursprung.x, y: ursprung.y }, lautstaerke });
+  const ninkasi = spiel.zustand.entitaeten[spiel.zustand.spielerinId];
+  const spielerinHoert = Boolean(ninkasi?.position) && ninkasi.id !== urheberId && erreicht.has(feldIndex(ebene, ninkasi.position.x, ninkasi.position.y));
+  melden(spiel, "laerm", { ursprung: { x: ursprung.x, y: ursprung.y }, lautstaerke, geraeusch, spielerinHoert });
   // jedes Feld kostet mindestens 1, weiter als die Lautstärke (Schachbrett) trägt Lärm also nie
   for (const wesen of entitaetenImUmkreis(spiel.zustand, ursprung, lautstaerke)) {
     if (!wesen.ki || !wesen.position || wesen.id === urheberId) continue;

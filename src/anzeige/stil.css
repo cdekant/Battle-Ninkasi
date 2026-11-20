@@ -50,6 +50,22 @@ html, body {
 
 #karte-canvas { display: block; position: absolute; inset: 0; }
 
+/* Tooltip über der Karte (main.js, anzeige/oberflaeche.js tooltipHtml); fängt keine Maus ab */
+#tooltip {
+  position: absolute;
+  max-width: 280px;
+  padding: 4px 8px;
+  background: rgba(26, 21, 16, 0.92);
+  border: 1px solid var(--linie);
+  font-size: 0.85em;
+  pointer-events: none;
+}
+#tooltip[hidden] { display: none; }
+#tooltip ul { list-style: none; margin: 0; padding: 0; }
+#tooltip li.gewaehlt { color: var(--bier); }
+#tooltip .leise { color: var(--leise); }
+#tooltip .schlimm { color: var(--schlimm); }
+
 #seitenleiste {
   grid-column: 2;
   grid-row: 1 / span 2;
@@ -70,6 +86,8 @@ html, body {
 #seitenleiste li.hinweis { color: var(--hinweis); font-size: 0.85em; margin-top: 6px; }
 #seitenleiste .buchstabe { color: var(--kupfer); font-family: monospace; }
 #seitenleiste .schlimm { color: var(--schlimm); }
+#seitenleiste li.einzug { padding-left: 1em; font-size: 0.9em; }
+#seitenleiste .zusatz { font-size: 0.8em; margin-top: -2px; }
 
 .wert { margin: 6px 0; }
 .wert-kopf { display: flex; justify-content: space-between; font-size: 0.9em; }

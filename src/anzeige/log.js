@@ -1,11 +1,15 @@
 // Log: übersetzt Meldungen in Textzeilen. Hört nur zu, verändert nichts.
 // Unten 5 Zeilen, aufklappbar (Anzeige-Zustand).
+// Nur was Ninkasi wahrnimmt (systeme/wahrnehmbar.js); Lärm, dessen Ursprung sie nicht sieht, hört sie als vage Zeile
+// mit Richtung, höchstens eine je Zug (ZEIT_ZWISCHEN_GERAEUSCHEN).
 
 import { satzanfang } from "./texte.js";
 import { promilleText } from "./pegelanzeige.js";
+import { meldungWahrnehmbar, geraeuschGehoert } from "../systeme/wahrnehmbar.js";
 
 const SICHTBARE_ZEILEN = 5;
 const HOECHSTE_ZEILENZAHL = 500;
+const ZEIT_ZWISCHEN_GERAEUSCHEN = 100;
 
 export class Log {
   constructor(element, texte) {
@@ -13,13 +17,33 @@ export class Log {
     this.texte = texte;
     this.zeilen = [];
     this.aufgeklappt = false;
+    this.spiel = null;
     this.spielerinId = null;
+    this.letztesGeraeusch = -Infinity;
   }
 
-  leeren(spielerinId) {
+  leeren(spiel) {
     this.zeilen = [];
-    this.spielerinId = spielerinId;
+    this.spiel = spiel;
+    this.spielerinId = spiel.zustand.spielerinId;
+    this.letztesGeraeusch = -Infinity;
     this.anzeigen();
+  }
+
+  // Gehörter Lärm: eine Zeile je Zug, mit grober Richtung
+  geraeusch(meldung) {
+    const gehoert = geraeuschGehoert(this.spiel, meldung);
+    if (!gehoert || meldung.zeit - this.letztesGeraeusch < ZEIT_ZWISCHEN_GERAEUSCHEN) return;
+    this.letztesGeraeusch = meldung.zeit;
+    const { text } = this.texte;
+    this.zeile(text(`log.geraeusch.${gehoert.geraeusch}`, { richtung: text(`richtung.${gehoert.richtung ?? "nah"}`) }), "leise");
+  }
+
+  // Name eines Zustands aus seinen Daten
+  zustandsname(name) {
+    const { text, hatSchluessel } = this.texte;
+    const schluessel = this.spiel.daten.zustaende?.[name]?.text;
+    return schluessel && hatSchluessel(schluessel) ? text(schluessel) : name;
   }
 
   zeile(text, cssKlasse = "") {
@@ -36,6 +60,8 @@ export class Log {
   // Hörer für Spielmeldungen
   melden = (meldung) => {
     const { text, hatSchluessel } = this.texte;
+    if (meldung.art === "laerm") return this.geraeusch(meldung);
+    if (!meldungWahrnehmbar(this.spiel, meldung)) return;
     switch (meldung.art) {
       case "tod":
         if (meldung.opfer.id === this.spielerinId) return this.zeile(text("log.tod_ninkasi"), "schlimm");
@@ -94,6 +120,16 @@ export class Log {
       case "fluch_aufgehoben":
         if (meldung.wer.id === this.spielerinId) this.zeile(text("log.fluch_aufgehoben", meldung), "gut");
         return;
+      // eigener Text des Zustands (log.zustand.<name>.beginnt), sonst der allgemeine
+      case "zustand_beginnt":
+      case "zustand_endet": {
+        const vorgang = meldung.art === "zustand_beginnt" ? "beginnt" : "endet";
+        const eigenerSchluessel = `log.zustand.${meldung.zustand}.${vorgang}`;
+        const schluessel = hatSchluessel(eigenerSchluessel) ? eigenerSchluessel : `log.zustand_${vorgang}`;
+        return this.zeile(text(schluessel, { ...meldung, zustand: this.zustandsname(meldung.zustand) }));
+      }
+      case "beschworen":
+        return this.zeile(text(meldung.wer ? "log.beschworen" : "log.erschienen", meldung));
       default: {
         const schluessel = `log.${meldung.art}`;
         if (hatSchluessel(schluessel)) this.zeile(text(schluessel, meldung));

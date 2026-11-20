@@ -159,7 +159,7 @@ test("Angriffsprofile werden geprüft", () => {
 test("Zustände: Felder, Verweise und Kreise über Beginn und Ende werden geprüft", () => {
   const mitZustand = (zustand, effekte = {}) => {
     const daten = structuredClone(rohdaten);
-    daten.zustaende = { test: zustand };
+    daten.zustaende = { ...daten.zustaende, test: zustand };
     Object.assign(daten.effekte, effekte);
     return vorbereiten(daten).fehler;
   };
@@ -193,7 +193,7 @@ test("Zustände: Felder, Verweise und Kreise über Beginn und Ende werden geprü
 test("Verhalten in Zuständen und Beschwören werden geprüft", () => {
   const mitZustand = (zustand, effekte = {}) => {
     const daten = rohdatenMitTesteintraegen();
-    daten.zustaende = { test: { text: "test", ...zustand } };
+    daten.zustaende = { ...daten.zustaende, test: { text: "test", ...zustand } };
     Object.assign(daten.effekte, effekte);
     return vorbereiten(daten).fehler;
   };
@@ -236,7 +236,7 @@ test("Modifikatoren, Tags und Auren an Wesen und Zuständen werden geprüft", ()
     assert.ok(mitNinkasi(() => abweichung).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
   }
   const daten = structuredClone(rohdaten);
-  daten.zustaende = { test: { text: "test", auren: [{ ...aura, trifft: "niemand" }] } };
+  daten.zustaende = { ...daten.zustaende, test: { text: "test", auren: [{ ...aura, trifft: "niemand" }] } };
   assert.ok(vorbereiten(daten).fehler.some((meldung) => meldung.includes("zustaende.test.auren[0]")));
 });
 
@@ -256,7 +256,7 @@ test("Fähigkeiten, Risikotabellen und Unterhalt werden geprüft", () => {
   const regeln = structuredClone(rohdaten.regeln);
   regeln.laufendeAktionen.unterbrechen = ["schaden", "erdbeben"];
   assert.ok(mitFaehigkeit(gueltig, { regeln }).some((meldung) => meldung.includes('Gefahrenprüfung "erdbeben"')));
-  assert.deepEqual(mitFaehigkeit({ text: "wesen.ninkasi", art: "aufrecht", zustand: "test" }, { zustaende: { test: { text: "wesen.ninkasi", unterhalt: { mp: 2 } } } }), []);
+  assert.deepEqual(mitFaehigkeit({ text: "wesen.ninkasi", art: "aufrecht", zustand: "test" }, { zustaende: { ...rohdaten.zustaende, test: { text: "wesen.ninkasi", unterhalt: { mp: 2 } } } }), []);
   const erwartet = [
     [{ ...gueltig, text: undefined }, "Textschlüssel"],
     [{ ...gueltig, art: "passiv" }, "art muss"],
@@ -285,7 +285,7 @@ test("Fähigkeiten, Risikotabellen und Unterhalt werden geprüft", () => {
   assert.ok(fehler.some((meldung) => meldung.includes("risiken.psi[0]: wirkt fehlt")));
   assert.ok(fehler.some((meldung) => meldung.includes("aufsteigen")));
   const daten = structuredClone(rohdaten);
-  daten.zustaende = { test: { text: "wesen.ninkasi", unterhalt: { mp: "viel" } } };
+  daten.zustaende = { ...daten.zustaende, test: { text: "wesen.ninkasi", unterhalt: { mp: "viel" } } };
   assert.ok(vorbereiten(daten).fehler.some((meldung) => meldung.includes("unterhalt.mp")));
 });
 
