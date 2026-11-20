@@ -1,8 +1,8 @@
 # Battle Ninkasi - Oberfläche
 
-Stand: 2026-11-20, Entwurf, nicht umgesetzt
+Stand: 2026-11-20, Entwurf, nicht umgesetzt, erste Entscheidungen getroffen
 
-Schema der Oberfläche: Prinzipien, Layout, Leisten, Log, Fenster, Tastatur, Einstellungen. Alles hier ist Anzeige und Eingabe; die Logik kennt weder Fenster noch Leisten und bekommt nur gewöhnliche Befehle. Was heute umgesetzt ist, beschreibt [Architektur.md](Architektur.md) (Anzeige, Oberfläche, Eingabe, Zielmodus, Untersuchen); Bewegung und Effekte stehen in [Animationen.md](Animationen.md), die Arbeitsliste in Punkt 11 von [Systemausbau.md](Systemausbau.md). Offene Entscheidungen stehen am Ende.
+Schema der Oberfläche: Prinzipien, Layout, Leisten, Log, Fenster, Tastatur, Einstellungen. Alles hier ist Anzeige und Eingabe; die Logik kennt weder Fenster noch Leisten und bekommt nur gewöhnliche Befehle. Was heute umgesetzt ist, beschreibt [Architektur.md](Architektur.md) (Anzeige, Oberfläche, Eingabe, Zielmodus, Untersuchen); Bewegung und Effekte stehen in [Animationen.md](Animationen.md), die Arbeitsliste in Punkt 11 von [Systemausbau.md](Systemausbau.md). Entschiedenes und Offenes steht am Ende unter Entscheidungen.
 
 ## Vorbilder
 
@@ -67,7 +67,7 @@ Die Darstellung kann weitgehend neu entstehen, die Systeme darunter bleiben:
 
 Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgrößen in `rem`, so dass die Größe der Oberfläche eine Einstellung ist, getrennt vom Zoom der Tiles.
 
-### Variante A (Vorschlag für die Vorgabe)
+### Variante A (Vorgabe)
 
 ```
 +---------------------------------------------------------------+----------------------+
@@ -94,7 +94,7 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 + Höhen: Kopfleiste etwa 28 px, Schnellleiste etwa 56 px, Log 8 Zeilen etwa 176 px; für die Karte bleiben etwa 1520x820 px, bei 16 px etwa 95x51 Felder, bei 32 px etwa 47x25
 + Seitenleiste etwa 400 px; Minikarte oben mit 4 px je Feld (100x40 Felder ergeben 400x160 px), bei größeren Ebenen 3 px oder ein Ausschnitt
 
-### Variante B (umschaltbar)
+### Variante B (umstellbar)
 
 ```
 +------------------+---------------------------------------------+------------------+
@@ -142,7 +142,7 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 + Je Platz: Symbol, Taste, Anzahl bzw. Ladungen, Abklingzeit als Zahl der Züge mit abgedunkeltem Symbol (ToME, Qud), Mindestpegel als Kante mit eigener Form, nicht verfügbar grau mit dem Grund aus der Prüfung des Befehls im Tooltip
 + Unbekannte Gegenstände zeigen, was Ninkasi weiß (siehe Unbekanntes in [Architektur.md](Architektur.md)): Etikett statt Name, Ladungen als "?", bis sie bekannt sind; eine Abklingzeit zeigt der Platz erst, wenn die Art bekannt ist oder Ninkasi sie einmal erlebt hat; die Leiste verrät nie mehr als das Inventarfenster
 + Zielen: braucht die Wirkung ein Ziel, öffnet die Taste den Zielmodus mit vorbelegtem Cursor; ein zweiter Druck derselben Taste bestätigt (Vorbild DCSS), Tab wechselt das Ziel, Esc bricht ab
-+ Vorbelegung des Cursors nach der Art der Wirkung: schädlich auf den nächsten Feind in Sicht, nützlich auf den nächsten verletzten Gefährten bzw. Ninkasi selbst; lebt das zuletzt gewählte Ziel und ist in Sicht, gewinnt es; die Art steht als Angabe in den Daten der Fähigkeit bzw. des Gegenstands oder folgt aus den Tags der Wirkung (offene Entscheidung)
++ Vorbelegung des Cursors nach der Art der Wirkung: schädlich auf den nächsten Feind in Sicht, nützlich auf den nächsten verletzten Gefährten bzw. Ninkasi selbst; lebt das zuletzt gewählte Ziel und ist in Sicht, gewinnt es; die Art steht als Angabe `zielvorgabe` ("feind", "gefaehrte", "selbst") in den Daten der Fähigkeit bzw. des Gegenstands, ohne Angabe folgt sie aus den Tags der Wirkung
 + Einstellung "sofort auslösen": mit vorbelegtem Ziel ohne Bestätigung wirken (Vorbild Shattered Pixel Dungeon), Vorgabe aus
 
 ## Log
@@ -188,7 +188,7 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 
 + Spielbar ohne Ziffernblock; Ziffernblock und Pfeiltasten bleiben zusätzlich belegt
 + Bewegung nach den vi-Tasten der Roguelikes (seit Rogue, NetHack): h j k l für links, unten, oben, rechts, y u b n für die Diagonalen; Umschalt plus Richtung läuft, bis etwas Bemerkenswertes passiert
-+ Die Belegung nennt physische Tasten (`KeyboardEvent.code`), so bleibt die Form erhalten: auf der deutschen Tastatur liegt die Diagonale links oben auf der Taste mit der Aufschrift Z (offene Entscheidung, ob nach Lage oder nach Buchstabe)
++ Die Belegung nennt physische Tasten (`KeyboardEvent.code`), so bleibt die Form erhalten: auf der deutschen Tastatur liegt die Diagonale links oben auf der Taste mit der Aufschrift Z (entschieden: nach Lage, nicht nach Buchstabe)
 + Zeichen ohne feste Lage (`:`, `/`, `?`, `<`, `>`) gelten nach dem Zeichen (`KeyboardEvent.key`), weil sie auf der deutschen Tastatur anders liegen
 + Aus neovim übernommen: Modi statt Tastenkombinationen (Normalmodus, Zielmodus mit denselben Richtungstasten, Fenster), `:` öffnet eine Befehlszeile mit Vervollständigung über alle Aktionen des Katalogs, `/` sucht in Listen, `?` zeigt die Hilfe, Esc verlässt jeden Modus
 + Nicht übernommen: Zahlen vor einem Befehl (sie gehören der Schnellleiste); das Laufen mit Umschalt deckt den häufigsten Fall ab
@@ -222,13 +222,13 @@ Vorschlag für die Vorgabe, Buchstaben nach der deutschen Aufschrift:
 | Esc | Kette (siehe oben) | Reise abbrechen |
 | + - | Zoom | + - |
 
-+ Die Taste zum Umschalten der Leisten ist offen: Strg+1 bis 5 wechselt im Browser die Reiter und lässt sich nicht sicher abfangen; Kandidaten sind Umschalt+1 bis 5 oder [ und ] (auf der deutschen Tastatur ü und +, kollidiert mit dem Zoom)
++ Die Leisten wechselt Umschalt+1 bis 5; Strg+1 bis 5 schied aus, weil es im Browser die Reiter wechselt und sich nicht sicher abfangen lässt
 
 ## Maus
 
 + Klickregeln wie bisher (aufheben, angreifen, reisen), dazu Klick auf Minikarte, Schaltflächen, Plätze der Schnellleiste und Wesen in der Seitenleiste
 + Ziehen belegt die Schnellleiste
-+ Rechtsklick untersucht (offen)
++ Rechtsklick untersucht (offen, siehe Entscheidungen)
 + Mausrad zoomt über der Karte und blättert über Listen und Log
 
 ## Gamepad
@@ -286,17 +286,22 @@ Als Einstellung umschaltbar:
 
 + Layout-Variante, Seite der Seitenleiste, Lage und Zeilen des Logs, Minikarte, Schnellleiste an oder aus, Bestätigungen, Tooltip
 
-## Offene Entscheidungen
+## Entscheidungen
 
-1. Schaltflächen für die Maus: Empfehlung Kopfleiste oben; Alternative Knopfreihe unten in der Seitenleiste wie Brogue
-2. Ablage der Schnellleiste: Empfehlung im Spielstand als Anzeigedaten neben dem Logikzustand, nicht in der Befehlsliste; so bleibt die Wiederholbarkeit unberührt und die Belegung gehört zum Lauf
-3. Vorgabe des Layouts: Empfehlung Variante A (Log unten in zwei Spalten, Minikarte oben in der Seitenleiste), Variante B als Einstellung
-4. vi-Tasten nach Lage (`code`, die Form bleibt, auf Deutsch Z statt y) oder nach Buchstabe (`key`, Y bleibt Y, die Form verzieht sich): Empfehlung nach Lage
-5. Taste zum Umschalten der Leisten: Empfehlung Umschalt+1 bis 5
-6. Art der Wirkung für die Vorbelegung des Ziels: Empfehlung eine Angabe `zielvorgabe` ("feind", "gefaehrte", "selbst") in den Daten mit Ableitung aus den Tags als Vorgabe
-7. Rechtsklick: Empfehlung Untersuchen
-8. Metaeffekte des Pegels: Empfehlung festhalten, umsetzen mit Punkt 12, immer abschaltbar
-9. Reihenfolge: Empfehlung 0.27.0 Aktionskatalog, Fensterstapel und Skillfenster; 0.28.0 neues Layout mit Kopfleiste, Schnellleiste, Log in Spalten, Minikarte, Esc-Kette, Spielmenü und Einstellungen; vi-Belegung mit 0.28.0
+Entschieden am 2026-11-20:
+
++ Layout: Variante A und B werden beide umgesetzt und sind umstellbar, Vorgabe vorläufig A
++ vi-Tasten nach Lage (`KeyboardEvent.code`): die Form bleibt, auf der deutschen Tastatur liegt die Diagonale links oben auf Z
++ Umschalten der Leisten mit Umschalt+1 bis 5
++ Vorbelegung des Ziels über eine Angabe `zielvorgabe` ("feind", "gefaehrte", "selbst") in den Daten der Fähigkeit bzw. des Gegenstands, ohne Angabe abgeleitet aus den Tags der Wirkung
++ Reihenfolge: 0.27.0 Aktionskatalog, Fensterstapel und Skillfenster; 0.28.0 neues Layout mit Kopfleiste, Schnellleiste, Log in Spalten, Minikarte, Esc-Kette, Spielmenü, Einstellungen und vi-Belegung; die Einordnung neben den übrigen Schwerpunkten (Zustände im Inhalt, Licht, Brausystem) wird bei der weiteren Planung abgestimmt
+
+Offen:
+
+1. Schaltflächen für die Maus: klickbare Knöpfe mit Text und Taste (z. B. "[i] Inventar"), damit sich jedes Fenster und jede Hauptaktion auch ohne Kenntnis der Tasten öffnen lässt; Empfehlung als Kopfleiste oben, Alternative eine Knopfreihe unten in der Seitenleiste wie Brogue (Erkunden, Rasten, Suchen, Menü, Inventar)
+2. Ablage der Schnellleiste: der Spielstand besteht aus Version, Startwert, Startoptionen und Befehlsliste und wird beim Laden nachgespielt; die Belegung der Leiste ist kein Befehl und darf das Nachspielen nicht beeinflussen; Empfehlung ein eigener Teil `oberflaeche` im Spielstand, der mitgespeichert und beim Laden einfach wieder eingesetzt, aber nicht nachgespielt wird; Alternative im Browser bei den Einstellungen, dann gälte sie für alle Läufe zugleich
+3. Rechtsklick: die rechte Maustaste auf einem Feld öffnet dessen ausführliche Beschreibung wie Untersuchen mit X (der linke Klick handelt), das Kontextmenü des Browsers wird dafür unterdrückt; Empfehlung so; Alternative ein kleines Kontextmenü am Feld (untersuchen, hinreisen, hierhin werfen, Fähigkeit hierauf)
+4. Metaeffekte des Pegels: Bildschirmeffekte, die Ninkasis Zustand spürbar machen, ohne etwas anzuzeigen, z. B. leichtes Verschwimmen oder Schwanken der Karte bei hohem Pegel, ein roter Rand bei wenig LP; reine Anzeige ohne Einfluss auf die Logik; Empfehlung als Idee festhalten, umsetzen mit Punkt 12 (Darstellung, zurückgestellt), jeder Effekt in den Einstellungen abschaltbar (Bewegungsempfindlichkeit)
 
 ## Quellen
 
