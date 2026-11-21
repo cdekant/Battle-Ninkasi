@@ -52,6 +52,7 @@ Regeln:
 + Keine Befehle sind reine Anzeige-Zustände: Fenster öffnen, im Log blättern, Tooltips, Karte verschieben, Zoom; sie kosten keine Zeit und kommen nicht in den Spielstand
 + Einstellungen (Tastenbelegung, Zoom, Kameraverhalten) sind keine Befehle und werden getrennt gespeichert
 + Tastatur, Maus, Gamepad, Testbots und Simulationen benutzen denselben Weg; abgelehnte Befehle kosten nichts und werden nicht aufgezeichnet
++ Gegner benutzen dieselben Befehlsarten über `befehlAusfuehren`, ihre Befehle werden aber nicht aufgezeichnet; verändert ein Zustand einen Befehl, wird der ursprüngliche aufgezeichnet (siehe [Wirkungen.md](Wirkungen.md), Zustände)
 
 ## Entitäten und Komponenten
 

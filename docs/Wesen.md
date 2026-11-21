@@ -84,6 +84,7 @@ Vorläufige Ideen, noch nicht umgesetzt:
 ## Bewegung
 
 + Vorbilder: Brogue (fliegende Wesen über Abgrund und Wasser, unbewegliche Totems, zerplatzende Würfe, Lärm des Aufschlags als Ablenkung), DCSS (Aufprall beim Stoß für beide, Teleport auf das nächste freie Feld), Into the Breach (vorhersagbarer Aufprall)
++ Befehl `bewegen` greift durch Hineinlaufen Feinde an, mit `angreifen: true` jedes Wesen (gezielter Angriff, Rausch, Verwirrung); `warten` wartet eine Aktion
 + Bewegungsarten (`src/welt/karte.js`): am Wesen `bewegung`, Vorgabe `laufend`, sonst `fliegend`, `schwebend`, `phasend`, `unbeweglich`; ein Zustand überlagert sie mit `bewegung` (Levitation, Phasen), `bewegungVon` liefert die wirksame wie bei Fraktion und KI
 + Gelände: `passierbar: true` gilt für alle, `passierbarFuer: [Arten]` für einzelne (Abgrund für `fliegend`, Wasser für `fliegend` und `schwebend`); was eine Art kann, sagen also die Daten; `phasend` betritt jedes Gelände außer `undurchdringlich: true`; `unbeweglich` steht, wo `laufend` steht
 + `betretbar(spiel, wesen, feld)` gilt für Schritte, Wege (Option `bewegung` in `src/welt/wege.js`), Schrittwahl der KI, Beschwören, Reise und Erkunden; Sicht und Lärm hängen weiter am Gelände selbst
