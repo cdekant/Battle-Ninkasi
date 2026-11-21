@@ -65,3 +65,5 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 + Laden von `sprache/literatur.json` im Spiel (`fetch` oder `import … with { type: "json" }`) und Prüfung unbekannter Quellenschlüssel
 + Wo erzeugte Texte vorkommen: Bücher, Schriftrollen, Inschriften, HACCP-Aushänge, Händlergerede
 + Mehrzahl und Adjektive im Detail
++ Anrede in Oberflächentexten: die Hilfe zur Charaktererstellung spricht die Spielerin mit "du" an und sagt "Run", die übrigen Texte sprechen über Ninkasi in der dritten Person und sagen "Lauf"; einheitlich festlegen
++ Platzhalter in Hilfetexten: ein Fenster gibt seiner Hilfe Werte mit (`hilfewerte`, z.B. `{punkte}` in `hilfe.thema.erstellung`), damit Zahlen aus den Regeln nicht fest im Text stehen

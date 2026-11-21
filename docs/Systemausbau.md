@@ -10,7 +10,8 @@ Arbeitsliste der Strukturen, die Logik und Datenmodell noch brauchen, damit Fern
 + Ist ein Punkt umgesetzt, wandert seine Beschreibung nach [Architektur.md](Architektur.md) (bzw. [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md)) und wird hier gestrichen; bleibt nur ein Rest offen, steht hier nur der Rest
 + Status je Punkt: offen, in Arbeit, umgesetzt in Version X
 + Die Reihenfolge ist eine Empfehlung: 1 bis 4 sind Kernarchitektur, danach sind die meisten Systeme Daten plus wenige neue Bausteine
-+ Nächste Schwerpunkte (Stand 2026-11-20): Skillsystem (Punkt 13, Mechanik seit 0.26.0, offen Skillfenster und Katalog), bevor Details der Reste angegangen werden (davon hängen Kennerschaft und Nachtsicht ab); danach Zustände im Spielinhalt (Punkt 3), dann Licht (Punkt 7), vor Inhalt und Balancing, weil es Heimlichkeit und Gefahr verschiebt; das Brausystem in einer eigenen Sitzung; Darstellung (Punkt 12) ist zurückgestellt
++ Nächste Schritte (Stand 2026-11-21): Browserprüfung aller Fenster aus 0.27.0 (Fehler werden 0.27.1), dann Plan für 0.28.0, das neue Layout nach [Oberflaeche.md](Oberflaeche.md) (Bedienzeile mit Schnellleiste und Knöpfen, Log in Spalten, Minikarte, Esc-Kette, Spielmenü, Einstellungen, vi-Belegung, Varianten A und B), dazu vielleicht der Titelbildschirm; die Einordnung neben den übrigen Schwerpunkten ist abzustimmen
++ Nächste Schwerpunkte (Stand 2026-11-20): Skillsystem (Punkt 13, Mechanik seit 0.26.0, Skillfenster seit 0.27.0, offen der Katalog), bevor Details der Reste angegangen werden (davon hängen Kennerschaft und Nachtsicht ab); danach Zustände im Spielinhalt (Punkt 3), dann Licht (Punkt 7), vor Inhalt und Balancing, weil es Heimlichkeit und Gefahr verschiebt; das Brausystem in einer eigenen Sitzung; Darstellung (Punkt 12) ist zurückgestellt
 + Licht lässt sich nachreichen: ohne Angabe gilt jedes Feld als hell, das Spiel verhält sich dann wie bisher
 
 ## Bekannte Fehler

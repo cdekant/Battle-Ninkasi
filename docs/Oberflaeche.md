@@ -60,7 +60,8 @@ Die Darstellung kann weitgehend neu entstehen, die Systeme darunter bleiben:
 
 ## Bildschirme
 
-+ Titel: Neues Spiel, Fortsetzen, Einstellungen, Hilfe, Beenden
++ Titel: Neues Spiel, Fortsetzen, Einstellungen, Hilfe, Beenden; jederzeit nachrüstbar als reine Anzeige vor der Charaktererstellung, sinnvoll mit 0.28.0 (Spielmenü und Einstellungen nutzen dieselben Knöpfe); der Titel ist zugleich die erste Handlung der Spielerin, die der Browser für Ton und Vollbild verlangt; Hintergrund aus `Artwork/titel/` denkbar
++ Idee: Intro-Film als Bildfolge in Pixelart (klein, im Stil) statt Video, jede Taste überspringt, eine Einstellung zeigt ihn nur beim ersten Start; mit Punkt 12 (Darstellung); Bild und Ton unter CC BY-NC-SA 4.0 in `LIZENZEN.md`
 + Charaktererstellung: Eigenschaften verteilen (Punkt 13, die Logik nimmt die Verteilung als Startoption)
 + Spiel: das Layout unten
 + Tod: Laufbericht (Morgue, Punkt 10), Neustart
