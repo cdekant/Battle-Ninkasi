@@ -58,7 +58,8 @@ Die Darstellung kann weitgehend neu entstehen, die Systeme darunter bleiben:
 + Umgesetzt in 0.27.0: Aktionskatalog (`src/eingabe/aktionskatalog.js`) mit Belegung Taste zu Aktion, Fensterstapel über der Karte (`src/eingabe/fenster.js`, `src/anzeige/fenster.js`) nach der Grammatik unten, Inventar und Fähigkeiten als Fenster, Charakter und Skills (C), Charaktererstellung vor jedem Lauf, Hilfe (?) aus dem Katalog; die Seitenleiste zeigt freie EP und bis zur Schnellleiste eine Kurzliste der Fähigkeiten, siehe Fenster in [Architektur.md](Architektur.md)
 + Umgesetzt in 0.29.0: Schnellleiste vollständig, Speichern, Minikarte und Übersichtskarte, Hervorheben; siehe Stand der Umsetzung
 + Umgesetzt in 0.28.0: Aufbau der Seite (`index.html`, `stil.css`) mit Varianten A und B, Seitenleiste neu geordnet, Log in zwei Spalten (`src/anzeige/logzeilen.js`, `src/anzeige/log.js`), Bedienzeile mit Schnellleiste in der Grundform und Knöpfen, Esc-Kette, Spielmenü, Bestätigung, Verlauf, vi-Belegung, Laufen, Rechtsklick; siehe Stand der Umsetzung
-+ Noch neu zu bauen: Einstellungen, Tastenbelegung als Seite, Titel, Befehlszeile
++ Umgesetzt in 0.30.0: Einstellungen samt Tastenbelegung, Layout kompakt, Befehlszeile, Suche im Verlauf
++ Noch neu zu bauen: Klicks in Fenstern (0.31.0), Titel
 
 ## Bildschirme
 
@@ -231,6 +232,7 @@ Vorschlag für die Vorgabe, Buchstaben nach der deutschen Aufschrift:
 | 1 bis 0 | Schnellleiste | 0.28.0 |
 | Tab | Verlauf | 0.28.0 |
 | : | Befehlszeile | 0.30.0 |
+| / (im Verlauf) | Suche | 0.30.0 |
 | ? | Hilfe | 0.27.0 |
 | Esc | Kette (siehe oben) | 0.28.0 |
 | + - | Zoom | umgesetzt |
@@ -258,7 +260,7 @@ Die eigentliche Anbindung (Gamepad-API im Takt von `src/main.js`, Belegung der K
 
 + Anzeige: Zoom, Größe der Oberfläche, Schriftgröße, Vollbild, Layout (Variante A, B, kompakt), Seitenleiste links oder rechts, Log oben oder unten und seine Zeilen, Minikarte an oder aus, Verzögerung des Tooltips
 + Spiel: Reisetempo, Haltegründe, Bestätigungen, Animationen und Geschossbahn, "sofort auslösen" der Schnellleiste
-+ Tasten: Belegungssatz, Belegung jeder Aktion mit Erkennung von Konflikten, Vorgabe wiederherstellen
++ Tasten: Belegung jeder Aktion mit Erkennung von Konflikten, Vorgabe wiederherstellen (seit 0.30.0; Belegungssätze entfallen, siehe Entscheidungen)
 + Barrierefreiheit: Kontrast, Palette für Farbenblinde, Bewegung reduzieren (schaltet alle bewegten Effekte ab), jeder Metaeffekt einzeln an oder aus, Stärke der Metaeffekte
 + Später: Ton, Sprache, Gamepad
 + Gespeichert wird wie bisher nur die Abweichung von der Vorgabe (`src/eingabe/einstellungen.js`)
@@ -305,10 +307,21 @@ Aufgeteilt am 2026-11-21 in drei Versionen, damit jede für sich im Browser prü
 
 + 0.28.0 Layout (umgesetzt): Grid mit Variante A und B (bis zum Einstellungsfenster im Spielmenü umgeschaltet), Effektschicht, Seitenleiste mit Kopf (Tiefe, Zug), Gefährten und Wesen nach Abstand, Log in zwei Spalten mit Zugmarke, Symbolen, Zahlen, Zusammenfassen, Verblassen und Farben nach Seite, Verlauf mit Filter, Bedienzeile mit acht Knöpfen und der Schnellleiste in der Grundform (automatisch nach Lernreihenfolge, danach Getränkearten; nicht umbelegbar, nicht gespeichert), Zielvorgabe und Bestätigen mit derselben Ziffer, Esc-Kette, Spielmenü mit Bestätigung, vi-Belegung samt Pfeilen und Zeichen, Laufen mit Umschalt, Rechtsklick untersucht; Reise, Laufen und Erkunden halten nur bei neuen Feinden
 + 0.29.0 Schnellleiste und Speichern (umgesetzt): fünf Leisten (Umschalt+1 bis 5), automatisch nachgeführt, Umbelegen mit Ziffer und Entf in Inventar und Fähigkeitenfenster sowie durch Ziehen, Wurfwaffen von Hand, graue Plätze mit Anzahl 0; Fähigkeitenfenster mit Auswahl und Einzelheiten; Speichern im Browser mit Schnappschuss des Zustands samt Teil `oberflaeche`; Minikarte und Übersichtskarte (m) mit Klick zum Reisen; gegenseitiges Hervorheben von Seitenleiste und Karte; d und w als eigene Tasten; Knopf Karte statt Verlauf, der Verlauf über Tab oder einen Klick auf das Log
-+ 0.30.0 Einstellungen und Titel: Einstellungsfenster samt Seite zur Tastenbelegung, Layout kompakt, Titelbildschirm (Fortsetzen nutzt das Speichern aus 0.29.0), Befehlszeile (:) und Suche im Verlauf (/)
++ 0.30.0 Einstellungen (umgesetzt): Einstellungskatalog und Einstellungsfenster mit Reitern, Seite zur Tastenbelegung mit Konflikten und Vorgabe, Layout kompakt, Größe der Oberfläche, Logzeilen, Minikarte an oder aus, Vollbild, Reisetempo, Geschossbahn, sofort auslösen, Nachfrage beim Neustart, Bewegung reduzieren, hoher Kontrast, Palette für Farbenblinde; Befehlszeile (:) mit Register der Quellen; Suche im Verlauf (/)
++ 0.31.0 Klicks in Fenstern: Einträge, Reiter und Fußzeilen der Fenster mit der Maus bedienen
++ Danach der Titelbildschirm (Neues Spiel, Fortsetzen über den gespeicherten Lauf, Einstellungen, Hilfe, Beenden) mit eigenem Plan
 + Später: Halten an Abzweigungen beim Laufen (wie DCSS), Mindestpegel als Kante an der Schnellleiste, Gamepad
 
 ## Entscheidungen
+
+Entschieden am 2026-11-21 für 0.30.0:
+
++ Keine Belegungssätze: eine Belegung für die große Tastatur, die auch ohne Ziffernblock spielbar ist (vi-Tasten); Ziffernblock und Pfeile liegen zusätzlich auf der Bewegung; eigene Änderungen liegen darüber
++ Layout kompakt nur von Hand, nicht nach der Fenstergröße
++ Palette für Farbenblinde schon jetzt, weil das Kampflog Grün und Rot unterscheidet
++ Befehlszeile zunächst ohne Zusatzangaben; die Quellen sind ein Register, damit Bierrezepte, Lore-Texte und Bücher später dazukommen
++ "Sofort auslösen" als Schalter im Reiter Spiel, Vorgabe aus
++ Klicks in Fenstern als eigene Version 0.31.0, vor dem Titelbildschirm; der Titelbildschirm bekommt einen eigenen Plan
 
 Entschieden am 2026-11-21 für 0.29.0:
 

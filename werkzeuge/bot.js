@@ -21,7 +21,12 @@ import { neueLeisten, leistenNachfuehren, aktivePlaetze, platzZustand, platzAusl
 import { speicherstandText, speicherstandLesen } from "../src/eingabe/speicherstand.js";
 import { minikartenBild } from "../src/anzeige/minikarte.js";
 import { menueOeffnen, menueTaste } from "../src/eingabe/menue.js";
-import { verlaufOeffnen } from "../src/eingabe/verlauf.js";
+import { verlaufOeffnen, verlaufTaste } from "../src/eingabe/verlauf.js";
+import { REITER } from "../src/eingabe/einstellungskatalog.js";
+import { einstellungsfensterOeffnen, einstellungsfensterTaste } from "../src/eingabe/einstellungsfenster.js";
+import { befehlszeileOeffnen, befehlszeileTaste } from "../src/eingabe/befehlszeile.js";
+import { leereAbweichungen } from "../src/eingabe/belegunganpassen.js";
+import "../src/anzeige/einstellungsanzeige.js";
 import { zielmodusBeginnen, zielmodusTaste, zielangabeVon, cursorSetzen } from "../src/eingabe/zielmodus.js";
 import belegung from "../src/eingabe/belegung.js";
 import einstellungen from "../src/eingabe/einstellungen.js";
@@ -65,7 +70,10 @@ function mitWarnungen(zeichnen) {
   }
 }
 function fensterZeichnen(spiel, art, zustand) {
-  mitWarnungen(() => fensterHtml({ spiel, daten, texte: anzeigetexte, belegung, logzeilen: botLog?.zeilen ?? [], einstellungen, version: "bot" }, fensterOeffnen([], art, zustand)));
+  mitWarnungen(() => fensterHtml(botUmgebung(spiel), fensterOeffnen([], art, zustand)));
+}
+function botUmgebung(spiel) {
+  return { spiel, daten, texte: anzeigetexte, belegung, belegungsVorgabe: belegung, abweichungen: leereAbweichungen(), leisten: botLeisten, logzeilen: botLog?.zeilen ?? [], einstellungen, vorgaben: einstellungen, version: "bot" };
 }
 const seitenleiste = new Oberflaeche(ohneDom(), anzeigetexte, "bot");
 const bedienzeile = new Bedienzeile(ohneDom(), anzeigetexte, belegung);
@@ -89,6 +97,24 @@ function menueBedienen(spiel) {
   if (menueTaste(zustand, { code: "Enter" }).zustand !== null) throw new Error("Fortsetzen schließt das Menü nicht");
   fensterZeichnen(spiel, "verlauf", verlaufOeffnen());
   fensterZeichnen(spiel, "bestaetigung", { frage: "menue.neustart_frage", aktion: "neustart" });
+  // Suche im Verlauf: / und ein Wort
+  let suche = verlaufTaste(verlaufOeffnen(), { code: "Digit7", zeichen: "/" }).zustand;
+  for (const zeichen of "trifft") suche = verlaufTaste(suche, { code: "KeyX", zeichen }).zustand;
+  fensterZeichnen(spiel, "verlauf", suche);
+  // Einstellungsfenster: jeder Reiter, in jedem ein Schritt nach rechts und zurück (die Ergebnisse wirft der Bot weg)
+  const umgebung = botUmgebung(spiel);
+  let fenster = einstellungsfensterOeffnen();
+  for (let reiter = 0; reiter < REITER.length; reiter++) {
+    fensterZeichnen(spiel, "einstellungen", fenster);
+    einstellungsfensterTaste(fenster, { code: "ArrowDown" }, umgebung);
+    einstellungsfensterTaste(fenster, { code: "ArrowRight" }, umgebung);
+    fenster = einstellungsfensterTaste(fenster, { code: "Tab" }, umgebung).zustand;
+  }
+  // Befehlszeile: tippen, Tab, Enter muss ein Ziel liefern
+  let zeile = befehlszeileOeffnen();
+  for (const zeichen of "hilf") zeile = befehlszeileTaste(zeile, { code: "KeyX", zeichen }, umgebung).zustand;
+  fensterZeichnen(spiel, "befehlszeile", zeile);
+  if (!befehlszeileTaste(zeile, { code: "Enter" }, umgebung).befehlszeile) throw new Error("Befehlszeile ohne Ziel für hilf");
 }
 
 function invariantenPruefen(spiel) {

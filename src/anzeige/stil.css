@@ -45,6 +45,30 @@
   font-size: 15px;
 }
 
+/* Barrierefreiheit (Einstellungen hoherKontrast, farbenblind; data-Attribute an <html>, src/main.js) */
+:root[data-kontrast="hoch"] {
+  --grund: #000;
+  --flaeche: #0b0906;
+  --linie: #8c7a63;
+  --text: #ffffff;
+  --leise: #c9b99f;
+}
+/* Rot-Grün ersetzt durch Blau und Orange; Verbündete bleiben unterscheidbar in Türkis */
+:root[data-palette="farbenblind"] {
+  --ninkasi-treffer: #4f9cff;
+  --ninkasi-krit: #9fd0ff;
+  --ninkasi-abgewehrt: #5d7799;
+  --verbuendet-treffer: #3fd0c9;
+  --verbuendet-krit: #9ff5ef;
+  --verbuendet-abgewehrt: #4f8f8a;
+  --gegner-treffer: #ff8c1a;
+  --gegner-krit: #ffc266;
+  --gegner-abgewehrt: #9a7a5a;
+  --gut: #4f9cff;
+  --schlimm: #ff8c1a;
+  --lp: #d97a1f;
+}
+
 * { box-sizing: border-box; }
 
 html, body {
@@ -65,6 +89,19 @@ html, body {
     "log seite"
     "bedien bedien";
 }
+/* Kompakt: wie A, mit 3 Logzeilen, schmaler Seitenleiste und kleineren Knöpfen */
+#spiel[data-layout="kompakt"] {
+  --breite-seite: 20rem;
+  --log-zeilen: 3;
+  --hoehe-bedienzeile: 3rem;
+  grid-template-columns: 1fr var(--breite-seite);
+  grid-template-rows: 1fr var(--hoehe-log) var(--hoehe-bedienzeile);
+  grid-template-areas:
+    "karte seite"
+    "log seite"
+    "bedien bedien";
+}
+#spiel[data-layout="kompakt"] .knopf { font-size: 0.68em; }
 #spiel[data-layout="b"] {
   grid-template-columns: var(--breite-log-links) 1fr var(--breite-seite);
   grid-template-rows: auto 1fr var(--hoehe-bedienzeile);
@@ -134,6 +171,19 @@ html, body {
 .fenster-rahmen .verlauf { font-size: 0.95em; }
 .fenster-rahmen .verlauf-filter span { margin-right: 10px; }
 .fenster-rahmen .verlauf-filter span.gewaehlt { color: var(--bier); }
+/* Eingabezeile (Befehlszeile, Suche im Verlauf) und Einstellungsfenster */
+.fenster-rahmen .eingabezeile { margin-top: 6px; font-family: monospace; color: var(--hinweis); }
+.fenster-rahmen .schreibmarke { animation: blinken 1s steps(1) infinite; }
+@keyframes blinken { 50% { opacity: 0; } }
+.fenster-rahmen .reiterleiste .reiter { margin-right: 16px; padding: 2px 6px; color: var(--leise); }
+.fenster-rahmen .reiterleiste .reiter.gewaehlt { color: var(--bier); border-bottom: 2px solid var(--bier); }
+.fenster-rahmen ul.einstellungen li { display: flex; justify-content: space-between; gap: 12px; padding: 1px 4px; }
+.fenster-rahmen .wert-rechts { color: var(--hinweis); }
+.fenster-rahmen ul.tastenbelegung li { display: flex; gap: 6px; align-items: baseline; padding: 1px 4px; }
+.fenster-rahmen ul.tastenbelegung .aktion { flex: 1; }
+.fenster-rahmen ul.tastenbelegung .taste { font-family: monospace; color: var(--kupfer); border: 1px solid var(--linie); padding: 0 4px; }
+.fenster-rahmen ul.tastenbelegung .taste.frei { color: var(--leise); }
+.fenster-rahmen ul.tastenbelegung .taste.gewaehlt { border-color: var(--bier); color: var(--bier); }
 .fenster-rahmen p.thema { margin: 4px 0; max-width: 70em; }
 .fenster-rahmen h1 { margin: 0; padding: 10px 16px; font-size: 1.2em; color: var(--bier); border-bottom: 1px solid var(--linie); letter-spacing: 0.04em; }
 .fenster-rahmen h2 { margin: 0 0 6px; font-size: 1.05em; color: var(--bier); }

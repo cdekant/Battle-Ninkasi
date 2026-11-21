@@ -14,7 +14,7 @@
 
 + Roguelike-Spiel, Details in [docs/Grundlagen.md](docs/Grundlagen.md)
 + Charakter, Eigenschaften, Skills und EP in [docs/Charakter.md](docs/Charakter.md)
-+ Technische Architektur (Datenfluss, Befehle, Zeitmodell, Wirkungsarten, Modifikatoren, Kampfwerte, Fähigkeiten, lange Aktionen, Skills und Lernen, Fraktionen, Effekte, Haken, Tod und Zustandsprüfung, Auslöser, Zustände, Zielauswahl, Wiederholbarkeit, Anzeige, Oberfläche, Log, Schnellleiste, Speichern, Licht, Wahrnehmung, KI, Fenster, Bewegung, Gelände, Feldschichten, Ebenen, Inventar, Ausrüstung, Verschleiß, Unbekanntes, Laufen, Zielmodus, Untersuchen, Leistung) in [docs/Architektur.md](docs/Architektur.md)
++ Technische Architektur (Datenfluss, Befehle, Zeitmodell, Wirkungsarten, Modifikatoren, Kampfwerte, Fähigkeiten, lange Aktionen, Skills und Lernen, Fraktionen, Effekte, Haken, Tod und Zustandsprüfung, Auslöser, Zustände, Zielauswahl, Wiederholbarkeit, Anzeige, Oberfläche, Log, Schnellleiste, Speichern, Einstellungen, Licht, Wahrnehmung, KI, Fenster, Bewegung, Gelände, Feldschichten, Ebenen, Inventar, Ausrüstung, Verschleiß, Unbekanntes, Laufen, Zielmodus, Untersuchen, Leistung) in [docs/Architektur.md](docs/Architektur.md)
 + Sprachdateien, Textkorpus (`sprache/de/korpus/`) und Literaturverzeichnis (`sprache/literatur.json`, Originale in `sprache/Literatur/` nicht im Repo) in [docs/Texte.md](docs/Texte.md)
 + Tileset: Artstyle-Fibel, Pixeldaten, Varianten, Vorschau und Ablauf in [docs/Tileset.md](docs/Tileset.md); neue Tiles folgen der Fibel
 + Oberfläche: Entwurf des UI-Schemas (Prinzipien, Layout, Schnellleiste, Log, Fenster, Tastatur nach vi, Einstellungen, Entscheidungen, Stand der Umsetzung) in [docs/Oberflaeche.md](docs/Oberflaeche.md)

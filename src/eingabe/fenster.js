@@ -4,14 +4,17 @@
 // Fensterarten melden sich hier an (eingabe/inventar.js, faehigkeiten.js, charakter.js, erstellung.js, hilfe.js):
 //   { taste(zustand, taste, kontext) => ergebnis }
 //   taste:    { code, zeichen, umschalt } (KeyboardEvent.code, KeyboardEvent.key, Umschalttaste)
-//   kontext:  { spiel, daten, belegung }
-//   ergebnis: { zustand, befehl?, auswahl?, grund?, oeffnen?, start?, aktion?, leiste? }
+//   kontext:  { spiel, daten, texte, belegung, belegungsVorgabe, abweichungen, einstellungen, vorgaben }
+//   ergebnis: { zustand, oeffnen?, befehl?, auswahl?, grund?, start?, aktion?, leiste?, befehlszeile?, einstellungen?, abweichungen? }
 //     zustand null schließt das Fenster, sonst ersetzt er den Zustand des Fensters
 //     befehl:  an die Logik (z.B. lernen, trinken); auswahl: für den Zielmodus, schließt alle Fenster
 //     grund:   warum nichts geschieht (das Log nennt ihn); oeffnen: { art, zustand } legt ein Fenster obenauf
 //     start:   Startoptionen für einen neuen Lauf (Charaktererstellung)
 //     aktion:  Aktion der Oberfläche, die src/main.js ausführt (Spielmenü: neustart, layout, beenden)
 //     leiste:  Änderung der Schnellleiste { belegen: { stelle, platz } } oder { entfernen: platz } (eingabe/schnellleiste.js)
+//     befehlszeile: Ziel eines Treffers der Befehlszeile (eingabe/befehlszeile.js)
+//     einstellungen, abweichungen: neue Einstellungen bzw. Tastenbelegung (eingabe/einstellungsfenster.js)
+//   Alle Felder außer zustand und oeffnen reicht fensterTaste unverändert weiter.
 // Die Anzeige der Fenster steht in anzeige/fenster.js.
 
 const fensterarten = new Map();
@@ -33,7 +36,7 @@ export function fensterOeffnen(stapel, art, zustand = {}) {
   return [...stapel, { art, zustand }];
 }
 
-// Gibt die Taste an das oberste Fenster; { stapel, befehl?, auswahl?, grund?, start?, aktion?, leiste? }
+// Gibt die Taste an das oberste Fenster; { stapel, ...die übrigen Felder des Ergebnisses }
 export function fensterTaste(stapel, taste, kontext) {
   const oben = oberstesFenster(stapel);
   if (!oben) return { stapel };
@@ -41,6 +44,6 @@ export function fensterTaste(stapel, taste, kontext) {
   let neuerStapel = ergebnis.zustand === null ? stapel.slice(0, -1) : [...stapel.slice(0, -1), { art: oben.art, zustand: ergebnis.zustand }];
   if (ergebnis.oeffnen) neuerStapel = fensterOeffnen(neuerStapel, ergebnis.oeffnen.art, ergebnis.oeffnen.zustand);
   if (ergebnis.auswahl) neuerStapel = [];
-  const { befehl, auswahl, grund, start, aktion, leiste } = ergebnis;
-  return { stapel: neuerStapel, ...(befehl && { befehl }), ...(auswahl && { auswahl }), ...(grund && { grund }), ...(start && { start }), ...(aktion && { aktion }), ...(leiste && { leiste }) };
+  const weiter = Object.fromEntries(Object.entries(ergebnis).filter(([name, wert]) => name !== "zustand" && name !== "oeffnen" && wert));
+  return { stapel: neuerStapel, ...weiter };
 }

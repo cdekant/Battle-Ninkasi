@@ -6,7 +6,11 @@ import rohdaten from "../daten/index.js";
 import tileset from "../grafik/tileset.js";
 import texteDe from "../sprache/de/texte.js";
 import grammatikDe from "../sprache/de/grammatik.js";
-import belegung from "./eingabe/belegung.js";
+import belegungsVorgabe from "./eingabe/belegung.js";
+import { abweichungenAnwenden, abweichungenGueltig } from "./eingabe/belegunganpassen.js";
+import { einstellungsfensterOeffnen } from "./eingabe/einstellungsfenster.js";
+import { befehlszeileOeffnen } from "./eingabe/befehlszeile.js";
+import "./anzeige/einstellungsanzeige.js";
 import vorgaben from "./eingabe/einstellungen.js";
 import { datenLaden, neuesSpiel, befehlGeben } from "./kern/spiel.js";
 import { entitaetenAuf, istWesen } from "./kern/zustand.js";
@@ -22,7 +26,7 @@ import { neueKamera, folgen } from "./anzeige/kamera.js";
 import { Oberflaeche } from "./anzeige/oberflaeche.js";
 import { Log } from "./anzeige/log.js";
 import { angekuendigteFelder } from "./anzeige/ankuendigungen.js";
-import { uebersetzen } from "./eingabe/eingabe.js";
+import { uebersetzen, aktionsergebnis } from "./eingabe/eingabe.js";
 import { feldAnPixel, klickDeuten } from "./eingabe/maus.js";
 import { reiseBeginnen, naechsterReiseschritt } from "./eingabe/reise.js";
 import { rastenBeginnen, naechsterRastschritt } from "./eingabe/rasten.js";
@@ -52,6 +56,7 @@ import { neueAnimation, geschossEinreihen, laeuftAnimation, aktuellesGeschoss, a
 
 const SPEICHERSCHLUESSEL_EINSTELLUNGEN = "battle-ninkasi.einstellungen";
 const SPEICHERSCHLUESSEL_EIGENSCHAFTEN = "battle-ninkasi.eigenschaften"; // letzte Verteilung der Charaktererstellung
+const SPEICHERSCHLUESSEL_BELEGUNG = "battle-ninkasi.belegung"; // Abweichungen von der Tastenbelegung
 const RAD_PAUSE_MS = 150; // zwischen zwei Zoomschritten per Rad
 const SPEICHERN_NACH_MS = 300; // Speichern gesammelt, höchstens so oft; beim Verlassen der Seite sofort
 const MINIKARTE_HOECHSTENS = 3; // Pixel je Feld; in Variante B streckt CSS sie auf die Breite der Log-Spalte
@@ -82,6 +87,20 @@ function einstellungenSpeichern(aktuelleEinstellungen) {
   }
   try { localStorage.setItem(SPEICHERSCHLUESSEL_EINSTELLUNGEN, JSON.stringify(abweichungen)); } catch { /* ohne Speicher weiter */ }
 }
+
+// Eigene Tastenbelegung: gespeichert werden nur die Abweichungen (eingabe/belegunganpassen.js)
+function belegungsabweichungenLaden() {
+  try {
+    return abweichungenGueltig(JSON.parse(localStorage.getItem(SPEICHERSCHLUESSEL_BELEGUNG) || "null"));
+  } catch {
+    return abweichungenGueltig(null);
+  }
+}
+function belegungsabweichungenSpeichern(abweichungen) {
+  try { localStorage.setItem(SPEICHERSCHLUESSEL_BELEGUNG, JSON.stringify(abweichungen)); } catch { /* ohne Speicher weiter */ }
+}
+let belegungsabweichungen = belegungsabweichungenLaden();
+let belegung = abweichungenAnwenden(belegungsVorgabe, belegungsabweichungen);
 
 // Letzte Verteilung der Eigenschaften, Vorbelegung der nächsten Charaktererstellung (geprüft in erstellungOeffnen)
 function letzteEigenschaftenLaden() {
@@ -124,9 +143,6 @@ const ninkasiBild = tilebilder.bild("ninkasi", 32);
 if (ninkasiBild) document.getElementById("favicon").href = ninkasiBild.toDataURL("image/png");
 
 const einstellungen = einstellungenLaden();
-if (!einstellungen.zoomstufen.includes(einstellungen.zoom)) einstellungen.zoom = einstellungen.zoomstufen[0];
-const LAYOUTS = ["a", "b"];
-if (!LAYOUTS.includes(einstellungen.layout)) einstellungen.layout = LAYOUTS[0];
 const spielElement = document.getElementById("spiel");
 
 const kartenCanvas = document.getElementById("karte-canvas");
@@ -135,14 +151,48 @@ const oberflaeche = new Oberflaeche(document.getElementById("seiteninhalt"), tex
 const seitenkopfElement = document.getElementById("seitenkopf");
 const minikartenCanvas = document.getElementById("minikarte");
 
-// Layout anwenden: Variante als data-layout; in Variante B steht die Minikarte links über dem Log, sonst in der
-// Seitenleiste unter dem Kopf
-function layoutAnwenden() {
+// Einstellungen anwenden, die die Seite betreffen (eingabe/einstellungskatalog.js): Layout als data-layout (in
+// Variante B steht die Minikarte links über dem Log, sonst in der Seitenleiste unter dem Kopf), Logzeilen in A,
+// Größe der Oberfläche als Schriftgröße von :root, Minikarte, Kontrast und Palette als data-Attribute an <html>
+const LAYOUTS = ["a", "b", "kompakt"];
+function einstellungenAnwenden() {
+  if (!LAYOUTS.includes(einstellungen.layout)) einstellungen.layout = LAYOUTS[0];
+  if (!einstellungen.zoomstufen.includes(einstellungen.zoom)) einstellungen.zoom = einstellungen.zoomstufen[0];
   spielElement.dataset.layout = einstellungen.layout;
   if (einstellungen.layout === "b") document.getElementById("minikarte-links").append(minikartenCanvas);
   else seitenkopfElement.after(minikartenCanvas);
+  spielElement.style.setProperty("--log-zeilen", einstellungen.layout === "a" ? String(einstellungen.logZeilen) : "");
+  const wurzel = document.documentElement;
+  wurzel.style.fontSize = `${einstellungen.oberflaecheGroesse}px`;
+  wurzel.dataset.kontrast = einstellungen.hoherKontrast ? "hoch" : "normal";
+  wurzel.dataset.palette = einstellungen.farbenblind ? "farbenblind" : "normal";
+  minikartenCanvas.hidden = !einstellungen.minikarte;
+  document.getElementById("minikarte-links").hidden = !einstellungen.minikarte;
 }
-layoutAnwenden();
+einstellungenAnwenden();
+
+// Neue Einstellungen aus dem Einstellungsfenster: übernehmen, anwenden, speichern
+function einstellungenUebernehmen(neu) {
+  const zoomVorher = einstellungen.zoom;
+  Object.assign(einstellungen, neu);
+  einstellungenAnwenden();
+  einstellungenSpeichern(einstellungen);
+  if (einstellungen.zoom !== zoomVorher) kamera.gesetzt = false;
+}
+
+// Neue Tastenbelegung aus dem Einstellungsfenster
+function belegungUebernehmen(abweichungen) {
+  belegungsabweichungen = abweichungen;
+  belegung = abweichungenAnwenden(belegungsVorgabe, belegungsabweichungen);
+  bedienzeile.belegung = belegung;
+  belegungsabweichungenSpeichern(belegungsabweichungen);
+}
+
+// Vollbild an oder aus (der Browser verlangt dafür eine Handlung der Spielerin, ein Tastendruck zählt)
+function vollbildUmschalten() {
+  if (document.fullscreenElement) document.exitFullscreen?.();
+  else document.documentElement.requestFullscreen?.().catch(() => { /* abgelehnt */ });
+}
 const log = new Log(document.getElementById("log"), texte);
 const bedienzeile = new Bedienzeile(document.getElementById("bedienzeile"), texte, belegung);
 const tooltipElement = document.getElementById("tooltip");
@@ -200,11 +250,16 @@ function zeichnen() {
   minikarteAktualisieren(hervorgehobenId);
   oberflaeche.anzeigen(spiel, { ziel: zielModus && { modus: zielModus, vorschau: zielvorschau }, hervorgehobenId });
   bedienzeile.anzeigen(spiel, leisten);
-  const fensterInhalt = fensterHtml({ spiel, daten, texte, belegung, leisten, logzeilen: log.zeilen, einstellungen, version: VERSION }, fensterStapel);
+  const fensterInhalt = fensterHtml(fensterumgebung(), fensterStapel);
   fensterElement.hidden = !fensterInhalt;
   fensterElement.innerHTML = fensterInhalt;
   uebersichtskarteZeichnen();
   tooltipZeigen();
+}
+
+// Was Fenster zum Zeichnen und für ihre Tasten bekommen (anzeige/fenster.js, eingabe/fenster.js)
+function fensterumgebung() {
+  return { spiel, daten, texte, belegung, belegungsVorgabe, abweichungen: belegungsabweichungen, leisten, logzeilen: log.zeilen, einstellungen, vorgaben, version: VERSION };
 }
 
 // ID des sichtbaren Wesens auf einem Feld oder null
@@ -294,7 +349,7 @@ function tooltipZeigen() {
 
 // Geschossbahnen: nur die Felder, die Ninkasi gerade sieht; der Takt läuft unabhängig von Reise und Eingabe
 function geschossGemeldet(meldung) {
-  if (meldung.art !== "geschoss" || einstellungen.geschossPause <= 0) return;
+  if (meldung.art !== "geschoss" || einstellungen.geschossPause <= 0 || einstellungen.bewegungReduzieren) return;
   geschossEinreihen(animation, meldung.bahn.filter((feld) => istSichtbar(spiel.zustand, feld.x, feld.y)));
 }
 function animationTakt() {
@@ -439,7 +494,7 @@ function erstellungAbschliessen(startoptionen) {
 }
 
 // Fenster obenauf legen; nach dem Tod nur die, die nichts am Lauf ändern (Spielmenü, Hilfe, Verlauf)
-const FENSTER_NACH_DEM_TOD = ["menue", "hilfe", "verlauf", "karte"];
+const FENSTER_NACH_DEM_TOD = ["menue", "hilfe", "verlauf", "karte", "einstellungen", "befehlszeile", "bestaetigung"];
 function fensterAuf(art, zustand) {
   if (spiel.zustand.vorbei && !FENSTER_NACH_DEM_TOD.includes(art)) return;
   fensterStapel = fensterOeffnen(fensterStapel, art, zustand);
@@ -453,11 +508,8 @@ function fensteraktionAusfuehren(aktion) {
     gespeichertenLaufLoeschen();
     return starten(zufaelligerStartwert());
   }
-  if (aktion === "layout") {
-    einstellungen.layout = LAYOUTS[(LAYOUTS.indexOf(einstellungen.layout) + 1) % LAYOUTS.length];
-    einstellungenSpeichern(einstellungen);
-    layoutAnwenden();
-    kamera.gesetzt = false;
+  if (aktion === "vollbild") {
+    vollbildUmschalten();
     return zeichnen();
   }
   if (aktion === "beenden") {
@@ -478,6 +530,15 @@ function platzBenutzen(stelle) {
     return zeichnen();
   }
   if (ergebnis.befehl) return befehlGebenUndZeichnen(ergebnis.befehl);
+  // sofort auslösen: mit gültigem vorbelegtem Ziel gleich wirken, sonst bleibt der Zielmodus offen
+  if (einstellungen.sofortAusloesen) {
+    const beginn = zielmodusBeginnen(spiel, ergebnis.auswahl, { platz: stelle, letztesZielId });
+    if (beginn.befehl) return befehlGebenUndZeichnen(beginn.befehl);
+    if (beginn.modus) {
+      const bestaetigt = zielmodusBestaetigen(spiel, beginn.modus);
+      if (bestaetigt.befehl) return befehlGebenUndZeichnen(bestaetigt.befehl);
+    }
+  }
   auswahlStarten(ergebnis.auswahl, { platz: stelle });
 }
 
@@ -500,6 +561,14 @@ function befehlGebenUndZeichnen(befehl) {
   animationStarten();
 }
 
+// Ein Fenster, das gerade Text oder eine Taste aufnimmt, bekommt auch ? und Umschalt+Ziffer
+function fensterNimmtText(fenster) {
+  if (fenster.art === "befehlszeile") return true;
+  if (fenster.art === "verlauf") return Boolean(fenster.zustand.sucheAktiv);
+  if (fenster.art === "einstellungen") return Boolean(fenster.zustand.aufnahme || fenster.zustand.konflikt);
+  return false;
+}
+
 window.addEventListener("keydown", (tastenereignis) => {
   // Eine laufende Geschossbahn überspringt jede Taste, die Taste wirkt trotzdem
   if (laeuftAnimation(animation)) animationUeberspringen();
@@ -511,21 +580,25 @@ window.addEventListener("keydown", (tastenereignis) => {
   // Offene Fenster bekommen jede Taste (eingabe/fenster.js); ? legt die Hilfe zum obersten Fenster obenauf
   if (fensterStapel.length) {
     tastenereignis.preventDefault();
-    if (aktionDerTaste(belegung, tastenereignis.code, tastenereignis.key) === "hilfe" && oberstesFenster(fensterStapel).art !== "hilfe") {
+    const nimmtText = fensterNimmtText(oberstesFenster(fensterStapel));
+    if (!nimmtText && aktionDerTaste(belegung, tastenereignis.code, tastenereignis.key) === "hilfe" && oberstesFenster(fensterStapel).art !== "hilfe") {
       fensterStapel = fensterOeffnen(fensterStapel, "hilfe", { thema: oberstesFenster(fensterStapel).art });
       return zeichnen();
     }
     const taste = { code: tastenereignis.code, zeichen: tastenereignis.key, umschalt: tastenereignis.shiftKey };
     // Umschalt+Ziffer wechselt die Leiste auch bei offenem Fenster (zum Belegen anderer Leisten)
     const leistenAktion = AKTIONEN[aktionDerTaste(belegung, tastenereignis.code, tastenereignis.key, tastenereignis.shiftKey)];
-    if (tastenereignis.shiftKey && leistenAktion?.leiste !== undefined) {
+    if (!nimmtText && tastenereignis.shiftKey && leistenAktion?.leiste !== undefined) {
       leisten = leisteWechseln(leisten, leistenAktion.leiste);
       speichernVormerken();
       return zeichnen();
     }
-    const { stapel, befehl, auswahl, grund, start, aktion, leiste } = fensterTaste(fensterStapel, taste, { spiel, daten, belegung });
+    const { stapel, befehl, auswahl, grund, start, aktion, leiste, befehlszeile, einstellungen: neueEinstellungen, abweichungen } = fensterTaste(fensterStapel, taste, fensterumgebung());
     fensterStapel = stapel;
     if (leiste) leisteAendern(leiste);
+    if (neueEinstellungen) einstellungenUebernehmen(neueEinstellungen);
+    if (abweichungen) belegungUebernehmen(abweichungen);
+    if (befehlszeile) return befehlszeileAusfuehren(befehlszeile);
     if (grund) ablehnungMelden(grund);
     if (start) return erstellungAbschliessen(start);
     if (aktion) return fensteraktionAusfuehren(aktion);
@@ -556,6 +629,8 @@ function aktionAusfuehren(ergebnis) {
   if (aktion === "fallenlassen_waehlen") return fensterAuf("inventar", { gewaehlt: null, absicht: "fallenlassen" });
   if (aktion === "werfen_waehlen") return fensterAuf("inventar", { gewaehlt: null, absicht: "werfen" });
   if (aktion === "karte") return fensterAuf("karte", {});
+  if (aktion === "befehlszeile") return fensterAuf("befehlszeile", befehlszeileOeffnen());
+  if (aktion === "einstellungen") return fensterAuf("einstellungen", einstellungsfensterOeffnen());
   if (aktion === "abbrechen") {
     if (escSchritt({ zielModus, fensterStapel, laufenderAblauf }) === "menue") return fensterAuf("menue", menueOeffnen());
     return;
@@ -580,6 +655,17 @@ function aktionAusfuehren(ergebnis) {
     return;
   }
   if (ergebnis.befehl) befehlGebenUndZeichnen(ergebnis.befehl);
+}
+
+// Ziel eines Treffers der Befehlszeile (eingabe/befehlszeile.js): eine Aktion wie ihre Taste, eine Einstellung öffnet
+// das Einstellungsfenster an diesem Eintrag
+function befehlszeileAusfuehren(ziel) {
+  if (ziel.einstellung) {
+    fensterStapel = fensterOeffnen([], "einstellungen", einstellungsfensterOeffnen(ziel.einstellung));
+    return zeichnen();
+  }
+  zeichnen();
+  aktionAusfuehren(aktionsergebnis(ziel.aktion, spiel));
 }
 
 // Bedienzeile (anzeige/bedienzeile.js): Klick auf einen Platz oder Knopf wirkt wie seine Taste. Bei offenem Fenster oder

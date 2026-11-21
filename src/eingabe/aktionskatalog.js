@@ -7,6 +7,7 @@
 //   knopf:  kurzes Wort auf dem Knopf der Bedienzeile (Sprachschlüssel)
 //   platz:  Stelle in der Schnellleiste (0 bis 9), siehe eingabe/schnellleiste.js
 //   leiste: Nummer der Leiste (0 bis 4), auf die die Aktion umschaltet
+//   ohneTaste: hat in der Vorgabe keine Taste (erreichbar über Spielmenü und Befehlszeile), belegbar im Einstellungsfenster
 // Aktionen ohne befehl wertet src/main.js aus (Fenster öffnen, Zoom, Abläufe); die Logik kennt sie nicht.
 
 export const GRUPPEN = ["bewegen", "handeln", "schnellleiste", "ablaeufe", "fenster", "anzeige"];
@@ -48,6 +49,8 @@ export const AKTIONEN = {
   verlauf: { text: "aktion.verlauf", gruppe: "fenster", knopf: "knopf.verlauf" },
   karte: { text: "aktion.karte", gruppe: "fenster", knopf: "knopf.karte" },
   hilfe: { text: "aktion.hilfe", gruppe: "fenster", knopf: "knopf.hilfe" },
+  befehlszeile: { text: "aktion.befehlszeile", gruppe: "fenster" }, // eingabe/befehlszeile.js
+  einstellungen: { text: "aktion.einstellungen", gruppe: "fenster", ohneTaste: true }, // eingabe/einstellungsfenster.js
   zoom_rein: { text: "aktion.zoom_rein", gruppe: "anzeige" },
   zoom_raus: { text: "aktion.zoom_raus", gruppe: "anzeige" },
   neustart: { text: "aktion.neustart", gruppe: "anzeige" },

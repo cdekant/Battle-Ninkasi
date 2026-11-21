@@ -7,14 +7,13 @@ import { logzeileHtml } from "./log.js";
 import { MENUE_EINTRAEGE } from "../eingabe/menue.js";
 import { VERLAUF_FILTER, VERLAUF_SEITE, passtZumFilter } from "../eingabe/verlauf.js";
 import { PUNKTFARBEN } from "./minikarte.js";
+
+const escapeHtml = (text) => String(text).replace(/[&<>"]/g, (zeichen) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[zeichen]);
 import "../eingabe/karte.js"; // meldet die Fensterart "karte" an
 
-fensterinhaltAnmelden("menue", ({ spiel, texte, einstellungen, version }, zustand) => {
+fensterinhaltAnmelden("menue", ({ spiel, texte, version }, zustand) => {
   const { text } = texte;
-  const zeilen = MENUE_EINTRAEGE.map((eintrag, stelle) => {
-    const zusatz = eintrag === "layout" ? ` <span class="leise">(${text(`menue.layout.${einstellungen.layout}`)})</span>` : "";
-    return `<li${stelle === zustand.gewaehlt ? ' class="gewaehlt"' : ""}>${buchstabeHtml(stelle)}${text(`menue.${eintrag}`)}${zusatz}</li>`;
-  });
+  const zeilen = MENUE_EINTRAEGE.map((eintrag, stelle) => `<li${stelle === zustand.gewaehlt ? ' class="gewaehlt"' : ""}>${buchstabeHtml(stelle)}${text(`menue.${eintrag}`)}</li>`);
   return {
     titel: text("menue.titel"),
     liste: `<ul>${zeilen.join("")}</ul>`,
@@ -30,7 +29,7 @@ fensterinhaltAnmelden("bestaetigung", ({ texte }, zustand) => ({
 
 fensterinhaltAnmelden("verlauf", ({ texte, logzeilen }, zustand) => {
   const { text } = texte;
-  const passend = logzeilen.filter((zeile) => passtZumFilter(zeile, zustand.filter));
+  const passend = logzeilen.filter((zeile) => passtZumFilter(zeile, zustand.filter, zustand.suche ?? ""));
   const versatz = Math.min(zustand.versatz, Math.max(0, passend.length - VERLAUF_SEITE));
   const ende = passend.length - versatz;
   const sichtbar = passend.slice(Math.max(0, ende - VERLAUF_SEITE), ende);
@@ -39,7 +38,8 @@ fensterinhaltAnmelden("verlauf", ({ texte, logzeilen }, zustand) => {
   return {
     titel: text("aktion.verlauf"),
     breit: true,
-    kopf: `<div class="verlauf-filter">${filter}</div>`,
+    kopf: `<div class="verlauf-filter">${filter}</div>${zustand.sucheAktiv || zustand.suche
+      ? `<div class="eingabezeile">/${escapeHtml(zustand.suche ?? "")}${zustand.sucheAktiv ? '<span class="schreibmarke">▏</span>' : ""}</div>` : ""}`,
     liste: `<div class="verlauf">${zeilenHtml || `<div class="leise">${text("ui.leer")}</div>`}</div>`,
     fuss: text("verlauf.fuss", { von: Math.max(0, ende - sichtbar.length) + (sichtbar.length ? 1 : 0), bis: ende, alle: passend.length }),
   };

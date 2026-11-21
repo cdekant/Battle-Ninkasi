@@ -68,6 +68,7 @@ export default {
   },
   zeichen: {
     "?": "hilfe", // deutsche Tastatur Umschalt+ß, US Umschalt+/
+    ":": "befehlszeile", // deutsche Tastatur Umschalt+., US Umschalt+;
     ".": "warten",
     "<": "treppe",
     ">": "treppe",

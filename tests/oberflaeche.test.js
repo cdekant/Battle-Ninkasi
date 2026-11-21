@@ -106,7 +106,7 @@ test("Esc-Kette: Zielmodus, Fenster, Ablauf, sonst Spielmenü", () => {
   assert.equal(escSchritt({ zielModus: null, fensterStapel: [], laufenderAblauf: null }), "menue");
 });
 
-test("Spielmenü: Buchstabe, Pfeile, Enter; Neustart fragt nach, Hilfe legt sich darüber, Layout bleibt offen", () => {
+test("Spielmenü: Buchstabe, Pfeile, Enter; Neustart fragt nach, Hilfe und Einstellungen legen sich darüber", () => {
   const zustand = menueOeffnen();
   assert.equal(menueTaste(zustand, { code: "ArrowUp" }).zustand.gewaehlt, MENUE_EINTRAEGE.length - 1, "läuft rund");
   assert.deepEqual(menueTaste(zustand, { code: "Enter" }), { zustand: null }, "Fortsetzen schließt");
@@ -119,8 +119,9 @@ test("Spielmenü: Buchstabe, Pfeile, Enter; Neustart fragt nach, Hilfe legt sich
   assert.deepEqual(bestaetigt.stapel.map(({ art }) => art), ["menue"]);
   assert.equal(fensterTaste(neustart.stapel, { code: "KeyN", zeichen: "n" }, {}).aktion, undefined, "nein tut nichts");
   assert.deepEqual(fensterTaste(stapel, { code: "KeyB", zeichen: "b" }, {}).stapel.map(({ art }) => art), ["menue", "hilfe"]);
-  const layout = fensterTaste(stapel, { code: "KeyC", zeichen: "c" }, {});
-  assert.deepEqual([layout.aktion, layout.stapel.length], ["layout", 1]);
+  const einstellungen = fensterTaste(stapel, { code: "KeyC", zeichen: "c" }, {});
+  assert.deepEqual(einstellungen.stapel.map(({ art }) => art), ["menue", "einstellungen"], "Einstellungen legen sich über das Menü");
+  assert.deepEqual(menueTaste(zustand, { code: "KeyD", zeichen: "d" }, { einstellungen: { neustartNachfragen: false } }), { zustand: null, aktion: "neustart" }, "ohne Nachfrage");
   assert.deepEqual(menueTaste(zustand, { code: "KeyE", zeichen: "e" }), { zustand: null, aktion: "beenden" });
   assert.deepEqual(menueTaste(zustand, { code: "KeyZ", zeichen: "z" }), { zustand }, "an z liegt nichts");
   assert.deepEqual(bestaetigungTaste({ frage: "x", aktion: "a" }, { code: "Enter" }), { zustand: null, aktion: "a" });
@@ -136,7 +137,7 @@ test("Verlauf: Filter nach Spalte und Art, Blättern nie unter 0, Tab schließt"
   assert.equal(zustand.versatz, 0);
   zustand = verlaufTaste(zustand, { code: "PageUp" }).zustand;
   assert.ok(zustand.versatz > 0);
-  assert.deepEqual(verlaufTaste(zustand, { code: "KeyC", zeichen: "c" }).zustand, { filter: VERLAUF_FILTER[2], versatz: 0 });
+  assert.deepEqual(verlaufTaste(zustand, { code: "KeyC", zeichen: "c" }).zustand, { ...zustand, filter: VERLAUF_FILTER[2], versatz: 0 });
   assert.equal(verlaufTaste(zustand, { code: "Tab" }).zustand, null);
 });
 
@@ -150,7 +151,7 @@ test("Anzeige: Menü, Bestätigung, Verlauf, Seitenleiste und Bedienzeile ohne f
   log.hinzufuegen({ spalte: "kampf", art: "angriff", text: "Hieb.", seite: "ninkasi", ton: "treffer", zahlen: [{ text: "9", klasse: "menge" }] });
   const umgebung = { spiel, daten, texte, belegung, logzeilen: log.zeilen, einstellungen: vorgaben, version: "test" };
   const zeigen = (art, zustand) => fensterHtml(umgebung, fensterOeffnen([], art, zustand));
-  assert.match(zeigen("menue", menueOeffnen()), /Spielmenü.*Layout wechseln.*Log unter der Karte/s);
+  assert.match(zeigen("menue", menueOeffnen()), /Spielmenü.*Einstellungen.*Neuer Lauf/s);
   assert.match(zeigen("bestaetigung", { frage: "menue.neustart_frage", aktion: "neustart" }), /Wirklich\?/);
   const verlauf = zeigen("verlauf", verlaufOeffnen());
   assert.match(verlauf, /Willkommen.*Hieb/s);

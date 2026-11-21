@@ -16,7 +16,10 @@ test("Belegung: jede Taste zeigt auf eine Aktion des Katalogs, jede Aktion hat e
   for (const teil of ["tasten", "weitereTasten", "zeichen"]) {
     for (const [taste, aktion] of Object.entries(belegung[teil])) assert.ok(AKTIONEN[aktion], `${teil}.${taste}: unbekannte Aktion ${aktion}`);
   }
-  for (const aktion of Object.keys(AKTIONEN)) assert.ok(tastenDerAktion(belegung, aktion).length, `${aktion} hat keine Taste`);
+  for (const aktion of Object.keys(AKTIONEN)) {
+    if (AKTIONEN[aktion].ohneTaste) assert.equal(tastenDerAktion(belegung, aktion).length, 0, `${aktion} ist ohne Taste gedacht`);
+    else assert.ok(tastenDerAktion(belegung, aktion).length, `${aktion} hat keine Taste`);
+  }
   const doppelt = Object.keys(belegung.tasten).filter((taste) => taste in belegung.weitereTasten);
   assert.deepEqual(doppelt, [], "eine Taste steht nur einmal");
 });
@@ -70,7 +73,8 @@ test("Hilfe: Gruppen aus dem Katalog, Tastennamen, schließen mit Esc oder ?", (
   assert.deepEqual(gruppen.map(({ gruppe }) => gruppe), GRUPPEN);
   const anzahl = gruppen.reduce((summe, { eintraege }) => summe + eintraege.length, 0);
   const leistenwechsel = Object.values(AKTIONEN).filter((eintrag) => eintrag.leiste !== undefined).length;
-  assert.equal(anzahl, Object.keys(AKTIONEN).length - PLAETZE_DER_LEISTE + 1 - leistenwechsel + 1, "jede Aktion steht in der Hilfe, Plätze und Leistenwechsel je in einer Zeile");
+  const ohneTaste = Object.values(AKTIONEN).filter((eintrag) => eintrag.ohneTaste).length;
+  assert.equal(anzahl, Object.keys(AKTIONEN).length - PLAETZE_DER_LEISTE + 1 - leistenwechsel + 1 - ohneTaste, "jede Aktion mit Taste steht in der Hilfe, Plätze und Leistenwechsel je in einer Zeile");
   const wechsel = gruppen.find(({ gruppe }) => gruppe === "schnellleiste").eintraege[1];
   assert.equal(wechsel.tasten.map((taste) => tastenname(texte, taste)).join(", "), "Umschalt+1, Umschalt+2, Umschalt+3, Umschalt+4, Umschalt+5");
   assert.equal(aktionDerTaste(belegung, "Digit2", "\"", true), "leiste_2", "Umschalt+Ziffer vor dem Zeichen");
