@@ -66,4 +66,14 @@ export function charakterTaste(zustand, taste, spiel) {
   return { zustand };
 }
 
-fensterartAnmelden("charakter", { taste: (zustand, taste, { spiel }) => charakterTaste(zustand, taste, spiel) });
+// Klick auf eine Zeile ({ stelle }, über alle Seiten gezählt): wählt sie, die schon gewählte verteilt wie Enter
+export function charakterKlick(zustand, ziel, spiel) {
+  if (ziel.stelle === zustand.gewaehlt) return verteilen(spiel, zustand, false);
+  const anzahl = skillUebersicht(spiel, spielerin(spiel.zustand)).length;
+  return ziel.stelle >= 0 && ziel.stelle < anzahl ? { zustand: { gewaehlt: ziel.stelle, eingabe: "" } } : { zustand };
+}
+
+fensterartAnmelden("charakter", {
+  taste: (zustand, taste, { spiel }) => charakterTaste(zustand, taste, spiel),
+  klick: (zustand, ziel, { spiel }) => charakterKlick(zustand, ziel, spiel),
+});

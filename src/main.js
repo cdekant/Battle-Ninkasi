@@ -43,7 +43,7 @@ import "./eingabe/faehigkeiten.js";
 import "./eingabe/hilfe.js";
 import { charakterfensterOeffnen } from "./eingabe/charakter.js";
 import { erstellungOeffnen } from "./eingabe/erstellung.js";
-import { fensterOeffnen, fensterTaste, oberstesFenster } from "./eingabe/fenster.js";
+import { fensterOeffnen, fensterTaste, fensterKlick, oberstesFenster } from "./eingabe/fenster.js";
 import { AKTIONEN, aktionDerTaste } from "./eingabe/aktionskatalog.js";
 import { fensterHtml } from "./anzeige/fenster.js";
 import "./anzeige/charakterfenster.js";
@@ -561,6 +561,61 @@ function befehlGebenUndZeichnen(befehl) {
   animationStarten();
 }
 
+// Ergebnis von fensterTaste oder fensterKlick (eingabe/fenster.js): Stapel übernehmen, dann was das Fenster verlangt
+function fensterergebnisVerarbeiten(ergebnis) {
+  const { stapel, befehl, auswahl, grund, start, aktion, leiste, befehlszeile, einstellungen: neueEinstellungen, abweichungen } = ergebnis;
+  fensterStapel = stapel;
+  if (leiste) leisteAendern(leiste);
+  if (neueEinstellungen) einstellungenUebernehmen(neueEinstellungen);
+  if (abweichungen) belegungUebernehmen(abweichungen);
+  if (befehlszeile) return befehlszeileAusfuehren(befehlszeile);
+  if (grund) ablehnungMelden(grund);
+  if (start) return erstellungAbschliessen(start);
+  if (aktion) return fensteraktionAusfuehren(aktion);
+  if (befehl) return befehlGebenUndZeichnen(befehl);
+  if (auswahl) return auswahlStarten(auswahl);
+  return zeichnen();
+}
+
+// Maus in Fenstern ("Klick ist Taste", anzeige/fenster.js): data-taste kommt als gewöhnliche Taste an, data-ziel über
+// die klick-Funktion der Fensterart; ein Rechtsklick wirkt wie Esc; das Rad blättert im Verlauf
+const datenAus = (element, name) => {
+  try { return JSON.parse(element.dataset[name]); } catch { return null; }
+};
+fensterElement.addEventListener("click", (mausereignis) => {
+  if (!fensterStapel.length || mausereignis.target.closest?.("canvas.uebersichtskarte")) return;
+  const element = mausereignis.target.closest?.("[data-taste], [data-ziel]");
+  if (!element) return;
+  element.blur?.();
+  const taste = element.dataset.taste !== undefined ? datenAus(element, "taste") : null;
+  if (taste) return fensterergebnisVerarbeiten(fensterTaste(fensterStapel, taste, fensterumgebung()));
+  const ziel = datenAus(element, "ziel");
+  if (ziel) fensterergebnisVerarbeiten(fensterKlick(fensterStapel, ziel, fensterumgebung()));
+});
+fensterElement.addEventListener("contextmenu", (mausereignis) => {
+  if (!fensterStapel.length) return;
+  mausereignis.preventDefault();
+  fensterergebnisVerarbeiten(fensterTaste(fensterStapel, { code: "Escape" }, fensterumgebung()));
+});
+fensterElement.addEventListener("wheel", (radereignis) => {
+  if (oberstesFenster(fensterStapel)?.art !== "verlauf") return;
+  radereignis.preventDefault();
+  fensterergebnisVerarbeiten(fensterTaste(fensterStapel, { code: radereignis.deltaY < 0 ? "ArrowUp" : "ArrowDown" }, fensterumgebung()));
+}, { passive: false });
+
+// Klick außerhalb des obersten Fensters schließt es, außer bei Charaktererstellung und Bestätigung; gibt true zurück,
+// wenn der Klick damit verbraucht ist (ein offenes Fenster schluckt Klicks dahinter immer)
+const FENSTER_OHNE_KLICK_AUSSEN = ["erstellung", "bestaetigung"];
+function klickAusserhalbDesFensters() {
+  const oben = oberstesFenster(fensterStapel);
+  if (!oben) return false;
+  if (!FENSTER_OHNE_KLICK_AUSSEN.includes(oben.art)) {
+    fensterStapel = fensterStapel.slice(0, -1);
+    zeichnen();
+  }
+  return true;
+}
+
 // Ein Fenster, das gerade Text oder eine Taste aufnimmt, bekommt auch ? und Umschalt+Ziffer
 function fensterNimmtText(fenster) {
   if (fenster.art === "befehlszeile") return true;
@@ -593,18 +648,7 @@ window.addEventListener("keydown", (tastenereignis) => {
       speichernVormerken();
       return zeichnen();
     }
-    const { stapel, befehl, auswahl, grund, start, aktion, leiste, befehlszeile, einstellungen: neueEinstellungen, abweichungen } = fensterTaste(fensterStapel, taste, fensterumgebung());
-    fensterStapel = stapel;
-    if (leiste) leisteAendern(leiste);
-    if (neueEinstellungen) einstellungenUebernehmen(neueEinstellungen);
-    if (abweichungen) belegungUebernehmen(abweichungen);
-    if (befehlszeile) return befehlszeileAusfuehren(befehlszeile);
-    if (grund) ablehnungMelden(grund);
-    if (start) return erstellungAbschliessen(start);
-    if (aktion) return fensteraktionAusfuehren(aktion);
-    if (befehl) return befehlGebenUndZeichnen(befehl);
-    if (auswahl) return auswahlStarten(auswahl);
-    return zeichnen();
+    return fensterergebnisVerarbeiten(fensterTaste(fensterStapel, taste, fensterumgebung()));
   }
   // Zielmodus: Bewegungstasten zielen, dazu Tab, Enter und Esc (eingabe/zielmodus.js)
   if (zielModus) {
@@ -730,7 +774,11 @@ document.addEventListener("dragend", () => {
 
 // Klick auf das Log öffnet den Verlauf
 document.getElementById("log").addEventListener("click", () => {
-  if (!fensterStapel.length && !zielModus && !laufenderAblauf) fensterAuf("verlauf", verlaufOeffnen());
+  if (fensterStapel.length) return klickAusserhalbDesFensters();
+  if (!zielModus && !laufenderAblauf) fensterAuf("verlauf", verlaufOeffnen());
+});
+document.getElementById("seitenleiste").addEventListener("click", () => {
+  if (fensterStapel.length) klickAusserhalbDesFensters();
 });
 
 // Klick auf Minikarte oder Übersichtskarte reist zum Feld (wie ein Klick auf die Karte, nur über Erkundetes)
@@ -789,8 +837,12 @@ kartenCanvas.addEventListener("contextmenu", (mausereignis) => mausereignis.prev
 
 kartenCanvas.addEventListener("mousedown", (mausereignis) => {
   if (laufenderAblauf) return ablaufBeenden("abgebrochen");
-  // ein offenes Fenster liegt über der Karte, der Klick dahinter zählt nicht
-  if (fensterStapel.length || spiel.zustand.vorbei) return;
+  // ein offenes Fenster liegt über der Karte: der Klick daneben schließt es (außer Erstellung und Bestätigung)
+  if (fensterStapel.length) {
+    mausereignis.preventDefault();
+    return klickAusserhalbDesFensters();
+  }
+  if (spiel.zustand.vorbei) return;
   const feld = feldAnPixel(mausereignis.offsetX, mausereignis.offsetY, kamera, einstellungen.zoom);
   if (belegung.maus[mausereignis.button] === "untersuchen") {
     mausereignis.preventDefault();

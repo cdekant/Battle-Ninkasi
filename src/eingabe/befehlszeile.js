@@ -65,4 +65,13 @@ export function befehlszeileTaste(zustand, taste, kontext) {
   return { zustand: eingabe === null ? zustand : { eingabe, gewaehlt: 0 } };
 }
 
-fensterartAnmelden("befehlszeile", { taste: (zustand, taste, kontext) => befehlszeileTaste(zustand, taste, kontext) });
+// Klick auf einen Treffer ({ zeile }): wählt ihn, den schon gewählten führt er aus wie Enter
+export function befehlszeileKlick(zustand, ziel, kontext) {
+  if (ziel.zeile === zustand.gewaehlt) return befehlszeileTaste(zustand, { code: "Enter" }, kontext);
+  return { zustand: { ...zustand, gewaehlt: ziel.zeile } };
+}
+
+fensterartAnmelden("befehlszeile", {
+  taste: (zustand, taste, kontext) => befehlszeileTaste(zustand, taste, kontext),
+  klick: (zustand, ziel, kontext) => befehlszeileKlick(zustand, ziel, kontext),
+});

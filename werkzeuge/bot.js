@@ -36,7 +36,7 @@ import { feldBeschreiben, werteAufschluesseln } from "../src/systeme/untersuchen
 import { meldungWahrnehmbar, geraeuschGehoert } from "../src/systeme/wahrnehmbar.js";
 import { charakterfensterOeffnen, charakterTaste } from "../src/eingabe/charakter.js";
 import { erstellungOeffnen, erstellungTaste } from "../src/eingabe/erstellung.js";
-import { fensterOeffnen } from "../src/eingabe/fenster.js";
+import { fensterOeffnen, fensterTaste, fensterKlick } from "../src/eingabe/fenster.js";
 import "../src/eingabe/inventar.js";
 import "../src/eingabe/faehigkeiten.js";
 import "../src/eingabe/hilfe.js";
@@ -88,6 +88,23 @@ function oberflaecheZeichnen(spiel) {
   });
   for (const zeile of botLog.zeilen) if (!(zeile.art in ARTEN) || !["geschehen", "kampf"].includes(zeile.spalte)) throw new Error(`Logzeile ohne Art oder Spalte: ${JSON.stringify(zeile)}`);
 }
+// Klicks in Fenstern wie im Browser: jedes data-taste und data-ziel im HTML eines Fensters einmal auslösen (die
+// Ergebnisse wirft der Bot weg, es geht darum, dass nichts wirft und keine Texte fehlen)
+function attributwerte(html, name) {
+  return [...html.matchAll(new RegExp(`data-${name}="([^"]*)"`, "g"))].map((treffer) => JSON.parse(treffer[1].replace(/&quot;/g, '"').replace(/&amp;/g, "&")));
+}
+function fensterKlicksPruefen(spiel) {
+  const umgebung = botUmgebung(spiel);
+  const fenster = [["inventar", { gewaehlt: spielerin(spiel.zustand).inventar?.[0] ?? null }], ["faehigkeiten", { gewaehlt: null }], ["charakter", charakterfensterOeffnen()], ["menue", menueOeffnen()], ["einstellungen", einstellungsfensterOeffnen()]];
+  for (const [art, zustand] of fenster) {
+    const stapel = fensterOeffnen([], art, zustand);
+    let html = "";
+    mitWarnungen(() => { html = fensterHtml(umgebung, stapel); });
+    for (const taste of attributwerte(html, "taste")) fensterTaste(stapel, taste, umgebung);
+    for (const ziel of attributwerte(html, "ziel")) fensterKlick(stapel, ziel, umgebung);
+  }
+}
+
 // Spielmenü per Tasten wie im Browser: Pfeil runter und wieder hoch, dann Fortsetzen; nichts davon ändert den Lauf
 function menueBedienen(spiel) {
   let zustand = menueOeffnen();
@@ -456,7 +473,10 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
         untersuchen(spiel);
         oberflaecheZeichnen(spiel);
       }
-      if (spiel.befehle.length % 500 === 0) menueBedienen(spiel);
+      if (spiel.befehle.length % 500 === 0) {
+        menueBedienen(spiel);
+        fensterKlicksPruefen(spiel);
+      }
     }
     if (geladeneKopie) {
       for (const befehl of spiel.befehle.slice(geladeneKopie.befehle.length)) {

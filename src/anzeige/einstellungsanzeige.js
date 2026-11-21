@@ -2,7 +2,7 @@
 // Grammatik aus anzeige/fenster.js. Liest nur. Die Kopfzeile des Einstellungsfensters nennt alle Reiter (Prinzip 7).
 // umgebung zusätzlich: { einstellungen, vorgaben, belegung, belegungsVorgabe } (src/main.js)
 
-import { fensterinhaltAnmelden, buchstabeHtml, tastenname } from "./fenster.js";
+import { fensterinhaltAnmelden, buchstabeHtml, tastenname, zielAttribut } from "./fenster.js";
 import { REITER, EINSTELLUNGEN, einstellungenImReiter, einstellungLesen } from "../eingabe/einstellungskatalog.js";
 import { tastenZeilen, ALLE_AUF_VORGABE } from "../eingabe/einstellungsfenster.js";
 import { aenderbareTasten } from "../eingabe/belegunganpassen.js";
@@ -25,7 +25,7 @@ export function wertText(texte, id, wert) {
 }
 
 function reiterKopf(texte, aktiv) {
-  return REITER.map((reiter) => `<span class="reiter${reiter === aktiv ? " gewaehlt" : ""}">${texte.text(`einstellung.reiter.${reiter}`)}</span>`).join("");
+  return REITER.map((reiter) => `<span class="reiter${reiter === aktiv ? " gewaehlt" : ""}"${zielAttribut({ reiter })}>${texte.text(`einstellung.reiter.${reiter}`)}</span>`).join("");
 }
 
 function einstellungenListe(umgebung, zustand) {
@@ -35,12 +35,16 @@ function einstellungenListe(umgebung, zustand) {
   const zeilen = ids.map((id, stelle) => {
     const klasse = stelle === zustand.gewaehlt ? ' class="gewaehlt"' : "";
     const wert = einstellungLesen(einstellungen, id);
-    return `<li${klasse}>${buchstabeHtml(stelle)}${text(`einstellung.${id}`)} <span class="wert-rechts">${escapeHtml(wertText(texte, id, wert))}</span></li>`;
+    const schritte = ["zahl", "auswahl"].includes(EINSTELLUNGEN[id].art);
+    const minus = schritte ? `<button class="schritt" tabindex="-1"${zielAttribut({ zeile: stelle, schritt: -1 })}>−</button> ` : "";
+    const plus = schritte ? ` <button class="schritt" tabindex="-1"${zielAttribut({ zeile: stelle, schritt: 1 })}>+</button>` : "";
+    return `<li${klasse}${zielAttribut({ zeile: stelle })}>${buchstabeHtml(stelle)}${text(`einstellung.${id}`)} <span class="wert-rechts">${minus}${escapeHtml(wertText(texte, id, wert))}${plus}</span></li>`;
   });
   const id = ids[zustand.gewaehlt];
   const details = id ? `<h2>${text(`einstellung.${id}`)}</h2><p>${text(`einstellung.${id}.erklaerung`)}</p>
     ${EINSTELLUNGEN[id].art === "knopf" ? "" : `<p class="leise">${text("einstellung.vorgabe")}: ${escapeHtml(wertText(texte, id, einstellungLesen(vorgaben, id)))}</p>`}` : "";
-  return { liste: `<ul class="einstellungen">${zeilen.join("")}</ul>`, details, fuss: text("einstellung.fuss") };
+  const knoepfe = id && EINSTELLUNGEN[id].art !== "knopf" ? [{ taste: { code: "Delete" }, text: text("ui.knopf.vorgabe") }] : [];
+  return { liste: `<ul class="einstellungen">${zeilen.join("")}</ul>`, details, fuss: text("einstellung.fuss"), knoepfe };
 }
 
 function tastenListe(umgebung, zustand) {
@@ -52,19 +56,24 @@ function tastenListe(umgebung, zustand) {
   const html = zeilen.slice(von, von + 18).map((aktion, versatz) => {
     const stelle = von + versatz;
     const gewaehlt = stelle === zustand.gewaehlt;
-    if (aktion === ALLE_AUF_VORGABE) return `<li${gewaehlt ? ' class="gewaehlt"' : ""}>${text("einstellung.tasten.alle_vorgabe")}</li>`;
+    if (aktion === ALLE_AUF_VORGABE) return `<li${gewaehlt ? ' class="gewaehlt"' : ""}${zielAttribut({ zeile: stelle })}>${text("einstellung.tasten.alle_vorgabe")}</li>`;
     const tasten = aenderbareTasten(belegung, aktion);
-    const zellen = tasten.map((taste, nummer) => `<span class="taste${gewaehlt && nummer === zustand.tastenStelle ? " gewaehlt" : ""}">${escapeHtml(tastenname(texte, taste))}</span>`);
-    zellen.push(`<span class="taste frei${gewaehlt && zustand.tastenStelle === tasten.length ? " gewaehlt" : ""}">+</span>`);
+    const zellen = tasten.map((taste, nummer) => `<span class="taste${gewaehlt && nummer === zustand.tastenStelle ? " gewaehlt" : ""}"${zielAttribut({ zeile: stelle, tastenStelle: nummer })}>${escapeHtml(tastenname(texte, taste))}</span>`);
+    zellen.push(`<span class="taste frei${gewaehlt && zustand.tastenStelle === tasten.length ? " gewaehlt" : ""}"${zielAttribut({ zeile: stelle, tastenStelle: tasten.length })}>+</span>`);
     const geaendert = JSON.stringify(tasten) !== JSON.stringify(aenderbareTasten(belegungsVorgabe, aktion)) ? ` <span class="leise">${text("einstellung.tasten.geaendert")}</span>` : "";
-    return `<li${gewaehlt ? ' class="gewaehlt"' : ""}><span class="aktion">${text(AKTIONEN[aktion].text)}${geaendert}</span> ${zellen.join(" ")}</li>`;
+    return `<li${gewaehlt ? ' class="gewaehlt"' : ""}${zielAttribut({ zeile: stelle })}><span class="aktion">${text(AKTIONEN[aktion].text)}${geaendert}</span> ${zellen.join(" ")}</li>`;
   }).join("");
   let zeile = text("einstellung.tasten.fuss");
   if (zustand.aufnahme) zeile = text("einstellung.tasten.aufnahme");
   if (zustand.hinweis === "gesperrt") zeile = text("einstellung.tasten.gesperrt");
   if (zustand.konflikt) zeile = text("einstellung.tasten.konflikt", { andere: text(AKTIONEN[zustand.konflikt.verdraengt].text), taste: tastenname(texte, zustand.konflikt.neueTaste.code ? { code: zustand.konflikt.neueTaste.code } : zustand.konflikt.neueTaste) });
   const fest = `<p class="leise">${text("einstellung.tasten.fest")}</p>`;
-  return { liste: `<ul class="tastenbelegung">${html}</ul>${fest}`, fuss: escapeHtml(zeile) };
+  const knoepfe = zustand.aufnahme || zustand.konflikt ? [] : [
+    { taste: { code: "Enter" }, text: text("ui.knopf.neue_taste") },
+    { taste: { code: "Delete" }, text: text("ui.knopf.taste_weg") },
+    { taste: { code: "Backspace" }, text: text("ui.knopf.vorgabe") },
+  ];
+  return { liste: `<ul class="tastenbelegung">${html}</ul>${fest}`, fuss: escapeHtml(zeile), knoepfe };
 }
 
 fensterinhaltAnmelden("einstellungen", (umgebung, zustand) => {
@@ -78,7 +87,7 @@ fensterinhaltAnmelden("befehlszeile", (umgebung, zustand) => {
   const treffer = befehlstreffer(befehlseintraege(umgebung), zustand.eingabe);
   const zeilen = treffer.map((eintrag, stelle) => {
     const tasten = eintrag.ziel.aktion ? tastenDerAktion(belegung, eintrag.ziel.aktion).map((taste) => tastenname(texte, taste)).join(", ") : "";
-    return `<li${stelle === zustand.gewaehlt ? ' class="gewaehlt"' : ""}>${escapeHtml(eintrag.text)}${tasten ? ` <span class="leise">${escapeHtml(tasten)}</span>` : ""}</li>`;
+    return `<li${stelle === zustand.gewaehlt ? ' class="gewaehlt"' : ""}${zielAttribut({ zeile: stelle })}>${escapeHtml(eintrag.text)}${tasten ? ` <span class="leise">${escapeHtml(tasten)}</span>` : ""}</li>`;
   });
   return {
     titel: text("aktion.befehlszeile"),

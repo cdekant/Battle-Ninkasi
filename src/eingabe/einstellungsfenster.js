@@ -118,4 +118,22 @@ export function einstellungsfensterTaste(zustand, taste, kontext) {
   return ergebnis;
 }
 
-fensterartAnmelden("einstellungen", { taste: (zustand, taste, kontext) => einstellungsfensterTaste(zustand, taste, kontext) });
+// Klick: { reiter } wechselt den Reiter; { zeile, schritt? } wählt eine Zeile (die schon gewählte wirkt wie Enter,
+// schritt -1 oder +1 ändert sie wie links und rechts); auf der Tastenseite { zeile, tastenStelle } wählt eine Taste der
+// Aktion (die schon gewählte nimmt wie Enter eine neue auf). Während Aufnahme oder Konflikt zählen Klicks nicht.
+export function einstellungsfensterKlick(zustand, ziel, kontext) {
+  if (zustand.aufnahme || zustand.konflikt) return { zustand };
+  if (ziel.reiter) return { zustand: REITER.includes(ziel.reiter) ? { ...einstellungsfensterOeffnen(), reiter: ziel.reiter } : zustand };
+  if (!(ziel.zeile >= 0 && ziel.zeile < zeilenzahl(zustand.reiter))) return { zustand };
+  const tastenStelle = ziel.tastenStelle ?? 0;
+  const schonGewaehlt = ziel.zeile === zustand.gewaehlt && (zustand.reiter !== "tasten" || tastenStelle === zustand.tastenStelle);
+  const gewaehlt = { ...zustand, gewaehlt: ziel.zeile, tastenStelle, hinweis: null };
+  if (ziel.schritt) return einstellungsfensterTaste(gewaehlt, { code: ziel.schritt > 0 ? "ArrowRight" : "ArrowLeft" }, kontext);
+  if (schonGewaehlt) return einstellungsfensterTaste(gewaehlt, { code: "Enter" }, kontext);
+  return { zustand: gewaehlt };
+}
+
+fensterartAnmelden("einstellungen", {
+  taste: (zustand, taste, kontext) => einstellungsfensterTaste(zustand, taste, kontext),
+  klick: (zustand, ziel, kontext) => einstellungsfensterKlick(zustand, ziel, kontext),
+});

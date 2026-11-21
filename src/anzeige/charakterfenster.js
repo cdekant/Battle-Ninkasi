@@ -6,7 +6,7 @@ import { spielerin } from "../kern/zustand.js";
 import { skillUebersicht, lernvorschau, ermoeglicht, skillVon, eigenschaftGrundwert, eigenschaftWirksam, HOECHSTE_STUFE } from "../systeme/skills.js";
 import { SEITENLAENGE, geplanteEp } from "../eingabe/charakter.js";
 import { namenDerEigenschaften, restpunkte, erstellungHilfewerte } from "../eingabe/erstellung.js";
-import { fensterinhaltAnmelden, buchstabeHtml } from "./fenster.js";
+import { fensterinhaltAnmelden, buchstabeHtml, zielAttribut } from "./fenster.js";
 
 const stufenpunkte = (stufe) => `<span class="stufe">${"●".repeat(stufe)}${"○".repeat(HOECHSTE_STUFE - stufe)}</span>`;
 
@@ -98,7 +98,7 @@ fensterinhaltAnmelden("charakter", ({ spiel, texte }, zustand) => {
     }
     const klassen = [eintrag.gesperrt && eintrag.gesperrt !== "hoechststufe" ? "gesperrt" : "", seite * SEITENLAENGE + stelle === zustand.gewaehlt ? "gewaehlt" : ""].filter(Boolean).join(" ");
     const rest = eintrag.stufe >= HOECHSTE_STUFE ? "" : eintrag.gesperrt ? "" : ` <span class="leise">${text("ui.skill_ep_kurz", { ep: eintrag.epBisNaechste })}</span>`;
-    zeilen.push(`<li${klassen ? ` class="${klassen}"` : ""}>${buchstabeHtml(stelle)}${text(eintrag.definition.text)} ${stufenpunkte(eintrag.stufe)}${rest}</li>`);
+    zeilen.push(`<li${klassen ? ` class="${klassen}"` : ""}${zielAttribut({ stelle: seite * SEITENLAENGE + stelle })}>${buchstabeHtml(stelle)}${text(eintrag.definition.text)} ${stufenpunkte(eintrag.stufe)}${rest}</li>`);
   });
   const seiten = Math.max(1, Math.ceil(uebersicht.length / SEITENLAENGE));
   const seitenText = seiten > 1 ? ` <span class="leise">${text("ui.seite", { seite: seite + 1, seiten })}</span>` : "";
@@ -111,6 +111,11 @@ fensterinhaltAnmelden("charakter", ({ spiel, texte }, zustand) => {
     liste: `<ul class="skills">${zeilen.length ? zeilen.join("") : `<li class="leise">${text("ui.skills_keine")}</li>`}</ul>`,
     details: gewaehlt ? skillDetails(spiel, texte, ninkasi, gewaehlt, zustand.eingabe) : "",
     fuss: text("ui.charakter_hinweis"),
+    knoepfe: [
+      { taste: { code: "Enter" }, text: text("ui.knopf.naechste_stufe") },
+      { taste: { code: "Enter", umschalt: true }, text: text("ui.knopf.hoechste_stufe") },
+      ...(seiten > 1 ? [{ taste: { code: "PageUp" }, text: text("ui.knopf.seite_zurueck") }, { taste: { code: "PageDown" }, text: text("ui.knopf.seite_vor") }] : []),
+    ],
   };
 });
 
@@ -120,10 +125,10 @@ fensterinhaltAnmelden("erstellung", ({ daten, texte }, zustand) => {
   const zeilen = namenDerEigenschaften(daten).map((name, stelle) => {
     const wert = zustand.eigenschaften[name];
     const anteil = Math.round(((wert - eigenschaftStart) / (eigenschaftHoechstens - eigenschaftStart)) * 100);
-    return `<li${stelle === zustand.gewaehlt ? ' class="gewaehlt"' : ""}>
+    return `<li${stelle === zustand.gewaehlt ? ' class="gewaehlt"' : ""}${zielAttribut({ stelle })}>
       <span class="name">${text(daten.eigenschaften[name].text)}</span>
       <span class="balken klein"><span class="fuellung" style="width:${anteil}%"></span></span>
-      <span class="wert-zahl">${wert}</span></li>`;
+      <span class="wert-zahl"><button class="schritt" tabindex="-1"${zielAttribut({ stelle, aendern: -1 })}>−</button> ${wert} <button class="schritt" tabindex="-1"${zielAttribut({ stelle, aendern: 1 })}>+</button></span></li>`;
   });
   const rest = restpunkte(daten, zustand.eigenschaften);
   return {
@@ -132,5 +137,7 @@ fensterinhaltAnmelden("erstellung", ({ daten, texte }, zustand) => {
     liste: `<ul class="erstellung">${zeilen.join("")}</ul>`,
     hilfewerte: erstellungHilfewerte(daten),
     fuss: text("ui.erstellung_hinweis"),
+    ohneSchliessen: true,
+    knoepfe: [{ taste: { code: "KeyA", zeichen: "a" }, text: text("ui.knopf.vorgabe") }, { taste: { code: "Enter" }, text: text("ui.knopf.start") }],
   };
 });

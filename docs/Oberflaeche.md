@@ -59,7 +59,8 @@ Die Darstellung kann weitgehend neu entstehen, die Systeme darunter bleiben:
 + Umgesetzt in 0.29.0: Schnellleiste vollständig, Speichern, Minikarte und Übersichtskarte, Hervorheben; siehe Stand der Umsetzung
 + Umgesetzt in 0.28.0: Aufbau der Seite (`index.html`, `stil.css`) mit Varianten A und B, Seitenleiste neu geordnet, Log in zwei Spalten (`src/anzeige/logzeilen.js`, `src/anzeige/log.js`), Bedienzeile mit Schnellleiste in der Grundform und Knöpfen, Esc-Kette, Spielmenü, Bestätigung, Verlauf, vi-Belegung, Laufen, Rechtsklick; siehe Stand der Umsetzung
 + Umgesetzt in 0.30.0: Einstellungen samt Tastenbelegung, Layout kompakt, Befehlszeile, Suche im Verlauf
-+ Noch neu zu bauen: Klicks in Fenstern (0.31.0), Titel
++ Umgesetzt in 0.31.0: Klicks in Fenstern
++ Noch neu zu bauen: Titel (eigener Plan)
 
 ## Bildschirme
 
@@ -245,6 +246,7 @@ Vorschlag für die Vorgabe, Buchstaben nach der deutschen Aufschrift:
 + Ziehen belegt die Schnellleiste
 + Rechtsklick auf ein Feld öffnet dessen ausführliche Beschreibung wie Untersuchen mit X, das Kontextmenü des Browsers wird dafür unterdrückt; der linke Klick handelt wie bisher
 + Mausrad zoomt über der Karte und blättert über Listen und Log
++ In Fenstern (seit 0.31.0): ein Klick wirkt wie die Taste des Eintrags oder Knopfs; der zweite Klick auf die gewählte Zeile wie Enter; Rechtsklick wie Esc; Klick außerhalb des obersten Fensters schließt es, außer Charaktererstellung und Bestätigung; Darüberfahren hebt nur hervor
 
 ## Gamepad
 
@@ -308,11 +310,19 @@ Aufgeteilt am 2026-11-21 in drei Versionen, damit jede für sich im Browser prü
 + 0.28.0 Layout (umgesetzt): Grid mit Variante A und B (bis zum Einstellungsfenster im Spielmenü umgeschaltet), Effektschicht, Seitenleiste mit Kopf (Tiefe, Zug), Gefährten und Wesen nach Abstand, Log in zwei Spalten mit Zugmarke, Symbolen, Zahlen, Zusammenfassen, Verblassen und Farben nach Seite, Verlauf mit Filter, Bedienzeile mit acht Knöpfen und der Schnellleiste in der Grundform (automatisch nach Lernreihenfolge, danach Getränkearten; nicht umbelegbar, nicht gespeichert), Zielvorgabe und Bestätigen mit derselben Ziffer, Esc-Kette, Spielmenü mit Bestätigung, vi-Belegung samt Pfeilen und Zeichen, Laufen mit Umschalt, Rechtsklick untersucht; Reise, Laufen und Erkunden halten nur bei neuen Feinden
 + 0.29.0 Schnellleiste und Speichern (umgesetzt): fünf Leisten (Umschalt+1 bis 5), automatisch nachgeführt, Umbelegen mit Ziffer und Entf in Inventar und Fähigkeitenfenster sowie durch Ziehen, Wurfwaffen von Hand, graue Plätze mit Anzahl 0; Fähigkeitenfenster mit Auswahl und Einzelheiten; Speichern im Browser mit Schnappschuss des Zustands samt Teil `oberflaeche`; Minikarte und Übersichtskarte (m) mit Klick zum Reisen; gegenseitiges Hervorheben von Seitenleiste und Karte; d und w als eigene Tasten; Knopf Karte statt Verlauf, der Verlauf über Tab oder einen Klick auf das Log
 + 0.30.0 Einstellungen (umgesetzt): Einstellungskatalog und Einstellungsfenster mit Reitern, Seite zur Tastenbelegung mit Konflikten und Vorgabe, Layout kompakt, Größe der Oberfläche, Logzeilen, Minikarte an oder aus, Vollbild, Reisetempo, Geschossbahn, sofort auslösen, Nachfrage beim Neustart, Bewegung reduzieren, hoher Kontrast, Palette für Farbenblinde; Befehlszeile (:) mit Register der Quellen; Suche im Verlauf (/)
-+ 0.31.0 Klicks in Fenstern: Einträge, Reiter und Fußzeilen der Fenster mit der Maus bedienen
++ 0.31.0 Klicks in Fenstern (umgesetzt): "Klick ist Taste" über `data-taste`, direkte Ziele über `data-ziel` und `klick` der Fensterart, Knöpfe in der Fußzeile, × zum Schließen, − und + an Zeilen, Rechtsklick wie Esc, Klick außerhalb schließt, Rad blättert im Verlauf
 + Danach der Titelbildschirm (Neues Spiel, Fortsetzen über den gespeicherten Lauf, Einstellungen, Hilfe, Beenden) mit eigenem Plan
 + Später: Halten an Abzweigungen beim Laufen (wie DCSS), Mindestpegel als Kante an der Schnellleiste, Gamepad
 
 ## Entscheidungen
+
+Entschieden am 2026-11-21 für 0.31.0:
+
++ Grundsatz "Klick ist Taste"; eine eigene klick-Funktion nur für Ziele ohne eigene Taste
++ Klick auf eine schon gewählte Zeile wirkt wie Enter; das Inventar bekommt Enter als Standardhandlung (trinken, sonst anlegen oder ablegen)
++ Klick außerhalb des obersten Fensters schließt es, außer Charaktererstellung und Bestätigung
++ Rechtsklick im Fenster wirkt wie Esc
++ Darüberfahren hebt nur hervor, gewählt wird mit dem Klick
 
 Entschieden am 2026-11-21 für 0.30.0:
 

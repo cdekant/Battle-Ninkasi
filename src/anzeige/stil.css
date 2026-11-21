@@ -156,6 +156,16 @@ html, body {
   z-index: 5;
 }
 #fenster[hidden] { display: none; }
+/* Maus in Fenstern (seit 0.31.0): klickbare Ziele heben sich beim Darüberfahren hervor, ohne die Auswahl zu ändern */
+.fenster-rahmen [data-taste], .fenster-rahmen [data-ziel] { cursor: pointer; }
+.fenster-rahmen li[data-taste]:hover, .fenster-rahmen li[data-ziel]:hover, .fenster-rahmen span[data-taste]:hover, .fenster-rahmen span[data-ziel]:hover { background: rgba(200, 117, 51, 0.12); }
+.fenster-rahmen h1 { display: flex; justify-content: space-between; align-items: center; }
+.fenster-rahmen button { font: inherit; color: var(--text); background: var(--grund); border: 1px solid var(--linie); cursor: pointer; }
+.fenster-rahmen button:hover { border-color: var(--kupfer); }
+.fenster-rahmen button.schliessen { font-size: 1em; line-height: 1; padding: 0 8px; color: var(--leise); }
+.fenster-rahmen button.schritt { padding: 0 6px; font-size: 0.9em; }
+.fenster-knoepfe { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+.fensterknopf { padding: 1px 8px; font-size: 0.95em; color: var(--text) !important; }
 .fenster-rahmen {
   pointer-events: auto;
   display: flex;

@@ -68,4 +68,15 @@ export function erstellungTaste(zustand, taste, daten) {
   return { zustand };
 }
 
-fensterartAnmelden("erstellung", { taste: (zustand, taste, { daten }) => erstellungTaste(zustand, taste, daten) });
+// Klick ({ stelle, aendern? }): wählt die Zeile, aendern -1 oder +1 ändert sie danach wie - und +
+export function erstellungKlick(zustand, ziel, daten) {
+  const anzahl = namenDerEigenschaften(daten).length;
+  if (!(ziel.stelle >= 0 && ziel.stelle < anzahl)) return { zustand };
+  const gewaehlt = { ...zustand, gewaehlt: ziel.stelle };
+  return ziel.aendern ? aendern(daten, gewaehlt, ziel.aendern > 0 ? 1 : -1) : { zustand: gewaehlt };
+}
+
+fensterartAnmelden("erstellung", {
+  taste: (zustand, taste, { daten }) => erstellungTaste(zustand, taste, daten),
+  klick: (zustand, ziel, { daten }) => erstellungKlick(zustand, ziel, daten),
+});

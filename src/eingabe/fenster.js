@@ -2,7 +2,9 @@
 // Der Stapel ist Anzeige-Zustand, nicht Spielzustand: [{ art, zustand }], das letzte Fenster liegt oben und bekommt
 // jede Taste. Fenster kosten keine Spielzeit; die Logik sieht nur die Befehle, die ein Fenster ausgibt.
 // Fensterarten melden sich hier an (eingabe/inventar.js, faehigkeiten.js, charakter.js, erstellung.js, hilfe.js):
-//   { taste(zustand, taste, kontext) => ergebnis }
+//   { taste(zustand, taste, kontext) => ergebnis, klick?(zustand, ziel, kontext) => ergebnis }
+//   klick: für Mausziele ohne eigene Taste (data-ziel in der Anzeige, z.B. { zeile }, { reiter }); Grundsatz ist
+//          "Klick ist Taste": alles andere trägt data-taste und kommt als gewöhnliche Taste an (fensterTaste)
 //   taste:    { code, zeichen, umschalt } (KeyboardEvent.code, KeyboardEvent.key, Umschalttaste)
 //   kontext:  { spiel, daten, texte, belegung, belegungsVorgabe, abweichungen, einstellungen, vorgaben }
 //   ergebnis: { zustand, oeffnen?, befehl?, auswahl?, grund?, start?, aktion?, leiste?, befehlszeile?, einstellungen?, abweichungen? }
@@ -40,7 +42,18 @@ export function fensterOeffnen(stapel, art, zustand = {}) {
 export function fensterTaste(stapel, taste, kontext) {
   const oben = oberstesFenster(stapel);
   if (!oben) return { stapel };
-  const ergebnis = fensterarten.get(oben.art).taste(oben.zustand, taste, kontext) ?? { zustand: oben.zustand };
+  return ergebnisAnwenden(stapel, oben, fensterarten.get(oben.art).taste(oben.zustand, taste, kontext) ?? { zustand: oben.zustand });
+}
+
+// Gibt ein Mausziel (data-ziel) an das oberste Fenster; ohne klick der Fensterart geschieht nichts
+export function fensterKlick(stapel, ziel, kontext) {
+  const oben = oberstesFenster(stapel);
+  const klick = oben && fensterarten.get(oben.art).klick;
+  if (!klick) return { stapel };
+  return ergebnisAnwenden(stapel, oben, klick(oben.zustand, ziel, kontext) ?? { zustand: oben.zustand });
+}
+
+function ergebnisAnwenden(stapel, oben, ergebnis) {
   let neuerStapel = ergebnis.zustand === null ? stapel.slice(0, -1) : [...stapel.slice(0, -1), { art: oben.art, zustand: ergebnis.zustand }];
   if (ergebnis.oeffnen) neuerStapel = fensterOeffnen(neuerStapel, ergebnis.oeffnen.art, ergebnis.oeffnen.zustand);
   if (ergebnis.auswahl) neuerStapel = [];
