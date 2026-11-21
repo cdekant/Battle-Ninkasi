@@ -69,7 +69,7 @@ Technik:
 + [docs/Gegenstaende.md](docs/Gegenstaende.md): Inventar, Ausrüstung, Verschleiß, Unbekanntes
 + [docs/Anzeige.md](docs/Anzeige.md): Renderer, Seitenleiste, Kamera, Log
 + [docs/Bedienung.md](docs/Bedienung.md): Eingabe, Maus und Abläufe, Fenster, Schnellleiste, Zielmodus, Untersuchen, Einstellungen
-+ [docs/Entwicklung.md](docs/Entwicklung.md): Starten, Tests, Bot, Werkzeuge, Ablauf einer Version, Stolpersteine, Prototyp
++ [docs/Entwicklung.md](docs/Entwicklung.md): Starten, Tests, Bot, Werkzeuge, Ablauf einer Version, Stolpersteine, Stand des Spielinhalts
 
 Arbeitsliste: [docs/Systemausbau.md](docs/Systemausbau.md), fehlende Strukturen und bekannte Fehler; umgesetzte Punkte wandern in das zuständige Dokument.
 
