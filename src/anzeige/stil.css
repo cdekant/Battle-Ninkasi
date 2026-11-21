@@ -372,3 +372,48 @@ html, body {
   overflow: auto;
   z-index: 10;
 }
+
+/* Titelbildschirm (anzeige/titel.js, docs/Titelbildschirm.md): eigene Ebene über der ganzen Seite. Das Bild füllt das
+   Fenster und darf seitlich und in der Höhe beschnitten werden (der Fokuspunkt steht je Bild als object-position);
+   links Name und Menü, rechts Läufe und Spruch, beide nur als weicher Verlauf ins Dunkle, ohne Kästen. Fenster über
+   dem Titel (Einstellungen, Hilfe, Läufe) stehen mittig im ganzen Fenster statt über der Karte. */
+:root {
+  --titel-spalte: 24rem;
+  --titel-verlauf: rgba(13, 11, 9, 0.92);
+}
+#titel {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: var(--titel-spalte) 1fr var(--titel-spalte);
+  background: var(--grund);
+  overflow: hidden;
+}
+#titel[hidden] { display: none; }
+:root[data-bildschirm="titel"] #fenster { position: fixed; inset: 4% 6%; z-index: 6; }
+.titel-hintergrund { position: absolute; inset: 0; }
+.titel-bild { width: 100%; height: 100%; object-fit: cover; display: block; }
+.titel-spalte { position: relative; display: flex; flex-direction: column; padding: 3rem 2.2rem; min-height: 0; }
+.titel-links { grid-column: 1; background: linear-gradient(to right, var(--titel-verlauf) 55%, transparent); }
+.titel-rechts { grid-column: 3; background: linear-gradient(to left, var(--titel-verlauf) 55%, transparent); }
+.titel-name { margin: 0; font-size: 2.6em; line-height: 1.1; color: var(--bier); letter-spacing: 0.03em; text-shadow: 0 2px 8px #000; }
+.titel-untertitel { margin: 0.3rem 0 2.4rem; color: var(--kupfer); font-size: 1.1em; text-shadow: 0 1px 6px #000; }
+.titel-menue { list-style: none; margin: 0; padding: 0; font-size: 1.25em; }
+.titel-menue li { padding: 0.25rem 0.5rem; cursor: pointer; text-shadow: 0 1px 4px #000; }
+.titel-menue li:hover { background: rgba(200, 117, 51, 0.15); }
+.titel-menue li.gewaehlt { color: var(--bier); border-left: 3px solid var(--bier); }
+.titel-hinweis { color: var(--hinweis); margin-top: 1rem; }
+.titel-fuss { margin-top: auto; color: var(--leise); font-size: 0.85em; }
+.titel-rechts h2 { margin: 0 0 0.6rem; font-size: 1.1em; color: var(--bier); text-shadow: 0 1px 4px #000; }
+.titel-plaetze { list-style: none; margin: 0 0 2rem; padding: 0; }
+.titel-plaetze li { padding: 0.3rem 0.5rem; cursor: pointer; text-shadow: 0 1px 4px #000; }
+.titel-plaetze li:hover { background: rgba(200, 117, 51, 0.15); }
+.titel-plaetze li.leer, .titel-plaetze li.veraltet { color: var(--leise); }
+.titel-spruch { margin: auto 0 0; font-style: italic; line-height: 1.5; text-shadow: 0 1px 4px #000; }
+.titel-spruch cite { display: block; margin-top: 0.5rem; font-style: normal; color: var(--leise); font-size: 0.85em; }
+/* schmale Fenster: die Spalten rücken übereinander und über das Bild, der Verlauf wird dichter */
+@media (max-width: 900px) {
+  #titel { grid-template-columns: 1fr; grid-template-rows: auto auto; overflow: auto; }
+  .titel-links, .titel-rechts { grid-column: 1; background: var(--titel-verlauf); }
+}

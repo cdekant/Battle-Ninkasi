@@ -18,6 +18,7 @@
 + Sprachdateien, Textkorpus (`sprache/de/korpus/`) und Literaturverzeichnis (`sprache/literatur.json`, Originale in `sprache/Literatur/` nicht im Repo) in [docs/Texte.md](docs/Texte.md)
 + Tileset: Artstyle-Fibel, Pixeldaten, Varianten, Vorschau und Ablauf in [docs/Tileset.md](docs/Tileset.md); neue Tiles folgen der Fibel
 + Oberfläche: Entwurf des UI-Schemas (Prinzipien, Layout, Schnellleiste, Log, Fenster, Tastatur nach vi, Einstellungen, Entscheidungen, Stand der Umsetzung) in [docs/Oberflaeche.md](docs/Oberflaeche.md)
++ Titelbildschirm: Vorbilder, Entscheidungen, Aufbau, Speicherplätze und Ideen für später (Ruhmeshalle, Aufzeichnungen, Spielarten, Vorführmodus) in [docs/Titelbildschirm.md](docs/Titelbildschirm.md)
 + Animationen: Effektschicht, Kampfanimation und Kamera als zurückgestellter Entwurf in [docs/Animationen.md](docs/Animationen.md)
 + Arbeitsliste fehlender Strukturen (Reste aus Tod, Zielauswahl, Zuständen, Modifikatoren, Kampfwerten und Fähigkeiten, Fernkampf, Feldschichten, Ebenen, Gegenstände, Oberfläche, Darstellung, Skillsystem) samt bekannter Fehler in [docs/Systemausbau.md](docs/Systemausbau.md); umgesetzte Punkte wandern in die übrige Doku
 + Weitere Dokumentation liegt in `docs/`.

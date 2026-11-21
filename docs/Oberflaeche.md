@@ -60,15 +60,15 @@ Die Darstellung kann weitgehend neu entstehen, die Systeme darunter bleiben:
 + Umgesetzt in 0.28.0: Aufbau der Seite (`index.html`, `stil.css`) mit Varianten A und B, Seitenleiste neu geordnet, Log in zwei Spalten (`src/anzeige/logzeilen.js`, `src/anzeige/log.js`), Bedienzeile mit Schnellleiste in der Grundform und Knöpfen, Esc-Kette, Spielmenü, Bestätigung, Verlauf, vi-Belegung, Laufen, Rechtsklick; siehe Stand der Umsetzung
 + Umgesetzt in 0.30.0: Einstellungen samt Tastenbelegung, Layout kompakt, Befehlszeile, Suche im Verlauf
 + Umgesetzt in 0.31.0: Klicks in Fenstern
-+ Noch neu zu bauen: Titel (eigener Plan)
++ Umgesetzt in 0.32.0: Titelbildschirm, drei Speicherplätze, Fenster nach dem Lauf, Chronik, siehe [Titelbildschirm.md](Titelbildschirm.md)
 
 ## Bildschirme
 
-+ Titel: Neues Spiel, Fortsetzen, Einstellungen, Hilfe, Beenden; jederzeit nachrüstbar als reine Anzeige vor der Charaktererstellung, sinnvoll mit 0.28.0 (Spielmenü und Einstellungen nutzen dieselben Knöpfe); der Titel ist zugleich die erste Handlung der Spielerin, die der Browser für Ton und Vollbild verlangt; Hintergrund aus `Artwork/titel/` denkbar
-+ Idee: Intro-Film als Bildfolge in Pixelart (klein, im Stil) statt Video, jede Taste überspringt, eine Einstellung zeigt ihn nur beim ersten Start; mit Punkt 12 (Darstellung); Bild und Ton unter CC BY-NC-SA 4.0 in `LIZENZEN.md`
++ Titel: Hauptmenü mit Titelbild ohne "Drücke eine Taste", Fortsetzen mit Vorschau, Neues Spiel, Einstellungen, Hilfe, Beenden; der erste Klick ist die Geste, die der Browser für Ton und Vollbild verlangt; Entwurf, Entscheidungen und Ideen in [Titelbildschirm.md](Titelbildschirm.md)
++ Idee: Intro-Film mit Lore und Vorgeschichte als Bildfolge in Pixelart (klein, im Stil) statt Video, jede Taste überspringt, eine Einstellung zeigt ihn nur beim ersten Start oder nie; mit Punkt 12 (Darstellung); Bild und Ton unter CC BY-NC-SA 4.0 in `LIZENZEN.md`
 + Charaktererstellung: Eigenschaften verteilen (Punkt 13, die Logik nimmt die Verteilung als Startoption)
 + Spiel: das Layout unten
-+ Tod: Laufbericht (Morgue, Punkt 10), Neustart
++ Nach dem Lauf (Tod oder Sieg): neuer Lauf, Titel, Aufzeichnung sichern oder abspielen, Laufbericht (Morgue, Punkt 10), Ruhmeshalle; siehe [Titelbildschirm.md](Titelbildschirm.md)
 
 ## Layout
 
@@ -311,7 +311,7 @@ Aufgeteilt am 2026-11-21 in drei Versionen, damit jede für sich im Browser prü
 + 0.29.0 Schnellleiste und Speichern (umgesetzt): fünf Leisten (Umschalt+1 bis 5), automatisch nachgeführt, Umbelegen mit Ziffer und Entf in Inventar und Fähigkeitenfenster sowie durch Ziehen, Wurfwaffen von Hand, graue Plätze mit Anzahl 0; Fähigkeitenfenster mit Auswahl und Einzelheiten; Speichern im Browser mit Schnappschuss des Zustands samt Teil `oberflaeche`; Minikarte und Übersichtskarte (m) mit Klick zum Reisen; gegenseitiges Hervorheben von Seitenleiste und Karte; d und w als eigene Tasten; Knopf Karte statt Verlauf, der Verlauf über Tab oder einen Klick auf das Log
 + 0.30.0 Einstellungen (umgesetzt): Einstellungskatalog und Einstellungsfenster mit Reitern, Seite zur Tastenbelegung mit Konflikten und Vorgabe, Layout kompakt, Größe der Oberfläche, Logzeilen, Minikarte an oder aus, Vollbild, Reisetempo, Geschossbahn, sofort auslösen, Nachfrage beim Neustart, Bewegung reduzieren, hoher Kontrast, Palette für Farbenblinde; Befehlszeile (:) mit Register der Quellen; Suche im Verlauf (/)
 + 0.31.0 Klicks in Fenstern (umgesetzt): "Klick ist Taste" über `data-taste`, direkte Ziele über `data-ziel` und `klick` der Fensterart, Knöpfe in der Fußzeile, × zum Schließen, − und + an Zeilen, Rechtsklick wie Esc, Klick außerhalb schließt, Rad blättert im Verlauf
-+ Danach der Titelbildschirm (Neues Spiel, Fortsetzen über den gespeicherten Lauf, Einstellungen, Hilfe, Beenden) mit eigenem Plan
++ 0.32.0 Titelbildschirm (umgesetzt): Titel als unterste Ebene mit Bild, Menü, drei Speicherplätzen mit Vorschau und Spruch aus dem Korpus; Läufe, Zum Titel im Spielmenü, Fenster nach dem Tod; Chronik, aufbewahrter letzter Lauf, Spielart als Startoption; siehe [Titelbildschirm.md](Titelbildschirm.md)
 + Später: Halten an Abzweigungen beim Laufen (wie DCSS), Mindestpegel als Kante an der Schnellleiste, Gamepad
 
 ## Entscheidungen

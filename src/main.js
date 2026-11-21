@@ -1,5 +1,7 @@
 // Einstieg im Browser: verdrahtet Logik, Anzeige und Eingabe.
-// Startwert per URL (?seed=1234), sonst zufällig; wird in die URL geschrieben, damit Neuladen denselben Lauf ergibt.
+// Die Seite öffnet den Titelbildschirm (docs/Titelbildschirm.md); ?seed=1234 beginnt stattdessen gleich einen Lauf mit
+// diesem Startwert auf dem ersten freien Platz (für Entwicklung und Fehlerberichte), danach verschwindet er aus der
+// Adresse, damit Neuladen wieder zum Titel führt.
 
 import VERSION from "./version.js";
 import rohdaten from "../daten/index.js";
@@ -33,10 +35,16 @@ import { rastenBeginnen, naechsterRastschritt } from "./eingabe/rasten.js";
 import { erkundenBeginnen, naechsterErkundungsschritt } from "./eingabe/erkunden.js";
 import { laufenBeginnen, naechsterLaufschritt } from "./eingabe/laufen.js";
 import { neueLeisten, leistenNachfuehren, platzAusloesen, platzBelegen, platzLeeren, plaetzeTauschen, leisteWechseln, ohneSchluessel, aktivePlaetze } from "./eingabe/schnellleiste.js";
-import { SPEICHERSCHLUESSEL_LAUF, speicherstandText, speicherstandLesen } from "./eingabe/speicherstand.js";
+import { ANZAHL_PLAETZE, speicherschluesselPlatz, SPEICHERSCHLUESSEL_ALTER_LAUF, SPEICHERSCHLUESSEL_LETZTER_LAUF, speicherstandText, speicherstandLesen, platzVorschau, platzFuerNeuesSpiel } from "./eingabe/speicherstand.js";
+import { SPEICHERSCHLUESSEL_CHRONIK, chronikGueltig, meldungZaehlen, sichtungenZaehlen, laufEintragen } from "./eingabe/chronik.js";
 import "./eingabe/karte.js";
 import { escSchritt } from "./eingabe/esckette.js";
-import { menueOeffnen } from "./eingabe/menue.js";
+import { menueOeffnen, endeOeffnen } from "./eingabe/menue.js";
+import { titelOeffnen } from "./eingabe/titel.js";
+import { titelHtml } from "./anzeige/titel.js";
+import { titelbildWaehlen } from "./anzeige/titelbilder.js";
+import { korpustextZerlegen, spruchWaehlen } from "./anzeige/korpus.js";
+import korpusliste from "../sprache/de/korpus/index.js";
 import { verlaufOeffnen } from "./eingabe/verlauf.js";
 import "./eingabe/inventar.js";
 import "./eingabe/faehigkeiten.js";
@@ -114,13 +122,43 @@ function letzteEigenschaftenSpeichern(eigenschaften) {
   try { localStorage.setItem(SPEICHERSCHLUESSEL_EIGENSCHAFTEN, JSON.stringify(eigenschaften)); } catch { /* ohne Speicher weiter */ }
 }
 
-// Ein gespeicherter Lauf geht vor; ?seed= gilt nur ohne ihn oder mit &neu
-function neuErzwungen() {
-  return new URLSearchParams(location.search).has("neu");
+// Chronik über alle Läufe (eingabe/chronik.js); gespeichert mit den Läufen
+function chronikLaden() {
+  try {
+    return chronikGueltig(JSON.parse(localStorage.getItem(SPEICHERSCHLUESSEL_CHRONIK) || "null"));
+  } catch {
+    return chronikGueltig(null);
+  }
 }
+function chronikSpeichern() {
+  try { localStorage.setItem(SPEICHERSCHLUESSEL_CHRONIK, JSON.stringify(chronik)); } catch { /* ohne Speicher weiter */ }
+}
+const chronik = chronikLaden();
 
+// Speicherplätze (eingabe/speicherstand.js): was der Titel über jeden weiß
+function plaetzeLesen() {
+  return Array.from({ length: ANZAHL_PLAETZE }, (_, stelle) => {
+    try {
+      return platzVorschau(localStorage.getItem(speicherschluesselPlatz(stelle)));
+    } catch {
+      return null;
+    }
+  });
+}
+function platzLoeschen(stelle) {
+  if (stelle === null) return;
+  try { localStorage.removeItem(speicherschluesselPlatz(stelle)); } catch { /* ohne Speicher weiter */ }
+}
+// der eine Platz bis 0.31.0 passt zu keiner neueren Version
+try { localStorage.removeItem(SPEICHERSCHLUESSEL_ALTER_LAUF); } catch { /* ohne Speicher weiter */ }
+
+// ?seed= aus der Adresse lesen und entfernen (auch das frühere &neu)
 function startwertAusUrl() {
   const startwertText = new URLSearchParams(location.search).get("seed");
+  const adresse = new URL(location.href);
+  adresse.searchParams.delete("seed");
+  adresse.searchParams.delete("neu");
+  history.replaceState(null, "", adresse);
   if (startwertText === null || startwertText === "") return null;
   return /^\d+$/.test(startwertText) ? Number(startwertText) >>> 0 : startwertAbleiten(0, startwertText);
 }
@@ -222,8 +260,35 @@ let speicherZeitgeber = null;
 // Geschossbahnen aus den Meldungen "geschoss", abgespielt im Takt geschossPause (anzeige/animation.js)
 const animation = neueAnimation();
 let animationsZeitgeber = null;
+// Titel und Speicherplätze: Stelle des laufenden Spiels (0 bis ANZAHL_PLAETZE - 1), was der Titel über die Plätze
+// zeigt, das Titelbild dieses Starts und der Spruch aus dem Korpus (kommt nach, sobald die Texte geladen sind)
+let aktuelleStelle = null;
+let plaetze = plaetzeLesen();
+const titelbild = titelbildWaehlen(chronik, Math.random());
+let spruch = null;
+// Chronik im laufenden Lauf: schon gezählte Wesenarten, die Todesmeldung Ninkasis, abgeschlossene Läufe
+let gesehenImLauf = new Set();
+let todesmeldung = null;
+const abgeschlosseneSpiele = new WeakSet();
+const titelElement = document.getElementById("titel");
 
 function zeichnen() {
+  // der Titel liegt unten im Fensterstapel und deckt die ganze Seite; Fenster darüber stehen dann mittig (stil.css)
+  const titelOffen = fensterStapel[0]?.art === "titel";
+  document.documentElement.dataset.bildschirm = titelOffen ? "titel" : "spiel";
+  titelElement.hidden = !titelOffen;
+  titelElement.innerHTML = titelOffen ? titelHtml(fensterumgebung(), fensterStapel) : "";
+  if (spiel && !titelOffen) spielZeichnen();
+  const fensterInhalt = fensterHtml(fensterumgebung(), fensterStapel);
+  fensterElement.hidden = !fensterInhalt;
+  fensterElement.innerHTML = fensterInhalt;
+  if (spiel && !titelOffen) {
+    uebersichtskarteZeichnen();
+    tooltipZeigen();
+  }
+}
+
+function spielZeichnen() {
   const ansicht = renderer.ansicht(einstellungen.zoom);
   const ninkasi = spielerin(spiel.zustand);
   folgen(kamera, ninkasi.position, ansicht, spiel.zustand.ebene);
@@ -250,16 +315,11 @@ function zeichnen() {
   minikarteAktualisieren(hervorgehobenId);
   oberflaeche.anzeigen(spiel, { ziel: zielModus && { modus: zielModus, vorschau: zielvorschau }, hervorgehobenId });
   bedienzeile.anzeigen(spiel, leisten);
-  const fensterInhalt = fensterHtml(fensterumgebung(), fensterStapel);
-  fensterElement.hidden = !fensterInhalt;
-  fensterElement.innerHTML = fensterInhalt;
-  uebersichtskarteZeichnen();
-  tooltipZeigen();
 }
 
 // Was Fenster zum Zeichnen und für ihre Tasten bekommen (anzeige/fenster.js, eingabe/fenster.js)
 function fensterumgebung() {
-  return { spiel, daten, texte, belegung, belegungsVorgabe, abweichungen: belegungsabweichungen, leisten, logzeilen: log.zeilen, einstellungen, vorgaben, version: VERSION };
+  return { spiel, daten, texte, belegung, belegungsVorgabe, abweichungen: belegungsabweichungen, leisten, logzeilen: log.zeilen, einstellungen, vorgaben, version: VERSION, plaetze, titelbild, spruch };
 }
 
 // ID des sichtbaren Wesens auf einem Feld oder null
@@ -297,29 +357,52 @@ function uebersichtskarteZeichnen() {
   minikarteZeichnen(canvas, bild, feldgroesseFuer(verfuegbar, bild.breite, UEBERSICHT_HOECHSTENS));
 }
 
-// Speichern (eingabe/speicherstand.js): gesammelt nach Befehlen; nicht während der Charaktererstellung, nach dem Tod
-// wird der Stand gelöscht
+// Speichern (eingabe/speicherstand.js) auf den Platz des Laufs, gesammelt nach Befehlen, dazu die Chronik; nicht
+// während der Charaktererstellung; ein beendeter Lauf räumt seinen Platz (laufAbschliessen)
 function speichernJetzt() {
   clearTimeout(speicherZeitgeber);
   speicherZeitgeber = null;
-  if (!spiel || fensterStapel.some(({ art }) => art === "erstellung")) return;
+  if (!spiel || aktuelleStelle === null || fensterStapel.some(({ art }) => art === "erstellung")) return;
+  if (spiel.zustand.vorbei) return laufAbschliessen("tod");
   try {
-    if (spiel.zustand.vorbei) localStorage.removeItem(SPEICHERSCHLUESSEL_LAUF);
-    else localStorage.setItem(SPEICHERSCHLUESSEL_LAUF, speicherstandText(spiel, { leisten, logzeilen: log.zeilen }));
+    localStorage.setItem(speicherschluesselPlatz(aktuelleStelle), speicherstandText(spiel, { leisten, logzeilen: log.zeilen, gesehen: gesehenImLauf, gespeichertAm: Date.now() }));
   } catch { /* ohne Speicher weiter */ }
+  chronikSpeichern();
 }
 function speichernVormerken() {
   if (!speicherZeitgeber) speicherZeitgeber = setTimeout(speichernJetzt, SPEICHERN_NACH_MS);
 }
-function gespeichertenLaufLoeschen() {
-  try { localStorage.removeItem(SPEICHERSCHLUESSEL_LAUF); } catch { /* ohne Speicher weiter */ }
-}
 window.addEventListener("pagehide", speichernJetzt);
 
-// Nach jedem angenommenen Befehl: Schnellleiste nachführen, speichern
+// Ende eines Laufs (Tod oder aufgegeben), einmal je Lauf: Eintrag in die Chronik, die Aufzeichnung bleibt als letzter
+// Lauf für ein späteres Abspielen, der Platz wird frei
+function laufAbschliessen(ergebnis) {
+  if (!spiel || abgeschlosseneSpiele.has(spiel) || !spiel.befehle.length) return;
+  abgeschlosseneSpiele.add(spiel);
+  laufEintragen(chronik, spiel, { ergebnis, datum: Date.now(), version: VERSION, todesmeldung });
+  chronikSpeichern();
+  try {
+    localStorage.setItem(SPEICHERSCHLUESSEL_LETZTER_LAUF, speicherstandText(spiel, { leisten, logzeilen: log.zeilen, gesehen: gesehenImLauf, gespeichertAm: Date.now() }));
+  } catch { /* ohne Speicher weiter */ }
+  platzLoeschen(aktuelleStelle);
+}
+
+// Meldungen der Logik für die Chronik; die Todesmeldung Ninkasis nennt später die Ursache
+function chronikMelden(meldung) {
+  meldungZaehlen(chronik, spiel, meldung);
+  if (meldung.art === "tod" && meldung.opfer.id === spiel.zustand.spielerinId) todesmeldung = meldung;
+}
+
+// Nach jedem angenommenen Befehl: Schnellleiste nachführen, Sichtungen zählen, speichern; nach dem Tod Ninkasis das
+// Fenster "ende"
 function nachDemBefehl() {
   leisten = leistenNachfuehren(spiel, leisten);
+  sichtungenZaehlen(chronik, spiel, gesehenImLauf);
   speichernVormerken();
+  if (spiel.zustand.vorbei && !abgeschlosseneSpiele.has(spiel)) {
+    laufAbschliessen("tod");
+    fensterStapel = fensterOeffnen([], "ende", endeOeffnen());
+  }
 }
 
 // Änderung der Schnellleiste aus einem Fenster: { belegen: { stelle, platz } } oder { entfernen: platz }
@@ -427,14 +510,15 @@ function ablaufStarten(beginn, naechsterSchritt) {
 // Ein Lauf mit Startoptionen (Charaktererstellung); dieselbe Ebene wie in der Vorschau, die Eigenschaften
 // ändern an der Erzeugung nichts
 function laufBeginnen(startwert, optionen) {
-  gespeichertenLaufLoeschen();
+  platzLoeschen(aktuelleStelle);
   spielEinsetzen(neuesSpiel(daten, startwert, optionen), neueLeisten());
   log.zeile(texte.text("log.willkommen"));
   zeichnen();
 }
 
-// Ein Spiel wird das laufende: Anzeige-Zustand zurücksetzen, Hörer anmelden, Startwert in die Adresse
-function spielEinsetzen(neuesSpielObjekt, neueLeistenStand) {
+// Ein Spiel wird das laufende: Anzeige-Zustand zurücksetzen, Hörer anmelden (Log, Geschosse, Chronik);
+// gesehen: schon gezählte Wesenarten dieses Laufs (aus dem Speicherstand)
+function spielEinsetzen(neuesSpielObjekt, neueLeistenStand, gesehen = []) {
   if (laufenderAblauf) ablaufBeenden(null);
   zielModus = null;
   letztesZielId = null;
@@ -446,44 +530,48 @@ function spielEinsetzen(neuesSpielObjekt, neueLeistenStand) {
   log.leeren(spiel);
   hoererAnmelden(spiel, log.melden);
   hoererAnmelden(spiel, geschossGemeldet);
+  hoererAnmelden(spiel, chronikMelden);
   leisten = leistenNachfuehren(spiel, neueLeistenStand);
-  const adresse = new URL(location.href);
-  adresse.searchParams.set("seed", String(spiel.zustand.startwert));
-  adresse.searchParams.delete("neu");
-  history.replaceState(null, "", adresse);
+  // gezählt wird erst nach dem ersten Befehl, sonst zählte die Vorschau der Charaktererstellung mit
+  gesehenImLauf = new Set(gesehen);
+  todesmeldung = null;
 }
 
-// Beim Laden der Seite: den gespeicherten Lauf fortsetzen; gibt false zurück, wenn es keinen gibt oder er nicht passt
-// (dann nennt das Log nach dem Neubeginn den Grund)
-let verworfenerStand = null;
-function gespeichertenLaufFortsetzen() {
+// Titelbildschirm: der laufende Lauf ist gespeichert, der Titel wird die einzige Ebene
+function titelZeigen(hinweis = null) {
+  speichernJetzt();
+  if (laufenderAblauf) ablaufBeenden(null);
+  zielModus = null;
+  spiel = null;
+  aktuelleStelle = null;
+  plaetze = plaetzeLesen();
+  fensterStapel = fensterOeffnen([], "titel", { ...titelOeffnen(), hinweis });
+  zeichnen();
+}
+
+// Lauf auf einem Platz fortsetzen; lässt er sich nicht einsetzen, wird er gelöscht und der Titel sagt es
+function platzFortsetzen(stelle) {
   let text = null;
-  try { text = localStorage.getItem(SPEICHERSCHLUESSEL_LAUF); } catch { /* ohne Speicher */ }
-  if (!text || neuErzwungen()) return false;
-  const gelesen = speicherstandLesen(daten, text);
+  try { text = localStorage.getItem(speicherschluesselPlatz(stelle)); } catch { /* ohne Speicher */ }
+  const gelesen = text ? speicherstandLesen(daten, text) : { grund: "kaputt" };
   if (gelesen.grund) {
-    verworfenerStand = gelesen;
-    gespeichertenLaufLoeschen();
-    return false;
+    platzLoeschen(stelle);
+    return titelZeigen("titel.verworfen");
   }
+  aktuelleStelle = stelle;
   fensterStapel = [];
-  spielEinsetzen(gelesen.spiel, gelesen.oberflaeche.leisten);
+  spielEinsetzen(gelesen.spiel, gelesen.oberflaeche.leisten, gelesen.oberflaeche.gesehen);
   log.zeilenEinsetzen(gelesen.oberflaeche.log);
   log.zeile(texte.text("log.fortgesetzt"), "hinweis");
   zeichnen();
-  return true;
 }
 
-// Neuer Lauf: erst die Charaktererstellung über der Karte des Laufs, vorbelegt mit der letzten Verteilung
-function starten(startwert) {
+// Neuer Lauf auf einem Platz: erst die Charaktererstellung über der Karte des Laufs, vorbelegt mit der letzten Verteilung
+function starten(stelle, startwert) {
+  aktuelleStelle = stelle;
   const erstellung = erstellungOeffnen(daten, letzteEigenschaftenLaden());
   fensterStapel = fensterOeffnen([], "erstellung", erstellung);
   laufBeginnen(startwert, { eigenschaften: erstellung.eigenschaften });
-  if (verworfenerStand) {
-    log.zeile(texte.text(`log.stand_verworfen.${verworfenerStand.grund}`, verworfenerStand), "gefahr");
-    verworfenerStand = null;
-    zeichnen();
-  }
 }
 
 // Ergebnis der Charaktererstellung: derselbe Startwert mit der gewählten Verteilung
@@ -494,28 +582,42 @@ function erstellungAbschliessen(startoptionen) {
 }
 
 // Fenster obenauf legen; nach dem Tod nur die, die nichts am Lauf ändern (Spielmenü, Hilfe, Verlauf)
-const FENSTER_NACH_DEM_TOD = ["menue", "hilfe", "verlauf", "karte", "einstellungen", "befehlszeile", "bestaetigung"];
+const FENSTER_NACH_DEM_TOD = ["menue", "hilfe", "verlauf", "karte", "einstellungen", "befehlszeile", "bestaetigung", "ende"];
 function fensterAuf(art, zustand) {
   if (spiel.zustand.vorbei && !FENSTER_NACH_DEM_TOD.includes(art)) return;
   fensterStapel = fensterOeffnen(fensterStapel, art, zustand);
   zeichnen();
 }
 
-// Aktionen, die ein Fenster zurückgibt (eingabe/menue.js): Neustart, Layout, Beenden
+// Aktionen, die ein Fenster zurückgibt (eingabe/menue.js, eingabe/titel.js): ein Name oder { art, ... }
 function fensteraktionAusfuehren(aktion) {
-  if (aktion === "neustart") {
+  const { art, ...werte } = typeof aktion === "string" ? { art: aktion } : aktion;
+  if (art === "neustart") {
+    // ein Lauf, der nicht zu Ende ist, geht als aufgegeben in die Chronik; der neue nimmt denselben Platz
+    if (!spiel.zustand.vorbei) laufAbschliessen("aufgegeben");
     fensterStapel = [];
-    gespeichertenLaufLoeschen();
-    return starten(zufaelligerStartwert());
+    return starten(aktuelleStelle, zufaelligerStartwert());
   }
-  if (aktion === "vollbild") {
+  if (art === "zum_titel") return titelZeigen();
+  if (art === "fortsetzen") return platzFortsetzen(werte.stelle);
+  if (art === "neuesSpiel") {
+    fensterStapel = [];
+    return starten(werte.stelle, zufaelligerStartwert());
+  }
+  if (art === "platzLoeschen") {
+    platzLoeschen(werte.stelle);
+    plaetze = plaetzeLesen();
+    return zeichnen();
+  }
+  if (art === "vollbild") {
     vollbildUmschalten();
     return zeichnen();
   }
-  if (aktion === "beenden") {
+  if (art === "beenden") {
     // gelingt im Fenster aus starten.py (dom.allow_scripts_to_close_windows); sonst bleibt der Hinweis
     window.close();
-    log.zeile(texte.text("menue.beenden_hinweis"), "hinweis");
+    if (fensterStapel[0]?.art === "titel") fensterStapel[0] = { art: "titel", zustand: { ...fensterStapel[0].zustand, hinweis: "menue.beenden_hinweis" } };
+    else log.zeile(texte.text("menue.beenden_hinweis"), "hinweis");
     return zeichnen();
   }
 }
@@ -605,7 +707,7 @@ fensterElement.addEventListener("wheel", (radereignis) => {
 
 // Klick außerhalb des obersten Fensters schließt es, außer bei Charaktererstellung und Bestätigung; gibt true zurück,
 // wenn der Klick damit verbraucht ist (ein offenes Fenster schluckt Klicks dahinter immer)
-const FENSTER_OHNE_KLICK_AUSSEN = ["erstellung", "bestaetigung"];
+const FENSTER_OHNE_KLICK_AUSSEN = ["erstellung", "bestaetigung", "titel"];
 function klickAusserhalbDesFensters() {
   const oben = oberstesFenster(fensterStapel);
   if (!oben) return false;
@@ -643,7 +745,7 @@ window.addEventListener("keydown", (tastenereignis) => {
     const taste = { code: tastenereignis.code, zeichen: tastenereignis.key, umschalt: tastenereignis.shiftKey };
     // Umschalt+Ziffer wechselt die Leiste auch bei offenem Fenster (zum Belegen anderer Leisten)
     const leistenAktion = AKTIONEN[aktionDerTaste(belegung, tastenereignis.code, tastenereignis.key, tastenereignis.shiftKey)];
-    if (!nimmtText && tastenereignis.shiftKey && leistenAktion?.leiste !== undefined) {
+    if (spiel && !nimmtText && tastenereignis.shiftKey && leistenAktion?.leiste !== undefined) {
       leisten = leisteWechseln(leisten, leistenAktion.leiste);
       speichernVormerken();
       return zeichnen();
@@ -694,8 +796,9 @@ function aktionAusfuehren(ergebnis) {
   if (aktion === "rasten") return ablaufStarten(rastenBeginnen(spiel, einstellungen), naechsterRastschritt);
   if (aktion === "erkunden") return ablaufStarten(erkundenBeginnen(spiel, einstellungen), naechsterErkundungsschritt);
   if (aktion === "laufen") return ablaufStarten(laufenBeginnen(spiel, ergebnis.richtung, einstellungen), naechsterLaufschritt);
+  // nach dem Tod öffnet Enter das Fenster "ende" wieder
   if (aktion === "neustart") {
-    if (spiel.zustand.vorbei) starten(zufaelligerStartwert());
+    if (spiel.zustand.vorbei) fensterAuf("ende", endeOeffnen());
     return;
   }
   if (ergebnis.befehl) befehlGebenUndZeichnen(ergebnis.befehl);
@@ -874,4 +977,33 @@ kartenCanvas.addEventListener("wheel", (radereignis) => {
 
 window.addEventListener("resize", () => zeichnen());
 
-if (!gespeichertenLaufFortsetzen()) starten(startwertAusUrl() ?? zufaelligerStartwert());
+// Titel: Klicks wie in Fenstern ("Klick ist Taste"); liegt ein Fenster darüber, schließt ein Klick auf den Titel es
+// (außer Bestätigung); das Kontextmenü des Browsers bleibt zu
+titelElement.addEventListener("click", (mausereignis) => {
+  if (oberstesFenster(fensterStapel)?.art !== "titel") return klickAusserhalbDesFensters();
+  const element = mausereignis.target.closest?.("[data-taste], [data-ziel]");
+  if (!element) return;
+  const taste = element.dataset.taste !== undefined ? datenAus(element, "taste") : null;
+  if (taste) return fensterergebnisVerarbeiten(fensterTaste(fensterStapel, taste, fensterumgebung()));
+  const ziel = datenAus(element, "ziel");
+  if (ziel) fensterergebnisVerarbeiten(fensterKlick(fensterStapel, ziel, fensterumgebung()));
+});
+titelElement.addEventListener("contextmenu", (mausereignis) => {
+  mausereignis.preventDefault();
+  if (oberstesFenster(fensterStapel)?.art !== "titel") klickAusserhalbDesFensters();
+});
+
+// Spruch aus dem Korpus: die Texte kommen nach; fehlen sie, bleibt der Titel ohne Spruch
+Promise.all(korpusliste.map((name) => fetch(`sprache/de/korpus/${name}`).then((antwort) => (antwort.ok ? antwort.text() : Promise.reject(new Error(name))))
+  .then((text) => korpustextZerlegen(name, text))))
+  .then((korpustexte) => {
+    spruch = spruchWaehlen(korpustexte, Math.random());
+    if (fensterStapel[0]?.art === "titel") zeichnen();
+  })
+  .catch(() => { /* ohne Spruch */ });
+
+// Start: mit ?seed= gleich ein Lauf auf dem ersten freien Platz, sonst (oder ohne freien Platz) der Titel
+const startwertDerAdresse = startwertAusUrl();
+const freieStelle = platzFuerNeuesSpiel(plaetze);
+if (startwertDerAdresse !== null && freieStelle !== null && !plaetze[freieStelle]) starten(freieStelle, startwertDerAdresse);
+else titelZeigen();

@@ -6,6 +6,8 @@
 //   breit: auch ohne Einzelheiten in voller Breite (Verlauf)
 //   knoepfe: [{ taste, text }] klickbare Knöpfe in der Fußzeile, jeder mit seiner Taste
 //   ohneSchliessen: kein × in der Titelzeile (Charaktererstellung)
+//   ebene: eigene Ebene statt Fenster (Titelbildschirm, anzeige/titel.js): erscheint nicht im Weg durch den Stapel und
+//     wird hier nicht gezeichnet, liefert aber fuss und hilfewerte für die Hilfe darüber
 // Maus (seit 0.31.0, "Klick ist Taste"): klickbare Elemente tragen data-taste (tasteAttribut) mit dem Tastendruck, für
 // den sie stehen, oder data-ziel (zielAttribut) für Ziele ohne eigene Taste, die die klick-Funktion der Fensterart
 // auswertet (eingabe/fenster.js fensterKlick); src/main.js gibt beides weiter. Das × trägt Esc.
@@ -52,8 +54,9 @@ export function fensterHtml(umgebung, stapel) {
   for (const eintrag of stapel) {
     // jedes Fenster kennt den Inhalt des Fensters darunter (die Hilfe zum Fenster nennt dessen Tasten)
     oben = inhalte.get(eintrag.art)({ ...umgebung, darunter: oben }, eintrag.zustand);
-    titel.push(oben.titel);
+    if (!oben.ebene) titel.push(oben.titel);
   }
+  if (oben.ebene) return "";
   const details = oben.details ? `<div class="fenster-details">${oben.details}</div>` : "";
   // ohne Einzelheiten ist das Fenster schmal, sonst stünde eine kurze Liste allein in der Breite
   const schliessen = oben.ohneSchliessen ? "" : `<button class="schliessen" tabindex="-1" title="${umgebung.texte.text("ui.schliessen")}"${tasteAttribut({ code: "Escape" })}>×</button>`;

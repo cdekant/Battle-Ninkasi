@@ -123,7 +123,7 @@ Stand: 2026-11-18
 + Dienste des Hubs im Detail
 + Ziel eines Laufs und was zwei Läufe unterscheidet
 + Welt und Schauplatz
-+ Bestenliste der eigenen Läufe ja oder nein
++ Bestenliste der eigenen Läufe: ja, als Ruhmeshalle (entschieden 2026-11-21, siehe [Titelbildschirm.md](Titelbildschirm.md))
 + Licht und Wahrnehmung (vorläufige Ideen in [Architektur.md](Architektur.md)): wie Ninkasi ohne Nachtsicht im Dunkeln sieht (gar nicht, geringe Reichweite, abhängig vom Pegel)
 + Ob Mikroorganismen durch Wände spüren oder nur entlang von Wegen, wie ein Geruch
 + Ob Kontrolleure Taschenlampen tragen (bewegliche Lichtquelle, später vielleicht als Lichtkegel in Blickrichtung)

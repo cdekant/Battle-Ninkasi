@@ -21,7 +21,9 @@ import { charakterfensterOeffnen } from "../src/eingabe/charakter.js";
 import { erstellungOeffnen } from "../src/eingabe/erstellung.js";
 import { einstellungsfensterOeffnen, tastenZeilen } from "../src/eingabe/einstellungsfenster.js";
 import { befehlszeileOeffnen } from "../src/eingabe/befehlszeile.js";
-import { menueOeffnen } from "../src/eingabe/menue.js";
+import { menueOeffnen, endeOeffnen } from "../src/eingabe/menue.js";
+import { titelOeffnen, laeufeOeffnen } from "../src/eingabe/titel.js";
+import { titelHtml } from "../src/anzeige/titel.js";
 import { verlaufOeffnen } from "../src/eingabe/verlauf.js";
 import { inventarTaste, inventarKlick } from "../src/eingabe/inventar.js";
 import { leereAbweichungen } from "../src/eingabe/belegunganpassen.js";
@@ -50,7 +52,8 @@ function aufstellen() {
   ninkasi.freieEp = 500;
   const bier = gegenstandTragen(spiel, ninkasi, { typ: "bier", text: "gegenstand.bier", trinkbar: true });
   const helm = gegenstandTragen(spiel, ninkasi, { typ: "kupferhelm", text: "gegenstand.kupferhelm", ausruestung: { platz: "kopf" } });
-  const umgebung = { spiel, daten, texte, belegung, belegungsVorgabe: belegung, abweichungen: leereAbweichungen(), einstellungen: vorgaben, vorgaben, leisten: leistenNachfuehren(spiel, neueLeisten()), logzeilen: [], version: "test" };
+  const plaetze = [{ vorschau: { tiefe: 2, zuege: 40, gespeichertAm: 1 } }, { grund: "version", version: "0.31.0" }, null];
+  const umgebung = { spiel, daten, texte, belegung, belegungsVorgabe: belegung, abweichungen: leereAbweichungen(), einstellungen: vorgaben, vorgaben, leisten: leistenNachfuehren(spiel, neueLeisten()), logzeilen: [], version: "test", plaetze };
   return { spiel, ninkasi, bier, helm, umgebung };
 }
 
@@ -66,6 +69,9 @@ const FENSTER = (daten) => [
   ["einstellungen", einstellungsfensterOeffnen()],
   ["einstellungen", { ...einstellungsfensterOeffnen(), reiter: "tasten" }],
   ["befehlszeile", befehlszeileOeffnen()],
+  ["laeufe", laeufeOeffnen("fortsetzen")],
+  ["laeufe", laeufeOeffnen("ersetzen")],
+  ["ende", endeOeffnen()],
 ];
 
 test("Jedes Fenster: data-taste und data-ziel lassen sich auslösen, ohne zu werfen; × außer bei der Erstellung", () => {
@@ -116,4 +122,17 @@ test("Charakter, Erstellung, Einstellungen und Befehlszeile: Klick wählt, der z
   assert.equal(fensterKlick(gewaehlt, { zeile, tastenStelle: 0 }, umgebung).stapel[0].zustand.aufnahme, true, "zweiter Klick nimmt auf");
   const befehlszeile = fensterOeffnen([], "befehlszeile", { eingabe: "hilf", gewaehlt: 0 });
   assert.deepEqual(fensterKlick(befehlszeile, { zeile: 0 }, umgebung).befehlszeile, { aktion: "hilfe" });
+});
+
+test("Titel: jedes data-taste und data-ziel der Titelebene lässt sich auslösen; Esc ist kein Klickziel", () => {
+  const { umgebung } = aufstellen();
+  const stapel = fensterOeffnen([], "titel", titelOeffnen());
+  const html = titelHtml(umgebung, stapel);
+  const tasten = attributwerte(html, "taste");
+  const ziele = attributwerte(html, "ziel");
+  assert.equal(tasten.length, 6, "sechs Einträge mit zwei belegten Plätzen");
+  assert.equal(ziele.length, 3, "drei Plätze");
+  assert.ok(!tasten.some((taste) => taste.code === "Escape"));
+  for (const taste of tasten) assert.ok(fensterTaste(stapel, taste, umgebung).stapel, JSON.stringify(taste));
+  for (const ziel of ziele) assert.ok(fensterKlick(stapel, ziel, umgebung).stapel, JSON.stringify(ziel));
 });

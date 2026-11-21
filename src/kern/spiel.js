@@ -34,11 +34,17 @@ export function datenLaden(rohdaten, sprache) {
   return daten;
 }
 
-// optionen: { eigenschaften? } aus der Charaktererstellung (geprüft in systeme/lernen.js lernenEinrichten);
-// sie gehören zum Spielstand, damit das Nachspielen dieselbe Ninkasi erzeugt
+// Spielarten (docs/Titelbildschirm.md): eine Spielart gehört zum Lauf, nicht zu den Einstellungen, und lässt sich im
+// Lauf nicht wechseln; bisher nur "normal", weitere (weich, friedlich, allmächtig, eigene Regeln) kommen als Startoption
+export const SPIELARTEN = ["normal"];
+
+// optionen: { eigenschaften?, spielart? } aus der Charaktererstellung (Eigenschaften geprüft in systeme/lernen.js
+// lernenEinrichten) und der Wahl des Laufs; sie gehören zum Spielstand, damit das Nachspielen denselben Lauf erzeugt
 export function neuesSpiel(daten, startwert, optionen = {}) {
+  const startoptionen = { spielart: "normal", ...structuredClone(optionen) };
+  if (!SPIELARTEN.includes(startoptionen.spielart)) throw new Error(`Unbekannte Spielart ${startoptionen.spielart}`);
   const zustand = neuerZustand(startwert >>> 0);
-  const spiel = { daten, zustand, optionen: structuredClone(optionen), befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
+  const spiel = { daten, zustand, optionen: startoptionen, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
   zustand.zufallszustand = zufallErzeugen(startwertAbleiten(zustand.startwert, "spiel"));
   // vor der ersten Ebene, damit schon ihre Gegenstände ihr Etikett tragen (systeme/kennen.js)
   etikettenZuordnen(spiel);

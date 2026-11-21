@@ -122,7 +122,8 @@ test("Spielmenü: Buchstabe, Pfeile, Enter; Neustart fragt nach, Hilfe und Einst
   const einstellungen = fensterTaste(stapel, { code: "KeyC", zeichen: "c" }, {});
   assert.deepEqual(einstellungen.stapel.map(({ art }) => art), ["menue", "einstellungen"], "Einstellungen legen sich über das Menü");
   assert.deepEqual(menueTaste(zustand, { code: "KeyD", zeichen: "d" }, { einstellungen: { neustartNachfragen: false } }), { zustand: null, aktion: "neustart" }, "ohne Nachfrage");
-  assert.deepEqual(menueTaste(zustand, { code: "KeyE", zeichen: "e" }), { zustand: null, aktion: "beenden" });
+  assert.deepEqual(menueTaste(zustand, { code: "KeyE", zeichen: "e" }), { zustand: null, aktion: "zum_titel" });
+  assert.deepEqual(menueTaste(zustand, { code: "KeyF", zeichen: "f" }), { zustand: null, aktion: "beenden" });
   assert.deepEqual(menueTaste(zustand, { code: "KeyZ", zeichen: "z" }), { zustand }, "an z liegt nichts");
   assert.deepEqual(bestaetigungTaste({ frage: "x", aktion: "a" }, { code: "Enter" }), { zustand: null, aktion: "a" });
 });

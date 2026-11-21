@@ -61,7 +61,7 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 
 ## Offen
 
-+ Korpustexte noch nicht an Spielinhalte gekoppelt (Brauschritte, Fundstücke), vorerst nur Material zum Experimentieren
++ Korpustexte noch nicht an Spielinhalte gekoppelt (Brauschritte, Fundstücke); seit 0.32.0 liest das Spiel sie zur Laufzeit (`sprache/de/korpus/index.js` als Liste der Dateien, `src/anzeige/korpus.js` zerlegt in Kopf, Strophen und Sätze) und zeigt einen Satz als Spruch im Titel; ein neuer Korpustext braucht seine Zeile in der Liste
 + Laden von `sprache/literatur.json` im Spiel (`fetch` oder `import … with { type: "json" }`) und Prüfung unbekannter Quellenschlüssel
 + Wo erzeugte Texte vorkommen: Bücher, Schriftrollen, Inschriften, HACCP-Aushänge, Händlergerede
 + Mehrzahl und Adjektive im Detail

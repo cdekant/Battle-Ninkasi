@@ -1,0 +1,97 @@
+// Titelbildschirm und Wahl der Läufe (siehe docs/Titelbildschirm.md): reine Tastenlogik ohne DOM.
+//   titel:  unterste Fensterart im Stapel; Esc und ein Klick daneben schließen ihn nicht. Zustand { gewaehlt, hinweis? }.
+//           Einträge je nach Speicherplätzen: Fortsetzen (zuletzt gespielter Lauf, vorgewählt), Neues Spiel, Läufe (ab
+//           zwei belegten Plätzen), Einstellungen, Hilfe, Beenden. Ein Klick auf einen Platz der rechten Spalte trägt
+//           data-ziel { stelle } und setzt diesen Lauf fort.
+//   laeufe: die drei Speicherplätze; Zustand { gewaehlt, zweck }; zweck "fortsetzen" (Lauf wählen) oder "ersetzen"
+//           (alle Plätze belegt, ein neues Spiel verdrängt einen Lauf, mit Nachfrage); Entf löscht mit Nachfrage.
+// kontext.plaetze: [null | { vorschau, grund? }] (eingabe/speicherstand.js platzVorschau), aus src/main.js.
+// Aktionen für src/main.js: { art: "fortsetzen", stelle }, { art: "neuesSpiel", stelle }, { art: "platzLoeschen", stelle },
+// "beenden".
+
+import { fensterartAnmelden } from "./fenster.js";
+import { listeBedienen } from "./menue.js";
+import { einstellungsfensterOeffnen } from "./einstellungsfenster.js";
+import { platzSpielbar, platzFuerNeuesSpiel, zuletztGespielt } from "./speicherstand.js";
+
+export function titelEintraege(plaetze) {
+  const spielbar = plaetze.some(platzSpielbar);
+  const belegt = plaetze.filter(Boolean).length;
+  return [...(spielbar ? ["fortsetzen"] : []), "neues_spiel", ...(belegt >= 2 ? ["laeufe"] : []), "einstellungen", "hilfe", "beenden"];
+}
+
+export function titelOeffnen() {
+  return { gewaehlt: 0 };
+}
+
+function titelEintragWaehlen(zustand, eintrag, plaetze) {
+  if (eintrag === "fortsetzen") return { zustand, aktion: { art: "fortsetzen", stelle: zuletztGespielt(plaetze) } };
+  if (eintrag === "neues_spiel") {
+    const stelle = platzFuerNeuesSpiel(plaetze);
+    if (stelle === null) return { zustand, oeffnen: { art: "laeufe", zustand: laeufeOeffnen("ersetzen", plaetze) } };
+    return { zustand, aktion: { art: "neuesSpiel", stelle } };
+  }
+  if (eintrag === "laeufe") return { zustand, oeffnen: { art: "laeufe", zustand: laeufeOeffnen("fortsetzen", plaetze) } };
+  if (eintrag === "einstellungen") return { zustand, oeffnen: { art: "einstellungen", zustand: einstellungsfensterOeffnen() } };
+  if (eintrag === "hilfe") return { zustand, oeffnen: { art: "hilfe", zustand: {} } };
+  return { zustand, aktion: eintrag };
+}
+
+export function titelTaste(zustand, taste, kontext = {}) {
+  const plaetze = kontext.plaetze ?? [];
+  if (taste.code === "Escape") return { zustand };
+  const eintraege = titelEintraege(plaetze);
+  const { gewaehlt, waehlen } = listeBedienen(zustand.gewaehlt, eintraege.length, taste);
+  const neu = { gewaehlt };
+  if (waehlen === null) return { zustand: neu };
+  return titelEintragWaehlen(neu, eintraege[waehlen], plaetze);
+}
+
+// Klick auf einen Platz in der rechten Spalte: wie die Wahl in den Läufen
+export function titelKlick(zustand, ziel, kontext = {}) {
+  if (ziel.stelle === undefined) return { zustand };
+  return { ...platzWaehlen(ziel.stelle, kontext.plaetze ?? [], "fortsetzen"), zustand };
+}
+
+// Läufe
+
+export function laeufeOeffnen(zweck, plaetze = []) {
+  return { gewaehlt: zweck === "fortsetzen" ? zuletztGespielt(plaetze) ?? 0 : 0, zweck };
+}
+
+// Was die Wahl eines Platzes bedeutet (ohne zustand, den setzt die aufrufende Fensterart)
+function platzWaehlen(stelle, plaetze, zweck) {
+  const platz = plaetze[stelle] ?? null;
+  const nummer = { platz: stelle + 1 };
+  if (zweck === "ersetzen" && platzSpielbar(platz)) {
+    return { oeffnen: { art: "bestaetigung", zustand: { frage: "laeufe.ersetzen_frage", werte: nummer, aktion: { art: "neuesSpiel", stelle } } } };
+  }
+  if (platz?.grund) {
+    return { oeffnen: { art: "bestaetigung", zustand: { frage: "laeufe.veraltet_frage", werte: { ...nummer, version: platz.version ?? "?" }, aktion: { art: "neuesSpiel", stelle } } } };
+  }
+  if (!platz) return { aktion: { art: "neuesSpiel", stelle } };
+  return { aktion: { art: "fortsetzen", stelle } };
+}
+
+export function laeufeTaste(zustand, taste, kontext = {}) {
+  const plaetze = kontext.plaetze ?? [];
+  if (taste.code === "Escape") return { zustand: null };
+  if ((taste.code === "Delete" || taste.code === "Backspace") && plaetze[zustand.gewaehlt]) {
+    const stelle = zustand.gewaehlt;
+    return { zustand, oeffnen: { art: "bestaetigung", zustand: { frage: "laeufe.loeschen_frage", werte: { platz: stelle + 1 }, aktion: { art: "platzLoeschen", stelle } } } };
+  }
+  const { gewaehlt, waehlen } = listeBedienen(zustand.gewaehlt, plaetze.length || 1, taste);
+  const neu = { ...zustand, gewaehlt };
+  if (waehlen === null) return { zustand: neu };
+  return { zustand: neu, ...platzWaehlen(waehlen, plaetze, zustand.zweck) };
+}
+
+// Klick auf eine Zeile wählt sie, der zweite Klick wirkt wie Enter
+export function laeufeKlick(zustand, ziel, kontext = {}) {
+  if (ziel.stelle === undefined) return { zustand };
+  if (ziel.stelle !== zustand.gewaehlt) return { zustand: { ...zustand, gewaehlt: ziel.stelle } };
+  return laeufeTaste(zustand, { code: "Enter" }, kontext);
+}
+
+fensterartAnmelden("titel", { taste: titelTaste, klick: titelKlick });
+fensterartAnmelden("laeufe", { taste: laeufeTaste, klick: laeufeKlick });

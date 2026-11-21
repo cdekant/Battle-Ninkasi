@@ -49,5 +49,5 @@ test("Speicherstand: Spiel, Leisten und Log kommen zurück; andere Version und k
   assert.deepEqual(speicherstandLesen(daten, "{kaputt"), { grund: "kaputt" });
   assert.deepEqual(speicherstandLesen(daten, "{}"), { grund: "kaputt" });
   const ohneLeisten = JSON.stringify({ ...JSON.parse(text), oberflaeche: {} });
-  assert.deepEqual(speicherstandLesen(daten, ohneLeisten).oberflaeche, { leisten: neueLeisten(), log: [] }, "fehlende Oberfläche wird frisch");
+  assert.deepEqual(speicherstandLesen(daten, ohneLeisten).oberflaeche, { leisten: neueLeisten(), log: [], gesehen: [] }, "fehlende Oberfläche wird frisch");
 });

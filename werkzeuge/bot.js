@@ -18,9 +18,12 @@ import { rastenBeginnen, naechsterRastschritt } from "../src/eingabe/rasten.js";
 import { erkundenBeginnen, naechsterErkundungsschritt } from "../src/eingabe/erkunden.js";
 import { laufenBeginnen, naechsterLaufschritt } from "../src/eingabe/laufen.js";
 import { neueLeisten, leistenNachfuehren, aktivePlaetze, platzZustand, platzAusloesen, platzBelegen, plaetzeTauschen, platzLeeren, leisteWechseln, ANZAHL_LEISTEN } from "../src/eingabe/schnellleiste.js";
-import { speicherstandText, speicherstandLesen } from "../src/eingabe/speicherstand.js";
+import { speicherstandText, speicherstandLesen, vorschauAusSpiel, platzVorschau } from "../src/eingabe/speicherstand.js";
+import { neueChronik, chronikGueltig, meldungZaehlen, sichtungenZaehlen, laufEintragen, zaehlerstand } from "../src/eingabe/chronik.js";
+import { titelOeffnen, laeufeOeffnen } from "../src/eingabe/titel.js";
+import { titelHtml } from "../src/anzeige/titel.js";
 import { minikartenBild } from "../src/anzeige/minikarte.js";
-import { menueOeffnen, menueTaste } from "../src/eingabe/menue.js";
+import { menueOeffnen, menueTaste, endeOeffnen } from "../src/eingabe/menue.js";
 import { verlaufOeffnen, verlaufTaste } from "../src/eingabe/verlauf.js";
 import { REITER } from "../src/eingabe/einstellungskatalog.js";
 import { einstellungsfensterOeffnen, einstellungsfensterTaste } from "../src/eingabe/einstellungsfenster.js";
@@ -73,7 +76,8 @@ function fensterZeichnen(spiel, art, zustand) {
   mitWarnungen(() => fensterHtml(botUmgebung(spiel), fensterOeffnen([], art, zustand)));
 }
 function botUmgebung(spiel) {
-  return { spiel, daten, texte: anzeigetexte, belegung, belegungsVorgabe: belegung, abweichungen: leereAbweichungen(), leisten: botLeisten, logzeilen: botLog?.zeilen ?? [], einstellungen, vorgaben: einstellungen, version: "bot" };
+  const plaetze = [{ vorschau: vorschauAusSpiel(spiel, 0) }, { grund: "version", version: "0.0.0" }, null];
+  return { spiel, daten, texte: anzeigetexte, belegung, belegungsVorgabe: belegung, abweichungen: leereAbweichungen(), leisten: botLeisten, logzeilen: botLog?.zeilen ?? [], einstellungen, vorgaben: einstellungen, version: "bot", plaetze };
 }
 const seitenleiste = new Oberflaeche(ohneDom(), anzeigetexte, "bot");
 const bedienzeile = new Bedienzeile(ohneDom(), anzeigetexte, belegung);
@@ -95,7 +99,7 @@ function attributwerte(html, name) {
 }
 function fensterKlicksPruefen(spiel) {
   const umgebung = botUmgebung(spiel);
-  const fenster = [["inventar", { gewaehlt: spielerin(spiel.zustand).inventar?.[0] ?? null }], ["faehigkeiten", { gewaehlt: null }], ["charakter", charakterfensterOeffnen()], ["menue", menueOeffnen()], ["einstellungen", einstellungsfensterOeffnen()]];
+  const fenster = [["inventar", { gewaehlt: spielerin(spiel.zustand).inventar?.[0] ?? null }], ["faehigkeiten", { gewaehlt: null }], ["charakter", charakterfensterOeffnen()], ["menue", menueOeffnen()], ["einstellungen", einstellungsfensterOeffnen()], ["laeufe", laeufeOeffnen("fortsetzen")], ["ende", endeOeffnen()]];
   for (const [art, zustand] of fenster) {
     const stapel = fensterOeffnen([], art, zustand);
     let html = "";
@@ -103,6 +107,12 @@ function fensterKlicksPruefen(spiel) {
     for (const taste of attributwerte(html, "taste")) fensterTaste(stapel, taste, umgebung);
     for (const ziel of attributwerte(html, "ziel")) fensterKlick(stapel, ziel, umgebung);
   }
+  // Titel als eigene Ebene (anzeige/titel.js)
+  const titel = fensterOeffnen([], "titel", titelOeffnen());
+  let html = "";
+  mitWarnungen(() => { html = titelHtml(umgebung, titel); });
+  for (const taste of attributwerte(html, "taste")) fensterTaste(titel, taste, umgebung);
+  for (const ziel of attributwerte(html, "ziel")) fensterKlick(titel, ziel, umgebung);
 }
 
 // Spielmenü per Tasten wie im Browser: Pfeil runter und wieder hoch, dann Fortsetzen; nichts davon ändert den Lauf
@@ -433,6 +443,10 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
     botLog.leeren(spiel);
     hoererAnmelden(spiel, (meldung) => mitWarnungen(() => botLog.melden(meldung)));
     epBuch = { erwartet: daten.regeln.lernen.startEp };
+    // Chronik wie im Browser: Meldungen und Sichtungen zählen, am Ende ein Eintrag (eingabe/chronik.js)
+    const botChronik = neueChronik();
+    const gesehen = new Set();
+    hoererAnmelden(spiel, (meldung) => meldungZaehlen(botChronik, spiel, meldung));
     let getoetet = 0, getrunkeneBiere = 0;
     hoererAnmelden(spiel, (meldung) => {
       lernmeldungBuchen(spiel, meldung);
@@ -468,6 +482,7 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
       const befehl = ausDerLeiste ?? zufallsbefehl(botZufall, spiel);
       befehlGeben(spiel, befehl);
       botLeisten = leistenNachfuehren(spiel, botLeisten);
+      sichtungenZaehlen(botChronik, spiel, gesehen);
       invariantenPruefen(spiel);
       if (spiel.befehle.length % 10 === 0 && !spiel.zustand.vorbei) {
         untersuchen(spiel);
@@ -485,6 +500,12 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
       if (JSON.stringify(geladeneKopie.zustand) !== JSON.stringify(spiel.zustand)) throw new Error("Geladene Kopie ergibt anderen Zustand");
       anzahlGeladen++;
     }
+    laufEintragen(botChronik, spiel, { ergebnis: spiel.zustand.vorbei ? "tod" : "aufgegeben", datum: 0, version: "bot" });
+    if (JSON.stringify(chronikGueltig(JSON.parse(JSON.stringify(botChronik)))) !== JSON.stringify(botChronik)) throw new Error("Chronik übersteht JSON nicht");
+    if (zaehlerstand(botChronik, "tode") !== (spiel.zustand.vorbei ? 1 : 0)) throw new Error("Chronik zählt die Tode falsch");
+    if (!gesehen.size) throw new Error("Chronik hat keine Wesenart gesehen");
+    const vorschau = platzVorschau(speicherstandText(spiel, { leisten: botLeisten, gesehen, gespeichertAm: 1 }));
+    if (vorschau.grund || vorschau.vorschau.tiefe !== spiel.zustand.tiefe) throw new Error("Vorschau des Speicherplatzes falsch");
     const nachgespielt = nachspielen(daten, JSON.parse(JSON.stringify(spielstand(spiel))));
     const zustaendeGleich = JSON.stringify(nachgespielt.zustand) === JSON.stringify(spiel.zustand);
     if (!zustaendeGleich) throw new Error("Nachspielen ergibt anderen Zustand");
