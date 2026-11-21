@@ -1,11 +1,12 @@
-// Seitenleiste: LP, MP, PP, Pegel als logarithmische Leiste mit Schwellen, freie EP, Zielmodus, Fähigkeiten als
-// Kurzliste mit Abklingzeit, Last, sichtbare Gegner, Startwert. Liest den Zustand nur. Inventar, Fähigkeiten, Charakter
-// und Hilfe sind Fenster über der Karte (anzeige/fenster.js); die Kurzliste der Fähigkeiten weicht mit 0.28.0 der
-// Schnellleiste (docs/Oberflaeche.md). Im Zielmodus (eingabe/zielmodus.js)
-// steht oben, womit gezielt wird, was dagegen spricht und wen es mit welcher Trefferchance trifft; beim Untersuchen
-// (Taste X) stattdessen, was Ninkasi über das Feld weiß (systeme/untersuchen.js), auf ihr selbst mit der Aufschlüsselung
-// ihrer Werte. Unter den Balken stehen Heimlichkeitsweite, laufende Aktion und Zustände; die Gegnerliste nennt
-// Wachzustand, Zustände und laufende Aktion. tooltipHtml liefert die Kurzfassung eines Feldes für den Tooltip.
+// Seitenleiste (docs/Oberflaeche.md, Seitenleiste): Kopf mit Ort und Zeit, Ninkasi (LP, MP, PP, Pegel als logarithmische
+// Leiste mit Schwellen, freie EP, Heimlichkeit, laufende Aktion, Zustände, Last), Zielen und Untersuchen, Gefährten
+// mit LP, Wesen in Sicht nach Abstand. Liest den Zustand nur. Inventar, Fähigkeiten, Charakter, Verlauf, Spielmenü und
+// Hilfe sind Fenster über der Karte (anzeige/fenster.js), die Fähigkeiten stehen in der Schnellleiste
+// (anzeige/bedienzeile.js); Startwert und Version zeigt das Spielmenü. Im Zielmodus (eingabe/zielmodus.js)
+// steht, womit gezielt wird, was dagegen spricht und wen es mit welcher Trefferchance trifft; beim Untersuchen
+// (Taste X, Rechtsklick) stattdessen, was Ninkasi über das Feld weiß (systeme/untersuchen.js), auf ihr selbst mit der
+// Aufschlüsselung ihrer Werte. Die Liste In Sicht nennt Wachzustand, Zustände und laufende Aktion.
+// tooltipHtml liefert die Kurzfassung eines Feldes für den Tooltip.
 
 import { spielerin, entitaetMitId } from "../kern/zustand.js";
 import { beziehungZwischen, urheberVon } from "../systeme/fraktionen.js";
@@ -14,8 +15,8 @@ import { optimalerPegel } from "../systeme/stoffwechsel.js";
 import { promilleText, leistenanteil, TEILSTRICHE } from "./pegelanzeige.js";
 
 import { anzahlVon } from "../systeme/inventar.js";
-import { faehigkeitVon, faehigkeitFuer, zuegeBisBereit } from "../systeme/faehigkeiten.js";
-import { lastText, verbrauchText } from "./fenster.js";
+import { faehigkeitVon } from "../systeme/faehigkeiten.js";
+import { lastText } from "./fenster.js";
 import { feldBeschreiben, zustaendeVon, laufendeAktionVon, werteAufschluesseln, wesenBeschreiben } from "../systeme/untersuchen.js";
 import { heimlichkeitsweite } from "../systeme/wahrnehmung.js";
 
@@ -215,19 +216,23 @@ export class Oberflaeche {
     return teile.length ? `<div class="leise zusatz">${teile.join(", ")}</div>` : "";
   }
 
-  // Fähigkeiten als Kurzliste mit Verbrauch und Abklingzeit (bis zur Schnellleiste in 0.28.0)
-  faehigkeitenHtml(spiel, ninkasi) {
-    const namen = ninkasi.faehigkeiten || [];
-    if (!namen.length) return "";
-    const { text } = this.texte;
-    const zeilen = namen.map((name) => {
-      const definition = faehigkeitFuer(spiel, ninkasi, name);
-      const verbrauch = verbrauchText(spiel, this.texte, ninkasi, definition);
-      const zuege = zuegeBisBereit(ninkasi, name);
-      const abklingend = zuege > 0 ? ` <span class="schlimm">(${text("ui.abklingend", { zuege })})</span>` : "";
-      return `<li>${text(definition.text)}${verbrauch ? ` <span class="leise">${verbrauch}</span>` : ""}${abklingend}</li>`;
-    });
-    return `<h2>${text("ui.faehigkeiten")}</h2><ul class="faehigkeiten">${zeilen.join("")}</ul>`;
+  // Wesen mit Position in Sicht außer Ninkasi, nach Abstand und ID, getrennt in Gefährten und die übrigen
+  wesenInSicht(spiel) {
+    const zustand = spiel.zustand;
+    const ninkasi = spielerin(zustand);
+    const sichtbareFelder = new Set(zustand.sichtbareFelder);
+    const abstand = (wesen) => Math.max(Math.abs(wesen.position.x - ninkasi.position.x), Math.abs(wesen.position.y - ninkasi.position.y));
+    const sichtbar = Object.values(zustand.entitaeten)
+      .filter((entitaet) => entitaet.position && entitaet.fraktion !== undefined && entitaet.id !== ninkasi.id
+        && sichtbareFelder.has(entitaet.position.y * zustand.ebene.breite + entitaet.position.x))
+      .sort((erstes, zweites) => abstand(erstes) - abstand(zweites) || erstes.id - zweites.id);
+    const verbuendet = (wesen) => beziehungZwischen(spiel, urheberVon(ninkasi), wesen) === "verbuendet";
+    return { gefaehrten: sichtbar.filter(verbuendet), andere: sichtbar.filter((wesen) => !verbuendet(wesen)) };
+  }
+
+  wesenlisteHtml(spiel, liste, mitZusatz) {
+    const { nomenForm } = this.texte;
+    return liste.map((wesen) => `<li>${balken(nomenForm(wesen, "nom", "ohne"), wesen.werte.lp.aktuell, hoechstwert(spiel, wesen, "lp"), "lp klein")}${mitZusatz ? this.gegnerZusatz(spiel, wesen) : ""}</li>`).join("");
   }
 
   // ziel: null | { modus, vorschau } (eingabe/zielmodus.js; beim Untersuchen ist vorschau null)
@@ -236,37 +241,25 @@ export class Oberflaeche {
     const zustand = spiel.zustand;
     const ninkasi = spielerin(zustand);
     const werte = ninkasi.werte;
-    const sichtbareFelder = new Set(zustand.sichtbareFelder);
-
-    const sichtbareGegner = Object.values(zustand.entitaeten).filter((entitaet) =>
-      entitaet.position && entitaet.fraktion !== undefined && entitaet.id !== ninkasi.id
-      && beziehungZwischen(spiel, urheberVon(ninkasi), entitaet) !== "verbuendet"
-      && sichtbareFelder.has(entitaet.position.y * zustand.ebene.breite + entitaet.position.x)
-    );
-    const gegnerHtml = sichtbareGegner.length
-      ? sichtbareGegner.map((gegner) => `<li>${balken(nomenForm(gegner, "nom", "ohne"), gegner.werte.lp.aktuell, hoechstwert(spiel, gegner, "lp"), "lp klein")}${this.gegnerZusatz(spiel, gegner)}</li>`).join("")
-      : `<li class="leise">${text("ui.niemand")}</li>`;
+    const { gefaehrten, andere } = this.wesenInSicht(spiel);
+    const gefaehrtenHtml = gefaehrten.length ? `<h2>${text("ui.gefaehrten")}</h2><ul class="gefaehrten">${this.wesenlisteHtml(spiel, gefaehrten, false)}</ul>` : "";
+    const andereHtml = andere.length ? this.wesenlisteHtml(spiel, andere, true) : `<li class="leise">${text("ui.niemand")}</li>`;
 
     this.element.innerHTML = `
-      <h1>${nomenForm(ninkasi, "nom", "ohne")}</h1>
-      ${balken(text("ui.lp"), werte.lp.aktuell, hoechstwert(spiel, ninkasi, "lp"), "lp")}
-      ${balken(text("ui.mp"), werte.mp.aktuell, hoechstwert(spiel, ninkasi, "mp"), "mp")}
-      ${balken(text("ui.pp"), werte.pp.aktuell, hoechstwert(spiel, ninkasi, "pp"), "pp")}
-      <h2>${text("ui.pegel")}</h2>
-      ${pegelLeiste(text("ui.promille"), werte.pegel.aktuell, ninkasi.stoffwechsel.schwellen || [], optimalerPegel(spiel, ninkasi, "lp"))}
-      <div class="freie-ep">${text("ui.freie_ep")}: <b>${ninkasi.freieEp ?? 0}</b> <span class="leise">${text("ui.freie_ep_hinweis")}</span></div>
-      ${this.lageHtml(spiel, ninkasi)}
+      <div class="kopf">${text("ui.ort_und_zeit", { tiefe: zustand.tiefe, zug: ninkasi.zuege ?? 0 })}</div>
+      <section class="ninkasi">
+        <h1>${nomenForm(ninkasi, "nom", "ohne")}</h1>
+        ${balken(text("ui.lp"), werte.lp.aktuell, hoechstwert(spiel, ninkasi, "lp"), "lp")}
+        ${balken(text("ui.mp"), werte.mp.aktuell, hoechstwert(spiel, ninkasi, "mp"), "mp")}
+        ${balken(text("ui.pp"), werte.pp.aktuell, hoechstwert(spiel, ninkasi, "pp"), "pp")}
+        ${pegelLeiste(text("ui.promille"), werte.pegel.aktuell, ninkasi.stoffwechsel.schwellen || [], optimalerPegel(spiel, ninkasi, "lp"))}
+        <div class="freie-ep">${text("ui.freie_ep")}: <b>${ninkasi.freieEp ?? 0}</b> <span class="leise">${text("ui.freie_ep_hinweis")}</span></div>
+        ${this.lageHtml(spiel, ninkasi)}
+        <div class="leise last">${lastText(spiel, this.texte, ninkasi)}</div>
+      </section>
       ${ziel?.modus.auswahl.zweck === "untersuchen" ? this.untersuchenHtml(spiel, ziel.modus) : this.zielHtml(spiel, ziel)}
-      ${this.faehigkeitenHtml(spiel, ninkasi)}
-      <div class="leise last">${lastText(spiel, this.texte, ninkasi)}</div>
+      ${gefaehrtenHtml}
       <h2>${text("ui.in_sicht")}</h2>
-      <ul class="gegner">${gegnerHtml}</ul>
-      <div class="fuss">
-        <div>${text("ui.startwert")}: ${zustand.startwert}</div>
-        <div>${text("ui.zeit")}: ${zustand.zeit}</div>
-        <div>${text("ui.tiefe")}: ${zustand.tiefe}</div>
-        <div>${text("ui.version")}: ${this.version}</div>
-        <div class="tasten">${text("ui.hilfe_hinweis")}</div>
-      </div>`;
+      <ul class="gegner">${andereHtml}</ul>`;
   }
 }

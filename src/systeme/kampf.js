@@ -70,7 +70,8 @@ export function trefferanteil(spiel, { quelle, ziel, genauigkeit, gegen = "auswe
   return { zaehler: wirksameGenauigkeit, nenner: wirksameGenauigkeit + verteidigung };
 }
 
-// Trefferwurf, Blocken und Krit nacheinander; gibt { ergebnis: "treffer" | "ausgewichen" | "geblockt", kritisch, hinterhalt } zurück
+// Trefferwurf, Blocken und Krit nacheinander; gibt { ergebnis: "treffer" | "ausgewichen" | "geblockt", kritisch, hinterhalt,
+// trefferchance } zurück (trefferchance in Prozent vor dem Blocken, nur für die Anzeige im Log)
 // wurf wie bei trefferanteil, dazu kritchance? (Punkte zusätzlich zu denen der Quelle)
 // Hinterhalt: ein ahnungsloses Ziel (systeme/wahrnehmung.js) wird sicher getroffen, nicht geblockt und kritisch
 export function trefferwurf(spiel, wurf) {
@@ -78,17 +79,18 @@ export function trefferwurf(spiel, wurf) {
   const { quelle, ziel, tags = [] } = wurf;
   if (quelle && istAhnungslos(ziel)) {
     melden(spiel, "hinterhalt", { quelle: bezugAuf(quelle), ziel: bezugAuf(ziel) });
-    return { ergebnis: "treffer", kritisch: true, hinterhalt: true };
+    return { ergebnis: "treffer", kritisch: true, hinterhalt: true, trefferchance: 100 };
   }
   const regeln = kampfregeln(spiel);
   const { zaehler, nenner } = trefferanteil(spiel, wurf);
-  if (!mitAnteil(zufallszustand, zaehler, nenner)) return { ergebnis: "ausgewichen", kritisch: false, hinterhalt: false };
+  const trefferchance = anteilInProzent(zaehler, nenner);
+  if (!mitAnteil(zufallszustand, zaehler, nenner)) return { ergebnis: "ausgewichen", kritisch: false, hinterhalt: false, trefferchance };
   if (!tags.includes("unblockbar")) {
     const blocken = kampfwert(spiel, ziel, "blocken", { gegenueberId: quelle?.id, tags });
-    if (mitAnteil(zufallszustand, blocken, blocken + regeln.halbwertBlocken)) return { ergebnis: "geblockt", kritisch: false, hinterhalt: false };
+    if (mitAnteil(zufallszustand, blocken, blocken + regeln.halbwertBlocken)) return { ergebnis: "geblockt", kritisch: false, hinterhalt: false, trefferchance };
   }
   const kritchance = quelle ? kampfwert(spiel, quelle, "kritchance", { gegenueberId: ziel.id, tags }, wurf.kritchance ?? 0) : 0;
-  return { ergebnis: "treffer", kritisch: mitAnteil(zufallszustand, kritchance, kritchance + regeln.halbwertKritchance), hinterhalt: false };
+  return { ergebnis: "treffer", kritisch: mitAnteil(zufallszustand, kritchance, kritchance + regeln.halbwertKritchance), hinterhalt: false, trefferchance };
 }
 
 const tagsDesEffekts = (spiel, effektName) => spiel.daten.effekte?.[effektName]?.tags || [];
@@ -151,13 +153,13 @@ function einzelangriff(spiel, angreifer, profil, ziel, kettentiefe = 0) {
   const urheberId = angreifer.beschworenVon ?? angreifer.id;
   const vorher = hakenAusloesen(spiel, "vor_angriff", { quelleId: angreifer.id, urheberId, zielId: ziel.id, ursache: "nahkampf", kettentiefe, mittel, tags, angriff: profil.name, abgebrochen: false });
   if (vorher.abgebrochen) return;
-  const { ergebnis, kritisch } = trefferwurf(spiel, { quelle: angreifer, ziel, genauigkeit: profil.genauigkeit, tags, kritchance: profil.kritchance });
-  const beteiligte = { quelleId: angreifer.id, urheberId, zielId: ziel.id, ursache: "nahkampf", kettentiefe, mittel, tags, kritisch };
+  const { ergebnis, kritisch, trefferchance } = trefferwurf(spiel, { quelle: angreifer, ziel, genauigkeit: profil.genauigkeit, tags, kritchance: profil.kritchance });
+  const beteiligte = { quelleId: angreifer.id, urheberId, zielId: ziel.id, ursache: "nahkampf", kettentiefe, mittel, tags, kritisch, trefferchance };
   if (ergebnis === "treffer") {
     effektAnwenden(spiel, profil.effekt, beteiligte);
     hakenAusloesen(spiel, "nach_treffer", { ...beteiligte });
   } else {
-    melden(spiel, "verfehlt", { quelle: bezugAuf(angreifer), ziel: bezugAuf(ziel), grund: ergebnis });
+    melden(spiel, "verfehlt", { quelle: bezugAuf(angreifer), ziel: bezugAuf(ziel), grund: ergebnis, trefferchance });
     hakenAusloesen(spiel, "verfehlt", { ...beteiligte, grund: ergebnis });
   }
 }
@@ -187,13 +189,13 @@ bausteinAnmelden("trefferwurf", { genauigkeit: "ganzzahl", effekt: "effekt", geg
   const quelle = entitaeten[kontext.quelleId];
   const tags = [...kontext.tags];
   for (const tag of tagsDesEffekts(spiel, parameter.effekt)) if (!tags.includes(tag)) tags.push(tag);
-  const { ergebnis, kritisch } = trefferwurf(spiel, { quelle, ziel, genauigkeit: parameter.genauigkeit, gegen: parameter.gegen, tags, kritchance: parameter.kritchance });
+  const { ergebnis, kritisch, trefferchance } = trefferwurf(spiel, { quelle, ziel, genauigkeit: parameter.genauigkeit, gegen: parameter.gegen, tags, kritchance: parameter.kritchance });
   if (ergebnis === "treffer") {
-    effektAnwenden(spiel, parameter.effekt, { ...kontext, kritisch });
+    effektAnwenden(spiel, parameter.effekt, { ...kontext, kritisch, trefferchance });
     hakenAusloesen(spiel, "nach_treffer", { ...beteiligteAus(kontext), kritisch });
     return;
   }
-  melden(spiel, "verfehlt", { quelle: quelle ? bezugAuf(quelle) : null, ziel: bezugAuf(ziel), grund: ergebnis });
+  melden(spiel, "verfehlt", { quelle: quelle ? bezugAuf(quelle) : null, ziel: bezugAuf(ziel), grund: ergebnis, trefferchance });
   hakenAusloesen(spiel, "verfehlt", { ...beteiligteAus(kontext), kritisch: false, grund: ergebnis });
   if (parameter.sonst) effektAnwenden(spiel, parameter.sonst, { ...kontext, kritisch: false });
 }, { brauchtZiel: true });
@@ -210,6 +212,7 @@ anmelden("haken", "vor_schaden", (spiel, kontext) => {
   if (kontext.kritisch) {
     const kritfaktor = Math.max(100, modifiziert(spiel, quelle, "kritfaktor", kampfregeln(spiel).kritfaktor, umstaende));
     kontext.menge = Math.round((kontext.menge * kritfaktor) / 100);
+    kontext.kritfaktor = kritfaktor;
   }
 }, { rang: RANG_ANGREIFER });
 

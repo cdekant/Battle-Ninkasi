@@ -1,10 +1,14 @@
 // Zielmodus (siehe docs/Architektur.md, Zielmodus): reine Tasten- und Mauslogik ohne DOM, damit sie testbar ist.
-// Anzeige-Zustand, nicht im Spielzustand: null oder { auswahl, zielart, cursor: { x, y } }
+// Anzeige-Zustand, nicht im Spielzustand: null oder { auswahl, zielart, cursor: { x, y }, platz? }
 //   auswahl wie in systeme/vorschau.js: { zweck: "werfen", gegenstandId } oder { zweck: "faehigkeit", faehigkeit },
 //   dazu { zweck: "untersuchen" } (Taste X): derselbe Cursor ohne Befehl, Enter tut nichts, Esc oder X schließt;
 //   was der Cursor zeigt, beschreibt systeme/untersuchen.js
 //   Bewegungstasten der Belegung verschieben den Cursor, die Maus setzt ihn; Tab springt zum nächsten Ziel in Sicht,
 //   Enter bestätigt (nur, wenn die Vorschau keinen Grund dagegen nennt), Esc bricht ab.
+//   platz: aus der Schnellleiste begonnen (eingabe/schnellleiste.js); dieselbe Taste noch einmal bestätigt (wie DCSS).
+// Vorbelegung des Cursors nach der zielvorgabe der Fähigkeit ("feind", "gefaehrte", "selbst"); ohne Angabe
+// "gefaehrte" bei den Tags heilung oder nuetzlich der Wirkung, sonst "feind"; Werfen zielt auf Feinde. Lebt das zuletzt
+// gewählte Ziel und ist in Sicht, gewinnt es (letztesZielId, Anzeige-Zustand in src/main.js).
 // Fähigkeiten ohne Ziel oder mit Zielart selbst brauchen keinen Zielmodus, sie werden sofort zum Befehl.
 
 import { spielerin, entitaetMitId, entitaetenAuf, istWesen } from "../kern/zustand.js";
@@ -13,7 +17,8 @@ import { istSichtbar } from "../systeme/sicht.js";
 import { beziehungZwischen, urheberVon } from "../systeme/fraktionen.js";
 import { faehigkeitFuer, faehigkeitPruefen } from "../systeme/faehigkeiten.js";
 import { zielvorschau } from "../systeme/vorschau.js";
-import { aktionDerTaste, befehlDerAktion } from "./aktionskatalog.js";
+import { hoechstwert } from "../kern/werte.js";
+import { AKTIONEN, aktionDerTaste, befehlDerAktion } from "./aktionskatalog.js";
 
 export const TASTEN_BESTAETIGEN = ["Enter", "NumpadEnter"];
 export const TASTE_NAECHSTES_ZIEL = "Tab";
@@ -38,8 +43,41 @@ export function zieleInSicht(spiel) {
     .sort((erstes, zweites) => quadratAbstand(erstes.position, ninkasi.position) - quadratAbstand(zweites.position, ninkasi.position) || erstes.id - zweites.id);
 }
 
+// Sichtbare Verbündete samt Ninkasi, verletzte zuerst, dann nach Abstand und ID
+function gefaehrtenInSicht(spiel) {
+  const zustand = spiel.zustand;
+  const ninkasi = spielerin(zustand);
+  const verletzt = (wesen) => (wesen.werte?.lp ? wesen.werte.lp.aktuell < hoechstwert(spiel, wesen, "lp") : false);
+  return Object.values(zustand.entitaeten)
+    .filter((entitaet) => istWesen(entitaet) && entitaet.position && istSichtbar(zustand, entitaet.position.x, entitaet.position.y)
+      && (entitaet.id === ninkasi.id || beziehungZwischen(spiel, urheberVon(ninkasi), entitaet) === "verbuendet"))
+    .sort((erstes, zweites) => verletzt(zweites) - verletzt(erstes)
+      || quadratAbstand(erstes.position, ninkasi.position) - quadratAbstand(zweites.position, ninkasi.position) || erstes.id - zweites.id);
+}
+
+// Art der Vorbelegung einer Auswahl: "feind", "gefaehrte" oder "selbst"
+export function zielvorgabeVon(spiel, auswahl) {
+  if (auswahl.zweck !== "faehigkeit") return "feind";
+  const definition = faehigkeitFuer(spiel, spielerin(spiel.zustand), auswahl.faehigkeit);
+  if (definition?.zielvorgabe) return definition.zielvorgabe;
+  const tags = [...(definition?.tags || []), ...(spiel.daten.effekte?.[definition?.wirkung]?.tags || [])];
+  return tags.includes("heilung") || tags.includes("nuetzlich") ? "gefaehrte" : "feind";
+}
+
+// Startfeld des Cursors: das zuletzt gewählte Ziel, wenn es lebt, in Sicht ist und zur Vorgabe passt, sonst nach der Vorgabe
+function startcursor(spiel, auswahl, letztesZielId) {
+  const ninkasi = spielerin(spiel.zustand);
+  const vorgabe = auswahl.zweck === "untersuchen" ? "feind" : zielvorgabeVon(spiel, auswahl);
+  if (vorgabe === "selbst") return { ...ninkasi.position };
+  const kandidaten = vorgabe === "gefaehrte" ? gefaehrtenInSicht(spiel) : zieleInSicht(spiel);
+  const letztes = letztesZielId != null ? kandidaten.find((wesen) => wesen.id === letztesZielId) : null;
+  const ziel = letztes ?? kandidaten[0];
+  return ziel ? { ...ziel.position } : { ...ninkasi.position };
+}
+
 // Beginnt den Zielmodus: { modus } oder { befehl } (kein Ziel nötig) oder { grund } (geht gar nicht)
-export function zielmodusBeginnen(spiel, auswahl) {
+// optionen: { platz? (Schnellleiste), letztesZielId? }
+export function zielmodusBeginnen(spiel, auswahl, { platz, letztesZielId } = {}) {
   const ninkasi = spielerin(spiel.zustand);
   let zielart;
   if (auswahl.zweck === "untersuchen") {
@@ -56,9 +94,8 @@ export function zielmodusBeginnen(spiel, auswahl) {
     if (grund && !GRUENDE_DES_ZIELS.includes(grund)) return { grund };
     zielart = definition.ziel;
   }
-  const erstesZiel = zieleInSicht(spiel)[0];
-  const cursor = erstesZiel ? { ...erstesZiel.position } : { ...ninkasi.position };
-  return { modus: { auswahl: structuredClone(auswahl), zielart, cursor } };
+  const cursor = startcursor(spiel, auswahl, letztesZielId);
+  return { modus: { auswahl: structuredClone(auswahl), zielart, cursor, ...(platz !== undefined && { platz }) } };
 }
 
 // Zielangabe für den Befehl aus dem Cursor, je nach Zielart
@@ -105,8 +142,10 @@ function naechstesZiel(spiel, modus) {
 export function zielmodusTaste(spiel, modus, tastencode, belegung) {
   if (tastencode === TASTE_ABBRECHEN || (tastencode === TASTE_UNTERSUCHEN && istUntersuchen(modus))) return { modus: null };
   if (TASTEN_BESTAETIGEN.includes(tastencode)) return zielmodusBestaetigen(spiel, modus);
+  const aktion = aktionDerTaste(belegung, tastencode);
+  if (modus.platz !== undefined && AKTIONEN[aktion]?.platz === modus.platz) return zielmodusBestaetigen(spiel, modus);
   if (tastencode === TASTE_NAECHSTES_ZIEL) return { modus: naechstesZiel(spiel, modus) };
-  const vorlage = befehlDerAktion(aktionDerTaste(belegung, tastencode));
+  const vorlage = befehlDerAktion(aktion);
   if (vorlage?.art === "bewegen") return { modus: cursorSetzen(spiel, modus, { x: modus.cursor.x + vorlage.dx, y: modus.cursor.y + vorlage.dy }) };
   return { modus };
 }

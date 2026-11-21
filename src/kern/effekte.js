@@ -14,6 +14,7 @@
 //   mittel:      { art: "angriff" | "faehigkeit" | "gegenstand" | "zustand" | "falle" | "gelaende", name } oder null
 //   tags:        z.B. ["feuer", "magie"]; die Tags des Effekts kommen dazu
 //   kritisch:    true, wenn ein Trefferwurf kritisch war (systeme/kampf.js); verschachtelte Effekte erben es
+//   trefferchance: Prozent des Trefferwurfs davor (nur für die Meldung schaden), sonst nicht gesetzt
 //   werte:       Ablage zwischen Schritten, über alle Verschachtelungen eines Effekts geteilt
 //                (summeSchaden, anzahlZiele, getroffeneIds, sprungnummer)
 // Ein Baustein mit brauchtZiel wird übersprungen, wenn das Ziel (bei auf: "quelle" die Quelle) fehlt; der Effekt läuft weiter.
@@ -49,6 +50,7 @@ export function kontextVervollstaendigen(spiel, kontext, effekt = {}) {
     mittel: kontext.mittel ?? null,
     tags,
     kritisch: kontext.kritisch ?? false,
+    ...(kontext.trefferchance !== undefined && { trefferchance: kontext.trefferchance }),
     werte: kontext.werte ?? {},
   };
 }
@@ -76,6 +78,7 @@ export function beteiligteAus(kontext) {
     mittel: kontext.mittel ?? null,
     tags: kontext.tags ?? [],
     kritisch: kontext.kritisch ?? false,
+    ...(kontext.trefferchance !== undefined && { trefferchance: kontext.trefferchance }),
   };
 }
 

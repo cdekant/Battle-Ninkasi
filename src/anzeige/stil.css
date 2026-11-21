@@ -1,5 +1,9 @@
-/* Oberfläche: Karte links, Seitenleiste rechts (etwa 400 px), Log unten (5 Zeilen, aufklappbar), Fenster über der Karte.
-   Farben vorläufig: Biertöne, Kupfer, Stein, dazu Signalfarben. */
+/* Oberfläche (docs/Oberflaeche.md, Layout): Zonen als CSS-Grid, Maße als Variablen in rem, so dass die Größe der
+   Oberfläche über die Schriftgröße von :root skaliert, getrennt vom Zoom der Tiles.
+   Variante A (Vorgabe): Karte, darunter das Log in zwei Spalten, Seitenleiste rechts, Bedienzeile unten.
+   Variante B: Log links über die ganze Höhe (Geschehen über Kampf), Karte in der Mitte, Seitenleiste rechts.
+   Die Variante steht als data-layout an #spiel (src/main.js, Einstellung layout).
+   Stil getrennt vom Layout: Farben als Variablen, vorläufig Biertöne, Kupfer, Stein, dazu Signalfarben. */
 
 :root {
   --grund: #0d0b09;
@@ -18,6 +22,25 @@
   --schlimm: #e5533d;
   --hinweis: #3af2ff;
   --log-zeile: 1.35em;
+  /* Maße der Zonen */
+  --breite-seite: 26rem;
+  --breite-log-links: 24rem;
+  --log-zeilen: 8;
+  --hoehe-log: calc(var(--log-zeilen) * var(--log-zeile) * 0.9 + 2.2rem);
+  --hoehe-bedienzeile: 3.6rem;
+  /* Kampflog: Farbfamilie nach der Seite, Ton nach dem Ausgang (anzeige/logzeilen.js) */
+  --ninkasi-treffer: #6fcf6f;
+  --ninkasi-krit: #b8ff8a;
+  --ninkasi-abgewehrt: #6f8f6f;
+  --verbuendet-treffer: #5aa9e6;
+  --verbuendet-krit: #5ff0e0;
+  --verbuendet-abgewehrt: #5f7f99;
+  --gegner-treffer: #e5533d;
+  --gegner-krit: #ff9a3c;
+  --gegner-abgewehrt: #9a6a62;
+  --gegner-ankuendigung: #f2d64b;
+  --gegner-magisch: #b77cf0;
+  --neutral: #9a9a9a;
   font-family: "Segoe UI", "DejaVu Sans", system-ui, sans-serif;
   font-size: 15px;
 }
@@ -34,14 +57,24 @@ html, body {
 
 #spiel {
   display: grid;
-  grid-template-columns: 1fr 400px;
-  grid-template-rows: 1fr auto;
   height: 100vh;
+  grid-template-columns: 1fr var(--breite-seite);
+  grid-template-rows: 1fr var(--hoehe-log) var(--hoehe-bedienzeile);
+  grid-template-areas:
+    "karte seite"
+    "log seite"
+    "bedien bedien";
+}
+#spiel[data-layout="b"] {
+  grid-template-columns: var(--breite-log-links) 1fr var(--breite-seite);
+  grid-template-rows: 1fr var(--hoehe-bedienzeile);
+  grid-template-areas:
+    "log karte seite"
+    "log bedien bedien";
 }
 
 #karte {
-  grid-column: 1;
-  grid-row: 1;
+  grid-area: karte;
   position: relative;
   overflow: hidden;
   background: #000;
@@ -50,9 +83,13 @@ html, body {
 
 #karte-canvas { display: block; position: absolute; inset: 0; }
 
+/* Effektschicht über der Karte und unter Tooltip und Fenstern: vorbereitet für Metaeffekte (Punkt 12), noch leer */
+#effektschicht { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+
 /* Tooltip über der Karte (main.js, anzeige/oberflaeche.js tooltipHtml); fängt keine Maus ab */
 #tooltip {
   position: absolute;
+  z-index: 2;
   max-width: 280px;
   padding: 4px 8px;
   background: rgba(26, 21, 16, 0.92);
@@ -88,6 +125,10 @@ html, body {
   box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.6);
 }
 .fenster-rahmen.schmal { width: min(100%, 600px); }
+.fenster-rahmen.breit { width: min(100%, 1100px); }
+.fenster-rahmen .verlauf { font-size: 0.95em; }
+.fenster-rahmen .verlauf-filter span { margin-right: 10px; }
+.fenster-rahmen .verlauf-filter span.gewaehlt { color: var(--bier); }
 .fenster-rahmen p.thema { margin: 4px 0; max-width: 70em; }
 .fenster-rahmen h1 { margin: 0; padding: 10px 16px; font-size: 1.2em; color: var(--bier); border-bottom: 1px solid var(--linie); letter-spacing: 0.04em; }
 .fenster-rahmen h2 { margin: 0 0 6px; font-size: 1.05em; color: var(--bier); }
@@ -120,14 +161,15 @@ html, body {
 .fenster-rahmen .wert-zahl { font-variant-numeric: tabular-nums; text-align: right; }
 
 #seitenleiste {
-  grid-column: 2;
-  grid-row: 1 / span 2;
+  grid-area: seite;
+  min-height: 0;
   background: var(--flaeche);
   border-left: 1px solid var(--linie);
   padding: 16px 20px;
   overflow-y: auto;
 }
 
+#seitenleiste .kopf { margin: -4px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--linie); color: var(--leise); font-size: 0.9em; }
 #seitenleiste h1 { margin: 0 0 12px; font-size: 1.5em; color: var(--bier); letter-spacing: 0.04em; }
 #seitenleiste h2 { margin: 18px 0 6px; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--leise); }
 #seitenleiste ul { list-style: none; margin: 0; padding: 0; }
@@ -161,24 +203,87 @@ html, body {
 .teilstriche span:last-child { transform: translateX(-100%); }
 .wert.klein .balken { height: 6px; }
 
-.fuss { margin-top: 24px; font-size: 0.8em; color: var(--leise); line-height: 1.5; }
-.tasten { margin-top: 8px; }
 .leise { color: var(--leise); }
 
+/* Log in zwei Spalten (anzeige/log.js): Zug, Symbol, Text, rechtsbündig die Zahlen; neueste Zeile unten */
 #log {
-  grid-column: 1;
-  grid-row: 2;
+  grid-area: log;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 0;
   background: var(--flaeche);
   border-top: 1px solid var(--linie);
-  padding: 6px 12px;
-  height: calc(5 * var(--log-zeile) + 12px);
+  font-size: 0.9em;
   line-height: var(--log-zeile);
-  overflow: hidden;
 }
-#log.offen { height: 40vh; overflow-y: auto; }
-#log .gut { color: var(--gut); }
-#log .schlimm { color: var(--schlimm); }
-#log .hinweis { color: var(--hinweis); font-weight: bold; }
+#spiel[data-layout="b"] #log { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; border-top: none; border-right: 1px solid var(--linie); }
+.log-spalte { display: flex; flex-direction: column; min-height: 0; min-width: 0; padding: 2px 10px 4px; }
+.log-spalte + .log-spalte { border-left: 1px solid var(--linie); }
+#spiel[data-layout="b"] .log-spalte + .log-spalte { border-left: none; border-top: 1px solid var(--linie); }
+.log-zeilen { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
+/* Feste Spalten: Zug, Symbol, Text; im Kampf dazu Chance, Schaden, Krit, Abzug (anzeige/logzeilen.js ZAHLENSPALTEN) */
+.logzeile, .logkopf { display: grid; grid-template-columns: 3.2em 1.2em minmax(0, 1fr); column-gap: 4px; align-items: baseline; }
+.logzeile.seite-ninkasi, .logzeile.seite-verbuendet, .logzeile.seite-gegner, .logzeile.seite-neutral, .logkopf.kampf {
+  grid-template-columns: 3.2em 1.2em minmax(0, 1fr) 3.4em 3.4em 3em 3.4em;
+}
+.logkopf { font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.06em; color: var(--leise); border-bottom: 1px solid var(--linie); }
+.logkopf .zahl { text-align: right; }
+.logzeile .text { overflow: hidden; text-overflow: ellipsis; }
+.logzeile .zahl { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.logzeile.neuer-zug { border-top: 1px solid rgba(58, 47, 36, 0.8); }
+.logzeile .zug { color: var(--leise); font-size: 0.8em; text-align: right; font-variant-numeric: tabular-nums; }
+.logzeile .symbol { text-align: center; }
+.logzeile .anzahl { color: var(--leise); }
+.logzeile .zahl.chance { color: var(--leise); }
+.logzeile .zahl.abzug { color: var(--mp); }
+.logzeile .zahl.krit { font-weight: bold; }
+.logzeile.alter-1 { opacity: 0.85; }
+.logzeile.alter-2 { opacity: 0.7; }
+.logzeile.alter-3 { opacity: 0.58; }
+.logzeile.alter-4 { opacity: 0.48; }
+/* Geschehen nach Art */
+.logzeile.art-gefahr { color: var(--schlimm); }
+.logzeile.art-heilung, .logzeile.art-lernen { color: var(--gut); }
+.logzeile.art-pegel { color: var(--bier); }
+.logzeile.art-fund { color: var(--kupfer); }
+.logzeile.art-hinweis { color: var(--leise); }
+/* Kampf nach Seite und Ton */
+.logzeile.seite-ninkasi { color: var(--ninkasi-treffer); }
+.logzeile.seite-ninkasi.ton-krit { color: var(--ninkasi-krit); font-weight: bold; }
+.logzeile.seite-ninkasi.ton-abgewehrt { color: var(--ninkasi-abgewehrt); }
+.logzeile.seite-verbuendet { color: var(--verbuendet-treffer); }
+.logzeile.seite-verbuendet.ton-krit { color: var(--verbuendet-krit); font-weight: bold; }
+.logzeile.seite-verbuendet.ton-abgewehrt { color: var(--verbuendet-abgewehrt); }
+.logzeile.seite-gegner { color: var(--gegner-treffer); }
+.logzeile.seite-gegner.magisch { color: var(--gegner-magisch); }
+.logzeile.seite-gegner.ton-krit { color: var(--gegner-krit); font-weight: bold; }
+.logzeile.seite-gegner.ton-abgewehrt { color: var(--gegner-abgewehrt); }
+.logzeile.seite-gegner.ton-ankuendigung { color: var(--gegner-ankuendigung); background: rgba(242, 214, 75, 0.08); }
+.logzeile.seite-neutral { color: var(--neutral); }
+
+/* Bedienzeile (anzeige/bedienzeile.js): Schnellleiste unter der Karte, Knöpfe unter der Seitenleiste */
+#bedienzeile {
+  grid-area: bedien;
+  display: grid;
+  grid-template-columns: 1fr var(--breite-seite);
+  min-height: 0;
+  background: var(--flaeche);
+  border-top: 1px solid var(--linie);
+}
+#bedienzeile button { font: inherit; color: var(--text); background: var(--grund); border: 1px solid var(--linie); cursor: pointer; }
+#bedienzeile button:hover { border-color: var(--kupfer); }
+.schnellleiste { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; padding: 4px 8px; min-width: 0; }
+.platz { position: relative; display: flex; align-items: center; gap: 4px; padding: 0 6px; min-width: 0; font-size: 0.8em; }
+.platz.leer { opacity: 0.35; cursor: default; }
+.platz.grau { color: var(--leise); }
+.platz.abklingend .platz-name { opacity: 0.5; }
+.platz-taste { color: var(--kupfer); font-family: monospace; }
+.platz-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+.platz-zahl { font-variant-numeric: tabular-nums; }
+.platz-zahl.abklingzeit { color: var(--schlimm); font-weight: bold; }
+.knoepfe { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr 1fr; gap: 3px; padding: 3px 8px; border-left: 1px solid var(--linie); }
+#bedienzeile .knopf { font-size: 0.75em; padding: 0 4px; white-space: nowrap; overflow: hidden; }
+.knopf-taste { color: var(--kupfer); font-family: monospace; }
 
 #fehler {
   position: fixed;

@@ -63,6 +63,7 @@ bausteinAnmelden("schaden", { art: "schadensart", ...MENGE }, (spiel, kontextDes
   melden(spiel, "schaden", {
     quelle: quelle ? bezugAuf(quelle) : null, ziel: bezugAuf(ziel), menge: schadenspunkte, ursache: kontext.ursache, schadensart: hakenKontext.schadensart,
     kritisch: beteiligte.kritisch, ruestungAbzug: hakenKontext.ruestungAbzug ?? 0, widerstanden: hakenKontext.widerstanden ?? 0, immun: Boolean(hakenKontext.immun),
+    trefferchance: beteiligte.trefferchance ?? null, kritfaktor: hakenKontext.kritfaktor ?? null,
   });
   if (schadenspunkte > 0) hakenAusloesen(spiel, "nach_schaden", { ...beteiligte, schadensart: hakenKontext.schadensart, menge: schadenspunkte });
 }, { brauchtZiel: true });

@@ -23,6 +23,9 @@ export default {
   // Bewegung, siehe src/systeme/verschieben.js
   bewegung: {
     beimFestsitzen: "eingeklemmt", // Effekt auf ein Wesen in Gelände, das es nicht betreten kann, ohne eigenes beimFestsitzen
+    // Steht ein Wesen, das kein Ziel ist, auf dem Weg eines Jägers, geht er um alle Wesen herum, wenn dieser Weg
+    // höchstens so viele Felder länger ist; sonst wartet er (src/ki/jagen.js, Vorbild Brogue)
+    umwegHoechstens: 4,
   },
   // Population, siehe src/systeme/beschwoerung.js und src/welt/ebene.js (Tabellen in daten/populationen.js)
   population: {

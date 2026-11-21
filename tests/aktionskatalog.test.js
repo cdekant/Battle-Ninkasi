@@ -4,7 +4,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import texteDe from "../sprache/de/texte.js";
 import belegung from "../src/eingabe/belegung.js";
-import { AKTIONEN, GRUPPEN, aktionDerTaste, befehlDerAktion, tastenDerAktion } from "../src/eingabe/aktionskatalog.js";
+import { AKTIONEN, GRUPPEN, KNOEPFE, PLAETZE_DER_LEISTE, aktionDerTaste, befehlDerAktion, tastenDerAktion } from "../src/eingabe/aktionskatalog.js";
 import { uebersetzen } from "../src/eingabe/eingabe.js";
 import { hilfeGruppen, hilfeTaste } from "../src/eingabe/hilfe.js";
 import { tastenname } from "../src/anzeige/fenster.js";
@@ -39,7 +39,12 @@ test("Taste zu Aktion: Zeichen vor Tasten, weitere Tasten wirken mit", () => {
   assert.equal(aktionDerTaste(belegung, "Minus", "?"), "hilfe", "Umschalt+ß auf deutscher Tastatur");
   assert.equal(aktionDerTaste(belegung, "Slash", "?"), "hilfe", "Umschalt+/ auf US-Tastatur");
   assert.equal(aktionDerTaste(belegung, "Minus", "ß"), "zoom_raus", "die Lage von - auf US-Tastatur");
-  assert.equal(aktionDerTaste(belegung, "KeyY", "z"), "faehigkeiten");
+  assert.equal(aktionDerTaste(belegung, "KeyY", "z"), "bewegen_nw", "vi nach Lage: Aufschrift Z der deutschen Tastatur");
+  assert.equal(aktionDerTaste(belegung, "KeyF", "f"), "faehigkeiten");
+  assert.equal(aktionDerTaste(belegung, "Period", "."), "warten");
+  assert.equal(aktionDerTaste(belegung, "IntlBackslash", ">"), "treppe");
+  assert.equal(aktionDerTaste(belegung, "ArrowLeft"), "bewegen_w");
+  assert.equal(aktionDerTaste(belegung, "Digit0", "0"), "schnellplatz_10");
   assert.equal(aktionDerTaste(belegung, "KeyC"), "charakter");
   assert.equal(aktionDerTaste(belegung, "KeyQ", "q"), null);
 });
@@ -49,17 +54,30 @@ test("Übersetzen: Aktion mit Befehl, ohne Befehl, mit Strg nichts", () => {
   assert.deepEqual(uebersetzen({ code: "KeyI", key: "i" }, belegung, null), { aktion: "inventar" });
   assert.equal(uebersetzen({ code: "KeyI", key: "i", ctrlKey: true }, belegung, null), null);
   assert.equal(uebersetzen({ code: "KeyQ", key: "q" }, belegung, null), null);
+  assert.deepEqual(uebersetzen({ code: "KeyL", key: "L", shiftKey: true }, belegung, null), { aktion: "laufen", richtung: { dx: 1, dy: 0 } }, "Umschalt plus Richtung läuft");
+  assert.deepEqual(uebersetzen({ code: "KeyI", key: "I", shiftKey: true }, belegung, null), { aktion: "inventar" }, "Umschalt ändert nur Bewegungen");
+});
+
+test("Knöpfe der Bedienzeile: acht Aktionen des Katalogs mit Text, Plätze der Leiste 0 bis 9", () => {
+  assert.equal(KNOEPFE.length, 8);
+  for (const aktion of KNOEPFE) assert.ok(AKTIONEN[aktion]?.knopf in texteDe, `Knopf ${aktion}`);
+  const plaetze = Object.values(AKTIONEN).filter((eintrag) => eintrag.platz !== undefined).map((eintrag) => eintrag.platz);
+  assert.deepEqual(plaetze, Array.from({ length: PLAETZE_DER_LEISTE }, (_, platz) => platz));
 });
 
 test("Hilfe: Gruppen aus dem Katalog, Tastennamen, schließen mit Esc oder ?", () => {
   const gruppen = hilfeGruppen(belegung);
   assert.deepEqual(gruppen.map(({ gruppe }) => gruppe), GRUPPEN);
   const anzahl = gruppen.reduce((summe, { eintraege }) => summe + eintraege.length, 0);
-  assert.equal(anzahl, Object.keys(AKTIONEN).length, "jede Aktion steht in der Hilfe");
+  assert.equal(anzahl, Object.keys(AKTIONEN).length - PLAETZE_DER_LEISTE + 1, "jede Aktion steht in der Hilfe, die Plätze der Leiste in einer Zeile");
+  const leiste = gruppen.find(({ gruppe }) => gruppe === "schnellleiste").eintraege[0];
+  assert.deepEqual(leiste.tasten.map((taste) => tastenname(texte, taste)).join(""), "1234567890");
+  const laufen = gruppen.find(({ gruppe }) => gruppe === "bewegen").eintraege.find(({ aktion }) => aktion === "laufen");
+  assert.equal(tastenname(texte, laufen.tasten[0]), "Umschalt + Richtung");
   const zoom = gruppen.find(({ gruppe }) => gruppe === "anzeige").eintraege.find(({ aktion }) => aktion === "zoom_raus");
   assert.deepEqual(zoom.tasten.map((taste) => tastenname(texte, taste)), ["Num -", "-"], "die US-Lage steht nicht in der Hilfe");
-  assert.equal(tastenname(texte, { code: "KeyY" }), "Z");
-  assert.equal(tastenname(texte, { code: "KeyG" }), "G");
+  assert.equal(tastenname(texte, { code: "KeyY" }), "z");
+  assert.equal(tastenname(texte, { code: "KeyG" }), "g", "klein, wie ohne Umschalt getippt");
   assert.equal(tastenname(texte, { code: "Numpad7" }), "Num 7");
   assert.equal(tastenname(texte, { code: "Digit3" }), "3");
   assert.equal(tastenname(texte, { zeichen: "?" }), "?");

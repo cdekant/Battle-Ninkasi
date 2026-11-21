@@ -13,10 +13,11 @@ function vollGerastet(spiel, einstellungen) {
   return einstellungen.rastenBis.every((wertName) => !hatWert(ninkasi, wertName) || ninkasi.werte[wertName].aktuell >= hoechstwert(spiel, ninkasi, wertName));
 }
 
-// Gibt { ablauf } oder { grund } zurück; grund: "vorbei" | "feinde_in_sicht" | "schon_voll"
+// Gibt { ablauf } oder { grund } zurück; grund: "vorbei" | "feinde_in_sicht" (nur ohne rastenTrotzFeinden) | "schon_voll"
+// Mit Feinden in Sicht hält es wie die Reise erst bei einem neuen Feind oder bei Schaden (rastenHalt)
 export function rastenBeginnen(spiel, einstellungen) {
   if (spiel.zustand.vorbei) return { grund: "vorbei" };
-  if (sichtbareFeinde(spiel).length) return { grund: "feinde_in_sicht" };
+  if (!einstellungen.rastenTrotzFeinden && sichtbareFeinde(spiel).length) return { grund: "feinde_in_sicht" };
   if (vollGerastet(spiel, einstellungen)) return { grund: "schon_voll" };
   return { ablauf: { lage: lageErfassen(spiel), schrittzahl: 0 } };
 }

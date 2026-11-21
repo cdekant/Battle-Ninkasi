@@ -1,6 +1,6 @@
 # Battle Ninkasi - Oberfläche
 
-Stand: 2026-11-20, Entwurf, nicht umgesetzt, Entscheidungen getroffen
+Stand: 2026-11-21, Entwurf, Entscheidungen getroffen, teilweise umgesetzt (siehe Stand der Umsetzung)
 
 Schema der Oberfläche: Prinzipien, Layout, Leisten, Log, Fenster, Tastatur, Einstellungen. Alles hier ist Anzeige und Eingabe; die Logik kennt weder Fenster noch Leisten und bekommt nur gewöhnliche Befehle. Was heute umgesetzt ist, beschreibt [Architektur.md](Architektur.md) (Anzeige, Oberfläche, Eingabe, Zielmodus, Untersuchen); Bewegung und Effekte stehen in [Animationen.md](Animationen.md), die Arbeitsliste in Punkt 11 von [Systemausbau.md](Systemausbau.md). Entschiedenes und Offenes steht am Ende unter Entscheidungen.
 
@@ -56,7 +56,8 @@ Die Darstellung kann weitgehend neu entstehen, die Systeme darunter bleiben:
 
 + Bleibt: Logik und Meldungen, die Auswahl des Wahrnehmbaren (`src/systeme/wahrnehmbar.js`), Vorschau und Untersuchen (`vorschau.js`, `untersuchen.js`), die DOM-freien Kerne der Eingabe (Zielmodus, Inventar- und Fähigkeitenfenster, Reise, Rasten, Erkunden), Pegelanzeige, Texte und Sprachdateien, Renderer und Kamera
 + Umgesetzt in 0.27.0: Aktionskatalog (`src/eingabe/aktionskatalog.js`) mit Belegung Taste zu Aktion, Fensterstapel über der Karte (`src/eingabe/fenster.js`, `src/anzeige/fenster.js`) nach der Grammatik unten, Inventar und Fähigkeiten als Fenster, Charakter und Skills (C), Charaktererstellung vor jedem Lauf, Hilfe (?) aus dem Katalog; die Seitenleiste zeigt freie EP und bis zur Schnellleiste eine Kurzliste der Fähigkeiten, siehe Fenster in [Architektur.md](Architektur.md)
-+ Neu: Aufbau der Seite (`index.html`, `stil.css`), `src/anzeige/oberflaeche.js` als Seitenleiste, die Darstellung des Logs (`src/anzeige/log.js` behält die Übersetzung der Meldungen), Bedienzeile mit Schnellleiste und Knöpfen, Minikarte, Spielmenü, Einstellungen, Tastenbelegung
++ Umgesetzt in 0.28.0: Aufbau der Seite (`index.html`, `stil.css`) mit Varianten A und B, Seitenleiste neu geordnet, Log in zwei Spalten (`src/anzeige/logzeilen.js`, `src/anzeige/log.js`), Bedienzeile mit Schnellleiste in der Grundform und Knöpfen, Esc-Kette, Spielmenü, Bestätigung, Verlauf, vi-Belegung, Laufen, Rechtsklick; siehe Stand der Umsetzung
++ Noch neu zu bauen: Minikarte, Einstellungen, Tastenbelegung als Seite, Titel
 
 ## Bildschirme
 
@@ -161,6 +162,8 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 + Arten mit Farbe und Symbol: Gefahr, Schaden genommen, Schaden ausgeteilt, Heilung, Pegel, Fund, Gespräch, Hinweis
 + Verlauf als Fenster (Strg+P wie in vielen Roguelikes, oder Tab): ganze Länge, Filter nach Art, Suche mit /
 + Das Log zeigt weiterhin nur, was Ninkasi wahrnimmt
++ Farben im Kampf nach der Seite, die handelt: Ninkasi in Grüntönen, Verbündete in Blautönen, Gegner in Rot, Orange, Gelb und Lila, Neutrale grau; der Ton folgt dem Ausgang (Treffer, Krit hell und fett, abgewehrt gedämpft), bei Gegnern Gelb für angekündigte Angriffe und Lila für Psi und Magie; Symbole bleiben, damit nichts nur an der Farbe hängt
++ Zahlen im Kampf in festen Spalten mit Kopfzeile: Chance, Schaden, Krit (Faktor), Abzug (Rüstung und Widerstand zusammen, die Aufteilung im Tooltip); Reflektieren und Absorbieren bekommen ihren Platz, sobald es sie gibt
 
 ## Fenster
 
@@ -205,30 +208,30 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 
 Vorschlag für die Vorgabe, Buchstaben nach der deutschen Aufschrift:
 
-| Taste | Aktion | heute |
+| Taste | Aktion | Stand |
 |:--|:--|:--|
-| h j k l, Z u b n | Bewegen (Z ist die Lage von y) | Ziffernblock |
-| Umschalt + Richtung | Laufen | neu |
-| . | Warten | Ziffernblock 5 |
-| g | Aufheben | g |
-| d | Fallenlassen | im Inventar |
-| t | Trinken (wählt im Zweifel) | t |
-| w | Werfen (fragt nach dem Gegenstand) | w im Inventar |
-| i | Inventar | i |
-| f | Fähigkeiten | z |
-| c | Charakter und Skills | neu |
-| x | Untersuchen | x |
-| r | Rasten | r |
-| o | Erkunden | o |
-| m | Übersichtskarte | neu |
-| < > | Treppe | <> |
-| Leertaste | Fortsetzen | Leertaste |
-| 1 bis 0 | Schnellleiste | neu |
-| Tab bzw. Strg+P | Log aufklappen bzw. Verlauf | Tab |
-| : | Befehlszeile | neu |
-| ? | Hilfe | neu |
-| Esc | Kette (siehe oben) | Reise abbrechen |
-| + - | Zoom | + - |
+| h j k l, z u b n | Bewegen (z ist die Lage von y) | 0.28.0, dazu Ziffernblock und Pfeile |
+| Umschalt + Richtung | Laufen | 0.28.0 |
+| . | Warten | 0.28.0, dazu Ziffernblock 5 |
+| g | Aufheben | umgesetzt |
+| d | Fallenlassen | im Inventar (f), als eigene Taste mit 0.29.0 |
+| t | Trinken (wählt im Zweifel) | umgesetzt |
+| w | Werfen (fragt nach dem Gegenstand) | im Inventar, als eigene Taste mit 0.29.0 |
+| i | Inventar | umgesetzt |
+| f | Fähigkeiten | 0.28.0 |
+| c | Charakter und Skills | 0.27.0 |
+| x | Untersuchen | umgesetzt |
+| r | Rasten | umgesetzt |
+| o | Erkunden | umgesetzt |
+| m | Übersichtskarte | 0.29.0 |
+| < > | Treppe | 0.28.0 nach dem Zeichen |
+| Leertaste | Fortsetzen | umgesetzt |
+| 1 bis 0 | Schnellleiste | 0.28.0 |
+| Tab | Verlauf | 0.28.0 |
+| : | Befehlszeile | 0.29.0 |
+| ? | Hilfe | 0.27.0 |
+| Esc | Kette (siehe oben) | 0.28.0 |
+| + - | Zoom | umgesetzt |
 
 + Die Leisten wechselt Umschalt+1 bis 5; Strg+1 bis 5 schied aus, weil es im Browser die Reiter wechselt und sich nicht sicher abfangen lässt
 
@@ -294,7 +297,24 @@ Als Einstellung umschaltbar:
 
 + Layout-Variante, Seite der Seitenleiste, Lage und Zeilen des Logs, Minikarte, Schnellleiste an oder aus, Bestätigungen, Tooltip
 
+## Stand der Umsetzung
+
+Aufgeteilt am 2026-11-21 in drei Versionen, damit jede für sich im Browser prüfbar ist:
+
++ 0.28.0 Layout (umgesetzt): Grid mit Variante A und B (bis zum Einstellungsfenster im Spielmenü umgeschaltet), Effektschicht, Seitenleiste mit Kopf (Tiefe, Zug), Gefährten und Wesen nach Abstand, Log in zwei Spalten mit Zugmarke, Symbolen, Zahlen, Zusammenfassen, Verblassen und Farben nach Seite, Verlauf mit Filter, Bedienzeile mit acht Knöpfen und der Schnellleiste in der Grundform (automatisch nach Lernreihenfolge, danach Getränkearten; nicht umbelegbar, nicht gespeichert), Zielvorgabe und Bestätigen mit derselben Ziffer, Esc-Kette, Spielmenü mit Bestätigung, vi-Belegung samt Pfeilen und Zeichen, Laufen mit Umschalt, Rechtsklick untersucht; Reise, Laufen und Erkunden halten nur bei neuen Feinden
++ 0.29.0 Schnellleiste und Speichern: Umbelegen und Ziehen, mehrere Leisten (Umschalt+1 bis 5), Wurfwaffen, graue Plätze mit Anzahl 0, Spielstand im Browser automatisch gespeichert samt Teil `oberflaeche`, Minikarte, Übersichtskarte (m), gegenseitiges Hervorheben von Seitenleiste und Karte, Befehlszeile (:), d und w als eigene Tasten, Suche im Verlauf (/)
++ 0.30.0 Einstellungen und Titel: Einstellungsfenster samt Seite zur Tastenbelegung, Layout kompakt, Titelbildschirm (Fortsetzen braucht das Speichern aus 0.29.0)
++ Später: Halten an Abzweigungen beim Laufen (wie DCSS), Mindestpegel als Kante an der Schnellleiste, Gamepad
+
 ## Entscheidungen
+
+Entschieden am 2026-11-21:
+
++ Aufteilung in 0.28.0, 0.29.0 und 0.30.0 (siehe Stand der Umsetzung)
++ Schnellleiste bis 0.29.0 automatisch: Fähigkeiten in Lernreihenfolge, danach jede Getränkeart; Wurfwaffen erst mit dem Umbelegen
++ Kampfspalte: Schaden, Krit samt Faktor, Ausweichen, Blocken, Rüstung, Widerstand, Immunität, Tod anderer, Fähigkeiten, angekündigte Angriffe; Reflektieren und Absorbieren, sobald es sie gibt; Farben nach der Seite (siehe Log)
++ Laufen mit Umschalt hält wie die Reise; Reise, Laufen und Erkunden beginnen auch mit Feinden in Sicht und halten nur bei einem neuen Feind; wer aus der Sicht gerät und wieder auftaucht, zählt als neu (wie Brogue); auch Rasten (r) beginnt mit bekannten Feinden in Sicht und hält bei einem neuen Feind oder Schaden
++ Beenden im Spielmenü schließt das Fenster (`window.close()`, im Fenster aus `starten.py` erlaubt), sonst ein Hinweis auf Strg+W
 
 Entschieden am 2026-11-20:
 
@@ -305,7 +325,7 @@ Entschieden am 2026-11-20:
 + Ablage der Schnellleiste: ein eigener Teil `oberflaeche` im Spielstand (Belegung der Leisten, später weitere Anzeigedaten des Laufs); der Spielstand besteht sonst aus Version, Startwert, Startoptionen und Befehlsliste und wird beim Laden nachgespielt, der Teil `oberflaeche` wird mitgespeichert und beim Laden wieder eingesetzt, aber nicht nachgespielt; die Logik liest ihn nie
 + Rechtsklick untersucht (siehe Maus)
 + Metaeffekte als Idee festgehalten und vorbereitet (Effektschicht, Schalter in den Einstellungen), umgesetzt mit der Darstellung (Punkt 12)
-+ Reihenfolge: 0.27.0 Aktionskatalog, Fensterstapel und Skillfenster; 0.28.0 neues Layout mit Bedienzeile (Schnellleiste und Knöpfe), Log in Spalten, Minikarte, Esc-Kette, Spielmenü, Einstellungen und vi-Belegung; die Einordnung neben den übrigen Schwerpunkten (Zustände im Inhalt, Licht, Brausystem) wird bei der weiteren Planung abgestimmt
++ Reihenfolge: 0.27.0 Aktionskatalog, Fensterstapel und Skillfenster; danach das neue Layout, am 2026-11-21 auf 0.28.0 bis 0.30.0 aufgeteilt; die Einordnung neben den übrigen Schwerpunkten (Zustände im Inhalt, Licht, Brausystem) wird bei der weiteren Planung abgestimmt
 + Knöpfe für die Maus in einer Bedienzeile am unteren Rand mit der Schnellleiste, unten in der Seitenleiste; keine Kopfleiste (siehe Bedienzeile)
 
 Offen ist derzeit nichts; neue Fragen kommen hierher.

@@ -17,6 +17,9 @@ import { UNTERBRECHUNGSGRUENDE } from "../systeme/laufendeAktionen.js";
 import { BEWEGUNGSARTEN } from "../welt/karte.js";
 import { HOECHSTE_STUFE, ANZAHL_TIERS, eigenschaftenPruefen } from "../systeme/skills.js";
 
+// Vorbelegung des Cursors im Zielmodus (eingabe/zielmodus.js)
+const ZIELVORGABEN = ["feind", "gefaehrte", "selbst"];
+
 const istObjekt = (wert) => wert && typeof wert === "object" && !Array.isArray(wert);
 
 // Tiefes Zusammenführen: Objekte werden gemischt, alles andere (auch Arrays) ersetzt
@@ -219,7 +222,7 @@ function pruefeRegeln(daten, regeln, fehler) {
     }
   }
   if (!istObjekt(regeln.bewegung)) fehler.push("regeln.bewegung fehlt");
-  else pruefeParameter(daten, { beimFestsitzen: "effekt" }, regeln.bewegung, "regeln.bewegung", fehler);
+  else pruefeParameter(daten, { beimFestsitzen: "effekt", umwegHoechstens: "ganzzahl?" }, regeln.bewegung, "regeln.bewegung", fehler);
   if (!istGanzzahl(regeln.werfen?.reichweite) || regeln.werfen.reichweite < 1) fehler.push("regeln.werfen.reichweite muss eine ganze Zahl >= 1 sein");
   if (!istGanzzahl(regeln.population?.hoechstWesen) || regeln.population.hoechstWesen < 1) fehler.push("regeln.population.hoechstWesen muss eine ganze Zahl >= 1 sein");
   if (!istProzent(regeln.population?.tieferChance)) fehler.push("regeln.population.tieferChance muss eine ganze Zahl von 0 bis 100 sein");
@@ -553,6 +556,8 @@ function pruefeFaehigkeit(daten, sprache, name, faehigkeit, fehler) {
   if (faehigkeit.ankuendigung !== undefined) pruefeText(sprache.texte, faehigkeit.ankuendigung, `${ort}.ankuendigung`, fehler);
   if ((faehigkeit.ankuendigung !== undefined || faehigkeit.unterbrechbar !== undefined) && faehigkeit.dauer === undefined) fehler.push(`${ort}: ankuendigung und unterbrechbar gibt es nur mit dauer`);
   if (faehigkeit.risiko !== undefined && !daten.risiken?.[faehigkeit.risiko]) fehler.push(`${ort}: Risikotabelle "${faehigkeit.risiko}" gibt es nicht`);
+  // Vorbelegung des Cursors im Zielmodus (eingabe/zielmodus.js); nur Anzeige
+  if (faehigkeit.zielvorgabe !== undefined && !ZIELVORGABEN.includes(faehigkeit.zielvorgabe)) fehler.push(`${ort}: zielvorgabe muss eines von ${ZIELVORGABEN.join(", ")} sein`);
   // Skill, Anforderung und Ausbau, siehe systeme/faehigkeiten.js
   if (faehigkeit.skill !== undefined) {
     if (!istObjekt(faehigkeit.skill)) fehler.push(`${ort}: skill muss { name, stufe, risiko } sein`);

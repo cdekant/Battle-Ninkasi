@@ -166,3 +166,21 @@ test("Furcht an Ninkasi: die KI übernimmt und flieht vor der Urheberin, danach 
   assert.deepEqual(ninkasi.position, { x: 6, y: 1 }, "drei Schritte weg, jeweils auf das fernste Feld");
   assert.equal(befehlGeben(spiel, { art: "warten" }).ok, true);
 });
+
+test("Jagen: das hintere von zwei Bakterien in einer Linie geht um das vordere herum, im engen Gang wartet es", () => {
+  const spiel = spielBauen();
+  const ninkasi = ninkasiAmZug(spiel, 1, 2);
+  bakterium(spiel, 2, 2);
+  const hinten = bakterium(spiel, 3, 2);
+  const jagen = holen("ki", "jagen");
+  const befehl = jagen(spiel, hinten, hinten.ki);
+  assert.equal(befehl.art, "bewegen", "geht, statt zu warten");
+  assert.equal(befehl.dx, -1, "näher an Ninkasi heran");
+  assert.notEqual(befehl.dy, 0, "seitlich am vorderen vorbei");
+  assert.ok(ninkasi);
+  const gang = spielBauen(["#######", "#.....#", "#######"]);
+  ninkasiAmZug(gang, 1, 1);
+  bakterium(gang, 2, 1);
+  const imGang = bakterium(gang, 3, 1);
+  assert.equal(holen("ki", "jagen")(gang, imGang, imGang.ki).art, "warten", "kein Weg herum");
+});

@@ -26,15 +26,22 @@ import { feldAnPixel, klickDeuten } from "./eingabe/maus.js";
 import { reiseBeginnen, naechsterReiseschritt } from "./eingabe/reise.js";
 import { rastenBeginnen, naechsterRastschritt } from "./eingabe/rasten.js";
 import { erkundenBeginnen, naechsterErkundungsschritt } from "./eingabe/erkunden.js";
+import { laufenBeginnen, naechsterLaufschritt } from "./eingabe/laufen.js";
+import { platzAusloesen } from "./eingabe/schnellleiste.js";
+import { escSchritt } from "./eingabe/esckette.js";
+import { menueOeffnen } from "./eingabe/menue.js";
+import { verlaufOeffnen } from "./eingabe/verlauf.js";
 import "./eingabe/inventar.js";
 import "./eingabe/faehigkeiten.js";
 import "./eingabe/hilfe.js";
 import { charakterfensterOeffnen } from "./eingabe/charakter.js";
 import { erstellungOeffnen } from "./eingabe/erstellung.js";
 import { fensterOeffnen, fensterTaste, oberstesFenster } from "./eingabe/fenster.js";
-import { aktionDerTaste } from "./eingabe/aktionskatalog.js";
+import { AKTIONEN, aktionDerTaste } from "./eingabe/aktionskatalog.js";
 import { fensterHtml } from "./anzeige/fenster.js";
 import "./anzeige/charakterfenster.js";
+import "./anzeige/systemfenster.js";
+import { Bedienzeile } from "./anzeige/bedienzeile.js";
 import { zielmodusBeginnen, zielmodusTaste, zielmodusVorschau, zielmodusBestaetigen, cursorSetzen } from "./eingabe/zielmodus.js";
 import { istSichtbar } from "./systeme/sicht.js";
 import { neueAnimation, geschossEinreihen, laeuftAnimation, aktuellesGeschoss, animationWeiter, animationLeeren } from "./anzeige/animation.js";
@@ -106,11 +113,16 @@ if (ninkasiBild) document.getElementById("favicon").href = ninkasiBild.toDataURL
 
 const einstellungen = einstellungenLaden();
 if (!einstellungen.zoomstufen.includes(einstellungen.zoom)) einstellungen.zoom = einstellungen.zoomstufen[0];
+const LAYOUTS = ["a", "b"];
+if (!LAYOUTS.includes(einstellungen.layout)) einstellungen.layout = LAYOUTS[0];
+const spielElement = document.getElementById("spiel");
+spielElement.dataset.layout = einstellungen.layout;
 
 const kartenCanvas = document.getElementById("karte-canvas");
 const renderer = new Renderer(kartenCanvas, daten.zeichen, tilebilder);
 const oberflaeche = new Oberflaeche(document.getElementById("seitenleiste"), texte, VERSION);
 const log = new Log(document.getElementById("log"), texte);
+const bedienzeile = new Bedienzeile(document.getElementById("bedienzeile"), texte, belegung);
 const tooltipElement = document.getElementById("tooltip");
 const fensterElement = document.getElementById("fenster");
 
@@ -126,6 +138,8 @@ let letzterRadZoom = 0;
 let fensterStapel = [];
 // Zielmodus: null oder { auswahl, zielart, cursor } (eingabe/zielmodus.js), auch zum Untersuchen (auswahl { zweck: "untersuchen" })
 let zielModus = null;
+// Zuletzt gewähltes Ziel (ID eines Wesens) für die Vorbelegung des Cursors (eingabe/zielmodus.js)
+let letztesZielId = null;
 // Geschossbahnen aus den Meldungen "geschoss", abgespielt im Takt geschossPause (anzeige/animation.js)
 const animation = neueAnimation();
 let animationsZeitgeber = null;
@@ -151,7 +165,8 @@ function zeichnen() {
     zeiger: feldUnterZeiger, weg: wegvorschau, gefahr: angekuendigteFelder(spiel), ziel: zielmarkierung || untersuchmarkierung, geschoss: aktuellesGeschoss(animation),
   });
   oberflaeche.anzeigen(spiel, { ziel: zielModus && { modus: zielModus, vorschau: zielvorschau } });
-  const fensterInhalt = fensterHtml({ spiel, daten, texte, belegung }, fensterStapel);
+  bedienzeile.anzeigen(spiel);
+  const fensterInhalt = fensterHtml({ spiel, daten, texte, belegung, logzeilen: log.zeilen, einstellungen, version: VERSION }, fensterStapel);
   fensterElement.hidden = !fensterInhalt;
   fensterElement.innerHTML = fensterInhalt;
   tooltipZeigen();
@@ -198,12 +213,13 @@ function animationUeberspringen() {
 
 function ablehnungMelden(grund) {
   const schluessel = `log.abgelehnt.${grund}`;
-  if (texte.hatSchluessel(schluessel)) log.zeile(texte.text(schluessel), "leise");
+  if (texte.hatSchluessel(schluessel)) log.zeile(texte.text(schluessel), "hinweis");
 }
 
-// Auswahl aus Inventar (Werfen) oder Fähigkeitenfenster: Zielmodus, sofortiger Befehl oder Grund dagegen
-function auswahlStarten(auswahl) {
-  const beginn = zielmodusBeginnen(spiel, auswahl);
+// Auswahl aus Inventar (Werfen), Fähigkeitenfenster oder Schnellleiste (optionen.platz): Zielmodus, sofortiger Befehl
+// oder Grund dagegen
+function auswahlStarten(auswahl, optionen = {}) {
+  const beginn = zielmodusBeginnen(spiel, auswahl, { ...optionen, letztesZielId });
   if (beginn.befehl) return befehlGebenUndZeichnen(beginn.befehl);
   if (beginn.grund) ablehnungMelden(beginn.grund);
   zielModus = beginn.modus ?? null;
@@ -220,7 +236,7 @@ function zielergebnisAnwenden(ergebnis) {
 
 function ablaufMelden(grund) {
   const schluessel = `reise.${grund}`;
-  if (texte.hatSchluessel(schluessel)) log.zeile(texte.text(schluessel), "leise");
+  if (texte.hatSchluessel(schluessel)) log.zeile(texte.text(schluessel), "hinweis");
 }
 
 function ablaufBeenden(grund) {
@@ -254,6 +270,7 @@ function ablaufStarten(beginn, naechsterSchritt) {
 function laufBeginnen(startwert, optionen) {
   if (laufenderAblauf) ablaufBeenden(null);
   zielModus = null;
+  letztesZielId = null;
   animationUeberspringen();
   spiel = neuesSpiel(daten, startwert, optionen);
   window.spiel = spiel; // zum Nachsehen in der Konsole
@@ -281,10 +298,46 @@ function erstellungAbschliessen(startoptionen) {
   laufBeginnen(spiel.zustand.startwert, startoptionen);
 }
 
+// Fenster obenauf legen; nach dem Tod nur die, die nichts am Lauf ändern (Spielmenü, Hilfe, Verlauf)
+const FENSTER_NACH_DEM_TOD = ["menue", "hilfe", "verlauf"];
 function fensterAuf(art, zustand) {
-  if (spiel.zustand.vorbei) return;
+  if (spiel.zustand.vorbei && !FENSTER_NACH_DEM_TOD.includes(art)) return;
   fensterStapel = fensterOeffnen(fensterStapel, art, zustand);
   zeichnen();
+}
+
+// Aktionen, die ein Fenster zurückgibt (eingabe/menue.js): Neustart, Layout, Beenden
+function fensteraktionAusfuehren(aktion) {
+  if (aktion === "neustart") {
+    fensterStapel = [];
+    return starten(zufaelligerStartwert());
+  }
+  if (aktion === "layout") {
+    einstellungen.layout = LAYOUTS[(LAYOUTS.indexOf(einstellungen.layout) + 1) % LAYOUTS.length];
+    einstellungenSpeichern(einstellungen);
+    spielElement.dataset.layout = einstellungen.layout;
+    kamera.gesetzt = false;
+    return zeichnen();
+  }
+  if (aktion === "beenden") {
+    // gelingt im Fenster aus starten.py (dom.allow_scripts_to_close_windows); sonst bleibt der Hinweis
+    window.close();
+    log.zeile(texte.text("menue.beenden_hinweis"), "hinweis");
+    return zeichnen();
+  }
+}
+
+// Platz der Schnellleiste (eingabe/schnellleiste.js): Getränk sofort, Fähigkeit über den Zielmodus mit Vorbelegung
+function platzBenutzen(stelle) {
+  if (spiel.zustand.vorbei) return;
+  const ergebnis = platzAusloesen(spiel, stelle);
+  if (!ergebnis) return;
+  if (ergebnis.grund) {
+    ablehnungMelden(ergebnis.grund);
+    return zeichnen();
+  }
+  if (ergebnis.befehl) return befehlGebenUndZeichnen(ergebnis.befehl);
+  auswahlStarten(ergebnis.auswahl, { platz: stelle });
 }
 
 function zoomen(richtung) {
@@ -298,7 +351,8 @@ function zoomen(richtung) {
 }
 
 function befehlGebenUndZeichnen(befehl) {
-  befehlGeben(spiel, befehl);
+  const ergebnis = befehlGeben(spiel, befehl);
+  if (ergebnis.ok && befehl.ziel?.id != null) letztesZielId = befehl.ziel.id;
   if (spiel.zustand.vorbei) zielModus = null;
   zeichnen();
   animationStarten();
@@ -307,7 +361,7 @@ function befehlGebenUndZeichnen(befehl) {
 window.addEventListener("keydown", (tastenereignis) => {
   // Eine laufende Geschossbahn überspringt jede Taste, die Taste wirkt trotzdem
   if (laeuftAnimation(animation)) animationUeberspringen();
-  // Während eines Ablaufs (Reise, Rasten, Erkunden) bricht jede Taste ab und wird dabei geschluckt
+  // Während eines Ablaufs (Reise, Laufen, Rasten, Erkunden) bricht jede Taste ab und wird dabei geschluckt
   if (laufenderAblauf) {
     tastenereignis.preventDefault();
     return ablaufBeenden("abgebrochen");
@@ -320,10 +374,11 @@ window.addEventListener("keydown", (tastenereignis) => {
       return zeichnen();
     }
     const taste = { code: tastenereignis.code, zeichen: tastenereignis.key, umschalt: tastenereignis.shiftKey };
-    const { stapel, befehl, auswahl, grund, start } = fensterTaste(fensterStapel, taste, { spiel, daten });
+    const { stapel, befehl, auswahl, grund, start, aktion } = fensterTaste(fensterStapel, taste, { spiel, daten });
     fensterStapel = stapel;
     if (grund) ablehnungMelden(grund);
     if (start) return erstellungAbschliessen(start);
+    if (aktion) return fensteraktionAusfuehren(aktion);
     if (befehl) return befehlGebenUndZeichnen(befehl);
     if (auswahl) return auswahlStarten(auswahl);
     return zeichnen();
@@ -336,25 +391,57 @@ window.addEventListener("keydown", (tastenereignis) => {
   const ergebnis = uebersetzen(tastenereignis, belegung, spiel);
   if (!ergebnis) return;
   tastenereignis.preventDefault();
-  if (ergebnis.aktion === "inventar") return fensterAuf("inventar", { gewaehlt: null });
-  if (ergebnis.aktion === "faehigkeiten") return fensterAuf("faehigkeiten", {});
-  if (ergebnis.aktion === "charakter") return fensterAuf("charakter", charakterfensterOeffnen());
-  if (ergebnis.aktion === "hilfe") return fensterAuf("hilfe", {});
-  if (ergebnis.aktion === "untersuchen") {
+  aktionAusfuehren(ergebnis);
+});
+
+// Aktion aus Taste oder Knopf ohne offenes Fenster und ohne Zielmodus; ergebnis wie von uebersetzen
+function aktionAusfuehren(ergebnis) {
+  const aktion = ergebnis.aktion;
+  if (AKTIONEN[aktion]?.platz !== undefined) return platzBenutzen(AKTIONEN[aktion].platz);
+  if (aktion === "abbrechen") {
+    if (escSchritt({ zielModus, fensterStapel, laufenderAblauf }) === "menue") return fensterAuf("menue", menueOeffnen());
+    return;
+  }
+  if (aktion === "inventar") return fensterAuf("inventar", { gewaehlt: null });
+  if (aktion === "faehigkeiten") return fensterAuf("faehigkeiten", {});
+  if (aktion === "charakter") return fensterAuf("charakter", charakterfensterOeffnen());
+  if (aktion === "verlauf") return fensterAuf("verlauf", verlaufOeffnen());
+  if (aktion === "hilfe") return fensterAuf("hilfe", {});
+  if (aktion === "untersuchen") {
     if (spiel.zustand.vorbei) return;
     zielModus = zielmodusBeginnen(spiel, { zweck: "untersuchen" }).modus;
     return zeichnen();
   }
-  if (ergebnis.aktion === "zoom_rein") return zoomen(1);
-  if (ergebnis.aktion === "zoom_raus") return zoomen(-1);
-  if (ergebnis.aktion === "log_umschalten") return log.umschalten();
-  if (ergebnis.aktion === "rasten") return ablaufStarten(rastenBeginnen(spiel, einstellungen), naechsterRastschritt);
-  if (ergebnis.aktion === "erkunden") return ablaufStarten(erkundenBeginnen(spiel, einstellungen), naechsterErkundungsschritt);
-  if (ergebnis.aktion === "neustart") {
+  if (aktion === "zoom_rein") return zoomen(1);
+  if (aktion === "zoom_raus") return zoomen(-1);
+  if (aktion === "rasten") return ablaufStarten(rastenBeginnen(spiel, einstellungen), naechsterRastschritt);
+  if (aktion === "erkunden") return ablaufStarten(erkundenBeginnen(spiel, einstellungen), naechsterErkundungsschritt);
+  if (aktion === "laufen") return ablaufStarten(laufenBeginnen(spiel, ergebnis.richtung, einstellungen), naechsterLaufschritt);
+  if (aktion === "neustart") {
     if (spiel.zustand.vorbei) starten(zufaelligerStartwert());
     return;
   }
   if (ergebnis.befehl) befehlGebenUndZeichnen(ergebnis.befehl);
+}
+
+// Bedienzeile (anzeige/bedienzeile.js): Klick auf einen Platz oder Knopf wirkt wie seine Taste. Bei offenem Fenster oder
+// Zielmodus geht nur der Knopf Menü (Esc), er schließt dann das oberste Fenster bzw. bricht das Zielen ab.
+const bedienzeilenElement = document.getElementById("bedienzeile");
+bedienzeilenElement.addEventListener("mousedown", (mausereignis) => mausereignis.preventDefault()); // kein Fokus auf Knöpfen
+bedienzeilenElement.addEventListener("click", (mausereignis) => {
+  const knopf = mausereignis.target.closest("button");
+  if (!knopf) return;
+  if (laeuftAnimation(animation)) animationUeberspringen();
+  if (laufenderAblauf) return ablaufBeenden("abgebrochen");
+  const aktion = knopf.dataset.aktion;
+  if (zielModus || fensterStapel.length) {
+    if (aktion !== "abbrechen") return;
+    if (zielModus) zielModus = null;
+    else fensterStapel = fensterStapel.slice(0, -1);
+    return zeichnen();
+  }
+  if (knopf.dataset.platz !== undefined) return platzBenutzen(Number(knopf.dataset.platz));
+  if (aktion) aktionAusfuehren({ aktion });
 });
 
 kartenCanvas.addEventListener("mousemove", (mausereignis) => {
@@ -370,10 +457,21 @@ kartenCanvas.addEventListener("mouseleave", () => {
   zeichnen();
 });
 
+// Rechtsklick untersucht; das Kontextmenü des Browsers bleibt über der Karte zu
+kartenCanvas.addEventListener("contextmenu", (mausereignis) => mausereignis.preventDefault());
+
 kartenCanvas.addEventListener("mousedown", (mausereignis) => {
   if (laufenderAblauf) return ablaufBeenden("abgebrochen");
   // ein offenes Fenster liegt über der Karte, der Klick dahinter zählt nicht
-  if (fensterStapel.length || belegung.maus[mausereignis.button] !== "handeln" || spiel.zustand.vorbei) return;
+  if (fensterStapel.length || spiel.zustand.vorbei) return;
+  const feld = feldAnPixel(mausereignis.offsetX, mausereignis.offsetY, kamera, einstellungen.zoom);
+  if (belegung.maus[mausereignis.button] === "untersuchen") {
+    mausereignis.preventDefault();
+    const beginn = zielModus?.auswahl.zweck === "untersuchen" ? zielModus : zielmodusBeginnen(spiel, { zweck: "untersuchen" }).modus;
+    zielModus = cursorSetzen(spiel, beginn, feld);
+    return zeichnen();
+  }
+  if (belegung.maus[mausereignis.button] !== "handeln") return;
   mausereignis.preventDefault();
   // im Zielmodus bestätigt ein Klick das Feld unter dem Zeiger
   if (zielModus) {

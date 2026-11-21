@@ -46,6 +46,8 @@ firefoxEinstellungen = {
     "toolkit.legacyUserProfileCustomizations.stylesheets": True,
     # Firefox zeichnet die Titelleiste selbst, sie verschwindet daher mit den Leisten.
     "browser.tabs.inTitlebar": 1,
+    # "Beenden" im Spielmenü schließt das Fenster per window.close() und beendet so auch den Server.
+    "dom.allow_scripts_to_close_windows": True,
 }
 
 # Blendet Tabs, Adressleiste, Lesezeichen und Titelleiste aus, übrig bleibt die Seite.

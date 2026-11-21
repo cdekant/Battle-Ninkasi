@@ -1,33 +1,74 @@
-// Log: übersetzt Meldungen in Textzeilen. Hört nur zu, verändert nichts.
-// Unten 5 Zeilen, aufklappbar (Anzeige-Zustand).
+// Log: hört auf Spielmeldungen und zeigt sie in zwei Spalten, Geschehen und Kampf (docs/Oberflaeche.md, Log).
+// Die Form der Zeilen entsteht ohne DOM in anzeige/logzeilen.js; hier liegen Zugmarke, Zusammenfassen und Darstellung.
 // Nur was Ninkasi wahrnimmt (systeme/wahrnehmbar.js); Lärm, dessen Ursprung sie nicht sieht, hört sie als vage Zeile
 // mit Richtung, höchstens eine je Zug (ZEIT_ZWISCHEN_GERAEUSCHEN).
+// Zeile im Speicher: { zug, spalte, art, text, seite?, ton?, magisch?, zahlen?, anzahl }
+// Wie viele Zeilen sichtbar sind, entscheidet das Layout (stil.css): jede Spalte zeigt die neuesten unten.
+// Den ganzen Verlauf zeigt das Fenster "verlauf" (eingabe/verlauf.js, anzeige/fenster.js).
 
 import { satzanfang } from "./texte.js";
-import { promilleText } from "./pegelanzeige.js";
+import { zeilenAusMeldung, ARTEN, ZAHLENSPALTEN } from "./logzeilen.js";
+import { spielerin } from "../kern/zustand.js";
 import { meldungWahrnehmbar, geraeuschGehoert } from "../systeme/wahrnehmbar.js";
 
-const SICHTBARE_ZEILEN = 5;
+export const SPALTEN = ["geschehen", "kampf"];
+const GEZEICHNETE_ZEILEN = 60; // je Spalte; mehr passt in keinem Layout
 const HOECHSTE_ZEILENZAHL = 500;
 const ZEIT_ZWISCHEN_GERAEUSCHEN = 100;
+const VERBLASSEN_AB = 3; // die neuesten Zeilen bleiben voll, ältere werden in Stufen blasser
+const VERBLASSEN_STUFEN = 4;
+
+const escapeHtml = (text) => String(text).replace(/[&<>"]/g, (zeichen) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[zeichen]);
+
+// HTML einer Zeile; vorher: die Zeile davor in derselben Liste (für den Strich zwischen den Zügen), alter: Stufe 0 bis 4
+export function logzeileHtml(zeile, vorher, alter = 0) {
+  const klassen = ["logzeile", `art-${zeile.art}`];
+  if (zeile.seite) klassen.push(`seite-${zeile.seite}`);
+  if (zeile.ton) klassen.push(`ton-${zeile.ton}`);
+  if (zeile.magisch) klassen.push("magisch");
+  if (vorher && vorher.zug !== zeile.zug) klassen.push("neuer-zug");
+  if (alter) klassen.push(`alter-${alter}`);
+  const anzahl = zeile.anzahl > 1 ? ` <span class="anzahl">x${zeile.anzahl}</span>` : "";
+  // Kampfzeilen haben je Zahl eine feste Spalte (ZAHLENSPALTEN), auch wenn sie leer bleibt
+  const zahlen = zeile.spalte === "kampf"
+    ? ZAHLENSPALTEN.map((klasse) => {
+      const zahl = (zeile.zahlen || []).find((eintrag) => eintrag.klasse === klasse);
+      const titel = zahl?.titel ? ` title="${escapeHtml(zahl.titel)}"` : "";
+      return `<span class="zahl ${klasse}"${titel}>${zahl ? escapeHtml(zahl.text) : ""}</span>`;
+    }).join("")
+    : "";
+  return `<div class="${klassen.join(" ")}"><span class="zug">${vorher?.zug === zeile.zug ? "" : zeile.zug}</span>`
+    + `<span class="symbol" aria-hidden="true">${ARTEN[zeile.art] ?? ""}</span><span class="text">${escapeHtml(zeile.text)}${anzahl}</span>`
+    + `${zahlen}</div>`;
+}
+
+// Kopfzeile einer Spalte; im Kampf mit den Überschriften der Zahlen in denselben festen Spalten wie die Zeilen
+export function logkopfHtml(texte, spalte) {
+  const { text } = texte;
+  if (spalte !== "kampf") return `<div class="logkopf"><span class="zug"></span><span class="symbol"></span><span class="text">${text(`log.spalte.${spalte}`)}</span></div>`;
+  return `<div class="logkopf kampf"><span class="zug"></span><span class="symbol"></span><span class="text">${text("log.spalte.kampf")}</span>`
+    + ZAHLENSPALTEN.map((klasse) => `<span class="zahl ${klasse}">${text(`log.spalte.${klasse}`)}</span>`).join("") + "</div>";
+}
 
 export class Log {
   constructor(element, texte) {
     this.element = element;
     this.texte = texte;
     this.zeilen = [];
-    this.aufgeklappt = false;
     this.spiel = null;
-    this.spielerinId = null;
     this.letztesGeraeusch = -Infinity;
   }
 
   leeren(spiel) {
     this.zeilen = [];
     this.spiel = spiel;
-    this.spielerinId = spiel.zustand.spielerinId;
     this.letztesGeraeusch = -Infinity;
     this.anzeigen();
+  }
+
+  // Zugmarke: Zahl der Züge Ninkasis; ein Strich trennt ihre Aktionen
+  zug() {
+    return this.spiel ? spielerin(this.spiel.zustand)?.zuege ?? 0 : 0;
   }
 
   // Gehörter Lärm: eine Zeile je Zug, mit grober Richtung
@@ -36,132 +77,51 @@ export class Log {
     if (!gehoert || meldung.zeit - this.letztesGeraeusch < ZEIT_ZWISCHEN_GERAEUSCHEN) return;
     this.letztesGeraeusch = meldung.zeit;
     const { text } = this.texte;
-    this.zeile(text(`log.geraeusch.${gehoert.geraeusch}`, { richtung: text(`richtung.${gehoert.richtung ?? "nah"}`) }), "leise");
+    this.zeile(text(`log.geraeusch.${gehoert.geraeusch}`, { richtung: text(`richtung.${gehoert.richtung ?? "nah"}`) }), "hinweis");
   }
 
   // Name eines Zustands aus seinen Daten
-  zustandsname(name) {
+  zustandsname = (name) => {
     const { text, hatSchluessel } = this.texte;
     const schluessel = this.spiel.daten.zustaende?.[name]?.text;
     return schluessel && hatSchluessel(schluessel) ? text(schluessel) : name;
+  };
+
+  // Eine Zeile der Oberfläche (Ablehnung, Reise, Willkommen); art aus logzeilen.js ARTEN
+  zeile(text, art = "geschehen") {
+    this.hinzufuegen({ spalte: "geschehen", art, text });
   }
 
-  zeile(text, cssKlasse = "") {
-    this.zeilen.push({ text: satzanfang(text), cssKlasse });
-    if (this.zeilen.length > HOECHSTE_ZEILENZAHL) this.zeilen.shift();
-    this.anzeigen();
-  }
-
-  umschalten() {
-    this.aufgeklappt = !this.aufgeklappt;
+  // Gleiche Zeilen hintereinander in derselben Spalte werden zusammengefasst ("x3")
+  hinzufuegen(beschreibung) {
+    const zeile = { ...beschreibung, text: satzanfang(beschreibung.text), zug: this.zug(), anzahl: 1 };
+    const letzte = this.zeilen.findLast((vorhanden) => vorhanden.spalte === zeile.spalte);
+    if (letzte && letzte.text === zeile.text && JSON.stringify(letzte.zahlen) === JSON.stringify(zeile.zahlen)) {
+      letzte.anzahl++;
+      letzte.zug = zeile.zug;
+    } else {
+      this.zeilen.push(zeile);
+      if (this.zeilen.length > HOECHSTE_ZEILENZAHL) this.zeilen.shift();
+    }
     this.anzeigen();
   }
 
   // Hörer für Spielmeldungen
   melden = (meldung) => {
-    const { text, hatSchluessel } = this.texte;
     if (meldung.art === "laerm") return this.geraeusch(meldung);
     if (!meldungWahrnehmbar(this.spiel, meldung)) return;
-    switch (meldung.art) {
-      case "tod":
-        if (meldung.opfer.id === this.spielerinId) return this.zeile(text("log.tod_ninkasi"), "schlimm");
-        return this.zeile(text("log.tod", meldung), "gut");
-      case "schaden": {
-        const schluessel = meldung.immun ? "log.schaden_immun" : meldung.kritisch ? "log.schaden_kritisch" : "log.schaden";
-        const art = meldung.schadensart && hatSchluessel(`schaden.${meldung.schadensart}`) ? text(`schaden.${meldung.schadensart}`) : "?";
-        return this.zeile(text(schluessel, { ...meldung, art }), meldung.ziel.id === this.spielerinId ? "schlimm" : "");
-      }
-      case "faehigkeit":
-        return this.zeile(text("log.faehigkeit", { ...meldung, faehigkeit: hatSchluessel(meldung.text) ? text(meldung.text) : meldung.faehigkeit }));
-      case "aktion_beginnt":
-        // angekündigte Angriffe: eigener Text der Fähigkeit, sonst still
-        if (meldung.ankuendigung && hatSchluessel(meldung.ankuendigung)) this.zeile(text(meldung.ankuendigung, meldung), meldung.wer.id === this.spielerinId ? "" : "schlimm");
-        return;
-      case "ebene_gewechselt":
-        return this.zeile(text("log.ebene_gewechselt", { ...meldung, richtung: text(meldung.richtung === "ab" ? "ui.hinab" : "ui.hinauf") }));
-      case "population_voll":
-        // ausdrücklicher Hinweis statt stillschweigend, auch auf der Konsole für die Entwicklung
-        console.warn(`Obergrenze der Population erreicht (${meldung.hoechstWesen}), ${meldung.ausgefallen} Wesen entstehen nicht`);
-        return this.zeile(text("log.population_voll", meldung), "hinweis");
-      case "risiko": {
-        const schluessel = `log.risiko.${meldung.ausgang}`;
-        if (hatSchluessel(schluessel)) this.zeile(text(schluessel, meldung), "schlimm");
-        return;
-      }
-      case "verfehlt":
-        return this.zeile(text(meldung.grund === "geblockt" ? "log.geblockt" : "log.verfehlt", meldung));
-      case "geheilt":
-      case "wert_geaendert": {
-        if (meldung.menge === 0) return;
-        const vorzeichen = meldung.menge > 0 ? "+" : "";
-        const menge = meldung.wertName === "pegel" ? promilleText(meldung.menge) : meldung.menge;
-        const platzhalter = { ...meldung, menge: vorzeichen + menge, wertName: text(`ui.${meldung.wertName}`) };
-        return this.zeile(text(`log.${meldung.art}`, platzhalter), "gut");
-      }
-      case "pegel_steigt":
-      case "pegel_sinkt":
-        return this.zeile(text(`log.${meldung.art}`, { ...meldung, schwelle: promilleText(meldung.schwelle) }));
-      case "abgelehnt": {
-        const schluessel = `log.abgelehnt.${meldung.grund}`;
-        if (hatSchluessel(schluessel)) this.zeile(text(schluessel), "leise");
-        return;
-      }
-      // Verschleiß und Flüche nur an Ninkasis Sachen; was anderswo verdirbt, bleibt still
-      case "verdorben":
-      case "kaputt":
-        if (meldung.traegerin?.id === this.spielerinId) this.zeile(text(`log.${meldung.art}`, meldung), "schlimm");
-        return;
-      case "abgenutzt":
-        if (meldung.wer.id === this.spielerinId) this.zeile(text("log.abgenutzt", meldung), "schlimm");
-        return;
-      case "fluch_entdeckt":
-        if (meldung.wer.id === this.spielerinId) this.zeile(text("log.fluch_entdeckt", meldung), "schlimm");
-        return;
-      case "fluch_aufgehoben":
-        if (meldung.wer.id === this.spielerinId) this.zeile(text("log.fluch_aufgehoben", meldung), "gut");
-        return;
-      // eigener Text des Zustands (log.zustand.<name>.beginnt), sonst der allgemeine
-      case "zustand_beginnt":
-      case "zustand_endet": {
-        const vorgang = meldung.art === "zustand_beginnt" ? "beginnt" : "endet";
-        const eigenerSchluessel = `log.zustand.${meldung.zustand}.${vorgang}`;
-        const schluessel = hatSchluessel(eigenerSchluessel) ? eigenerSchluessel : `log.zustand_${vorgang}`;
-        return this.zeile(text(schluessel, { ...meldung, zustand: this.zustandsname(meldung.zustand) }));
-      }
-      case "beschworen":
-        return this.zeile(text(meldung.wer ? "log.beschworen" : "log.erschienen", meldung));
-      // Skillsystem (systeme/skills.js, systeme/lernen.js): nur, was Ninkasi selbst lernt
-      case "skillstufe":
-      case "gelernt":
-      case "skill_freigeschaltet":
-        if (meldung.wer.id === this.spielerinId) this.zeile(text(`log.${meldung.art}`, { ...meldung, skill: hatSchluessel(meldung.text) ? text(meldung.text) : meldung.skill }), "gut");
-        return;
-      case "ep_erhalten":
-        if (meldung.ep > 0) this.zeile(text("log.ep_erhalten", meldung), "leise");
-        return;
-      case "eigenschaft_geaendert": {
-        if (meldung.wer.id !== this.spielerinId) return;
-        const eigenschaft = text(this.spiel.daten.eigenschaften?.[meldung.eigenschaft]?.text ?? meldung.eigenschaft);
-        return this.zeile(text("log.eigenschaft_geaendert", { eigenschaft, menge: (meldung.menge > 0 ? "+" : "") + meldung.menge }), meldung.menge > 0 ? "gut" : "schlimm");
-      }
-      default: {
-        const schluessel = `log.${meldung.art}`;
-        if (hatSchluessel(schluessel)) this.zeile(text(schluessel, meldung));
-      }
-    }
+    for (const beschreibung of zeilenAusMeldung({ spiel: this.spiel, texte: this.texte, zustandsname: this.zustandsname }, meldung)) this.hinzufuegen(beschreibung);
   };
 
   anzeigen() {
-    const angezeigteZeilen = this.aufgeklappt ? this.zeilen : this.zeilen.slice(-SICHTBARE_ZEILEN);
-    this.element.classList.toggle("offen", this.aufgeklappt);
-    this.element.replaceChildren(
-      ...angezeigteZeilen.map((zeile) => {
-        const div = document.createElement("div");
-        div.textContent = zeile.text;
-        if (zeile.cssKlasse) div.className = zeile.cssKlasse;
-        return div;
-      })
-    );
-    this.element.scrollTop = this.element.scrollHeight;
+    this.element.innerHTML = SPALTEN.map((spalte) => {
+      const zeilen = this.zeilen.filter((zeile) => zeile.spalte === spalte).slice(-GEZEICHNETE_ZEILEN);
+      const html = zeilen.map((zeile, stelle) => {
+        const vonUnten = zeilen.length - 1 - stelle;
+        const alter = Math.min(VERBLASSEN_STUFEN, Math.max(0, vonUnten - VERBLASSEN_AB + 1));
+        return logzeileHtml(zeile, zeilen[stelle - 1], alter);
+      }).join("");
+      return `<section class="log-spalte" data-spalte="${spalte}">${logkopfHtml(this.texte, spalte)}<div class="log-zeilen">${html}</div></section>`;
+    }).join("");
   }
 }

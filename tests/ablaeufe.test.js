@@ -1,4 +1,4 @@
-// Abläufe der Eingabe aus Einzelbefehlen: Rasten und Auto-Erkunden (die Reise prüft der Bot)
+// Abläufe der Eingabe aus Einzelbefehlen: Rasten, Auto-Erkunden, Reise und Laufen (die Reise prüft auch der Bot)
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { miniSpiel, wesen, spielerinSetzen } from "./hilfen.js";
@@ -7,8 +7,11 @@ import { akteurEinreihen } from "../src/kern/zeit.js";
 import { feldIndex, passierbar } from "../src/welt/karte.js";
 import { naechstesFeldMit, amRandDesErkundeten } from "../src/welt/wege.js";
 import { sichtfeldAktualisieren } from "../src/systeme/sicht.js";
+import { positionSetzen } from "../src/kern/raumindex.js";
 import { rastenBeginnen, naechsterRastschritt } from "../src/eingabe/rasten.js";
 import { erkundenBeginnen, naechsterErkundungsschritt } from "../src/eingabe/erkunden.js";
+import { reiseBeginnen, naechsterReiseschritt } from "../src/eingabe/reise.js";
+import { laufenBeginnen, naechsterLaufschritt } from "../src/eingabe/laufen.js";
 import vorgaben from "../src/eingabe/einstellungen.js";
 
 const HOEHLE = [
@@ -64,10 +67,28 @@ test("Auto-Erkunden läuft, bis alle erreichbaren Felder erkundet sind", () => {
   assert.equal(erkundenBeginnen(spiel, vorgaben).grund, "alles_erkundet");
 });
 
-test("Auto-Erkunden beginnt nicht mit Feinden in Sicht", () => {
+test("Auto-Erkunden beginnt mit bekannten Feinden in Sicht, ohne reiseTrotzFeinden nicht", () => {
   const { spiel } = ninkasiIn(HOEHLE, 1, 1, { allesErkundet: false });
   wesen(spiel, 2, 1, "verderber", 10);
-  assert.equal(erkundenBeginnen(spiel, vorgaben).grund, "feinde_in_sicht");
+  sichtfeldAktualisieren(spiel);
+  assert.ok(erkundenBeginnen(spiel, vorgaben).ablauf);
+  assert.equal(erkundenBeginnen(spiel, { ...vorgaben, reiseTrotzFeinden: false }).grund, "feinde_in_sicht");
+});
+
+test("Reise hält nur bei neuen Feinden: ein bekannter hält nicht, wer aus der Sicht gerät und wiederkommt, schon", () => {
+  const { spiel } = ninkasiIn(HOEHLE, 1, 1);
+  const feind = wesen(spiel, 1, 3, "verderber", 10);
+  sichtfeldAktualisieren(spiel);
+  const reise = reiseBeginnen(spiel, { x: 4, y: 1 }, vorgaben).reise;
+  assert.ok(reise, "beginnt trotz bekanntem Feind");
+  reise.schrittzahl = 1; // wie nach dem ersten Schritt
+  assert.ok(naechsterReiseschritt(spiel, reise, vorgaben).befehl, "bekannter Feind hält nicht");
+  positionSetzen(spiel.zustand, feind, { x: 10, y: 5 });
+  sichtfeldAktualisieren(spiel);
+  assert.ok(naechsterReiseschritt(spiel, reise, vorgaben).befehl, "außer Sicht");
+  positionSetzen(spiel.zustand, feind, { x: 1, y: 3 });
+  sichtfeldAktualisieren(spiel);
+  assert.equal(naechsterReiseschritt(spiel, reise, vorgaben).halt, "gegner_in_sicht", "wieder aufgetaucht");
 });
 
 test("Rasten: wartet bis voll, hält nach höchstens so vielen Schritten, beginnt nicht, wenn schon voll", () => {
@@ -91,4 +112,45 @@ test("Rasten hält, wenn ein Feind auftaucht", () => {
   wesen(spiel, 2, 1, "verderber", 10);
   sichtfeldAktualisieren(spiel);
   assert.equal(naechsterRastschritt(spiel, ablauf, vorgaben).halt, "gegner_in_sicht");
+});
+
+const GANG = [
+  "############",
+  "#..........#",
+  "#.......>..#",
+  "############",
+];
+
+test("Laufen: geradeaus bis zum Hindernis, beginnt nicht vor einer Wand", () => {
+  const { spiel, ninkasi } = ninkasiIn(GANG, 1, 1);
+  assert.equal(laufenBeginnen(spiel, { dx: -1, dy: 0 }, vorgaben).grund, "versperrt");
+  const { halt } = bisZumHalt(spiel, laufenBeginnen(spiel, { dx: 1, dy: 0 }, vorgaben).ablauf, naechsterLaufschritt);
+  assert.equal(halt, "bemerkenswert", "die Treppe kommt in Reichweite");
+  assert.deepEqual(ninkasi.position, { x: 7, y: 1 });
+  const weiter = bisZumHalt(spiel, laufenBeginnen(spiel, { dx: 1, dy: 0 }, vorgaben).ablauf, naechsterLaufschritt);
+  assert.equal(weiter.halt, "hindernis", "die schon bemerkte Treppe hält nicht noch einmal");
+  assert.deepEqual(ninkasi.position, { x: 10, y: 1 });
+});
+
+test("Laufen hält bei einem neuen Feind, ein bekannter hält nicht", () => {
+  const { spiel, ninkasi } = ninkasiIn(GANG, 1, 1);
+  ninkasi.sicht = { reichweite: 20 };
+  wesen(spiel, 4, 2, "verderber", 10);
+  sichtfeldAktualisieren(spiel);
+  const ablauf = laufenBeginnen(spiel, { dx: 1, dy: 0 }, vorgaben).ablauf;
+  assert.ok(ablauf, "beginnt trotz bekanntem Feind");
+  assert.ok(naechsterLaufschritt(spiel, ablauf, vorgaben).befehl);
+  assert.equal(laufenBeginnen(spiel, { dx: 1, dy: 0 }, { ...vorgaben, reiseTrotzFeinden: false }).grund, "feinde_in_sicht");
+});
+
+test("Rasten beginnt mit bekanntem Feind in Sicht und hält erst bei einem neuen, ohne rastenTrotzFeinden gar nicht", () => {
+  const { spiel, ninkasi } = ninkasiIn(HOEHLE, 1, 1);
+  ninkasi.werte.lp.aktuell = 50;
+  wesen(spiel, 2, 1, "verderber", 10);
+  sichtfeldAktualisieren(spiel);
+  const ablauf = rastenBeginnen(spiel, vorgaben).ablauf;
+  assert.ok(ablauf);
+  ablauf.schrittzahl = 1;
+  assert.ok(naechsterRastschritt(spiel, ablauf, vorgaben).befehl, "der bekannte Feind hält nicht");
+  assert.equal(rastenBeginnen(spiel, { ...vorgaben, rastenTrotzFeinden: false }).grund, "feinde_in_sicht");
 });

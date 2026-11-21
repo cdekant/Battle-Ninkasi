@@ -16,6 +16,10 @@ import { hoechstwert } from "../src/kern/werte.js";
 import { reiseBeginnen, naechsterReiseschritt } from "../src/eingabe/reise.js";
 import { rastenBeginnen, naechsterRastschritt } from "../src/eingabe/rasten.js";
 import { erkundenBeginnen, naechsterErkundungsschritt } from "../src/eingabe/erkunden.js";
+import { laufenBeginnen, naechsterLaufschritt } from "../src/eingabe/laufen.js";
+import { plaetzeDerLeiste, platzZustand, platzAusloesen } from "../src/eingabe/schnellleiste.js";
+import { menueOeffnen, menueTaste } from "../src/eingabe/menue.js";
+import { verlaufOeffnen } from "../src/eingabe/verlauf.js";
 import { zielmodusBeginnen, zielmodusTaste, zielangabeVon, cursorSetzen } from "../src/eingabe/zielmodus.js";
 import belegung from "../src/eingabe/belegung.js";
 import einstellungen from "../src/eingabe/einstellungen.js";
@@ -31,23 +35,54 @@ import "../src/eingabe/faehigkeiten.js";
 import "../src/eingabe/hilfe.js";
 import { fensterHtml } from "../src/anzeige/fenster.js";
 import "../src/anzeige/charakterfenster.js";
+import "../src/anzeige/systemfenster.js";
 import { erstelleTexte } from "../src/anzeige/texte.js";
+import { Log } from "../src/anzeige/log.js";
+import { ARTEN } from "../src/anzeige/logzeilen.js";
+import { Oberflaeche } from "../src/anzeige/oberflaeche.js";
+import { Bedienzeile } from "../src/anzeige/bedienzeile.js";
 
 const [anzahlLaeufe = 20, hoechsteBefehlszahl = 3000, ersterStartwert = 1] = process.argv.slice(2).map(Number);
 const grammatik = erstelleGrammatik(grammatikDe);
 const daten = datenLaden(rohdaten, { texte, nomenPruefen: grammatik.pruefen });
 const anzeigetexte = erstelleTexte(texte, grammatik);
 
-// Fenster wie im Browser zeichnen (ohne DOM): fehlende Texte und Fehler in der Anzeige fallen so auch im Bot auf
+// Fenster, Log, Seitenleiste und Bedienzeile wie im Browser zeichnen (ohne DOM, ein Element ist hier nur ein Objekt
+// mit innerHTML): fehlende Texte und Fehler in der Anzeige fallen so auch im Bot auf
 const fehlendeTexte = new Set();
 const warnen = console.warn;
-function fensterZeichnen(spiel, art, zustand) {
+const ohneDom = () => ({ innerHTML: "" });
+let botLog = null;
+function mitWarnungen(zeichnen) {
   console.warn = (meldung) => fehlendeTexte.add(meldung);
   try {
-    fensterHtml({ spiel, daten, texte: anzeigetexte, belegung }, fensterOeffnen([], art, zustand));
+    zeichnen();
   } finally {
     console.warn = warnen;
   }
+}
+function fensterZeichnen(spiel, art, zustand) {
+  mitWarnungen(() => fensterHtml({ spiel, daten, texte: anzeigetexte, belegung, logzeilen: botLog?.zeilen ?? [], einstellungen, version: "bot" }, fensterOeffnen([], art, zustand)));
+}
+const seitenleiste = new Oberflaeche(ohneDom(), anzeigetexte, "bot");
+const bedienzeile = new Bedienzeile(ohneDom(), anzeigetexte, belegung);
+function oberflaecheZeichnen(spiel) {
+  mitWarnungen(() => {
+    seitenleiste.anzeigen(spiel);
+    bedienzeile.anzeigen(spiel);
+    for (const platz of plaetzeDerLeiste(spiel)) platzZustand(spiel, platz);
+  });
+  for (const zeile of botLog.zeilen) if (!(zeile.art in ARTEN) || !["geschehen", "kampf"].includes(zeile.spalte)) throw new Error(`Logzeile ohne Art oder Spalte: ${JSON.stringify(zeile)}`);
+}
+// Spielmenü per Tasten wie im Browser: Pfeil runter und wieder hoch, dann Fortsetzen; nichts davon ändert den Lauf
+function menueBedienen(spiel) {
+  let zustand = menueOeffnen();
+  zustand = menueTaste(zustand, { code: "ArrowDown" }).zustand;
+  fensterZeichnen(spiel, "menue", zustand);
+  zustand = menueTaste(zustand, { code: "KeyK" }).zustand;
+  if (menueTaste(zustand, { code: "Enter" }).zustand !== null) throw new Error("Fortsetzen schließt das Menü nicht");
+  fensterZeichnen(spiel, "verlauf", verlaufOeffnen());
+  fensterZeichnen(spiel, "bestaetigung", { frage: "menue.neustart_frage", aktion: "neustart" });
 }
 
 function invariantenPruefen(spiel) {
@@ -267,9 +302,31 @@ function treppeNehmen(botZufall, spiel) {
   return ergebnis.ok ? `nach_tiefe_${spiel.zustand.tiefe}` : ergebnis.grund;
 }
 
-// Ein zufälliger Ablauf: meist Reise, sonst Erkunden, Rasten oder Treppe; gibt "art:haltegrund" zurück
+// Laufen in eine zufällige Richtung, wie mit Umschalt plus Richtung
+function laufen(botZufall, spiel) {
+  const richtung = { dx: zufallsGanzzahl(botZufall, -1, 1), dy: zufallsGanzzahl(botZufall, -1, 1) };
+  if (!richtung.dx && !richtung.dy) richtung.dx = 1;
+  return ablaufLaufenLassen(spiel, laufenBeginnen(spiel, richtung, einstellungen), naechsterLaufschritt);
+}
+
+// Ein Platz der Schnellleiste wie mit seiner Ziffer: Getränk sofort, Fähigkeit über den Zielmodus, bestätigt mit
+// derselben Ziffer; gibt einen Befehl zurück oder null
+function schnellleisteBenutzen(botZufall, spiel) {
+  const stelle = zufallsGanzzahl(botZufall, 0, 9);
+  const ergebnis = platzAusloesen(spiel, stelle);
+  if (!ergebnis || ergebnis.grund) return null;
+  if (ergebnis.befehl) return ergebnis.befehl;
+  const beginn = zielmodusBeginnen(spiel, ergebnis.auswahl, { platz: stelle });
+  if (beginn.befehl) return beginn.befehl;
+  if (!beginn.modus) return null;
+  const ziffer = stelle === 9 ? "Digit0" : `Digit${stelle + 1}`;
+  return zielmodusTaste(spiel, beginn.modus, ziffer, belegung).befehl ?? null;
+}
+
+// Ein zufälliger Ablauf: meist Reise, sonst Laufen, Erkunden, Rasten oder Treppe; gibt "art:haltegrund" zurück
 function ablaufWaehlen(botZufall, spiel) {
   if (zufallsGanzzahl(botZufall, 1, 6) === 1) return `treppe:${treppeNehmen(botZufall, spiel)}`;
+  if (zufallsGanzzahl(botZufall, 1, 4) === 1) return `laufen:${laufen(botZufall, spiel)}`;
   const wurf = zufallsGanzzahl(botZufall, 1, 5);
   if (wurf === 4) return `erkunden:${ablaufLaufenLassen(spiel, erkundenBeginnen(spiel, einstellungen), naechsterErkundungsschritt)}`;
   if (wurf === 5) return `rasten:${ablaufLaufenLassen(spiel, rastenBeginnen(spiel, einstellungen), naechsterRastschritt)}`;
@@ -305,6 +362,9 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
     const verteilung = startwert % 4 === 0 ? eigenschaftenUeberErstellung(zufallErzeugen(startwert + 2_000_000)) : zufallsEigenschaften(zufallErzeugen(startwert + 1_000_000));
     const optionen = startwert % 2 === 0 ? { eigenschaften: verteilung } : {};
     const spiel = neuesSpiel(daten, startwert, optionen);
+    botLog = new Log(ohneDom(), anzeigetexte);
+    botLog.leeren(spiel);
+    hoererAnmelden(spiel, (meldung) => mitWarnungen(() => botLog.melden(meldung)));
     epBuch = { erwartet: daten.regeln.lernen.startEp };
     let getoetet = 0, getrunkeneBiere = 0;
     hoererAnmelden(spiel, (meldung) => {
@@ -330,9 +390,14 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
         reisenNachHaltegrund[haltegrund] = (reisenNachHaltegrund[haltegrund] || 0) + 1;
         continue;
       }
-      befehlGeben(spiel, zufallsbefehl(botZufall, spiel));
+      const ausDerLeiste = zufallsGanzzahl(botZufall, 1, 30) === 1 ? schnellleisteBenutzen(botZufall, spiel) : null;
+      befehlGeben(spiel, ausDerLeiste ?? zufallsbefehl(botZufall, spiel));
       invariantenPruefen(spiel);
-      if (spiel.befehle.length % 10 === 0 && !spiel.zustand.vorbei) untersuchen(spiel);
+      if (spiel.befehle.length % 10 === 0 && !spiel.zustand.vorbei) {
+        untersuchen(spiel);
+        oberflaecheZeichnen(spiel);
+      }
+      if (spiel.befehle.length % 500 === 0) menueBedienen(spiel);
     }
     const nachgespielt = nachspielen(daten, JSON.parse(JSON.stringify(spielstand(spiel))));
     const zustaendeGleich = JSON.stringify(nachgespielt.zustand) === JSON.stringify(spiel.zustand);

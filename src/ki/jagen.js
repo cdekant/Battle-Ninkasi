@@ -9,9 +9,11 @@
 // unbewegliches Wesen setzt Fähigkeiten ein, greift an, wer daneben steht, und wartet sonst.
 // Wachzustand (systeme/wahrnehmung.js): schlaeft wartet; wach geht nur Lärm nach; jagt verfolgt Ziele innerhalb der
 // Spurweite und wird wieder wach, wenn es an der letzten bekannten Position niemanden mehr findet.
+// Steht auf dem nächsten Feld ein Wesen, das kein Ziel ist (z.B. ein Verbündeter im Gang), sucht es einen Weg um alle
+// Wesen herum und nimmt ihn, wenn er höchstens regeln.bewegung.umwegHoechstens Felder länger ist; sonst wartet es.
 
 import { anmelden } from "../kern/register.js";
-import { naechstesWegfeld } from "../welt/wege.js";
+import { weg } from "../welt/wege.js";
 import { wesenAufFeld, gleichesFeld } from "../welt/geometrie.js";
 import { abwarten } from "./abwarten.js";
 import { naechstesSichtbaresZiel, istZielFuer } from "./ziele.js";
@@ -64,10 +66,24 @@ anmelden("ki", "jagen", (spiel, jaeger, ki) => {
   }
 
   if (istUnbeweglich(jaeger)) return angriffDaneben(spiel, jaeger, beute, trifft);
-  const naechstesFeld = naechstesWegfeld(spiel, position, ziel, { bewegung: bewegungVon(jaeger), oeffnetTueren: oeffnetTueren(jaeger), meiden: meidenZusammen(fallenMeiden(spiel), gefahrenMeiden(spiel)) });
-  if (!naechstesFeld) return abwarten();
-  const befehl = { art: "bewegen", dx: naechstesFeld.x - position.x, dy: naechstesFeld.y - position.y };
+  const wegOptionen = { bewegung: bewegungVon(jaeger), oeffnetTueren: oeffnetTueren(jaeger), meiden: meidenZusammen(fallenMeiden(spiel), gefahrenMeiden(spiel)) };
+  const direkterWeg = weg(spiel, position, ziel, wegOptionen);
+  if (!direkterWeg?.length) return abwarten();
+  const naechstesFeld = direkterWeg[0];
+  const schritt = (feld) => ({ art: "bewegen", dx: feld.x - position.x, dy: feld.y - position.y });
   const wesenImWeg = wesenAufFeld(spiel, naechstesFeld)[0];
-  if (!wesenImWeg) return befehl;
-  return istZielFuer(spiel, jaeger, wesenImWeg, trifft) ? { ...befehl, angreifen: true } : abwarten();
+  if (!wesenImWeg) return schritt(naechstesFeld);
+  if (istZielFuer(spiel, jaeger, wesenImWeg, trifft)) return { ...schritt(naechstesFeld), angreifen: true };
+  return umwegSchritt(spiel, position, ziel, wegOptionen, direkterWeg.length) ?? abwarten();
 });
+
+// Erster Schritt eines Weges um alle Wesen herum, wenn er höchstens umwegHoechstens Felder länger ist als der direkte;
+// sonst null. Das Ziel selbst darf besetzt sein (dort steht meist die Beute).
+function umwegSchritt(spiel, position, ziel, wegOptionen, direkteLaenge) {
+  const umwegHoechstens = spiel.daten.regeln.bewegung?.umwegHoechstens ?? 0;
+  if (umwegHoechstens <= 0) return null;
+  const umweg = weg(spiel, position, ziel, { ...wegOptionen, wesenMeiden: true });
+  if (!umweg?.length || umweg.length > direkteLaenge + umwegHoechstens) return null;
+  if (wesenAufFeld(spiel, umweg[0]).length) return null;
+  return { art: "bewegen", dx: umweg[0].x - position.x, dy: umweg[0].y - position.y };
+}

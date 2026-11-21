@@ -2,9 +2,20 @@
 //   tasten:        physische Tasten nach KeyboardEvent.code, in der Hilfe angezeigt
 //   weitereTasten: wirken genauso, die Hilfe nennt sie nicht (z.B. die Lage von + und - auf der US-Tastatur)
 //   zeichen:       nach dem Zeichen der Taste (KeyboardEvent.key), für Zeichen ohne feste Lage; gehen den Tasten vor
-// Eine Aktion darf mehrere Tasten haben. Der Satz "vi" (h j k l ...) folgt mit 0.28.0, siehe docs/Oberflaeche.md.
+//   umschaltBewegen: Aktion für Umschalt plus eine Bewegungstaste (Laufen, eingabe/laufen.js)
+// Eine Aktion darf mehrere Tasten haben. Bewegung nach den vi-Tasten der Roguelikes, nach der Lage der Taste:
+// h j k l, dazu y u b n für die Diagonalen; auf der deutschen Tastatur liegt y auf der Taste mit der Aufschrift Z
+// (KeyY). Ziffernblock und Pfeiltasten bleiben zusätzlich belegt (docs/Oberflaeche.md, Tastatur).
 export default {
   tasten: {
+    KeyY: "bewegen_nw", // Aufschrift Z auf deutscher Tastatur
+    KeyK: "bewegen_n",
+    KeyU: "bewegen_no",
+    KeyH: "bewegen_w",
+    KeyL: "bewegen_o",
+    KeyB: "bewegen_sw",
+    KeyJ: "bewegen_s",
+    KeyN: "bewegen_so",
     Numpad7: "bewegen_nw",
     Numpad8: "bewegen_n",
     Numpad9: "bewegen_no",
@@ -14,35 +25,54 @@ export default {
     Numpad2: "bewegen_s",
     Numpad3: "bewegen_so",
     Numpad5: "warten",
-    IntlBackslash: "treppe", // Taste <> auf deutscher Tastatur: Treppe hinab oder hinauf
     KeyG: "aufheben",
     KeyT: "trinken", // Gegenstand wählt die Eingabe: erstes Getränk im Gepäck
     Space: "fortsetzen", // unterbrochene lange Aktion weiterführen
     KeyX: "untersuchen", // Untersuchen mit dem Cursor des Zielmodus (eingabe/zielmodus.js)
+    Digit1: "schnellplatz_1",
+    Digit2: "schnellplatz_2",
+    Digit3: "schnellplatz_3",
+    Digit4: "schnellplatz_4",
+    Digit5: "schnellplatz_5",
+    Digit6: "schnellplatz_6",
+    Digit7: "schnellplatz_7",
+    Digit8: "schnellplatz_8",
+    Digit9: "schnellplatz_9",
+    Digit0: "schnellplatz_10",
     KeyR: "rasten", // bis LP und MP voll sind
     KeyO: "erkunden", // automatisch erkunden
-    Escape: "abbrechen", // Reise, Rasten, Erkunden; offene Fenster und der Zielmodus fangen Esc vorher ab
+    Escape: "abbrechen", // Esc-Kette: Zielmodus, Fenster, Ablauf, sonst Spielmenü (eingabe/esckette.js)
     KeyI: "inventar", // Inventarfenster (eingabe/inventar.js)
-    KeyY: "faehigkeiten", // Taste Z auf deutscher Tastatur: Fähigkeitenfenster (eingabe/faehigkeiten.js)
+    KeyF: "faehigkeiten", // Fähigkeitenfenster (eingabe/faehigkeiten.js)
     KeyC: "charakter", // Charakter und Skills (eingabe/charakter.js)
+    Tab: "verlauf", // ganzes Log als Fenster (eingabe/verlauf.js)
     NumpadAdd: "zoom_rein",
     NumpadSubtract: "zoom_raus",
     BracketRight: "zoom_rein", // "+" auf deutscher Tastatur
     Slash: "zoom_raus", // "-" auf deutscher Tastatur
-    Tab: "log_umschalten",
     Enter: "neustart",
   },
   weitereTasten: {
+    ArrowUp: "bewegen_n",
+    ArrowDown: "bewegen_s",
+    ArrowLeft: "bewegen_w",
+    ArrowRight: "bewegen_o",
+    IntlBackslash: "treppe", // Taste <> der deutschen Tastatur, falls der Browser kein Zeichen meldet
     Equal: "zoom_rein", // US-Tastatur
     Minus: "zoom_raus", // US-Tastatur
     NumpadEnter: "neustart",
   },
   zeichen: {
     "?": "hilfe", // deutsche Tastatur Umschalt+ß, US Umschalt+/
+    ".": "warten",
+    "<": "treppe",
+    ">": "treppe",
   },
+  umschaltBewegen: "laufen",
   // Maustasten nach MouseEvent.button (0 links, 1 Mitte, 2 rechts); Rad: Zoom oder nichts
   maus: {
     0: "handeln", // Klick wird über die Klickregeln gedeutet (eingabe/maus.js)
+    2: "untersuchen", // Rechtsklick beschreibt das Feld wie X, das Kontextmenü des Browsers bleibt zu
   },
   rad: "zoom",
 };

@@ -1,7 +1,8 @@
 // Anzeige des Fensterstapels (eingabe/fenster.js) über der Karte, nach der Grammatik aus docs/Oberflaeche.md:
 // Titel mit dem Weg durch den Stapel, darunter wahlweise ein Kopf, links die Liste, rechts die Einzelheiten des
 // Gewählten, unten die Fußzeile mit den gültigen Tasten. Gezeigt wird nur das oberste Fenster. Liest den Zustand nur.
-// Jede Fensterart meldet hier ihren Inhalt an: (umgebung, zustand) => { titel, kopf?, liste, details?, fuss, hilfewerte? }
+// Jede Fensterart meldet hier ihren Inhalt an: (umgebung, zustand) => { titel, kopf?, liste, details?, fuss, hilfewerte?, breit? }
+//   breit: auch ohne Einzelheiten in voller Breite (Verlauf)
 //   hilfewerte: Platzhalter für den Text der Hilfe zu diesem Fenster (hilfe.thema.<art>), z.B. { punkte }
 //   umgebung: { spiel, daten, texte, belegung, darunter } (darunter: Inhalt des Fensters darunter oder null)
 // Inhalte von Inventar, Fähigkeiten und Hilfe stehen hier, Charakter und Erstellung in anzeige/charakterfenster.js.
@@ -33,7 +34,7 @@ export function fensterHtml(umgebung, stapel) {
   }
   const details = oben.details ? `<div class="fenster-details">${oben.details}</div>` : "";
   // ohne Einzelheiten ist das Fenster schmal, sonst stünde eine kurze Liste allein in der Breite
-  return `<div class="fenster-rahmen${oben.details ? "" : " schmal"}">
+  return `<div class="fenster-rahmen${oben.details || oben.breit ? "" : " schmal"}">
     <h1>${titel.join(" › ")}</h1>
     ${oben.kopf ? `<div class="fenster-kopf">${oben.kopf}</div>` : ""}
     <div class="fenster-inhalt"><div class="fenster-liste">${oben.liste}</div>${details}</div>
@@ -133,8 +134,9 @@ export function tastenname(texte, taste) {
   if (taste.zeichen !== undefined) return taste.zeichen;
   const schluessel = `taste.${taste.code}`;
   if (texte.hatSchluessel(schluessel)) return texte.text(schluessel);
+  // Buchstaben klein, wie sie ohne Umschalt getippt werden
   const buchstabe = /^Key([A-Z])$/.exec(taste.code)?.[1];
-  if (buchstabe) return buchstabe;
+  if (buchstabe) return buchstabe.toLowerCase();
   const ziffer = /^Digit([0-9])$/.exec(taste.code)?.[1];
   if (ziffer) return ziffer;
   const ziffernblock = /^Numpad(.+)$/.exec(taste.code)?.[1];

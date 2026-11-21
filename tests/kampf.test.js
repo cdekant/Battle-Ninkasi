@@ -202,3 +202,18 @@ test("vor_angriff: ein Abbruch lässt den einzelnen Angriff aus", (t) => {
   assert.deepEqual(gesehen, ["biss", "stoss"]);
   assert.equal(ziel.werte.lp.aktuell, 98);
 });
+
+test("Meldungen nennen Trefferchance und Kritfaktor für das Kampflog", () => {
+  const kritisch = { angriffe: [{ name: "hieb", genauigkeit: 100, effekt: "hieb" }], kampfwerte: { kritchance: SEHR_VIEL } };
+  const { spiel, quelle, ziel } = aufstellen({ angreifer: kritisch, ziel: { kampfwerte: { ausweichen: 100 } } });
+  const meldungen = meldungenMitschneiden(spiel);
+  nahkampf(spiel, quelle, ziel);
+  const meldung = meldungen.find((eintrag) => eintrag.art === "schaden" || eintrag.art === "verfehlt");
+  assert.equal(meldung.trefferchance, 50);
+  if (meldung.art === "schaden") assert.equal(meldung.kritfaktor, 150);
+  const ohneKrit = schadenDurch("gedankenstoss", { ziel: { kampfwerte: { ausweichen: SEHR_VIEL } } });
+  assert.equal(ohneKrit.meldung.kritfaktor, null, "ohne Krit kein Faktor");
+  assert.equal(typeof ohneKrit.meldung.trefferchance, "number", "Trefferchance des Bausteins trefferwurf");
+  const direkt = schadenDurch("hieb");
+  assert.equal(direkt.meldung.trefferchance, null, "ohne Trefferwurf keine Chance");
+});
