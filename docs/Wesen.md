@@ -2,7 +2,7 @@
 
 Stand: 2026-11-21
 
-Zuständig für: `src/systeme/kampf.js`, `src/systeme/fraktionen.js`, `src/systeme/wahrnehmung.js`, `src/systeme/bewegung.js`, `src/systeme/verschieben.js`, `src/systeme/werfen.js`, `src/systeme/skills.js`, `src/systeme/lernen.js`, `src/ki/*`, `daten/gegner.js`, `daten/ninkasi.js`, `daten/fraktionen.js`, `daten/schadensarten.js`, `daten/eigenschaften.js`, `daten/skills.js`, `daten/wurfgegenstaende.js`
+Zuständig für: `src/systeme/kampf.js`, `src/systeme/fraktionen.js`, `src/systeme/wahrnehmung.js`, `src/systeme/bewegung.js`, `src/systeme/verschieben.js`, `src/systeme/werfen.js`, `src/systeme/skills.js`, `src/systeme/lernen.js`, `src/systeme/stoffwechsel.js`, `src/ki/*`, `daten/gegner.js`, `daten/ninkasi.js`, `daten/fraktionen.js`, `daten/schadensarten.js`, `daten/eigenschaften.js`, `daten/skills.js`, `daten/wurfgegenstaende.js`
 
 Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Charakter.md](Charakter.md)
 
@@ -98,6 +98,22 @@ Vorläufige Ideen, noch nicht umgesetzt:
 + Lage (Zustandsprüfung nach jedem Vorgang, nach dem Tod): steht ein lebendes Wesen auf einem Feld, das es mit seiner wirksamen Bewegungsart nicht betreten kann (Phasen endet in der Wand, Levitation über dem Abgrund, hineingestoßen), wirkt `beimFestsitzen` des Geländes, sonst `regeln.bewegung.beimFestsitzen` (`eingeklemmt`, 2W6 stumpf, vorläufig); lebt es danach, wird es aufs nächste freie Feld gedrückt; Meldungen `festgesessen` und `herausgedrueckt`; der Sturz in einen Abgrund folgt mit den Ebenen (Punkt 8)
 + Werfen (`src/systeme/werfen.js`): Befehl `{ art: "werfen", gegenstandId, ziel: { x, y } | { id } }` entlang der Bahn eines Geschosses (bis zum ersten Wesen oder vor die Wand), Reichweite `wurf.reichweite` am Gegenstand, sonst `regeln.werfen.reichweite` (6), Zeitkosten `aktionen.werfen`; mit `wurf: { effekt }` zerbricht der Gegenstand am Aufschlag und der Effekt wirkt dort (Ziel das getroffene Wesen, Ursache `wurf`), sonst landet er auf dem Feld; am Aufschlag entsteht Lärm (`laermWurf` 4), dem Wache nachgehen; Meldungen `geworfen`, `geschoss`, `zerbrochen` bzw. `gelandet`; Gründe der Ablehnung `nichts_zu_werfen` und die der Zielauswahl; im Browser über das Inventarfenster (W) und den Zielmodus
 + Werfen gibt es bisher nur in Logik, Tests und Bot; der Zielmodus der Oberfläche für Werfen und Fähigkeiten folgt (siehe [Systemausbau.md](Systemausbau.md))
+
+## Stoffwechsel
+
+Daten:
+
++ Komponente `stoffwechsel` (`src/systeme/stoffwechsel.js`, Werte für Ninkasi in `daten/ninkasi.js`): Abbau des Pegels, Schwellen und je Wert eine Kurve der Regeneration über dem Pegel (Hundertstel je Welttick, Kurven siehe [Architektur.md](Architektur.md), Entitäten und Komponenten)
+
+Schnittstellen:
+
++ Handler der Weltuhr (Register `welttick`): je Welttick Regeneration oder Schwund nach den Kurven, danach Abbau des Pegels
++ Modifikatoren: `regeneration.<wert>` auf positive Raten, `schwund.<wert>` auf den Betrag negativer Raten, `kurvenverschiebung.<wert>` verschiebt die Kurve nach rechts (z.B. Optimum der LP nach oben), `abbau.pegel` auf den Abbau; Quellen sind Skills, Schriftrollen, Items und Zustände
+
+Regeln:
+
++ Negative Kurvenwerte sind Schwund, für jeden Wert möglich; Schwund der LP kann töten
++ Bruchteile laufen über Speicher in Hundertsteln (siehe [Architektur.md](Architektur.md), Zeitmodell)
 
 ## Skills und Lernen
 

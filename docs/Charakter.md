@@ -62,7 +62,7 @@ Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaf
 + Sinnlichkeit ist die schwerste Eigenschaft, Ausgleich über das Balancing
 + Vorräte und Eigenschaften: LP zu Körperlichkeit, MP zu Klugheit und Braukunde, PP zu Sinnlichkeit, Pegel zu Trinkfestigkeit, Ausdauer (Option) zu Gewandtheit oder Körperlichkeit
 + Kennerschaft (Unbekanntes erkennen) als Skill mit Sinnlichkeit und Braukunde
-+ Skills, Schriftrollen und Items wirken auf Regeneration und Schwund über Modifikatoren, siehe Stoffwechsel unter Entitäten und Komponenten in [Architektur.md](Architektur.md)
++ Skills, Schriftrollen und Items wirken auf Regeneration und Schwund über Modifikatoren, siehe Stoffwechsel in [Wesen.md](Wesen.md)
 
 ### Magie und Psi
 

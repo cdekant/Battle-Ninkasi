@@ -62,14 +62,14 @@ Spieldesign:
 
 Technik:
 
-+ [docs/Architektur.md](docs/Architektur.md): Kern (Grundsätze, Datenfluss, Befehle, Entitäten, Zeit, Ereignisse, Daten, Wiederholbarkeit, Speichern, Versionen, Leistung)
++ [docs/Architektur.md](docs/Architektur.md): Kern (Grundsätze, Datenfluss, Befehle, Entitäten, Zeit, Ereignisse, Register, Daten, Wiederholbarkeit, Speichern, Versionen, Leistung)
 + [docs/Wirkungen.md](docs/Wirkungen.md): Wirkungsarten, Effekte, Modifikatoren, Auslöser, Zustände, Zielauswahl, Fähigkeiten, lange Aktionen, Tod
-+ [docs/Wesen.md](docs/Wesen.md): Kampfwerte, Fraktionen, Wahrnehmung, KI, Bewegung, Skills und Lernen
++ [docs/Wesen.md](docs/Wesen.md): Kampfwerte, Fraktionen, Wahrnehmung, KI, Bewegung, Stoffwechsel, Skills und Lernen
 + [docs/Welt.md](docs/Welt.md): Gelände, Feldschichten, Ebenen, Wegfindung, Sicht, Licht, Gefahrenprüfung
 + [docs/Gegenstaende.md](docs/Gegenstaende.md): Inventar, Ausrüstung, Verschleiß, Unbekanntes
 + [docs/Anzeige.md](docs/Anzeige.md): Renderer, Seitenleiste, Kamera, Log
 + [docs/Bedienung.md](docs/Bedienung.md): Eingabe, Maus und Abläufe, Fenster, Schnellleiste, Zielmodus, Untersuchen, Einstellungen
-+ [docs/Entwicklung.md](docs/Entwicklung.md): Tests, Bot, Werkzeuge, Ablauf einer Version, Stolpersteine, Prototyp
++ [docs/Entwicklung.md](docs/Entwicklung.md): Starten, Tests, Bot, Werkzeuge, Ablauf einer Version, Stolpersteine, Prototyp
 
 Arbeitsliste: [docs/Systemausbau.md](docs/Systemausbau.md), fehlende Strukturen und bekannte Fehler; umgesetzte Punkte wandern in das zuständige Dokument.
 

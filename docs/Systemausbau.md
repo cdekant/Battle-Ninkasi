@@ -4,7 +4,7 @@ Stand: 2026-11-20
 
 Mitprüfen bei Änderungen: alle Dokumente, deren Punkte hier umgesetzt werden
 
-Arbeitsliste der Strukturen, die Logik und Datenmodell noch brauchen, damit Fernkampf, Flächenwirkung, Effekte über Zeit, Magie, Psi, Nahkampf und viele Gegner überwiegend als Daten abbildbar sind. Grundlage ist eine Prüfung von Doku und Code mit Stand 0.3.0. Die Begriffe stehen in [Architektur.md](Architektur.md) (Zeitmodell) und [Wirkungen.md](Wirkungen.md) (Wirkungsarten, Effektsystem, Register).
+Arbeitsliste der Strukturen, die Logik und Datenmodell noch brauchen, damit Fernkampf, Flächenwirkung, Effekte über Zeit, Magie, Psi, Nahkampf und viele Gegner überwiegend als Daten abbildbar sind. Grundlage ist eine Prüfung von Doku und Code mit Stand 0.3.0. Die Begriffe stehen in [Architektur.md](Architektur.md) (Zeitmodell, Register) und [Wirkungen.md](Wirkungen.md) (Wirkungsarten, Effektsystem).
 
 ## Arbeitsweise
 

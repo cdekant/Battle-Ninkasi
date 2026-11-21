@@ -2,11 +2,19 @@
 
 Stand: 2026-11-21
 
-Zuständig für: `tests/*`, `werkzeuge/bot.js`, `werkzeuge/messung.js`
+Zuständig für: `starten.py`, `starten.bat`, `tests/*`, `werkzeuge/bot.js`, `werkzeuge/messung.js`
 
 Mitprüfen bei Änderungen: [Architektur.md](Architektur.md)
 
 Arbeitsweise am Code: Tests, Bot, Werkzeuge, Prototyp, Ablauf einer Version und Stolpersteine.
+
+## Starten
+
++ Startskript `starten.py` (unter Windows per `starten.bat`): Webserver auf `127.0.0.1:8000` (belegt: freier Port) ohne Zwischenspeicher (`Cache-Control: no-store`), dazu Firefox als eigene Instanz (`-no-remote`) mit Entwicklungsprofil `.firefox-profil/` (in `.gitignore`, wird bei Bedarf angelegt, Einstellungen über `user.js`)
++ Fenster ohne Tabs, Adressleiste und Titelleiste über `chrome/userChrome.css` im Profil (dazu `toolkit.legacyUserProfileCustomizations.stylesheets` und `browser.tabs.inTitlebar` = 1); mit `--mit-leisten` gewohnte Oberfläche, dann bleibt `userChrome.css` leer
++ Endet Firefox, endet der Server; unter Windows mit `-wait-for-browser`, da `firefox.exe` sonst nur einen sofort endenden Startprozess ist; endet Firefox ohne Fehler binnen 5 Sekunden, läuft der Server bis Strg+C weiter; Firefox-Pfad notfalls über Umgebungsvariable `FIREFOX`
++ Fester Port, weil Einstellungen und Speicherplätze im `localStorage` je Ursprung (Host und Port) liegen
++ Von Hand: `python -m http.server`, dann `http://localhost:8000/`
 
 ## Tests und Balancing
 
