@@ -29,6 +29,7 @@ Regeln:
 Daten:
 
 + Unittests mit dem in Node eingebauten `node:test` und `node:assert`, ohne Abhängigkeiten; Dateien in `tests/`, benannt nach dem geprüften Modul mit Endung `.test.js` (z. B. `tests/wege.test.js`); welche Tests zu welchem System gehören, nennt jedes technische Dokument unter "Tests"
++ `tests/doku.test.js` prüft die Dokumentation: Markdown-Links auf vorhandene Dokumente, Verweise mit Abschnitt (im Code `docs/<Datei>.md, <Abschnitt>`, in Markdown "siehe" mit Link auf das Dokument, danach Komma und Abschnitt, für die Arbeitsliste auch `Punkt N`) auf vorhandene Überschriften, genau ein zuständiges Dokument je Datei in `src/`, `daten/`, `sprache/`, `grafik/`, `lib/`, `werkzeuge/`, `tests/` und je Startskript (`sprache/Literatur/` ausgenommen), jedes Dokument in CLAUDE.md, CLAUDE.md unter 12000 Zeichen, "Mitprüfen" in jedem Kopf; Text klein hinter einem Verweis (z.B. ein Pfad) gilt nicht als Abschnitt
 + `tests/hilfen.js` baut kleine Spiele aus Testkarten (ohne Dungeon-Erzeugung) mit Testeffekten, Schadensarten und Regelwerten (Grundverteidigung dort 0, damit Genauigkeit 100 ohne Ausweichen sicher trifft), samt Wesen, Spielerin und getragenen Gegenständen, macht auf Wunsch die ganze Karte sichtbar, lässt die Welt (Weltuhr, Zeitereignisse) bis zu einem Zeitpunkt laufen, schneidet Meldungen mit und meldet Haken nur für die Dauer eines Tests an; `rohdatenMitTesteintraegen` liefert die Spieldaten samt Testeinträgen (alle mit "test" im Namen)
 
 Schnittstellen:

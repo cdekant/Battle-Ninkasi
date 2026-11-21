@@ -81,7 +81,7 @@ Kaskade: CLAUDE.md gibt Prinzipien, Ordner und Wegweiser; jedes Dokument in `doc
 + Wer eine Datei ändert, führt ihr zuständiges Dokument nach und prüft die Dokumente aus dessen "Mitprüfen"; ändern sich Prinzipien, Ordner oder Begriffe, auch CLAUDE.md.
 + Jede Aussage steht an genau einer Stelle; andere verweisen darauf, in Markdown als Link auf das Dokument mit dem Abschnitt dahinter, im Code als `siehe docs/<Dokument>.md, <Abschnitt>`.
 + Widersprechen sich Doku und Code, wird das gemeldet und nicht still einseitig angepasst.
-+ Vor jedem Commit: Verweise zeigen auf vorhandene Dateien und Abschnitte, jede Datei ist zugeordnet, CLAUDE.md bleibt unter dem Limit; Tests und Bot laufen fehlerfrei.
++ Vor jedem Commit: Verweise zeigen auf vorhandene Dateien und Abschnitte, jede Datei ist zugeordnet, CLAUDE.md bleibt unter dem Limit (geprüft von `tests/doku.test.js` bei `node --test`); Tests und Bot laufen fehlerfrei. Doppeltes findet kein Test, das bleibt Handarbeit.
 
 ## Repository und Umgebung
 
