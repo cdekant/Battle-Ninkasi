@@ -69,7 +69,12 @@ test("Hilfe: Gruppen aus dem Katalog, Tastennamen, schließen mit Esc oder ?", (
   const gruppen = hilfeGruppen(belegung);
   assert.deepEqual(gruppen.map(({ gruppe }) => gruppe), GRUPPEN);
   const anzahl = gruppen.reduce((summe, { eintraege }) => summe + eintraege.length, 0);
-  assert.equal(anzahl, Object.keys(AKTIONEN).length - PLAETZE_DER_LEISTE + 1, "jede Aktion steht in der Hilfe, die Plätze der Leiste in einer Zeile");
+  const leistenwechsel = Object.values(AKTIONEN).filter((eintrag) => eintrag.leiste !== undefined).length;
+  assert.equal(anzahl, Object.keys(AKTIONEN).length - PLAETZE_DER_LEISTE + 1 - leistenwechsel + 1, "jede Aktion steht in der Hilfe, Plätze und Leistenwechsel je in einer Zeile");
+  const wechsel = gruppen.find(({ gruppe }) => gruppe === "schnellleiste").eintraege[1];
+  assert.equal(wechsel.tasten.map((taste) => tastenname(texte, taste)).join(", "), "Umschalt+1, Umschalt+2, Umschalt+3, Umschalt+4, Umschalt+5");
+  assert.equal(aktionDerTaste(belegung, "Digit2", "\"", true), "leiste_2", "Umschalt+Ziffer vor dem Zeichen");
+  assert.equal(aktionDerTaste(belegung, "Digit2", "2", false), "schnellplatz_2");
   const leiste = gruppen.find(({ gruppe }) => gruppe === "schnellleiste").eintraege[0];
   assert.deepEqual(leiste.tasten.map((taste) => tastenname(texte, taste)).join(""), "1234567890");
   const laufen = gruppen.find(({ gruppe }) => gruppe === "bewegen").eintraege.find(({ aktion }) => aktion === "laufen");

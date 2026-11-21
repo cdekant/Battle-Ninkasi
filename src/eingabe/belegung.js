@@ -3,6 +3,7 @@
 //   weitereTasten: wirken genauso, die Hilfe nennt sie nicht (z.B. die Lage von + und - auf der US-Tastatur)
 //   zeichen:       nach dem Zeichen der Taste (KeyboardEvent.key), für Zeichen ohne feste Lage; gehen den Tasten vor
 //   umschaltBewegen: Aktion für Umschalt plus eine Bewegungstaste (Laufen, eingabe/laufen.js)
+//   umschaltTasten: physische Tasten mit Umschalt (Leiste wechseln); gehen allem anderen vor
 // Eine Aktion darf mehrere Tasten haben. Bewegung nach den vi-Tasten der Roguelikes, nach der Lage der Taste:
 // h j k l, dazu y u b n für die Diagonalen; auf der deutschen Tastatur liegt y auf der Taste mit der Aufschrift Z
 // (KeyY). Ziffernblock und Pfeiltasten bleiben zusätzlich belegt (docs/Oberflaeche.md, Tastatur).
@@ -27,6 +28,8 @@ export default {
     Numpad5: "warten",
     KeyG: "aufheben",
     KeyT: "trinken", // Gegenstand wählt die Eingabe: erstes Getränk im Gepäck
+    KeyD: "fallenlassen_waehlen", // Inventar, der Buchstabe lässt fallen
+    KeyW: "werfen_waehlen", // Inventar, der Buchstabe wirft
     Space: "fortsetzen", // unterbrochene lange Aktion weiterführen
     KeyX: "untersuchen", // Untersuchen mit dem Cursor des Zielmodus (eingabe/zielmodus.js)
     Digit1: "schnellplatz_1",
@@ -46,6 +49,7 @@ export default {
     KeyF: "faehigkeiten", // Fähigkeitenfenster (eingabe/faehigkeiten.js)
     KeyC: "charakter", // Charakter und Skills (eingabe/charakter.js)
     Tab: "verlauf", // ganzes Log als Fenster (eingabe/verlauf.js)
+    KeyM: "karte", // Übersichtskarte (eingabe/karte.js)
     NumpadAdd: "zoom_rein",
     NumpadSubtract: "zoom_raus",
     BracketRight: "zoom_rein", // "+" auf deutscher Tastatur
@@ -69,6 +73,13 @@ export default {
     ">": "treppe",
   },
   umschaltBewegen: "laufen",
+  umschaltTasten: {
+    Digit1: "leiste_1",
+    Digit2: "leiste_2",
+    Digit3: "leiste_3",
+    Digit4: "leiste_4",
+    Digit5: "leiste_5",
+  },
   // Maustasten nach MouseEvent.button (0 links, 1 Mitte, 2 rechts); Rad: Zoom oder nichts
   maus: {
     0: "handeln", // Klick wird über die Klickregeln gedeutet (eingabe/maus.js)

@@ -20,8 +20,12 @@ import { menueOeffnen, menueTaste, bestaetigungTaste, MENUE_EINTRAEGE } from "..
 import { verlaufOeffnen, verlaufTaste, passtZumFilter, VERLAUF_FILTER } from "../src/eingabe/verlauf.js";
 import { fensterHtml } from "../src/anzeige/fenster.js";
 import "../src/anzeige/systemfenster.js";
+import "../src/eingabe/inventar.js";
+import "../src/eingabe/faehigkeiten.js";
 import { Oberflaeche } from "../src/anzeige/oberflaeche.js";
 import { Bedienzeile } from "../src/anzeige/bedienzeile.js";
+import { minikartenBild, feldgroesseFuer, feldAmPunkt } from "../src/anzeige/minikarte.js";
+import { neueLeisten, leistenNachfuehren } from "../src/eingabe/schnellleiste.js";
 import { erstelleTexte } from "../src/anzeige/texte.js";
 import { erstelleGrammatik } from "../src/anzeige/grammatik.js";
 
@@ -54,7 +58,7 @@ test("Logzeilen: Kampf mit Seite, Ton und Zahlen, Geschehen mit Art", () => {
   const schaden = (quelle, zusatz) => zeilenAusMeldung(kontext, { art: "schaden", quelle: bezugAuf(quelle), ziel: bezugAuf(quelle === feind ? ninkasi : feind), menge: 9, schadensart: "stumpf", kritisch: false, ruestungAbzug: 0, widerstanden: 0, immun: false, trefferchance: 78, kritfaktor: null, ...zusatz })[0];
   const krit = schaden(ninkasi, { kritisch: true, kritfaktor: 150, ruestungAbzug: 2 });
   assert.deepEqual([krit.spalte, krit.art, krit.seite, krit.ton], ["kampf", "krit", "ninkasi", "krit"]);
-  assert.deepEqual(krit.zahlen.map((zahl) => zahl.text), ["78 %", "9", "x1,5", "−2"]);
+  assert.deepEqual(krit.zahlen.map((zahl) => zahl.text), ["78", "9", "x1,5", "−2"]);
   assert.deepEqual(krit.zahlen.map((zahl) => zahl.klasse), ZAHLENSPALTEN, "in der Reihenfolge der festen Spalten");
   assert.equal(schaden(freundin).seite, "verbuendet");
   const gegnerisch = schaden(feind, { schadensart: "psi" });
@@ -63,7 +67,7 @@ test("Logzeilen: Kampf mit Seite, Ton und Zahlen, Geschehen mit Art", () => {
   const abgezogen = schaden(feind, { widerstanden: 3, ruestungAbzug: 2 }).zahlen.at(-1);
   assert.deepEqual([abgezogen.text, abgezogen.titel], ["−5", "−2 Rüstung, −3 Widerstand"], "Abzug zusammen, die Aufteilung im Tooltip");
   const verfehlt = zeilenAusMeldung(kontext, { art: "verfehlt", quelle: bezugAuf(feind), ziel: bezugAuf(ninkasi), grund: "geblockt", trefferchance: 40 })[0];
-  assert.deepEqual([verfehlt.spalte, verfehlt.seite, verfehlt.ton, verfehlt.zahlen[0].text], ["kampf", "gegner", "abgewehrt", "40 %"]);
+  assert.deepEqual([verfehlt.spalte, verfehlt.seite, verfehlt.ton, verfehlt.zahlen[0].text], ["kampf", "gegner", "abgewehrt", "40"]);
   const tod = zeilenAusMeldung(kontext, { art: "tod", opfer: bezugAuf(feind), quelle: null })[0];
   assert.deepEqual([tod.spalte, tod.art, tod.seite], ["kampf", "tod", "ninkasi"], "ohne Quelle die Seite, der der Tod nützt");
   const eigenerTod = zeilenAusMeldung(kontext, { art: "tod", opfer: bezugAuf(ninkasi), quelle: bezugAuf(feind) })[0];
@@ -91,7 +95,7 @@ test("Log: Zugmarke, gleiche Zeilen zusammengefasst, zwei Spalten, Strich zwisch
   assert.match(logzeileHtml({ zug: 6, art: "krit", text: "<b>", seite: "gegner", ton: "krit", anzahl: 1 }, { zug: 5 }), /seite-gegner ton-krit neuer-zug.*&lt;b&gt;/s, "Klassen und maskierter Text");
   const kampfzeile = logzeileHtml({ zug: 6, spalte: "kampf", art: "angriff", text: "Hieb.", seite: "ninkasi", ton: "treffer", anzahl: 1, zahlen: [{ text: "9", klasse: "menge" }] });
   assert.equal((kampfzeile.match(/class="zahl /g) || []).length, 4, "vier feste Zahlenspalten, auch leere");
-  assert.match(logkopfHtml(texte, "kampf"), /Chance.*Schaden.*Krit.*Abzug/s);
+  assert.match(logkopfHtml(texte, "kampf"), /title="Trefferchance in Prozent">%<.*>DMG<.*>×<.*>–</s);
   assert.doesNotMatch(logzeileHtml({ zug: 6, spalte: "geschehen", art: "geschehen", text: "Tropf.", anzahl: 1 }), /class="zahl /, "das Geschehen hat keine Zahlen");
 });
 
@@ -153,12 +157,35 @@ test("Anzeige: Menü, Bestätigung, Verlauf, Seitenleiste und Bedienzeile ohne f
   assert.doesNotMatch(verlauf, /schmal/, "der Verlauf ist breit");
   assert.doesNotMatch(zeigen("verlauf", { filter: "kampf", versatz: 0 }), /Willkommen/);
   const seitenleiste = new Oberflaeche(ohneDom(), texte, "test");
-  seitenleiste.anzeigen(spiel);
-  assert.match(seitenleiste.element.innerHTML, /Tiefe \d+ · Zug \d+/);
+  seitenleiste.anzeigen(spiel, { hervorgehobenId: spiel.zustand.spielerinId });
+  assert.match(seitenleiste.kopfHtml(spiel), /Tiefe \d+ · Zug \d+/);
   const bedienzeile = new Bedienzeile(ohneDom(), texte, belegung);
-  bedienzeile.anzeigen(spiel);
+  bedienzeile.anzeigen(spiel, leistenNachfuehren(spiel, neueLeisten()));
+  assert.match(bedienzeile.element.innerHTML, /class="leiste-nummer"[^>]*>1</);
   assert.equal((bedienzeile.element.innerHTML.match(/data-platz=/g) || []).length, 10);
   assert.equal((bedienzeile.element.innerHTML.match(/data-aktion=/g) || []).length, 8);
-  assert.match(bedienzeile.element.innerHTML, /Gepäck.*Menü/s);
+  assert.match(bedienzeile.element.innerHTML, /Gepäck.*Karte.*Menü/s);
+  assert.match(zeigen("karte", {}), /uebersichtskarte.*Treppe/s);
+  assert.match(zeigen("faehigkeiten", { gewaehlt: null }), /Fähigkeiten/);
+  assert.match(zeigen("inventar", { gewaehlt: null, absicht: "werfen" }), /Werfen/);
   assert.deepEqual(warnungen, []);
+});
+
+test("Minikarte: Farbe je erkundetem Feld, gedämpft außer Sicht, Punkte für Treppe, Wesen und zuletzt Ninkasi", () => {
+  const spiel = miniSpiel(["#####", "#..>#", "#####"]);
+  const ninkasi = spielerinSetzen(spiel, 1, 1);
+  wesen(spiel, 2, 1, "feinde", 10);
+  spiel.zustand.ebene.erkundet[0] = 0;
+  spiel.zustand.sichtbareFelder = [6, 7, 8];
+  const bild = minikartenBild(spiel, daten.zeichen);
+  assert.deepEqual([bild.breite, bild.hoehe, bild.felder.length], [5, 3, 15]);
+  assert.equal(bild.felder[0], null, "unerkundet");
+  assert.equal(bild.felder[6], daten.zeichen.gelaende.boden.farbe);
+  assert.deepEqual([bild.gedaempft[6], bild.gedaempft[1]], [false, true]);
+  assert.deepEqual(bild.punkte.map(({ art }) => art), ["treppe", "gegner", "ninkasi"]);
+  assert.equal(bild.punkte.at(-1).id, ninkasi.id);
+  assert.equal(feldgroesseFuer(400, 120, 3), 3);
+  assert.equal(feldgroesseFuer(200, 120, 3), 1);
+  assert.deepEqual(feldAmPunkt(bild, 3, 7, 4), { x: 2, y: 1 });
+  assert.equal(feldAmPunkt(bild, 3, 99, 4), null);
 });

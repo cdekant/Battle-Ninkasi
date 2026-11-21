@@ -9,7 +9,7 @@ import { aktionDerTaste, befehlDerAktion } from "./aktionskatalog.js";
 // Umschalt plus eine Bewegungstaste wird zur Aktion belegung.umschaltBewegen mit { richtung: { dx, dy } } (Laufen).
 export function uebersetzen(tastenereignis, belegung, spiel) {
   if (tastenereignis.ctrlKey || tastenereignis.altKey || tastenereignis.metaKey) return null;
-  const aktion = aktionDerTaste(belegung, tastenereignis.code, tastenereignis.key);
+  const aktion = aktionDerTaste(belegung, tastenereignis.code, tastenereignis.key, tastenereignis.shiftKey);
   if (!aktion) return null;
   const befehl = befehlDerAktion(aktion);
   if (befehl?.art === "bewegen" && tastenereignis.shiftKey && belegung.umschaltBewegen) {

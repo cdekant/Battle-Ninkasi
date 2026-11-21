@@ -9,6 +9,7 @@ import grammatikDe from "../sprache/de/grammatik.js";
 import belegung from "./eingabe/belegung.js";
 import vorgaben from "./eingabe/einstellungen.js";
 import { datenLaden, neuesSpiel, befehlGeben } from "./kern/spiel.js";
+import { entitaetenAuf, istWesen } from "./kern/zustand.js";
 import { hoererAnmelden } from "./kern/ereignisse.js";
 import { startwertAbleiten } from "./kern/zufall.js";
 import { spielerin, bewegungVon } from "./kern/zustand.js";
@@ -27,7 +28,9 @@ import { reiseBeginnen, naechsterReiseschritt } from "./eingabe/reise.js";
 import { rastenBeginnen, naechsterRastschritt } from "./eingabe/rasten.js";
 import { erkundenBeginnen, naechsterErkundungsschritt } from "./eingabe/erkunden.js";
 import { laufenBeginnen, naechsterLaufschritt } from "./eingabe/laufen.js";
-import { platzAusloesen } from "./eingabe/schnellleiste.js";
+import { neueLeisten, leistenNachfuehren, platzAusloesen, platzBelegen, platzLeeren, plaetzeTauschen, leisteWechseln, ohneSchluessel, aktivePlaetze } from "./eingabe/schnellleiste.js";
+import { SPEICHERSCHLUESSEL_LAUF, speicherstandText, speicherstandLesen } from "./eingabe/speicherstand.js";
+import "./eingabe/karte.js";
 import { escSchritt } from "./eingabe/esckette.js";
 import { menueOeffnen } from "./eingabe/menue.js";
 import { verlaufOeffnen } from "./eingabe/verlauf.js";
@@ -42,6 +45,7 @@ import { fensterHtml } from "./anzeige/fenster.js";
 import "./anzeige/charakterfenster.js";
 import "./anzeige/systemfenster.js";
 import { Bedienzeile } from "./anzeige/bedienzeile.js";
+import { minikartenBild, zeichnen as minikarteZeichnen, feldgroesseFuer, feldAmPunkt } from "./anzeige/minikarte.js";
 import { zielmodusBeginnen, zielmodusTaste, zielmodusVorschau, zielmodusBestaetigen, cursorSetzen } from "./eingabe/zielmodus.js";
 import { istSichtbar } from "./systeme/sicht.js";
 import { neueAnimation, geschossEinreihen, laeuftAnimation, aktuellesGeschoss, animationWeiter, animationLeeren } from "./anzeige/animation.js";
@@ -49,6 +53,9 @@ import { neueAnimation, geschossEinreihen, laeuftAnimation, aktuellesGeschoss, a
 const SPEICHERSCHLUESSEL_EINSTELLUNGEN = "battle-ninkasi.einstellungen";
 const SPEICHERSCHLUESSEL_EIGENSCHAFTEN = "battle-ninkasi.eigenschaften"; // letzte Verteilung der Charaktererstellung
 const RAD_PAUSE_MS = 150; // zwischen zwei Zoomschritten per Rad
+const SPEICHERN_NACH_MS = 300; // Speichern gesammelt, höchstens so oft; beim Verlassen der Seite sofort
+const MINIKARTE_HOECHSTENS = 3; // Pixel je Feld; in Variante B streckt CSS sie auf die Breite der Log-Spalte
+const UEBERSICHT_HOECHSTENS = 10; // Pixel je Feld auf der Übersichtskarte
 const TOOLTIP_ABSTAND = 6; // Pixel zwischen Feld und Tooltip
 
 const grammatik = erstelleGrammatik(grammatikDe);
@@ -88,6 +95,11 @@ function letzteEigenschaftenSpeichern(eigenschaften) {
   try { localStorage.setItem(SPEICHERSCHLUESSEL_EIGENSCHAFTEN, JSON.stringify(eigenschaften)); } catch { /* ohne Speicher weiter */ }
 }
 
+// Ein gespeicherter Lauf geht vor; ?seed= gilt nur ohne ihn oder mit &neu
+function neuErzwungen() {
+  return new URLSearchParams(location.search).has("neu");
+}
+
 function startwertAusUrl() {
   const startwertText = new URLSearchParams(location.search).get("seed");
   if (startwertText === null || startwertText === "") return null;
@@ -116,11 +128,21 @@ if (!einstellungen.zoomstufen.includes(einstellungen.zoom)) einstellungen.zoom =
 const LAYOUTS = ["a", "b"];
 if (!LAYOUTS.includes(einstellungen.layout)) einstellungen.layout = LAYOUTS[0];
 const spielElement = document.getElementById("spiel");
-spielElement.dataset.layout = einstellungen.layout;
 
 const kartenCanvas = document.getElementById("karte-canvas");
 const renderer = new Renderer(kartenCanvas, daten.zeichen, tilebilder);
-const oberflaeche = new Oberflaeche(document.getElementById("seitenleiste"), texte, VERSION);
+const oberflaeche = new Oberflaeche(document.getElementById("seiteninhalt"), texte, VERSION);
+const seitenkopfElement = document.getElementById("seitenkopf");
+const minikartenCanvas = document.getElementById("minikarte");
+
+// Layout anwenden: Variante als data-layout; in Variante B steht die Minikarte links über dem Log, sonst in der
+// Seitenleiste unter dem Kopf
+function layoutAnwenden() {
+  spielElement.dataset.layout = einstellungen.layout;
+  if (einstellungen.layout === "b") document.getElementById("minikarte-links").append(minikartenCanvas);
+  else seitenkopfElement.after(minikartenCanvas);
+}
+layoutAnwenden();
 const log = new Log(document.getElementById("log"), texte);
 const bedienzeile = new Bedienzeile(document.getElementById("bedienzeile"), texte, belegung);
 const tooltipElement = document.getElementById("tooltip");
@@ -140,6 +162,13 @@ let fensterStapel = [];
 let zielModus = null;
 // Zuletzt gewähltes Ziel (ID eines Wesens) für die Vorbelegung des Cursors (eingabe/zielmodus.js)
 let letztesZielId = null;
+// Schnellleiste (eingabe/schnellleiste.js), gespeichert im Teil oberflaeche des Speicherstands
+let leisten = neueLeisten();
+// Wesen, über dem in der Seitenleiste der Zeiger steht (Hervorheben auf der Karte)
+let seitenleisteWesenId = null;
+// Feldgröße und Bild der Minikarte vom letzten Zeichnen, für Klicks
+let minikarte = null;
+let speicherZeitgeber = null;
 // Geschossbahnen aus den Meldungen "geschoss", abgespielt im Takt geschossPause (anzeige/animation.js)
 const animation = neueAnimation();
 let animationsZeitgeber = null;
@@ -161,16 +190,90 @@ function zeichnen() {
   };
   // Untersuchen: nur der Cursor, ohne Bahn und Fläche
   const untersuchmarkierung = zielModus && !zielvorschau && { cursor: zielModus.cursor, ok: true, bahn: [], felder: [], betroffene: [] };
+  const hervorgehobenesWesen = seitenleisteWesenId !== null ? spiel.zustand.entitaeten[seitenleisteWesenId] : null;
   renderer.zeichnen(spiel, kamera, ansicht, einstellungen.zoom, {
     zeiger: feldUnterZeiger, weg: wegvorschau, gefahr: angekuendigteFelder(spiel), ziel: zielmarkierung || untersuchmarkierung, geschoss: aktuellesGeschoss(animation),
+    hervorgehoben: hervorgehobenesWesen?.position ?? null,
   });
-  oberflaeche.anzeigen(spiel, { ziel: zielModus && { modus: zielModus, vorschau: zielvorschau } });
-  bedienzeile.anzeigen(spiel);
-  const fensterInhalt = fensterHtml({ spiel, daten, texte, belegung, logzeilen: log.zeilen, einstellungen, version: VERSION }, fensterStapel);
+  const hervorgehobenId = seitenleisteWesenId ?? wesenIdAuf(zielModus?.auswahl.zweck === "untersuchen" ? zielModus.cursor : feldUnterZeiger);
+  seitenkopfElement.textContent = oberflaeche.kopfHtml(spiel);
+  minikarteAktualisieren(hervorgehobenId);
+  oberflaeche.anzeigen(spiel, { ziel: zielModus && { modus: zielModus, vorschau: zielvorschau }, hervorgehobenId });
+  bedienzeile.anzeigen(spiel, leisten);
+  const fensterInhalt = fensterHtml({ spiel, daten, texte, belegung, leisten, logzeilen: log.zeilen, einstellungen, version: VERSION }, fensterStapel);
   fensterElement.hidden = !fensterInhalt;
   fensterElement.innerHTML = fensterInhalt;
+  uebersichtskarteZeichnen();
   tooltipZeigen();
 }
+
+// ID des sichtbaren Wesens auf einem Feld oder null
+function wesenIdAuf(feld) {
+  if (!feld || !istSichtbar(spiel.zustand, feld.x, feld.y)) return null;
+  return entitaetenAuf(spiel.zustand, feld.x, feld.y).find(istWesen)?.id ?? null;
+}
+
+// Minikarte in der Seitenleiste (anzeige/minikarte.js); passt sich der Breite der Seitenleiste an
+function minikarteAktualisieren(hervorgehobenId) {
+  const bild = minikartenBild(spiel, daten.zeichen);
+  const verfuegbar = innenbreite(minikartenCanvas.parentElement) - 2 || bild.breite * MINIKARTE_HOECHSTENS;
+  const feldgroesse = feldgroesseFuer(verfuegbar, bild.breite, MINIKARTE_HOECHSTENS);
+  minikarteZeichnen(minikartenCanvas, bild, feldgroesse, { hervorgehobenId });
+  minikarte = { bild, feldgroesse };
+}
+
+// Breite eines Elements ohne seine Polsterung
+function innenbreite(element) {
+  const stil = getComputedStyle(element);
+  return element.clientWidth - parseFloat(stil.paddingLeft) - parseFloat(stil.paddingRight);
+}
+
+// Pixel eines Mausereignisses im Koordinatensystem des Canvas (falls CSS es verkleinert)
+function canvasPunkt(canvas, mausereignis) {
+  return { x: mausereignis.offsetX * (canvas.width / canvas.clientWidth), y: mausereignis.offsetY * (canvas.height / canvas.clientHeight) };
+}
+
+// Übersichtskarte im offenen Fenster "karte"
+function uebersichtskarteZeichnen() {
+  const canvas = fensterElement.querySelector("canvas.uebersichtskarte");
+  if (!canvas) return;
+  const bild = minikartenBild(spiel, daten.zeichen);
+  const verfuegbar = innenbreite(canvas.parentElement) || kartenCanvas.clientWidth;
+  minikarteZeichnen(canvas, bild, feldgroesseFuer(verfuegbar, bild.breite, UEBERSICHT_HOECHSTENS));
+}
+
+// Speichern (eingabe/speicherstand.js): gesammelt nach Befehlen; nicht während der Charaktererstellung, nach dem Tod
+// wird der Stand gelöscht
+function speichernJetzt() {
+  clearTimeout(speicherZeitgeber);
+  speicherZeitgeber = null;
+  if (!spiel || fensterStapel.some(({ art }) => art === "erstellung")) return;
+  try {
+    if (spiel.zustand.vorbei) localStorage.removeItem(SPEICHERSCHLUESSEL_LAUF);
+    else localStorage.setItem(SPEICHERSCHLUESSEL_LAUF, speicherstandText(spiel, { leisten, logzeilen: log.zeilen }));
+  } catch { /* ohne Speicher weiter */ }
+}
+function speichernVormerken() {
+  if (!speicherZeitgeber) speicherZeitgeber = setTimeout(speichernJetzt, SPEICHERN_NACH_MS);
+}
+function gespeichertenLaufLoeschen() {
+  try { localStorage.removeItem(SPEICHERSCHLUESSEL_LAUF); } catch { /* ohne Speicher weiter */ }
+}
+window.addEventListener("pagehide", speichernJetzt);
+
+// Nach jedem angenommenen Befehl: Schnellleiste nachführen, speichern
+function nachDemBefehl() {
+  leisten = leistenNachfuehren(spiel, leisten);
+  speichernVormerken();
+}
+
+// Änderung der Schnellleiste aus einem Fenster: { belegen: { stelle, platz } } oder { entfernen: platz }
+function leisteAendern(aenderung) {
+  if (aenderung.belegen) leisten = platzBelegen(leisten, aenderung.belegen.stelle, aenderung.belegen.platz);
+  if (aenderung.entfernen) leisten = ohneSchluessel(leisten, platzSchluesselVon(aenderung.entfernen));
+  speichernVormerken();
+}
+const platzSchluesselVon = (platz) => (platz.art === "faehigkeit" ? `faehigkeit:${platz.faehigkeit}` : `gegenstand:${platz.typ}`);
 
 // Tooltip: Kurzfassung des Feldes unter dem Zeiger, beim Untersuchen unter dem Cursor (auch per Tastatur);
 // rechts neben dem Feld, am rechten Rand links davon
@@ -253,6 +356,7 @@ function ablaufTakt() {
   const schritt = laufenderAblauf.naechsterSchritt(spiel, laufenderAblauf.zustand, einstellungen);
   if (schritt.halt) return ablaufBeenden(schritt.halt);
   if (!befehlGeben(spiel, schritt.befehl).ok) return ablaufBeenden("abgelehnt");
+  nachDemBefehl();
   zeichnen();
   animationStarten();
   ablaufZeitgeber = setTimeout(ablaufTakt, einstellungen.reisePause);
@@ -268,21 +372,51 @@ function ablaufStarten(beginn, naechsterSchritt) {
 // Ein Lauf mit Startoptionen (Charaktererstellung); dieselbe Ebene wie in der Vorschau, die Eigenschaften
 // ändern an der Erzeugung nichts
 function laufBeginnen(startwert, optionen) {
+  gespeichertenLaufLoeschen();
+  spielEinsetzen(neuesSpiel(daten, startwert, optionen), neueLeisten());
+  log.zeile(texte.text("log.willkommen"));
+  zeichnen();
+}
+
+// Ein Spiel wird das laufende: Anzeige-Zustand zurücksetzen, Hörer anmelden, Startwert in die Adresse
+function spielEinsetzen(neuesSpielObjekt, neueLeistenStand) {
   if (laufenderAblauf) ablaufBeenden(null);
   zielModus = null;
   letztesZielId = null;
+  seitenleisteWesenId = null;
   animationUeberspringen();
-  spiel = neuesSpiel(daten, startwert, optionen);
+  spiel = neuesSpielObjekt;
   window.spiel = spiel; // zum Nachsehen in der Konsole
   kamera = neueKamera();
   log.leeren(spiel);
   hoererAnmelden(spiel, log.melden);
   hoererAnmelden(spiel, geschossGemeldet);
-  log.zeile(texte.text("log.willkommen"));
+  leisten = leistenNachfuehren(spiel, neueLeistenStand);
   const adresse = new URL(location.href);
   adresse.searchParams.set("seed", String(spiel.zustand.startwert));
+  adresse.searchParams.delete("neu");
   history.replaceState(null, "", adresse);
+}
+
+// Beim Laden der Seite: den gespeicherten Lauf fortsetzen; gibt false zurück, wenn es keinen gibt oder er nicht passt
+// (dann nennt das Log nach dem Neubeginn den Grund)
+let verworfenerStand = null;
+function gespeichertenLaufFortsetzen() {
+  let text = null;
+  try { text = localStorage.getItem(SPEICHERSCHLUESSEL_LAUF); } catch { /* ohne Speicher */ }
+  if (!text || neuErzwungen()) return false;
+  const gelesen = speicherstandLesen(daten, text);
+  if (gelesen.grund) {
+    verworfenerStand = gelesen;
+    gespeichertenLaufLoeschen();
+    return false;
+  }
+  fensterStapel = [];
+  spielEinsetzen(gelesen.spiel, gelesen.oberflaeche.leisten);
+  log.zeilenEinsetzen(gelesen.oberflaeche.log);
+  log.zeile(texte.text("log.fortgesetzt"), "hinweis");
   zeichnen();
+  return true;
 }
 
 // Neuer Lauf: erst die Charaktererstellung über der Karte des Laufs, vorbelegt mit der letzten Verteilung
@@ -290,16 +424,22 @@ function starten(startwert) {
   const erstellung = erstellungOeffnen(daten, letzteEigenschaftenLaden());
   fensterStapel = fensterOeffnen([], "erstellung", erstellung);
   laufBeginnen(startwert, { eigenschaften: erstellung.eigenschaften });
+  if (verworfenerStand) {
+    log.zeile(texte.text(`log.stand_verworfen.${verworfenerStand.grund}`, verworfenerStand), "gefahr");
+    verworfenerStand = null;
+    zeichnen();
+  }
 }
 
 // Ergebnis der Charaktererstellung: derselbe Startwert mit der gewählten Verteilung
 function erstellungAbschliessen(startoptionen) {
   letzteEigenschaftenSpeichern(startoptionen.eigenschaften);
   laufBeginnen(spiel.zustand.startwert, startoptionen);
+  speichernJetzt();
 }
 
 // Fenster obenauf legen; nach dem Tod nur die, die nichts am Lauf ändern (Spielmenü, Hilfe, Verlauf)
-const FENSTER_NACH_DEM_TOD = ["menue", "hilfe", "verlauf"];
+const FENSTER_NACH_DEM_TOD = ["menue", "hilfe", "verlauf", "karte"];
 function fensterAuf(art, zustand) {
   if (spiel.zustand.vorbei && !FENSTER_NACH_DEM_TOD.includes(art)) return;
   fensterStapel = fensterOeffnen(fensterStapel, art, zustand);
@@ -310,12 +450,13 @@ function fensterAuf(art, zustand) {
 function fensteraktionAusfuehren(aktion) {
   if (aktion === "neustart") {
     fensterStapel = [];
+    gespeichertenLaufLoeschen();
     return starten(zufaelligerStartwert());
   }
   if (aktion === "layout") {
     einstellungen.layout = LAYOUTS[(LAYOUTS.indexOf(einstellungen.layout) + 1) % LAYOUTS.length];
     einstellungenSpeichern(einstellungen);
-    spielElement.dataset.layout = einstellungen.layout;
+    layoutAnwenden();
     kamera.gesetzt = false;
     return zeichnen();
   }
@@ -330,7 +471,7 @@ function fensteraktionAusfuehren(aktion) {
 // Platz der Schnellleiste (eingabe/schnellleiste.js): Getränk sofort, Fähigkeit über den Zielmodus mit Vorbelegung
 function platzBenutzen(stelle) {
   if (spiel.zustand.vorbei) return;
-  const ergebnis = platzAusloesen(spiel, stelle);
+  const ergebnis = platzAusloesen(spiel, leisten, stelle);
   if (!ergebnis) return;
   if (ergebnis.grund) {
     ablehnungMelden(ergebnis.grund);
@@ -353,6 +494,7 @@ function zoomen(richtung) {
 function befehlGebenUndZeichnen(befehl) {
   const ergebnis = befehlGeben(spiel, befehl);
   if (ergebnis.ok && befehl.ziel?.id != null) letztesZielId = befehl.ziel.id;
+  if (ergebnis.ok) nachDemBefehl();
   if (spiel.zustand.vorbei) zielModus = null;
   zeichnen();
   animationStarten();
@@ -374,8 +516,16 @@ window.addEventListener("keydown", (tastenereignis) => {
       return zeichnen();
     }
     const taste = { code: tastenereignis.code, zeichen: tastenereignis.key, umschalt: tastenereignis.shiftKey };
-    const { stapel, befehl, auswahl, grund, start, aktion } = fensterTaste(fensterStapel, taste, { spiel, daten });
+    // Umschalt+Ziffer wechselt die Leiste auch bei offenem Fenster (zum Belegen anderer Leisten)
+    const leistenAktion = AKTIONEN[aktionDerTaste(belegung, tastenereignis.code, tastenereignis.key, tastenereignis.shiftKey)];
+    if (tastenereignis.shiftKey && leistenAktion?.leiste !== undefined) {
+      leisten = leisteWechseln(leisten, leistenAktion.leiste);
+      speichernVormerken();
+      return zeichnen();
+    }
+    const { stapel, befehl, auswahl, grund, start, aktion, leiste } = fensterTaste(fensterStapel, taste, { spiel, daten, belegung });
     fensterStapel = stapel;
+    if (leiste) leisteAendern(leiste);
     if (grund) ablehnungMelden(grund);
     if (start) return erstellungAbschliessen(start);
     if (aktion) return fensteraktionAusfuehren(aktion);
@@ -398,6 +548,14 @@ window.addEventListener("keydown", (tastenereignis) => {
 function aktionAusfuehren(ergebnis) {
   const aktion = ergebnis.aktion;
   if (AKTIONEN[aktion]?.platz !== undefined) return platzBenutzen(AKTIONEN[aktion].platz);
+  if (AKTIONEN[aktion]?.leiste !== undefined) {
+    leisten = leisteWechseln(leisten, AKTIONEN[aktion].leiste);
+    speichernVormerken();
+    return zeichnen();
+  }
+  if (aktion === "fallenlassen_waehlen") return fensterAuf("inventar", { gewaehlt: null, absicht: "fallenlassen" });
+  if (aktion === "werfen_waehlen") return fensterAuf("inventar", { gewaehlt: null, absicht: "werfen" });
+  if (aktion === "karte") return fensterAuf("karte", {});
   if (aktion === "abbrechen") {
     if (escSchritt({ zielModus, fensterStapel, laufenderAblauf }) === "menue") return fensterAuf("menue", menueOeffnen());
     return;
@@ -427,10 +585,12 @@ function aktionAusfuehren(ergebnis) {
 // Bedienzeile (anzeige/bedienzeile.js): Klick auf einen Platz oder Knopf wirkt wie seine Taste. Bei offenem Fenster oder
 // Zielmodus geht nur der Knopf Menü (Esc), er schließt dann das oberste Fenster bzw. bricht das Zielen ab.
 const bedienzeilenElement = document.getElementById("bedienzeile");
-bedienzeilenElement.addEventListener("mousedown", (mausereignis) => mausereignis.preventDefault()); // kein Fokus auf Knöpfen
+// Kein Fokus auf Knöpfen (sonst lösten Leertaste und Enter den Knopf aus); preventDefault beim Mausdruck ginge nicht,
+// es verhinderte das Ziehen der Plätze
 bedienzeilenElement.addEventListener("click", (mausereignis) => {
   const knopf = mausereignis.target.closest("button");
   if (!knopf) return;
+  knopf.blur();
   if (laeuftAnimation(animation)) animationUeberspringen();
   if (laufenderAblauf) return ablaufBeenden("abgebrochen");
   const aktion = knopf.dataset.aktion;
@@ -442,6 +602,87 @@ bedienzeilenElement.addEventListener("click", (mausereignis) => {
   }
   if (knopf.dataset.platz !== undefined) return platzBenutzen(Number(knopf.dataset.platz));
   if (aktion) aktionAusfuehren({ aktion });
+});
+
+// Ziehen mit der Maus (HTML-Drag-and-Drop): Plätze und Einträge aus Inventar und Fähigkeitenfenster tragen data-ziehen
+// (Schlüssel des Platzes); auf einen Platz gezogen belegt bzw. tauscht, ein Platz aus der Leiste heraus gezogen wird leer
+let gezogen = null; // { schluessel, vonStelle? }
+document.addEventListener("dragstart", (ziehereignis) => {
+  const quelle = ziehereignis.target.closest?.("[data-ziehen]");
+  if (!quelle) return;
+  const vonStelle = quelle.dataset.platz !== undefined ? Number(quelle.dataset.platz) : undefined;
+  gezogen = { schluessel: quelle.dataset.ziehen, vonStelle, abgelegt: false };
+  ziehereignis.dataTransfer.setData("text/plain", quelle.dataset.ziehen);
+  ziehereignis.dataTransfer.effectAllowed = "move";
+});
+bedienzeilenElement.addEventListener("dragover", (ziehereignis) => {
+  if (!gezogen || !ziehereignis.target.closest(".platz")) return;
+  ziehereignis.preventDefault();
+});
+bedienzeilenElement.addEventListener("drop", (ziehereignis) => {
+  const ziel = ziehereignis.target.closest(".platz");
+  if (!gezogen || !ziel) return;
+  ziehereignis.preventDefault();
+  gezogen.abgelegt = true;
+  const nachStelle = Number(ziel.dataset.platz);
+  if (gezogen.vonStelle !== undefined) leisten = plaetzeTauschen(leisten, gezogen.vonStelle, nachStelle);
+  else {
+    const [art, name] = gezogen.schluessel.split(/:(.*)/);
+    leisten = platzBelegen(leisten, nachStelle, art === "faehigkeit" ? { art, faehigkeit: name } : { art, typ: name });
+  }
+  speichernVormerken();
+  zeichnen();
+});
+document.addEventListener("dragend", () => {
+  if (gezogen && !gezogen.abgelegt && gezogen.vonStelle !== undefined && aktivePlaetze(leisten)[gezogen.vonStelle]) {
+    leisten = platzLeeren(leisten, gezogen.vonStelle);
+    speichernVormerken();
+    zeichnen();
+  }
+  gezogen = null;
+});
+
+// Klick auf das Log öffnet den Verlauf
+document.getElementById("log").addEventListener("click", () => {
+  if (!fensterStapel.length && !zielModus && !laufenderAblauf) fensterAuf("verlauf", verlaufOeffnen());
+});
+
+// Klick auf Minikarte oder Übersichtskarte reist zum Feld (wie ein Klick auf die Karte, nur über Erkundetes)
+function reiseNachKarte(feld) {
+  if (!feld || spiel.zustand.vorbei) return;
+  if (laufenderAblauf) return ablaufBeenden("abgebrochen");
+  ablaufStarten(reiseBeginnen(spiel, feld, einstellungen), naechsterReiseschritt);
+}
+minikartenCanvas.addEventListener("click", (mausereignis) => {
+  if (!minikarte || fensterStapel.length || zielModus) return;
+  const punkt = canvasPunkt(minikartenCanvas, mausereignis);
+  reiseNachKarte(feldAmPunkt(minikarte.bild, minikarte.feldgroesse, punkt.x, punkt.y));
+});
+fensterElement.addEventListener("click", (mausereignis) => {
+  const canvas = mausereignis.target.closest?.("canvas.uebersichtskarte");
+  if (!canvas) return;
+  const bild = minikartenBild(spiel, daten.zeichen);
+  const feldgroesse = canvas.width / bild.breite;
+  const punkt = canvasPunkt(canvas, mausereignis);
+  const feld = feldAmPunkt(bild, feldgroesse, punkt.x, punkt.y);
+  fensterStapel = [];
+  zeichnen();
+  reiseNachKarte(feld);
+});
+
+// Seitenleiste und Karte heben sich gegenseitig hervor (Vorbild Brogue)
+const seitenleisteElement = document.getElementById("seitenleiste");
+seitenleisteElement.addEventListener("mouseover", (mausereignis) => {
+  const id = mausereignis.target.closest?.("[data-wesen]")?.dataset.wesen;
+  const neu = id === undefined ? null : Number(id);
+  if (neu === seitenleisteWesenId) return;
+  seitenleisteWesenId = neu;
+  zeichnen();
+});
+seitenleisteElement.addEventListener("mouseleave", () => {
+  if (seitenleisteWesenId === null) return;
+  seitenleisteWesenId = null;
+  zeichnen();
 });
 
 kartenCanvas.addEventListener("mousemove", (mausereignis) => {
@@ -495,4 +736,4 @@ kartenCanvas.addEventListener("wheel", (radereignis) => {
 
 window.addEventListener("resize", () => zeichnen());
 
-starten(startwertAusUrl() ?? zufaelligerStartwert());
+if (!gespeichertenLaufFortsetzen()) starten(startwertAusUrl() ?? zufaelligerStartwert());

@@ -24,7 +24,7 @@
   --log-zeile: 1.35em;
   /* Maße der Zonen */
   --breite-seite: 26rem;
-  --breite-log-links: 24rem;
+  --breite-log-links: 28rem;
   --log-zeilen: 8;
   --hoehe-log: calc(var(--log-zeilen) * var(--log-zeile) * 0.9 + 2.2rem);
   --hoehe-bedienzeile: 3.6rem;
@@ -67,11 +67,16 @@ html, body {
 }
 #spiel[data-layout="b"] {
   grid-template-columns: var(--breite-log-links) 1fr var(--breite-seite);
-  grid-template-rows: 1fr var(--hoehe-bedienzeile);
+  grid-template-rows: auto 1fr var(--hoehe-bedienzeile);
   grid-template-areas:
+    "mini karte seite"
     "log karte seite"
     "log bedien bedien";
 }
+/* Variante B: die Minikarte steht links oben über dem Log, so breit wie die Spalte (src/main.js setzt sie um) */
+#minikarte-links { display: none; }
+#spiel[data-layout="b"] #minikarte-links { display: block; grid-area: mini; padding: 6px 10px 4px; background: var(--flaeche); border-right: 1px solid var(--linie); border-bottom: 1px solid var(--linie); }
+#minikarte-links #minikarte { width: 100%; margin: 0; }
 
 #karte {
   grid-area: karte;
@@ -169,7 +174,15 @@ html, body {
   overflow-y: auto;
 }
 
-#seitenleiste .kopf { margin: -4px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--linie); color: var(--leise); font-size: 0.9em; }
+#seitenkopf { margin: -4px 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--linie); color: var(--leise); font-size: 0.9em; }
+/* Minikarte (anzeige/minikarte.js): Pixel scharf, Klick reist */
+#minikarte { display: block; max-width: 100%; image-rendering: pixelated; cursor: crosshair; margin-bottom: 8px; border: 1px solid var(--linie); background: #000; }
+#minikarte[hidden] { display: none; }
+#seitenleiste li[data-wesen] { cursor: default; }
+#seitenleiste li.hervorgehoben { outline: 1px solid var(--bier); outline-offset: 2px; }
+.fenster-rahmen canvas.uebersichtskarte { display: block; max-width: 100%; image-rendering: pixelated; cursor: crosshair; background: #000; }
+.fenster-rahmen .legende span { margin-right: 12px; }
+.fenster-rahmen .legende i { display: inline-block; width: 0.8em; height: 0.8em; margin-right: 4px; vertical-align: middle; }
 #seitenleiste h1 { margin: 0 0 12px; font-size: 1.5em; color: var(--bier); letter-spacing: 0.04em; }
 #seitenleiste h2 { margin: 18px 0 6px; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--leise); }
 #seitenleiste ul { list-style: none; margin: 0; padding: 0; }
@@ -217,19 +230,19 @@ html, body {
   line-height: var(--log-zeile);
 }
 #spiel[data-layout="b"] #log { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; border-top: none; border-right: 1px solid var(--linie); }
-.log-spalte { display: flex; flex-direction: column; min-height: 0; min-width: 0; padding: 2px 10px 4px; }
+.log-spalte { display: flex; flex-direction: column; min-height: 0; min-width: 0; padding: 2px 6px 4px; }
 .log-spalte + .log-spalte { border-left: 1px solid var(--linie); }
 #spiel[data-layout="b"] .log-spalte + .log-spalte { border-left: none; border-top: 1px solid var(--linie); }
 .log-zeilen { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
 /* Feste Spalten: Zug, Symbol, Text; im Kampf dazu Chance, Schaden, Krit, Abzug (anzeige/logzeilen.js ZAHLENSPALTEN) */
-.logzeile, .logkopf { display: grid; grid-template-columns: 3.2em 1.2em minmax(0, 1fr); column-gap: 4px; align-items: baseline; }
+.logzeile, .logkopf { display: grid; grid-template-columns: 2.2em 1em minmax(0, 1fr); column-gap: 3px; align-items: baseline; }
 .logzeile.seite-ninkasi, .logzeile.seite-verbuendet, .logzeile.seite-gegner, .logzeile.seite-neutral, .logkopf.kampf {
-  grid-template-columns: 3.2em 1.2em minmax(0, 1fr) 3.4em 3.4em 3em 3.4em;
+  grid-template-columns: 2.2em 1em minmax(0, 1fr) 1.6em 1.7em 2em 1.7em;
 }
 .logkopf { font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.06em; color: var(--leise); border-bottom: 1px solid var(--linie); }
 .logkopf .zahl { text-align: right; }
 .logzeile .text { overflow: hidden; text-overflow: ellipsis; }
-.logzeile .zahl { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.logzeile .zahl { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 0.9em; }
 .logzeile.neuer-zug { border-top: 1px solid rgba(58, 47, 36, 0.8); }
 .logzeile .zug { color: var(--leise); font-size: 0.8em; text-align: right; font-variant-numeric: tabular-nums; }
 .logzeile .symbol { text-align: center; }
@@ -272,7 +285,9 @@ html, body {
 }
 #bedienzeile button { font: inherit; color: var(--text); background: var(--grund); border: 1px solid var(--linie); cursor: pointer; }
 #bedienzeile button:hover { border-color: var(--kupfer); }
-.schnellleiste { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; padding: 4px 8px; min-width: 0; }
+.schnellleiste { display: grid; grid-template-columns: 1.4em repeat(10, minmax(0, 1fr)); gap: 4px; padding: 4px 8px; min-width: 0; }
+.leiste-nummer { align-self: center; text-align: center; color: var(--bier); font-weight: bold; }
+.platz.ziel-des-ziehens { border-color: var(--bier) !important; }
 .platz { position: relative; display: flex; align-items: center; gap: 4px; padding: 0 6px; min-width: 0; font-size: 0.8em; }
 .platz.leer { opacity: 0.35; cursor: default; }
 .platz.grau { color: var(--leise); }

@@ -17,7 +17,9 @@ import { reiseBeginnen, naechsterReiseschritt } from "../src/eingabe/reise.js";
 import { rastenBeginnen, naechsterRastschritt } from "../src/eingabe/rasten.js";
 import { erkundenBeginnen, naechsterErkundungsschritt } from "../src/eingabe/erkunden.js";
 import { laufenBeginnen, naechsterLaufschritt } from "../src/eingabe/laufen.js";
-import { plaetzeDerLeiste, platzZustand, platzAusloesen } from "../src/eingabe/schnellleiste.js";
+import { neueLeisten, leistenNachfuehren, aktivePlaetze, platzZustand, platzAusloesen, platzBelegen, plaetzeTauschen, platzLeeren, leisteWechseln, ANZAHL_LEISTEN } from "../src/eingabe/schnellleiste.js";
+import { speicherstandText, speicherstandLesen } from "../src/eingabe/speicherstand.js";
+import { minikartenBild } from "../src/anzeige/minikarte.js";
 import { menueOeffnen, menueTaste } from "../src/eingabe/menue.js";
 import { verlaufOeffnen } from "../src/eingabe/verlauf.js";
 import { zielmodusBeginnen, zielmodusTaste, zielangabeVon, cursorSetzen } from "../src/eingabe/zielmodus.js";
@@ -53,6 +55,7 @@ const fehlendeTexte = new Set();
 const warnen = console.warn;
 const ohneDom = () => ({ innerHTML: "" });
 let botLog = null;
+let botLeisten = null;
 function mitWarnungen(zeichnen) {
   console.warn = (meldung) => fehlendeTexte.add(meldung);
   try {
@@ -68,9 +71,12 @@ const seitenleiste = new Oberflaeche(ohneDom(), anzeigetexte, "bot");
 const bedienzeile = new Bedienzeile(ohneDom(), anzeigetexte, belegung);
 function oberflaecheZeichnen(spiel) {
   mitWarnungen(() => {
-    seitenleiste.anzeigen(spiel);
-    bedienzeile.anzeigen(spiel);
-    for (const platz of plaetzeDerLeiste(spiel)) platzZustand(spiel, platz);
+    seitenleiste.anzeigen(spiel, { hervorgehobenId: spiel.zustand.spielerinId });
+    seitenleiste.kopfHtml(spiel);
+    bedienzeile.anzeigen(spiel, botLeisten);
+    for (const platz of aktivePlaetze(botLeisten)) platzZustand(spiel, platz);
+    const bild = minikartenBild(spiel, daten.zeichen);
+    if (bild.felder.length !== bild.breite * bild.hoehe || bild.punkte.at(-1)?.art !== "ninkasi") throw new Error("Minikarte ohne Ninkasi oder mit falscher Größe");
   });
   for (const zeile of botLog.zeilen) if (!(zeile.art in ARTEN) || !["geschehen", "kampf"].includes(zeile.spalte)) throw new Error(`Logzeile ohne Art oder Spalte: ${JSON.stringify(zeile)}`);
 }
@@ -309,11 +315,25 @@ function laufen(botZufall, spiel) {
   return ablaufLaufenLassen(spiel, laufenBeginnen(spiel, richtung, einstellungen), naechsterLaufschritt);
 }
 
+// Umbelegen wie mit Ziffer im Fenster, Ziehen oder Umschalt+Ziffer; würfelt nur mit dem Zufall des Bots
+function leistenUmbelegen(botZufall, spiel) {
+  const ninkasi = spielerin(spiel.zustand);
+  const wurf = zufallsGanzzahl(botZufall, 1, 4);
+  const stelle = zufallsGanzzahl(botZufall, 0, 9);
+  if (wurf === 1) botLeisten = leisteWechseln(botLeisten, zufallsGanzzahl(botZufall, 0, ANZAHL_LEISTEN - 1));
+  else if (wurf === 2) botLeisten = plaetzeTauschen(botLeisten, stelle, zufallsGanzzahl(botZufall, 0, 9));
+  else if (wurf === 3) botLeisten = platzLeeren(botLeisten, stelle);
+  else {
+    const typ = spiel.zustand.entitaeten[(ninkasi.inventar || [])[0]]?.typ;
+    if (typ) botLeisten = platzBelegen(botLeisten, stelle, { art: "gegenstand", typ });
+  }
+}
+
 // Ein Platz der Schnellleiste wie mit seiner Ziffer: Getränk sofort, Fähigkeit über den Zielmodus, bestätigt mit
 // derselben Ziffer; gibt einen Befehl zurück oder null
 function schnellleisteBenutzen(botZufall, spiel) {
   const stelle = zufallsGanzzahl(botZufall, 0, 9);
-  const ergebnis = platzAusloesen(spiel, stelle);
+  const ergebnis = platzAusloesen(spiel, botLeisten, stelle);
   if (!ergebnis || ergebnis.grund) return null;
   if (ergebnis.befehl) return ergebnis.befehl;
   const beginn = zielmodusBeginnen(spiel, ergebnis.auswahl, { platz: stelle });
@@ -333,7 +353,7 @@ function ablaufWaehlen(botZufall, spiel) {
   return `reise:${reisen(botZufall, spiel)}`;
 }
 
-let anzahlTode = 0, anzahlFehler = 0;
+let anzahlTode = 0, anzahlFehler = 0, anzahlGeladen = 0;
 const reisenNachHaltegrund = {};
 // Fähigkeiten der Gegner: gewirkt, lange Aktionen begonnen und abgebrochen
 const gegnerfaehigkeiten = { gewirkt: 0, begonnen: 0, abgebrochen: 0 };
@@ -363,6 +383,10 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
     const optionen = startwert % 2 === 0 ? { eigenschaften: verteilung } : {};
     const spiel = neuesSpiel(daten, startwert, optionen);
     botLog = new Log(ohneDom(), anzeigetexte);
+    botLeisten = leistenNachfuehren(spiel, neueLeisten());
+    // jeder vierte Lauf wird mitten im Lauf gespeichert und geladen; die Kopie bekommt am Ende die übrigen Befehle der
+    // Aufzeichnung und muss denselben Zustand haben wie der echte Lauf (eingabe/speicherstand.js)
+    let geladeneKopie = null;
     botLog.leeren(spiel);
     hoererAnmelden(spiel, (meldung) => mitWarnungen(() => botLog.melden(meldung)));
     epBuch = { erwartet: daten.regeln.lernen.startEp };
@@ -390,14 +414,30 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
         reisenNachHaltegrund[haltegrund] = (reisenNachHaltegrund[haltegrund] || 0) + 1;
         continue;
       }
+      if (startwert % 4 === 1 && !geladeneKopie && spiel.befehle.length >= hoechsteBefehlszahl / 3) {
+        const gelesen = speicherstandLesen(daten, speicherstandText(spiel, { leisten: botLeisten, logzeilen: botLog.zeilen }));
+        if (gelesen.grund) throw new Error(`Speicherstand nicht lesbar: ${gelesen.grund}`);
+        if (JSON.stringify(gelesen.oberflaeche.leisten) !== JSON.stringify(botLeisten)) throw new Error("Leisten nach dem Laden anders");
+        geladeneKopie = gelesen.spiel;
+      }
+      if (zufallsGanzzahl(botZufall, 1, 40) === 1) leistenUmbelegen(botZufall, spiel);
       const ausDerLeiste = zufallsGanzzahl(botZufall, 1, 30) === 1 ? schnellleisteBenutzen(botZufall, spiel) : null;
-      befehlGeben(spiel, ausDerLeiste ?? zufallsbefehl(botZufall, spiel));
+      const befehl = ausDerLeiste ?? zufallsbefehl(botZufall, spiel);
+      befehlGeben(spiel, befehl);
+      botLeisten = leistenNachfuehren(spiel, botLeisten);
       invariantenPruefen(spiel);
       if (spiel.befehle.length % 10 === 0 && !spiel.zustand.vorbei) {
         untersuchen(spiel);
         oberflaecheZeichnen(spiel);
       }
       if (spiel.befehle.length % 500 === 0) menueBedienen(spiel);
+    }
+    if (geladeneKopie) {
+      for (const befehl of spiel.befehle.slice(geladeneKopie.befehle.length)) {
+        if (!befehlGeben(geladeneKopie, structuredClone(befehl)).ok) throw new Error("Geladene Kopie lehnt einen Befehl ab");
+      }
+      if (JSON.stringify(geladeneKopie.zustand) !== JSON.stringify(spiel.zustand)) throw new Error("Geladene Kopie ergibt anderen Zustand");
+      anzahlGeladen++;
     }
     const nachgespielt = nachspielen(daten, JSON.parse(JSON.stringify(spielstand(spiel))));
     const zustaendeGleich = JSON.stringify(nachgespielt.zustand) === JSON.stringify(spiel.zustand);
@@ -429,5 +469,6 @@ const budget = Object.entries(epJeTiefe).sort(([links], [rechts]) => links - rec
   .map(([tiefe, { erkundung, gebunden, frei }]) => `Tiefe ${tiefe}: Erkundung ${Math.round(erkundung / anzahlLaeufe)}, gebunden ${Math.round(gebunden / anzahlLaeufe)}, frei aus Beute ${Math.round(frei / anzahlLaeufe)}`)
   .join("; ");
 console.log(`EP je Lauf: ${budget}`);
+console.log(`Speichern: ${anzahlGeladen} Läufe mitten im Lauf gespeichert und geladen`);
 console.log(`${anzahlLaeufe} Läufe, ${anzahlTode} tot, ${anzahlFehler} Fehler`);
 process.exitCode = anzahlFehler ? 1 : 0;

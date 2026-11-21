@@ -160,7 +160,8 @@ export class Renderer {
     );
   }
 
-  markierungenZeichnen(kamera, ansicht, zoom, { zeiger = null, weg = [], gefahr = [], ziel = null, geschoss = null }) {
+  // hervorgehoben: Feld eines Wesens, über dem in der Seitenleiste der Zeiger steht (Rahmen in Biergold)
+  markierungenZeichnen(kamera, ansicht, zoom, { zeiger = null, weg = [], gefahr = [], ziel = null, geschoss = null, hervorgehoben = null }) {
     const pinsel = this.pinsel;
     const imAusschnitt = (feld) =>
       feld.x - kamera.x >= 0 && feld.y - kamera.y >= 0 && feld.x - kamera.x < ansicht.breite && feld.y - kamera.y < ansicht.hoehe;
@@ -186,6 +187,9 @@ export class Renderer {
       if (imAusschnitt(ziel.cursor)) this.feldRahmen(kamera, zoom, ziel.cursor, ziel.ok ? "#7fd36b" : "#d9553b");
     } else if (zeiger && imAusschnitt(zeiger)) {
       this.feldRahmen(kamera, zoom, zeiger, "#c87533");
+    }
+    if (hervorgehoben && imAusschnitt(hervorgehoben)) {
+      this.feldRahmen(kamera, zoom, hervorgehoben, "#f2c14e");
     }
     // Geschoss als kleines helles Quadrat in der Feldmitte
     if (geschoss && imAusschnitt(geschoss)) {

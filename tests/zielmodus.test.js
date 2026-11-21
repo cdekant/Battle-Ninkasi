@@ -134,9 +134,13 @@ test("Zielmodus: ohne Ziel sofort ein Befehl, Zielangabe nach Zielart", () => {
 
 test("Fähigkeitenfenster und Werfen aus dem Inventar führen zur Auswahl für den Zielmodus", () => {
   const { spiel, ninkasi } = aufstellen();
-  assert.deepEqual(faehigkeitenTaste({}, "KeyA", spiel), { fenster: null, auswahl: { zweck: "faehigkeit", faehigkeit: "flaeche" } });
-  assert.deepEqual(faehigkeitenTaste({}, "KeyZ", spiel), { fenster: {} }, "keine Fähigkeit an dieser Stelle");
-  assert.deepEqual(faehigkeitenTaste({}, "Escape", spiel), { fenster: null });
+  const gewaehlt = faehigkeitenTaste({ gewaehlt: null }, "KeyA", spiel).fenster;
+  assert.deepEqual(gewaehlt, { gewaehlt: "flaeche" }, "der Buchstabe wählt erst");
+  assert.deepEqual(faehigkeitenTaste(gewaehlt, "Enter", spiel), { fenster: null, auswahl: { zweck: "faehigkeit", faehigkeit: "flaeche" } });
+  assert.deepEqual(faehigkeitenTaste(gewaehlt, "KeyA", spiel), { fenster: null, auswahl: { zweck: "faehigkeit", faehigkeit: "flaeche" } }, "derselbe Buchstabe wirkt");
+  assert.deepEqual(faehigkeitenTaste({ gewaehlt: null }, "KeyZ", spiel), { fenster: { gewaehlt: null } }, "keine Fähigkeit an dieser Stelle");
+  assert.deepEqual(faehigkeitenTaste(gewaehlt, "Escape", spiel), { fenster: { gewaehlt: null } }, "Esc erst zurück zur Auswahl");
+  assert.deepEqual(faehigkeitenTaste({ gewaehlt: null }, "Escape", spiel), { fenster: null });
   const flasche = gegenstandTragen(spiel, ninkasi, { typ: "flasche", wurf: { effekt: "zerspringt" } });
   assert.deepEqual(inventarTaste({ gewaehlt: flasche.id }, "KeyW", spiel), { fenster: null, auswahl: { zweck: "werfen", gegenstandId: flasche.id } });
 });

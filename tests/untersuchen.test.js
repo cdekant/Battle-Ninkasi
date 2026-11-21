@@ -146,7 +146,7 @@ test("Buchstaben nach dem Zeichen der Taste: Z auf deutscher Tastatur (Tastencod
   assert.deepEqual(inventarTaste({ gewaehlt: null }, "KeyY", spiel, "z").fenster, { gewaehlt: gegenstaende[25].id });
   assert.deepEqual(inventarTaste({ gewaehlt: null }, "KeyZ", spiel, "y").fenster, { gewaehlt: gegenstaende[24].id });
   ninkasi.faehigkeiten = ["eins", "zwei"];
-  assert.deepEqual(faehigkeitenTaste({}, "KeyB", spiel, "b").auswahl, { zweck: "faehigkeit", faehigkeit: "zwei" });
+  assert.deepEqual(faehigkeitenTaste({}, "KeyB", spiel, "b").fenster, { gewaehlt: "zwei" });
 });
 
 test("Meldungen: wahrnehmbar mit Ninkasi, mit sichtbarem Ort oder ganz ohne Ort; bemerkt nur bei Sicht", () => {

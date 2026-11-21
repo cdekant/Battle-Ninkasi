@@ -217,6 +217,19 @@ export function spielstand(spiel) {
   return { version: VERSION, startwert: spiel.zustand.startwert, optionen: structuredClone(spiel.optionen ?? {}), befehle: structuredClone(spiel.befehle) };
 }
 
+// Schnappschuss = Spielstand + Kopie des Zustands (reines JSON); Fortsetzen daraus braucht kein Nachspielen.
+// Der räumliche Index und der Zwischenspeicher sind aus dem Zustand ableitbar und entstehen beim ersten Zugriff neu.
+// Zwischen zwei Befehlen sind die vorgemerkten Auslöser leer, ein Schnappschuss nach einem Befehl verliert also nichts.
+export function schnappschuss(spiel) {
+  return { ...spielstand(spiel), zustand: structuredClone(spiel.zustand) };
+}
+
+export function ausSchnappschuss(daten, stand) {
+  if (stand.version !== VERSION) throw new Error(`Spielstand von Version ${stand.version}, dieses Spiel ist ${VERSION}`);
+  if (!stand.zustand) throw new Error("Spielstand ohne Zustand");
+  return { daten, zustand: structuredClone(stand.zustand), optionen: structuredClone(stand.optionen ?? {}), befehle: structuredClone(stand.befehle ?? []), hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
+}
+
 export function nachspielen(daten, stand) {
   if (stand.version !== VERSION) throw new Error(`Spielstand von Version ${stand.version}, dieses Spiel ist ${VERSION}`);
   const spiel = neuesSpiel(daten, stand.startwert, stand.optionen ?? {});

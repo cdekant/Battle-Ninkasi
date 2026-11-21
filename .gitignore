@@ -9,3 +9,6 @@ __pycache__/
 
 # Private Sammlung der Konzeptbilder, nicht im Repo (siehe CLAUDE.md)
 Artwork/*/privat/
+
+# Arbeitsordner von ComfyAI (Bilderzeugung), nicht im Repo
+Artwork/ComfyAI/

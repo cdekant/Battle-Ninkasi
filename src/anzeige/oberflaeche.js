@@ -6,7 +6,9 @@
 // steht, womit gezielt wird, was dagegen spricht und wen es mit welcher Trefferchance trifft; beim Untersuchen
 // (Taste X, Rechtsklick) stattdessen, was Ninkasi über das Feld weiß (systeme/untersuchen.js), auf ihr selbst mit der
 // Aufschlüsselung ihrer Werte. Die Liste In Sicht nennt Wachzustand, Zustände und laufende Aktion.
-// tooltipHtml liefert die Kurzfassung eines Feldes für den Tooltip.
+// tooltipHtml liefert die Kurzfassung eines Feldes für den Tooltip. Den Kopf mit Ort und Zeit liefert kopfHtml, die
+// Minikarte darunter zeichnet anzeige/minikarte.js. Jedes Wesen in den Listen trägt data-wesen (seine ID); das Wesen
+// mit hervorgehobenId (unter dem Zeiger auf der Karte oder dem Cursor beim Untersuchen) ist hervorgehoben.
 
 import { spielerin, entitaetMitId } from "../kern/zustand.js";
 import { beziehungZwischen, urheberVon } from "../systeme/fraktionen.js";
@@ -230,23 +232,28 @@ export class Oberflaeche {
     return { gefaehrten: sichtbar.filter(verbuendet), andere: sichtbar.filter((wesen) => !verbuendet(wesen)) };
   }
 
-  wesenlisteHtml(spiel, liste, mitZusatz) {
+  wesenlisteHtml(spiel, liste, mitZusatz, hervorgehobenId) {
     const { nomenForm } = this.texte;
-    return liste.map((wesen) => `<li>${balken(nomenForm(wesen, "nom", "ohne"), wesen.werte.lp.aktuell, hoechstwert(spiel, wesen, "lp"), "lp klein")}${mitZusatz ? this.gegnerZusatz(spiel, wesen) : ""}</li>`).join("");
+    return liste.map((wesen) => `<li data-wesen="${wesen.id}"${wesen.id === hervorgehobenId ? ' class="hervorgehoben"' : ""}>${balken(nomenForm(wesen, "nom", "ohne"), wesen.werte.lp.aktuell, hoechstwert(spiel, wesen, "lp"), "lp klein")}${mitZusatz ? this.gegnerZusatz(spiel, wesen) : ""}</li>`).join("");
+  }
+
+  // Kopf der Seitenleiste: Ort und Zeit
+  kopfHtml(spiel) {
+    return this.texte.text("ui.ort_und_zeit", { tiefe: spiel.zustand.tiefe, zug: spielerin(spiel.zustand).zuege ?? 0 });
   }
 
   // ziel: null | { modus, vorschau } (eingabe/zielmodus.js; beim Untersuchen ist vorschau null)
-  anzeigen(spiel, { ziel = null } = {}) {
+  // hervorgehobenId: ID des Wesens, das in den Listen hervorgehoben wird
+  anzeigen(spiel, { ziel = null, hervorgehobenId = null } = {}) {
     const { text, nomenForm } = this.texte;
     const zustand = spiel.zustand;
     const ninkasi = spielerin(zustand);
     const werte = ninkasi.werte;
     const { gefaehrten, andere } = this.wesenInSicht(spiel);
-    const gefaehrtenHtml = gefaehrten.length ? `<h2>${text("ui.gefaehrten")}</h2><ul class="gefaehrten">${this.wesenlisteHtml(spiel, gefaehrten, false)}</ul>` : "";
-    const andereHtml = andere.length ? this.wesenlisteHtml(spiel, andere, true) : `<li class="leise">${text("ui.niemand")}</li>`;
+    const gefaehrtenHtml = gefaehrten.length ? `<h2>${text("ui.gefaehrten")}</h2><ul class="gefaehrten">${this.wesenlisteHtml(spiel, gefaehrten, false, hervorgehobenId)}</ul>` : "";
+    const andereHtml = andere.length ? this.wesenlisteHtml(spiel, andere, true, hervorgehobenId) : `<li class="leise">${text("ui.niemand")}</li>`;
 
     this.element.innerHTML = `
-      <div class="kopf">${text("ui.ort_und_zeit", { tiefe: zustand.tiefe, zug: ninkasi.zuege ?? 0 })}</div>
       <section class="ninkasi">
         <h1>${nomenForm(ninkasi, "nom", "ohne")}</h1>
         ${balken(text("ui.lp"), werte.lp.aktuell, hoechstwert(spiel, ninkasi, "lp"), "lp")}

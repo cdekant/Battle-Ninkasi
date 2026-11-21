@@ -56,8 +56,9 @@ Die Darstellung kann weitgehend neu entstehen, die Systeme darunter bleiben:
 
 + Bleibt: Logik und Meldungen, die Auswahl des Wahrnehmbaren (`src/systeme/wahrnehmbar.js`), Vorschau und Untersuchen (`vorschau.js`, `untersuchen.js`), die DOM-freien Kerne der Eingabe (Zielmodus, Inventar- und Fähigkeitenfenster, Reise, Rasten, Erkunden), Pegelanzeige, Texte und Sprachdateien, Renderer und Kamera
 + Umgesetzt in 0.27.0: Aktionskatalog (`src/eingabe/aktionskatalog.js`) mit Belegung Taste zu Aktion, Fensterstapel über der Karte (`src/eingabe/fenster.js`, `src/anzeige/fenster.js`) nach der Grammatik unten, Inventar und Fähigkeiten als Fenster, Charakter und Skills (C), Charaktererstellung vor jedem Lauf, Hilfe (?) aus dem Katalog; die Seitenleiste zeigt freie EP und bis zur Schnellleiste eine Kurzliste der Fähigkeiten, siehe Fenster in [Architektur.md](Architektur.md)
++ Umgesetzt in 0.29.0: Schnellleiste vollständig, Speichern, Minikarte und Übersichtskarte, Hervorheben; siehe Stand der Umsetzung
 + Umgesetzt in 0.28.0: Aufbau der Seite (`index.html`, `stil.css`) mit Varianten A und B, Seitenleiste neu geordnet, Log in zwei Spalten (`src/anzeige/logzeilen.js`, `src/anzeige/log.js`), Bedienzeile mit Schnellleiste in der Grundform und Knöpfen, Esc-Kette, Spielmenü, Bestätigung, Verlauf, vi-Belegung, Laufen, Rechtsklick; siehe Stand der Umsetzung
-+ Noch neu zu bauen: Minikarte, Einstellungen, Tastenbelegung als Seite, Titel
++ Noch neu zu bauen: Einstellungen, Tastenbelegung als Seite, Titel, Befehlszeile
 
 ## Bildschirme
 
@@ -115,7 +116,7 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 +------------------+---------------------------------------------+------------------+
 ```
 
-+ Linke und rechte Spalte etwa 360 px; Karte etwa 1200x1024 px, bei 16 px etwa 75x64 Felder, bei 32 px etwa 37x32
++ Linke Spalte (Minikarte und Log) etwa 420 px (`--breite-log-links` 28rem), rechte etwa 390 px; Karte etwa 1100x1024 px, bei 16 px etwa 68x64 Felder, bei 32 px etwa 34x32
 + Mehr Logzeilen und eine höhere Karte, dafür schmaler; Spalten im Log passen hier nicht, Geschehen und Kampf liegen als Umschalter übereinander
 
 ### Weitere Varianten
@@ -163,7 +164,7 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 + Verlauf als Fenster (Strg+P wie in vielen Roguelikes, oder Tab): ganze Länge, Filter nach Art, Suche mit /
 + Das Log zeigt weiterhin nur, was Ninkasi wahrnimmt
 + Farben im Kampf nach der Seite, die handelt: Ninkasi in Grüntönen, Verbündete in Blautönen, Gegner in Rot, Orange, Gelb und Lila, Neutrale grau; der Ton folgt dem Ausgang (Treffer, Krit hell und fett, abgewehrt gedämpft), bei Gegnern Gelb für angekündigte Angriffe und Lila für Psi und Magie; Symbole bleiben, damit nichts nur an der Farbe hängt
-+ Zahlen im Kampf in festen Spalten mit Kopfzeile: Chance, Schaden, Krit (Faktor), Abzug (Rüstung und Widerstand zusammen, die Aufteilung im Tooltip); Reflektieren und Absorbieren bekommen ihren Platz, sobald es sie gibt
++ Zahlen im Kampf in festen, schmalen Spalten mit kurzer Kopfzeile ("%", "DMG", "×", "–"): Chance, Schaden, Krit (Faktor), Abzug (Rüstung und Widerstand zusammen, die Aufteilung im Tooltip); Reflektieren und Absorbieren bekommen ihren Platz, sobald es sie gibt
 
 ## Fenster
 
@@ -214,9 +215,9 @@ Vorschlag für die Vorgabe, Buchstaben nach der deutschen Aufschrift:
 | Umschalt + Richtung | Laufen | 0.28.0 |
 | . | Warten | 0.28.0, dazu Ziffernblock 5 |
 | g | Aufheben | umgesetzt |
-| d | Fallenlassen | im Inventar (f), als eigene Taste mit 0.29.0 |
+| d | Fallenlassen | 0.29.0 |
 | t | Trinken (wählt im Zweifel) | umgesetzt |
-| w | Werfen (fragt nach dem Gegenstand) | im Inventar, als eigene Taste mit 0.29.0 |
+| w | Werfen (fragt nach dem Gegenstand) | 0.29.0 |
 | i | Inventar | umgesetzt |
 | f | Fähigkeiten | 0.28.0 |
 | c | Charakter und Skills | 0.27.0 |
@@ -224,11 +225,12 @@ Vorschlag für die Vorgabe, Buchstaben nach der deutschen Aufschrift:
 | r | Rasten | umgesetzt |
 | o | Erkunden | umgesetzt |
 | m | Übersichtskarte | 0.29.0 |
+| Umschalt + 1 bis 5 | Leiste wechseln | 0.29.0 |
 | < > | Treppe | 0.28.0 nach dem Zeichen |
 | Leertaste | Fortsetzen | umgesetzt |
 | 1 bis 0 | Schnellleiste | 0.28.0 |
 | Tab | Verlauf | 0.28.0 |
-| : | Befehlszeile | 0.29.0 |
+| : | Befehlszeile | 0.30.0 |
 | ? | Hilfe | 0.27.0 |
 | Esc | Kette (siehe oben) | 0.28.0 |
 | + - | Zoom | umgesetzt |
@@ -302,11 +304,20 @@ Als Einstellung umschaltbar:
 Aufgeteilt am 2026-11-21 in drei Versionen, damit jede für sich im Browser prüfbar ist:
 
 + 0.28.0 Layout (umgesetzt): Grid mit Variante A und B (bis zum Einstellungsfenster im Spielmenü umgeschaltet), Effektschicht, Seitenleiste mit Kopf (Tiefe, Zug), Gefährten und Wesen nach Abstand, Log in zwei Spalten mit Zugmarke, Symbolen, Zahlen, Zusammenfassen, Verblassen und Farben nach Seite, Verlauf mit Filter, Bedienzeile mit acht Knöpfen und der Schnellleiste in der Grundform (automatisch nach Lernreihenfolge, danach Getränkearten; nicht umbelegbar, nicht gespeichert), Zielvorgabe und Bestätigen mit derselben Ziffer, Esc-Kette, Spielmenü mit Bestätigung, vi-Belegung samt Pfeilen und Zeichen, Laufen mit Umschalt, Rechtsklick untersucht; Reise, Laufen und Erkunden halten nur bei neuen Feinden
-+ 0.29.0 Schnellleiste und Speichern: Umbelegen und Ziehen, mehrere Leisten (Umschalt+1 bis 5), Wurfwaffen, graue Plätze mit Anzahl 0, Spielstand im Browser automatisch gespeichert samt Teil `oberflaeche`, Minikarte, Übersichtskarte (m), gegenseitiges Hervorheben von Seitenleiste und Karte, Befehlszeile (:), d und w als eigene Tasten, Suche im Verlauf (/)
-+ 0.30.0 Einstellungen und Titel: Einstellungsfenster samt Seite zur Tastenbelegung, Layout kompakt, Titelbildschirm (Fortsetzen braucht das Speichern aus 0.29.0)
++ 0.29.0 Schnellleiste und Speichern (umgesetzt): fünf Leisten (Umschalt+1 bis 5), automatisch nachgeführt, Umbelegen mit Ziffer und Entf in Inventar und Fähigkeitenfenster sowie durch Ziehen, Wurfwaffen von Hand, graue Plätze mit Anzahl 0; Fähigkeitenfenster mit Auswahl und Einzelheiten; Speichern im Browser mit Schnappschuss des Zustands samt Teil `oberflaeche`; Minikarte und Übersichtskarte (m) mit Klick zum Reisen; gegenseitiges Hervorheben von Seitenleiste und Karte; d und w als eigene Tasten; Knopf Karte statt Verlauf, der Verlauf über Tab oder einen Klick auf das Log
++ 0.30.0 Einstellungen und Titel: Einstellungsfenster samt Seite zur Tastenbelegung, Layout kompakt, Titelbildschirm (Fortsetzen nutzt das Speichern aus 0.29.0), Befehlszeile (:) und Suche im Verlauf (/)
 + Später: Halten an Abzweigungen beim Laufen (wie DCSS), Mindestpegel als Kante an der Schnellleiste, Gamepad
 
 ## Entscheidungen
+
+Entschieden am 2026-11-21 für 0.29.0:
+
++ Fähigkeitenfenster mit Auswahl wie das Inventar: Buchstabe wählt, Enter oder derselbe Buchstabe wirkt, Ziffer belegt
++ Automatische Belegung auf den ersten freien Platz der Leiste 1, dann der Leisten 2 bis 5
++ Ein Speicherstand anderer Version wird verworfen, das Log nennt den Grund
++ Ein gespeicherter Lauf geht vor; `?seed=` gilt nur ohne ihn oder mit `&neu`
++ Befehlszeile und Suche im Verlauf rücken nach 0.30.0
++ Laden über einen Schnappschuss des Zustands statt Nachspielen (gemessen knapp 1 s je 2000 Befehle)
 
 Entschieden am 2026-11-21:
 

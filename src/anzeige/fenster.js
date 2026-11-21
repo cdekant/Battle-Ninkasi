@@ -4,7 +4,9 @@
 // Jede Fensterart meldet hier ihren Inhalt an: (umgebung, zustand) => { titel, kopf?, liste, details?, fuss, hilfewerte?, breit? }
 //   breit: auch ohne Einzelheiten in voller Breite (Verlauf)
 //   hilfewerte: Platzhalter für den Text der Hilfe zu diesem Fenster (hilfe.thema.<art>), z.B. { punkte }
-//   umgebung: { spiel, daten, texte, belegung, darunter } (darunter: Inhalt des Fensters darunter oder null)
+//   umgebung: { spiel, daten, texte, belegung, leisten?, darunter } (darunter: Inhalt des Fensters darunter oder null,
+//             leisten: Stand der Schnellleiste, eingabe/schnellleiste.js)
+// Einträge, die man auf die Schnellleiste ziehen kann, tragen data-ziehen mit dem Schlüssel des Platzes.
 // Inhalte von Inventar, Fähigkeiten und Hilfe stehen hier, Charakter und Erstellung in anzeige/charakterfenster.js.
 
 import { spielerin, entitaetMitId } from "../kern/zustand.js";
@@ -13,6 +15,7 @@ import { anzahlVon, ladungenVon, lastVon, tragkraftVon, lastZuschlag } from "../
 import { faehigkeitFuer, verbrauchVon, zuegeBisBereit } from "../systeme/faehigkeiten.js";
 import { BUCHSTABEN } from "../eingabe/inventar.js";
 import { hilfeGruppen } from "../eingabe/hilfe.js";
+import { stellenVon } from "../eingabe/schnellleiste.js";
 
 const inhalte = new Map();
 
@@ -68,7 +71,16 @@ export function lastText(spiel, texte, ninkasi) {
   return `${texte.text("ui.last")} ${kilo(lastVon(spiel, ninkasi))} / ${kilo(tragkraftVon(spiel, ninkasi))} kg${ueberladen}`;
 }
 
-fensterinhaltAnmelden("inventar", ({ spiel, texte }, zustand) => {
+// Wo ein Eintrag in der Schnellleiste liegt, als Text ("Leiste 1, Platz 3"), oder "nicht in der Schnellleiste"
+export function platzText(texte, leisten, schluessel) {
+  const stellen = leisten ? stellenVon(leisten, schluessel) : [];
+  if (!stellen.length) return texte.text("ui.platz_keiner");
+  return stellen.map(({ leiste, stelle }) => texte.text("ui.platz", { leiste: leiste + 1, platz: (stelle + 1) % 10 })).join(", ");
+}
+
+const ziehbar = (schluessel) => ` draggable="true" data-ziehen="${schluessel}"`;
+
+fensterinhaltAnmelden("inventar", ({ spiel, texte, leisten }, zustand) => {
   const { text, nomenForm } = texte;
   const ninkasi = spielerin(spiel.zustand);
   const gegenstaende = ninkasi.inventar.map((id) => entitaetMitId(spiel.zustand, id)).filter(Boolean);
@@ -77,7 +89,7 @@ fensterinhaltAnmelden("inventar", ({ spiel, texte }, zustand) => {
     const gewaehlt = zustand.gewaehlt === gegenstand.id ? ' class="gewaehlt"' : "";
     const anzahl = anzahlVon(gegenstand) > 1 ? ` x ${anzahlVon(gegenstand)}` : "";
     const ladungen = gegenstand.ladungen ? ` (${ladungenVon(gegenstand)}/${gegenstand.ladungen.hoechstens})` : "";
-    return `<li${gewaehlt}>${buchstabeHtml(stelle)}${nomenForm(gegenstand, "nom", "ohne")}${anzahl}${ladungen}${verschleissText(texte, gegenstand)}${angelegt}</li>`;
+    return `<li${gewaehlt}${ziehbar(`gegenstand:${gegenstand.typ}`)}>${buchstabeHtml(stelle)}${nomenForm(gegenstand, "nom", "ohne")}${anzahl}${ladungen}${verschleissText(texte, gegenstand)}${angelegt}</li>`;
   });
   const gewaehlt = zustand.gewaehlt !== null ? entitaetMitId(spiel.zustand, zustand.gewaehlt) : null;
   const details = gewaehlt
@@ -87,11 +99,13 @@ fensterinhaltAnmelden("inventar", ({ spiel, texte }, zustand) => {
         ${gewaehlt.haltbarkeit ? `<li>${text("ui.haltbarkeit")}: ${haltbarkeitProzent(gewaehlt)} %</li>` : ""}
         ${istAngelegt(ninkasi, gewaehlt.id) ? `<li>${text("ui.angelegt")}</li>` : ""}
         ${gewaehlt.fluchBekannt ? `<li class="schlimm">${text("ui.verflucht")}</li>` : ""}
+        <li class="leise">${platzText(texte, leisten, `gegenstand:${gewaehlt.typ}`)}</li>
       </ul>`
     : "";
-  const hinweis = !gegenstaende.length ? "ui.inventar_leer" : zustand.gewaehlt === null ? "ui.inventar_waehlen" : "ui.inventar_handeln";
+  const hinweis = !gegenstaende.length ? "ui.inventar_leer" : zustand.gewaehlt !== null ? "ui.inventar_handeln"
+    : zustand.absicht ? `ui.inventar_absicht.${zustand.absicht}` : "ui.inventar_waehlen";
   return {
-    titel: text("ui.inventar"),
+    titel: zustand.absicht ? text(`ui.inventar_titel.${zustand.absicht}`) : text("ui.inventar"),
     kopf: `<div class="leise">${lastText(spiel, texte, ninkasi)}</div>`,
     liste: `<ul>${zeilen.length ? zeilen.join("") : `<li class="leise">${text("ui.leer")}</li>`}</ul>`,
     details,
@@ -108,22 +122,35 @@ export function verbrauchText(spiel, texte, wesen, definition) {
     .map(([wertName, menge]) => `${menge} ${texte.text(`ui.${wertName}`)}`).join(", ");
 }
 
-fensterinhaltAnmelden("faehigkeiten", ({ spiel, texte }) => {
+fensterinhaltAnmelden("faehigkeiten", ({ spiel, texte, leisten }, zustand) => {
   const { text } = texte;
   const ninkasi = spielerin(spiel.zustand);
   const namen = ninkasi.faehigkeiten || [];
+  const gewaehlt = zustand.gewaehlt ?? null;
   const zeilen = namen.map((name, stelle) => {
     const definition = faehigkeitFuer(spiel, ninkasi, name);
-    const verbrauch = verbrauchText(spiel, texte, ninkasi, definition);
     const zuege = zuegeBisBereit(ninkasi, name);
-    const abklingzeit = definition.abklingzeit ? ` <span class="leise">${text("ui.abklingzeit", { zuege: definition.abklingzeit })}</span>` : "";
     const abklingend = zuege > 0 ? ` <span class="schlimm">(${text("ui.abklingend", { zuege })})</span>` : "";
-    return `<li>${buchstabeHtml(stelle)}${text(definition.text)}${verbrauch ? ` <span class="leise">${verbrauch}</span>` : ""}${abklingzeit}${abklingend}</li>`;
+    const klasse = name === gewaehlt ? ' class="gewaehlt"' : "";
+    return `<li${klasse}${ziehbar(`faehigkeit:${name}`)}>${buchstabeHtml(stelle)}${text(definition.text)}${abklingend}</li>`;
   });
+  let details = "";
+  if (gewaehlt) {
+    const definition = faehigkeitFuer(spiel, ninkasi, gewaehlt);
+    const verbrauch = verbrauchText(spiel, texte, ninkasi, definition);
+    details = `<h2>${text(definition.text)}</h2><ul>
+      <li>${text("ui.verbrauch")}: ${verbrauch || text("ui.nichts")}</li>
+      ${definition.abklingzeit ? `<li>${text("ui.abklingzeit", { zuege: definition.abklingzeit })}</li>` : ""}
+      ${zuegeBisBereit(ninkasi, gewaehlt) > 0 ? `<li class="schlimm">${text("ui.abklingend", { zuege: zuegeBisBereit(ninkasi, gewaehlt) })}</li>` : ""}
+      <li class="leise">${platzText(texte, leisten, `faehigkeit:${gewaehlt}`)}</li>
+    </ul>`;
+  }
+  const hinweis = !namen.length ? "ui.faehigkeiten_keine" : gewaehlt ? "ui.faehigkeiten_handeln" : "ui.faehigkeiten_waehlen";
   return {
     titel: text("ui.faehigkeiten"),
     liste: `<ul>${zeilen.join("")}</ul>`,
-    fuss: text(namen.length ? "ui.faehigkeiten_waehlen" : "ui.faehigkeiten_keine"),
+    details,
+    fuss: text(hinweis),
   };
 });
 
@@ -131,6 +158,7 @@ fensterinhaltAnmelden("faehigkeiten", ({ spiel, texte }) => {
 
 // Anzeigename einer Taste: eigener Text (taste.<code>), sonst aus dem Code (KeyG -> G, Numpad7 -> Num 7, Digit1 -> 1)
 export function tastenname(texte, taste) {
+  if (taste.umschalt) return texte.text("taste.mit_umschalt", { taste: tastenname(texte, { code: taste.code }) });
   if (taste.zeichen !== undefined) return taste.zeichen;
   const schluessel = `taste.${taste.code}`;
   if (texte.hatSchluessel(schluessel)) return texte.text(schluessel);

@@ -47,7 +47,7 @@ export function logkopfHtml(texte, spalte) {
   const { text } = texte;
   if (spalte !== "kampf") return `<div class="logkopf"><span class="zug"></span><span class="symbol"></span><span class="text">${text(`log.spalte.${spalte}`)}</span></div>`;
   return `<div class="logkopf kampf"><span class="zug"></span><span class="symbol"></span><span class="text">${text("log.spalte.kampf")}</span>`
-    + ZAHLENSPALTEN.map((klasse) => `<span class="zahl ${klasse}">${text(`log.spalte.${klasse}`)}</span>`).join("") + "</div>";
+    + ZAHLENSPALTEN.map((klasse) => `<span class="zahl ${klasse}" title="${text(`log.spalte_titel.${klasse}`)}">${text(`log.spalte.${klasse}`)}</span>`).join("") + "</div>";
 }
 
 export class Log {
@@ -63,6 +63,13 @@ export class Log {
     this.zeilen = [];
     this.spiel = spiel;
     this.letztesGeraeusch = -Infinity;
+    this.anzeigen();
+  }
+
+  // Gespeicherte Zeilen wieder einsetzen (eingabe/speicherstand.js); nur gültig aussehende, höchstens die Obergrenze
+  zeilenEinsetzen(zeilen) {
+    const gueltig = (zeile) => zeile && typeof zeile.text === "string" && SPALTEN.includes(zeile.spalte) && zeile.art in ARTEN;
+    this.zeilen = (Array.isArray(zeilen) ? zeilen : []).filter(gueltig).slice(-HOECHSTE_ZEILENZAHL).map((zeile) => ({ anzahl: 1, zug: 0, ...zeile }));
     this.anzeigen();
   }
 

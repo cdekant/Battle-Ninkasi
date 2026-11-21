@@ -1,11 +1,13 @@
-// Inhalte der Fenster Spielmenü, Bestätigung und Verlauf (eingabe/menue.js, eingabe/verlauf.js) nach der Grammatik
-// aus anzeige/fenster.js. Liest den Zustand nur.
+// Inhalte der Fenster Spielmenü, Bestätigung, Verlauf und Übersichtskarte (eingabe/menue.js, eingabe/verlauf.js,
+// eingabe/karte.js) nach der Grammatik aus anzeige/fenster.js. Liest den Zustand nur.
 // umgebung zusätzlich: { logzeilen, einstellungen, version } (src/main.js)
 
 import { fensterinhaltAnmelden, buchstabeHtml } from "./fenster.js";
 import { logzeileHtml } from "./log.js";
 import { MENUE_EINTRAEGE } from "../eingabe/menue.js";
 import { VERLAUF_FILTER, VERLAUF_SEITE, passtZumFilter } from "../eingabe/verlauf.js";
+import { PUNKTFARBEN } from "./minikarte.js";
+import "../eingabe/karte.js"; // meldet die Fensterart "karte" an
 
 fensterinhaltAnmelden("menue", ({ spiel, texte, einstellungen, version }, zustand) => {
   const { text } = texte;
@@ -40,5 +42,17 @@ fensterinhaltAnmelden("verlauf", ({ texte, logzeilen }, zustand) => {
     kopf: `<div class="verlauf-filter">${filter}</div>`,
     liste: `<div class="verlauf">${zeilenHtml || `<div class="leise">${text("ui.leer")}</div>`}</div>`,
     fuss: text("verlauf.fuss", { von: Math.max(0, ende - sichtbar.length) + (sichtbar.length ? 1 : 0), bis: ende, alle: passend.length }),
+  };
+});
+
+// Übersichtskarte: das Canvas füllt src/main.js nach dem Einsetzen (anzeige/minikarte.js zeichnen)
+fensterinhaltAnmelden("karte", ({ texte }) => {
+  const { text } = texte;
+  const legende = Object.entries(PUNKTFARBEN).map(([art, farbe]) => `<span><i style="background:${farbe}"></i>${text(`karte.legende.${art}`)}</span>`).join("");
+  return {
+    titel: text("aktion.karte"),
+    breit: true,
+    liste: `<canvas class="uebersichtskarte"></canvas><div class="legende leise">${legende}</div>`,
+    fuss: text("karte.fuss"),
   };
 });
