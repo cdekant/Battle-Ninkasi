@@ -1,6 +1,6 @@
 # Battle Ninkasi - Systemausbau
 
-Stand: 2026-11-20
+Stand: 2026-11-22
 
 Mitprüfen bei Änderungen: alle Dokumente, deren Punkte hier umgesetzt werden
 
@@ -117,6 +117,7 @@ Offener Rest:
 + Benommenheit und Ersticken als Zustände statt Giftschaden, sobald es Zustände im Spielinhalt gibt
 + Bewusst noch ohne: Endosporen, die Feuer weckt (es gibt keine Endosporen), Licht durch Feuer (mit dem Licht), Fließen von Flüssigkeiten
 + Wesen folgen Ninkasi über Treppen (Brogue: wer neben ihr steht, kommt mit)
++ Sturz in einen Abgrund auf die Ebene darunter; bisher klemmt die Lageprüfung ein Wesen dort nur ein und drückt es aufs nächste freie Feld (siehe [Wesen.md](Wesen.md), Bewegung)
 + Dienste des Hubs (Spieldesign in [Grundlagen.md](Grundlagen.md)); bisher ein leerer Raum mit Treppe
 + Treppe per Maus (Reise zur Treppe und hinüber); bisher nur die Taste <>
 + Mehr Ebenenarten und Gegner, damit die Population nach Tiefe etwas zu unterscheiden hat; Themenräume wie der Gärkeller (Punkt 10)
@@ -152,7 +153,7 @@ Status: offen, jeweils erst Spieldesign in [Grundlagen.md](Grundlagen.md) entsch
 + Filmriss als Mechanik: Zeitsprung, verlorene Erinnerung an erkundete Felder
 + Gefahreneinschätzung beim Untersuchen (Untersuchen mit Beschreibung und Trefferchance ohne Spiel-Zufall seit 0.25.0)
 + Todesbericht (Morgue) mit Todesursache und Statistik des Laufs; braucht die Urheberkette aus Punkt 2
-+ Speichern als Schnappschuss zusätzlich zum Nachspielen, da lange Läufe sonst langsam laden; Mods gehören in die Prüfsumme der Daten
++ Prüfsumme der Daten im Spielstand, samt Mods: das Laden prüft bisher nur die Version, geänderte Daten ohne neue Version fallen nicht auf (siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit); der Schnappschuss ist seit 0.29.0 umgesetzt
 + Vorschau durch Simulation auf einer Kopie des Zustands (Vorbild Desktop Dungeons), z.B. "wie viel Schaden macht dieser Angriff"; der Zustand ist JSON, die Kopie also billig
 + Leichen als Hinterlassenschaft: gärende Überreste, Nahrung für Mikroorganismen
 
