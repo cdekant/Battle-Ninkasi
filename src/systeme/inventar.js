@@ -1,4 +1,4 @@
-// Inventar (siehe docs/Architektur.md, Gegenstände): aufheben, trinken, fallenlassen, Stapel, Ladungen, Behälter, Gewicht.
+// Inventar (siehe docs/Gegenstaende.md, Inventar): aufheben, trinken, fallenlassen, Stapel, Ladungen, Behälter, Gewicht.
 // Befehle: { art: "aufheben" }, { art: "trinken", gegenstandId }, { art: "fallenlassen", gegenstandId }
 // Getragene Gegenstände haben keine Position, sondern getragenVon; die Trägerin führt sie in inventar.
 // Daten am Gegenstand:

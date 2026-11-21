@@ -1,4 +1,4 @@
-// Geometrie auf dem Gitter (siehe docs/Architektur.md, Zielauswahl).
+// Geometrie auf dem Gitter (siehe docs/Wirkungen.md, Zielauswahl).
 // Nur ganze Zahlen und keine Winkelfunktionen, damit jede Maschine dieselben Felder berechnet.
 //   linie:          symmetrisch, von A nach B ergibt dieselben Felder wie von B nach A, nur umgekehrt
 //   sichtlinieFrei: kein undurchsichtiges Feld zwischen den Endpunkten; ein Diagonalschritt an einer

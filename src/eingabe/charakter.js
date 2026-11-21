@@ -1,4 +1,4 @@
-// Charakter- und Skillfenster (Taste C; siehe docs/Architektur.md, Fenster): reine Tastenlogik ohne DOM.
+// Charakter- und Skillfenster (Taste C; siehe docs/Bedienung.md, Fenster): reine Tastenlogik ohne DOM.
 // Fensterart "charakter" im Fensterstapel (eingabe/fenster.js), Zustand { gewaehlt, eingabe }:
 //   gewaehlt: Stelle in der Skillübersicht (systeme/skills.js skillUebersicht), eingabe: getippte Zahl als Text
 //   Pfeil hoch und runter wählen, Bild auf und ab blättern um eine Seite (26), A bis Z wählt auf der Seite;

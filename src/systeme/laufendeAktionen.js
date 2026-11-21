@@ -1,4 +1,4 @@
-// Lange Aktionen (siehe docs/Architektur.md, Lange Aktionen): Rituale, später Brauen, laufen über mehrere Schritte.
+// Lange Aktionen (siehe docs/Wirkungen.md, Lange Aktionen): Rituale, später Brauen, laufen über mehrere Schritte.
 // Komponente an der Akteurin:
 //   laufendeAktion: { art, schritteGesamt, schritteErledigt, unterbrochen: null | Grund, lage, unterbrechbar?, ...Daten der Art }
 //   unterbrechbar: Liste der Gründe, die die Aktion sofort abbrechen, für jedes Wesen (UNTERBRECHUNGSGRUENDE):

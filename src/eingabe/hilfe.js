@@ -1,4 +1,4 @@
-// Hilfe (Taste ?; siehe docs/Architektur.md, Fenster): Fensterart "hilfe" im Fensterstapel (eingabe/fenster.js).
+// Hilfe (Taste ?; siehe docs/Bedienung.md, Fenster): Fensterart "hilfe" im Fensterstapel (eingabe/fenster.js).
 // Der Inhalt entsteht aus Aktionskatalog und Belegung (hilfeGruppen), nichts davon ist von Hand geschrieben.
 // Zustand { thema? }: aus einem Fenster geöffnet, ist das Thema dessen Art; die Anzeige zeigt dann nur die Hilfe zum
 // Fenster (Text hilfe.thema.<art>, sonst die allgemeine Erklärung der Fenster, dazu dessen Tasten), ohne Thema die

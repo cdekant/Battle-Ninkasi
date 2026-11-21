@@ -1,4 +1,4 @@
-// Eigenschaften und Skills (siehe docs/Architektur.md, Skills und Lernen; Spieldesign in docs/Charakter.md).
+// Eigenschaften und Skills (siehe docs/Wesen.md, Skills und Lernen; Spieldesign in docs/Charakter.md).
 // Eigenschaften (daten/eigenschaften.js): Grundwerte an Ninkasi als eigenschaften: { koerperlichkeit: 14, ... };
 //   vorübergehende Änderungen sind Modifikatoren auf eigenschaft.<name>. Das Lerntempo rechnet mit dem Grundwert,
 //   Anforderungen und Bedingungen mit dem wirksamen Wert (eigenschaftWirksam).

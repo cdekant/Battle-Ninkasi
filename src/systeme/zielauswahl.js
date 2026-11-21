@@ -1,4 +1,4 @@
-// Zielmuster und Zielauswahl (siehe docs/Architektur.md, Zielauswahl).
+// Zielmuster und Zielauswahl (siehe docs/Wirkungen.md, Zielauswahl).
 // Zielmuster im Register "zielmuster": (spiel, auswahl, parameter) => [{x, y}]
 //   auswahl = { ursprung, zielpunkt, quelleId }; in den Daten z.B. muster: { art: "kreis", radius: 1 }
 //   jedes Muster beschreibt seine Parameter in "parameter" für die Datenprüfung (wie die Bausteine)

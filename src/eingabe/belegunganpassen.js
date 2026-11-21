@@ -1,4 +1,4 @@
-// Eigene Tastenbelegung (siehe docs/Architektur.md, Eingabe): Abweichungen von der Vorgabe (eingabe/belegung.js),
+// Eigene Tastenbelegung (siehe docs/Bedienung.md, Eingabe): Abweichungen von der Vorgabe (eingabe/belegung.js),
 // ohne DOM, damit sie testbar ist. src/main.js speichert die Abweichungen unter battle-ninkasi.belegung und baut beim
 // Start einmal die wirksame Belegung (abweichungenAnwenden).
 //   abweichungen: { tasten: { code: aktion | null }, zeichen: { zeichen: aktion | null } }, null nimmt eine Taste weg

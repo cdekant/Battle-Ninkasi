@@ -1,4 +1,4 @@
-// Inventarfenster (siehe docs/Architektur.md, Eingabe): reine Tastenlogik ohne DOM, damit sie testbar ist.
+// Inventarfenster (siehe docs/Bedienung.md, Eingabe): reine Tastenlogik ohne DOM, damit sie testbar ist.
 // Fenster-Zustand der Anzeige (nicht im Spielzustand): null (zu) oder { gewaehlt: null | gegenstandId, absicht? }.
 //   zu:                 Taste i öffnet; d und w öffnen mit absicht "fallenlassen" bzw. "werfen"
 //   offen, nichts gewählt: a bis z wählt den Gegenstand an dieser Stelle des Gepäcks, Esc oder i schließt;

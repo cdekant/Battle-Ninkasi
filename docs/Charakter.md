@@ -2,12 +2,14 @@
 
 Stand: 2026-11-20
 
-Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaft, Skillpunkte unabhängig vom späteren Lerntempo), DCSS (EP fließen in die benutzten Skills, Kosten anzeigen statt Formel), Caves of Qud (Eigenschaften dauerhaft und vorübergehend veränderbar), Tales of Maj'Eyal und Path of Exile (Skills wirken über Tags auch auf künftige Fähigkeiten). Die Mechanik ist seit 0.26.0 umgesetzt, mit den hier genannten vorläufigen Zahlen, beschrieben in [Architektur.md](Architektur.md) (Skills und Lernen); offen sind Skillfenster, Charaktererstellung und Skillkatalog (Punkt 13 in [Systemausbau.md](Systemausbau.md)).
+Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Bedienung.md](Bedienung.md)
+
+Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaft, Skillpunkte unabhängig vom späteren Lerntempo), DCSS (EP fließen in die benutzten Skills, Kosten anzeigen statt Formel), Caves of Qud (Eigenschaften dauerhaft und vorübergehend veränderbar), Tales of Maj'Eyal und Path of Exile (Skills wirken über Tags auch auf künftige Fähigkeiten). Die Mechanik ist seit 0.26.0 umgesetzt, mit den hier genannten vorläufigen Zahlen, beschrieben in [Wesen.md](Wesen.md) (Skills und Lernen); offen sind Skillfenster, Charaktererstellung und Skillkatalog (Punkt 13 in [Systemausbau.md](Systemausbau.md)).
 
 ## Charaktererstellung
 
 + Alle sechs Eigenschaften starten bei 10, die Spielerin verteilt 20 Punkte, höchstens 20 je Eigenschaft (vorläufig, Regelwerte in `regeln.lernen`)
-+ Die Charaktererstellung erscheint vor jedem Lauf als Fenster über der Karte, vorbelegt mit der letzten Verteilung (seit 0.27.0, siehe Fenster in [Architektur.md](Architektur.md))
++ Die Charaktererstellung erscheint vor jedem Lauf als Fenster über der Karte, vorbelegt mit der letzten Verteilung (seit 0.27.0, siehe Fenster in [Bedienung.md](Bedienung.md))
 + Keine festen Startskills: Ninkasi beginnt mit einem Startguthaben freier EP (vorläufig 300) und verteilt es selbst
 + Makel gehören zur Charaktererstellung: Nachteil gegen zusätzliche Punkte
 + Idee, noch nicht bestätigt: Vorzüge als Gegenstück, Vorteil gegen Punkte
@@ -60,7 +62,7 @@ Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaf
 + Sinnlichkeit ist die schwerste Eigenschaft, Ausgleich über das Balancing
 + Vorräte und Eigenschaften: LP zu Körperlichkeit, MP zu Klugheit und Braukunde, PP zu Sinnlichkeit, Pegel zu Trinkfestigkeit, Ausdauer (Option) zu Gewandtheit oder Körperlichkeit
 + Kennerschaft (Unbekanntes erkennen) als Skill mit Sinnlichkeit und Braukunde
-+ Skills, Schriftrollen und Items wirken auf Regeneration und Schwund über Modifikatoren, siehe Stoffwechsel in [Architektur.md](Architektur.md)
++ Skills, Schriftrollen und Items wirken auf Regeneration und Schwund über Modifikatoren, siehe Stoffwechsel unter Entitäten und Komponenten in [Architektur.md](Architektur.md)
 
 ### Magie und Psi
 
@@ -112,10 +114,10 @@ Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaf
 + Umstellbar über den Regelwert `regeln.lernen.verrechnung` (`multiplizieren` als Vorgabe, `addieren`), die Daten bleiben gleich; ein später Wechsel verlangt, die bis dahin balancierten Zahlen neu einzustellen
 + Bei Abzügen ist das Multiplizieren milder (zweimal −25 % Zeit ergibt ×0,56), exponentiell wachsen nur steigende Werte wie Schaden und Vorräte; Kampfwerte bleiben über ihren Halbwert unter 100 %
 + Ausrüstung und Zustände addieren sich weiter, `mal` nur, wo ihre Daten es ausdrücklich sagen
-+ Tag-System: Fähigkeiten, Angriffe und Effekte tragen Tags, Skills wirken über Modifikatoren mit `tag` auch auf künftige Fähigkeiten, siehe Modifikatoren in [Architektur.md](Architektur.md)
++ Tag-System: Fähigkeiten, Angriffe und Effekte tragen Tags, Skills wirken über Modifikatoren mit `tag` auch auf künftige Fähigkeiten, siehe Modifikatoren in [Wirkungen.md](Wirkungen.md)
 + Höhere Tiers und Stufen verändern Fähigkeiten qualitativ (z.B. Psi-Teleport nimmt ab Meister ein Ziel mit); die Fähigkeit nennt das selbst in ihrem Ausbau mit der Bedingung Skillstufe
 + Skills können auch Auslöser tragen (z.B. "bei Hinterhalt Blutung")
-+ Vorläufige Idee: Nachtsicht (Sehen bei weniger Licht) und Fernsicht (größere Sichtweite) als Skills; Licht und Wahrnehmung siehe [Architektur.md](Architektur.md)
++ Vorläufige Idee: Nachtsicht (Sehen bei weniger Licht) und Fernsicht (größere Sichtweite) als Skills; Licht siehe [Welt.md](Welt.md), Wahrnehmung siehe [Wesen.md](Wesen.md)
 
 ### Fähigkeiten
 
@@ -164,7 +166,7 @@ Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaf
 ## Offen
 
 + Ausnahmen von der Regel "keine Fähigkeiten direkt durch Skills"
-+ Übersicht der Skills in der Oberfläche: Liste nach Set und Tier mit Voraussetzungen und "ermöglicht" seit 0.27.0 (siehe Fenster in [Architektur.md](Architektur.md)); offen sind Filter, Suche und ein Graph der Abhängigkeiten, wenn der Katalog groß ist
++ Übersicht der Skills in der Oberfläche: Liste nach Set und Tier mit Voraussetzungen und "ermöglicht" seit 0.27.0 (siehe Fenster in [Bedienung.md](Bedienung.md)); offen sind Filter, Suche und ein Graph der Abhängigkeiten, wenn der Katalog groß ist
 + Idee, noch nicht bestätigt: zufällige besondere Skills mit zufälligen Kombinationen, als Fundstück freigeschaltet
 + Idee, noch nicht bestätigt: Zielstufe je Skill wie in DCSS, eingehende freie EP fließen von selbst dorthin (Mechanik, nicht Oberfläche)
 + Ob Fähigkeitsquellen verbraucht werden oder dauerhaft lehren, flexibel pro Quelle regelbar, später entscheiden

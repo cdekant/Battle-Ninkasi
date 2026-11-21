@@ -1,4 +1,4 @@
-// Wahrnehmung (siehe docs/Architektur.md, Wahrnehmung), Vorbild Brogue.
+// Wahrnehmung (siehe docs/Wesen.md, Wahrnehmung), Vorbild Brogue.
 // Wachzustand in der KI-Komponente: ki.wachzustand = "schlaeft" | "wach" | "jagt" (Vorgabe "jagt", wie bisher)
 //   schlaeft: tut nichts, bis es etwas bemerkt (dann jagt) oder Lärm hört (dann wach)
 //   wach:     hat noch niemanden bemerkt; geht Lärm nach (letzteBekanntePosition), sonst wartet es

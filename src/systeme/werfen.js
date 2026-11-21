@@ -1,4 +1,4 @@
-// Befehl "werfen" (siehe docs/Architektur.md, Bewegung): einen getragenen Gegenstand entlang der Flugbahn werfen.
+// Befehl "werfen" (siehe docs/Wesen.md, Bewegung): einen getragenen Gegenstand entlang der Flugbahn werfen.
 // Befehl: { art: "werfen", gegenstandId, ziel: { x, y } | { id } }
 // Die Bahn ist die eines Geschosses (zielAufloesen mit Zielart geschoss): sie endet am ersten Wesen oder vor der Wand.
 // Reichweite: wurf.reichweite am Gegenstand, sonst regeln.werfen.reichweite. Zeitkosten: aktionen.werfen.

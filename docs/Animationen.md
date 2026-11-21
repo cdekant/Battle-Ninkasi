@@ -2,11 +2,13 @@
 
 Stand: 2026-11-20, Entwurf, zurückgestellt
 
-Konzept für Bewegung und Effekte in der Anzeige: Effektschicht, Kampfanimation, Kamera. Alles hier ist reine Anzeige und berührt weder den Spielzustand noch den Spiel-Zufall; die Logik liefert über ihre Meldungen schon alles Nötige. Grafik (Varianten von Boden und Wand, bewegte Tiles) steht in [Tileset.md](Tileset.md), die Arbeitsliste in Punkt 12 von [Systemausbau.md](Systemausbau.md), Licht in [Architektur.md](Architektur.md) (Licht, Wahrnehmung).
+Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Oberflaeche.md](Oberflaeche.md)
+
+Konzept für Bewegung und Effekte in der Anzeige: Effektschicht, Kampfanimation, Kamera. Alles hier ist reine Anzeige und berührt weder den Spielzustand noch den Spiel-Zufall; die Logik liefert über ihre Meldungen schon alles Nötige. Grafik (Varianten von Boden und Wand, bewegte Tiles) steht in [Tileset.md](Tileset.md), die Arbeitsliste in Punkt 12 von [Systemausbau.md](Systemausbau.md), Licht in [Welt.md](Welt.md) (Licht), [Wesen.md](Wesen.md) (Wahrnehmung).
 
 ## Stand
 
-+ `src/anzeige/animation.js` spielt nur Geschossbahnen ab: nacheinander, ein helles Quadrat je Feld, Takt per `setTimeout` aus `src/main.js` (Einstellung `geschossPause`, 30 ms); jede Taste überspringt, die Taste wirkt trotzdem (siehe Zielmodus in [Architektur.md](Architektur.md))
++ `src/anzeige/animation.js` spielt nur Geschossbahnen ab: nacheinander, ein helles Quadrat je Feld, Takt per `setTimeout` aus `src/main.js` (Einstellung `geschossPause`, 30 ms); jede Taste überspringt, die Taste wirkt trotzdem (siehe Zielmodus in [Bedienung.md](Bedienung.md))
 + Meldungen, an denen Animationen hängen können: `schaden` (mit `kritisch`, `immun`, `schadensart`), `verfehlt` (mit `grund`), `geheilt`, `wert_geaendert`, `tod`, `geschoss` (`bahn`, `aufschlag`), `flaeche` (`felder`), `hinterhalt`, `zustand_beginnt`, `zustand_endet`, `teleportiert`, `gestossen`, `gezogen`, `beschworen`, `verschwindet`, `entzuendet`, `erloschen`, `zerbrochen`
 + Das Log filtert schon nach dem, was Ninkasi wahrnimmt (`meldungWahrnehmbar` in `src/systeme/wahrnehmbar.js`); Animationen folgen derselben Regel
 

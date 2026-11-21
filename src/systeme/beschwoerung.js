@@ -1,4 +1,4 @@
-// Beschwören und Verschwinden (siehe docs/Architektur.md, Zustände).
+// Beschwören und Verschwinden (siehe docs/Wirkungen.md, Zustände).
 //   beschwoeren:  { wesen, anzahl?, muster?, zustand?, dauer? } erzeugt Wesen aus den Daten auf freien Feldern des
 //                 Musters (Vorgabe angrenzend um den Ursprung, in der Reihenfolge der Felder), höchstens anzahl
 //                 (Vorgabe 1); sie bekommen die Fraktion der Urheberin und beschworenVon (ihnen Zugerechnetes

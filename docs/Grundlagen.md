@@ -2,6 +2,8 @@
 
 Stand: 2026-11-18
 
+Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Architektur.md](Architektur.md)
+
 ## Spiel
 
 + Dungeon-Crawler/Roguelike, rundenbasiert
@@ -25,7 +27,7 @@ Stand: 2026-11-18
   + LP regenerieren immer, langsam (Vorbild: Brogue); ohne Pegel etwas langsamer, am schnellsten bei einem optimalen Pegel weit über dem von Normalsterblichen, darüber wieder abnehmend
   + MP regenerieren nüchtern am schnellsten, je höher der Pegel, desto langsamer
   + PP regenerieren nur bei hohem Pegel, je höher, desto schneller; unter einer niedrigen Schwelle schwinden sie
-  + Regeneration und Schwund sind für jeden Vorrat möglich; Skills, Schriftrollen, Items und Zustände passen Rate, Schwund und Lage der Verläufe an, siehe [Architektur.md](Architektur.md)
+  + Regeneration und Schwund sind für jeden Vorrat möglich; Skills, Schriftrollen, Items und Zustände passen Rate, Schwund und Lage der Verläufe an, siehe Entitäten und Komponenten in [Architektur.md](Architektur.md)
 + Folge: Auf Magie bereitet man sich nüchtern vor, Psi braucht für Regeneration und Wirksamkeit einen möglichst hohen Pegel, bei dem das Risiko steigt; Mischbuilds müssen ihren Rausch planen
 + Meditieren und Schriftrollen schreiben nur nüchtern
 + Vorschlag, noch nicht bestätigt: Bier füllt LP, Wein füllt MP, Brand füllt PP oder wirkt nur über den Pegel; jedes Getränk hebt den Pegel nach seinem Alkoholgehalt
@@ -83,16 +85,16 @@ Stand: 2026-11-18
 + Läufe aus Startwert und Befehlsliste reproduzierbar, Inhalte als Daten, Zeitmodell mit Aktionskosten
 + Bezugsgröße 1920x1080, Kamera mit Scrollen, Tile-Größe einstellbar
 + Texte zweisprachig über Sprachdateien, Textkorpus für erzeugte Texte
-+ Details: [Architektur.md](Architektur.md), [Texte.md](Texte.md)
++ Details: [Architektur.md](Architektur.md) und die übrigen technischen Dokumente (Übersicht in CLAUDE.md), [Texte.md](Texte.md)
 
 ## Tileset
 
 + Keine Zeichen als Platzhalter: Neue Entitäten kommen direkt als Tile ins Spiel
 + Claude zeichnet die Tiles
-+ Pixelart in vier Sätzen (16, 32, 48, 64 px); gezeichnet wird der größte, die kleineren werden per Werkzeug abgeleitet und von Hand nachgearbeitet; Einzelheiten in [Architektur.md](Architektur.md)
++ Pixelart in vier Sätzen (16, 32, 48, 64 px); gezeichnet wird der größte, die kleineren werden per Werkzeug abgeleitet und von Hand nachgearbeitet; Einzelheiten in [Tileset.md](Tileset.md) und [Anzeige.md](Anzeige.md)
 + Draufsicht, Figuren und Wände leicht von vorn
 + Licht von links oben, Figuren mit dunklem Rand, Umgebung gedämpft
-+ Zunächst keine Animation der Tiles; ausgenommen ist das Flackern von Licht, siehe Licht in [Architektur.md](Architektur.md)
++ Zunächst keine Animation der Tiles; ausgenommen ist das Flackern von Licht, siehe Licht in [Welt.md](Welt.md)
 + Palette mit 62 Farben und verbindliche Artstyle-Fibel in [Tileset.md](Tileset.md)
 + Erstliste: Boden, Wand, Tür, Treppe, Ninkasi, zwei Gegner, Bier, Truhe, Falle
 + Arbeitsweise, Pixeldaten, Vorschau und Ablauf: [Tileset.md](Tileset.md)
@@ -112,19 +114,19 @@ Stand: 2026-11-18
 + Ob die MP-Regeneration bei hohem Pegel auf null sinkt oder nur immer langsamer wird
 + Wofür der Brand gut ist: PP direkt füllen oder nur über den Pegel wirken
 + Ab welcher Schwelle "nüchtern" für Meditieren und Schriftrollen gilt
-+ Worin das Risiko von Psi besteht (Fehlschlag, Kontrollverlust, Rückschlag); der Mechanismus (Risikotabellen über den Pegel) steht seit 0.12.0, siehe Fähigkeiten in [Architektur.md](Architektur.md)
++ Worin das Risiko von Psi besteht (Fehlschlag, Kontrollverlust, Rückschlag); der Mechanismus (Risikotabellen über den Pegel) steht seit 0.12.0, siehe Fähigkeiten in [Wirkungen.md](Wirkungen.md)
 + Magie im Detail: welche Wirkungen über die Zeit (Schaden, Flächen, Segen und Fluch, Beschwörung)
 + Pegel im Detail: Schwellen, Risiken, Aktionen mit Mindestpegel
 + Ausdauer: ob überhaupt, Zuordnung zu Gewandtheit oder Körperlichkeit, Verhältnis zu einer Nahrungsuhr
 + Endboss: Sobrietas oder erfundener Gott der Nüchternheit
 + Unterschiede der Mikroorganismen ausarbeiten (Hefen, Bakterien, Schimmel, weitere Gruppen)
 + Brausystem im Detail: Zutaten, Rezepte, Wirkung der Kessel-Tiers, Reihenfolge der Materialien
-+ Folgen eines abgebrochenen Brauvorgangs: verdorben, minderwertig oder wieder aufnehmbar (Unterbrechung und Entscheidung per Befehl regelt [Architektur.md](Architektur.md))
++ Folgen eines abgebrochenen Brauvorgangs: verdorben, minderwertig oder wieder aufnehmbar (Unterbrechung und Entscheidung per Befehl regelt [Wirkungen.md](Wirkungen.md), Lange Aktionen)
 + Dienste des Hubs im Detail
 + Ziel eines Laufs und was zwei Läufe unterscheidet
 + Welt und Schauplatz
 + Bestenliste der eigenen Läufe: ja, als Ruhmeshalle (entschieden 2026-11-21, siehe [Titelbildschirm.md](Titelbildschirm.md))
-+ Licht und Wahrnehmung (vorläufige Ideen in [Architektur.md](Architektur.md)): wie Ninkasi ohne Nachtsicht im Dunkeln sieht (gar nicht, geringe Reichweite, abhängig vom Pegel)
++ Licht und Wahrnehmung (vorläufige Ideen in [Welt.md](Welt.md), Licht, und [Wesen.md](Wesen.md), Wahrnehmung): wie Ninkasi ohne Nachtsicht im Dunkeln sieht (gar nicht, geringe Reichweite, abhängig vom Pegel)
 + Ob Mikroorganismen durch Wände spüren oder nur entlang von Wegen, wie ein Geruch
 + Ob Kontrolleure Taschenlampen tragen (bewegliche Lichtquelle, später vielleicht als Lichtkegel in Blickrichtung)
 + Wertebereich und Stufenzahl der Helligkeit in der Logik, Reichweiten und Stärken der Lichtquellen

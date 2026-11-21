@@ -1,4 +1,4 @@
-// Fallen (siehe docs/Architektur.md, Gelände): Entitäten auf einem Feld mit der Komponente falle.
+// Fallen (siehe docs/Welt.md, Gelände): Entitäten auf einem Feld mit der Komponente falle.
 // Daten (daten/fallen.js): { text, falle: { tarnung, effekt, ausloesenFuer? }, verborgen? }
 //   tarnung:       Punkte gegen das Entdecken, die Qualität der Falle (z.B. 20 plump, 80 meisterhaft)
 //   effekt:        wirkt auf das Wesen, das hineintritt (Quelle die Falle, Ursache "falle"), eine Kettenstufe tiefer

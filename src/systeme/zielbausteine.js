@@ -1,4 +1,4 @@
-// Bausteine mit Zielauswahl (siehe docs/Architektur.md, Zielauswahl): Sie wählen Felder oder Wesen
+// Bausteine mit Zielauswahl (siehe docs/Wirkungen.md, Zielauswahl): Sie wählen Felder oder Wesen
 // und wenden darauf einen benannten Effekt an. Der innere Effekt teilt die Ablage kontext.werte.
 //   fuer_jedes_ziel: { muster, effekt, trifft?, ohneUrheber? } auf jede getroffene Entität im Muster;
 //                    schreibt werte.anzahlZiele (für teilen), Meldung "flaeche"

@@ -1,4 +1,4 @@
-// Feldschichten (siehe docs/Architektur.md, Feldschichten): Oberfläche, Gas und Feuer neben der Karte, Vorbild Brogue.
+// Feldschichten (siehe docs/Welt.md, Feldschichten): Oberfläche, Gas und Feuer neben der Karte, Vorbild Brogue.
 // Datenzugriff in welt/schichten.js; Arten in daten/schichten.js, Feuer in regeln.feuer, Obergrenzen in regeln.schichten.
 //
 // Oberfläche { art, menge }: oberflaechen.<art> = { text, schwund?, hoechstens?, beimBetreten?, jeTick?, ausloesenFuer?,

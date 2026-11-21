@@ -1,4 +1,4 @@
-// Zielmodus (siehe docs/Architektur.md, Zielmodus): reine Tasten- und Mauslogik ohne DOM, damit sie testbar ist.
+// Zielmodus (siehe docs/Bedienung.md, Zielmodus): reine Tasten- und Mauslogik ohne DOM, damit sie testbar ist.
 // Anzeige-Zustand, nicht im Spielzustand: null oder { auswahl, zielart, cursor: { x, y }, platz? }
 //   auswahl wie in systeme/vorschau.js: { zweck: "werfen", gegenstandId } oder { zweck: "faehigkeit", faehigkeit },
 //   dazu { zweck: "untersuchen" } (Taste X): derselbe Cursor ohne Befehl, Enter tut nichts, Esc oder X schließt;

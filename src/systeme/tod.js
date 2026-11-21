@@ -1,4 +1,4 @@
-// Tod als Zustandsprüfung (siehe docs/Architektur.md, Tod und Zustandsprüfung).
+// Tod als Zustandsprüfung (siehe docs/Wirkungen.md, Tod und Zustandsprüfung).
 // Nach jedem Vorgang stirbt jedes Wesen, dessen Lebenswert (Daten: lebenswert, Vorgabe "lp") bei 0 liegt,
 // in fester Reihenfolge nach Entitäts-ID. Geprüft werden nur Wesen, bei denen seit der letzten Prüfung ein Wert auf 0
 // gefallen ist (vorgemerkt in kern/werte.js, kern/raumindex.js); im Spiel läuft jede Änderung über wertAendern.

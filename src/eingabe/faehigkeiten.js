@@ -1,4 +1,4 @@
-// Fähigkeitenfenster (siehe docs/Architektur.md, Zielmodus und Schnellleiste): reine Tastenlogik ohne DOM, wie
+// Fähigkeitenfenster (siehe docs/Bedienung.md, Zielmodus und Schnellleiste): reine Tastenlogik ohne DOM, wie
 // eingabe/inventar.js. Fenster-Zustand der Anzeige (nicht im Spielzustand): null (zu) oder { gewaehlt: null | name }.
 //   zu:       Taste f öffnet
 //   offen:    a bis z wählt die Fähigkeit an dieser Stelle der Liste (faehigkeiten am Wesen); die Einzelheiten zeigen

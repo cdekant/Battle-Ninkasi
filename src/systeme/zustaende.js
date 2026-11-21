@@ -1,4 +1,4 @@
-// Zustände (siehe docs/Architektur.md, Zustände): zeitlich begrenzte Wirkungen an einer Entität.
+// Zustände (siehe docs/Wirkungen.md, Zustände): zeitlich begrenzte Wirkungen an einer Entität.
 // Daten (daten/zustaende.js):
 //   name: { text, tags?, dauer?, stapel?, hoechstStapel?, verlauf?, modifikatoren?, jeTick?, beimBeginn?, beimEnde?,
 //           ausloeser?, gebundenAnQuelle? }

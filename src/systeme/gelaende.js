@@ -1,4 +1,4 @@
-// Veränderliches Gelände (siehe docs/Architektur.md, Gelände): Felder der Karte ändern, Türen, Benutzen.
+// Veränderliches Gelände (siehe docs/Welt.md, Gelände): Felder der Karte ändern, Türen, Benutzen.
 //   gelaendeSetzen(spiel, feld, name)   ändert ein Feld; Meldung "gelaende_geaendert"; das Sichtfeld wird neu berechnet,
 //                                        wenn das Feld in Ninkasis Sichtweite liegt; Wesen darauf kommen in die Lageprüfung
 //                                        (eine Wand an ihrem Platz klemmt sie ein, systeme/verschieben.js)

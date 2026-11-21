@@ -1,4 +1,4 @@
-// Erzeugung einer Ebene (siehe docs/Architektur.md, Ebenen): die Ebene der Tiefe t ist daten.abfolge[t], ein Eintrag
+// Erzeugung einer Ebene (siehe docs/Welt.md, Ebenen): die Ebene der Tiefe t ist daten.abfolge[t], ein Eintrag
 // aus daten/ebenen.js; mehrere Tiefen dürfen dieselbe Vorlage nutzen, jede bekommt ihren eigenen abgeleiteten Zufall.
 // Ninkasi legt die Ebene nicht an; sie gibt die Treppenfelder zurück: { treppeAuf, treppeAb } (oder null).
 //

@@ -1,4 +1,4 @@
-// Ausrüstung (siehe docs/Architektur.md, Ausrüstung): Plätze, anlegen und ablegen, Modifikatoren, Waffen, Sets.
+// Ausrüstung (siehe docs/Gegenstaende.md, Ausrüstung): Plätze, anlegen und ablegen, Modifikatoren, Waffen, Sets.
 // Plätze am Wesen: plaetze: { hand: 2, kopf: 1, brust: 1, beine: 1, hals: 1, finger: 2 } (Namen aus
 //   regeln.ausruestung.plaetze); angelegt ist, was in ausgeruestet: [IDs] steht, der Gegenstand bleibt im Inventar.
 // Gegenstand: ausruestung: { platz, belegt?, angriffe?, modifikatoren?, ausloeser? }, dazu tags am Gegenstand für Sets

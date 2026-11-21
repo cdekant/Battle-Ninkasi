@@ -2,7 +2,11 @@
 
 Stand: 2026-11-18
 
-Plan für das Zeichnen der Tiles; wird nach Bedarf umgebaut. Regeln zur Anzeige (Sätze, Zoom, Ersatz fehlender Tiles) stehen in [Architektur.md](Architektur.md), Grundsätze in [Grundlagen.md](Grundlagen.md).
+Zuständig für: `grafik/*`, `src/anzeige/tilebilder.js`, `daten/zeichen.js`, `werkzeuge/tiles-ableiten.js`
+
+Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Grundlagen.md](Grundlagen.md)
+
+Plan für das Zeichnen der Tiles; wird nach Bedarf umgebaut. Regeln zur Anzeige (Sätze, Zoom, Ersatz fehlender Tiles) stehen in [Anzeige.md](Anzeige.md), Grundsätze in [Grundlagen.md](Grundlagen.md).
 
 ## Artstyle-Fibel
 
@@ -14,7 +18,7 @@ Verbindliche Regeln für jedes Tile, damit das Tileset wie aus einem Guss wirkt;
 + Licht von links oben: Höhen oben links in der hellsten, Schatten unten rechts in der dunkelsten Stufe der eigenen Rampe; kein Licht von rechts, keine Glanzpunkte unten
 + Figuren mit dunklem Rand, Umgebung gedämpft, damit Figuren und Gegenstände sich abheben
 + Zunächst keine Animation; Flackern von Licht ist ausgenommen, es entsteht in der Lichtkarte, nicht im Tile (Entwurf für bewegte Tiles siehe Varianten und Bewegung)
-+ Dynamisches Licht kommt zur eingezeichneten Beleuchtung hinzu (Lichtkarte über der Karte, siehe Licht in [Architektur.md](Architektur.md)); Tiles mit leuchtenden Pixeln (Augen, Glut) bekommen dafür später eine Maske
++ Dynamisches Licht kommt zur eingezeichneten Beleuchtung hinzu (Lichtkarte über der Karte, siehe Licht in [Welt.md](Welt.md)); Tiles mit leuchtenden Pixeln (Augen, Glut) bekommen dafür später eine Maske
 + Farbwelt: Biertöne, Edelstahl, Kupfer, Stein, dazu Signalfarben (siehe Design in [Grundlagen.md](Grundlagen.md))
 
 ### Raster und Maße

@@ -2,6 +2,10 @@
 
 Titelbildschirm, Fenster nach dem Lauf und die Ideen, die daran hängen; umgesetzt in 0.32.0, Stand 2026-11-21. Der Rahmen (Bildschirme, Fenster, Tasten) steht in [Oberflaeche.md](Oberflaeche.md), das Speichern unter Speichern in [Architektur.md](Architektur.md).
 
+Zuständig für: `src/eingabe/titel.js`, `src/eingabe/chronik.js`, `src/anzeige/titel.js`, `src/anzeige/titelbilder.js`
+
+Mitprüfen bei Änderungen: [Oberflaeche.md](Oberflaeche.md), [Bedienung.md](Bedienung.md), [Architektur.md](Architektur.md)
+
 ## Vorbilder
 
 Was ein Titel in anderen Spielen leistet (aus Kenntnis der Spiele, nicht im Einzelnen nachgeprüft):

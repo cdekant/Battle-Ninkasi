@@ -1,4 +1,4 @@
-// Vorschau für den Zielmodus (siehe docs/Architektur.md, Zielmodus): reine Lesefunktionen, ändern nichts und würfeln nicht.
+// Vorschau für den Zielmodus (siehe docs/Bedienung.md, Zielmodus): reine Lesefunktionen, ändern nichts und würfeln nicht.
 // Eine Auswahl sagt, womit gezielt wird:
 //   { zweck: "werfen", gegenstandId }       ein Gegenstand aus dem Gepäck (systeme/werfen.js)
 //   { zweck: "faehigkeit", faehigkeit }     eine Fähigkeit der Akteurin (systeme/faehigkeiten.js)

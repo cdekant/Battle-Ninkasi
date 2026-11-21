@@ -1,4 +1,4 @@
-// Untersuchen (siehe docs/Architektur.md, Untersuchen): reine Lesefunktionen, was Ninkasi über ein Feld und die
+// Untersuchen (siehe docs/Bedienung.md, Untersuchen): reine Lesefunktionen, was Ninkasi über ein Feld und die
 // Wesen darauf weiß; ändern nichts und würfeln nicht. Grundlage für Tooltip und Seitenleiste (anzeige/oberflaeche.js).
 // Ein unbekanntes Feld gibt nichts preis, ein erkundetes, das sie gerade nicht sieht, nur das Gelände (erinnert),
 // ein sichtbares alles: Gelände, Feldschichten, Gegenstände, bekannte Fallen und Wesen.

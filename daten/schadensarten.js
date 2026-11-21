@@ -1,4 +1,4 @@
-// Schadensarten (siehe docs/Architektur.md, Kampfwerte). Jeder Schritt "schaden" nennt seine Art.
+// Schadensarten (siehe docs/Wesen.md, Kampfwerte). Jeder Schritt "schaden" nennt seine Art.
 //   text:     Schlüssel in der Sprachdatei
 //   ruestung: true, wenn der Kampfwert ruestung dagegen hilft (körperliche Arten); gegen alle Arten wirkt
 //             zusätzlich ruestung.<art> aus Modifikatoren, z.B. eine säurefeste Schürze mit ruestung.saeure

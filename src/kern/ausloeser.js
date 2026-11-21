@@ -1,4 +1,4 @@
-// Auslöser aus Daten (siehe docs/Architektur.md, Auslöser).
+// Auslöser aus Daten (siehe docs/Wirkungen.md, Auslöser).
 // Daten an einer Entität: ausloeser: [{ bei, rolle?, ziel?, effekt, chance?, daempfung? }]
 //   bei:       Haken aus dem Katalog mit ausloeserErlaubt (kern/hakenkatalog.js)
 //   rolle:     "quelle" | "ziel", welche Rolle die Trägerin im Ereignis haben muss; ohne Angabe jede

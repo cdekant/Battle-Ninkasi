@@ -1,4 +1,4 @@
-// Fraktionen und ihre Beziehungen (siehe docs/Architektur.md, Fraktionen).
+// Fraktionen und ihre Beziehungen (siehe docs/Wesen.md, Fraktionen).
 // Daten (daten/fraktionen.js): name: { text, beziehungen?: { andereFraktion: "feind" | "neutral" | "verbuendet" } }
 //   Eine Beziehung gilt in beide Richtungen; sagen beide Seiten etwas anderes, gewinnt die strengere
 //   (feind vor neutral vor verbuendet). Gleiche Fraktion ist verbündet, "eigene:<nummer>" (Zwietracht) mit allen

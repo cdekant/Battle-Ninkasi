@@ -2,7 +2,9 @@
 
 Stand: 2026-11-21, Entwurf, Entscheidungen getroffen, teilweise umgesetzt (siehe Stand der Umsetzung)
 
-Schema der Oberfläche: Prinzipien, Layout, Leisten, Log, Fenster, Tastatur, Einstellungen. Alles hier ist Anzeige und Eingabe; die Logik kennt weder Fenster noch Leisten und bekommt nur gewöhnliche Befehle. Was heute umgesetzt ist, beschreibt [Architektur.md](Architektur.md) (Anzeige, Oberfläche, Eingabe, Zielmodus, Untersuchen); Bewegung und Effekte stehen in [Animationen.md](Animationen.md), die Arbeitsliste in Punkt 11 von [Systemausbau.md](Systemausbau.md). Entschiedenes und Offenes steht am Ende unter Entscheidungen.
+Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Bedienung.md](Bedienung.md)
+
+Schema der Oberfläche: Prinzipien, Layout, Leisten, Log, Fenster, Tastatur, Einstellungen. Alles hier ist Anzeige und Eingabe; die Logik kennt weder Fenster noch Leisten und bekommt nur gewöhnliche Befehle. Was heute umgesetzt ist, beschreibt [Anzeige.md](Anzeige.md) (Anzeige, Oberfläche), [Bedienung.md](Bedienung.md) (Eingabe, Zielmodus, Untersuchen); Bewegung und Effekte stehen in [Animationen.md](Animationen.md), die Arbeitsliste in Punkt 11 von [Systemausbau.md](Systemausbau.md). Entschiedenes und Offenes steht am Ende unter Entscheidungen.
 
 ## Vorbilder
 
@@ -55,7 +57,7 @@ Nach Fagerholt und Lorentzon ("Beyond the HUD", 2009): diegetisch (in Geschichte
 Die Darstellung kann weitgehend neu entstehen, die Systeme darunter bleiben:
 
 + Bleibt: Logik und Meldungen, die Auswahl des Wahrnehmbaren (`src/systeme/wahrnehmbar.js`), Vorschau und Untersuchen (`vorschau.js`, `untersuchen.js`), die DOM-freien Kerne der Eingabe (Zielmodus, Inventar- und Fähigkeitenfenster, Reise, Rasten, Erkunden), Pegelanzeige, Texte und Sprachdateien, Renderer und Kamera
-+ Umgesetzt in 0.27.0: Aktionskatalog (`src/eingabe/aktionskatalog.js`) mit Belegung Taste zu Aktion, Fensterstapel über der Karte (`src/eingabe/fenster.js`, `src/anzeige/fenster.js`) nach der Grammatik unten, Inventar und Fähigkeiten als Fenster, Charakter und Skills (C), Charaktererstellung vor jedem Lauf, Hilfe (?) aus dem Katalog; die Seitenleiste zeigt freie EP und bis zur Schnellleiste eine Kurzliste der Fähigkeiten, siehe Fenster in [Architektur.md](Architektur.md)
++ Umgesetzt in 0.27.0: Aktionskatalog (`src/eingabe/aktionskatalog.js`) mit Belegung Taste zu Aktion, Fensterstapel über der Karte (`src/eingabe/fenster.js`, `src/anzeige/fenster.js`) nach der Grammatik unten, Inventar und Fähigkeiten als Fenster, Charakter und Skills (C), Charaktererstellung vor jedem Lauf, Hilfe (?) aus dem Katalog; die Seitenleiste zeigt freie EP und bis zur Schnellleiste eine Kurzliste der Fähigkeiten, siehe Fenster in [Bedienung.md](Bedienung.md)
 + Umgesetzt in 0.29.0: Schnellleiste vollständig, Speichern, Minikarte und Übersichtskarte, Hervorheben; siehe Stand der Umsetzung
 + Umgesetzt in 0.28.0: Aufbau der Seite (`index.html`, `stil.css`) mit Varianten A und B, Seitenleiste neu geordnet, Log in zwei Spalten (`src/anzeige/logzeilen.js`, `src/anzeige/log.js`), Bedienzeile mit Schnellleiste in der Grundform und Knöpfen, Esc-Kette, Spielmenü, Bestätigung, Verlauf, vi-Belegung, Laufen, Rechtsklick; siehe Stand der Umsetzung
 + Umgesetzt in 0.30.0: Einstellungen samt Tastenbelegung, Layout kompakt, Befehlszeile, Suche im Verlauf
@@ -151,7 +153,7 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 + Mehrere Leisten (Vorbild Qud), umgeschaltet mit einer Taste, die Nummer der Leiste steht daneben
 + Gegenstände liegen nach ihrer Art auf dem Platz, nicht als einzelnes Stück: ist ein Stapel aufgebraucht, bleibt der Platz grau mit Anzahl 0 und füllt sich wieder, sobald Ninkasi ein Stück derselben Art trägt
 + Je Platz: Symbol, Taste, Anzahl bzw. Ladungen, Abklingzeit als Zahl der Züge mit abgedunkeltem Symbol (ToME, Qud), Mindestpegel als Kante mit eigener Form, nicht verfügbar grau mit dem Grund aus der Prüfung des Befehls im Tooltip
-+ Unbekannte Gegenstände zeigen, was Ninkasi weiß (siehe Unbekanntes in [Architektur.md](Architektur.md)): Etikett statt Name, Ladungen als "?", bis sie bekannt sind; eine Abklingzeit zeigt der Platz erst, wenn die Art bekannt ist oder Ninkasi sie einmal erlebt hat; die Leiste verrät nie mehr als das Inventarfenster
++ Unbekannte Gegenstände zeigen, was Ninkasi weiß (siehe Unbekanntes in [Gegenstaende.md](Gegenstaende.md)): Etikett statt Name, Ladungen als "?", bis sie bekannt sind; eine Abklingzeit zeigt der Platz erst, wenn die Art bekannt ist oder Ninkasi sie einmal erlebt hat; die Leiste verrät nie mehr als das Inventarfenster
 + Zielen: braucht die Wirkung ein Ziel, öffnet die Taste den Zielmodus mit vorbelegtem Cursor; ein zweiter Druck derselben Taste bestätigt (Vorbild DCSS), Tab wechselt das Ziel, Esc bricht ab
 + Vorbelegung des Cursors nach der Art der Wirkung: schädlich auf den nächsten Feind in Sicht, nützlich auf den nächsten verletzten Gefährten bzw. Ninkasi selbst; lebt das zuletzt gewählte Ziel und ist in Sicht, gewinnt es; die Art steht als Angabe `zielvorgabe` ("feind", "gefaehrte", "selbst") in den Daten der Fähigkeit bzw. des Gegenstands, ohne Angabe folgt sie aus den Tags der Wirkung
 + Einstellung "sofort auslösen": mit vorbelegtem Ziel ohne Bestätigung wirken (Vorbild Shattered Pixel Dungeon), Vorgabe aus

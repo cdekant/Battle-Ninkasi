@@ -1,4 +1,4 @@
-// Kampf (siehe docs/Architektur.md, Kampfwerte): Trefferwurf, Blocken, Krit, Nahkampf und die Schadensrechnung
+// Kampf (siehe docs/Wesen.md, Kampfwerte): Trefferwurf, Blocken, Krit, Nahkampf und die Schadensrechnung
 // über Rüstung, Widerstand und Immunität.
 //
 // Angriffsprofile in den Daten: angriffe: [{ name, genauigkeit, effekt, kosten?, chance?, tags?, kritchance?, muster?, trifft? }]

@@ -8,7 +8,7 @@
 //   wenn: [{ bedingung, ...parameter }] alle müssen gelten (Register "modifikatorbedingungen", systeme/modifikatoren.js)
 // Umstände einer Abfrage: { gegenueberId?, tags? }, z.B. das Ziel und die Tags eines Angriffs
 // Modifikatoren werden bei jeder Abfrage aus allen Quellen gesammelt (Register "modifikatorquellen"), nichts wird nachgeführt.
-// Verrechnung (siehe docs/Architektur.md, Modifikatoren):
+// Verrechnung (siehe docs/Wirkungen.md, Modifikatoren):
 //   (basiswert + Summe plus) x (100 + Summe prozent) / 100 x jedes mal / 100, einmal gerundet,
 //   dann mindestens (der höchste), dann hoechstens (der niedrigste, gewinnt also); setzen zählt als beides.
 

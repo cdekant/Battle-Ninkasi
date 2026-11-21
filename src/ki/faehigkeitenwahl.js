@@ -1,4 +1,4 @@
-// Fähigkeiten in der KI (siehe docs/Architektur.md, KI): welche Fähigkeit ein Wesen gegen seine Beute einsetzt.
+// Fähigkeiten in der KI (siehe docs/Wesen.md, KI): welche Fähigkeit ein Wesen gegen seine Beute einsetzt.
 // Daten an der KI: faehigkeiten: [{ name, chance?, abstandAb?, abstandBis?, wenn? }]
 //   Die Einträge werden der Reihe nach geprüft, der erste passende wird benutzt. Ein Eintrag passt, wenn
 //   der Abstand zur Beute (Schachbrett, wie die Reichweite des Nahkampfs) zwischen abstandAb und abstandBis liegt,

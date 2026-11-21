@@ -2,12 +2,14 @@
 
 Stand: 2026-11-20
 
-Arbeitsliste der Strukturen, die Logik und Datenmodell noch brauchen, damit Fernkampf, Flächenwirkung, Effekte über Zeit, Magie, Psi, Nahkampf und viele Gegner überwiegend als Daten abbildbar sind. Grundlage ist eine Prüfung von Doku und Code mit Stand 0.3.0. Die Begriffe (Wirkungsarten, Effektsystem, Register, Zeitmodell) stehen in [Architektur.md](Architektur.md).
+Mitprüfen bei Änderungen: alle Dokumente, deren Punkte hier umgesetzt werden
+
+Arbeitsliste der Strukturen, die Logik und Datenmodell noch brauchen, damit Fernkampf, Flächenwirkung, Effekte über Zeit, Magie, Psi, Nahkampf und viele Gegner überwiegend als Daten abbildbar sind. Grundlage ist eine Prüfung von Doku und Code mit Stand 0.3.0. Die Begriffe stehen in [Architektur.md](Architektur.md) (Zeitmodell) und [Wirkungen.md](Wirkungen.md) (Wirkungsarten, Effektsystem, Register).
 
 ## Arbeitsweise
 
 + Jeder Punkt wird vor der Umsetzung als Vorschlag ausgearbeitet und freigegeben
-+ Ist ein Punkt umgesetzt, wandert seine Beschreibung nach [Architektur.md](Architektur.md) (bzw. [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md)) und wird hier gestrichen; bleibt nur ein Rest offen, steht hier nur der Rest
++ Ist ein Punkt umgesetzt, wandert seine Beschreibung in das zuständige technische Dokument (Übersicht in CLAUDE.md, Dokumentation; bzw. [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md)) und wird hier gestrichen; bleibt nur ein Rest offen, steht hier nur der Rest
 + Status je Punkt: offen, in Arbeit, umgesetzt in Version X
 + Die Reihenfolge ist eine Empfehlung: 1 bis 4 sind Kernarchitektur, danach sind die meisten Systeme Daten plus wenige neue Bausteine
 + Nächste Schritte (Stand 2026-11-21): Browserprüfung von 0.30.0 bis 0.32.0 (Einstellungen, Tastenbelegung, Befehlszeile, Suche, Klicks in allen Fenstern, Titelbildschirm), dazu die kleinen Nacharbeiten an den Fenstern aus 0.27.0 und die Gestaltung des Titels; danach die Ideen aus [Titelbildschirm.md](Titelbildschirm.md) (Ruhmeshalle, Abspielen, Spielarten) neben den übrigen Schwerpunkten einordnen
@@ -21,7 +23,7 @@ Arbeitsliste der Strukturen, die Logik und Datenmodell noch brauchen, damit Fern
 
 ## 1. Tod, Haken, Auslöser
 
-Status: umgesetzt in Version 0.4.0, beschrieben in [Architektur.md](Architektur.md) (Ereignisse, Tod und Zustandsprüfung, Auslöser)
+Status: umgesetzt in Version 0.4.0, beschrieben in [Architektur.md](Architektur.md) (Ereignisse), [Wirkungen.md](Wirkungen.md) (Tod und Zustandsprüfung, Auslöser)
 
 Offener Rest, wird mit den genannten Punkten umgesetzt:
 
@@ -33,7 +35,7 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 ## 2. Effektkontext, Zielauswahl, verschachtelte Effekte
 
-Status: umgesetzt in Version 0.5.0, beschrieben in [Architektur.md](Architektur.md) (Effektsystem, Auslöser, Zielauswahl)
+Status: umgesetzt in Version 0.5.0, beschrieben in [Wirkungen.md](Wirkungen.md) (Effektsystem, Auslöser, Zielauswahl)
 
 Offener Rest, wird mit den genannten Punkten umgesetzt:
 
@@ -42,7 +44,7 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 ## 3. Zustände
 
-Status: umgesetzt in Version 0.6.0 (Grundgerüst) und 0.7.0 (Verhalten, Beschwörung), beschrieben in [Architektur.md](Architektur.md) (Zustände, Befehle, Wahrnehmung)
+Status: umgesetzt in Version 0.6.0 (Grundgerüst) und 0.7.0 (Verhalten, Beschwörung), beschrieben in [Wirkungen.md](Wirkungen.md) (Zustände), [Architektur.md](Architektur.md) (Befehle), [Wesen.md](Wesen.md) (Wahrnehmung)
 
 Entschieden: Takt ist die Weltuhr; Stapelregel je Zustand, Vorgabe `erneuern`; Verlauf mit drei Namen oder eigener Kurve; handlungsunfähige Ninkasi wartet je Eingabe eine Aktion; Torkeln und Verwirrung über denselben Veränderer, Verwirrung greift auch Freunde an; Beschworene werden der Beschwörerin zugerechnet; Zustände im Spielinhalt erst, wenn der Systemausbau abgeschlossen ist (bis dahin nur in den Tests und seit 0.25.0 der vorläufige `testzustand` der Testfähigkeit); seit 0.8.0 kommen ihre Modifikatoren aus der Modifikatorquelle `zustaende`
 
@@ -53,7 +55,7 @@ Offener Rest:
 
 ## 4. Modifikatoren
 
-Status: umgesetzt in Version 0.8.0 (Register der Modifikatorquellen, Verrechnung, Zustände ohne Nachführen) und 0.9.0 (Bedingungen, Tags, Auren), beschrieben in [Architektur.md](Architektur.md) (Modifikatoren, Zustände)
+Status: umgesetzt in Version 0.8.0 (Register der Modifikatorquellen, Verrechnung, Zustände ohne Nachführen) und 0.9.0 (Bedingungen, Tags, Auren), beschrieben in [Wirkungen.md](Wirkungen.md) (Modifikatoren, Zustände)
 
 Entschieden: Verrechnung nach dem Vorbild "increased" und "more" (Prozente addieren, nur `mal` multipliziert, einmal gerundet, `hoechstens` gewinnt gegen `mindestens`); Boni zwischen Quellen multiplizieren nicht automatisch, sondern nur über `mal` in den Daten; Auren ohne Sichtlinie (Option `sichtlinie: true`), `trifft` aus Sicht der Trägerin mit den Werten der Zielauswahl, standardmäßig nicht auf sich selbst; Tags als eigenes Feld am Modifikator
 
@@ -64,7 +66,7 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 ## 5. Kampfwerte
 
-Status: umgesetzt in Version 0.10.0 (Schadensarten, Widerstand, Immunität, Rüstung, Ausweichen, Willenskraft, Blocken, Krit, Marker, Baustein `trefferwurf`) und 0.11.0 (Angriffsprofile mit Zeitkosten, `vor_angriff`), beschrieben in [Architektur.md](Architektur.md) (Kampfwerte)
+Status: umgesetzt in Version 0.10.0 (Schadensarten, Widerstand, Immunität, Rüstung, Ausweichen, Willenskraft, Blocken, Krit, Marker, Baustein `trefferwurf`) und 0.11.0 (Angriffsprofile mit Zeitkosten, `vor_angriff`), beschrieben in [Wesen.md](Wesen.md) (Kampfwerte)
 
 Entschieden: Kampfwerte sind Punkte, die über einen Halbwert zu Anteilen werden, die sich 100 % nur annähern (Trefferchance, Blocken, Kritchance, Widerstand); Trefferchance als Verhältnis von Genauigkeit zu Verteidigung plus Grundverteidigung, ohne harte Grenzen; Rüstung als fester Abzug mit Mindestschaden 1; Verwundbarkeit nähert sich dem doppelten Schaden; Immunität als eigener Sonderfall; Kritfaktor x1,5 als Regelwert, nach oben offen; `art` am Baustein `schaden` ist Pflicht; mehrere Angriffe laufen in einer Aktion nacheinander, die Aktion kostet so viel wie ihr langsamstes Profil; Durchschaubarkeit kommt aus der Anzeige der errechneten Prozentzahl, nicht aus der Formel
 
@@ -76,7 +78,7 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 ## 6. Fähigkeiten und lange Aktionen
 
-Status: umgesetzt in Version 0.12.0 (Datentyp Fähigkeit, Befehl `faehigkeit`, Verbrauch, Material, Abklingzeit, Voraussetzungen, Risikotabellen, aufrechterhaltene Zauber mit Unterhalt, dazu `auf: "quelle"` und der Veränderer `ziel_verfehlen`) und 0.13.0 (lange Aktionen mit Unterbrechung und `fortsetzen`, Rasten und Auto-Erkunden in der Eingabe), beschrieben in [Architektur.md](Architektur.md) (Fähigkeiten, Lange Aktionen, Zustände, Maus, Reise, Rasten und Erkunden)
+Status: umgesetzt in Version 0.12.0 (Datentyp Fähigkeit, Befehl `faehigkeit`, Verbrauch, Material, Abklingzeit, Voraussetzungen, Risikotabellen, aufrechterhaltene Zauber mit Unterhalt, dazu `auf: "quelle"` und der Veränderer `ziel_verfehlen`) und 0.13.0 (lange Aktionen mit Unterbrechung und `fortsetzen`, Rasten und Auto-Erkunden in der Eingabe), beschrieben in [Wirkungen.md](Wirkungen.md) (Fähigkeiten, Lange Aktionen, Zustände), [Bedienung.md](Bedienung.md) (Maus, Reise, Laufen, Rasten und Erkunden)
 
 Entschieden: Modifikatorziele `verbrauch.<wert>` für Vorräte, `kosten.*` bleibt die Zeit; Abklingzeit in eigenen Zügen der Wirkenden (schneller Handelnde haben Fähigkeiten in Weltzeit früher zurück); Psi-Risiko als Mechanismus mit vorläufigen Zahlen, die Folgen von Rückschlag und Glimmer sind Spieldesign; Rituale und Brauen laufen in der Logik, Rasten und Auto-Erkunden in der Eingabe wie die Reise; beim Abbruch einer langen Aktion sind die Kosten verloren, `beimAbbruch` wirkt; die Gründe zur Unterbrechung stehen in den Regeln, weil sie das Nachspielen bestimmen
 
@@ -89,19 +91,19 @@ Offener Rest, wird mit den genannten Punkten umgesetzt:
 
 ## 7. Fernkampf, Fraktionen, Wahrnehmung, viele Gegner
 
-Status: umgesetzt bis auf den offenen Rest, in den Versionen 0.14.0 (Fraktionen als Daten mit Zorn, Wahrnehmung mit Wachzustand, Heimlichkeit, Bemerken, Lärm und Hinterhalt), 0.15.0 (die KI nutzt Fähigkeiten und hält Abstand, schont Verbündete, `ueberVerbuendete`, angekündigte und unterbrechbare lange Aktionen, Baustein `angreifen`, Auslöser mit `wenn`, Testgegner Fernkämpfer-Test), 0.16.0 (Bewegungsarten mit `passierbarFuer` und `phasend`, `versetzen` mit den Haken `betritt_feld` und `verlaesst_feld`, Stoßen, Ziehen, Tauschen, Teleportieren, Lageprüfung, Werfen, `unterbrechbar` als Liste) und 0.17.0 (räumlicher Index, Zustandsprüfungen nur für Vorgemerktes, Warteschlange als Heap, Obergrenze der Population, Messwerkzeug), beschrieben in [Architektur.md](Architektur.md) (Fraktionen, Wahrnehmung, KI, Bewegung, Leistung, Kampfwerte, Fähigkeiten, Lange Aktionen, Auslöser, Zielauswahl)
+Status: umgesetzt bis auf den offenen Rest, in den Versionen 0.14.0 (Fraktionen als Daten mit Zorn, Wahrnehmung mit Wachzustand, Heimlichkeit, Bemerken, Lärm und Hinterhalt), 0.15.0 (die KI nutzt Fähigkeiten und hält Abstand, schont Verbündete, `ueberVerbuendete`, angekündigte und unterbrechbare lange Aktionen, Baustein `angreifen`, Auslöser mit `wenn`, Testgegner Fernkämpfer-Test), 0.16.0 (Bewegungsarten mit `passierbarFuer` und `phasend`, `versetzen` mit den Haken `betritt_feld` und `verlaesst_feld`, Stoßen, Ziehen, Tauschen, Teleportieren, Lageprüfung, Werfen, `unterbrechbar` als Liste) und 0.17.0 (räumlicher Index, Zustandsprüfungen nur für Vorgemerktes, Warteschlange als Heap, Obergrenze der Population, Messwerkzeug), beschrieben in [Wesen.md](Wesen.md) (Fraktionen, Wahrnehmung, KI, Bewegung, Kampfwerte), [Architektur.md](Architektur.md) (Leistung), [Wirkungen.md](Wirkungen.md) (Fähigkeiten, Lange Aktionen, Auslöser, Zielauswahl)
 
 Entschieden: Vorgabe für Paare ohne Angabe ist feind, die Tabelle nennt Abweichungen; Zorn trifft das angegriffene Wesen und Genossen, die die Angreiferin sehen, nicht die ganze Fraktion; Wahrnehmung nach Brogue mit Heimlichkeit als Modifikatorziel für Skills; Hinterhalt trifft sicher und kritisch, mehr Schaden über Modifikatoren mit `gegenueber_ahnungslos`; Lärm über Weglänge, Gelände dämpft nach `laermdaempfung`; die Nutzung von Fähigkeiten steht an der KI des Wesens; keine Gelegenheitsangriffe; keine Mehrfeld-Wesen, Bossphasen über Auslöser mit Bedingungen; mit `abstandHalten` wartet ein Wesen auf genau dem Abstand, statt zu pendeln; die KI schont Verbündete bei allen Zielarten und Mustern; `unterbrechbar` gilt auch für Ninkasi und nennt die Gründe (`schaden`, `versetzt`); `schwebend` heißt knapp über dem Boden, `fliegend` überquert alles, beides nur über `passierbarFuer`; `phasend` geht durch Wände, endet es darin, entscheidet die Lageprüfung mit `beimFestsitzen`; Aufprall nur an festem Gelände, Wesen und Kartenrand, die Menge steht am Baustein; Index per `WeakMap` neben dem Zustand, ferne Wesen voll simuliert, Obergrenze 500 mit ausdrücklichem Hinweis
 
 Offener Rest:
 
-+ Licht in der Wahrnehmung (Brogue: Heimlichkeitsweite im Licht doppelt, im Dunkeln halb), Spüren ohne Licht, Umherziehen wacher Wesen, Spur als Geruch (Brogue folgt der Spielerin über eine Duftkarte um Ecken, passend zu Mikroorganismen, die entlang von Wegen spüren); siehe Wahrnehmung und Licht in [Architektur.md](Architektur.md)
++ Licht in der Wahrnehmung (Brogue: Heimlichkeitsweite im Licht doppelt, im Dunkeln halb), Spüren ohne Licht, Umherziehen wacher Wesen, Spur als Geruch (Brogue folgt der Spielerin über eine Duftkarte um Ecken, passend zu Mikroorganismen, die entlang von Wegen spüren); siehe Wahrnehmung in [Wesen.md](Wesen.md) und Licht in [Welt.md](Welt.md)
 + Ruf bei ganzen Fraktionen (Spieldesign in [Grundlagen.md](Grundlagen.md))
 + Tile für den Fernkämpfer-Test (bisher nur Zeichen F), falls er im Spiel bleibt
 
 ## 8. Gelände, Feldschichten, Ebenen
 
-Status: umgesetzt bis auf den offenen Rest, in den Versionen 0.18.0 (veränderliches Gelände, `geschossdurchlaessig`, Türen, `tueren` am Wesen, Benutzen, Fallen mit Entdecken, Haken `zug_ende`) , 0.19.0 (Feldschichten Oberfläche, Gas und Feuer, dichter Rauch versperrt die Sicht, Gärbottiche, Brandflasche) und 0.20.0 (Abfolge der Tiefen, Treppen, verlassene Ebenen ruhen, Hub als feste Karte, Population nach Tiefe mit Rudeln, Gegnern aus der Tiefe und Affixen), beschrieben in [Architektur.md](Architektur.md) (Gelände, Feldschichten, Ebenen, Wegfindung)
+Status: umgesetzt bis auf den offenen Rest, in den Versionen 0.18.0 (veränderliches Gelände, `geschossdurchlaessig`, Türen, `tueren` am Wesen, Benutzen, Fallen mit Entdecken, Haken `zug_ende`) , 0.19.0 (Feldschichten Oberfläche, Gas und Feuer, dichter Rauch versperrt die Sicht, Gärbottiche, Brandflasche) und 0.20.0 (Abfolge der Tiefen, Treppen, verlassene Ebenen ruhen, Hub als feste Karte, Population nach Tiefe mit Rudeln, Gegnern aus der Tiefe und Affixen), beschrieben in [Welt.md](Welt.md) (Gelände, Feldschichten, Ebenen, Wegfindung)
 
 Entschieden: Aufteilung in 0.18.0, 0.19.0 und 0.20.0; Türen nach Brogue, sie öffnen sich beim Hindurchgehen und schließen sich von selbst, wer sie öffnet, steht am Wesen (Bakterien nicht); Fallen verborgen, Entdecken nach Tarnung, Abstand und dem Kampfwert `entdecken`; verlassene Ebenen ruhen; Gas als ganzzahlige Konzentration je Feld mit Diffusion nach Brogue, Wände und geschlossene Türen halten es auf, ohne Schwerkraft, Druck und Temperatur; Flüssigkeiten zunächst als Oberfläche mit Menge, ohne Fließen; je Feld und Schicht eine Art, auf der Oberfläche verdrängt die neue, beim Gas die größere Menge; Wirkung des Gases in Stufen; dichter Rauch versperrt die Sicht
 
@@ -121,7 +123,7 @@ Offener Rest:
 
 ## 9. Gegenstände
 
-Status: umgesetzt bis auf den offenen Rest, in den Versionen 0.21.0 (Plätze, anlegen und ablegen mit Tauschen, Modifikatorquelle `ausruestung`, Waffen statt Faust, Sets mit `traegt_tag`, Auslöser an der Ausrüstung, Haken `gegenstand_benutzt`, Inventarfenster), 0.22.0 (Stapel, Ladungen, Behälter mit `wirdZu`, Gewicht und Last in Stufen, Befehl `fallenlassen`, Bierfass) und 0.23.0 (Verderben mit gemitteltem Zeitpunkt in Stapeln, Haltbarkeit mit Baustein `abnutzen` und Zustandsprüfung `kaputt`, angefressen schwächer, Fluch mit `fluch_aufheben`, Unbekanntes mit Etiketten je Lauf, Vertrautheit und Kampfwert `kennerschaft`, Register `beimErzeugen`), beschrieben in [Architektur.md](Architektur.md) (Inventar, Ausrüstung, Verschleiß, Unbekanntes)
+Status: umgesetzt bis auf den offenen Rest, in den Versionen 0.21.0 (Plätze, anlegen und ablegen mit Tauschen, Modifikatorquelle `ausruestung`, Waffen statt Faust, Sets mit `traegt_tag`, Auslöser an der Ausrüstung, Haken `gegenstand_benutzt`, Inventarfenster), 0.22.0 (Stapel, Ladungen, Behälter mit `wirdZu`, Gewicht und Last in Stufen, Befehl `fallenlassen`, Bierfass) und 0.23.0 (Verderben mit gemitteltem Zeitpunkt in Stapeln, Haltbarkeit mit Baustein `abnutzen` und Zustandsprüfung `kaputt`, angefressen schwächer, Fluch mit `fluch_aufheben`, Unbekanntes mit Etiketten je Lauf, Vertrautheit und Kampfwert `kennerschaft`, Register `beimErzeugen`), beschrieben in [Gegenstaende.md](Gegenstaende.md) (Inventar, Ausrüstung, Verschleiß, Unbekanntes)
 
 Entschieden: Aufteilung in 0.21.0, 0.22.0 und 0.23.0; Plätze Kopf, Brust, Beine, Hals und zwei Finger für Rüstung und Schmuck, zwei Hände für Waffen; ein voller Platz wird in einem Befehl getauscht; Waffen ersetzen die Faust; Flüche sind unbekannt bis zum Anlegen; Biersorten sind ein eigenes Thema, 0.23.0 baut nur die Mechanik für Unbekanntes; Bier wird zur leeren Flasche, der Ballast ist gewollt; Tragkraft 20 kg als Startwert, Modifikatoren durch Skills offen; Fallenlassen nimmt den ganzen Stapel; Bierfass mit 20 Schlucken zu einer Halben; fließen Stapel zusammen, verdirbt der ganze Stapel zum nach Anzahl gewichteten Durchschnitt; abgenutzt wird nur über Effekte (Säure), nicht durch Zuschlagen oder Getroffenwerden, verbraucht werden nur Ladungen; angefressen wirkt ein Gegenstand schwächer (Vorteile im Verhältnis der Haltbarkeit, Nachteile voll), damit sich der Wechsel zu anderer Rüstung irgendwann lohnt; kaputt wird ein Gegenstand zu `wirdZu`, er verschwindet nicht; Trinken erkennt sofort, Ausrüstung über eine mit der Benutzung steigende Chance, Aufheben nur mit Kennerschaft
 
@@ -156,13 +158,13 @@ Status: offen, jeweils erst Spieldesign in [Grundlagen.md](Grundlagen.md) entsch
 
 ## 11. Oberfläche
 
-Status: umgesetzt bis auf den offenen Rest, in den Versionen 0.24.0 (Zielmodus für Werfen und Fähigkeiten mit Vorschau und Trefferchance, Fähigkeitenfenster, Werfen aus dem Inventar, Animation der Geschossbahn, vorläufige `testfaehigkeit` für Ninkasi) und 0.25.0 (Untersuchen mit X und Tooltip, Aufschlüsselung der Werte Ninkasis, Zustände, laufende Aktion, Wachzustand und Heimlichkeitsweite in der Seitenleiste, Log nur mit Wahrnehmbarem, Hören von Lärm außer Sicht, Texte zu Zuständen, Buchstaben nach `KeyboardEvent.key`, vorläufiger `testzustand`), beschrieben in [Architektur.md](Architektur.md) (Zielmodus, Untersuchen, Anzeige, Oberfläche, Eingabe, Wahrnehmung)
+Status: umgesetzt bis auf den offenen Rest, in den Versionen 0.24.0 (Zielmodus für Werfen und Fähigkeiten mit Vorschau und Trefferchance, Fähigkeitenfenster, Werfen aus dem Inventar, Animation der Geschossbahn, vorläufige `testfaehigkeit` für Ninkasi) und 0.25.0 (Untersuchen mit X und Tooltip, Aufschlüsselung der Werte Ninkasis, Zustände, laufende Aktion, Wachzustand und Heimlichkeitsweite in der Seitenleiste, Log nur mit Wahrnehmbarem, Hören von Lärm außer Sicht, Texte zu Zuständen, Buchstaben nach `KeyboardEvent.key`, vorläufiger `testzustand`), beschrieben in [Bedienung.md](Bedienung.md) (Zielmodus, Untersuchen, Eingabe), [Anzeige.md](Anzeige.md) (Anzeige, Oberfläche), [Wesen.md](Wesen.md) (Wahrnehmung)
 
 Entschieden: zwei Versionen, 0.24.0 Zielmodus und 0.25.0 Untersuchen und Zustände; Tasten W (werfen im Inventarfenster), Z (Fähigkeiten), X (untersuchen); Ninkasi bekommt bis zu ihren eigentlichen Fähigkeiten die vorläufige `testfaehigkeit` (der gleichnamige Testeintrag in `tests/hilfen.js` heißt seitdem `testritual`), dazu den vorläufigen `testzustand`; Kosmetik wie schwebende Zahlen ist ein eigener Punkt (12, seit dem Entwurf "Darstellung"); das Log zeigt keine Meldungen ohne Sichtkontakt, Lärm außer Sicht hört Ninkasi als vage Zeile mit Richtung; der Tooltip erscheint beim Darüberfahren mit der Maus und folgt beim Untersuchen dem Cursor
 
 Offener Rest:
 
-+ Schema der Oberfläche in [Oberflaeche.md](Oberflaeche.md): seit 0.27.0 Aktionskatalog, Fensterstapel, Charakterfenster, Charaktererstellung und Hilfe; seit 0.28.0 Layout A und B, Log in zwei Spalten mit Farben nach Seite, Bedienzeile, Esc-Kette, Spielmenü, Verlauf, vi-Belegung, Laufen; seit 0.29.0 Schnellleiste vollständig, Speichern, Minikarte und Übersichtskarte; seit 0.30.0 Einstellungen samt Tastenbelegung, Befehlszeile und Suche im Verlauf; seit 0.31.0 Klicks in Fenstern; seit 0.32.0 Titelbildschirm mit drei Speicherplätzen, Fenster nach dem Lauf und Chronik (siehe Oberfläche, Log, Schnellleiste, Speichern, Einstellungen, Eingabe, Fenster in [Architektur.md](Architektur.md) und [Titelbildschirm.md](Titelbildschirm.md))
++ Schema der Oberfläche in [Oberflaeche.md](Oberflaeche.md): seit 0.27.0 Aktionskatalog, Fensterstapel, Charakterfenster, Charaktererstellung und Hilfe; seit 0.28.0 Layout A und B, Log in zwei Spalten mit Farben nach Seite, Bedienzeile, Esc-Kette, Spielmenü, Verlauf, vi-Belegung, Laufen; seit 0.29.0 Schnellleiste vollständig, Speichern, Minikarte und Übersichtskarte; seit 0.30.0 Einstellungen samt Tastenbelegung, Befehlszeile und Suche im Verlauf; seit 0.31.0 Klicks in Fenstern; seit 0.32.0 Titelbildschirm mit drei Speicherplätzen, Fenster nach dem Lauf und Chronik (siehe [Anzeige.md](Anzeige.md) (Oberfläche, Log), [Bedienung.md](Bedienung.md) (Schnellleiste, Einstellungen, Eingabe, Fenster), [Architektur.md](Architektur.md) (Speichern) und [Titelbildschirm.md](Titelbildschirm.md))
 + 0.30.0 und 0.31.0 im Browser prüfen (Einstellungen, Tastenbelegung, Befehlszeile, Suche, Klicks in Fenstern); 0.28.0 und 0.29.0 sind geprüft, die Fenster aus 0.27.0 sind angesehen, kleine Nacharbeiten stehen aus
 + Laufen hält noch nicht an Abzweigungen in Gängen (wie DCSS)
 + Gehörter Lärm kommt im jetzigen Inhalt kaum vor (im Bot 0 Mal), weil fast nur Kämpfe mit Ninkasi Lärm machen; mit Kämpfen unter Gegnern, Beschworenen und Fallen nachprüfen
@@ -183,11 +185,11 @@ Entschieden: Animationen halten die Eingabe auf, bis alle Meldungen seit Ninkasi
 + Varianten und Schmuck für Boden und Wand, Vorderseite der Wand
 + Bewegte Tiles
 + Metaeffekte des Pegels und der LP, vorbereitet mit dem Layout (siehe Klassen der Elemente in [Oberflaeche.md](Oberflaeche.md))
-+ Weiches Scrollen der Kamera (siehe Kamera in [Architektur.md](Architektur.md))
++ Weiches Scrollen der Kamera (siehe Kamera in [Anzeige.md](Anzeige.md))
 
 ## 13. Skillsystem
 
-Status: Mechanik umgesetzt in 0.26.0 (Eigenschaften, Skills, Lernpunkte, freie und gebundene EP, Beitragsbuch, Topf je Abstammungslinie, Anforderungen, Risiko ohne Skill, Ausbau), Skillfenster und Charaktererstellung in 0.27.0, beschrieben in [Architektur.md](Architektur.md) (Skills und Lernen, Fenster), Spieldesign in [Charakter.md](Charakter.md); im Spielinhalt nur vorläufige Skills (Zähigkeit, Nahkampf, Ausweichen)
+Status: Mechanik umgesetzt in 0.26.0 (Eigenschaften, Skills, Lernpunkte, freie und gebundene EP, Beitragsbuch, Topf je Abstammungslinie, Anforderungen, Risiko ohne Skill, Ausbau), Skillfenster und Charaktererstellung in 0.27.0, beschrieben in [Wesen.md](Wesen.md) (Skills und Lernen), [Bedienung.md](Bedienung.md) (Fenster), Spieldesign in [Charakter.md](Charakter.md); im Spielinhalt nur vorläufige Skills (Zähigkeit, Nahkampf, Ausweichen)
 
 Offen:
 

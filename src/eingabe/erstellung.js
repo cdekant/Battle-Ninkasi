@@ -1,4 +1,4 @@
-// Charaktererstellung (siehe docs/Charakter.md, Charaktererstellung, und docs/Architektur.md, Fenster):
+// Charaktererstellung (siehe docs/Charakter.md, Charaktererstellung, und docs/Bedienung.md, Fenster):
 // reine Tastenlogik ohne DOM. Fensterart "erstellung" im Fensterstapel (eingabe/fenster.js), Zustand
 // { eigenschaften: { name: wert }, gewaehlt }: Pfeil hoch und runter wählen die Eigenschaft, Pfeil links und rechts
 // oder - und + ändern sie, A holt die ausgewogene Vorgabe aus den Daten zurück, Enter startet, sobald alle Punkte

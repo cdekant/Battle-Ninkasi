@@ -1,4 +1,4 @@
-// Effektsystem (siehe docs/Architektur.md, Effektsystem)
+// Effektsystem (siehe docs/Wirkungen.md, Effektsystem)
 // Zusammengesetzte Effekte sind Daten: { schritte: [ { baustein: "schaden", wuerfel: "1W6" }, ... ], tags? }
 // Grundbausteine sind Code im Register "bausteine", siehe bausteine.js und systeme/zielbausteine.js.
 // Kontext: { quelleId, urheberId, urheberFraktion, zielId, ursprung, zielfeld, ursache, kettentiefe, mittel, tags, kritisch, werte }

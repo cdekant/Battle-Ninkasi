@@ -1,4 +1,4 @@
-// Bedingungen am Modifikator und Auren als Modifikatorquelle (siehe docs/Architektur.md, Modifikatoren).
+// Bedingungen am Modifikator und Auren als Modifikatorquelle (siehe docs/Wirkungen.md, Modifikatoren).
 //
 // Bedingungen (Register "modifikatorbedingungen"): (spiel, entitaet, parameter, umstaende) => true, wenn der Modifikator gilt.
 // Jede Bedingung beschreibt ihre Parameter in "parameter" für die Datenprüfung. Bedingungen lesen nur Rohwerte

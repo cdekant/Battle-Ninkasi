@@ -1,4 +1,4 @@
-// Fähigkeiten (siehe docs/Architektur.md, Fähigkeiten): Magie, Psi, Fernkampf und körpereigene Aktionen als Daten.
+// Fähigkeiten (siehe docs/Wirkungen.md, Fähigkeiten): Magie, Psi, Fernkampf und körpereigene Aktionen als Daten.
 // Daten (daten/faehigkeiten.js):
 //   name: { text, art?, tags?, verbrauch?, material?, zeit?, abklingzeit?, voraussetzungen?, ziel?, wirkung?, zustand?, risiko?,
 //           skill?, anforderung?, ausbau? }

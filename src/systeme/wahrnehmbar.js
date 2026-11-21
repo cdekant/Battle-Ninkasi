@@ -1,4 +1,4 @@
-// Wahrnehmbarkeit von Meldungen für Ninkasi (siehe docs/Architektur.md, Anzeige): reine Lesefunktionen für das Log,
+// Wahrnehmbarkeit von Meldungen für Ninkasi (siehe docs/Anzeige.md, Anzeige): reine Lesefunktionen für das Log,
 // ändern nichts und würfeln nicht. Eine Meldung ist wahrnehmbar, wenn
 //   Ninkasi beteiligt ist (in einem der BEZUGSFELDER), außer bei Meldungen in NUR_SICHT, oder
 //   ein beteiligter Bezug mit Ort (bezugAuf merkt sich die Position) oder ein Feld der Meldung (ursprung, aufschlag,

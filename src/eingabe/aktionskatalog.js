@@ -1,4 +1,4 @@
-// Aktionskatalog (siehe docs/Architektur.md, Eingabe, und docs/Oberflaeche.md, Tastatur): jede Aktion der Oberfläche
+// Aktionskatalog (siehe docs/Bedienung.md, Eingabe, und docs/Oberflaeche.md, Tastatur): jede Aktion der Oberfläche
 // einmal, mit Text, Gruppe für die Hilfe und, wenn sie zum Befehl an die Logik wird, der Vorlage des Befehls.
 // Welche Taste welche Aktion auslöst, steht in eingabe/belegung.js; aus beidem entstehen Hilfe, Knöpfe der
 // Bedienzeile (KNOEPFE), später Befehlszeile und die Seite zur Tastenbelegung.

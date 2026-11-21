@@ -1,4 +1,4 @@
-// Verschleiß der Gegenstände (siehe docs/Architektur.md, Verderben und Haltbarkeit).
+// Verschleiß der Gegenstände (siehe docs/Gegenstaende.md, Verschleiß).
 // Verderben: verdirbt: { nach, wird } am Gegenstand; beim Erzeugen bekommt er den Zeitpunkt verdirbtUm und ein
 //   gebundenes Zeitereignis (systeme/inventar.js verderbenEinplanen). Ist es so weit, wird er zum Typ wird, am selben
 //   Ort oder im selben Gepäck, mit derselben Anzahl (Meldung verdorben). Auf verlassenen Ebenen ruht das Verderben

@@ -51,7 +51,7 @@ export function istSichtbar(zustand, x, y) {
 }
 
 // Sieht ein Wesen ein anderes? Ninkasi sieht, was in ihrem Sichtfeld liegt; alle anderen sehen ein Ziel mit freier
-// Sichtlinie innerhalb ihrer Sichtweite (auch Ninkasi). Licht kommt später (siehe docs/Architektur.md, Licht).
+// Sichtlinie innerhalb ihrer Sichtweite (auch Ninkasi). Licht kommt später (siehe docs/Welt.md, Licht).
 export function sieht(spiel, betrachter, ziel) {
   const zustand = spiel.zustand;
   if (!betrachter.position || !ziel.position) return false;

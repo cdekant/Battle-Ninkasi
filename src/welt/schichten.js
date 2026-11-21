@@ -1,4 +1,4 @@
-// Feldschichten neben der Karte (siehe docs/Architektur.md, Feldschichten): reiner Datenzugriff, ändert nichts.
+// Feldschichten neben der Karte (siehe docs/Welt.md, Feldschichten): reiner Datenzugriff, ändert nichts.
 // zustand.ebene.schichten = { oberflaeche: { feldindex: { art, menge } }, gas: { ... }, feuer: { feldindex: { menge } } }
 // Nur belegte Felder stehen darin; je Feld und Schicht höchstens eine Art. Die Arten stehen in daten/schichten.js
 // (oberflaechen, gase), das Feuer in den Regeln (regeln.feuer). Geschrieben wird über systeme/schichten.js.

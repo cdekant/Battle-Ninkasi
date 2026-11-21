@@ -1,4 +1,4 @@
-// Fensterstapel (siehe docs/Architektur.md, Fenster): reine Tastenlogik ohne DOM, damit sie testbar ist.
+// Fensterstapel (siehe docs/Bedienung.md, Fenster): reine Tastenlogik ohne DOM, damit sie testbar ist.
 // Der Stapel ist Anzeige-Zustand, nicht Spielzustand: [{ art, zustand }], das letzte Fenster liegt oben und bekommt
 // jede Taste. Fenster kosten keine Spielzeit; die Logik sieht nur die Befehle, die ein Fenster ausgibt.
 // Fensterarten melden sich hier an (eingabe/inventar.js, faehigkeiten.js, charakter.js, erstellung.js, hilfe.js):

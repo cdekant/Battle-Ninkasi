@@ -1,4 +1,4 @@
-// Verschieben von Wesen (siehe docs/Architektur.md, Bewegung): Bausteine stossen, ziehen, tauschen, teleportieren
+// Verschieben von Wesen (siehe docs/Wesen.md, Bewegung): Bausteine stossen, ziehen, tauschen, teleportieren
 // und die Zustandsprüfung "lage" für Wesen auf Feldern, die sie nicht betreten können.
 //   stossen:       { weite, wuerfel|menge, art? } schiebt das Ziel weg vom Ursprung, entlang der verlängerten Linie
 //                  vom Ursprung durch das Ziel (bei einem Schlag die Angreiferin, bei einer Explosion die Mitte);

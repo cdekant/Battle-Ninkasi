@@ -1,4 +1,4 @@
-// Mehrere Ebenen (siehe docs/Architektur.md, Ebenen): Treppen, Wechsel der Ebene, verlassene Ebenen ruhen.
+// Mehrere Ebenen (siehe docs/Welt.md, Ebenen): Treppen, Wechsel der Ebene, verlassene Ebenen ruhen.
 // Befehl { art: "treppe" }: nur Ninkasi, auf einem Gelände mit treppe: "ab" oder "auf"; Ablehnung "keine_treppe",
 //   wenn dort keine Treppe ist oder es die Tiefe nicht gibt. Zeitkosten aktionen.treppe.
 // Wechsel: die alte Ebene wird samt ihrer Entitäten (alles außer Ninkasi und dem, was sie trägt) und deren Einträgen

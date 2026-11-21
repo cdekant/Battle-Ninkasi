@@ -1,4 +1,4 @@
-// Erfahrungspunkte (siehe docs/Architektur.md, Skills und Lernen; Spieldesign in docs/Charakter.md).
+// Erfahrungspunkte (siehe docs/Wesen.md, Skills und Lernen; Spieldesign in docs/Charakter.md).
 // Ninkasi lernt, sobald lernenEinrichten ihr skills, freieEp und freigeschaltet gegeben hat (kern/spiel.js neuesSpiel);
 //   ohne diese Komponenten (z.B. in Unittests mit eigener Ninkasi) bleibt alles hier still.
 // Freie EP: Startguthaben regeln.lernen.startEp, dazu epJeFeld je Feld, das zum ersten Mal gesehen wird (systeme/sicht.js);

@@ -1,4 +1,4 @@
-// Animation der Geschossbahnen (siehe docs/Architektur.md, Zielmodus): reine Anzeige, ohne Timer und DOM, damit sie
+// Animation der Geschossbahnen (siehe docs/Bedienung.md, Zielmodus): reine Anzeige, ohne Timer und DOM, damit sie
 // testbar ist; den Takt gibt src/main.js vor (Einstellung geschossPause). Liest den Spielzustand nie.
 // Zustand: { bahnen: [[{ x, y }]], schritt } die Bahnen der Meldungen "geschoss" in ihrer Reihenfolge; gezeigt wird
 // je Takt ein Feld der ersten Bahn, danach die nächste. Jede Taste überspringt alles (animationLeeren).
