@@ -1,6 +1,6 @@
 # Battle Ninkasi - Architektur
 
-Stand: 2026-11-21
+Stand: 2026-11-22
 
 Zuständig für: `index.html`, `package.json`, `lib/*`, `src/main.js`, `src/version.js`, `src/kern/spiel.js`, `src/kern/zustand.js`, `src/kern/zeit.js`, `src/kern/zufall.js`, `src/kern/ereignisse.js`, `src/kern/hakenkatalog.js`, `src/kern/register.js`, `src/kern/daten.js`, `src/kern/raumindex.js`, `src/kern/kurven.js`, `src/systeme/index.js`, `src/eingabe/speicherstand.js`, `daten/index.js`, `daten/regeln.js`, `daten/aktionen.js`
 
@@ -178,7 +178,7 @@ Daten:
 Schnittstellen (`src/kern/zufall.js`):
 
 + `zufallErzeugen`, `naechsteZufallszahl`, `zufallsGanzzahl(z, min, max)`, `mitProzentChance(z, prozent)`, `mitAnteil(z, zaehler, nenner)` (exakter Bruch), `wuerfeln(z, "1W6+2")`, `istWuerfelausdruck`, `startwertAbleiten(startwert, kennung)`
-+ Abgeleitete Startwerte: Spiel-Zufall (`"spiel"`), Grundriss (`"ebene.<name>"`) und Inhalt einer Ebene (`"ebene.<name>.inhalt"`) haben eigene Quellen, damit die Ebene nicht vom Spielverlauf abhängt; ebenso die Etiketten unbekannter Gegenstände (`"etiketten"`); später z.B. Buchtexte aus Lauf-Startwert und Objekt-ID
++ Abgeleitete Startwerte: Spiel-Zufall (`"spiel"`), Grundriss (`"ebene.<tiefe>.<name>"`), Türen, Objekte und Inhalt einer Ebene (`.tueren`, `.objekte`, `.inhalt` dahinter) haben eigene Quellen, damit die Ebene nicht vom Spielverlauf abhängt; ebenso die Etiketten unbekannter Gegenstände (`"etiketten"`); später z.B. Buchtexte aus Lauf-Startwert und Objekt-ID
 
 Regeln:
 
