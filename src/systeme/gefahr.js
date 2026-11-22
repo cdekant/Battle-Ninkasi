@@ -4,22 +4,22 @@
 // Neue Prüfungen meldet man im Register "gefahren" an.
 
 import { anmelden, hat, holen } from "../kern/register.js";
-import { entitaetenMitPosition, spielerin } from "../kern/zustand.js";
+import { entitaetenMitPosition, gesteuerteEntitaet } from "../kern/zustand.js";
 import { feindlich } from "./kampf.js";
 import { istSichtbar } from "./sicht.js";
 
 // Feinde, die Ninkasi gerade sieht (IDs aufsteigend)
 export function sichtbareFeinde(spiel) {
   const zustand = spiel.zustand;
-  const ninkasi = spielerin(zustand);
+  const gesteuerte = gesteuerteEntitaet(zustand);
   return entitaetenMitPosition(zustand)
-    .filter((entitaet) => entitaet.position && feindlich(spiel, ninkasi, entitaet) && istSichtbar(zustand, entitaet.position.x, entitaet.position.y))
+    .filter((entitaet) => entitaet.position && feindlich(spiel, gesteuerte, entitaet) && istSichtbar(zustand, entitaet.position.x, entitaet.position.y))
     .map((entitaet) => entitaet.id);
 }
 
 export function lageErfassen(spiel) {
-  const ninkasi = spielerin(spiel.zustand);
-  return { feinde: sichtbareFeinde(spiel), lp: ninkasi.werte.lp.aktuell };
+  const gesteuerte = gesteuerteEntitaet(spiel.zustand);
+  return { feinde: sichtbareFeinde(spiel), lp: gesteuerte.werte.lp.aktuell };
 }
 
 // Ein Feind ist in Sicht gekommen, der vorher nicht sichtbar war

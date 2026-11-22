@@ -1,7 +1,7 @@
 // Übersetzt Tastendrücke über Belegung und Aktionskatalog (eingabe/aktionskatalog.js) in Aktionen und Befehle.
 // Liest den Zustand nur, um Befehle zu vervollständigen (z.B. welches Getränk).
 
-import { spielerin } from "../kern/zustand.js";
+import { gesteuerteEntitaet } from "../kern/zustand.js";
 import { erstesGetraenk } from "../systeme/inventar.js";
 import { aktionDerTaste, befehlDerAktion } from "./aktionskatalog.js";
 
@@ -23,7 +23,7 @@ export function aktionsergebnis(aktion, spiel) {
   const befehl = befehlDerAktion(aktion);
   if (!befehl) return { aktion };
   if (befehl.art === "trinken" && befehl.gegenstandId === undefined && spiel) {
-    const getraenkId = erstesGetraenk(spiel.zustand, spielerin(spiel.zustand));
+    const getraenkId = erstesGetraenk(spiel.zustand, gesteuerteEntitaet(spiel.zustand));
     if (getraenkId !== null) befehl.gegenstandId = getraenkId;
   }
   return { aktion, befehl };

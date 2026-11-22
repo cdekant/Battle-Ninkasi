@@ -7,7 +7,7 @@
 //             eingabe/zielmodus.js), eine Ziffer legt sie auf diesen Platz der aktiven Leiste, Entf nimmt sie von
 //             allen Leisten (ergebnis.leiste, eingabe/schnellleiste.js), Esc zurück zur Auswahl bzw. schließt
 
-import { spielerin } from "../kern/zustand.js";
+import { gesteuerteEntitaet } from "../kern/zustand.js";
 import { BUCHSTABEN, buchstabeDerTaste } from "./inventar.js";
 import { fensterartAnmelden } from "./fenster.js";
 import { platzDerTaste } from "./aktionskatalog.js";
@@ -17,7 +17,7 @@ const ENTFERNEN = ["Delete", "Backspace"];
 
 // Name der Fähigkeit an einer Stelle der Liste oder null
 export function faehigkeitAnStelle(spiel, stelle) {
-  return (spielerin(spiel.zustand).faehigkeiten || [])[stelle] ?? null;
+  return (gesteuerteEntitaet(spiel.zustand).faehigkeiten || [])[stelle] ?? null;
 }
 
 const auswahlVon = (name) => ({ zweck: "faehigkeit", faehigkeit: name });

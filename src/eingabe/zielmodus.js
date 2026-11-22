@@ -11,7 +11,7 @@
 // gewählte Ziel und ist in Sicht, gewinnt es (letztesZielId, Anzeige-Zustand in src/main.js).
 // Fähigkeiten ohne Ziel oder mit Zielart selbst brauchen keinen Zielmodus, sie werden sofort zum Befehl.
 
-import { spielerin, entitaetMitId, entitaetenAuf, istWesen } from "../kern/zustand.js";
+import { gesteuerteEntitaet, entitaetMitId, entitaetenAuf, istWesen } from "../kern/zustand.js";
 import { aufDerKarte } from "../welt/karte.js";
 import { istSichtbar } from "../systeme/sicht.js";
 import { beziehungZwischen, urheberVon } from "../systeme/fraktionen.js";
@@ -35,30 +35,30 @@ const quadratAbstand = (von, nach) => (von.x - nach.x) ** 2 + (von.y - nach.y) *
 // Sichtbare Wesen, die nicht verbündet sind, nach Abstand zu Ninkasi und ID: die Reihenfolge für Tab
 export function zieleInSicht(spiel) {
   const zustand = spiel.zustand;
-  const ninkasi = spielerin(zustand);
+  const gesteuerte = gesteuerteEntitaet(zustand);
   return Object.values(zustand.entitaeten)
-    .filter((entitaet) => istWesen(entitaet) && entitaet.position && entitaet.id !== ninkasi.id
+    .filter((entitaet) => istWesen(entitaet) && entitaet.position && entitaet.id !== gesteuerte.id
       && istSichtbar(zustand, entitaet.position.x, entitaet.position.y)
-      && beziehungZwischen(spiel, urheberVon(ninkasi), entitaet) !== "verbuendet")
-    .sort((erstes, zweites) => quadratAbstand(erstes.position, ninkasi.position) - quadratAbstand(zweites.position, ninkasi.position) || erstes.id - zweites.id);
+      && beziehungZwischen(spiel, urheberVon(gesteuerte), entitaet) !== "verbuendet")
+    .sort((erstes, zweites) => quadratAbstand(erstes.position, gesteuerte.position) - quadratAbstand(zweites.position, gesteuerte.position) || erstes.id - zweites.id);
 }
 
 // Sichtbare Verbündete samt Ninkasi, verletzte zuerst, dann nach Abstand und ID
 function gefaehrtenInSicht(spiel) {
   const zustand = spiel.zustand;
-  const ninkasi = spielerin(zustand);
+  const gesteuerte = gesteuerteEntitaet(zustand);
   const verletzt = (wesen) => (wesen.werte?.lp ? wesen.werte.lp.aktuell < hoechstwert(spiel, wesen, "lp") : false);
   return Object.values(zustand.entitaeten)
     .filter((entitaet) => istWesen(entitaet) && entitaet.position && istSichtbar(zustand, entitaet.position.x, entitaet.position.y)
-      && (entitaet.id === ninkasi.id || beziehungZwischen(spiel, urheberVon(ninkasi), entitaet) === "verbuendet"))
+      && (entitaet.id === gesteuerte.id || beziehungZwischen(spiel, urheberVon(gesteuerte), entitaet) === "verbuendet"))
     .sort((erstes, zweites) => verletzt(zweites) - verletzt(erstes)
-      || quadratAbstand(erstes.position, ninkasi.position) - quadratAbstand(zweites.position, ninkasi.position) || erstes.id - zweites.id);
+      || quadratAbstand(erstes.position, gesteuerte.position) - quadratAbstand(zweites.position, gesteuerte.position) || erstes.id - zweites.id);
 }
 
 // Art der Vorbelegung einer Auswahl: "feind", "gefaehrte" oder "selbst"
 export function zielvorgabeVon(spiel, auswahl) {
   if (auswahl.zweck !== "faehigkeit") return "feind";
-  const definition = faehigkeitFuer(spiel, spielerin(spiel.zustand), auswahl.faehigkeit);
+  const definition = faehigkeitFuer(spiel, gesteuerteEntitaet(spiel.zustand), auswahl.faehigkeit);
   if (definition?.zielvorgabe) return definition.zielvorgabe;
   const tags = [...(definition?.tags || []), ...(spiel.daten.effekte?.[definition?.wirkung]?.tags || [])];
   return tags.includes("heilung") || tags.includes("nuetzlich") ? "gefaehrte" : "feind";
@@ -66,31 +66,31 @@ export function zielvorgabeVon(spiel, auswahl) {
 
 // Startfeld des Cursors: das zuletzt gewählte Ziel, wenn es lebt, in Sicht ist und zur Vorgabe passt, sonst nach der Vorgabe
 function startcursor(spiel, auswahl, letztesZielId) {
-  const ninkasi = spielerin(spiel.zustand);
+  const gesteuerte = gesteuerteEntitaet(spiel.zustand);
   const vorgabe = auswahl.zweck === "untersuchen" ? "feind" : zielvorgabeVon(spiel, auswahl);
-  if (vorgabe === "selbst") return { ...ninkasi.position };
+  if (vorgabe === "selbst") return { ...gesteuerte.position };
   const kandidaten = vorgabe === "gefaehrte" ? gefaehrtenInSicht(spiel) : zieleInSicht(spiel);
   const letztes = letztesZielId != null ? kandidaten.find((wesen) => wesen.id === letztesZielId) : null;
   const ziel = letztes ?? kandidaten[0];
-  return ziel ? { ...ziel.position } : { ...ninkasi.position };
+  return ziel ? { ...ziel.position } : { ...gesteuerte.position };
 }
 
 // Beginnt den Zielmodus: { modus } oder { befehl } (kein Ziel nötig) oder { grund } (geht gar nicht)
 // optionen: { platz? (Schnellleiste), letztesZielId? }
 export function zielmodusBeginnen(spiel, auswahl, { platz, letztesZielId } = {}) {
-  const ninkasi = spielerin(spiel.zustand);
+  const gesteuerte = gesteuerteEntitaet(spiel.zustand);
   let zielart;
   if (auswahl.zweck === "untersuchen") {
     zielart = { art: "feld" };
   } else if (auswahl.zweck === "werfen") {
-    const gegenstand = (ninkasi.inventar || []).includes(auswahl.gegenstandId) ? entitaetMitId(spiel.zustand, auswahl.gegenstandId) : null;
+    const gegenstand = (gesteuerte.inventar || []).includes(auswahl.gegenstandId) ? entitaetMitId(spiel.zustand, auswahl.gegenstandId) : null;
     if (!gegenstand) return { grund: "nichts_zu_werfen" };
     zielart = { art: "geschoss", reichweite: gegenstand.wurf?.reichweite ?? spiel.daten.regeln.werfen.reichweite };
   } else {
-    const definition = faehigkeitFuer(spiel, ninkasi, auswahl.faehigkeit);
+    const definition = faehigkeitFuer(spiel, gesteuerte, auswahl.faehigkeit);
     const befehl = { art: "faehigkeit", faehigkeit: auswahl.faehigkeit };
     if (!definition?.ziel || definition.ziel.art === "selbst" || definition.art === "aufrecht") return { befehl };
-    const grund = faehigkeitPruefen(spiel, ninkasi, auswahl.faehigkeit, undefined);
+    const grund = faehigkeitPruefen(spiel, gesteuerte, auswahl.faehigkeit, undefined);
     if (grund && !GRUENDE_DES_ZIELS.includes(grund)) return { grund };
     zielart = definition.ziel;
   }
@@ -106,8 +106,8 @@ export function zielangabeVon(spiel, modus) {
     return { id: wesen ? wesen.id : null };
   }
   if (zielart.art === "richtung") {
-    const ninkasi = spielerin(spiel.zustand);
-    return { dx: Math.sign(cursor.x - ninkasi.position.x), dy: Math.sign(cursor.y - ninkasi.position.y) };
+    const gesteuerte = gesteuerteEntitaet(spiel.zustand);
+    return { dx: Math.sign(cursor.x - gesteuerte.position.x), dy: Math.sign(cursor.y - gesteuerte.position.y) };
   }
   return { x: cursor.x, y: cursor.y };
 }
@@ -115,7 +115,7 @@ export function zielangabeVon(spiel, modus) {
 // Vorschau zum aktuellen Cursor (systeme/vorschau.js); beim Untersuchen null
 export function zielmodusVorschau(spiel, modus) {
   if (istUntersuchen(modus)) return null;
-  return zielvorschau(spiel, spielerin(spiel.zustand), modus.auswahl, zielangabeVon(spiel, modus));
+  return zielvorschau(spiel, gesteuerteEntitaet(spiel.zustand), modus.auswahl, zielangabeVon(spiel, modus));
 }
 
 // Setzt den Cursor auf ein Feld (Maus); außerhalb der Karte bleibt er stehen

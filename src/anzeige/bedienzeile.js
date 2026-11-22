@@ -6,7 +6,7 @@
 // mit den Fähigkeiten Ninkasis.
 
 import { faehigkeitFuer } from "../systeme/faehigkeiten.js";
-import { spielerin } from "../kern/zustand.js";
+import { gesteuerteEntitaet } from "../kern/zustand.js";
 import { KNOEPFE, AKTIONEN, tastenDerAktion } from "../eingabe/aktionskatalog.js";
 import { aktivePlaetze, platzZustand, erstesStueck, platzSchluessel } from "../eingabe/schnellleiste.js";
 import { tastenname } from "./fenster.js";
@@ -28,7 +28,7 @@ export class Bedienzeile {
 
   platzName(spiel, platz) {
     const { text, nomenForm } = this.texte;
-    if (platz.art === "faehigkeit") return text(faehigkeitFuer(spiel, spielerin(spiel.zustand), platz.faehigkeit)?.text ?? platz.faehigkeit);
+    if (platz.art === "faehigkeit") return text(faehigkeitFuer(spiel, gesteuerteEntitaet(spiel.zustand), platz.faehigkeit)?.text ?? platz.faehigkeit);
     const stueck = erstesStueck(spiel, platz.typ);
     if (stueck) return nomenForm(stueck, "nom", "ohne");
     // aufgebraucht: der Name aus den Daten, eine unbekannte Art mit ihrem Etikett (verrät nicht mehr als das Inventar)

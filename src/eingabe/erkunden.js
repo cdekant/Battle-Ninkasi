@@ -3,7 +3,7 @@
 // Wie die Reise, nur mit anderer Zielwahl; jeder Schritt ist ein gewöhnlicher Befehl "bewegen".
 // Ablauf: { lage, schrittzahl }
 
-import { spielerin, entitaetenAuf, istWesen, bewegungVon } from "../kern/zustand.js";
+import { gesteuerteEntitaet, entitaetenAuf, istWesen, bewegungVon } from "../kern/zustand.js";
 import { naechstesWegfeld, naechstesFeldMit, amRandDesErkundeten } from "../welt/wege.js";
 import { lageErfassen, sichtbareFeinde } from "../systeme/gefahr.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
@@ -12,10 +12,10 @@ import { fallenMeiden } from "../systeme/fallen.js";
 import { gefahrenMeiden, meidenZusammen } from "../systeme/schichten.js";
 
 // Wege nur über Erkundetes, nach Ninkasis wirksamer Bewegungsart
-const wegOptionen = (spiel) => ({ nurErkundet: true, bewegung: bewegungVon(spielerin(spiel.zustand)), meiden: meidenZusammen(fallenMeiden(spiel, { nurBekannte: true }), gefahrenMeiden(spiel)) });
+const wegOptionen = (spiel) => ({ nurErkundet: true, bewegung: bewegungVon(gesteuerteEntitaet(spiel.zustand)), meiden: meidenZusammen(fallenMeiden(spiel, { nurBekannte: true }), gefahrenMeiden(spiel)) });
 
 function naechstesRandfeld(spiel) {
-  const position = spielerin(spiel.zustand).position;
+  const position = gesteuerteEntitaet(spiel.zustand).position;
   return naechstesFeldMit(spiel, position, (x, y) => amRandDesErkundeten(spiel, x, y), wegOptionen(spiel));
 }
 
@@ -32,12 +32,12 @@ export function erkundenBeginnen(spiel, einstellungen) {
 export function naechsterErkundungsschritt(spiel, ablauf, einstellungen) {
   const zustand = spiel.zustand;
   if (zustand.vorbei) return { halt: "vorbei" };
-  if (istHandlungsunfaehig(spiel, spielerin(zustand))) return { halt: "handlungsunfaehig" };
+  if (istHandlungsunfaehig(spiel, gesteuerteEntitaet(zustand))) return { halt: "handlungsunfaehig" };
   const halt = unterwegsPruefen(spiel, ablauf, einstellungen.reiseHalt);
   if (halt) return { halt };
   const ziel = naechstesRandfeld(spiel);
   if (!ziel) return { halt: "alles_erkundet" };
-  const position = spielerin(zustand).position;
+  const position = gesteuerteEntitaet(zustand).position;
   const naechstesFeld = naechstesWegfeld(spiel, position, ziel, wegOptionen(spiel));
   if (!naechstesFeld) return { halt: "kein_weg" };
   if (entitaetenAuf(zustand, naechstesFeld.x, naechstesFeld.y).some(istWesen)) return { halt: "versperrt" };

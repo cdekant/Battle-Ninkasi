@@ -4,7 +4,7 @@
 // Reise: { ziel: { x, y }, lage, schrittzahl }
 // Später: automatisches Erkunden ist dieselbe Reise mit anderer Zielwahl.
 
-import { spielerin, entitaetenAuf, istWesen, bewegungVon } from "../kern/zustand.js";
+import { gesteuerteEntitaet, entitaetenAuf, istWesen, bewegungVon } from "../kern/zustand.js";
 import { feldIndex, betretbar } from "../welt/karte.js";
 import { naechstesWegfeld } from "../welt/wege.js";
 import { lageErfassen, sichtbareFeinde, gefahrPruefen } from "../systeme/gefahr.js";
@@ -13,16 +13,16 @@ import { fallenMeiden } from "../systeme/fallen.js";
 import { gefahrenMeiden, meidenZusammen } from "../systeme/schichten.js";
 
 // Wege nur über Erkundetes, nach Ninkasis wirksamer Bewegungsart
-const wegOptionen = (spiel) => ({ nurErkundet: true, bewegung: bewegungVon(spielerin(spiel.zustand)), meiden: meidenZusammen(fallenMeiden(spiel, { nurBekannte: true }), gefahrenMeiden(spiel)) });
+const wegOptionen = (spiel) => ({ nurErkundet: true, bewegung: bewegungVon(gesteuerteEntitaet(spiel.zustand)), meiden: meidenZusammen(fallenMeiden(spiel, { nurBekannte: true }), gefahrenMeiden(spiel)) });
 
 // Gibt { reise } oder { grund } zurück; grund: "kein_weg" | "feinde_in_sicht" | "vorbei"
 export function reiseBeginnen(spiel, ziel, einstellungen) {
   const zustand = spiel.zustand;
   if (zustand.vorbei) return { grund: "vorbei" };
   const ebene = zustand.ebene;
-  if (!ebene.erkundet[feldIndex(ebene, ziel.x, ziel.y)] || !betretbar(spiel, spielerin(zustand), ziel)) return { grund: "kein_weg" };
+  if (!ebene.erkundet[feldIndex(ebene, ziel.x, ziel.y)] || !betretbar(spiel, gesteuerteEntitaet(zustand), ziel)) return { grund: "kein_weg" };
   if (!einstellungen.reiseTrotzFeinden && sichtbareFeinde(spiel).length) return { grund: "feinde_in_sicht" };
-  if (!naechstesWegfeld(spiel, spielerin(zustand).position, ziel, wegOptionen(spiel))) return { grund: "kein_weg" };
+  if (!naechstesWegfeld(spiel, gesteuerteEntitaet(zustand).position, ziel, wegOptionen(spiel))) return { grund: "kein_weg" };
   return { reise: { ziel: { x: ziel.x, y: ziel.y }, lage: lageErfassen(spiel), schrittzahl: 0 } };
 }
 
@@ -34,7 +34,7 @@ export function unterwegsPruefen(spiel, ablauf, haltgruende) {
   const gefahr = gefahrPruefen(ablauf.lage, lageJetzt, haltgruende);
   if (gefahr) return gefahr;
   ablauf.lage = lageJetzt;
-  const position = spielerin(spiel.zustand).position;
+  const position = gesteuerteEntitaet(spiel.zustand).position;
   const gegenstandHier = entitaetenAuf(spiel.zustand, position.x, position.y).some((entitaet) => entitaet.aufhebbar);
   if (haltgruende.includes("gegenstand") && gegenstandHier) return "gegenstand";
   return null;
@@ -45,8 +45,8 @@ export function unterwegsPruefen(spiel, ablauf, haltgruende) {
 export function naechsterReiseschritt(spiel, reise, einstellungen) {
   const zustand = spiel.zustand;
   if (zustand.vorbei) return { halt: "vorbei" };
-  if (istHandlungsunfaehig(spiel, spielerin(zustand))) return { halt: "handlungsunfaehig" };
-  const position = spielerin(zustand).position;
+  if (istHandlungsunfaehig(spiel, gesteuerteEntitaet(zustand))) return { halt: "handlungsunfaehig" };
+  const position = gesteuerteEntitaet(zustand).position;
   if (position.x === reise.ziel.x && position.y === reise.ziel.y) return { halt: "angekommen" };
 
   const halt = unterwegsPruefen(spiel, reise, einstellungen.reiseHalt);

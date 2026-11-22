@@ -6,7 +6,7 @@
 // voraus, eine bekannte Falle oder Gefahr voraus, und ein neues Nachbarfeld mit Tür, Treppe oder Gegenstand.
 // Das Halten an Abzweigungen in Gängen (wie DCSS) kommt später, siehe docs/Systemausbau.md.
 
-import { spielerin, entitaetenAuf, istWesen } from "../kern/zustand.js";
+import { gesteuerteEntitaet, entitaetenAuf, istWesen } from "../kern/zustand.js";
 import { aufDerKarte, feldIndex, betretbar, gelaendeAuf } from "../welt/karte.js";
 import { sichtbareFeinde, lageErfassen } from "../systeme/gefahr.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
@@ -27,7 +27,7 @@ function bemerkenswert(spiel, x, y) {
 
 // Schlüssel der bemerkenswerten Nachbarfelder Ninkasis
 export function bemerkenswerteNachbarn(spiel) {
-  const { x, y } = spielerin(spiel.zustand).position;
+  const { x, y } = gesteuerteEntitaet(spiel.zustand).position;
   return NACHBARN.filter(([dx, dy]) => bemerkenswert(spiel, x + dx, y + dy)).map(([dx, dy]) => `${x + dx},${y + dy}`);
 }
 
@@ -36,9 +36,9 @@ export function laufenBeginnen(spiel, richtung, einstellungen) {
   const zustand = spiel.zustand;
   if (zustand.vorbei) return { grund: "vorbei" };
   if (!einstellungen.reiseTrotzFeinden && sichtbareFeinde(spiel).length) return { grund: "feinde_in_sicht" };
-  const ninkasi = spielerin(zustand);
-  const erstesFeld = { x: ninkasi.position.x + richtung.dx, y: ninkasi.position.y + richtung.dy };
-  if (!betretbar(spiel, ninkasi, erstesFeld)) return { grund: "versperrt" };
+  const gesteuerte = gesteuerteEntitaet(zustand);
+  const erstesFeld = { x: gesteuerte.position.x + richtung.dx, y: gesteuerte.position.y + richtung.dy };
+  if (!betretbar(spiel, gesteuerte, erstesFeld)) return { grund: "versperrt" };
   return { ablauf: { richtung: { dx: richtung.dx, dy: richtung.dy }, lage: lageErfassen(spiel), schrittzahl: 0, bemerkt: bemerkenswerteNachbarn(spiel) } };
 }
 
@@ -47,8 +47,8 @@ export function laufenBeginnen(spiel, richtung, einstellungen) {
 export function naechsterLaufschritt(spiel, ablauf, einstellungen) {
   const zustand = spiel.zustand;
   if (zustand.vorbei) return { halt: "vorbei" };
-  const ninkasi = spielerin(zustand);
-  if (istHandlungsunfaehig(spiel, ninkasi)) return { halt: "handlungsunfaehig" };
+  const gesteuerte = gesteuerteEntitaet(zustand);
+  if (istHandlungsunfaehig(spiel, gesteuerte)) return { halt: "handlungsunfaehig" };
   const halt = unterwegsPruefen(spiel, ablauf, einstellungen.reiseHalt);
   if (halt) return { halt };
   if (ablauf.schrittzahl > 0) {
@@ -57,8 +57,8 @@ export function naechsterLaufschritt(spiel, ablauf, einstellungen) {
     ablauf.bemerkt = jetzt;
     if (neu) return { halt: "bemerkenswert" };
   }
-  const naechstesFeld = { x: ninkasi.position.x + ablauf.richtung.dx, y: ninkasi.position.y + ablauf.richtung.dy };
-  if (!betretbar(spiel, ninkasi, naechstesFeld)) return { halt: "hindernis" };
+  const naechstesFeld = { x: gesteuerte.position.x + ablauf.richtung.dx, y: gesteuerte.position.y + ablauf.richtung.dy };
+  if (!betretbar(spiel, gesteuerte, naechstesFeld)) return { halt: "hindernis" };
   if (entitaetenAuf(zustand, naechstesFeld.x, naechstesFeld.y).some(istWesen)) return { halt: "versperrt" };
   const meiden = meidenZusammen(fallenMeiden(spiel, { nurBekannte: true }), gefahrenMeiden(spiel));
   if (meiden?.(naechstesFeld.x, naechstesFeld.y)) return { halt: "gefahr_voraus" };

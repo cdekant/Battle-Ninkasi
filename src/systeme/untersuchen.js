@@ -5,7 +5,7 @@
 // Wesen: LP, Zustände mit Restdauer in Zügen, Wachzustand, laufende Aktion, Trefferchance in beide Richtungen
 // (erstes Angriffsprofil, systeme/vorschau.js). Ninkasi selbst dazu mit der Aufschlüsselung ihrer Werte.
 
-import { spielerin, entitaetenAuf, istWesen } from "../kern/zustand.js";
+import { gesteuerteEntitaet, entitaetenAuf, istWesen } from "../kern/zustand.js";
 import { aufDerKarte, feldIndex, gelaendeName } from "../welt/karte.js";
 import { schichtAuf } from "../welt/schichten.js";
 import { hatHoechstwert, hoechstwert, modifikatorenAufgeschluesselt, verrechnet, lebenswertName } from "../kern/werte.js";
@@ -40,17 +40,17 @@ export function laufendeAktionVon(wesen) {
 }
 
 export function wesenBeschreiben(spiel, wesen) {
-  const ninkasi = spielerin(spiel.zustand);
-  const istNinkasi = wesen.id === ninkasi.id;
+  const gesteuerte = gesteuerteEntitaet(spiel.zustand);
+  const istGesteuerte = wesen.id === gesteuerte.id;
   const lebenswert = wesen.werte?.[lebenswertName(wesen)];
   return {
     id: wesen.id,
     lp: lebenswert ? { aktuell: lebenswert.aktuell, hoechst: hoechstwert(spiel, wesen, lebenswertName(wesen)) } : null,
     zustaende: zustaendeVon(spiel, wesen),
     laufendeAktion: laufendeAktionVon(wesen),
-    wachzustand: wesen.ki && !istNinkasi ? wachzustandVon(wesen) : null,
-    chanceNinkasi: istNinkasi ? null : nahkampfchanceVorschau(spiel, ninkasi, wesen),
-    chanceGegen: istNinkasi ? null : nahkampfchanceVorschau(spiel, wesen, ninkasi),
+    wachzustand: wesen.ki && !istGesteuerte ? wachzustandVon(wesen) : null,
+    chanceNinkasi: istGesteuerte ? null : nahkampfchanceVorschau(spiel, gesteuerte, wesen),
+    chanceGegen: istGesteuerte ? null : nahkampfchanceVorschau(spiel, wesen, gesteuerte),
   };
 }
 

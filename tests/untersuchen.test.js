@@ -178,14 +178,14 @@ test("Hören: Lärm außer Sicht wird zum Geräusch mit Richtung, hinter dicken 
   spiel.zustand.sichtbareFelder = [feldIndex(ebene, 1, 1)];
   const meldungen = meldungenMitschneiden(spiel);
   laermMachen(spiel, { x: 8, y: 1 }, 10, null, "nahkampf");
-  assert.equal(meldungen.at(-1).spielerinHoert, true);
+  assert.equal(meldungen.at(-1).gesteuerteHoert, true);
   assert.deepEqual(geraeuschGehoert(spiel, meldungen.at(-1)), { geraeusch: "nahkampf", richtung: "o" });
   // zu leise
   laermMachen(spiel, { x: 8, y: 1 }, 3, null, "aufschlag");
   assert.equal(geraeuschGehoert(spiel, meldungen.at(-1)), null);
   // eigener Lärm und gesehener Lärm sind kein Geräusch
   laermMachen(spiel, { x: 8, y: 1 }, 10, ninkasi.id);
-  assert.equal(meldungen.at(-1).spielerinHoert, false);
+  assert.equal(meldungen.at(-1).gesteuerteHoert, false);
   spiel.zustand.sichtbareFelder.push(feldIndex(ebene, 8, 1));
   laermMachen(spiel, { x: 8, y: 1 }, 10);
   assert.equal(geraeuschGehoert(spiel, meldungen.at(-1)), null);

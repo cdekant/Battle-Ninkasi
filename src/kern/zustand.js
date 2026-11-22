@@ -140,6 +140,17 @@ export function bewegungVon(entitaet) {
   return juengsteUeberlagerung(entitaet, "bewegung") ?? "laufend";
 }
 
+// Ninkasi: wer lernt, wer weiß, wessen Tod den Lauf beendet, wessen Züge die Bilanz zählt
 export function spielerin(zustand) {
   return entitaetMitId(zustand, zustand.spielerinId);
+}
+
+// Die gesteuerte Entität: wer Befehle über die Eingangstür bekommt, wessen Sicht gilt, wem Kamera, Zielmodus und
+// Abläufe folgen; vorerst immer Ninkasi, ohne eigenes Feld im Zustand (siehe docs/Architektur.md, Entitäten und Komponenten)
+export function gesteuerteEntitaet(zustand) {
+  return spielerin(zustand);
+}
+
+export function istGesteuert(zustand, entitaet) {
+  return Boolean(entitaet) && entitaet.id === gesteuerteEntitaet(zustand)?.id;
 }

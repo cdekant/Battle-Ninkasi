@@ -6,7 +6,7 @@
 // verschachtelt kommt (z.B. in fuer_jedes_ziel), ist ohne Simulation nicht vorherzusagen, die Chance bleibt dann offen.
 
 import { holen } from "../kern/register.js";
-import { entitaetMitId, istWesen } from "../kern/zustand.js";
+import { entitaetMitId, istWesen, istGesteuert } from "../kern/zustand.js";
 import { trefferanteil, anteilInProzent, angriffeVon } from "./kampf.js";
 import { istAhnungslos } from "./wahrnehmung.js";
 import { istSichtbar } from "./sicht.js";
@@ -61,7 +61,7 @@ function betroffeneMitChance(spiel, akteur, zielIds, effektName, tags) {
   return ohneDoppelte(zielIds)
     .map((id) => entitaetMitId(zustand, id))
     .filter((entitaet) => entitaet && istWesen(entitaet) && entitaet.position)
-    .filter((entitaet) => akteur.id !== zustand.spielerinId || istSichtbar(zustand, entitaet.position.x, entitaet.position.y))
+    .filter((entitaet) => !istGesteuert(zustand, akteur) || istSichtbar(zustand, entitaet.position.x, entitaet.position.y))
     .map((entitaet) => ({ id: entitaet.id, chance: trefferchanceVorschau(spiel, akteur, entitaet, effektName, tags) }));
 }
 

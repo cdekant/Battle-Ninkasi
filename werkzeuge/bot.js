@@ -8,7 +8,7 @@ import grammatikDe from "../sprache/de/grammatik.js";
 import { erstelleGrammatik } from "../src/anzeige/grammatik.js";
 import { datenLaden, neuesSpiel, befehlGeben, spielstand, nachspielen } from "../src/kern/spiel.js";
 import { zufallErzeugen, zufallsGanzzahl } from "../src/kern/zufall.js";
-import { alleEntitaeten, spielerin } from "../src/kern/zustand.js";
+import { alleEntitaeten, spielerin, gesteuerteEntitaet } from "../src/kern/zustand.js";
 import { passierbar, gelaendeAuf } from "../src/welt/karte.js";
 import { erstesGetraenk } from "../src/systeme/inventar.js";
 import { hoererAnmelden } from "../src/kern/ereignisse.js";
@@ -99,7 +99,7 @@ function attributwerte(html, name) {
 }
 function fensterKlicksPruefen(spiel) {
   const umgebung = botUmgebung(spiel);
-  const fenster = [["inventar", { gewaehlt: spielerin(spiel.zustand).inventar?.[0] ?? null }], ["faehigkeiten", { gewaehlt: null }], ["charakter", charakterfensterOeffnen()], ["menue", menueOeffnen()], ["einstellungen", einstellungsfensterOeffnen()], ["laeufe", laeufeOeffnen("fortsetzen")], ["ende", endeOeffnen()]];
+  const fenster = [["inventar", { gewaehlt: gesteuerteEntitaet(spiel.zustand).inventar?.[0] ?? null }], ["faehigkeiten", { gewaehlt: null }], ["charakter", charakterfensterOeffnen()], ["menue", menueOeffnen()], ["einstellungen", einstellungsfensterOeffnen()], ["laeufe", laeufeOeffnen("fortsetzen")], ["ende", endeOeffnen()]];
   for (const [art, zustand] of fenster) {
     const stapel = fensterOeffnen([], art, zustand);
     let html = "";
@@ -238,36 +238,36 @@ function zufallsEigenschaften(botZufall) {
 }
 
 function zufallsbefehl(botZufall, spiel) {
-  const ninkasi = spielerin(spiel.zustand);
+  const gesteuerte = gesteuerteEntitaet(spiel.zustand);
   const wurf = zufallsGanzzahl(botZufall, 1, 100);
   if (wurf <= 5) return { art: "warten" };
   if (wurf <= 10) return { art: "aufheben" };
-  if (wurf <= 13 && ninkasi.werte.lp.aktuell < 70) return { art: "trinken", gegenstandId: erstesGetraenk(spiel.zustand, ninkasi) };
-  if (wurf === 17 && ninkasi.inventar?.length) {
+  if (wurf <= 13 && gesteuerte.werte.lp.aktuell < 70) return { art: "trinken", gegenstandId: erstesGetraenk(spiel.zustand, gesteuerte) };
+  if (wurf === 17 && gesteuerte.inventar?.length) {
     // etwas fallen lassen, damit Gepäck und Boden in Bewegung bleiben
-    return { art: "fallenlassen", gegenstandId: ninkasi.inventar[zufallsGanzzahl(botZufall, 0, ninkasi.inventar.length - 1)] };
+    return { art: "fallenlassen", gegenstandId: gesteuerte.inventar[zufallsGanzzahl(botZufall, 0, gesteuerte.inventar.length - 1)] };
   }
-  const anlegbare = (ninkasi.inventar || []).filter((id) => spiel.zustand.entitaeten[id]?.ausruestung);
+  const anlegbare = (gesteuerte.inventar || []).filter((id) => spiel.zustand.entitaeten[id]?.ausruestung);
   if (wurf >= 14 && wurf <= 16 && anlegbare.length) {
     // Ausrüstung an- oder ablegen (tauscht bei vollem Platz)
     const id = anlegbare[zufallsGanzzahl(botZufall, 0, anlegbare.length - 1)];
-    return { art: (ninkasi.ausgeruestet || []).includes(id) ? "ablegen" : "anlegen", gegenstandId: id };
+    return { art: (gesteuerte.ausgeruestet || []).includes(id) ? "ablegen" : "anlegen", gegenstandId: id };
   }
-  if (wurf <= 15 && ninkasi.inventar?.length) {
+  if (wurf <= 15 && gesteuerte.inventar?.length) {
     // Wurf auf ein Feld in der Nähe; abgelehnte Ziele (zu weit, nicht sichtbar) prüfen die Ablehnung gleich mit
-    const ziel = { x: ninkasi.position.x + zufallsGanzzahl(botZufall, -5, 5), y: ninkasi.position.y + zufallsGanzzahl(botZufall, -5, 5) };
-    return { art: "werfen", gegenstandId: ninkasi.inventar[0], ziel };
+    const ziel = { x: gesteuerte.position.x + zufallsGanzzahl(botZufall, -5, 5), y: gesteuerte.position.y + zufallsGanzzahl(botZufall, -5, 5) };
+    return { art: "werfen", gegenstandId: gesteuerte.inventar[0], ziel };
   }
-  if (wurf >= 18 && wurf <= 20 && ninkasi.faehigkeiten?.length) return faehigkeitUeberZielmodus(botZufall, spiel, ninkasi);
-  if (wurf === 22 && ninkasi.freieEp > 0) {
+  if (wurf >= 18 && wurf <= 20 && gesteuerte.faehigkeiten?.length) return faehigkeitUeberZielmodus(botZufall, spiel, gesteuerte);
+  if (wurf === 22 && gesteuerte.freieEp > 0) {
     const befehl = lernenUeberSkillfenster(botZufall, spiel);
     if (befehl) return befehl;
   }
-  if (wurf === 21 && ninkasi.freieEp > 0) {
+  if (wurf === 21 && gesteuerte.freieEp > 0) {
     // freie EP auf einen zufälligen Skill, auch gesperrte, so werden die Ablehnungen mitgeprüft
     const namen = Object.keys(spiel.daten.skills);
     anzahlLernbefehle++;
-    return { art: "lernen", skill: namen[zufallsGanzzahl(botZufall, 0, namen.length - 1)], ep: zufallsGanzzahl(botZufall, 1, ninkasi.freieEp) };
+    return { art: "lernen", skill: namen[zufallsGanzzahl(botZufall, 0, namen.length - 1)], ep: zufallsGanzzahl(botZufall, 1, gesteuerte.freieEp) };
   }
   return { art: "bewegen", dx: zufallsGanzzahl(botZufall, -1, 1), dy: zufallsGanzzahl(botZufall, -1, 1) };
 }
@@ -306,14 +306,14 @@ function eigenschaftenUeberErstellung(botZufall) {
 
 // Fähigkeit wie im Browser über den Zielmodus (eingabe/zielmodus.js): ein Ziel per Tab oder ein Feld in der Nähe;
 // den Befehl gibt der Bot auch, wenn die Vorschau einen Grund dagegen nennt, so wird die Ablehnung mitgeprüft
-function faehigkeitUeberZielmodus(botZufall, spiel, ninkasi) {
-  const faehigkeit = ninkasi.faehigkeiten[zufallsGanzzahl(botZufall, 0, ninkasi.faehigkeiten.length - 1)];
+function faehigkeitUeberZielmodus(botZufall, spiel, gesteuerte) {
+  const faehigkeit = gesteuerte.faehigkeiten[zufallsGanzzahl(botZufall, 0, gesteuerte.faehigkeiten.length - 1)];
   const beginn = zielmodusBeginnen(spiel, { zweck: "faehigkeit", faehigkeit });
   if (beginn.befehl) return beginn.befehl;
   if (!beginn.modus) return { art: "faehigkeit", faehigkeit };
   let modus = beginn.modus;
   if (zufallsGanzzahl(botZufall, 1, 2) === 1) modus = zielmodusTaste(spiel, modus, "Tab", belegung).modus;
-  else modus = cursorSetzen(spiel, modus, { x: ninkasi.position.x + zufallsGanzzahl(botZufall, -7, 7), y: ninkasi.position.y + zufallsGanzzahl(botZufall, -7, 7) });
+  else modus = cursorSetzen(spiel, modus, { x: gesteuerte.position.x + zufallsGanzzahl(botZufall, -7, 7), y: gesteuerte.position.y + zufallsGanzzahl(botZufall, -7, 7) });
   return { art: "faehigkeit", faehigkeit, ziel: zielangabeVon(spiel, modus) };
 }
 
@@ -352,8 +352,8 @@ function treppeNehmen(botZufall, spiel) {
   });
   if (!treppen.length) return "keine_bekannt";
   const ziel = treppen[zufallsGanzzahl(botZufall, 0, treppen.length - 1)];
-  const ninkasi = spielerin(spiel.zustand);
-  const dort = ninkasi.position.x === ziel.x && ninkasi.position.y === ziel.y;
+  const gesteuerte = gesteuerteEntitaet(spiel.zustand);
+  const dort = gesteuerte.position.x === ziel.x && gesteuerte.position.y === ziel.y;
   const haltegrund = dort ? "angekommen" : ablaufLaufenLassen(spiel, reiseBeginnen(spiel, ziel, einstellungen), naechsterReiseschritt);
   if (haltegrund !== "angekommen" || spiel.zustand.vorbei) return haltegrund;
   const ergebnis = befehlGeben(spiel, { art: "treppe" });
@@ -370,14 +370,14 @@ function laufen(botZufall, spiel) {
 
 // Umbelegen wie mit Ziffer im Fenster, Ziehen oder Umschalt+Ziffer; würfelt nur mit dem Zufall des Bots
 function leistenUmbelegen(botZufall, spiel) {
-  const ninkasi = spielerin(spiel.zustand);
+  const gesteuerte = gesteuerteEntitaet(spiel.zustand);
   const wurf = zufallsGanzzahl(botZufall, 1, 4);
   const stelle = zufallsGanzzahl(botZufall, 0, 9);
   if (wurf === 1) botLeisten = leisteWechseln(botLeisten, zufallsGanzzahl(botZufall, 0, ANZAHL_LEISTEN - 1));
   else if (wurf === 2) botLeisten = plaetzeTauschen(botLeisten, stelle, zufallsGanzzahl(botZufall, 0, 9));
   else if (wurf === 3) botLeisten = platzLeeren(botLeisten, stelle);
   else {
-    const typ = spiel.zustand.entitaeten[(ninkasi.inventar || [])[0]]?.typ;
+    const typ = spiel.zustand.entitaeten[(gesteuerte.inventar || [])[0]]?.typ;
     if (typ) botLeisten = platzBelegen(botLeisten, stelle, { art: "gegenstand", typ });
   }
 }
@@ -413,9 +413,9 @@ const gegnerfaehigkeiten = { gewirkt: 0, begonnen: 0, abgebrochen: 0 };
 // Untersuchen wie mit Taste X: Ninkasis Feld mit ihren Werten, dann per Tab das nächste Wesen und ein Feld daneben;
 // würfelt nicht, damit der Lauf derselbe bleibt
 function untersuchen(spiel) {
-  const ninkasi = spielerin(spiel.zustand);
-  feldBeschreiben(spiel, ninkasi.position);
-  werteAufschluesseln(spiel, ninkasi);
+  const gesteuerte = gesteuerteEntitaet(spiel.zustand);
+  feldBeschreiben(spiel, gesteuerte.position);
+  werteAufschluesseln(spiel, gesteuerte);
   let modus = zielmodusBeginnen(spiel, { zweck: "untersuchen" }).modus;
   modus = zielmodusTaste(spiel, modus, "Tab", belegung).modus;
   feldBeschreiben(spiel, modus.cursor);

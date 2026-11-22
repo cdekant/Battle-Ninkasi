@@ -12,7 +12,7 @@
 // Buchstaben gelten nach dem Zeichen der Taste (KeyboardEvent.key), so passen sie zu jeder Tastaturbelegung;
 // ohne Zeichen (Tests, Bot) nach dem Tastencode der US-Belegung.
 
-import { spielerin, entitaetMitId } from "../kern/zustand.js";
+import { gesteuerteEntitaet, entitaetMitId } from "../kern/zustand.js";
 import { istAngelegt } from "../systeme/ausruestung.js";
 import { fensterartAnmelden } from "./fenster.js";
 import { platzDerTaste } from "./aktionskatalog.js";
@@ -32,8 +32,8 @@ export function buchstabeDerTaste(tastencode, zeichen) {
 
 // Gegenstand an einer Stelle des Gepäcks (Reihenfolge des Inventars) oder null
 export function gegenstandAnStelle(spiel, stelle) {
-  const ninkasi = spielerin(spiel.zustand);
-  const id = (ninkasi.inventar || [])[stelle];
+  const gesteuerte = gesteuerteEntitaet(spiel.zustand);
+  const id = (gesteuerte.inventar || [])[stelle];
   return id === undefined ? null : entitaetMitId(spiel.zustand, id);
 }
 
@@ -57,12 +57,12 @@ export function inventarTaste(fenster, tastencode, spiel, zeichen, belegung) {
     if (fenster.absicht === "fallenlassen") return { fenster: null, befehl: { art: "fallenlassen", gegenstandId: gegenstand.id } };
     return { fenster: { gewaehlt: gegenstand.id } };
   }
-  const ninkasi = spielerin(spiel.zustand);
+  const gesteuerte = gesteuerteEntitaet(spiel.zustand);
   if (buchstabe === "t") return { fenster: null, befehl: { art: "trinken", gegenstandId: fenster.gewaehlt } };
   if (buchstabe === "w") return { fenster: null, auswahl: { zweck: "werfen", gegenstandId: fenster.gewaehlt } };
   if (buchstabe === "f") return { fenster: null, befehl: { art: "fallenlassen", gegenstandId: fenster.gewaehlt } };
   if (buchstabe === "a") {
-    const art = istAngelegt(ninkasi, fenster.gewaehlt) ? "ablegen" : "anlegen";
+    const art = istAngelegt(gesteuerte, fenster.gewaehlt) ? "ablegen" : "anlegen";
     return { fenster: null, befehl: { art, gegenstandId: fenster.gewaehlt } };
   }
   return { fenster };
@@ -74,7 +74,7 @@ function standardhandlung(fenster, spiel) {
   if (!gegenstand) return { fenster };
   if (gegenstand.trinkbar) return { fenster: null, befehl: { art: "trinken", gegenstandId: gegenstand.id } };
   if (gegenstand.ausruestung) {
-    const art = istAngelegt(spielerin(spiel.zustand), gegenstand.id) ? "ablegen" : "anlegen";
+    const art = istAngelegt(gesteuerteEntitaet(spiel.zustand), gegenstand.id) ? "ablegen" : "anlegen";
     return { fenster: null, befehl: { art, gegenstandId: gegenstand.id } };
   }
   return { fenster };

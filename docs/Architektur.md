@@ -40,8 +40,9 @@ Daten:
 Schnittstellen (`src/kern/spiel.js`):
 
 + `befehlGeben(spiel, befehl)` → `{ ok: true }` oder `{ ok: false, grund }`; Gründe des Kerns: `vorbei`, `nicht_am_zug`, `unbekannt` (keine angemeldete Befehlsart), sonst der Grund aus `pruefen` (Meldung `abgelehnt`)
-+ Ablauf: prüfen, aufzeichnen (`spiel.befehle`), `befehlAusfuehren` (Befehlsveränderer und Haken `vor_befehl`, Abbruch einer laufenden Aktion außer bei `fortsetzen`, Ausführen, Zugzähler `zuege` und `letzteAktion`, Haken `zug_ende`, `vorgangAbschliessen`, Wiedereinreihen mit `zeitkosten`), danach `warteschlangeAbarbeiten` bis Ninkasi wieder am Zug ist
-+ Ist Ninkasi handlungsunfähig, wird jede Eingabe angenommen, aufgezeichnet und als `warten` ausgeführt (Meldung `handlungsunfaehig`, Rückgabe mit `handlungsunfaehig: true`)
++ Ablauf: prüfen, aufzeichnen (`spiel.befehle`), `befehlAusfuehren` (Befehlsveränderer und Haken `vor_befehl`, Abbruch einer laufenden Aktion außer bei `fortsetzen`, Ausführen, Zugzähler `zuege` und `letzteAktion`, Haken `zug_ende`, `vorgangAbschliessen`, Wiedereinreihen mit `zeitkosten`), danach `warteschlangeAbarbeiten` bis die gesteuerte Entität wieder am Zug ist
++ Befehle gehen an die gesteuerte Entität (siehe Entitäten und Komponenten), Befehlsarten mit `ohneZeit` an Ninkasi selbst
++ Ist die gesteuerte Entität handlungsunfähig, wird jede Eingabe angenommen, aufgezeichnet und als `warten` ausgeführt (Meldung `handlungsunfaehig`, Rückgabe mit `handlungsunfaehig: true`)
 + Befehlsarten mit `ohneZeit: true` (bisher `lernen`, siehe [Wesen.md](Wesen.md), Skills und Lernen) sind Entscheidungen ohne Spielzeit: geprüft, aufgezeichnet und ausgeführt, aber ohne Zug, Zugzähler, `vor_befehl`, `zug_ende` und ohne eine laufende Aktion abzubrechen
 + `zeitkosten(spiel, entitaet, aktion, umstaende, grundkosten)`: Grundkosten aus `daten/aktionen.js` oder dem Angriffsprofil, Modifikatoren `kosten.<aktion>` und `kosten.alle`, Zuschlag bei Überlast (siehe [Gegenstaende.md](Gegenstaende.md), Inventar)
 
@@ -68,7 +69,7 @@ Daten (`src/kern/zustand.js`):
 Schnittstellen:
 
 + Erzeugen: `entitaetErzeugen`, `entitaetAusDatensatz`; danach laufen die Handler des Registers `beimErzeugen` (`(zustand, entitaet) => void`), auch für einen abgespaltenen Teil eines Stapels; so planen Gegenstände ihr Verderben ein und bekommen ihr Etikett
-+ Lesen: `entitaetMitId`, `alleEntitaeten`, `entitaetenAuf`, `entitaetenImUmkreis`, `entitaetenMitPosition`, `spielerin`, `istWesen`, `fraktionVon`, `kiVon`, `bewegungVon`, `anzahlWesen`
++ Lesen: `entitaetMitId`, `alleEntitaeten`, `entitaetenAuf`, `entitaetenImUmkreis`, `entitaetenMitPosition`, `spielerin`, `gesteuerteEntitaet`, `istGesteuert`, `istWesen`, `fraktionVon`, `kiVon`, `bewegungVon`, `anzahlWesen`
 + Entfernen: `entitaetEntfernen` (mit gebundenen Zeitereignissen), `ausDemInventarNehmen`
 
 Regeln:
@@ -76,6 +77,7 @@ Regeln:
 + Alles in der Welt ist eine Entität: Ninkasi, Gegner, Verbündete, Händler, Items, Kessel, Fallen; Unterschiede entstehen allein durch die Kombination der Komponenten
 + Beispiele: Psi-Kontrolle ändert die Fraktion; Kulturhefe als Verbündete ist ein Dateneintrag; ein Phage tauscht beim Befall Komponenten des Bakteriums aus; ein wandernder Händler hat eine Handelskomponente und eine friedliche Fraktion
 + Der gesamte Zustand ist reine Daten und als JSON serialisierbar (keine Funktionen, keine DOM-Objekte)
++ Zwei Rollen, eine Figur: `gesteuerteEntitaet(zustand)` ist, wer Befehle über die Eingangstür bekommt, wessen Sicht gilt und wem Kamera, Zielmodus, Abläufe, Seitenleiste, Gepäck, Fähigkeiten und Schnellleiste folgen; `spielerin(zustand)` ist Ninkasi, die lernt, weiß (Kennen), deren Tod den Lauf beendet und deren Züge die Bilanz zählt; freie EP und Skills zeigt die Seitenleiste von Ninkasi. Vorerst ist die gesteuerte Entität immer Ninkasi, ohne eigenes Feld im Zustand; `istGesteuert(zustand, entitaet)` ersetzt den Vergleich mit `spielerinId`. Vorkehrung für Besessenheit, siehe [Ausblick.md](Ausblick.md), Steuerung anderer Wesen
 + Positionen ändern sich nur über `positionSetzen` (`src/kern/raumindex.js`), damit der räumliche Index stimmt; Wesen bewegt `versetzen` (siehe [Wesen.md](Wesen.md), Bewegung)
 
 ## Zeitmodell
@@ -90,7 +92,7 @@ Schnittstellen:
 
 + `einreihen`, `akteurEinreihen(zustand, id, verzoegerung)`, `ereignisEinreihen(zustand, zeitpunkt, typ, daten, gebundenAn)`, `ersterEintrag`, `ersterEintragEntnehmen`, `akteurEntfernen`, `gebundeneEreignisseEntfernen`, `eintraegeHerausnehmen` und `eintraegeEinfuegen` (Wechsel der Ebene), `warteschlangeGueltig` (Bot)
 + Register `welttick` (`(spiel) => void`, z.B. Stoffwechsel, Feldschichten) und `zeitereignisse` (`(spiel, daten) => void`)
-+ `warteschlangeAbarbeiten` in `src/kern/spiel.js`: Weltuhr, Zeitereignisse, KI-Akteure (`wahrnehmen`, dann Verhaltensmodul aus dem Register `ki`, ungültige Befehle werden zu `warten`) und Schritte langer Aktionen, bis Ninkasi am Zug ist; nach jedem Eintrag `vorgangAbschliessen`
++ `warteschlangeAbarbeiten` in `src/kern/spiel.js`: Weltuhr, Zeitereignisse, KI-Akteure (`wahrnehmen`, dann Verhaltensmodul aus dem Register `ki`, ungültige Befehle werden zu `warten`) und Schritte langer Aktionen, bis die gesteuerte Entität am Zug ist; nach jedem Eintrag `vorgangAbschliessen`
 
 Regeln:
 
@@ -254,7 +256,7 @@ Messwerte:
 
 ## Tests
 
-+ `tests/zeit.test.js` (Warteschlange, Gleichstand, Heap), `tests/zufall.test.js` (sfc32, Würfel, Anteile), `tests/register.test.js` (Ränge, Vorrat), `tests/kurven.test.js`, `tests/daten.test.js` (Datenprüfung), `tests/speichern.test.js` (Schnappschuss, Speicherstand, Plätze), `tests/leistung.test.js` (räumlicher Index), `tests/ausloeser.test.js` und `tests/tod.test.js` (Vorgang)
++ `tests/zeit.test.js` (Warteschlange, Gleichstand, Heap), `tests/zufall.test.js` (sfc32, Würfel, Anteile), `tests/register.test.js` (Ränge, Vorrat), `tests/kurven.test.js`, `tests/daten.test.js` (Datenprüfung), `tests/speichern.test.js` (Schnappschuss, Speicherstand, Plätze), `tests/leistung.test.js` (räumlicher Index), `tests/ausloeser.test.js` und `tests/tod.test.js` (Vorgang), `tests/gesteuert.test.js` (gesteuerte Entität; Dateien für Eingabe, Sicht, Kamera und Zielmodus fragen nicht `spielerin()`)
 + Der Bot prüft Wiederholbarkeit (Nachspielen), Index und Heap nach jedem Befehl und das Laden mitten im Lauf (siehe [Entwicklung.md](Entwicklung.md), Bot und Werkzeuge)
 
 ## Verweise

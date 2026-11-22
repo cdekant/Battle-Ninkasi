@@ -10,7 +10,7 @@
 // Minikarte darunter zeichnet anzeige/minikarte.js. Jedes Wesen in den Listen trägt data-wesen (seine ID); das Wesen
 // mit hervorgehobenId (unter dem Zeiger auf der Karte oder dem Cursor beim Untersuchen) ist hervorgehoben.
 
-import { spielerin, entitaetMitId } from "../kern/zustand.js";
+import { spielerin, gesteuerteEntitaet, entitaetMitId } from "../kern/zustand.js";
 import { beziehungZwischen, urheberVon } from "../systeme/fraktionen.js";
 import { hoechstwert } from "../kern/werte.js";
 import { optimalerPegel } from "../systeme/stoffwechsel.js";
@@ -177,13 +177,13 @@ export class Oberflaeche {
     return zeilen;
   }
 
-  // Untersuchen: das Feld unter dem Cursor; auf Ninkasi dazu ihre Werte
+  // Untersuchen: das Feld unter dem Cursor; auf der gesteuerten Entität dazu ihre Werte
   untersuchenHtml(spiel, modus) {
     const { text } = this.texte;
-    const ninkasi = spielerin(spiel.zustand);
+    const gesteuerte = gesteuerteEntitaet(spiel.zustand);
     const beschreibung = feldBeschreiben(spiel, modus.cursor);
-    const aufNinkasi = modus.cursor.x === ninkasi.position.x && modus.cursor.y === ninkasi.position.y;
-    const werte = aufNinkasi ? this.werteZeilen(spiel, ninkasi) : [];
+    const aufGesteuerter = modus.cursor.x === gesteuerte.position.x && modus.cursor.y === gesteuerte.position.y;
+    const werte = aufGesteuerter ? this.werteZeilen(spiel, gesteuerte) : [];
     return `<h2 class="offen">${text("ui.untersuchen")}</h2>
       <ul class="untersuchen offen">${this.feldZeilen(spiel, beschreibung, true).join("")}${werte.join("")}<li class="hinweis">${text("ui.untersuchen_hinweis")}</li></ul>`;
   }
@@ -195,11 +195,11 @@ export class Oberflaeche {
   }
 
   // Heimlichkeitsweite, laufende Aktion und Zustände Ninkasis unter den Balken
-  lageHtml(spiel, ninkasi) {
+  lageHtml(spiel, gesteuerte) {
     const { text } = this.texte;
-    const zustaende = zustaendeVon(spiel, ninkasi);
-    const aktion = laufendeAktionVon(ninkasi);
-    const heimlichkeit = `<div class="leise">${text("ui.heimlichkeit", { felder: heimlichkeitsweite(spiel, ninkasi) })}</div>`;
+    const zustaende = zustaendeVon(spiel, gesteuerte);
+    const aktion = laufendeAktionVon(gesteuerte);
+    const heimlichkeit = `<div class="leise">${text("ui.heimlichkeit", { felder: heimlichkeitsweite(spiel, gesteuerte) })}</div>`;
     const aktionHtml = aktion ? `<div>${this.aktionText(spiel, aktion)}</div>` : "";
     const zustaendeHtml = zustaende.length
       ? `<h2>${text("ui.zustaende")}</h2><ul class="zustaende">${zustaende.map((eintrag) => `<li>${this.zustandText(spiel, eintrag)}</li>`).join("")}</ul>`
@@ -221,14 +221,14 @@ export class Oberflaeche {
   // Wesen mit Position in Sicht außer Ninkasi, nach Abstand und ID, getrennt in Gefährten und die übrigen
   wesenInSicht(spiel) {
     const zustand = spiel.zustand;
-    const ninkasi = spielerin(zustand);
+    const gesteuerte = gesteuerteEntitaet(zustand);
     const sichtbareFelder = new Set(zustand.sichtbareFelder);
-    const abstand = (wesen) => Math.max(Math.abs(wesen.position.x - ninkasi.position.x), Math.abs(wesen.position.y - ninkasi.position.y));
+    const abstand = (wesen) => Math.max(Math.abs(wesen.position.x - gesteuerte.position.x), Math.abs(wesen.position.y - gesteuerte.position.y));
     const sichtbar = Object.values(zustand.entitaeten)
-      .filter((entitaet) => entitaet.position && entitaet.fraktion !== undefined && entitaet.id !== ninkasi.id
+      .filter((entitaet) => entitaet.position && entitaet.fraktion !== undefined && entitaet.id !== gesteuerte.id
         && sichtbareFelder.has(entitaet.position.y * zustand.ebene.breite + entitaet.position.x))
       .sort((erstes, zweites) => abstand(erstes) - abstand(zweites) || erstes.id - zweites.id);
-    const verbuendet = (wesen) => beziehungZwischen(spiel, urheberVon(ninkasi), wesen) === "verbuendet";
+    const verbuendet = (wesen) => beziehungZwischen(spiel, urheberVon(gesteuerte), wesen) === "verbuendet";
     return { gefaehrten: sichtbar.filter(verbuendet), andere: sichtbar.filter((wesen) => !verbuendet(wesen)) };
   }
 
@@ -247,22 +247,22 @@ export class Oberflaeche {
   anzeigen(spiel, { ziel = null, hervorgehobenId = null } = {}) {
     const { text, nomenForm } = this.texte;
     const zustand = spiel.zustand;
-    const ninkasi = spielerin(zustand);
-    const werte = ninkasi.werte;
+    const gesteuerte = gesteuerteEntitaet(zustand);
+    const werte = gesteuerte.werte;
     const { gefaehrten, andere } = this.wesenInSicht(spiel);
     const gefaehrtenHtml = gefaehrten.length ? `<h2>${text("ui.gefaehrten")}</h2><ul class="gefaehrten">${this.wesenlisteHtml(spiel, gefaehrten, false, hervorgehobenId)}</ul>` : "";
     const andereHtml = andere.length ? this.wesenlisteHtml(spiel, andere, true, hervorgehobenId) : `<li class="leise">${text("ui.niemand")}</li>`;
 
     this.element.innerHTML = `
       <section class="ninkasi">
-        <h1>${nomenForm(ninkasi, "nom", "ohne")}</h1>
-        ${balken(text("ui.lp"), werte.lp.aktuell, hoechstwert(spiel, ninkasi, "lp"), "lp")}
-        ${balken(text("ui.mp"), werte.mp.aktuell, hoechstwert(spiel, ninkasi, "mp"), "mp")}
-        ${balken(text("ui.pp"), werte.pp.aktuell, hoechstwert(spiel, ninkasi, "pp"), "pp")}
-        ${pegelLeiste(text("ui.promille"), werte.pegel.aktuell, ninkasi.stoffwechsel.schwellen || [], optimalerPegel(spiel, ninkasi, "lp"))}
-        <div class="freie-ep">${text("ui.freie_ep")}: <b>${ninkasi.freieEp ?? 0}</b> <span class="leise">${text("ui.freie_ep_hinweis")}</span></div>
-        ${this.lageHtml(spiel, ninkasi)}
-        <div class="leise last">${lastText(spiel, this.texte, ninkasi)}</div>
+        <h1>${nomenForm(gesteuerte, "nom", "ohne")}</h1>
+        ${balken(text("ui.lp"), werte.lp.aktuell, hoechstwert(spiel, gesteuerte, "lp"), "lp")}
+        ${balken(text("ui.mp"), werte.mp.aktuell, hoechstwert(spiel, gesteuerte, "mp"), "mp")}
+        ${balken(text("ui.pp"), werte.pp.aktuell, hoechstwert(spiel, gesteuerte, "pp"), "pp")}
+        ${pegelLeiste(text("ui.promille"), werte.pegel.aktuell, gesteuerte.stoffwechsel.schwellen || [], optimalerPegel(spiel, gesteuerte, "lp"))}
+        <div class="freie-ep">${text("ui.freie_ep")}: <b>${spielerin(zustand).freieEp ?? 0}</b> <span class="leise">${text("ui.freie_ep_hinweis")}</span></div>
+        ${this.lageHtml(spiel, gesteuerte)}
+        <div class="leise last">${lastText(spiel, this.texte, gesteuerte)}</div>
       </section>
       ${ziel?.modus.auswahl.zweck === "untersuchen" ? this.untersuchenHtml(spiel, ziel.modus) : this.zielHtml(spiel, ziel)}
       ${gefaehrtenHtml}

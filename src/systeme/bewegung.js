@@ -5,7 +5,7 @@
 // ein unbewegliches Wesen greift an, bewegt sich aber nicht und lässt sich nicht verschieben (systeme/verschieben.js).
 
 import { anmelden } from "../kern/register.js";
-import { entitaetenAuf, bewegungVon, positionSetzen } from "../kern/zustand.js";
+import { entitaetenAuf, bewegungVon, positionSetzen, istGesteuert } from "../kern/zustand.js";
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
 import { betretbar } from "../welt/karte.js";
 import { istWesen, feindlich, nahkampf, kannAngreifen } from "./kampf.js";
@@ -27,7 +27,7 @@ export function versetzen(spiel, wesen, feld, art, { urheberId = wesen.id, kette
   const beteiligte = { quelleId: urheberId, urheberId, zielId: wesen.id, ursache: "bewegung", kettentiefe, art };
   hakenAusloesen(spiel, "verlaesst_feld", { ...beteiligte, position: { x: wesen.position.x, y: wesen.position.y } });
   positionSetzen(spiel.zustand, wesen, feld);
-  if (wesen.id === spiel.zustand.spielerinId) {
+  if (istGesteuert(spiel.zustand, wesen)) {
     sichtfeldAktualisieren(spiel);
     for (const gegenstand of entitaetenAuf(spiel.zustand, feld.x, feld.y)) {
       if (gegenstand.aufhebbar) melden(spiel, "liegt_hier", { wer: bezugAuf(wesen), was: bezugAuf(gegenstand) });

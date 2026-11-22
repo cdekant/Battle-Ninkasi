@@ -14,7 +14,7 @@ import { anmelden } from "../kern/register.js";
 import { bausteinAnmelden } from "../kern/bausteine.js";
 import { effektAnwenden } from "../kern/effekte.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
-import { entitaetenAuf, spielerin } from "../kern/zustand.js";
+import { entitaetenAuf, gesteuerteEntitaet } from "../kern/zustand.js";
 import { lageVormerken } from "../kern/raumindex.js";
 import { aufDerKarte, gelaendeAuf, gelaendeName, oeffnetTueren, abstand } from "../welt/karte.js";
 import { musterFelder } from "./zielauswahl.js";
@@ -32,8 +32,8 @@ export function gelaendeSetzen(spiel, feld, name) {
   spiel.zwischenspeicher.gasquellen = null;
   melden(spiel, "gelaende_geaendert", { feld: { x: feld.x, y: feld.y }, vorher, nachher: name });
   for (const entitaet of entitaetenAuf(zustand, feld.x, feld.y)) lageVormerken(zustand, entitaet);
-  const ninkasi = zustand.spielerinId != null ? spielerin(zustand) : null;
-  if (ninkasi?.position && abstand(ninkasi.position, feld) <= reichweiteSicht(spiel, ninkasi)) sichtfeldAktualisieren(spiel);
+  const gesteuerte = gesteuerteEntitaet(zustand);
+  if (gesteuerte?.position && abstand(gesteuerte.position, feld) <= reichweiteSicht(spiel, gesteuerte)) sichtfeldAktualisieren(spiel);
 }
 
 // Felder eines Effekts: das Zielfeld oder die Felder des Musters vom Ursprung zum Zielfeld

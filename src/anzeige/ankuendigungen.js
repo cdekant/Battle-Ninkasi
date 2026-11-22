@@ -2,7 +2,7 @@
 // eine ankuendigung hat (siehe systeme/faehigkeiten.js). Wird beim Zeichnen aus dem Zustand berechnet, nichts
 // wird gespeichert; liest nur.
 
-import { alleEntitaeten } from "../kern/zustand.js";
+import { alleEntitaeten, istGesteuert } from "../kern/zustand.js";
 import { istSichtbar } from "../systeme/sicht.js";
 import { faehigkeitFuer } from "../systeme/faehigkeiten.js";
 import { zielAufloesen } from "../systeme/zielauswahl.js";
@@ -14,7 +14,7 @@ export function angekuendigteFelder(spiel) {
   const felder = [];
   for (const wesen of alleEntitaeten(zustand)) {
     const aktion = wesen.laufendeAktion;
-    if (wesen.id === zustand.spielerinId || aktion?.art !== "faehigkeit" || !wesen.position) continue;
+    if (istGesteuert(zustand, wesen) || aktion?.art !== "faehigkeit" || !wesen.position) continue;
     if (!istSichtbar(zustand, wesen.position.x, wesen.position.y)) continue;
     const definition = faehigkeitFuer(spiel, wesen, aktion.faehigkeit);
     if (!definition?.ankuendigung || !definition.ziel) continue;

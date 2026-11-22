@@ -16,7 +16,7 @@ import { modifiziert } from "../kern/werte.js";
 import { effektAnwenden } from "../kern/effekte.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { mitAnteil } from "../kern/zufall.js";
-import { entitaetenAuf, bewegungVon, spielerin } from "../kern/zustand.js";
+import { entitaetenAuf, bewegungVon, gesteuerteEntitaet } from "../kern/zustand.js";
 import { fallenIds } from "../kern/raumindex.js";
 import { abstand } from "../welt/karte.js";
 import { istSichtbar } from "./sicht.js";
@@ -66,20 +66,20 @@ anmelden("haken", "betritt_feld", (spiel, kontext) => {
 
 anmelden("haken", "zug_ende", (spiel, kontext) => {
   const zustand = spiel.zustand;
-  if (kontext.akteurId !== zustand.spielerinId || zustand.vorbei) return;
-  const ninkasi = spielerin(zustand);
-  if (!ninkasi?.position) return;
+  if (kontext.akteurId !== gesteuerteEntitaet(zustand)?.id || zustand.vorbei) return;
+  const gesteuerte = gesteuerteEntitaet(zustand);
+  if (!gesteuerte?.position) return;
   const reichweite = spiel.daten.regeln.fallen.reichweite;
   let entdecken = null;
   for (const id of fallenIds(zustand)) {
     const falle = zustand.entitaeten[id];
     if (istBekannt(falle)) continue;
-    const entfernung = abstand(ninkasi.position, falle.position);
+    const entfernung = abstand(gesteuerte.position, falle.position);
     if (entfernung > reichweite || !istSichtbar(zustand, falle.position.x, falle.position.y)) continue;
-    entdecken ??= entdeckenVon(spiel, ninkasi);
+    entdecken ??= entdeckenVon(spiel, gesteuerte);
     const { zaehler, nenner } = entdeckenChance(entdecken, falle.falle.tarnung, entfernung);
     if (!mitAnteil(zustand.zufallszustand, zaehler, nenner)) continue;
     falle.entdeckt = true;
-    melden(spiel, "falle_entdeckt", { wer: bezugAuf(ninkasi), was: bezugAuf(falle) });
+    melden(spiel, "falle_entdeckt", { wer: bezugAuf(gesteuerte), was: bezugAuf(falle) });
   }
 });

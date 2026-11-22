@@ -3,7 +3,7 @@
 // Weitere Regeln (Kessel benutzen, mit Händlern reden) kommen einfach in die Liste.
 // Ergebnis einer Regel: { befehl } oder { reise: feld }.
 
-import { spielerin, entitaetenAuf } from "../kern/zustand.js";
+import { gesteuerteEntitaet, entitaetenAuf } from "../kern/zustand.js";
 import { abstand, aufDerKarte } from "../welt/karte.js";
 import { feindlich } from "../systeme/kampf.js";
 import { istSichtbar } from "../systeme/sicht.js";
@@ -15,17 +15,17 @@ export function feldAnPixel(pixelX, pixelY, kamera, zoom) {
 export const KLICKREGELN = [
   {
     name: "aufheben",
-    passt: (spiel, feld, ninkasi) =>
-      feld.x === ninkasi.position.x && feld.y === ninkasi.position.y
+    passt: (spiel, feld, gesteuerte) =>
+      feld.x === gesteuerte.position.x && feld.y === gesteuerte.position.y
       && entitaetenAuf(spiel.zustand, feld.x, feld.y).some((entitaet) => entitaet.aufhebbar),
     aktion: () => ({ befehl: { art: "aufheben" } }),
   },
   {
     name: "angreifen",
-    passt: (spiel, feld, ninkasi) =>
-      abstand(feld, ninkasi.position) === 1 && istSichtbar(spiel.zustand, feld.x, feld.y)
-      && entitaetenAuf(spiel.zustand, feld.x, feld.y).some((entitaet) => feindlich(spiel, ninkasi, entitaet)),
-    aktion: (spiel, feld, ninkasi) => ({ befehl: { art: "bewegen", dx: feld.x - ninkasi.position.x, dy: feld.y - ninkasi.position.y } }),
+    passt: (spiel, feld, gesteuerte) =>
+      abstand(feld, gesteuerte.position) === 1 && istSichtbar(spiel.zustand, feld.x, feld.y)
+      && entitaetenAuf(spiel.zustand, feld.x, feld.y).some((entitaet) => feindlich(spiel, gesteuerte, entitaet)),
+    aktion: (spiel, feld, gesteuerte) => ({ befehl: { art: "bewegen", dx: feld.x - gesteuerte.position.x, dy: feld.y - gesteuerte.position.y } }),
   },
   {
     name: "reisen",
@@ -35,9 +35,9 @@ export const KLICKREGELN = [
 ];
 
 export function klickDeuten(spiel, feld, regeln = KLICKREGELN) {
-  const ninkasi = spielerin(spiel.zustand);
+  const gesteuerte = gesteuerteEntitaet(spiel.zustand);
   for (const regel of regeln) {
-    if (regel.passt(spiel, feld, ninkasi)) return regel.aktion(spiel, feld, ninkasi);
+    if (regel.passt(spiel, feld, gesteuerte)) return regel.aktion(spiel, feld, gesteuerte);
   }
   return null;
 }

@@ -61,11 +61,11 @@ Umsetzung: keine
 + Vorbilder: Caves of Qud, Domination: Ninkasi übernimmt den Körper eines Nachbarn, ihr eigener bleibt reglos liegen; ein Treffer kann die Übernahme brechen, Tötungen bringen in dieser Zeit keine EP, ein misslungener Versuch erzürnt Neutrale; im Extremfall bleibt man dauerhaft im fremden Körper
 + Braucht: zwei getrennte Begriffe, wo heute einer steht: wer Befehle über die Eingangstür bekommt, wessen Sicht gilt und wem Kamera und Zielmodus folgen (die gesteuerte Entität), und wessen Tod den Lauf beendet, wer lernt und wer weiß (Ninkasi)
 + Berührt: `zustand.spielerinId` und `spielerin()`, die heute beides bedeuten, in rund 40 Dateien unter `src/` (Eingangstür, Sicht, Lernen, Kennen, Tod, Ebenen, Fallen, Anzeige, Eingabe); den umgekehrten Fall, dass Ninkasi eine KI bekommt (Furcht, Rausch, Psi-Kontrolle), gibt es schon in `src/kern/spiel.js`
-+ Umbaurisiko: hoch, und es wächst mit jedem neuen System, das `spielerin()` fragt
-+ Vorkehrung (leichte Fassung, entschieden 2026-11-22): kein neues Feld im Zustand, keine Änderung am Spielstand; nur eine Lesefunktion `gesteuerteEntitaet(zustand)`, die vorerst Ninkasi liefert; Eingangstür, Sicht, Kamera und Zielmodus fragen sie, Tod, Lernen und Wissen fragen weiter `spielerin()`; kommt Besessenheit, ändert sich nur diese Funktion, kommt sie nicht, kostet es nur einen genauer benannten Aufruf
++ Umbaurisiko: seit 0.34.0 gering; vorher hoch, weil es mit jedem neuen System wuchs, das `spielerin()` fragte
++ Vorkehrung (leichte Fassung, entschieden 2026-11-22, erledigt in 0.34.0, siehe [Architektur.md](Architektur.md), Entitäten und Komponenten): kein neues Feld im Zustand, keine Änderung am Spielstand; nur eine Lesefunktion `gesteuerteEntitaet(zustand)`, die vorerst Ninkasi liefert; Eingangstür, Sicht, Kamera und Zielmodus fragen sie, Tod, Lernen und Wissen fragen weiter `spielerin()`; kommt Besessenheit, ändert sich nur diese Funktion, kommt sie nicht, kostet es nur einen genauer benannten Aufruf
 + Abgrenzung: [Grundlagen.md](Grundlagen.md), Spiel sagt "Gesteuert wird nur Ninkasi" (Begleiter nehmen nur Vorrangbefehle an); Besessenheit wäre eine ausdrückliche Ausnahme davon und ist noch nicht entschieden
 
-Umsetzung: offen
+Umsetzung: offen (nur die Vorkehrung steht)
 
 ## Begleiter und Befehle
 

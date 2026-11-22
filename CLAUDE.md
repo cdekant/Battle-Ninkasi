@@ -24,7 +24,7 @@ Roguelike um Ninkasi, die sumerische Göttin des Biers, im Browser ohne Engine u
 
 ## Ablauf eines Zugs
 
-Taste → `eingabe/eingabe.js` (Belegung → Aktion aus dem Aktionskatalog) → Befehl → `befehlGeben` in `kern/spiel.js` (prüfen, aufzeichnen) → `befehlAusfuehren` (Haken `vor_befehl`, Befehlsart aus dem Register `befehle`, Haken `zug_ende`) → `vorgangAbschliessen` in `kern/vorgang.js` (Tod und Zustandsprüfungen) → Wiedereinreihen mit Zeitkosten → `warteschlangeAbarbeiten` (Weltuhr, Zeitereignisse, KI-Akteure, lange Aktionen) bis Ninkasi wieder am Zug ist → Meldungen über `melden` (`kern/ereignisse.js`) an Log und Chronik → Anzeige liest den Zustand und zeichnet.
+Taste → `eingabe/eingabe.js` (Belegung → Aktion aus dem Aktionskatalog) → Befehl → `befehlGeben` in `kern/spiel.js` (prüfen, aufzeichnen) → `befehlAusfuehren` (Haken `vor_befehl`, Befehlsart aus dem Register `befehle`, Haken `zug_ende`) → `vorgangAbschliessen` in `kern/vorgang.js` (Tod und Zustandsprüfungen) → Wiedereinreihen mit Zeitkosten → `warteschlangeAbarbeiten` (Weltuhr, Zeitereignisse, KI-Akteure, lange Aktionen) bis die gesteuerte Entität (vorerst Ninkasi) wieder am Zug ist → Meldungen über `melden` (`kern/ereignisse.js`) an Log und Chronik → Anzeige liest den Zustand und zeichnet.
 
 ## Ordner
 
@@ -42,7 +42,7 @@ Taste → `eingabe/eingabe.js` (Belegung → Aktion aus dem Aktionskatalog) → 
 
 ## Grundbegriffe
 
-+ Entität, Komponente, Wert, Zeitmodell, Ereignis, Haken, Register, Speichern: [docs/Architektur.md](docs/Architektur.md)
++ Entität, gesteuerte Entität, Komponente, Wert, Zeitmodell, Ereignis, Haken, Register, Speichern: [docs/Architektur.md](docs/Architektur.md)
 + Wirkungsart, Effekt, Baustein, Modifikator, Auslöser, Zustand, Zielmuster, Fähigkeit, lange Aktion, Vorgang: [docs/Wirkungen.md](docs/Wirkungen.md)
 + Kampfwert, Angriffsprofil, Fraktion, Wahrnehmung, Verhaltensmodul, Bewegungsart, Skill, Lernpunkte: [docs/Wesen.md](docs/Wesen.md)
 + Gelände, Feldschicht, Plan des Laufs, Ebene, Ebenenschritt, Tiefe: [docs/Welt.md](docs/Welt.md); Stapel, Ladung, Platz, Verschleiß, Etikett: [docs/Gegenstaende.md](docs/Gegenstaende.md)

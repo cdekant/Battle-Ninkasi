@@ -18,14 +18,14 @@ import { anmelden, holen } from "../kern/register.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { lageErfassen, gefahrPruefen } from "./gefahr.js";
 import { istHandlungsunfaehig } from "./zustaende.js";
+import { istGesteuert } from "../kern/zustand.js";
 
 export const UNTERBRECHUNGSGRUENDE = ["schaden", "versetzt"];
 
-const istSpielerin = (spiel, akteur) => akteur.id === spiel.zustand.spielerinId;
 const eintragVon = (aktion) => holen("laufendeaktionen", aktion.art);
 
 function lageMerken(spiel, akteur, aktion) {
-  aktion.lage = istSpielerin(spiel, akteur) ? lageErfassen(spiel) : null;
+  aktion.lage = istGesteuert(spiel.zustand, akteur) ? lageErfassen(spiel) : null;
 }
 
 // Führt einen Schritt aus; nach dem letzten wird die Aktion abgeschlossen. Gibt das Ergebnis für die Zeitkosten zurück.
@@ -63,7 +63,7 @@ anmelden("haken", "nach_schaden", (spiel, kontext) => {
   if (getroffen?.laufendeAktion?.unterbrechbar?.includes("schaden")) aktionAbbrechen(spiel, getroffen, "schaden");
 });
 
-// Vor dem Zug einer Akteurin mit laufender Aktion: Abbruch bei Handlungsunfähigkeit, Pause bei Gefahr (nur Ninkasi).
+// Vor dem Zug einer Akteurin mit laufender Aktion: Abbruch bei Handlungsunfähigkeit, Pause bei Gefahr (nur die gesteuerte Entität).
 // Gibt true zurück, wenn die Logik den nächsten Schritt selbst ausführen darf.
 export function laufendeAktionVorDemZug(spiel, akteur) {
   const aktion = akteur.laufendeAktion;
@@ -72,7 +72,7 @@ export function laufendeAktionVorDemZug(spiel, akteur) {
     aktionAbbrechen(spiel, akteur, "handlungsunfaehig");
     return false;
   }
-  if (istSpielerin(spiel, akteur) && aktion.lage) {
+  if (istGesteuert(spiel.zustand, akteur) && aktion.lage) {
     const gefahr = gefahrPruefen(aktion.lage, lageErfassen(spiel), spiel.daten.regeln.laufendeAktionen.unterbrechen);
     if (gefahr) {
       aktion.unterbrochen = gefahr;

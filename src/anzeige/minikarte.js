@@ -8,7 +8,7 @@
 // zeichnen() malt das Bild mit feldgroesse Pixeln je Feld auf ein Canvas; derselbe Code dient der Minikarte in der
 // Seitenleiste und der Übersichtskarte (Fenster "karte").
 
-import { spielerin, entitaetenMitPosition, istWesen } from "../kern/zustand.js";
+import { gesteuerteEntitaet, entitaetenMitPosition, istWesen } from "../kern/zustand.js";
 import { gelaendeName } from "../welt/karte.js";
 import { beziehungZwischen, urheberVon } from "../systeme/fraktionen.js";
 
@@ -40,12 +40,12 @@ export function minikartenBild(spiel, zeichensatz) {
       if (spiel.daten.gelaende[name]?.treppe) punkte.push({ x, y, farbe: PUNKTFARBEN.treppe, art: "treppe" });
     }
   }
-  const ninkasi = spielerin(zustand);
+  const gesteuerte = gesteuerteEntitaet(zustand);
   for (const entitaet of entitaetenMitPosition(zustand)) {
     const { x, y } = entitaet.position;
-    if (entitaet.id === ninkasi.id || !sichtbar.has(y * ebene.breite + x)) continue;
+    if (entitaet.id === gesteuerte.id || !sichtbar.has(y * ebene.breite + x)) continue;
     if (istWesen(entitaet)) {
-      const beziehung = beziehungZwischen(spiel, urheberVon(ninkasi), entitaet);
+      const beziehung = beziehungZwischen(spiel, urheberVon(gesteuerte), entitaet);
       const art = beziehung === "verbuendet" ? "verbuendet" : beziehung === "feind" ? "gegner" : "neutral";
       punkte.push({ x, y, farbe: PUNKTFARBEN[art], art, id: entitaet.id });
     } else if (entitaet.aufhebbar) {
@@ -55,7 +55,7 @@ export function minikartenBild(spiel, zeichensatz) {
   // Wesen über Gegenständen und Treppen, Ninkasi zuletzt
   const rang = { treppe: 0, gegenstand: 1, neutral: 2, verbuendet: 3, gegner: 4 };
   punkte.sort((erster, zweiter) => rang[erster.art] - rang[zweiter.art]);
-  punkte.push({ x: ninkasi.position.x, y: ninkasi.position.y, farbe: PUNKTFARBEN.ninkasi, art: "ninkasi", id: ninkasi.id });
+  punkte.push({ x: gesteuerte.position.x, y: gesteuerte.position.y, farbe: PUNKTFARBEN.ninkasi, art: "ninkasi", id: gesteuerte.id });
   return { breite: ebene.breite, hoehe: ebene.hoehe, felder, gedaempft, punkte };
 }
 

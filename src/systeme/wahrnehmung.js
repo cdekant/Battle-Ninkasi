@@ -12,7 +12,7 @@
 //   laermdaempfung (ohne Angabe undurchlässig); wer innerhalb der Lautstärke liegt, hört ihn.
 
 import { anmelden } from "../kern/register.js";
-import { entitaetenImUmkreis, fraktionVon, istWesen } from "../kern/zustand.js";
+import { entitaetenImUmkreis, fraktionVon, istWesen, gesteuerteEntitaet } from "../kern/zustand.js";
 import { modifiziert, lebenswertName } from "../kern/werte.js";
 import { mitProzentChance } from "../kern/zufall.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
@@ -122,14 +122,14 @@ export function laermFelder(spiel, ursprung, lautstaerke) {
 export const GERAEUSCHE = ["nahkampf", "aufschlag", "sonstiges"];
 
 // Lärm am Ursprung: Schlafende werden wach, Wache gehen ihm nach; wer jagt, bleibt dabei.
-// Die Meldung sagt mit spielerinHoert, ob der Lärm Ninkasis Feld erreicht (ihr eigener zählt nicht).
+// Die Meldung sagt mit gesteuerteHoert, ob der Lärm das Feld der gesteuerten Entität erreicht (ihr eigener zählt nicht).
 export function laermMachen(spiel, ursprung, lautstaerke, urheberId = null, geraeusch = "sonstiges") {
   if (!ursprung || lautstaerke <= 0) return;
   const ebene = spiel.zustand.ebene;
   const erreicht = laermFelder(spiel, ursprung, lautstaerke);
-  const ninkasi = spiel.zustand.entitaeten[spiel.zustand.spielerinId];
-  const spielerinHoert = Boolean(ninkasi?.position) && ninkasi.id !== urheberId && erreicht.has(feldIndex(ebene, ninkasi.position.x, ninkasi.position.y));
-  melden(spiel, "laerm", { ursprung: { x: ursprung.x, y: ursprung.y }, lautstaerke, geraeusch, spielerinHoert });
+  const gesteuerte = gesteuerteEntitaet(spiel.zustand);
+  const gesteuerteHoert = Boolean(gesteuerte?.position) && gesteuerte.id !== urheberId && erreicht.has(feldIndex(ebene, gesteuerte.position.x, gesteuerte.position.y));
+  melden(spiel, "laerm", { ursprung: { x: ursprung.x, y: ursprung.y }, lautstaerke, geraeusch, gesteuerteHoert });
   // jedes Feld kostet mindestens 1, weiter als die Lautstärke (Schachbrett) trägt Lärm also nie
   for (const wesen of entitaetenImUmkreis(spiel.zustand, ursprung, lautstaerke)) {
     if (!wesen.ki || !wesen.position || wesen.id === urheberId) continue;

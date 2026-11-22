@@ -27,7 +27,7 @@ import { effektAnwenden } from "../kern/effekte.js";
 import { melden } from "../kern/ereignisse.js";
 import { mitProzentChance, zufallsGanzzahl } from "../kern/zufall.js";
 import { bedingungenErfuellt } from "../kern/werte.js";
-import { entitaetenAuf, bewegungVon, istWesen, spielerin } from "../kern/zustand.js";
+import { entitaetenAuf, bewegungVon, istWesen, gesteuerteEntitaet } from "../kern/zustand.js";
 import { aufDerKarte, feldIndex, gelaendeAuf, passierbar } from "../welt/karte.js";
 import { ACHT_RICHTUNGEN } from "../welt/geometrie.js";
 import { schichtenVon, schichtAuf, belegteFelder, feldVonIndex, gasdurchlaessig } from "../welt/schichten.js";
@@ -280,7 +280,7 @@ anmelden("welttick", "gas", (spiel) => {
     }
   }
   // dichter Rauch kommt und geht: Ninkasis Sichtfeld neu berechnen
-  if (sichtBetroffen && spiel.zustand.spielerinId != null && spielerin(spiel.zustand)?.position) sichtfeldAktualisieren(spiel);
+  if (sichtBetroffen && gesteuerteEntitaet(spiel.zustand)?.position) sichtfeldAktualisieren(spiel);
 });
 
 // Weltuhr: Feuer

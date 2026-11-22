@@ -7,7 +7,7 @@ import { feldIndex, aufDerKarte, abstand } from "../welt/karte.js";
 import { sichtdurchlaessig } from "../welt/schichten.js";
 import { sichtlinieFrei } from "../welt/geometrie.js";
 import { modifiziert } from "../kern/werte.js";
-import { spielerin, entitaetenMitPosition, entitaetenImUmkreis } from "../kern/zustand.js";
+import { gesteuerteEntitaet, istGesteuert, entitaetenMitPosition, entitaetenImUmkreis } from "../kern/zustand.js";
 import { epFuerErkundung } from "./lernen.js";
 
 export function reichweiteSicht(spiel, entitaet) {
@@ -17,12 +17,12 @@ export function reichweiteSicht(spiel, entitaet) {
 export function sichtfeldAktualisieren(spiel) {
   const zustand = spiel.zustand;
   const ebene = zustand.ebene;
-  const ninkasi = spielerin(zustand);
+  const gesteuerte = gesteuerteEntitaet(zustand);
   const sichtbareFelder = new Set();
   // Gelände und dichter Rauch (welt/schichten.js) halten die Sicht auf
   const lichtDurchlaessig = (x, y) => aufDerKarte(ebene, x, y) && sichtdurchlaessig(spiel, x, y);
   const schattenwurf = new PreciseShadowcasting(lichtDurchlaessig, { topology: 8 });
-  schattenwurf.compute(ninkasi.position.x, ninkasi.position.y, reichweiteSicht(spiel, ninkasi), (x, y) => {
+  schattenwurf.compute(gesteuerte.position.x, gesteuerte.position.y, reichweiteSicht(spiel, gesteuerte), (x, y) => {
     if (aufDerKarte(ebene, x, y)) sichtbareFelder.add(feldIndex(ebene, x, y));
   });
   zustand.sichtbareFelder = [...sichtbareFelder].sort((indexA, indexB) => indexA - indexB);
@@ -55,7 +55,7 @@ export function istSichtbar(zustand, x, y) {
 export function sieht(spiel, betrachter, ziel) {
   const zustand = spiel.zustand;
   if (!betrachter.position || !ziel.position) return false;
-  if (betrachter.id === zustand.spielerinId) return istSichtbar(zustand, ziel.position.x, ziel.position.y);
+  if (istGesteuert(zustand, betrachter)) return istSichtbar(zustand, ziel.position.x, ziel.position.y);
   const nahGenug = abstand(betrachter.position, ziel.position) <= reichweiteSicht(spiel, betrachter);
   return nahGenug && sichtlinieFrei(spiel, betrachter.position, ziel.position);
 }
@@ -63,6 +63,6 @@ export function sieht(spiel, betrachter, ziel) {
 // Wen ein Betrachter überhaupt sehen könnte, nach ID: für Ninkasi alle Entitäten mit Position (ihr Sichtfeld steht in
 // sichtbareFelder), für alle anderen nur die innerhalb ihrer Sichtweite (räumlicher Index); gesehen ist damit noch nichts
 export function kandidatenInSicht(spiel, betrachter) {
-  if (betrachter.id === spiel.zustand.spielerinId) return entitaetenMitPosition(spiel.zustand);
+  if (istGesteuert(spiel.zustand, betrachter)) return entitaetenMitPosition(spiel.zustand);
   return entitaetenImUmkreis(spiel.zustand, betrachter.position, reichweiteSicht(spiel, betrachter));
 }

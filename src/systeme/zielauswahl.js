@@ -9,7 +9,7 @@
 // Zielarten für Fähigkeiten (Punkt 6) und Vorschau: siehe zielAufloesen.
 
 import { anmelden, holen } from "../kern/register.js";
-import { entitaetenAuf, fraktionVon, istWesen } from "../kern/zustand.js";
+import { entitaetenAuf, fraktionVon, istWesen, istGesteuert } from "../kern/zustand.js";
 import { aufDerKarte } from "../welt/karte.js";
 import { kreis, kegel, flugbahn, sichtlinieFrei, felderOrdnen, gleichesFeld, inReichweite, KEGEL_OEFFNUNGEN } from "../welt/geometrie.js";
 import { beziehungZwischen } from "./fraktionen.js";
@@ -103,7 +103,7 @@ function zielwesen(spiel, zielangabe) {
 function zielpunktPruefen(spiel, akteur, zielart, zielpunkt, sichtlinieNoetig) {
   const zustand = spiel.zustand;
   if (!aufDerKarte(zustand.ebene, zielpunkt.x, zielpunkt.y)) return "ungueltig";
-  if (akteur.id === zustand.spielerinId && !istSichtbar(zustand, zielpunkt.x, zielpunkt.y)) return "nicht_sichtbar";
+  if (istGesteuert(zustand, akteur) && !istSichtbar(zustand, zielpunkt.x, zielpunkt.y)) return "nicht_sichtbar";
   if (zielart.reichweite !== undefined && !inReichweite(akteur.position, zielpunkt, zielart.reichweite)) return "zu_weit";
   if (sichtlinieNoetig && !sichtlinieFrei(spiel, akteur.position, zielpunkt)) return "keine_sichtlinie";
   return null;
@@ -179,7 +179,7 @@ export function zielAufloesen(spiel, akteur, zielart, zielangabe) {
     felder = [zielpunkt];
     betroffene = entitaetenAufFeldern(spiel, felder, trefferoptionen);
   }
-  if (akteur.id === zustand.spielerinId) {
+  if (istGesteuert(zustand, akteur)) {
     betroffene = betroffene.filter((entitaet) => istSichtbar(zustand, entitaet.position.x, entitaet.position.y));
   }
   return { ok: true, ursprung, zielpunkt, zielId, bahn, felder, betroffene: betroffene.map((entitaet) => entitaet.id) };

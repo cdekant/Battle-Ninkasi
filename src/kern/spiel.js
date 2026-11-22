@@ -10,7 +10,7 @@ import "../systeme/index.js";
 import "../ki/index.js";
 import VERSION from "../version.js";
 import { vorbereiten, Datenfehler } from "./daten.js";
-import { neuerZustand, entitaetMitId, alleEntitaeten, spielerin, kiVon, entitaetAusDatensatz } from "./zustand.js";
+import { neuerZustand, entitaetMitId, alleEntitaeten, spielerin, gesteuerteEntitaet, kiVon, entitaetAusDatensatz } from "./zustand.js";
 import { zufallErzeugen, startwertAbleiten } from "./zufall.js";
 import { WELTTICK, einreihen, ersterEintrag, ersterEintragEntnehmen, akteurEinreihen } from "./zeit.js";
 import { holen, hat, alle as alleImRegister } from "./register.js";
@@ -77,13 +77,13 @@ export function zeitkosten(spiel, entitaet, aktion, umstaende = {}, grundkosten 
   return Math.max(1, zuschlag ? prozentVon(kosten, 100 + zuschlag) : kosten);
 }
 
-// Ninkasi wartet auf eine Eingabe, außer ein Zustand gibt ihr eine KI (Furcht, Rausch, Psi-Kontrolle)
-// oder eine lange Aktion läuft ohne Unterbrechung weiter
+// Die gesteuerte Entität (vorerst Ninkasi) wartet auf eine Eingabe, außer ein Zustand gibt ihr eine KI (Furcht,
+// Rausch, Psi-Kontrolle) oder eine lange Aktion läuft ohne Unterbrechung weiter
 function wartetAufEingabe(zustand, eintrag) {
-  if (!eintrag || eintrag.art !== "akteur" || eintrag.akteurId !== zustand.spielerinId) return false;
-  const ninkasi = spielerin(zustand);
-  const aktionLaeuft = ninkasi.laufendeAktion && !ninkasi.laufendeAktion.unterbrochen;
-  return !kiVon(ninkasi) && !aktionLaeuft;
+  const gesteuerte = gesteuerteEntitaet(zustand);
+  if (!eintrag || eintrag.art !== "akteur" || !gesteuerte || eintrag.akteurId !== gesteuerte.id) return false;
+  const aktionLaeuft = gesteuerte.laufendeAktion && !gesteuerte.laufendeAktion.unterbrochen;
+  return !kiVon(gesteuerte) && !aktionLaeuft;
 }
 
 export function spielerinAmZug(spiel) {
@@ -149,35 +149,36 @@ function befehlOhneZeitGeben(spiel, ninkasi, befehl) {
 
 // Die Eingangstür: einziger Weg, wie Entscheidungen der Spielerin in die Logik gelangen.
 // Gibt { ok: true } oder { ok: false, grund } zurück; abgelehnte Befehle kosten nichts.
-// Ist Ninkasi handlungsunfähig, wird jede Eingabe angenommen, aufgezeichnet und als warten ausgeführt
+// Befehle gehen an die gesteuerte Entität (vorerst Ninkasi); Befehle ohne Zeit (lernen) gehen an Ninkasi selbst.
+// Ist die gesteuerte Entität handlungsunfähig, wird jede Eingabe angenommen, aufgezeichnet und als warten ausgeführt
 // (Meldung "handlungsunfaehig", Rückgabe { ok: true, handlungsunfaehig: true }).
 export function befehlGeben(spiel, befehl) {
   const zustand = spiel.zustand;
   if (zustand.vorbei) return { ok: false, grund: "vorbei" };
   if (!spielerinAmZug(spiel)) return { ok: false, grund: "nicht_am_zug" };
-  const ninkasi = spielerin(zustand);
-  if (befehlOhneZeit(befehl)) return befehlOhneZeitGeben(spiel, ninkasi, befehl);
-  if (istHandlungsunfaehig(spiel, ninkasi)) {
+  if (befehlOhneZeit(befehl)) return befehlOhneZeitGeben(spiel, spielerin(zustand), befehl);
+  const gesteuerte = gesteuerteEntitaet(zustand);
+  if (istHandlungsunfaehig(spiel, gesteuerte)) {
     spiel.befehle.push(structuredClone(befehl ?? null));
-    melden(spiel, "handlungsunfaehig", { wer: bezugAuf(ninkasi) });
+    melden(spiel, "handlungsunfaehig", { wer: bezugAuf(gesteuerte) });
     ersterEintragEntnehmen(zustand);
-    befehlAusfuehren(spiel, ninkasi, { art: "warten" });
+    befehlAusfuehren(spiel, gesteuerte, { art: "warten" });
     warteschlangeAbarbeiten(spiel);
     return { ok: true, handlungsunfaehig: true };
   }
-  const grund = befehlPruefen(spiel, ninkasi, befehl);
+  const grund = befehlPruefen(spiel, gesteuerte, befehl);
   if (grund) {
     melden(spiel, "abgelehnt", { grund, befehl });
     return { ok: false, grund };
   }
   spiel.befehle.push(structuredClone(befehl));
   ersterEintragEntnehmen(zustand);
-  befehlAusfuehren(spiel, ninkasi, befehl);
+  befehlAusfuehren(spiel, gesteuerte, befehl);
   warteschlangeAbarbeiten(spiel);
   return { ok: true };
 }
 
-// Arbeitet die Warteschlange ab, bis Ninkasi am Zug ist oder das Spiel vorbei ist (exportiert für Tests)
+// Arbeitet die Warteschlange ab, bis die gesteuerte Entität am Zug ist oder das Spiel vorbei ist (exportiert für Tests)
 export function warteschlangeAbarbeiten(spiel) {
   const zustand = spiel.zustand;
   let schleifenschutz = 0;

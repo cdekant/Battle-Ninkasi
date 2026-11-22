@@ -9,7 +9,7 @@
 // nicht von selbst wieder; ein von Hand belegter Platz wird nie überschrieben. Wurfwaffen kommen nur von Hand dazu.
 // Zustand eines Platzes für die Anzeige: { platz, anzahl?, abklingend?, grund? }
 
-import { spielerin, entitaetMitId } from "../kern/zustand.js";
+import { gesteuerteEntitaet, entitaetMitId } from "../kern/zustand.js";
 import { anzahlVon } from "../systeme/inventar.js";
 import { faehigkeitPruefen, zuegeBisBereit } from "../systeme/faehigkeiten.js";
 import { PLAETZE_DER_LEISTE } from "./aktionskatalog.js";
@@ -40,8 +40,8 @@ export function platzSchluessel(platz) {
 export const aktivePlaetze = (leisten) => leisten.leisten[leisten.aktiveLeiste];
 
 function gepaeck(spiel) {
-  const ninkasi = spielerin(spiel.zustand);
-  return (ninkasi.inventar || []).map((id) => entitaetMitId(spiel.zustand, id)).filter(Boolean);
+  const gesteuerte = gesteuerteEntitaet(spiel.zustand);
+  return (gesteuerte.inventar || []).map((id) => entitaetMitId(spiel.zustand, id)).filter(Boolean);
 }
 
 function belegteSchluessel(leisten) {
@@ -51,10 +51,10 @@ function belegteSchluessel(leisten) {
 // Fügt neue Fähigkeiten (in Lernreihenfolge) und neue Getränkearten (in der Reihenfolge des Gepäcks) auf freie Plätze;
 // gibt den neuen Stand zurück (der alte bleibt unverändert)
 export function leistenNachfuehren(spiel, leisten) {
-  const ninkasi = spielerin(spiel.zustand);
+  const gesteuerte = gesteuerteEntitaet(spiel.zustand);
   const neu = structuredClone(leisten);
   const belegt = belegteSchluessel(neu);
-  const kandidaten = (ninkasi.faehigkeiten || []).map((faehigkeit) => ({ art: "faehigkeit", faehigkeit }));
+  const kandidaten = (gesteuerte.faehigkeiten || []).map((faehigkeit) => ({ art: "faehigkeit", faehigkeit }));
   for (const gegenstand of gepaeck(spiel)) if (gegenstand.trinkbar) kandidaten.push({ art: "gegenstand", typ: gegenstand.typ });
   for (const platz of kandidaten) {
     const schluessel = platzSchluessel(platz);
@@ -122,13 +122,13 @@ export function erstesStueck(spiel, typ) {
 // Zustand eines Platzes für die Anzeige: Anzahl bei Gegenständen, Abklingzeit in Zügen, Grund, wenn er nicht geht
 export function platzZustand(spiel, platz) {
   if (!platz) return null;
-  const ninkasi = spielerin(spiel.zustand);
+  const gesteuerte = gesteuerteEntitaet(spiel.zustand);
   if (platz.art === "gegenstand") {
     const anzahl = gepaeck(spiel).filter((gegenstand) => gegenstand.typ === platz.typ).reduce((summe, gegenstand) => summe + anzahlVon(gegenstand), 0);
     return { platz, anzahl, ...(anzahl === 0 && { grund: "nichts_mehr_davon" }) };
   }
-  const abklingend = zuegeBisBereit(ninkasi, platz.faehigkeit);
-  const grund = faehigkeitPruefen(spiel, ninkasi, platz.faehigkeit, undefined);
+  const abklingend = zuegeBisBereit(gesteuerte, platz.faehigkeit);
+  const grund = faehigkeitPruefen(spiel, gesteuerte, platz.faehigkeit, undefined);
   return { platz, abklingend, ...(grund && !GRUENDE_DES_ZIELS.includes(grund) && { grund }) };
 }
 
