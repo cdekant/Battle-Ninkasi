@@ -99,7 +99,7 @@ Entschieden: Vorgabe für Paare ohne Angabe ist feind, die Tabelle nennt Abweich
 Offener Rest:
 
 + Licht in der Wahrnehmung (Brogue: Heimlichkeitsweite im Licht doppelt, im Dunkeln halb), Spüren ohne Licht, Umherziehen wacher Wesen, Spur als Geruch (Brogue folgt der Spielerin über eine Duftkarte um Ecken, passend zu Mikroorganismen, die entlang von Wegen spüren); siehe Wahrnehmung in [Wesen.md](Wesen.md) und Licht in [Welt.md](Welt.md)
-+ Ruf bei ganzen Fraktionen: als Idee in [Ausblick.md](Ausblick.md) (Handel, Währung, Gespräch, Ruf)
++ Ruf bei ganzen Fraktionen: seit 0.35.0 vorbereitet (siehe [Wesen.md](Wesen.md), Fraktionen), weitere Taten in [Ausblick.md](Ausblick.md) (Fraktionen: Ruf und Beistand)
 + Tile für den Fernkämpfer-Test (bisher nur Zeichen F), falls er im Spiel bleibt
 
 ## 8. Gelände, Feldschichten, Ebenen
@@ -202,12 +202,11 @@ Offen:
 
 ## 14. Vorkehrungen aus dem Ausblick
 
-Status: offen; Ideen und Begründungen in [Ausblick.md](Ausblick.md), hier nur die Arbeit, nach Dringlichkeit geordnet (zuerst, was mit jedem neuen System teurer wird); jede Vorkehrung bekommt vor der Umsetzung einen eigenen Plan; erledigt in 0.33.0: Plan des Laufs und Ebenenerzeugung in Schritten (siehe [Welt.md](Welt.md), Plan des Laufs und [Welt.md](Welt.md), Ebenen); erledigt in 0.34.0: gesteuerte Entität (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten)
+Status: offen; Ideen und Begründungen in [Ausblick.md](Ausblick.md), hier nur die Arbeit, nach Dringlichkeit geordnet (zuerst, was mit jedem neuen System teurer wird); jede Vorkehrung bekommt vor der Umsetzung einen eigenen Plan; erledigt in 0.33.0: Plan des Laufs und Ebenenerzeugung in Schritten (siehe [Welt.md](Welt.md), Plan des Laufs und [Welt.md](Welt.md), Ebenen); erledigt in 0.34.0: gesteuerte Entität (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); erledigt in 0.35.0: Ruf, Beistand und Kampfzustand (siehe [Wesen.md](Wesen.md), Fraktionen und [Wesen.md](Wesen.md), Kampfzustand)
 
-+ 1. Ruf vorbereiten und Beistand: `zustand.ruf` je Fraktion mit Vorgabe 0, `beziehung` liest Schwellen aus `daten/regeln.js`; Wesen helfen Ninkasi gegen einen Feind ihrer eigenen Fraktion in Sicht
-+ 2. Würfe über eine tauschbare Schnittstelle im Effektsystem (kleinster, größter Wurf, fremder Zufall), damit eine Vorschau durch Simulation nichts verrät
-+ 3. Erinnerung der Karte: je Feld das zuletzt gesehene Gelände, die Anzeige zeigt es für nicht sichtbare Felder; `erkundet` mit Werten für gesehen und kartiert; Grundlage für veränderbares Gelände, Hellsicht und Filmriss
-+ 4. Mitnehmen beim Ebenenwechsel erweiterbar (Register oder Haken), für Begleiter und Wesen, die Ninkasi über Treppen folgen (Rest aus Punkt 8)
-+ 5. Format der KI-Handlungen: Bewertung je Handlung mit Gewicht und Kurven, das heutige Format bleibt als Sonderfall gültig; dazu Vorrangbefehle für Begleiter
-+ 6. Lesefunktionen für Komponenten ohne Zahl (Angriffe, Plätze, Bewegungsart, Sicht, Türen), damit eine Gestalt sie überlagern kann (Verwandlung)
-+ 7. Regel für Wissen über Läufe hinweg festschreiben: was ein Lauf davon nutzt, kommt als Startoption in den Spielstand, die Logik liest die Ablage nie (siehe [Architektur.md](Architektur.md), Speichern)
++ 1. Würfe über eine tauschbare Schnittstelle im Effektsystem (kleinster, größter Wurf, fremder Zufall), damit eine Vorschau durch Simulation nichts verrät
++ 2. Erinnerung der Karte: je Feld das zuletzt gesehene Gelände, die Anzeige zeigt es für nicht sichtbare Felder; `erkundet` mit Werten für gesehen und kartiert; Grundlage für veränderbares Gelände, Hellsicht und Filmriss
++ 3. Mitnehmen beim Ebenenwechsel erweiterbar (Register oder Haken), für Begleiter und Wesen, die Ninkasi über Treppen folgen (Rest aus Punkt 8)
++ 4. Format der KI-Handlungen: Bewertung je Handlung mit Gewicht und Kurven, das heutige Format bleibt als Sonderfall gültig; dazu Vorrangbefehle für Begleiter
++ 5. Lesefunktionen für Komponenten ohne Zahl (Angriffe, Plätze, Bewegungsart, Sicht, Türen), damit eine Gestalt sie überlagern kann (Verwandlung)
++ 6. Regel für Wissen über Läufe hinweg festschreiben: was ein Lauf davon nutzt, kommt als Startoption in den Spielstand, die Logik liest die Ablage nie (siehe [Architektur.md](Architektur.md), Speichern)

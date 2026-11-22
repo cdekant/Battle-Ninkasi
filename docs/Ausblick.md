@@ -2,7 +2,7 @@
 
 Stand: 2026-11-22
 
-Mitprüfen bei Änderungen: [Grundlagen.md](Grundlagen.md), [Architektur.md](Architektur.md), [Systemausbau.md](Systemausbau.md)
+Mitprüfen bei Änderungen: [Grundlagen.md](Grundlagen.md), [Architektur.md](Architektur.md), [Systemausbau.md](Systemausbau.md), [Wesen.md](Wesen.md)
 
 Ideen für Mechaniken, über die noch nicht entschieden ist, mit dem, was sie dem Kern abverlangen. Zweck: früh erkennen, wo heutiger Code einer Idee den Weg verbaut, und dort rechtzeitig vorbauen, statt später schwer umzubauen.
 
@@ -26,7 +26,7 @@ Umsetzung: keine
 | Steuerung anderer Wesen | mittel, offen | hoch, mit Lesefunktion gering | ja (Lesefunktion) |
 | Handlungsoptionen der KI | hoch | mittel | ja (Format der Daten) |
 | Schatzräume mit Schlüssel | hoch | gering (Plan des Laufs steht) | erledigt (Plan des Laufs) |
-| Fraktionen: Ruf und Beistand | hoch | gering bis mittel | ja (Ruf vorbereiten) |
+| Fraktionen: Ruf und Beistand | hoch | gering | erledigt (Ruf und Beistand) |
 | Vorschau durch Simulation | hoch | mittel | ja |
 | Hellsicht, Spüren, Unsichtbarkeit | hoch | mittel | ja |
 | Zeitumkehr | hoch | mittel | ja |
@@ -304,10 +304,11 @@ Umsetzung: offen
 + Braucht: Ruf je Fraktion als Zahl im Zustand (Vorgabe 0); Schwellen in `daten/regeln.js`, ab denen die Beziehung kippt; Taten, die den Ruf verschieben (Angriff, Tötung, Hilfe, Gespräch), als Auslöser an der Fraktion; für den Beistand eine Regel in der Zielwahl (`src/ki/ziele.js`): wer ein Mitglied einer verfeindeten Fraktion angreift, wird für Zuschauer zum Verbündeten auf Zeit
 + Berührt: `beziehung` in `src/systeme/fraktionen.js` (liest heute nur Daten und Zorn), die KI, Handel und Gespräch, Anzeige (Ruf im Charakterfenster)
 + Umbaurisiko: gering bis mittel
-+ Vorkehrung: `zustand.ruf` mit Vorgabe 0 anlegen und `beziehung` über die Schwellen lesen lassen, solange es nur zwei Fraktionen gibt; die Signatur hat `spiel` schon
++ Vorkehrung (erledigt in 0.35.0, siehe [Wesen.md](Wesen.md), Fraktionen): `zustand.ruf` mit Vorgabe 0, `beziehung` liest Grundwert plus Ruf über die Schwellen; Beistand gegen Feinde der eigenen Fraktion mit Ende über den Kampfzustand; als erste Tat verschiebt eine Tötung den Ruf, nur mit Zeugen; Baustein `ruf_aendern` für Gespräch und Quests
++ Entschieden 2026-11-22: Ruf als Grundwert aus der Tabelle plus Ruf; er gehört der Fraktion `ninkasi`, unter Verkleidung oder Besessenheit gelten die Beziehungen der fremden Fraktion, und Taten ändern Ninkasis Ruf dann nicht; Beistand leisten nur Neutrale; Tötungen zählen nur mit Zeugen
 + Aus der Arbeitsliste hierher: Ruf bei ganzen Fraktionen (vorher [Systemausbau.md](Systemausbau.md), Punkt 7)
 
-Umsetzung: offen
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Fraktionen; offen: weitere Taten (Hilfe, Gespräch, Handel), Ruf im Charakterfenster, ob eine Tat in Verkleidung etwas anderes verschiebt
 
 ## Bestiarium, Glossar, Rezeptbuch
 

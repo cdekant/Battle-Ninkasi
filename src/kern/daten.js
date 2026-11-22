@@ -210,6 +210,8 @@ function pruefeRegeln(daten, regeln, fehler) {
   if (!istTextliste(unterbrechen)) fehler.push("regeln.laufendeAktionen.unterbrechen muss eine Liste von Gefahrenprüfungen sein");
   else for (const name of unterbrechen) if (!hat("gefahren", name)) fehler.push(`regeln.laufendeAktionen.unterbrechen: Gefahrenprüfung "${name}" ist nicht angemeldet`);
   if (!BEZIEHUNGEN.includes(regeln.fraktionen?.beziehungVorgabe)) fehler.push(`regeln.fraktionen.beziehungVorgabe muss eines von ${BEZIEHUNGEN.join(", ")} sein`);
+  pruefeRufregeln(daten, regeln.fraktionen ?? {}, fehler);
+  if (!istZahlAbNull(regeln.kampf?.nachwirkung)) fehler.push("regeln.kampf.nachwirkung muss eine ganze Zahl >= 0 sein");
   const wahrnehmung = regeln.wahrnehmung;
   if (!wahrnehmung) fehler.push("regeln.wahrnehmung fehlt");
   else {
@@ -438,7 +440,7 @@ function pruefeMenge(schritt, ort, fehler) {
 const istZahlAbNull = (wert) => istGanzzahl(wert) && wert >= 0;
 
 // Parameter nach Beschreibung (siehe kern/bausteine.js): "text", "ganzzahl", "wahrheitswert", "effekt",
-// "muster", "zustand", "wesen", "schadensart", "gelaende", "oberflaeche", "gas", "skill", "eigenschaft", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
+// "muster", "zustand", "wesen", "schadensart", "fraktion", "gelaende", "oberflaeche", "gas", "skill", "eigenschaft", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
 function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
   for (const [feld, typ] of Object.entries(beschreibung)) {
     const wert = werte[feld];
@@ -463,6 +465,7 @@ function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
     else if (grundtyp === "muster") pruefeMuster(daten, wert, `${ort}.${feld}`, fehler);
     else if (grundtyp === "zustand" && !daten.zustaende?.[wert]) fehler.push(`${ort}.${feld}: Zustand "${wert}" gibt es nicht`);
     else if (grundtyp === "schadensart" && !daten.schadensarten?.[wert]) fehler.push(`${ort}.${feld}: Schadensart "${wert}" gibt es nicht`);
+    else if (grundtyp === "fraktion" && !daten.fraktionen?.[wert]) fehler.push(`${ort}.${feld}: Fraktion "${wert}" gibt es nicht`);
     else if (grundtyp === "wesen" && (!daten.wesen?.[wert] || daten.wesen[wert].abstrakt)) fehler.push(`${ort}.${feld}: Wesen "${wert}" gibt es nicht`);
     else if (grundtyp === "gelaende" && !daten.gelaende?.[wert]) fehler.push(`${ort}.${feld}: Gelände "${wert}" gibt es nicht`);
     else if (grundtyp === "oberflaeche" && !daten.schichten?.oberflaechen?.[wert]) fehler.push(`${ort}.${feld}: Oberfläche "${wert}" gibt es nicht`);
@@ -836,7 +839,21 @@ function pruefeKi(daten, ki, ort, fehler, bekannte = null) {
   });
 }
 
-// Fraktionen: { text, beziehungen? }, siehe systeme/fraktionen.js
+// Ruf in regeln.fraktionen (siehe systeme/fraktionen.js): jeder Grundwert liegt in der Zone seiner Beziehung, damit
+// Ruf 0 die Tabelle ergibt
+function pruefeRufregeln(daten, regeln, fehler) {
+  if (!daten.fraktionen?.[regeln.rufTraeger]) fehler.push(`regeln.fraktionen.rufTraeger: Fraktion "${regeln.rufTraeger}" gibt es nicht`);
+  const grundwert = regeln.rufGrundwert ?? {}, schwellen = regeln.rufSchwellen ?? {};
+  const alleZahlen = BEZIEHUNGEN.every((name) => istGanzzahl(grundwert[name])) && istGanzzahl(schwellen.feind) && istGanzzahl(schwellen.verbuendet);
+  if (!alleZahlen) fehler.push("regeln.fraktionen.rufGrundwert braucht ganze Zahlen für feind, neutral, verbuendet, rufSchwellen für feind und verbuendet");
+  else if (!(grundwert.feind <= schwellen.feind && schwellen.feind < grundwert.neutral && grundwert.neutral < schwellen.verbuendet && schwellen.verbuendet <= grundwert.verbuendet)) {
+    fehler.push("regeln.fraktionen: jeder rufGrundwert muss in der Zone seiner Beziehung liegen (feind <= Schwelle feind < neutral < Schwelle verbuendet <= verbuendet)");
+  }
+  for (const feld of ["rufToetungFeind", "rufToetungEigene"]) if (!istGanzzahl(regeln[feld])) fehler.push(`regeln.fraktionen.${feld} muss eine ganze Zahl sein`);
+  if (typeof regeln.rufNurMitZeugen !== "boolean") fehler.push("regeln.fraktionen.rufNurMitZeugen muss true oder false sein");
+}
+
+// Fraktionen: { text, beziehungen?, rufFest? }, siehe systeme/fraktionen.js
 function pruefeFraktionen(daten, sprache, fehler) {
   for (const [name, fraktion] of Object.entries(daten.fraktionen || {})) {
     const ort = `fraktionen.${name}`;
@@ -845,6 +862,7 @@ function pruefeFraktionen(daten, sprache, fehler) {
       if (!daten.fraktionen[andere]) fehler.push(`${ort}.beziehungen: Fraktion "${andere}" gibt es nicht`);
       if (!BEZIEHUNGEN.includes(wert)) fehler.push(`${ort}.beziehungen.${andere} muss eines von ${BEZIEHUNGEN.join(", ")} sein`);
     }
+    if (fraktion.rufFest !== undefined && typeof fraktion.rufFest !== "boolean") fehler.push(`${ort}.rufFest muss true oder false sein`);
   }
 }
 

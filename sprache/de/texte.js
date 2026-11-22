@@ -74,6 +74,8 @@ export default {
   "log.aufgewacht": "{wer.nom} schreckt hoch.",
   "log.hinterhalt": "{quelle.nom} überrascht {ziel.akk}!",
   "log.zorn": "{wer.nom} wird wütend auf {auf.akk}.",
+  "log.beistand": "{wer.nom} eilt {fuer.dat} zu Hilfe.",
+  "log.ruf": "Ansehen bei der Fraktion {fraktion}: {menge}.",
   "log.gestossen": "{wer.nom} wird zurückgestoßen.",
   "log.gezogen": "{wer.nom} wird herangezogen.",
   "log.getauscht": "{wer.nom} tauscht den Platz mit {mit.dat}.",

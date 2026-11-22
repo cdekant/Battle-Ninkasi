@@ -30,6 +30,7 @@ export function neuerZustand(startwert) {
     sichtbareFelder: [], // Feldindizes, die Ninkasi gerade sieht (aufsteigend)
     zufallszustand: null, // Zustand des Spiel-Zufalls
     wissen: null, // was Ninkasi in diesem Lauf über unbekannte Gegenstände weiß (systeme/kennen.js)
+    ruf: {}, // Ruf der Fraktion regeln.fraktionen.rufTraeger bei anderen Fraktionen, fehlt heißt 0 (systeme/fraktionen.js)
   };
 }
 

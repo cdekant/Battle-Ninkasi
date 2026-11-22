@@ -8,6 +8,14 @@ export default {
   // Fraktionen, siehe src/systeme/fraktionen.js
   fraktionen: {
     beziehungVorgabe: "feind", // für Paare ohne Angabe in daten/fraktionen.js
+    // Ruf: gehört dieser Fraktion; Ansehen = Grundwert der Beziehung aus der Tabelle + Ruf, die Schwellen ordnen es
+    // wieder zu (bis feind: feind, ab verbuendet: verbündet, dazwischen neutral); alle Zahlen vorläufig
+    rufTraeger: "ninkasi",
+    rufGrundwert: { feind: -100, neutral: 0, verbuendet: 100 },
+    rufSchwellen: { feind: -50, verbuendet: 50 },
+    rufToetungFeind: 10, // Tötung eines Wesens: Ruf bei den ausdrücklichen Feinden seiner Fraktion
+    rufToetungEigene: -25, // Tötung eines Wesens: Ruf bei seiner eigenen Fraktion
+    rufNurMitZeugen: true, // eine Tötung zählt für eine Fraktion nur, wenn eines ihrer Wesen Täterin oder Opfer sieht
   },
   // Wahrnehmung, siehe src/systeme/wahrnehmung.js; Vorbild Brogue, alle Zahlen vorläufig
   wahrnehmung: {
@@ -83,6 +91,7 @@ export default {
     halbwertKritchance: 50,
     kritfaktor: 150, // in Prozent, x1,5; Modifikatoren auf "kritfaktor" heben ihn nach oben offen
     mindestschadenNachRuestung: 1, // Rüstung senkt einen Treffer mit Schaden nicht unter diesen Wert
+    nachwirkung: 500, // so lange nach dem letzten Angriff (eigener oder erlittener) ist ein Wesen im Kampf (src/systeme/kampfzustand.js)
   },
   // Eigenschaften, Skills und EP, siehe docs/Charakter.md, src/systeme/skills.js und src/systeme/lernen.js; alle Zahlen vorläufig
   lernen: {

@@ -3,5 +3,5 @@
 // Werte: "feind" | "neutral" | "verbuendet"
 export default {
   ninkasi: { text: "fraktion.ninkasi" },
-  verderber: { text: "fraktion.verderber" }, // Bakterien, die das Bier verderben
+  verderber: { text: "fraktion.verderber", rufFest: true }, // Bakterien, die das Bier verderben; lassen sich nicht umstimmen (vorläufig)
 };

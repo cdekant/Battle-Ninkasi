@@ -2,13 +2,13 @@
 
 Stand: 2026-11-22
 
-Zuständig für: `src/systeme/kampf.js`, `src/systeme/fraktionen.js`, `src/systeme/wahrnehmung.js`, `src/systeme/bewegung.js`, `src/systeme/verschieben.js`, `src/systeme/werfen.js`, `src/systeme/skills.js`, `src/systeme/lernen.js`, `src/systeme/stoffwechsel.js`, `src/ki/*`, `daten/gegner.js`, `daten/ninkasi.js`, `daten/fraktionen.js`, `daten/schadensarten.js`, `daten/eigenschaften.js`, `daten/skills.js`, `daten/wurfgegenstaende.js`
+Zuständig für: `src/systeme/kampf.js`, `src/systeme/kampfzustand.js`, `src/systeme/fraktionen.js`, `src/systeme/wahrnehmung.js`, `src/systeme/bewegung.js`, `src/systeme/verschieben.js`, `src/systeme/werfen.js`, `src/systeme/skills.js`, `src/systeme/lernen.js`, `src/systeme/stoffwechsel.js`, `src/ki/*`, `daten/gegner.js`, `daten/ninkasi.js`, `daten/fraktionen.js`, `daten/schadensarten.js`, `daten/eigenschaften.js`, `daten/skills.js`, `daten/wurfgegenstaende.js`
 
-Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Charakter.md](Charakter.md), [Grundlagen.md](Grundlagen.md)
+Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Charakter.md](Charakter.md), [Grundlagen.md](Grundlagen.md), [Ausblick.md](Ausblick.md)
 
 ## Zweck
 
-Was Wesen können und wie sie entscheiden: Kampfwerte und Schadensrechnung, Fraktionen, Wahrnehmung, KI, Bewegung samt Verschieben und Werfen, Stoffwechsel, Skills und Lernen. Jeder Abschnitt nennt, soweit vorhanden, Daten, Schnittstellen und Regeln.
+Was Wesen können und wie sie entscheiden: Kampfwerte und Schadensrechnung, Kampfzustand, Fraktionen mit Ruf und Beistand, Wahrnehmung, KI, Bewegung samt Verschieben und Werfen, Stoffwechsel, Skills und Lernen. Jeder Abschnitt nennt, soweit vorhanden, Daten, Schnittstellen und Regeln.
 
 ## Kampfwerte
 
@@ -52,26 +52,39 @@ Regeln:
 + Immunität als Sonderfall: `immun` am Wesen oder ein Modifikator auf `immunitaet` mit der Art als Tag (Betrag über 0), Schaden genau 0
 + Hinterhalt: Ein Angriff mit Quelle auf ein ahnungsloses Ziel (siehe Wahrnehmung) trifft sicher, wird nicht geblockt und ist kritisch; mehr Schaden im Hinterhalt geben Modifikatoren mit der Bedingung `gegenueber_ahnungslos`, z.B. auf `kritfaktor` für einen Dolch-Skill
 
+## Kampfzustand
+
+Ein Wesen ist im Kampf, solange sein letzter Angriff, eigener oder erlittener, kurz zurückliegt. Bisher fragt nur der Beistand danach; Rasten, Erholung und Abläufe können es später tun.
+
++ Am Wesen `kampfZuletzt`: Zeitpunkt des letzten Treffers, Fehlschlags oder Schadens zwischen zwei Wesen, gesetzt an beiden (Haken `nach_treffer`, `verfehlt`, `nach_schaden`); Fallen und Fässer bringen niemanden in den Kampf
++ `imKampf(spiel, wesen)` (`src/systeme/kampfzustand.js`): wahr, solange seit `kampfZuletzt` weniger als `regeln.kampf.nachwirkung` vergangen ist (500); ein Zeitstempel statt eines Zeitereignisses, nichts muss ablaufen
+
 ## Fraktionen
 
-Vorbild Caves of Qud: Feindliche greifen an, Neutrale tun nichts, werden aber feindlich, wenn man sie absichtlich trifft.
+Vorbild Caves of Qud: Feindliche greifen an, Neutrale tun nichts, werden aber feindlich, wenn man sie absichtlich trifft; der Ruf je Fraktion ist eine Zahl, Schwellen machen eine Fraktion freundlich oder feindlich, Mitglieder kommen einander zu Hilfe.
 
 Daten:
 
-+ Fraktion (`daten/fraktionen.js`): `{ text, beziehungen?: { andereFraktion: "feind" | "neutral" | "verbuendet" } }` (`BEZIEHUNGEN`); die Tabelle nennt nur Abweichungen von `regeln.fraktionen.beziehungVorgabe` (Vorgabe `feind`, wie vor 0.14.0)
-+ Am Wesen `fraktion`, überlagerbar durch Zustände (siehe [Wirkungen.md](Wirkungen.md), Zustände); `zornAuf: [IDs]` für einzelnen Zorn
++ Fraktion (`daten/fraktionen.js`): `{ text, beziehungen?: { andereFraktion: "feind" | "neutral" | "verbuendet" }, rufFest? }` (`BEZIEHUNGEN`); die Tabelle nennt nur Abweichungen von `regeln.fraktionen.beziehungVorgabe` (Vorgabe `feind`, wie vor 0.14.0); `rufFest: true` lässt sich durch keinen Ruf umstimmen (im Spielinhalt vorläufig die Verderber)
++ Am Wesen `fraktion`, überlagerbar durch Zustände (siehe [Wirkungen.md](Wirkungen.md), Zustände); `zornAuf: [IDs]` für einzelnen Zorn; `beistandFuer: { angreiferinId: [Gegner-IDs] }` für Beistand
++ Im Zustand `ruf: { fraktion: Zahl }`, ein fehlender Eintrag heißt 0
++ Regeln in `regeln.fraktionen`: `rufTraeger` (`ninkasi`), `rufGrundwert` (feind -100, neutral 0, verbündet 100), `rufSchwellen` (feind -50, verbündet 50), `rufToetungFeind` (10), `rufToetungEigene` (-25), `rufNurMitZeugen` (true); die Datenprüfung verlangt, dass jeder Grundwert in der Zone seiner Beziehung liegt
 
 Schnittstellen (`src/systeme/fraktionen.js`):
 
-+ `beziehungZwischen(spiel, urheber, entitaet)` mit `urheber = { id, fraktion }` (`urheberVon`) ist die eine Quelle für `feindlich`, `trifft` (Zielauswahl, Auren, KI) und die Anzeige "In Sicht"; `beziehung` zwischen zwei Fraktionen
-+ Meldung `zorn`
++ `beziehungZwischen(spiel, urheber, entitaet)` mit `urheber = { id, fraktion }` (`urheberVon`) ist die eine Quelle für `feindlich`, `trifft` (Zielauswahl, Auren, KI) und die Anzeige "In Sicht"; `beziehung` zwischen zwei Fraktionen, mit Ruf
++ `rufBei(spiel, fraktion)`, `rufAendern(spiel, fraktion, menge)`; Baustein `ruf_aendern { fraktion, wuerfel | menge }` (auch negativ) für Gespräche, Quests und Opfer
++ Meldungen `zorn`, `beistand` (`wer`, `fuer`), `ruf` (`fraktion`, `menge`, `ruf`)
 
 Regeln:
 
 + Die Datenprüfung verlangt, dass jedes Wesen eine bekannte Fraktion trägt
 + Eine Beziehung gilt in beide Richtungen; sagen beide Seiten etwas anderes, gewinnt die strengere (feind vor neutral vor verbuendet); gleiche Fraktion ist verbündet, `eigene:<nummer>` (Zwietracht) mit allen verfeindet
 + Neutrale greift man nicht durch Hineinlaufen an, nur ausdrücklich (`angreifen: true`)
-+ Zorn: Trifft oder verfehlt eine Urheberin ein neutrales Wesen oder schadet ihm, werden es und alle Wesen seiner Fraktion, die die Urheberin gerade sehen, ihr gegenüber feindlich; jedes merkt sich das einzeln (`zornAuf`, gilt in beide Richtungen und vor der Tabelle); wer nichts mitbekommt, bleibt neutral; ein Ruf bei ganzen Fraktionen ist Spieldesign für später
++ Zorn: Trifft oder verfehlt eine Urheberin ein neutrales Wesen oder schadet ihm, werden es und alle Wesen seiner Fraktion, die die Urheberin gerade sehen, ihr gegenüber feindlich; jedes merkt sich das einzeln (`zornAuf`, gilt in beide Richtungen und vor Tabelle, Ruf und Beistand); wer nichts mitbekommt, bleibt neutral; das gilt auch für ein Wesen, das ihr beisteht, sein Beistand endet damit
++ Ruf: gehört der Fraktion `rufTraeger` und gilt für jedes Wesen, dessen wirksame Fraktion sie gerade ist (Ninkasi, später Begleiter); Ansehen = Grundwert der Beziehung aus der Tabelle + Ruf bei der anderen Fraktion, bis zur Schwelle feind feind, ab der Schwelle verbündet verbündet, dazwischen neutral; bei Ruf 0 gilt die Tabelle; zwischen zwei anderen Fraktionen zählt kein Ruf; trägt Ninkasi eine fremde Fraktion (Verkleidung, Besessenheit), gelten deren Beziehungen
++ Ruf durch Tötung: tötet ein Wesen der Fraktion `rufTraeger` (bei Beschworenen zählt die Beschwörerin) ein Wesen einer anderen Fraktion, ändert sich der Ruf bei jeder Fraktion, die das Opfer ausdrücklich in der Tabelle als Feind führt, um `rufToetungFeind` (die Vorgabe feind zählt nicht, sonst stiege er bei allen), und bei der Fraktion des Opfers um `rufToetungEigene`; mit `rufNurMitZeugen` nur, wenn ein Wesen der jeweiligen Fraktion Täterin oder Opfer sieht (ein Zeuge reicht); unter fremder Fraktion ändert sich nichts
++ Beistand: greift eine Urheberin ein Wesen an, stehen ihr Zuschauerinnen bei, die ihr neutral gegenüberstehen, deren Fraktion mit der des Opfers verfeindet ist und die sie sehen; sie merken sich das Opfer in `beistandFuer`, sind ihr gegenüber verbündet (in beide Richtungen, nur statt neutral), wachen auf und jagen das Opfer (`wachzustand: "jagt"`, `letzteBekanntePosition`); weitere Gegner kommen dazu; der Beistand gilt, solange einer dieser Gegner noch da ist (nicht tot, auf derselben Ebene) und Helferin oder Urheberin im Kampf sind (siehe Kampfzustand); Feindliche leisten keinen Beistand
 
 ## Wahrnehmung
 
@@ -225,7 +238,7 @@ Regeln:
 
 ## Tests
 
-+ `tests/kampf.test.js` (Trefferwurf, Blocken, Krit, Schadensrechnung, Profile), `tests/fraktionen.test.js` (Beziehungen, Zorn), `tests/wahrnehmung.test.js` (Wachzustand, Bemerken, Lärm, Hinterhalt), `tests/faehigkeitenwahl.test.js` und `tests/verhalten.test.js` (KI), `tests/verschieben.test.js` (Bewegungsarten, Stoßen, Ziehen, Tauschen, Teleportieren, Lage, Werfen), `tests/wege.test.js`, `tests/stoffwechsel.test.js`, `tests/skills.test.js` und `tests/lernen.test.js`
++ `tests/kampf.test.js` (Trefferwurf, Blocken, Krit, Schadensrechnung, Profile), `tests/fraktionen.test.js` (Beziehungen, Zorn, Ruf, Kampfzustand, Beistand), `tests/wahrnehmung.test.js` (Wachzustand, Bemerken, Lärm, Hinterhalt), `tests/faehigkeitenwahl.test.js` und `tests/verhalten.test.js` (KI), `tests/verschieben.test.js` (Bewegungsarten, Stoßen, Ziehen, Tauschen, Teleportieren, Lage, Werfen), `tests/wege.test.js`, `tests/stoffwechsel.test.js`, `tests/skills.test.js` und `tests/lernen.test.js`
 
 ## Verweise
 

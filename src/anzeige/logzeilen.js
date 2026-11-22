@@ -163,6 +163,10 @@ export function zeilenAusMeldung(kontext, meldung) {
       const eigenschaft = text(spiel.daten.eigenschaften?.[meldung.eigenschaft]?.text ?? meldung.eigenschaft);
       return geschehen(text("log.eigenschaft_geaendert", { eigenschaft, menge: (meldung.menge > 0 ? "+" : "") + meldung.menge }), meldung.menge > 0 ? "lernen" : "gefahr");
     }
+    case "ruf": {
+      const fraktion = text(spiel.daten.fraktionen?.[meldung.fraktion]?.text ?? meldung.fraktion);
+      return geschehen(text("log.ruf", { fraktion, menge: (meldung.menge > 0 ? "+" : "") + meldung.menge }));
+    }
     case "liegt_hier":
     case "aufgehoben":
       return hatSchluessel(`log.${meldung.art}`) ? geschehen(text(`log.${meldung.art}`, meldung), "fund") : [];
