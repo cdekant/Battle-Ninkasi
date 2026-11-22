@@ -13,6 +13,7 @@ import { KAMPFWERTE } from "../systeme/kampf.js";
 import { FAEHIGKEITSARTEN } from "../systeme/faehigkeiten.js";
 import { BEZIEHUNGEN } from "../systeme/fraktionen.js";
 import { WACHZUSTAENDE } from "../systeme/wahrnehmung.js";
+import { WAHLREGELN } from "../ki/handlungen.js";
 import { UNTERBRECHUNGSGRUENDE } from "../systeme/laufendeAktionen.js";
 import { BEWEGUNGSARTEN } from "../welt/karte.js";
 import { HOECHSTE_STUFE, ANZAHL_TIERS, eigenschaftenPruefen } from "../systeme/skills.js";
@@ -818,25 +819,45 @@ function pruefeEffektKreise(daten, fehler) {
   for (const name of Object.keys(effekte)) besuchen(name, [name]);
 }
 
-// KI-Komponente: { modul, trifft?, wachzustand?, faehigkeiten?, abstandHalten? }, siehe ki/jagen.js und ki/faehigkeitenwahl.js
+// KI-Komponente: { modul, trifft?, wachzustand?, handlungen?, wahl? }, siehe ki/jagen.js und ki/handlungen.js
 // bekannte: die Fähigkeiten des Wesens (bei einer KI aus einem Zustand null, dann zählt nur, dass es sie gibt)
 function pruefeKi(daten, ki, ort, fehler, bekannte = null) {
   if (!istObjekt(ki) || !hat("ki", ki.modul)) return fehler.push(`${ort}: Verhaltensmodul "${ki?.modul}" ist nicht angemeldet`);
-  pruefeParameter(daten, { trifft: TRIFFT_ARTEN, wachzustand: WACHZUSTAENDE, abstandHalten: "ganzzahl?" }, ki, ort, fehler);
-  if (ki.abstandHalten === 0) fehler.push(`${ort}: abstandHalten muss eine ganze Zahl > 0 sein`);
-  if (ki.faehigkeiten === undefined) return;
-  if (!Array.isArray(ki.faehigkeiten)) return fehler.push(`${ort}: faehigkeiten muss eine Liste sein`);
-  ki.faehigkeiten.forEach((eintrag, nummer) => {
-    const stelle = `${ort}.faehigkeiten[${nummer}]`;
-    if (!istObjekt(eintrag)) return fehler.push(`${stelle}: Eintrag muss ein Objekt { name, ... } sein`);
-    pruefeParameter(daten, { name: "text", abstandAb: "ganzzahl?", abstandBis: "ganzzahl?" }, eintrag, stelle, fehler);
+  pruefeParameter(daten, { trifft: TRIFFT_ARTEN, wachzustand: WACHZUSTAENDE }, ki, ort, fehler);
+  // das Format vor 0.39.0
+  if (ki.faehigkeiten !== undefined) fehler.push(`${ort}: faehigkeiten an der KI gibt es nicht mehr, Fähigkeiten stehen als { handlung: "faehigkeit", name } in handlungen`);
+  if (ki.abstandHalten !== undefined) fehler.push(`${ort}: abstandHalten gibt es nicht mehr, dafür { handlung: "abstand_halten", abstand } in handlungen`);
+  if (ki.wahl !== undefined && !WAHLREGELN.includes(ki.wahl)) {
+    const unterBesten = istObjekt(ki.wahl) && Object.keys(ki.wahl).length === 1 ? ki.wahl.gewichtetUnterBesten : undefined;
+    if (!istGanzzahl(unterBesten) || unterBesten < 1) fehler.push(`${ort}: wahl muss "erste", "beste", "gewichtet" oder { gewichtetUnterBesten: n } mit n >= 1 sein`);
+  }
+  if (ki.handlungen === undefined) return;
+  if (!Array.isArray(ki.handlungen)) return fehler.push(`${ort}: handlungen muss eine Liste sein`);
+  ki.handlungen.forEach((eintrag, nummer) => {
+    const stelle = `${ort}.handlungen[${nummer}]`;
+    if (!istObjekt(eintrag)) return fehler.push(`${stelle}: Eintrag muss ein Objekt { handlung, ... } sein`);
+    if (!hat("kihandlungen", eintrag.handlung)) return fehler.push(`${stelle}: Handlung "${eintrag.handlung}" ist nicht angemeldet`);
+    pruefeParameter(daten, { abstandAb: "ganzzahl?", abstandBis: "ganzzahl?", gewicht: "ganzzahl?", ...holen("kihandlungen", eintrag.handlung).parameter }, eintrag, stelle, fehler);
     if (eintrag.chance !== undefined && !istProzent(eintrag.chance)) fehler.push(`${stelle}: chance muss eine ganze Zahl von 0 bis 100 sein`);
-    if (typeof eintrag.name === "string" && !daten.faehigkeiten?.[eintrag.name]) fehler.push(`${stelle}: Fähigkeit "${eintrag.name}" gibt es nicht`);
-    else if (bekannte && typeof eintrag.name === "string" && !bekannte.includes(eintrag.name)) fehler.push(`${stelle}: das Wesen kennt die Fähigkeit "${eintrag.name}" nicht (faehigkeiten)`);
+    if (eintrag.handlung === "abstand_halten" && istGanzzahl(eintrag.abstand) && eintrag.abstand < 1) fehler.push(`${stelle}: abstand muss eine ganze Zahl > 0 sein`);
+    if (eintrag.handlung === "faehigkeit" && typeof eintrag.name === "string") {
+      if (!daten.faehigkeiten?.[eintrag.name]) fehler.push(`${stelle}: Fähigkeit "${eintrag.name}" gibt es nicht`);
+      else if (bekannte && !bekannte.includes(eintrag.name)) fehler.push(`${stelle}: das Wesen kennt die Fähigkeit "${eintrag.name}" nicht (faehigkeiten)`);
+    }
     if (eintrag.wenn !== undefined) {
       if (!Array.isArray(eintrag.wenn)) fehler.push(`${stelle}: wenn muss eine Liste sein`);
       else pruefeBedingungen(daten, eintrag.wenn, `${stelle}.wenn`, fehler);
     }
+    if (eintrag.bewertung === undefined) return;
+    if (!Array.isArray(eintrag.bewertung)) return fehler.push(`${stelle}: bewertung muss eine Liste { eingabe, kurve } sein`);
+    eintrag.bewertung.forEach((bewertung, bewertungsnummer) => {
+      const bewertungsort = `${stelle}.bewertung[${bewertungsnummer}]`;
+      if (!istObjekt(bewertung)) return fehler.push(`${bewertungsort}: Eintrag muss ein Objekt { eingabe, kurve } sein`);
+      if (!hat("kieingaben", bewertung.eingabe)) fehler.push(`${bewertungsort}: Eingabe "${bewertung.eingabe}" ist nicht angemeldet`);
+      const kurvenmeldungen = kurvenfehler(bewertung.kurve, `${bewertungsort}.kurve`);
+      fehler.push(...kurvenmeldungen);
+      if (!kurvenmeldungen.length && bewertung.kurve.some(([, wert]) => wert < 0 || wert > 1000)) fehler.push(`${bewertungsort}.kurve: Werte in Promille von 0 bis 1000`);
+    });
   });
 }
 

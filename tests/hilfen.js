@@ -79,7 +79,7 @@ export function rohdatenMitTesteintraegen() {
   daten.wesen.testwesen = {
     text: "wesen.testwesen", fraktion: "testfraktion", werte: { lp: { grundwert: 5 } },
     faehigkeiten: ["testgeschoss", "testritual"],
-    ki: { modul: "jagen", letzteBekanntePosition: null, faehigkeiten: [{ name: "testgeschoss" }, { name: "testritual" }] },
+    ki: { modul: "jagen", letzteBekanntePosition: null, handlungen: [{ handlung: "faehigkeit", name: "testgeschoss" }, { handlung: "faehigkeit", name: "testritual" }] },
   };
   zeichen("wesen", "testwesen");
   daten.wesen.testvorlage = { abstrakt: true, fraktion: "testfraktion" };

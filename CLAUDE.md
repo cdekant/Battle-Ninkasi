@@ -31,7 +31,7 @@ Taste → `eingabe/eingabe.js` (Belegung → Aktion aus dem Aktionskatalog) → 
 + `index.html`, `src/main.js`: Einstieg im Browser, verdrahtet Logik, Anzeige und Eingabe; `src/version.js` einzige Quelle der Versionsnummer
 + `src/kern/`: Spiel und Eingangstür (`spiel.js`), Zustand, Zeit, Zufall und Würfe, Ereignisse und Haken, Register, Vorgang, Werte, Kurven, Effektsystem und Grundbausteine, Auslöser, Datenprüfung
 + `src/systeme/`: die Mechanik je Thema (Kampf, Bewegung, Zustände, Fähigkeiten, Inventar, Gelände, Wahrnehmung, Skills, Lernen u.a.); melden sich beim Import in Registern an (`systeme/index.js`)
-+ `src/ki/`: Verhaltensmodule (`abwarten`, `jagen`, `fliehen`), Zielwahl, Schrittwahl, Wahl der Fähigkeiten
++ `src/ki/`: Verhaltensmodule (`abwarten`, `jagen`, `fliehen`), Handlungen mit Bewertung, Verfolgen, Vorrang, Zielwahl, Schrittwahl
 + `src/welt/`: Plan des Laufs, Erzeugung der Ebenen in Schritten, Population, Karte, Feldschichten, Wegfindung, Geometrie
 + `src/eingabe/`: Aktionskatalog, Belegung, Fensterstapel und Fensterarten, Maus, Abläufe (Reise, Laufen, Rasten, Erkunden), Zielmodus, Einstellungen, Speicherstand; reine Tastenlogik ohne DOM
 + `src/anzeige/`: Renderer, Tilebilder, Kamera, Seitenleiste, Log, Fensterinhalte, Titel, Texte und Grammatik, `stil.css`
@@ -44,7 +44,7 @@ Taste → `eingabe/eingabe.js` (Belegung → Aktion aus dem Aktionskatalog) → 
 
 + Entität, gesteuerte Entität, Komponente, Wert, Zeitmodell, Ereignis, Haken, Register, Speichern: [docs/Architektur.md](docs/Architektur.md)
 + Wirkungsart, Effekt, Baustein, Modifikator, Auslöser, Zustand, Zielmuster, Fähigkeit, lange Aktion, Vorgang: [docs/Wirkungen.md](docs/Wirkungen.md)
-+ Kampfwert, Angriffsprofil, Kampfzustand, Fraktion, Ruf, Beistand, Wahrnehmung, Verhaltensmodul, Bewegungsart, Skill, Lernpunkte: [docs/Wesen.md](docs/Wesen.md)
++ Kampfwert, Angriffsprofil, Kampfzustand, Fraktion, Ruf, Beistand, Wahrnehmung, Verhaltensmodul, Handlung, Vorrangbefehl, Bewegungsart, Skill, Lernpunkte: [docs/Wesen.md](docs/Wesen.md)
 + Gelände, Feldschicht, Plan des Laufs, Ebene, Ebenenschritt, Tiefe, Erinnerung der Karte: [docs/Welt.md](docs/Welt.md); Stapel, Ladung, Platz, Verschleiß, Etikett: [docs/Gegenstaende.md](docs/Gegenstaende.md)
 + Aktion, Belegung, Fensterart, Fensterstapel, Ablauf, Zielmodus, Schnellleiste: [docs/Bedienung.md](docs/Bedienung.md)
 

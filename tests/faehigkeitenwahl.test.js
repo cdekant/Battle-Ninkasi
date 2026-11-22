@@ -48,9 +48,11 @@ function aufstellen() {
   return { spiel, ninkasi };
 }
 
-// Wesen mit KI "jagen", den Fähigkeiten aus den KI-Einträgen und weiteren Angaben an der KI
+// Wesen mit KI "jagen", den Fähigkeiten aus den Einträgen (als Handlung "faehigkeit") und weiteren Angaben an der KI;
+// kiZusatz.handlungen kommen hinter die Fähigkeiten
 function schuetze(spiel, x, y, kiEintraege, kiZusatz = {}, zusatz = {}) {
-  const ki = { modul: "jagen", letzteBekanntePosition: null, faehigkeiten: kiEintraege, ...kiZusatz };
+  const handlungen = [...kiEintraege.map((eintrag) => ({ handlung: "faehigkeit", ...eintrag })), ...(kiZusatz.handlungen || [])];
+  const ki = { modul: "jagen", letzteBekanntePosition: null, ...kiZusatz, handlungen };
   return wesen(spiel, x, y, "verderber", 10, { ki, sicht: { reichweite: 9 }, angriffe: ANGRIFFE, faehigkeiten: kiEintraege.map((eintrag) => eintrag.name), ...zusatz });
 }
 
@@ -95,7 +97,7 @@ test("Kein Schuss durch Verbündete; mit ueberVerbuendete fliegt das Geschoss da
   wesen(spiel, 3, 2, "verderber", 10);
   assert.equal(entscheiden(spiel, spuckerin).art, "bewegen", "ein Verbündeter steht auf der Bahn");
   spuckerin.faehigkeiten.push("bogenspucke");
-  spuckerin.ki.faehigkeiten = [{ name: "spucke" }, { name: "bogenspucke" }];
+  spuckerin.ki.handlungen = [{ handlung: "faehigkeit", name: "spucke" }, { handlung: "faehigkeit", name: "bogenspucke" }];
   assert.deepEqual(entscheiden(spiel, spuckerin), { art: "faehigkeit", faehigkeit: "bogenspucke", ziel: { id: ninkasi.id } });
 
   const meldungen = meldungenMitschneiden(spiel);
@@ -113,9 +115,9 @@ test("Flächen mit Verbündeten darin unterbleiben", () => {
   assert.equal(entscheiden(spiel, werferin).art, "bewegen");
 });
 
-test("abstandHalten: zu nah zurückweichen, auf Abstand warten, weiter weg näher kommen, in der Ecke angreifen", () => {
+test("abstand_halten: zu nah zurückweichen, auf Abstand warten, weiter weg näher kommen, in der Ecke angreifen", () => {
   const { spiel, ninkasi } = aufstellen();
-  const schuetzin = schuetze(spiel, 3, 2, [], { abstandHalten: 3 });
+  const schuetzin = schuetze(spiel, 3, 2, [], { handlungen: [{ handlung: "abstand_halten", abstand: 3 }] });
   assert.deepEqual(entscheiden(spiel, schuetzin), { art: "bewegen", dx: 1, dy: -1 }, "weg von Ninkasi");
   positionSetzen(spiel.zustand, schuetzin, { x: 4, y: 2 });
   assert.deepEqual(entscheiden(spiel, schuetzin), { art: "warten" });

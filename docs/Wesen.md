@@ -122,26 +122,38 @@ Vorläufige Ideen, noch nicht umgesetzt:
 
 ## KI
 
-Vorbilder: Brogue (Monster mit Abstand, `MONST_MAINTAINS_DISTANCE`; kein Bolt durch Verbündete), DCSS (Häufigkeit je Monsterzauber), Hoplite und Into the Breach (angekündigte Angriffe mit sichtbarem Zielfeld).
+Vorbilder: Brogue (Monster mit Abstand, `MONST_MAINTAINS_DISTANCE`; kein Bolt durch Verbündete), DCSS (Häufigkeit je Monsterzauber), Hoplite und Into the Breach (angekündigte Angriffe mit sichtbarem Zielfeld), Utility-KI nach Dave Mark (Infinite Axis Utility System: Bewertung je Handlung über Eingaben und Kurven, Quellen in [Ausblick.md](Ausblick.md), Recherche).
 
 Daten:
 
-+ KI-Komponente: `ki: { modul, wachzustand?, faehigkeiten?: [{ name, chance?, abstandAb?, abstandBis?, wenn? }], abstandHalten?, ...Parameter des Moduls }`; das Wesen muss die Fähigkeiten kennen (`faehigkeiten` am Wesen), die Datenprüfung achtet darauf
++ KI-Komponente: `ki: { modul, trifft?, wachzustand?, handlungen?, wahl?, vorrang?, ...Parameter des Moduls }` (seit 0.39.0; `faehigkeiten` und `abstandHalten` an der KI gibt es nicht mehr, die Datenprüfung nennt den Ersatz)
++ Handlungen: `handlungen: [{ handlung, gewicht? (Vorgabe 100), chance? (Prozent), abstandAb?, abstandBis?, wenn?, bewertung?: [{ eingabe, kurve }], ...Parameter der Handlung }]`; Grundhandlungen `faehigkeit { name }` (das Wesen muss die Fähigkeit kennen, `faehigkeiten` am Wesen), `abstand_halten { abstand }`, `fliehen`, `warten`, `verfolgen`
++ Wahl: `wahl: "erste"` (Vorgabe) | `"beste"` | `"gewichtet"` | `{ gewichtetUnterBesten: n }`
++ Eingaben der Bewertung: `abstand` (Schachbrett zur Beute), `eigeneLpProzent`, `beuteLpProzent`, `feindeInSicht`, `verbuendeteInSicht`; Kurven wie überall (`src/kern/kurven.js`), Werte in Promille von 0 bis 1000
++ Beispiel: `{ handlung: "fliehen", bewertung: [{ eingabe: "eigeneLpProzent", kurve: [[0, 1000], [30, 1000], [31, 0]] }] }` vor den Angriffen: unter 31 % LP flieht das Wesen
++ Vorrangbefehl (Laufzeit, für Begleiter): `vorrang: { anweisung: "angreifen" | "warten" | "folgen", zielId?, bis? }`; gesetzt wird er später über einen Befehl Ninkasis, die KI liest ihn schon
 + Regelwert `regeln.bewegung.umwegHoechstens` (4)
 
 Schnittstellen:
 
 + Verhaltensmodule im Register `ki` (`(spiel, akteur, ki) => befehl`, `src/ki/`, geladen über `src/ki/index.js`): `abwarten`, `jagen` (siehe Wahrnehmung), `fliehen` (weg von der Bedrohung, ist kein Feld weiter weg, wartet es)
-+ Zielwahl `naechstesSichtbaresZiel`, `istZielFuer` (`src/ki/ziele.js`); Schrittwahl `schrittWeg` (`src/ki/schritte.js`) für Flucht und Abstand; Wahl der Fähigkeit `faehigkeitWaehlen` (`src/ki/faehigkeitenwahl.js`)
++ Zielwahl `naechstesSichtbaresZiel`, `istZielFuer` (`src/ki/ziele.js`); Schrittwahl `schrittWeg` (`src/ki/schritte.js`) für Flucht und Abstand
++ `src/ki/handlungen.js`: `handlungWaehlen(spiel, wesen, ki, beute)` (Befehl, `VERFOLGEN` oder `null`), `wertung`; Register `kihandlungen` (`{ parameter, befehl(spiel, wesen, beute, eintrag) }`, ohne Nebenwirkungen, weil die Wahl alle Einträge fragt) und `kieingaben` (`(spiel, wesen, beute) => ganze Zahl`)
++ `faehigkeitsbefehl` (`src/ki/faehigkeitenwahl.js`): der Befehl einer Fähigkeit gegen die Beute oder `null`
++ `verfolgungsbefehl`, `angriffDaneben` (`src/ki/verfolgen.js`); `geltenderVorrang`, `vorrangBefehl` (`src/ki/vorrang.js`)
 + `kiVon` (`src/kern/zustand.js`) liefert die wirksame KI, auch eine überlagerte
 
 Regeln:
 
-+ Sieht das jagende Wesen seine Beute, prüft es die Einträge in `faehigkeiten` der Reihe nach und setzt den ersten passenden ein, vor Nahkampf und Bewegung; ein Eintrag passt, wenn der Abstand (Schachbrett) im Bereich liegt, `wenn` am Wesen gilt (Gegenüber ist die Beute), `faehigkeitPruefen` nichts einwendet und kein Verbündeter betroffen wäre; erst dann wird `chance` gewürfelt (Vorgabe 100, sichere Fälle würfeln nicht)
++ Sieht das jagende Wesen seine Beute, wählt es eine Handlung, vor Nahkampf und Bewegung; ein Eintrag kommt in Frage, wenn `gewicht` und `chance` nicht 0 sind, der Abstand (Schachbrett) im Bereich liegt, `wenn` am Wesen gilt (Gegenüber ist die Beute), die Handlung einen Befehl liefert (bei `faehigkeit`: `faehigkeitPruefen` wendet nichts ein und kein Verbündeter wäre betroffen) und die Wertung über 0 liegt; erst dann wird `chance` gewürfelt (sichere Fälle würfeln nicht)
++ Wertung: `gewicht` mal je Bewertung den Wert der Kurve an der Stelle der Eingabe in Promille (abgeschnitten auf 0 bis 1000), nach jedem Faktor abgerundet; ohne Ausgleichsfaktor für viele Bewertungen (er bräuchte eine Potenz), das Gewicht gleicht aus
++ Wahl: `erste` nimmt den ersten Eintrag, der in Frage kommt (die Reihenfolge ist der Vorrang, so verhielt sich die KI vor 0.39.0); `beste` den mit der höchsten Wertung, bei Gleichstand den früheren; `gewichtet` würfelt nach Wertung (`wurfGanzzahl`, Wurf `ki_wahl`), `gewichtetUnterBesten` nur unter den n besten; ein einziger Kandidat würfelt nicht
++ Kommt keine Handlung in Frage oder fällt die Wahl auf `verfolgen`, setzt das Wesen der Beute nach (Weg zur letzten bekannten Position, Angriff auf ein Ziel im Weg)
++ Vorrang: gilt vor der eigenen Wahl, außer im Schlaf; `angreifen` macht `zielId` zur Beute (die Position ist bekannt, gesehen wird es nur in Sicht), auch wenn es nach `trifft` keins wäre, und endet, wenn das Ziel fort oder tot ist; `warten` bleibt stehen und wehrt sich nur gegen ein Ziel daneben; `folgen` geht zu `zielId` (Vorgabe Ninkasi), bis es daneben steht, dort wie `warten`; ab `bis` gilt der Vorrang nicht mehr und wird gelöscht
 + Verbündete schonen: zählt unter den Betroffenen aus `zielAufloesen` ein anderes Wesen als verbündet, unterbleibt die Fähigkeit, außer die Zielart trifft ausdrücklich `verbuendete`; mit `ueberVerbuendete` an der Zielart fliegen Geschosse darüber
 + Zielangabe nach Zielart: `wesen` und `geschoss` die Beute, `feld` ihr Feld (angekündigte Angriffe zielen so auf das Feld beim Beginn), `selbst` keine, `richtung` zur Beute, nur wenn sie daneben steht
 + Umweg: steht auf dem nächsten Feld des Weges ein Wesen, das kein Ziel ist (ein Verbündeter im Gang), sucht der Jäger einen Weg um alle Wesen herum (`wesenMeiden`) und nimmt ihn, wenn er höchstens `umwegHoechstens` Felder länger ist; sonst wartet er (Vorbild Brogue); so gehen Rudel um den Vordermann herum, ohne sich in langen Gängen zu verlaufen
-+ `abstandHalten: n`: steht die Beute näher als n, weicht das Wesen zurück (in die Ecke gedrängt greift es normal an), auf genau n Feldern wartet es, bei mehr kommt es näher
++ `abstand_halten { abstand: n }`: steht die Beute näher als n, weicht das Wesen zurück (in die Ecke gedrängt kein Befehl, dann greift es normal an), auf genau n Feldern wartet es, bei mehr kommt die Handlung nicht in Frage
 + Ungültige Befehle der KI werden zu `warten`; handlungsunfähige Wesen warten (siehe [Architektur.md](Architektur.md), Zeitmodell)
 
 ## Bewegung

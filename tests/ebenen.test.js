@@ -144,9 +144,10 @@ test("Datenprüfung: Abfolge, Starttiefe, feste Karte, Population und Tabellen",
 });
 
 // Fingerabdruck der Ebenen aus 0.32.0, vor der Erzeugung in Schritten: der Umbau ändert keine Ebene. Ändern neue
-// Inhalte oder Regeln die Ebenen absichtlich, werden die Werte hier neu festgehalten.
+// Inhalte oder Regeln die Ebenen absichtlich, werden die Werte hier neu festgehalten. Neu festgehalten mit 0.39.0, weil
+// die KI-Daten der Wesen das Format der Handlungen bekamen (ohne die KI gerechnet blieben die Werte gleich).
 test("Erzeugung in Schritten: dieselben Ebenen wie vorher", () => {
-  const erwartet = { 1: "4806893f0e872822", 2: "1d86a38ea2a6b033", 3: "038dce44ef54f3e4", 42: "434e4018ee5c9957", 4711: "94fe6a9317291104" };
+  const erwartet = { 1: "0921348324308ebe", 2: "7748e86a2ab9355c", 3: "4eb5c28ca84b952c", 42: "ac5d521b6264cb16", 4711: "22d12f7f7a03eaab" };
   for (const [startwert, fingerabdruck] of Object.entries(erwartet)) {
     const spiel = neuesSpiel(DATEN, Number(startwert));
     for (const tiefe of [2, 3, 0]) ebeneWechseln(spiel, tiefe);

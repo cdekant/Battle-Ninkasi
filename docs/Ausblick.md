@@ -24,7 +24,7 @@ Umsetzung: keine
 | Idee | Wichtigkeit | Umbaurisiko | Vorkehrung nötig |
 |---|---|---|---|
 | Steuerung anderer Wesen | mittel, offen | hoch, mit Lesefunktion gering | ja (Lesefunktion) |
-| Handlungsoptionen der KI | hoch | mittel | ja (Format der Daten) |
+| Handlungsoptionen der KI | hoch | mittel | erledigt (Handlungen mit Bewertung) |
 | Schatzräume mit Schlüssel | hoch | gering (Plan des Laufs steht) | erledigt (Plan des Laufs) |
 | Fraktionen: Ruf und Beistand | hoch | gering | erledigt (Ruf und Beistand) |
 | Vorschau durch Simulation | hoch | mittel | erledigt (Würfe über eine Schnittstelle) |
@@ -32,7 +32,7 @@ Umsetzung: keine
 | Zeitumkehr | hoch | mittel | ja |
 | Verwandlung | mittel | mittel | ja |
 | Veränderbares Gelände | hoch | mittel | erledigt (Erinnerung der Karte) |
-| Begleiter und Befehle | hoch | gering bis mittel | teils erledigt (Treppen), offen: Befehle |
+| Begleiter und Befehle | hoch | gering bis mittel | teils erledigt (Treppen, Vorrang an der KI), offen: Befehl und Begleiter |
 | Handel, Währung, Gespräch | hoch | gering bis mittel | ja (Befehle) |
 | Bestiarium, Glossar, Rezeptbuch | hoch | gering | ja (Regel wie Fortschritt) |
 | Erfolge | hoch | gering | nein |
@@ -76,6 +76,7 @@ Umsetzung: offen (nur die Vorkehrung steht)
 + Berührt: Ebenenwechsel (seit 0.38.0 über das Register `mitnehmen`, siehe [Welt.md](Welt.md), Ebenen), Fraktionen (Begleiter gehören zur Fraktion `ninkasi`), Lernen (Zurechnung wie bei Beschworenen mit `beschworenVon`), Tod, Bot
 + Umbaurisiko: gering bis mittel, das Mittlere wegen der Treppen
 + Vorkehrung (erledigt in 0.38.0, siehe [Welt.md](Welt.md), Ebenen): was beim Ebenenwechsel mitkommt, sammelt das Register `mitnehmen`; Begleiter melden dort einen eigenen Eintrag an; damit ist auch der Rest "Wesen folgen Ninkasi über Treppen" aus [Systemausbau.md](Systemausbau.md), Punkt 8 gelöst
++ Vorkehrung für die Vorrangbefehle (erledigt in 0.39.0, siehe [Wesen.md](Wesen.md), KI): `ki.vorrang` mit `angreifen`, `warten`, `folgen` und `bis`, die KI liest es; offen sind der Befehl `befehlen`, Taste und Anzeige, sie kommen mit den Begleitern
 + Entschieden 2026-11-22: Begleiter handeln nach ihrer eigenen KI und nehmen Vorrangbefehle an (z.B. greif diesen an, warte hier, folge mir), die für eine Weile oder bis zum Widerruf vor ihrer eigenen Wahl gelten; festgehalten in [Grundlagen.md](Grundlagen.md), Spiel
 
 Umsetzung: offen
@@ -276,12 +277,12 @@ Umsetzung: offen
 ## Handlungsoptionen der KI
 
 + Wichtigkeit: hoch, "ausgefeiltere KI" (2026-11-22): Gegner wählen situationsbedingt oder zufällig aus einer Liste von Handlungen, z.B. wegspringen, Zauber wirken, Nahkampf
-+ Vorhanden: `faehigkeiten` an der KI als Liste, der erste passende Eintrag (Abstand, `wenn`, benutzbar, keine Verbündeten getroffen) wird mit `chance` gewürfelt, sonst Nahkampf und Bewegung; `abstandHalten`; Module `abwarten`, `jagen`, `fliehen` (siehe [Wesen.md](Wesen.md), KI)
++ Vorhanden bis 0.38.0: `faehigkeiten` an der KI als Liste, der erste passende Eintrag (Abstand, `wenn`, benutzbar, keine Verbündeten getroffen) wird mit `chance` gewürfelt, sonst Nahkampf und Bewegung; `abstandHalten`; Module `abwarten`, `jagen`, `fliehen` (siehe [Wesen.md](Wesen.md), KI)
 + Vorbilder: Utility-KI nach Dave Mark (Infinite Axis Utility System: jede Handlung bekommt eine Bewertung aus mehreren Gesichtspunkten wie eigene LP, Abstand, Zahl der Gegner, jeder über eine Kurve auf 0 bis 1 gebracht und multipliziert; gewählt wird die beste, gewichtet zufällig unter allen oder unter den besten n); Dungeon Crawl Stone Soup (Häufigkeit je Monsterzauber); Brogue (Monster blinken zur Flucht, fliehen nahe dem Tod, Affen stehlen und laufen weg); Old-School-Regelwerke (Moral als Wurf, wann ein Wesen aufgibt)
 + Braucht: Handlungen als Liste an der KI, jede mit Bedingungen, Gewicht und Bewertungen (Eingabe und Kurve); Grundhandlungen neben Fähigkeiten (angreifen, nähern, zurückweichen, fliehen, warten, rufen); eine Wahlregel (`beste`, `gewichtet`, `gewichtetUnterBesten`); Eingaben als Register (`ki_eingaben`), damit neue Gesichtspunkte Daten bleiben
 + Berührt: `src/ki/faehigkeitenwahl.js` und `src/ki/jagen.js`; Kurven (`src/kern/kurven.js`, ganzzahlig, passt zur Wiederholbarkeit); die Datenprüfung; Wegspringen geht schon mit den Bausteinen `teleportieren` und `stossen` als Fähigkeit
 + Umbaurisiko: mittel, aber auf `src/ki/` beschränkt
-+ Vorkehrung: das heutige Format als Sonderfall des neuen halten (Reihenfolge der Liste als Vorrang, `chance` als Gewicht), damit vorhandene Gegner ohne Änderung weiterlaufen; Bewertungen nur ganzzahlig oder als Bruch
++ Vorkehrung (erledigt in 0.39.0, siehe [Wesen.md](Wesen.md), KI): `handlungen` mit Gewicht, `chance` und Bewertungen über Eingaben und Kurven in Promille, Wahl `erste`, `beste`, `gewichtet`, `gewichtetUnterBesten`; das alte Format ist `wahl: "erste"`, die beiden vorhandenen Gegner sind umgebaut, ihr Verhalten blieb gleich; neue Gegner entstehen im neuen Format
 
 Umsetzung: offen
 

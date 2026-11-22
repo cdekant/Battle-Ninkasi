@@ -323,14 +323,24 @@ test("KI mit Fähigkeiten, Ankündigung und Unterbrechbarkeit werden geprüft", 
   };
   const mitKi = (ki) => mitGegner((gegner) => ({ ki: { ...gegner.ki, ...ki } }));
   const erwartet = [
-    [{ abstandHalten: 0 }, "abstandHalten"],
-    [{ faehigkeiten: "spucke" }, "faehigkeiten muss eine Liste"],
-    [{ faehigkeiten: [{ name: "gibt_es_nicht" }] }, 'Fähigkeit "gibt_es_nicht" gibt es nicht'],
-    [{ faehigkeiten: [{ name: "testgeschoss", chance: 120 }] }, "chance"],
-    [{ faehigkeiten: [{ name: "testgeschoss", abstandAb: -1 }] }, "abstandAb"],
-    [{ faehigkeiten: [{ name: "testgeschoss", wenn: [{ bedingung: "mondphase" }] }] }, "nicht angemeldet"],
+    [{ abstandHalten: 3 }, "abstandHalten gibt es nicht mehr"],
+    [{ faehigkeiten: [{ name: "testgeschoss" }] }, "faehigkeiten an der KI gibt es nicht mehr"],
+    [{ handlungen: "spucke" }, "handlungen muss eine Liste"],
+    [{ handlungen: [{ handlung: "tanzen" }] }, 'Handlung "tanzen" ist nicht angemeldet'],
+    [{ handlungen: [{ handlung: "faehigkeit", name: "gibt_es_nicht" }] }, 'Fähigkeit "gibt_es_nicht" gibt es nicht'],
+    [{ handlungen: [{ handlung: "faehigkeit", name: "testgeschoss", chance: 120 }] }, "chance"],
+    [{ handlungen: [{ handlung: "faehigkeit", name: "testgeschoss", abstandAb: -1 }] }, "abstandAb"],
+    [{ handlungen: [{ handlung: "faehigkeit", name: "testgeschoss", wenn: [{ bedingung: "mondphase" }] }] }, "nicht angemeldet"],
+    [{ handlungen: [{ handlung: "abstand_halten", abstand: 0 }] }, "abstand muss eine ganze Zahl > 0"],
+    [{ handlungen: [{ handlung: "abstand_halten" }] }, "abstand"],
+    [{ handlungen: [{ handlung: "warten", bewertung: [{ eingabe: "mondphase", kurve: [[0, 1000]] }] }] }, 'Eingabe "mondphase"'],
+    [{ handlungen: [{ handlung: "warten", bewertung: [{ eingabe: "abstand", kurve: [[0, 2000]] }] }] }, "Promille"],
+    [{ handlungen: [{ handlung: "warten", bewertung: [{ eingabe: "abstand", kurve: [] }] }] }, "Stützpunkt"],
+    [{ wahl: "zufall" }, "wahl muss"],
+    [{ wahl: { gewichtetUnterBesten: 0 } }, "wahl muss"],
   ];
   for (const [ki, teilDerMeldung] of erwartet) assert.ok(mitKi(ki).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
+  assert.deepEqual(mitKi({ wahl: { gewichtetUnterBesten: 2 }, handlungen: [{ handlung: "fliehen", gewicht: 50, bewertung: [{ eingabe: "eigeneLpProzent", kurve: [[0, 1000], [30, 0]] }] }] }), []);
   const unbekannt = mitGegner(() => ({ faehigkeiten: ["testgeschoss"] }));
   assert.ok(unbekannt.some((meldung) => meldung.includes('kennt die Fähigkeit "testritual" nicht')));
 

@@ -25,11 +25,12 @@ export default {
     angriffe: [{ name: "biss", genauigkeit: 60, effekt: "biss_klein" }],
     faehigkeiten: ["saeurespucke", "saeureschwall"],
     ki: {
-      faehigkeiten: [
-        { name: "saeureschwall", chance: 30, abstandAb: 2, abstandBis: 5 },
-        { name: "saeurespucke", abstandAb: 2 },
+      // der Reihe nach (wahl "erste"): Schwall, sonst Spucke, sonst Abstand halten, sonst nachsetzen
+      handlungen: [
+        { handlung: "faehigkeit", name: "saeureschwall", chance: 30, abstandAb: 2, abstandBis: 5 },
+        { handlung: "faehigkeit", name: "saeurespucke", abstandAb: 2 },
+        { handlung: "abstand_halten", abstand: 3 },
       ],
-      abstandHalten: 3,
     },
   },
 };

@@ -26,6 +26,8 @@ const ARTEN = [
   "planschritte",       // Schritte des Plans des Laufs (welt/plan.js): (spiel, plan, zufall) => void, beim Start nacheinander
   "ebenenschritte",     // Schritte der Ebenenerzeugung (welt/ebene.js): { braucht, liefert, verwirft?, ausfuehren(spiel, bau) }
   "mitnehmen",          // wer beim Ebenenwechsel mitkommt (systeme/ebenen.js): (spiel, ninkasi, wechsel) => [id]
+  "kihandlungen",       // Handlungen der KI (ki/handlungen.js): { parameter, befehl(spiel, wesen, beute, eintrag) }
+  "kieingaben",         // Eingaben der Bewertung (ki/handlungen.js): (spiel, wesen, beute) => ganze Zahl
 ];
 
 export const RANG_VORGABE = 100;
