@@ -7,6 +7,7 @@ import { miniSpiel, spielerinSetzen, wesen, allesSichtbar, gegenstandTragen, mel
 import { entitaetErzeugen } from "../src/kern/zustand.js";
 import { bezugAuf } from "../src/kern/ereignisse.js";
 import { feldIndex } from "../src/welt/karte.js";
+import { erinnerungAuffrischen } from "../src/systeme/erinnerung.js";
 import { zustandSetzen } from "../src/systeme/zustaende.js";
 import { laermMachen, GERAEUSCHE } from "../src/systeme/wahrnehmung.js";
 import { KAMPFWERTE } from "../src/systeme/kampf.js";
@@ -47,7 +48,7 @@ function aufstellen() {
   return { spiel, ninkasi, gegner };
 }
 
-test("Untersuchen: sichtbar alles, erinnert nur das Gelände, unbekannt nichts", () => {
+test("Untersuchen: sichtbar alles, außer Sicht das Erinnerte, unbekannt nichts", () => {
   const { spiel, ninkasi, gegner } = aufstellen();
   const ebene = spiel.zustand.ebene;
   const flasche = entitaetErzeugen(spiel.zustand, { typ: "flasche", text: "x", aufhebbar: true, position: { x: 4, y: 1 } });
@@ -66,11 +67,15 @@ test("Untersuchen: sichtbar alles, erinnert nur das Gelände, unbekannt nichts",
   const selbst = feldBeschreiben(spiel, ninkasi.position).wesen[0];
   assert.equal(selbst.chanceNinkasi, null);
   assert.equal(selbst.wachzustand, null);
-  // gerade nicht sichtbar: nur das Gelände, das Wesen nicht
+  // gerade nicht sichtbar: was erinnert ist (Gelände, Oberfläche ohne Menge, Gegenstand als Aussehen), das Wesen nicht
+  erinnerungAuffrischen(spiel, [feldIndex(ebene, 4, 1)]);
   spiel.zustand.sichtbareFelder = [feldIndex(ebene, 1, 1)];
-  assert.deepEqual(feldBeschreiben(spiel, { x: 4, y: 1 }), { x: 4, y: 1, sichtbar: false, gelaende: "boden", schichten: [], gegenstaende: [], fallen: [], wesen: [] });
-  // nie gesehen oder außerhalb der Karte: nichts
-  ebene.erkundet[feldIndex(ebene, 4, 1)] = 0;
+  assert.deepEqual(feldBeschreiben(spiel, { x: 4, y: 1 }), {
+    x: 4, y: 1, sichtbar: false, gelaende: "boden", schichten: [{ schicht: "oberflaeche", art: "saeure", menge: null }],
+    gegenstaende: [], fallen: [], wesen: [], erinnert: { gegenstaende: [{ typ: "flasche", text: "x", anzahl: 1 }], fallen: [] },
+  });
+  // unbekannt oder außerhalb der Karte: nichts
+  ebene.erinnerung[feldIndex(ebene, 4, 1)] = null;
   assert.equal(feldBeschreiben(spiel, { x: 4, y: 1 }), null);
   assert.equal(feldBeschreiben(spiel, { x: 40, y: 1 }), null);
 });

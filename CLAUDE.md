@@ -45,7 +45,7 @@ Taste → `eingabe/eingabe.js` (Belegung → Aktion aus dem Aktionskatalog) → 
 + Entität, gesteuerte Entität, Komponente, Wert, Zeitmodell, Ereignis, Haken, Register, Speichern: [docs/Architektur.md](docs/Architektur.md)
 + Wirkungsart, Effekt, Baustein, Modifikator, Auslöser, Zustand, Zielmuster, Fähigkeit, lange Aktion, Vorgang: [docs/Wirkungen.md](docs/Wirkungen.md)
 + Kampfwert, Angriffsprofil, Kampfzustand, Fraktion, Ruf, Beistand, Wahrnehmung, Verhaltensmodul, Bewegungsart, Skill, Lernpunkte: [docs/Wesen.md](docs/Wesen.md)
-+ Gelände, Feldschicht, Plan des Laufs, Ebene, Ebenenschritt, Tiefe: [docs/Welt.md](docs/Welt.md); Stapel, Ladung, Platz, Verschleiß, Etikett: [docs/Gegenstaende.md](docs/Gegenstaende.md)
++ Gelände, Feldschicht, Plan des Laufs, Ebene, Ebenenschritt, Tiefe, Erinnerung der Karte: [docs/Welt.md](docs/Welt.md); Stapel, Ladung, Platz, Verschleiß, Etikett: [docs/Gegenstaende.md](docs/Gegenstaende.md)
 + Aktion, Belegung, Fensterart, Fensterstapel, Ablauf, Zielmodus, Schnellleiste: [docs/Bedienung.md](docs/Bedienung.md)
 
 ## Dokumente

@@ -2,9 +2,9 @@
 
 Stand: 2026-11-22
 
-Zuständig für: `src/welt/ebene.js`, `src/welt/ebenenschritte.js`, `src/welt/plan.js`, `src/welt/population.js`, `src/welt/karte.js`, `src/welt/schichten.js`, `src/welt/wege.js`, `src/systeme/gelaende.js`, `src/systeme/fallen.js`, `src/systeme/schichten.js`, `src/systeme/ebenen.js`, `src/systeme/sicht.js`, `src/systeme/gefahr.js`, `daten/gelaende.js`, `daten/fallen.js`, `daten/schichten.js`, `daten/ebenen.js`, `daten/populationen.js`
+Zuständig für: `src/welt/ebene.js`, `src/welt/ebenenschritte.js`, `src/welt/plan.js`, `src/welt/population.js`, `src/welt/karte.js`, `src/welt/schichten.js`, `src/welt/wege.js`, `src/systeme/gelaende.js`, `src/systeme/fallen.js`, `src/systeme/schichten.js`, `src/systeme/ebenen.js`, `src/systeme/sicht.js`, `src/systeme/erinnerung.js`, `src/systeme/gefahr.js`, `daten/gelaende.js`, `daten/fallen.js`, `daten/schichten.js`, `daten/ebenen.js`, `daten/populationen.js`
 
-Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Anzeige.md](Anzeige.md), [Grundlagen.md](Grundlagen.md)
+Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Anzeige.md](Anzeige.md), [Grundlagen.md](Grundlagen.md), [Bedienung.md](Bedienung.md), [Ausblick.md](Ausblick.md)
 
 ## Zweck
 
@@ -131,8 +131,8 @@ Regeln:
 Schnittstellen (`src/welt/wege.js`, ein gemeinsames Modul für KI und Reise, AStar aus rot.js mit acht Richtungen):
 
 + `weg(spiel, start, ziel, optionen)` gibt die Felder des Weges ohne Startfeld zurück, `[]` wenn Start und Ziel gleich sind, `null`, wenn es keinen Weg gibt; `naechstesWegfeld`
-+ Optionen: `nurErkundet` (nur Felder, die Ninkasi schon gesehen hat, keine Hellseherei bei der Reise), `wesenMeiden` (Felder mit Wesen gelten als versperrt, außer Start und Ziel), `bewegung` (Bewegungsart, Vorgabe `laufend`), `oeffnetTueren` (geschlossene Türen zählen als begehbar, Vorgabe ja), `meiden` (`(x, y) => true` für gemiedene Felder, außer Start und Ziel, z.B. bekannte Fallen und Gefahren)
-+ `naechstesFeldMit` (Breitensuche, z.B. für das Erkunden), `amRandDesErkundeten`
++ Optionen: `nurBekannt` (nur Felder, deren Gelände Ninkasi kennt, und betretbar nach dem bekannten statt dem echten Gelände, siehe Sicht und Erinnerung; keine Hellseherei bei Reise, Erkunden und Wegvorschau; die KI plant mit dem echten Gelände), `wesenMeiden` (Felder mit Wesen gelten als versperrt, außer Start und Ziel), `bewegung` (Bewegungsart, Vorgabe `laufend`), `oeffnetTueren` (geschlossene Türen zählen als begehbar, Vorgabe ja), `meiden` (`(x, y) => true` für gemiedene Felder, außer Start und Ziel, z.B. bekannte Fallen und Gefahren)
++ `naechstesFeldMit` (Breitensuche, z.B. für das Erkunden), `amRandDesErkundeten` (ein Nachbar wurde nie gesehen, auch wenn er kartiert ist)
 
 Regeln:
 
@@ -142,6 +142,22 @@ Regeln:
 
 + Die Sichtweite (`reichweiteSicht` in `src/systeme/sicht.js`, Modifikatoren auf `reichweiteSicht`) ergibt sich aus Grundwert, Skills und Zuständen; Hindernisse begrenzt der Schattenwurf des Sichtfelds
 + Ist sie größer als der Ausschnitt, wird nicht herausgezoomt; die Liste "In Sicht" der Seitenleiste nennt alle sichtbaren Wesen; Markierungen am Kartenrand für Gegner außerhalb des Ausschnitts sind vorgesehen, noch nicht umgesetzt
+
+## Sicht und Erinnerung
+
+Daten (an der Ebene, seit 0.37.0):
+
++ `erkundet`: je Feld 1, wenn Ninkasi es einmal wirklich gesehen hat; bringt die EP für Erkundung (siehe [Wesen.md](Wesen.md), Skills und Lernen) und wird nie zurückgesetzt
++ `erinnerung`: je Feld die Kennung des zuletzt gesehenen oder kartierten Geländes, `null` für unbekannt; ein Feld ist bekannt, wenn hier etwas steht
++ `erinnerteDinge`: `{ <feldindex>: { oberflaeche?: art, gegenstaende?: [{ typ, text, anzahl }], fallen?: [{ typ, text }] } }`, nur Felder mit etwas darauf; gespeichert wird das Aussehen, nie eine ID, damit nichts über die Erinnerung den heutigen Zustand nachschlägt; Wesen, Gas und Feuer sind flüchtig und werden nicht erinnert
++ Verlassene Ebenen tragen ihre Erinnerung in `abgelegteEbenen` mit; am Spielstand ändert sich nichts (er ist die Liste der Befehle)
+
+Schnittstellen:
+
++ `sichtfeldAktualisieren` (`src/systeme/sicht.js`) schreibt bei jeder Neuberechnung die bis dahin sichtbaren und die jetzt sichtbaren Felder in die Erinnerung; so bleibt der letzte gesehene Stand stehen, und für sichtbare Felder ist die Erinnerung immer das echte Gelände; beim Ebenenwechsel hält `ebeneWechseln` vor dem Ablegen noch einmal fest, was Ninkasi zuletzt sah
++ `src/systeme/erinnerung.js`: `erinnerungAuffrischen(spiel, feldIndizes)`, `kartieren(spiel, feldIndizes, { mitDingen })` (bekannt, aber nicht erkundet: die EP kommen erst beim Sehen), `vergessen(spiel, feldIndizes)` (nur die Erinnerung, `erkundet` bleibt: Wiedersehen bringt keine EP), `erinnerteDingeAuf(ebene, index)`; Bausteine dafür kommen mit Hellsicht und Filmriss (siehe [Ausblick.md](Ausblick.md))
++ `src/welt/karte.js`: `feldBekannt(ebene, x, y)`, `bekanntesGelaendeAuf(spiel, x, y)`, `bekannterGelaendeName(spiel, x, y)`
++ Leser: Renderer, Minikarte und Untersuchen zeigen außer Sicht das Erinnerte (siehe [Anzeige.md](Anzeige.md), Oberfläche und [Bedienung.md](Bedienung.md), Untersuchen), Reise, Erkunden, Laufen und Wegvorschau planen nach dem bekannten Gelände (siehe [Bedienung.md](Bedienung.md), Maus, Reise, Laufen, Rasten und Erkunden)
 
 ## Licht
 
@@ -154,7 +170,7 @@ Vorläufige Ideen, noch nicht umgesetzt. Licht ist hauptsächlich Spielmechanik,
 + Anzeige: Eine Lichtkarte mit einem Pixel je Feld wird geglättet auf Kartengröße skaliert und per Mischmodus "multiply" über die Karte gelegt; Schwarz ist dunkel, Weiß unverändert, Farben tönen (Fackel warm, Psi cyan); so entstehen weiche Übergänge statt Stufen
 + Leuchtende Pixel (Augen, Leuchtfarben, Glut) zeichnet der Renderer nach der Abdunklung erneut, sie bleiben im Dunkeln sichtbar; dafür trägt ein Tile eine Maske seiner leuchtenden Pixel
 + Flackern ist reine Anzeige über den kosmetischen Zufall, die Logik rechnet mit festen Werten
-+ Dieselbe Abdunklung kann auch erkundete, aber gerade nicht sichtbare Felder darstellen
++ Dieselbe Abdunklung kann auch bekannte, aber gerade nicht sichtbare Felder darstellen
 
 ## Gefahrenprüfung
 

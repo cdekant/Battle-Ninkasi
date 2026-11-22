@@ -292,9 +292,9 @@ function spielZeichnen() {
   const ansicht = renderer.ansicht(einstellungen.zoom);
   const gesteuerte = gesteuerteEntitaet(spiel.zustand);
   folgen(kamera, gesteuerte.position, ansicht, spiel.zustand.ebene);
-  // Wegvorschau zum Feld unter dem Zeiger, nur über erkundete Felder; im Zielmodus stattdessen dessen Vorschau
+  // Wegvorschau zum Feld unter dem Zeiger, nur über bekannte Felder; im Zielmodus stattdessen dessen Vorschau
   const vorschauZeigen = feldUnterZeiger && !laufenderAblauf && !zielModus && !spiel.zustand.vorbei;
-  const wegvorschau = vorschauZeigen ? weg(spiel, gesteuerte.position, feldUnterZeiger, { nurErkundet: true, bewegung: bewegungVon(gesteuerte) }) || [] : [];
+  const wegvorschau = vorschauZeigen ? weg(spiel, gesteuerte.position, feldUnterZeiger, { nurBekannt: true, bewegung: bewegungVon(gesteuerte) }) || [] : [];
   const zielvorschau = zielModus ? zielmodusVorschau(spiel, zielModus) : null;
   const zielmarkierung = zielvorschau && {
     cursor: zielModus.cursor,

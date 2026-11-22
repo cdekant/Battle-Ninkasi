@@ -1,5 +1,6 @@
 // Sichtfeld von Ninkasi: PreciseShadowcasting aus rot.js.
-// Ergebnis im Zustand: zustand.sichtbareFelder (Feldindizes) und zustand.ebene.erkundet.
+// Ergebnis im Zustand: zustand.sichtbareFelder (Feldindizes), zustand.ebene.erkundet und die Erinnerung der Karte
+// (systeme/erinnerung.js).
 // Komponente in den Daten: sicht: { reichweite: 8 }
 
 import PreciseShadowcasting from "../../lib/rot/fov/precise-shadowcasting.js";
@@ -9,6 +10,7 @@ import { sichtlinieFrei } from "../welt/geometrie.js";
 import { modifiziert } from "../kern/werte.js";
 import { gesteuerteEntitaet, istGesteuert, entitaetenMitPosition, entitaetenImUmkreis } from "../kern/zustand.js";
 import { epFuerErkundung } from "./lernen.js";
+import { erinnerungAuffrischen } from "./erinnerung.js";
 
 export function reichweiteSicht(spiel, entitaet) {
   return modifiziert(spiel, entitaet, "reichweiteSicht", entitaet.sicht ? entitaet.sicht.reichweite : 0);
@@ -25,9 +27,13 @@ export function sichtfeldAktualisieren(spiel) {
   schattenwurf.compute(gesteuerte.position.x, gesteuerte.position.y, reichweiteSicht(spiel, gesteuerte), (x, y) => {
     if (aufDerKarte(ebene, x, y)) sichtbareFelder.add(feldIndex(ebene, x, y));
   });
+  // die bisher sichtbaren Felder halten fest, wie Ninkasi sie zuletzt gesehen hat, die jetzt sichtbaren den heutigen Stand
+  const bisher = zustand.sichtbareFelder.filter((index) => !sichtbareFelder.has(index));
   zustand.sichtbareFelder = [...sichtbareFelder].sort((indexA, indexB) => indexA - indexB);
-  // zum ersten Mal gesehene Felder bringen freie EP (systeme/lernen.js); ein später magisch kartiertes Feld
-  // bekommt einen eigenen Wert in erkundet und zählt hier dann erst beim wirklichen Sehen
+  erinnerungAuffrischen(spiel, bisher);
+  erinnerungAuffrischen(spiel, zustand.sichtbareFelder);
+  // zum ersten Mal gesehene Felder bringen freie EP (systeme/lernen.js); ein kartiertes Feld (systeme/erinnerung.js)
+  // ist nur erinnert, nicht erkundet, und zählt hier erst beim wirklichen Sehen
   let neuGesehen = 0;
   for (const index of zustand.sichtbareFelder) {
     if (ebene.erkundet[index] !== 1) neuGesehen++;

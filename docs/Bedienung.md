@@ -4,7 +4,7 @@ Stand: 2026-11-22
 
 Zuständig für: `src/eingabe/aktionskatalog.js`, `src/eingabe/befehlszeile.js`, `src/eingabe/belegung.js`, `src/eingabe/belegunganpassen.js`, `src/eingabe/charakter.js`, `src/eingabe/eingabe.js`, `src/eingabe/einstellungen.js`, `src/eingabe/einstellungsfenster.js`, `src/eingabe/einstellungskatalog.js`, `src/eingabe/erkunden.js`, `src/eingabe/erstellung.js`, `src/eingabe/esckette.js`, `src/eingabe/faehigkeiten.js`, `src/eingabe/fenster.js`, `src/eingabe/hilfe.js`, `src/eingabe/inventar.js`, `src/eingabe/karte.js`, `src/eingabe/laufen.js`, `src/eingabe/maus.js`, `src/eingabe/menue.js`, `src/eingabe/rasten.js`, `src/eingabe/reise.js`, `src/eingabe/schnellleiste.js`, `src/eingabe/texteingabe.js`, `src/eingabe/verlauf.js`, `src/eingabe/zielmodus.js`, `src/anzeige/fenster.js`, `src/anzeige/charakterfenster.js`, `src/anzeige/systemfenster.js`, `src/anzeige/einstellungsanzeige.js`, `src/systeme/vorschau.js`, `src/systeme/untersuchen.js`
 
-Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Oberflaeche.md](Oberflaeche.md), [Titelbildschirm.md](Titelbildschirm.md), [Charakter.md](Charakter.md), [Gegenstaende.md](Gegenstaende.md), [Animationen.md](Animationen.md)
+Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Oberflaeche.md](Oberflaeche.md), [Titelbildschirm.md](Titelbildschirm.md), [Charakter.md](Charakter.md), [Gegenstaende.md](Gegenstaende.md), [Animationen.md](Animationen.md), [Welt.md](Welt.md)
 
 ## Zweck
 
@@ -63,12 +63,12 @@ Regeln:
 
 + Die Maus erzeugt nur gewöhnliche Befehle; die Logik kennt weder Maus noch Reise, Laufen, Rasten oder Erkunden; Browser und Bot benutzen dieselben Kerne, den Takt gibt im Browser `src/main.js` vor, alle Abläufe gleich
 + Ein Rechtsklick untersucht das Feld wie x (Zielmodus mit `{ zweck: "untersuchen" }`, Cursor auf dem Feld); das Kontextmenü des Browsers bleibt über der Karte zu; das Mausrad zoomt
-+ Gereist wird nur über erkundete Felder, der Weg wird bei jedem Schritt neu berechnet; beim Darüberfahren zeigt die Anzeige den Weg als Vorschau
++ Gereist wird nur über bekannte Felder und nach dem bekannten Gelände (siehe [Welt.md](Welt.md), Sicht und Erinnerung), der Weg wird bei jedem Schritt neu berechnet; beim Darüberfahren zeigt die Anzeige den Weg als Vorschau
 + Seit 0.28.0 beginnen Reise, Laufen und Erkunden auch mit Feinden in Sicht und halten nur bei einem neuen Feind (`reiseTrotzFeinden`, Vorgabe an; aus, beginnt mit Feinden in Sicht nichts); neu heißt: im Schritt davor nicht zu sehen, wer aus der Sicht gerät und wieder auftaucht, hält also erneut (Prüfung `gegner_in_sicht`, Vorbild Brogue)
 + Eine Reise hält bei den Gründen aus `reiseHalt`, außerdem bei Ankunft, fehlendem Weg, versperrtem Feld, Tod und jeder Taste oder jedem Klick; jede Taste und jeder Klick bricht jeden Ablauf ab
 + Laufen (Umschalt plus Richtung) geht geradeaus; beginnt nicht vor einem Hindernis (`versperrt`); hält wie die Reise, vor einem Hindernis (`hindernis`) oder Wesen (`versperrt`), vor einer bekannten Falle oder Gefahr (`gefahr_voraus`) und wenn neben Ninkasi eine Tür, eine Treppe oder ein Gegenstand neu in Reichweite kommt (`bemerkenswert`; schon Bemerktes hält nicht noch einmal); das Halten an Abzweigungen in Gängen fehlt noch
 + Rasten wartet, bis die Vorräte aus `rastenBis` voll sind; beginnt seit 0.28.0 auch mit bekannten Feinden in Sicht (`rastenTrotzFeinden`), nicht aber, wenn schon alles voll ist; hält bei `rastenHalt` und nach höchstens `rastenHoechstens` Schritten, falls sich nichts mehr füllt (z.B. MP bei hohem Pegel)
-+ Erkunden geht zum nächsten erkundeten Feld am Rand des Unbekannten, nur über erkundete Felder, bei jedem Schritt neu gewählt; hält wie die Reise und wenn nichts mehr zu erkunden ist
++ Erkunden geht zum nächsten bekannten Feld am Rand des nie Gesehenen, nur über bekannte Felder (ein kartiertes, ungesehenes Gebiet wird also auch erkundet), nächster Rand per Breitensuche, bei jedem Schritt neu gewählt; hält wie die Reise und wenn nichts mehr zu erkunden ist
 + Im Zielmodus setzt die Maus den Cursor, ein Klick bestätigt; der Tooltip zeigt beim Darüberfahren die Kurzfassung des Feldes (siehe Untersuchen)
 
 ## Fenster
@@ -176,7 +176,7 @@ Daten:
 
 Schnittstellen (`src/systeme/untersuchen.js`, reine Lesefunktionen):
 
-+ `feldBeschreiben(spiel, feld)`: nichts für ein nie gesehenes Feld, für ein erkundetes, das Ninkasi gerade nicht sieht, nur das Gelände (erinnert), für ein sichtbares Gelände, Feldschichten mit Menge, Gegenstände, bekannte Fallen und Wesen
++ `feldBeschreiben(spiel, feld)`: nichts für ein unbekanntes Feld, für ein bekanntes, das Ninkasi gerade nicht sieht, das Erinnerte (Gelände, Oberfläche ohne Menge, unter `erinnert` Gegenstände und Fallen als Aussehen ohne ID), für ein sichtbares Gelände, Feldschichten mit Menge, Gegenstände, bekannte Fallen und Wesen
 + `wesenBeschreiben`: LP, Zustände mit Restdauer (`zustaendeVon`: angefangene Züge zu 100 Zeiteinheiten, unbegrenzt ohne), Wachzustand, laufende Aktion (`laufendeAktionVon`), Trefferchance des ersten Angriffsprofils in beide Richtungen (`nahkampfchanceVorschau`)
 + `werteAufschluesseln`: Höchstwerte, Genauigkeit des ersten Profils, Kampfwerte und Sichtweite Ninkasis, je mit Grundwert, Wert und jedem Modifikator samt Herkunft (`herkunftVon`: angeboren, Gegenstand, Zustand, Aura)
 + Tooltip: `tooltipHtml` in `src/anzeige/oberflaeche.js`, Element `#tooltip` über der Karte (siehe [Anzeige.md](Anzeige.md), Oberfläche)

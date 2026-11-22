@@ -1,5 +1,5 @@
-// Auto-Erkunden: Ninkasi geht Schritt für Schritt zum nächsten erkundeten Feld am Rand des Unbekannten
-// (Breitensuche über erkundete Felder), bis nichts mehr zu erkunden ist oder etwas sie aufhält.
+// Auto-Erkunden: Ninkasi geht Schritt für Schritt zum nächsten bekannten Feld am Rand des nie Gesehenen
+// (Breitensuche über bekannte Felder; ein kartiertes, ungesehenes Gebiet wird also auch erkundet), bis nichts mehr zu erkunden ist oder etwas sie aufhält.
 // Wie die Reise, nur mit anderer Zielwahl; jeder Schritt ist ein gewöhnlicher Befehl "bewegen".
 // Ablauf: { lage, schrittzahl }
 
@@ -11,8 +11,8 @@ import { unterwegsPruefen } from "./reise.js";
 import { fallenMeiden } from "../systeme/fallen.js";
 import { gefahrenMeiden, meidenZusammen } from "../systeme/schichten.js";
 
-// Wege nur über Erkundetes, nach Ninkasis wirksamer Bewegungsart
-const wegOptionen = (spiel) => ({ nurErkundet: true, bewegung: bewegungVon(gesteuerteEntitaet(spiel.zustand)), meiden: meidenZusammen(fallenMeiden(spiel, { nurBekannte: true }), gefahrenMeiden(spiel)) });
+// Wege nur über Bekanntes und nach dem bekannten Gelände, nach der wirksamen Bewegungsart der gesteuerten Entität
+const wegOptionen = (spiel) => ({ nurBekannt: true, bewegung: bewegungVon(gesteuerteEntitaet(spiel.zustand)), meiden: meidenZusammen(fallenMeiden(spiel, { nurBekannte: true }), gefahrenMeiden(spiel)) });
 
 function naechstesRandfeld(spiel) {
   const position = gesteuerteEntitaet(spiel.zustand).position;

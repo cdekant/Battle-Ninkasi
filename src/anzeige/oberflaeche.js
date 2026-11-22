@@ -120,7 +120,8 @@ export class Oberflaeche {
     const { text } = this.texte;
     const arten = eintrag.schicht === "gas" ? spiel.daten.schichten.gase : spiel.daten.schichten.oberflaechen;
     const name = eintrag.schicht === "feuer" ? text("ui.feuer") : text(arten[eintrag.art]?.text ?? eintrag.art);
-    return `${name} <span class="leise">(${eintrag.menge})</span>`;
+    // erinnerte Oberflächen haben keine Menge (systeme/untersuchen.js)
+    return eintrag.menge === null ? name : `${name} <span class="leise">(${eintrag.menge})</span>`;
   }
 
   // Ein Wesen für Untersuchen und Tooltip; ausfuehrlich mit Zuständen, Aktion und Trefferchancen
@@ -171,6 +172,8 @@ export class Oberflaeche {
       zeilen.push(`<li>${nomenForm(gegenstand, "nom", "ohne")}${anzahl}</li>`);
     }
     for (const id of beschreibung.fallen) zeilen.push(`<li class="schlimm">${nomenForm(entitaetMitId(zustand, id), "nom", "ohne")}</li>`);
+    for (const bezug of beschreibung.erinnert.gegenstaende) zeilen.push(`<li>${nomenForm(bezug, "nom", "ohne")}${bezug.anzahl > 1 ? ` x ${bezug.anzahl}` : ""}</li>`);
+    for (const bezug of beschreibung.erinnert.fallen) zeilen.push(`<li class="schlimm">${nomenForm(bezug, "nom", "ohne")}</li>`);
     for (const eintrag of beschreibung.schichten) zeilen.push(`<li>${this.schichtText(spiel, eintrag)}</li>`);
     const erinnert = beschreibung.sichtbar ? "" : ` <span class="leise">(${text("ui.erinnert")})</span>`;
     zeilen.push(`<li class="leise">${this.gelaendeText(spiel, beschreibung.gelaende)}${erinnert}</li>`);

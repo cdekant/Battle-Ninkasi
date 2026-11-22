@@ -2,7 +2,7 @@
 
 Stand: 2026-11-20
 
-Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Bedienung.md](Bedienung.md), [Grundlagen.md](Grundlagen.md), [Entwicklung.md](Entwicklung.md)
+Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Bedienung.md](Bedienung.md), [Grundlagen.md](Grundlagen.md), [Entwicklung.md](Entwicklung.md), [Ausblick.md](Ausblick.md)
 
 Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaft, Skillpunkte unabhängig vom späteren Lerntempo), DCSS (EP fließen in die benutzten Skills, Kosten anzeigen statt Formel), Caves of Qud (Eigenschaften dauerhaft und vorübergehend veränderbar), Tales of Maj'Eyal und Path of Exile (Skills wirken über Tags auch auf künftige Fähigkeiten). Die Mechanik ist seit 0.26.0 umgesetzt, mit den hier genannten vorläufigen Zahlen, beschrieben in [Wesen.md](Wesen.md) (Skills und Lernen); offen sind Skillfenster, Charaktererstellung und Skillkatalog (Punkt 13 in [Systemausbau.md](Systemausbau.md)).
 
@@ -108,7 +108,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Neuv
 ### Anfangsbalance
 
 + Ziel festlegen: was eine ausgewogene Ninkasi am Ende eines Laufs erreicht haben soll, z.B. zwei Sets bis Meister und ein göttliches Niveau
-+ EP-Budget messen: Der Bot zählt die EP je Ebene aus Erkundung und Bewältigtem; erste Messung mit 0.26.0 (zufällige Befehle, vorläufige Zahlen): rund 1200 EP aus Erkundung gegen rund 55 aus Gegnern in Tiefe 1, das Verhältnis ist noch festzulegen
++ EP-Budget messen: Der Bot zählt die EP je Ebene aus Erkundung und Bewältigtem; erste Messung mit 0.26.0 (zufällige Befehle, vorläufige Zahlen): rund 1200 EP aus Erkundung gegen rund 55 aus Gegnern in Tiefe 1, das Verhältnis ist noch festzulegen; vorgesehen sind zwei bis drei Strategien des Bots für das Erkunden (nächster Rand als Obergrenze, zielstrebig zur Treppe als Untergrenze, später die Dijkstra-Karte), damit die Spanne zwischen gründlichem und eiligem Spiel sichtbar wird
 + Die Stufentabelle danach ausrichten, dass Budget und Ziel zusammenpassen
 + Die Spreizung der Eigenschaften (etwa 2) bleibt dabei fest
 + Alle Stellschrauben sind Regelwerte in `regeln.lernen`: Startwert, Punkte, Höchstwert, Bezugswert, Stufentabelle, Ränge, Startguthaben, Topf der Abstammungslinie
@@ -141,7 +141,8 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skil
 
 + Freie EP aus Erkundung und Rätseln, die Spielerin verteilt sie selbst
 + Erkundung: 1 EP pro Feld, das zum ersten Mal wirklich gesehen wird
-+ Magisch kartierte Felder gelten als bekannt, bringen EP aber erst beim wirklichen Sehen
++ Magisch kartierte Felder gelten als bekannt, bringen EP aber erst beim wirklichen Sehen; vergessene Felder (Filmriss) bringen beim Wiedersehen keine EP mehr
++ Offen, ob EP je Feld die beste Form ist: Ein Ablaufen jeder Ecke wird belohnt; Abwägung in [Ausblick.md](Ausblick.md), EP für Erkundung
 + Jedes Rätsel bringt seine EP nur einmal
 + Freie EP lassen sich sparen, etwa bis entscheidende Fundstücke auftauchen
 + Freie EP lassen sich jederzeit verteilen, das Lernen kostet keine Spielzeit; Orte, an die das Verteilen gebunden ist (Altar, Hub), kommen vielleicht später, ein Schalter in den Regeln hält das offen

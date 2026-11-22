@@ -4,9 +4,10 @@
 // Bildschirmfelder (bildX, bildY) zählen ab der linken oberen Ecke des Ausschnitts.
 
 const SCHRIFT = '"DejaVu Sans Mono", "Cascadia Mono", Consolas, monospace';
-const DECKKRAFT_ERINNERT = 0.35; // erkundete, aber gerade nicht sichtbare Felder
+const DECKKRAFT_ERINNERT = 0.35; // bekannte, aber gerade nicht sichtbare Felder (aus der Erinnerung, systeme/erinnerung.js)
 
 import { istBekannt } from "../systeme/fallen.js";
+import { erinnerteDingeAuf } from "../systeme/erinnerung.js";
 import { schichtenVon, feldVonIndex } from "../welt/schichten.js";
 
 // Deckkraft der Feldschichten: Oberfläche und Feuer fest, Gas mit der Menge zunehmend bis höchstens GAS_DECKKRAFT
@@ -86,10 +87,13 @@ export class Renderer {
         const x = kamera.x + bildX;
         if (x < 0 || x >= ebene.breite) continue;
         const feldIndex = y * ebene.breite + x;
-        if (!ebene.erkundet[feldIndex]) continue;
-        const gelaendeName = gelaendeNameNachKennung[ebene.felder[y][x]];
-        const deckkraft = sichtbareFelder.has(feldIndex) ? 1 : DECKKRAFT_ERINNERT;
-        this.feldZeichnen(bildX, bildY, zoom, gelaendeName, zeichensatz.gelaende[gelaendeName], deckkraft);
+        const erinnert = ebene.erinnerung?.[feldIndex] ?? null;
+        if (erinnert === null) continue;
+        // in Sicht das echte Gelände, sonst das erinnerte
+        const sichtbar = sichtbareFelder.has(feldIndex);
+        const gelaendeName = gelaendeNameNachKennung[sichtbar ? ebene.felder[y][x] : erinnert];
+        this.feldZeichnen(bildX, bildY, zoom, gelaendeName, zeichensatz.gelaende[gelaendeName], sichtbar ? 1 : DECKKRAFT_ERINNERT);
+        if (!sichtbar) this.erinnerteDingeZeichnen(ebene, feldIndex, bildX, bildY, zoom);
       }
     }
 
@@ -120,6 +124,20 @@ export class Renderer {
     // Gas schwebt über allem
     this.schichtZeichnen(spiel, kamera, ansicht, zoom, sichtbareFelder, "gas");
     this.markierungenZeichnen(kamera, ansicht, zoom, markierungen);
+  }
+
+  // Was Ninkasi auf einem Feld außer Sicht erinnert, gedämpft: Oberfläche, bekannte Fallen, Gegenstände
+  erinnerteDingeZeichnen(ebene, feldIndex, bildX, bildY, zoom) {
+    const { oberflaeche, fallen, gegenstaende } = erinnerteDingeAuf(ebene, feldIndex);
+    const darstellung = oberflaeche && this.zeichensatz.schichten?.[oberflaeche];
+    if (darstellung) {
+      this.pinsel.globalAlpha = OBERFLAECHE_DECKKRAFT * DECKKRAFT_ERINNERT;
+      this.pinsel.fillStyle = darstellung.farbe;
+      this.pinsel.fillRect(bildX * zoom, bildY * zoom, zoom, zoom);
+      this.pinsel.globalAlpha = 1;
+    }
+    for (const falle of fallen) this.feldZeichnen(bildX, bildY, zoom, falle.typ, this.zeichensatz.fallen?.[falle.typ], DECKKRAFT_ERINNERT);
+    for (const gegenstand of gegenstaende) this.feldZeichnen(bildX, bildY, zoom, gegenstand.typ, this.zeichensatz.gegenstaende[gegenstand.typ], DECKKRAFT_ERINNERT);
   }
 
   // Eine Feldschicht als farbige Überlagerung auf sichtbaren Feldern (Farben in zeichen.schichten, Feuer mit Zeichen)

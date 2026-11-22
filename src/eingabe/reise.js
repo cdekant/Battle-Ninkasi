@@ -5,22 +5,24 @@
 // Später: automatisches Erkunden ist dieselbe Reise mit anderer Zielwahl.
 
 import { gesteuerteEntitaet, entitaetenAuf, istWesen, bewegungVon } from "../kern/zustand.js";
-import { feldIndex, betretbar } from "../welt/karte.js";
+import { feldBekannt, gelaendeBetretbarFuer, bekanntesGelaendeAuf, oeffnetTueren } from "../welt/karte.js";
 import { naechstesWegfeld } from "../welt/wege.js";
 import { lageErfassen, sichtbareFeinde, gefahrPruefen } from "../systeme/gefahr.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 import { fallenMeiden } from "../systeme/fallen.js";
 import { gefahrenMeiden, meidenZusammen } from "../systeme/schichten.js";
 
-// Wege nur über Erkundetes, nach Ninkasis wirksamer Bewegungsart
-const wegOptionen = (spiel) => ({ nurErkundet: true, bewegung: bewegungVon(gesteuerteEntitaet(spiel.zustand)), meiden: meidenZusammen(fallenMeiden(spiel, { nurBekannte: true }), gefahrenMeiden(spiel)) });
+// Wege nur über Bekanntes und nach dem bekannten Gelände, nach der wirksamen Bewegungsart der gesteuerten Entität
+const wegOptionen = (spiel) => ({ nurBekannt: true, bewegung: bewegungVon(gesteuerteEntitaet(spiel.zustand)), meiden: meidenZusammen(fallenMeiden(spiel, { nurBekannte: true }), gefahrenMeiden(spiel)) });
 
 // Gibt { reise } oder { grund } zurück; grund: "kein_weg" | "feinde_in_sicht" | "vorbei"
 export function reiseBeginnen(spiel, ziel, einstellungen) {
   const zustand = spiel.zustand;
   if (zustand.vorbei) return { grund: "vorbei" };
-  const ebene = zustand.ebene;
-  if (!ebene.erkundet[feldIndex(ebene, ziel.x, ziel.y)] || !betretbar(spiel, gesteuerteEntitaet(zustand), ziel)) return { grund: "kein_weg" };
+  const gesteuerte = gesteuerteEntitaet(zustand);
+  // das Ziel muss bekannt und nach dem bekannten Gelände betretbar sein (systeme/erinnerung.js)
+  const zielBetretbar = gelaendeBetretbarFuer(spiel, bekanntesGelaendeAuf(spiel, ziel.x, ziel.y), bewegungVon(gesteuerte), oeffnetTueren(gesteuerte));
+  if (!feldBekannt(zustand.ebene, ziel.x, ziel.y) || !zielBetretbar) return { grund: "kein_weg" };
   if (!einstellungen.reiseTrotzFeinden && sichtbareFeinde(spiel).length) return { grund: "feinde_in_sicht" };
   if (!naechstesWegfeld(spiel, gesteuerteEntitaet(zustand).position, ziel, wegOptionen(spiel))) return { grund: "kein_weg" };
   return { reise: { ziel: { x: ziel.x, y: ziel.y }, lage: lageErfassen(spiel), schrittzahl: 0 } };

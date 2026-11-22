@@ -9,7 +9,7 @@ import { erstelleGrammatik } from "../src/anzeige/grammatik.js";
 import { datenLaden, neuesSpiel, befehlGeben, spielstand, nachspielen } from "../src/kern/spiel.js";
 import { zufallErzeugen, zufallsGanzzahl } from "../src/kern/zufall.js";
 import { alleEntitaeten, spielerin, gesteuerteEntitaet } from "../src/kern/zustand.js";
-import { passierbar, gelaendeAuf } from "../src/welt/karte.js";
+import { passierbar, bekanntesGelaendeAuf } from "../src/welt/karte.js";
 import { erstesGetraenk } from "../src/systeme/inventar.js";
 import { hoererAnmelden } from "../src/kern/ereignisse.js";
 import { hoechstwert } from "../src/kern/werte.js";
@@ -330,15 +330,15 @@ function ablaufLaufenLassen(spiel, beginn, naechsterSchritt) {
   return "zu_lang";
 }
 
-// Reise zu einem zufälligen erkundeten Feld, wie per Mausklick
+// Reise zu einem zufälligen bekannten Feld, wie per Mausklick
 function reisen(botZufall, spiel) {
   const ebene = spiel.zustand.ebene;
-  const erkundeteFelder = [];
-  ebene.erkundet.forEach((erkundet, feldIndex) => {
+  const bekannteFelder = [];
+  ebene.erinnerung.forEach((kennung, feldIndex) => {
     const x = feldIndex % ebene.breite, y = Math.floor(feldIndex / ebene.breite);
-    if (erkundet && passierbar(spiel, x, y)) erkundeteFelder.push({ x, y });
+    if (kennung !== null && passierbar(spiel, x, y)) bekannteFelder.push({ x, y });
   });
-  const ziel = erkundeteFelder[zufallsGanzzahl(botZufall, 0, erkundeteFelder.length - 1)];
+  const ziel = bekannteFelder[zufallsGanzzahl(botZufall, 0, bekannteFelder.length - 1)];
   return ablaufLaufenLassen(spiel, reiseBeginnen(spiel, ziel, einstellungen), naechsterReiseschritt);
 }
 
@@ -346,9 +346,9 @@ function reisen(botZufall, spiel) {
 function treppeNehmen(botZufall, spiel) {
   const ebene = spiel.zustand.ebene;
   const treppen = [];
-  ebene.erkundet.forEach((erkundet, feldIndex) => {
+  ebene.erinnerung.forEach((kennung, feldIndex) => {
     const x = feldIndex % ebene.breite, y = Math.floor(feldIndex / ebene.breite);
-    if (erkundet && gelaendeAuf(spiel, x, y)?.treppe) treppen.push({ x, y });
+    if (kennung !== null && bekanntesGelaendeAuf(spiel, x, y)?.treppe) treppen.push({ x, y });
   });
   if (!treppen.length) return "keine_bekannt";
   const ziel = treppen[zufallsGanzzahl(botZufall, 0, treppen.length - 1)];

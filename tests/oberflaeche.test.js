@@ -173,15 +173,15 @@ test("Anzeige: Menü, Bestätigung, Verlauf, Seitenleiste und Bedienzeile ohne f
   assert.deepEqual(warnungen, []);
 });
 
-test("Minikarte: Farbe je erkundetem Feld, gedämpft außer Sicht, Punkte für Treppe, Wesen und zuletzt Ninkasi", () => {
+test("Minikarte: Farbe je bekanntem Feld, gedämpft außer Sicht, Punkte für Treppe, Wesen und zuletzt Ninkasi", () => {
   const spiel = miniSpiel(["#####", "#..>#", "#####"]);
   const ninkasi = spielerinSetzen(spiel, 1, 1);
   wesen(spiel, 2, 1, "feinde", 10);
-  spiel.zustand.ebene.erkundet[0] = 0;
+  spiel.zustand.ebene.erinnerung[0] = null;
   spiel.zustand.sichtbareFelder = [6, 7, 8];
   const bild = minikartenBild(spiel, daten.zeichen);
   assert.deepEqual([bild.breite, bild.hoehe, bild.felder.length], [5, 3, 15]);
-  assert.equal(bild.felder[0], null, "unerkundet");
+  assert.equal(bild.felder[0], null, "unbekannt");
   assert.equal(bild.felder[6], daten.zeichen.gelaende.boden.farbe);
   assert.deepEqual([bild.gedaempft[6], bild.gedaempft[1]], [false, true]);
   assert.deepEqual(bild.punkte.map(({ art }) => art), ["treppe", "gegner", "ninkasi"]);

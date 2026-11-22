@@ -7,7 +7,9 @@
 // Das Halten an Abzweigungen in Gängen (wie DCSS) kommt später, siehe docs/Systemausbau.md.
 
 import { gesteuerteEntitaet, entitaetenAuf, istWesen } from "../kern/zustand.js";
-import { aufDerKarte, feldIndex, betretbar, gelaendeAuf } from "../welt/karte.js";
+import { feldBekannt, feldIndex, betretbar, bekanntesGelaendeAuf } from "../welt/karte.js";
+import { istSichtbar } from "../systeme/sicht.js";
+import { erinnerteDingeAuf } from "../systeme/erinnerung.js";
 import { sichtbareFeinde, lageErfassen } from "../systeme/gefahr.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 import { fallenMeiden } from "../systeme/fallen.js";
@@ -16,13 +18,16 @@ import { unterwegsPruefen } from "./reise.js";
 
 const NACHBARN = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
 
-// Ein erkundetes Feld ist bemerkenswert, wenn dort eine Tür, eine Treppe oder ein aufhebbarer Gegenstand ist
+// Ein bekanntes Feld ist bemerkenswert, wenn dort nach Ninkasis Wissen eine Tür, eine Treppe oder ein aufhebbarer
+// Gegenstand ist (außer Sicht: erinnert, systeme/erinnerung.js)
 function bemerkenswert(spiel, x, y) {
-  const ebene = spiel.zustand.ebene;
-  if (!aufDerKarte(ebene, x, y) || !ebene.erkundet[feldIndex(ebene, x, y)]) return false;
-  const gelaende = gelaendeAuf(spiel, x, y);
+  const zustand = spiel.zustand;
+  const ebene = zustand.ebene;
+  if (!feldBekannt(ebene, x, y)) return false;
+  const gelaende = bekanntesGelaendeAuf(spiel, x, y);
   if (gelaende?.tuer || gelaende?.treppe) return true;
-  return entitaetenAuf(spiel.zustand, x, y).some((entitaet) => entitaet.aufhebbar);
+  if (!istSichtbar(zustand, x, y)) return erinnerteDingeAuf(ebene, feldIndex(ebene, x, y)).gegenstaende.length > 0;
+  return entitaetenAuf(zustand, x, y).some((entitaet) => entitaet.aufhebbar);
 }
 
 // Schlüssel der bemerkenswerten Nachbarfelder Ninkasis

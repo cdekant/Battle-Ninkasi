@@ -1,16 +1,19 @@
 // Untersuchen (siehe docs/Bedienung.md, Untersuchen): reine Lesefunktionen, was Ninkasi über ein Feld und die
 // Wesen darauf weiß; ändern nichts und würfeln nicht. Grundlage für Tooltip und Seitenleiste (anzeige/oberflaeche.js).
-// Ein unbekanntes Feld gibt nichts preis, ein erkundetes, das sie gerade nicht sieht, nur das Gelände (erinnert),
-// ein sichtbares alles: Gelände, Feldschichten, Gegenstände, bekannte Fallen und Wesen.
+// Ein unbekanntes Feld gibt nichts preis, ein bekanntes, das sie gerade nicht sieht, nur, woran sie sich erinnert
+// (Gelände, Oberfläche, Gegenstände und Fallen als Aussehen, systeme/erinnerung.js), ein sichtbares alles: Gelände,
+// Feldschichten, Gegenstände, bekannte Fallen und Wesen.
 // Wesen: LP, Zustände mit Restdauer in Zügen, Wachzustand, laufende Aktion, Trefferchance in beide Richtungen
 // (erstes Angriffsprofil, systeme/vorschau.js). Ninkasi selbst dazu mit der Aufschlüsselung ihrer Werte.
 
 import { gesteuerteEntitaet, entitaetenAuf, istWesen } from "../kern/zustand.js";
-import { aufDerKarte, feldIndex, gelaendeName } from "../welt/karte.js";
+import { feldBekannt, feldIndex, gelaendeName, bekannterGelaendeName } from "../welt/karte.js";
 import { schichtAuf } from "../welt/schichten.js";
 import { hatHoechstwert, hoechstwert, modifikatorenAufgeschluesselt, verrechnet, lebenswertName } from "../kern/werte.js";
 import { istSichtbar } from "./sicht.js";
 import { istBekannt } from "./fallen.js";
+import { erinnerteDingeAuf } from "./erinnerung.js";
+import { istUnbekannt } from "./kennen.js";
 import { wachzustandVon } from "./wahrnehmung.js";
 import { KAMPFWERTE, angriffeVon } from "./kampf.js";
 import { nahkampfchanceVorschau } from "./vorschau.js";
@@ -54,15 +57,32 @@ export function wesenBeschreiben(spiel, wesen) {
   };
 }
 
-// Was Ninkasi über ein Feld weiß, oder null (außerhalb der Karte oder nie gesehen):
-// { x, y, sichtbar, gelaende, schichten: [{ schicht, art, menge }], gegenstaende: [id], fallen: [id], wesen: [Beschreibung] }
+// Bezug für einen erinnerten Gegenstand (ohne ID): mit dem Etikett, solange sein Typ unbekannt ist
+function erinnerterBezug(zustand, eintrag) {
+  const bezug = { typ: eintrag.typ, text: eintrag.text };
+  if (istUnbekannt(zustand, eintrag.typ)) bezug.etikett = zustand.wissen.etiketten[eintrag.typ];
+  if (eintrag.anzahl !== undefined) bezug.anzahl = eintrag.anzahl;
+  return bezug;
+}
+
+// Was Ninkasi über ein Feld weiß, oder null (außerhalb der Karte oder unbekannt):
+// { x, y, sichtbar, gelaende, schichten: [{ schicht, art, menge }], gegenstaende: [id], fallen: [id], wesen: [Beschreibung],
+//   erinnert: { gegenstaende: [{ typ, text, etikett?, anzahl }], fallen: [{ typ, text }] } }
+// Außer Sicht kommen Gelände und Oberfläche (menge null) aus der Erinnerung, Gegenstände und Fallen stehen unter erinnert
 export function feldBeschreiben(spiel, feld) {
   const zustand = spiel.zustand;
   const ebene = zustand.ebene;
-  if (!feld || !aufDerKarte(ebene, feld.x, feld.y) || !ebene.erkundet[feldIndex(ebene, feld.x, feld.y)]) return null;
+  if (!feld || !feldBekannt(ebene, feld.x, feld.y)) return null;
   const sichtbar = istSichtbar(zustand, feld.x, feld.y);
-  const beschreibung = { x: feld.x, y: feld.y, sichtbar, gelaende: gelaendeName(spiel, feld.x, feld.y), schichten: [], gegenstaende: [], fallen: [], wesen: [] };
-  if (!sichtbar) return beschreibung;
+  const gelaende = sichtbar ? gelaendeName(spiel, feld.x, feld.y) : bekannterGelaendeName(spiel, feld.x, feld.y);
+  const beschreibung = { x: feld.x, y: feld.y, sichtbar, gelaende, schichten: [], gegenstaende: [], fallen: [], wesen: [], erinnert: { gegenstaende: [], fallen: [] } };
+  if (!sichtbar) {
+    const dinge = erinnerteDingeAuf(ebene, feldIndex(ebene, feld.x, feld.y));
+    if (dinge.oberflaeche) beschreibung.schichten.push({ schicht: "oberflaeche", art: dinge.oberflaeche, menge: null });
+    beschreibung.erinnert.gegenstaende = dinge.gegenstaende.map((eintrag) => erinnerterBezug(zustand, eintrag));
+    beschreibung.erinnert.fallen = dinge.fallen.map((eintrag) => ({ typ: eintrag.typ, text: eintrag.text }));
+    return beschreibung;
+  }
   for (const schicht of ["oberflaeche", "gas"]) {
     const eintrag = schichtAuf(spiel, schicht, feld.x, feld.y);
     if (eintrag) beschreibung.schichten.push({ schicht, art: eintrag.art, menge: eintrag.menge });

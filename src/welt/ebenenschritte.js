@@ -172,6 +172,8 @@ anmelden("ebenenschritte", "ebene_anlegen", {
       name: bau.name, breite, hoehe,
       felder: bau.zeilen.map((zeile) => zeile.join("")),
       erkundet: new Array(breite * hoehe).fill(0),
+      erinnerung: new Array(breite * hoehe).fill(null),
+      erinnerteDinge: {},
       schichten: { oberflaeche: {}, gas: {}, feuer: {} },
     };
   },

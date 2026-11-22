@@ -225,7 +225,7 @@ Regeln:
 + `freischaltung: true`: lernbar erst nach dem Baustein `skill_freischalten` (Braubücher, Rezepturen)
 + Wirkung: `jeStufe` wächst mit der Stufe, ein Prozent wird bei `verrechnung: "multiplizieren"` zu einem `mal` (100 + Prozent x Stufe), bei `"addieren"` bleibt es `prozent`; `abStufe` gilt ab der Stufe unverändert; Auslöser der Skills über das Register `ausloeserquellen` (siehe [Wirkungen.md](Wirkungen.md), Auslöser)
 + `lernen` verteilt freie EP; mehr EP als bis Stufe 5 nötig werden nicht abgebucht; `regeln.lernen.ort` hält eine spätere Ortsbindung offen (nur `jederzeit` umgesetzt)
-+ Freie EP: Startguthaben `startEp`, dazu `epJeFeld` je Feld, das Ninkasi zum ersten Mal sieht (`sichtfeldAktualisieren`); ein später magisch kartiertes Feld bekommt einen eigenen Wert in `erkundet` und bringt erst beim Sehen EP
++ Freie EP: Startguthaben `startEp`, dazu `epJeFeld` je Feld, das Ninkasi zum ersten Mal sieht (`sichtfeldAktualisieren`, gezählt über `erkundet`); ein kartiertes Feld ist nur erinnert und bringt erst beim Sehen EP, ein vergessenes beim Wiedersehen keine mehr (siehe [Welt.md](Welt.md), Sicht und Erinnerung)
 + Gebundene EP: je Anlass und Tags ein Eintrag im Beitragsbuch (Gewichtung `erste`):
   + `wirkung`: Ninkasi ist Urheberin eines Treffers, eines Schadens (mit der Schadensart als Tag) oder eines Zustands (dessen Tags) am Wesen; Tags von Angriff, Fähigkeit und Effekt; wirkt eine Beschworene Ninkasis, zählt es für Ninkasi mit dem Tag `beschworen`
   + `ausgewichen`, `geblockt`: das Wesen verfehlt Ninkasi

@@ -50,12 +50,26 @@ test("Ziel in der Wand oder unerreichbar ergibt null", () => {
   assert.equal(weg(spiel, { x: 1, y: 1 }, { x: 3, y: 1 }), null);
 });
 
-test("nurErkundet: unerkundete Felder sperren den Weg", () => {
+test("nurBekannt: unbekannte Felder sperren den Weg", () => {
   const spiel = miniSpiel(["#####", "#...#", "#####"]);
   const ebene = spiel.zustand.ebene;
-  ebene.erkundet[feldIndex(ebene, 2, 1)] = 0;
-  assert.equal(weg(spiel, { x: 1, y: 1 }, { x: 3, y: 1 }, { nurErkundet: true }), null);
+  ebene.erinnerung[feldIndex(ebene, 2, 1)] = null;
+  assert.equal(weg(spiel, { x: 1, y: 1 }, { x: 3, y: 1 }, { nurBekannt: true }), null);
   assert.equal(weg(spiel, { x: 1, y: 1 }, { x: 3, y: 1 }).length, 2);
+});
+
+test("nurBekannt: betretbar nach dem bekannten Gelände, nicht nach dem echten", () => {
+  const spiel = miniSpiel(["#####", "#.#.#", "#.#.#", "#...#", "#####"]);
+  const ebene = spiel.zustand.ebene;
+  // die Wand bei 2,1 ist außer Sicht gefallen, Ninkasi erinnert sie noch: ihr Weg führt außen herum
+  ebene.felder[1] = "#...#";
+  assert.equal(weg(spiel, { x: 1, y: 1 }, { x: 3, y: 1 }, { nurBekannt: true }).length, 4);
+  assert.equal(weg(spiel, { x: 1, y: 1 }, { x: 3, y: 1 }).length, 2, "die KI kennt das echte Gelände");
+  // umgekehrt: eine erinnerte Lücke, die inzwischen zu ist, verspricht einen kurzen Weg, bis Ninkasi hinsieht
+  ebene.felder[1] = "#.#.#";
+  ebene.erinnerung[feldIndex(ebene, 2, 1)] = ".";
+  assert.equal(weg(spiel, { x: 1, y: 1 }, { x: 3, y: 1 }, { nurBekannt: true }).length, 2);
+  assert.equal(weg(spiel, { x: 1, y: 1 }, { x: 3, y: 1 }).length, 4);
 });
 
 test("wesenMeiden: Wesen sperren den Weg, außer auf dem Ziel", () => {

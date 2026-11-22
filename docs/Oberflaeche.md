@@ -153,7 +153,7 @@ Umsetzung: siehe [Anzeige.md](Anzeige.md), Oberfläche
 ## Seitenleiste
 
 + Kopf: Ort und Zeit (Tiefe, Ebene, Zug)
-+ Minikarte (Variante A, in B oben in der linken Spalte): erkundete Felder, Ninkasi, Treppen, bekannte Wesen; Klick reist dorthin; die große Übersichtskarte (Taste m) zeichnet derselbe Renderer
++ Minikarte (Variante A, in B oben in der linken Spalte): bekannte Felder, Ninkasi, Treppen, bekannte Wesen; Klick reist dorthin; die große Übersichtskarte (Taste m) zeichnet derselbe Renderer
 + Ninkasi: LP, MP, PP als Balken, Platz für einen vierten Vorrat (Ausdauer, falls sie kommt), Pegel logarithmisch mit Schwellen, Zustände mit Stärke und Restdauer, laufende Aktion, Heimlichkeit, später Helligkeit des eigenen Feldes (Licht)
 + Zielen und Untersuchen: nur sichtbar, solange der Zielmodus offen ist
 + In Sicht: Wesen nach Abstand mit Wachzustand und Zuständen, "wirkt etwas" bei laufender Aktion; darüber Gefährten (Beschworene, Verbündete) mit LP

@@ -163,6 +163,7 @@ Offener Rest:
 + Schema der Oberfläche in [Oberflaeche.md](Oberflaeche.md): seit 0.27.0 Aktionskatalog, Fensterstapel, Charakterfenster, Charaktererstellung und Hilfe; seit 0.28.0 Layout A und B, Log in zwei Spalten mit Farben nach Seite, Bedienzeile, Esc-Kette, Spielmenü, Verlauf, vi-Belegung, Laufen; seit 0.29.0 Schnellleiste vollständig, Speichern, Minikarte und Übersichtskarte; seit 0.30.0 Einstellungen samt Tastenbelegung, Befehlszeile und Suche im Verlauf; seit 0.31.0 Klicks in Fenstern; seit 0.32.0 Titelbildschirm mit drei Speicherplätzen, Fenster nach dem Lauf und Chronik (siehe [Anzeige.md](Anzeige.md) (Oberfläche, Log), [Bedienung.md](Bedienung.md) (Schnellleiste, Einstellungen, Eingabe, Fenster), [Architektur.md](Architektur.md) (Speichern) und [Titelbildschirm.md](Titelbildschirm.md))
 + 0.30.0 und 0.31.0 im Browser prüfen (Einstellungen, Tastenbelegung, Befehlszeile, Suche, Klicks in Fenstern); 0.28.0 und 0.29.0 sind geprüft, die Fenster aus 0.27.0 sind angesehen, kleine Nacharbeiten stehen aus
 + Laufen hält noch nicht an Abzweigungen in Gängen (wie DCSS)
++ Automatisches Erkunden über eine Dijkstra-Karte (Vorbild Brogue): Ziele mit Gewichten (unentdeckte Felder, erinnerte Gegenstände zum Aufheben), Gefahren und später Kosten je Gelände teurer; heute geht es zum nächsten Rand (Breitensuche); Quellen in [Ausblick.md](Ausblick.md), Recherche
 + Gehörter Lärm kommt im jetzigen Inhalt kaum vor (im Bot 0 Mal), weil fast nur Kämpfe mit Ninkasi Lärm machen; mit Kämpfen unter Gegnern, Beschworenen und Fallen nachprüfen
 
 Später:
@@ -202,10 +203,9 @@ Offen:
 
 ## 14. Vorkehrungen aus dem Ausblick
 
-Status: offen; Ideen und Begründungen in [Ausblick.md](Ausblick.md), hier nur die Arbeit, nach Dringlichkeit geordnet (zuerst, was mit jedem neuen System teurer wird); jede Vorkehrung bekommt vor der Umsetzung einen eigenen Plan; erledigt in 0.33.0: Plan des Laufs und Ebenenerzeugung in Schritten (siehe [Welt.md](Welt.md), Plan des Laufs und [Welt.md](Welt.md), Ebenen); erledigt in 0.34.0: gesteuerte Entität (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); erledigt in 0.35.0: Ruf, Beistand und Kampfzustand (siehe [Wesen.md](Wesen.md), Fraktionen und [Wesen.md](Wesen.md), Kampfzustand); erledigt in 0.36.0: Würfe über eine tauschbare Schnittstelle (siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit)
+Status: offen; Ideen und Begründungen in [Ausblick.md](Ausblick.md), hier nur die Arbeit, nach Dringlichkeit geordnet (zuerst, was mit jedem neuen System teurer wird); jede Vorkehrung bekommt vor der Umsetzung einen eigenen Plan; erledigt in 0.33.0: Plan des Laufs und Ebenenerzeugung in Schritten (siehe [Welt.md](Welt.md), Plan des Laufs und [Welt.md](Welt.md), Ebenen); erledigt in 0.34.0: gesteuerte Entität (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); erledigt in 0.35.0: Ruf, Beistand und Kampfzustand (siehe [Wesen.md](Wesen.md), Fraktionen und [Wesen.md](Wesen.md), Kampfzustand); erledigt in 0.36.0: Würfe über eine tauschbare Schnittstelle (siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit); erledigt in 0.37.0: Erinnerung der Karte (siehe [Welt.md](Welt.md), Sicht und Erinnerung)
 
-+ 1. Erinnerung der Karte: je Feld das zuletzt gesehene Gelände, die Anzeige zeigt es für nicht sichtbare Felder; `erkundet` mit Werten für gesehen und kartiert; Grundlage für veränderbares Gelände, Hellsicht und Filmriss
-+ 2. Mitnehmen beim Ebenenwechsel erweiterbar (Register oder Haken), für Begleiter und Wesen, die Ninkasi über Treppen folgen (Rest aus Punkt 8)
-+ 3. Format der KI-Handlungen: Bewertung je Handlung mit Gewicht und Kurven, das heutige Format bleibt als Sonderfall gültig; dazu Vorrangbefehle für Begleiter
-+ 4. Lesefunktionen für Komponenten ohne Zahl (Angriffe, Plätze, Bewegungsart, Sicht, Türen), damit eine Gestalt sie überlagern kann (Verwandlung)
-+ 5. Regel für Wissen über Läufe hinweg festschreiben: was ein Lauf davon nutzt, kommt als Startoption in den Spielstand, die Logik liest die Ablage nie (siehe [Architektur.md](Architektur.md), Speichern)
++ 1. Mitnehmen beim Ebenenwechsel erweiterbar (Register oder Haken), für Begleiter und Wesen, die Ninkasi über Treppen folgen (Rest aus Punkt 8)
++ 2. Format der KI-Handlungen: Bewertung je Handlung mit Gewicht und Kurven, das heutige Format bleibt als Sonderfall gültig; dazu Vorrangbefehle für Begleiter
++ 3. Lesefunktionen für Komponenten ohne Zahl (Angriffe, Plätze, Bewegungsart, Sicht, Türen), damit eine Gestalt sie überlagern kann (Verwandlung)
++ 4. Regel für Wissen über Läufe hinweg festschreiben: was ein Lauf davon nutzt, kommt als Startoption in den Spielstand, die Logik liest die Ablage nie (siehe [Architektur.md](Architektur.md), Speichern)

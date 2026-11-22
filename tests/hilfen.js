@@ -17,7 +17,7 @@ import { vorgangAbschliessen } from "../src/kern/vorgang.js";
 import eigenschaftsdaten from "../daten/eigenschaften.js";
 import { lernenEinrichten } from "../src/systeme/lernen.js";
 
-// Spiel mit einer Karte aus Zeilen ("#" Wand, "." Boden), alles erkundet.
+// Spiel mit einer Karte aus Zeilen ("#" Wand, "." Boden), alles erkundet und bekannt (Erinnerung wie die Karte).
 // optionen: { gelaende: zusätzliches Testgelände (z.B. Abgrund mit eigener kennung), schichten: { oberflaechen, gase },
 //            effekte: Testeffekte, zustaende: Testzustände, wesen: Testwesen (zum Beschwören), faehigkeiten, risiken,
 //            gegenstaende: Testgegenstände, etiketten: Etiketten unbekannter Gegenstände, skills: Testskills,
@@ -28,7 +28,7 @@ export function miniSpiel(kartenzeilen, { gelaende: testgelaende = {}, schichten
   const zustand = neuerZustand(startwert);
   zustand.zufallszustand = zufallErzeugen(startwert);
   const breite = kartenzeilen[0].length, hoehe = kartenzeilen.length;
-  zustand.ebene = { name: "test", breite, hoehe, felder: kartenzeilen, erkundet: new Array(breite * hoehe).fill(1) };
+  zustand.ebene = { name: "test", breite, hoehe, felder: kartenzeilen, erkundet: new Array(breite * hoehe).fill(1), erinnerung: kartenzeilen.join("").split(""), erinnerteDinge: {} };
   const testregeln = {
     ...regeln,
     ausloeser: { ...regeln.ausloeser, ...regelAbweichungen.ausloeser },

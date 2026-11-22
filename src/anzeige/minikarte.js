@@ -1,15 +1,17 @@
 // Minikarte und Übersichtskarte (docs/Oberflaeche.md, Seitenleiste): ein Rechteck je Feld in der Farbe des Geländes,
 // darüber Punkte für Treppen, Gegenstände und Wesen in Sicht. Liest den Zustand nur.
 // minikartenBild rechnet ohne DOM (testbar): { breite, hoehe, felder: [farbe | null], gedaempft: [bool], punkte }
-//   felder:    je Feld (Zeile für Zeile) die Farbe des Geländes aus daten/zeichen.js, null für Unerkundetes
-//   gedaempft: erkundet, aber gerade nicht sichtbar (wird blasser gezeichnet)
+//   felder:    je Feld (Zeile für Zeile) die Farbe des bekannten Geländes aus daten/zeichen.js, null für Unbekanntes
+//   gedaempft: bekannt, aber gerade nicht sichtbar (wird blasser gezeichnet)
 //   punkte:    [{ x, y, farbe, art }] art: "treppe", "gegenstand", "gegner", "verbuendet", "neutral", "ninkasi"
-// Nur was Ninkasi kennt: Treppen auf erkundeten Feldern, Gegenstände und Wesen nur in Sicht.
+// Nur was Ninkasi kennt: Gelände und Treppen nach der Erinnerung (systeme/erinnerung.js), Gegenstände in Sicht oder
+// erinnert, Wesen nur in Sicht.
 // zeichnen() malt das Bild mit feldgroesse Pixeln je Feld auf ein Canvas; derselbe Code dient der Minikarte in der
 // Seitenleiste und der Übersichtskarte (Fenster "karte").
 
 import { gesteuerteEntitaet, entitaetenMitPosition, istWesen } from "../kern/zustand.js";
-import { gelaendeName } from "../welt/karte.js";
+import { bekannterGelaendeName } from "../welt/karte.js";
+import { erinnerteDingeAuf } from "../systeme/erinnerung.js";
 import { beziehungZwischen, urheberVon } from "../systeme/fraktionen.js";
 
 export const PUNKTFARBEN = {
@@ -33,11 +35,12 @@ export function minikartenBild(spiel, zeichensatz) {
   for (let y = 0; y < ebene.hoehe; y++) {
     for (let x = 0; x < ebene.breite; x++) {
       const index = y * ebene.breite + x;
-      if (!ebene.erkundet[index]) continue;
-      const name = gelaendeName(spiel, x, y);
+      const name = bekannterGelaendeName(spiel, x, y);
+      if (name === null) continue;
       felder[index] = zeichensatz.gelaende?.[name]?.farbe ?? ERSATZFARBE;
       gedaempft[index] = !sichtbar.has(index);
       if (spiel.daten.gelaende[name]?.treppe) punkte.push({ x, y, farbe: PUNKTFARBEN.treppe, art: "treppe" });
+      if (gedaempft[index] && erinnerteDingeAuf(ebene, index).gegenstaende.length) punkte.push({ x, y, farbe: PUNKTFARBEN.gegenstand, art: "gegenstand" });
     }
   }
   const gesteuerte = gesteuerteEntitaet(zustand);

@@ -2,7 +2,7 @@
 
 Stand: 2026-11-22
 
-Mitprüfen bei Änderungen: [Grundlagen.md](Grundlagen.md), [Architektur.md](Architektur.md), [Systemausbau.md](Systemausbau.md), [Wesen.md](Wesen.md)
+Mitprüfen bei Änderungen: [Grundlagen.md](Grundlagen.md), [Architektur.md](Architektur.md), [Systemausbau.md](Systemausbau.md), [Wesen.md](Wesen.md), [Welt.md](Welt.md), [Charakter.md](Charakter.md)
 
 Ideen für Mechaniken, über die noch nicht entschieden ist, mit dem, was sie dem Kern abverlangen. Zweck: früh erkennen, wo heutiger Code einer Idee den Weg verbaut, und dort rechtzeitig vorbauen, statt später schwer umzubauen.
 
@@ -28,10 +28,10 @@ Umsetzung: keine
 | Schatzräume mit Schlüssel | hoch | gering (Plan des Laufs steht) | erledigt (Plan des Laufs) |
 | Fraktionen: Ruf und Beistand | hoch | gering | erledigt (Ruf und Beistand) |
 | Vorschau durch Simulation | hoch | mittel | erledigt (Würfe über eine Schnittstelle) |
-| Hellsicht, Spüren, Unsichtbarkeit | hoch | mittel | ja |
+| Hellsicht, Spüren, Unsichtbarkeit | hoch | mittel | teils erledigt (Erinnerung, Kartieren), offen: Art der Wahrnehmung |
 | Zeitumkehr | hoch | mittel | ja |
 | Verwandlung | mittel | mittel | ja |
-| Veränderbares Gelände | hoch | mittel | ja (Erinnerung der Karte) |
+| Veränderbares Gelände | hoch | mittel | erledigt (Erinnerung der Karte) |
 | Begleiter und Befehle | hoch | gering bis mittel | ja (Treppen) |
 | Handel, Währung, Gespräch | hoch | gering bis mittel | ja (Befehle) |
 | Bestiarium, Glossar, Rezeptbuch | hoch | gering | ja (Regel wie Fortschritt) |
@@ -49,7 +49,8 @@ Umsetzung: keine
 | Prüfsumme der Daten | hoch | gering | nein |
 | Druck gegen endloses Rasten | ungeklärt | gering | nein |
 | Gunst der Nebengottheiten | ungeklärt | gering | nein |
-| Filmriss | ungeklärt | gering | mit der Erinnerung der Karte |
+| Filmriss | ungeklärt | gering | erledigt (Erinnerung der Karte) |
+| EP für Erkundung | ungeklärt | gering | erledigt (gesehen getrennt von bekannt) |
 | Mechaniken aus Pen-and-Paper | teils | gering | nein |
 | Wesen auf mehreren Feldern | gering | hoch | keine |
 
@@ -119,9 +120,9 @@ Umsetzung: offen
 + Vorbilder: Brogue (Gras brennt, Brücken stürzen ein, Gelände reagiert in Ketten); Cogmind (fast alles ist zerstörbar, man bahnt sich Wege durch Wände); Brigador Killers (ganz zerstörbare Ebenen machen klassische Sperren wie verschlossene Türen wirkungslos); Noita (Stoffe reagieren miteinander)
 + Vorhanden: `gelaendeSetzen`, `zerstoerbar`, Feuer mit `verbrenntZu` (siehe [Welt.md](Welt.md), Gelände)
 + Braucht: Graben und Bauen (z.B. einen Kessel aufstellen) als Befehle; Wachstum (Schimmel, Hefe) als System am Welttick; Kosten je Gelände in der Wegfindung (dort schon als "später" vermerkt); eine Erinnerung der Karte
-+ Berührt: Anzeige: erkundete, gerade nicht sichtbare Felder zeigt der Renderer heute mit dem aktuellen Gelände (`src/anzeige/renderer.js`), eine außer Sicht eingestürzte Wand verrät sich also sofort; Rätsel und Themenräume, die auf Sperren bauen
++ Berührt: Rätsel und Themenräume, die auf Sperren bauen; die Anzeige zeigt außer Sicht seit 0.37.0 das Erinnerte, eine außer Sicht eingestürzte Wand verrät sich nicht mehr
 + Umbaurisiko: mittel
-+ Vorkehrung: eine Erinnerung je Feld (zuletzt gesehenes Gelände) neben `erkundet`, die die Anzeige für nicht sichtbare Felder liest; dieselbe Erinnerung brauchen Hellsicht und Filmriss
++ Vorkehrung (erledigt in 0.37.0, siehe [Welt.md](Welt.md), Sicht und Erinnerung): eine Erinnerung je Feld (zuletzt gesehenes Gelände, dazu Oberfläche, Gegenstände und Fallen als Aussehen) neben `erkundet`, die Anzeige, Untersuchen und die Wege der Abläufe für nicht sichtbare Felder lesen
 
 Umsetzung: offen
 
@@ -142,9 +143,9 @@ Umsetzung: offen
 + Wichtigkeit: hoch, durch Wände sehen, Schätze und Gegner spüren "sehr interessant" (2026-11-22)
 + Vorbilder: Rogue und NetHack (Rolle der Kartierung zeigt die ganze Karte ohne Gegenstände; Erkennen von Wesen, von Magie); Brogue (Telepathie zeigt Wesen durch Wände, Kartierung; Brogue CE beschreibt magisch erkannte Felder als "erinnert"); gBrogue (ein geworfener Telepathietrank knüpft ein dauerhaftes Band zu einem Wesen); Caves of Qud (Hellsicht zeigt ein fernes Gebiet für einige Runden, ab hoher Stufe die ganze Karte; manches bleibt ohne Sichtlinie unsichtbar)
 + Braucht: Arten der Wahrnehmung neben dem Sehen: gesehen, gespürt (Ort bekannt, Art vielleicht nicht), kartiert (Gelände bekannt, nie gesehen); Unsichtbarkeit als Gegenstück; Anzeige je Art (z.B. Umriss für Gespürtes)
-+ Berührt: `sieht` in `src/systeme/sicht.js` (für Ninkasi heißt Sehen heute "im Sichtfeld"), der Filter des Logs (`src/systeme/wahrnehmbar.js`), der Renderer, die Wegfindung mit `nurErkundet`, EP für Erkundung (ein kartiertes Feld soll erst beim Sehen zählen, vorgesehen als eigener Wert in `erkundet`)
++ Berührt: `sieht` in `src/systeme/sicht.js` (für Ninkasi heißt Sehen heute "im Sichtfeld"), der Filter des Logs (`src/systeme/wahrnehmbar.js`), der Renderer, die Wegfindung mit `nurBekannt`, EP für Erkundung (ein kartiertes Feld zählt erst beim Sehen, siehe EP für Erkundung)
 + Umbaurisiko: mittel
-+ Vorkehrung: eine Abfrage "wie nimmt Ninkasi dieses Ziel wahr" (Art statt ja oder nein), die neue Systeme statt `istSichtbar` fragen; `erkundet` mit Werten für gesehen und kartiert
++ Vorkehrung: eine Abfrage "wie nimmt Ninkasi dieses Ziel wahr" (Art statt ja oder nein), die neue Systeme statt `istSichtbar` fragen (offen); kartiert neben gesehen ist erledigt in 0.37.0 über die Erinnerung (`kartieren`, auf Wunsch mit Schätzen, siehe [Welt.md](Welt.md), Sicht und Erinnerung); Gegner erinnert die Karte nie, sie brauchen das Spüren
 + Aus der Arbeitsliste hierher: Telepathie und Unsichtbarkeit (vorher [Systemausbau.md](Systemausbau.md), Punkt 10); magisch kartierte Felder (vorher Punkt 13)
 
 Umsetzung: offen
@@ -249,7 +250,7 @@ Umsetzung: offen
 + Inhalt: Zeitsprung und verlorene Erinnerung an erkundete Felder bei sehr hohem Pegel
 + Braucht: die Erinnerung der Karte aus "Veränderbares Gelände"; eine Weise, Zeit vergehen zu lassen, in der Ninkasi von der KI geführt wird
 + Umbaurisiko: gering
-+ Vorkehrung: mit der Erinnerung der Karte
++ Vorkehrung (erledigt in 0.37.0): `vergessen` löscht die Erinnerung an Felder, nicht `erkundet`; ein Wiedersehen bringt keine EP (siehe [Welt.md](Welt.md), Sicht und Erinnerung)
 + Aus der Arbeitsliste hierher: vorher [Systemausbau.md](Systemausbau.md), Punkt 10
 
 Umsetzung: offen
@@ -401,6 +402,17 @@ Umsetzung: offen
 
 Umsetzung: offen
 
+## EP für Erkundung
+
++ Wichtigkeit: ungeklärt, Frage gestellt am 2026-11-22
++ Inhalt: heute 1 EP je Feld, das Ninkasi zum ersten Mal wirklich sieht (siehe [Charakter.md](Charakter.md), Freie EP); laut Bot rund 1100 EP aus Erkundung gegen rund 25 aus Gegnern in Tiefe 1
++ Wege: a) nur Gesehenes zählt, Kartierung zeigt den Weg und die EP kommen beim Hingehen (gilt); b) jede Erkundung zählt, ein mächtiger Trank der Kartierung brächte alle EP der Ebene auf einmal und wäre die größte EP-Quelle; c) EP je Ort (Raum, Fundort) statt je Feld, das Ablaufen jeder Ecke lohnt dann nicht mehr
++ Berührt: `epFuerErkundung` (`src/systeme/lernen.js`) und das Balancing der EP
++ Umbaurisiko: gering
++ Vorkehrung (erledigt in 0.37.0): `erkundet` (einmal gesehen, EP) ist von der Erinnerung (bekannt) getrennt; jeder der drei Wege ist damit eine kleine Änderung, ein Filmriss bringt unter keinem doppelte EP
+
+Umsetzung: teilweise, siehe [Welt.md](Welt.md), Sicht und Erinnerung; offen: ob c) die bessere Form ist
+
 ## Entscheidungen
 
 + 2026-11-22: Gärung über Zeit ohne Ninkasi verworfen; Ninkasi muss am Kessel bleiben, damit das Bier gut wird (Brauen als lange Aktion, siehe [Wirkungen.md](Wirkungen.md), Lange Aktionen)
@@ -411,6 +423,7 @@ Umsetzung: offen
 + 2026-11-22: Begleiter nehmen Vorrangbefehle an ([Grundlagen.md](Grundlagen.md), Spiel)
 + 2026-11-22: die Vorkehrungen stehen nach Dringlichkeit als Punkt 14 in [Systemausbau.md](Systemausbau.md)
 + 2026-11-22: für Besessenheit nur die leichte Vorkehrung (Lesefunktion statt zweitem Feld); ob sie kommt, bleibt offen
++ 2026-11-22: Kartierung zeigt Gelände, auf Wunsch auch Schätze, bringt aber keine EP; die EP kommen erst beim Sehen (Weg a unter EP für Erkundung)
 + 2026-11-22: Plan des Laufs im Zustand, Folge der Ebenenschritte in den Daten (mit Vorgabe in `daten/regeln.js` und Prüfung von `braucht`), Erreichbarkeit mit neuem Versuch; umgesetzt in 0.33.0
 
 ## Recherche
@@ -434,6 +447,7 @@ Stand 2026-11-22; die Quellen sind teils Wikis und Foren, die Einzelheiten könn
 + Caves of Qud, Quests: Prozedurale Erzeugung (https://www.gamedeveloper.com/design/tapping-into-the-potential-of-procedural-generation-in-caves-of-qud), Fahrplan (https://cavesofqud.com/roadmap/), Story-Engine (https://ceur-ws.org/Vol-3217/paper12.pdf)
 + Shattered Pixel Dungeon: Quests der Figuren (https://pixeldungeon.fandom.com/wiki/NPC)
 + Brogue: Nachrücken der Horden (https://brogue.fandom.com/wiki/Level_Generation)
++ Automatisches Erkunden: Dijkstra-Karten mit allen unentdeckten Feldern als Ziel (https://groups.google.com/g/rec.games.roguelike.development/c/6yNIuhSerpM, https://drwjf.github.io/roc/notes/dijkstra.html), nächster Rand gegen Kosten und Nutzen (https://arxiv.org/abs/1711.03087v1), Erkunden in Brogue (https://brogue.fandom.com/wiki/Commands, https://raw.githubusercontent.com/tmewett/BrogueCE/master/CHANGELOG.md)
 + Minecraft: Bauwerke aus Vorlagen (https://learn.microsoft.com/en-us/minecraft/creator/documents/structures/introductiontojigsawstructures), Vorlagenpools (https://minecraft.fandom.com/wiki/Custom_world_generation/template_pool)
 + Dungeon Crawl Stone Soup: Vaults (https://sources.debian.org/src/crawl/2%3A0.34.1-1/docs/develop/levels/introduction.txt, https://sources.debian.org/src/crawl/2%3A0.34.1-1/docs/develop/levels/syntax.txt)
 + D&D 5e: Konzentration (https://www.dndbeyond.com/posts/1224-dont-lose-focus-your-guide-to-the-rules-for), Bindung (https://www.dndbeyond.com/sources/basic-rules/magic-items)

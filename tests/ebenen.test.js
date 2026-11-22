@@ -151,7 +151,10 @@ test("Erzeugung in Schritten: dieselben Ebenen wie vorher", () => {
     const spiel = neuesSpiel(DATEN, Number(startwert));
     for (const tiefe of [2, 3, 0]) ebeneWechseln(spiel, tiefe);
     const { ebene, abgelegteEbenen, entitaeten } = spiel.zustand;
-    const ergebnis = createHash("sha256").update(JSON.stringify({ ebene, abgelegt: abgelegteEbenen, entitaeten })).digest("hex").slice(0, 16);
+    // die Erinnerung der Karte (seit 0.37.0) ist Wissen Ninkasis, nicht Teil der Erzeugung, und zählt nicht mit
+    const ohneErinnerung = (karte) => { const { erinnerung, erinnerteDinge, ...rest } = karte; return rest; };
+    const abgelegt = Object.fromEntries(Object.entries(abgelegteEbenen).map(([tiefe, eintrag]) => [tiefe, { ...eintrag, ebene: ohneErinnerung(eintrag.ebene) }]));
+    const ergebnis = createHash("sha256").update(JSON.stringify({ ebene: ohneErinnerung(ebene), abgelegt, entitaeten })).digest("hex").slice(0, 16);
     assert.equal(ergebnis, fingerabdruck, `Startwert ${startwert}`);
   }
 });

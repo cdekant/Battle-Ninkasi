@@ -19,6 +19,7 @@ import { naechstesFeldMit } from "../welt/wege.js";
 import { ebeneErzeugen } from "../welt/ebene.js";
 import { ebenennameFuer } from "../welt/plan.js";
 import { sichtfeldAktualisieren } from "./sicht.js";
+import { erinnerungAuffrischen } from "./erinnerung.js";
 
 const RICHTUNG = { ab: 1, auf: -1 };
 
@@ -91,6 +92,8 @@ export function ebeneWechseln(spiel, zieltiefe) {
   const zustand = spiel.zustand;
   const ninkasi = spielerin(zustand);
   const hinab = zieltiefe > zustand.tiefe;
+  // was Ninkasi zuletzt gesehen hat, bleibt der verlassenen Ebene als Erinnerung (systeme/erinnerung.js)
+  erinnerungAuffrischen(spiel, zustand.sichtbareFelder);
   ebeneAblegen(spiel, ninkasi);
   zustand.tiefe = zieltiefe;
   if (zustand.abgelegteEbenen[zieltiefe]) ebeneZurueckholen(spiel, zieltiefe);
@@ -105,6 +108,7 @@ export function ebeneWechseln(spiel, zieltiefe) {
     if (frei) ninkasi.position = frei;
     indexVerwerfen(zustand);
   }
+  zustand.sichtbareFelder = [];
   sichtfeldAktualisieren(spiel);
   melden(spiel, "ebene_gewechselt", { wer: bezugAuf(ninkasi), tiefe: zieltiefe, ebene: zustand.ebene.name, richtung: hinab ? "ab" : "auf" });
 }

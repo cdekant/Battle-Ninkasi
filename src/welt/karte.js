@@ -1,5 +1,8 @@
 // Zugriff auf die Karte der aktuellen Ebene.
-// zustand.ebene = { name, breite, hoehe, felder: ["####..", ...], erkundet: [0, 1, ...] }
+// zustand.ebene = { name, breite, hoehe, felder: ["####..", ...], erkundet: [0, 1, ...], erinnerung: [kennung | null, ...],
+//   erinnerteDinge: { feldindex: { ... } } }
+// erkundet: je Feld 1, wenn Ninkasi es einmal wirklich gesehen hat (bringt einmal EP, wird nie zurückgesetzt);
+// erinnerung: was sie über das Gelände weiß (zuletzt gesehen oder kartiert, null unbekannt), siehe systeme/erinnerung.js
 // Ein Feld ist ein Zeichen, die Kennung eines Geländes aus daten/gelaende.js.
 // Bewegungsarten (am Wesen: bewegung, Vorgabe "laufend"; Zustände überlagern sie, kern/zustand.js bewegungVon):
 //   passierbar: true      Gelände für alle Bewegungsarten
@@ -29,6 +32,27 @@ function gelaendeNamenNachKennung(spiel) {
     for (const [name, gelaende] of Object.entries(spiel.daten.gelaende)) spiel.zwischenspeicher.gelaendeNamen[gelaende.kennung] = name;
   }
   return spiel.zwischenspeicher.gelaendeNamen;
+}
+
+// Ob Ninkasi das Gelände eines Felds kennt (gesehen oder kartiert, nicht vergessen)
+export function feldBekannt(ebene, x, y) {
+  return aufDerKarte(ebene, x, y) && (ebene.erinnerung?.[feldIndex(ebene, x, y)] ?? null) !== null;
+}
+
+// Das Gelände, das Ninkasi auf einem Feld kennt (Daten), oder null; für sichtbare Felder ist es das echte, weil die
+// Erinnerung bei jeder Neuberechnung der Sicht nachgeführt wird (systeme/erinnerung.js)
+export function bekanntesGelaendeAuf(spiel, x, y) {
+  const ebene = spiel.zustand.ebene;
+  if (!feldBekannt(ebene, x, y)) return null;
+  const name = gelaendeNamenNachKennung(spiel)[ebene.erinnerung[feldIndex(ebene, x, y)]];
+  return name ? spiel.daten.gelaende[name] : null;
+}
+
+// Name des bekannten Geländes oder null
+export function bekannterGelaendeName(spiel, x, y) {
+  const ebene = spiel.zustand.ebene;
+  if (!feldBekannt(ebene, x, y)) return null;
+  return gelaendeNamenNachKennung(spiel)[ebene.erinnerung[feldIndex(ebene, x, y)]] ?? null;
 }
 
 export function gelaendeName(spiel, x, y) {
