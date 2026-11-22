@@ -187,8 +187,12 @@ html, body {
 @keyframes blinken { 50% { opacity: 0; } }
 .fenster-rahmen .reiterleiste .reiter { margin-right: 16px; padding: 2px 6px; color: var(--leise); }
 .fenster-rahmen .reiterleiste .reiter.gewaehlt { color: var(--bier); border-bottom: 2px solid var(--bier); }
-.fenster-rahmen ul.einstellungen li { display: flex; justify-content: space-between; gap: 12px; padding: 1px 4px; }
-.fenster-rahmen .wert-rechts { color: var(--hinweis); }
+.fenster-rahmen ul.einstellungen { max-width: 42em; }
+.fenster-rahmen ul.einstellungen li { display: flex; align-items: baseline; gap: 12px; padding: 1px 4px; }
+.fenster-rahmen ul.einstellungen .bezeichnung { flex: 1; }
+.fenster-rahmen .wert-rechts { color: var(--hinweis); display: inline-grid; grid-template-columns: 2em minmax(12em, auto) 2em; align-items: baseline; }
+.fenster-rahmen .wert-rechts .wert { text-align: center; }
+.fenster-rahmen .wert-rechts .schrittplatz { text-align: center; }
 .fenster-rahmen ul.tastenbelegung li { display: flex; gap: 6px; align-items: baseline; padding: 1px 4px; }
 .fenster-rahmen ul.tastenbelegung .aktion { flex: 1; }
 .fenster-rahmen ul.tastenbelegung .taste { font-family: monospace; color: var(--kupfer); border: 1px solid var(--linie); padding: 0 4px; }

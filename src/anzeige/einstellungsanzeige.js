@@ -36,9 +36,11 @@ function einstellungenListe(umgebung, zustand) {
     const klasse = stelle === zustand.gewaehlt ? ' class="gewaehlt"' : "";
     const wert = einstellungLesen(einstellungen, id);
     const schritte = ["zahl", "auswahl"].includes(EINSTELLUNGEN[id].art);
-    const minus = schritte ? `<button class="schritt" tabindex="-1"${zielAttribut({ zeile: stelle, schritt: -1 })}>−</button> ` : "";
-    const plus = schritte ? ` <button class="schritt" tabindex="-1"${zielAttribut({ zeile: stelle, schritt: 1 })}>+</button>` : "";
-    return `<li${klasse}${zielAttribut({ zeile: stelle })}>${buchstabeHtml(stelle)}${text(`einstellung.${id}`)} <span class="wert-rechts">${minus}${escapeHtml(wertText(texte, id, wert))}${plus}</span></li>`;
+    // feste Plätze für −, Wert und +, damit die Werte aller Zeilen untereinander stehen (stil.css, ul.einstellungen)
+    const minus = schritte ? `<button class="schritt" tabindex="-1"${zielAttribut({ zeile: stelle, schritt: -1 })}>−</button>` : "";
+    const plus = schritte ? `<button class="schritt" tabindex="-1"${zielAttribut({ zeile: stelle, schritt: 1 })}>+</button>` : "";
+    const wertHtml = `<span class="wert-rechts"><span class="schrittplatz">${minus}</span><span class="wert">${escapeHtml(wertText(texte, id, wert))}</span><span class="schrittplatz">${plus}</span></span>`;
+    return `<li${klasse}${zielAttribut({ zeile: stelle })}>${buchstabeHtml(stelle)}<span class="bezeichnung">${text(`einstellung.${id}`)}</span>${wertHtml}</li>`;
   });
   const id = ids[zustand.gewaehlt];
   const details = id ? `<h2>${text(`einstellung.${id}`)}</h2><p>${text(`einstellung.${id}.erklaerung`)}</p>
