@@ -8,7 +8,7 @@
 // zustand_setzen und zustand_entfernen in systeme/zustaende.js.
 
 import { anmelden } from "./register.js";
-import { wuerfeln } from "./zufall.js";
+import { wurfWuerfel } from "./wurf.js";
 import { hakenAusloesen, melden, bezugAuf } from "./ereignisse.js";
 import { wertAendern, ursprungAus, beteiligteAus } from "./effekte.js";
 import { prozentVon, prozentWiederholt, geteiltGerundet } from "./werte.js";
@@ -19,10 +19,10 @@ import { prozentVon, prozentWiederholt, geteiltGerundet } from "./werte.js";
 //   auf: "quelle"         wirkt auf die Quelle statt auf das Ziel (schaden, heilen, wert_aendern)
 //   prozentJeSprung: 70     je Sprung einer Kette (werte.sprungnummer) bleiben so viele Prozent
 //   mitStaerke: true        skaliert mit der Stärke eines Zustands (werte.staerkeProzent, 100 = Stärke 1)
-export function mengeBestimmen(spiel, kontext, parameter) {
+export function mengeBestimmen(spiel, kontext, parameter, wurfname = "menge") {
   const ablage = kontext.werte || {};
   let menge;
-  if (parameter.wuerfel !== undefined) menge = wuerfeln(spiel.zustand.zufallszustand, parameter.wuerfel);
+  if (parameter.wuerfel !== undefined) menge = wurfWuerfel(spiel, wurfname, parameter.wuerfel);
   else if (typeof parameter.menge === "object") menge = prozentVon(ablage[parameter.menge.aus] ?? 0, parameter.menge.prozent ?? 100);
   else menge = parameter.menge;
   if (parameter.teilen !== undefined && ablage[parameter.teilen] > 1) menge = geteiltGerundet(menge, ablage[parameter.teilen]);
@@ -54,7 +54,7 @@ bausteinAnmelden("schaden", { art: "schadensart", ...MENGE }, (spiel, kontextDes
   const ziel = zustand.entitaeten[kontext.zielId];
   if (!ziel || !ziel.werte || !ziel.werte.lp) return;
   const beteiligte = beteiligteAus(kontext);
-  const hakenKontext = hakenAusloesen(spiel, "vor_schaden", { ...beteiligte, schadensart: parameter.art ?? null, menge: mengeBestimmen(spiel, kontext, parameter), abgebrochen: false });
+  const hakenKontext = hakenAusloesen(spiel, "vor_schaden", { ...beteiligte, schadensart: parameter.art ?? null, menge: mengeBestimmen(spiel, kontext, parameter, "schaden"), abgebrochen: false });
   if (hakenKontext.abgebrochen) return;
   const schadenspunkte = Math.max(0, hakenKontext.menge);
   const quelle = zustand.entitaeten[kontext.quelleId];
@@ -74,7 +74,7 @@ bausteinAnmelden("heilen", { wertName: "text?", ...MENGE }, (spiel, kontextDesSc
   const ziel = spiel.zustand.entitaeten[kontext.zielId];
   const wertName = parameter.wertName || "lp";
   if (!ziel || !ziel.werte || !ziel.werte[wertName]) return;
-  const geheilt = wertAendern(spiel, ziel, wertName, mengeBestimmen(spiel, kontext, parameter), ursprungAus(kontext));
+  const geheilt = wertAendern(spiel, ziel, wertName, mengeBestimmen(spiel, kontext, parameter, "heilen"), ursprungAus(kontext));
   melden(spiel, "geheilt", { ziel: bezugAuf(ziel), wertName, menge: geheilt });
 }, { brauchtZiel: true });
 

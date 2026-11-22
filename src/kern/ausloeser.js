@@ -20,7 +20,7 @@
 import { anmelden, alle } from "./register.js";
 import { HAKENKATALOG, AUSLOESER_ROLLEN } from "./hakenkatalog.js";
 import { effektAnwenden } from "./effekte.js";
-import { mitProzentChance } from "./zufall.js";
+import { wurfProzent } from "./wurf.js";
 import { prozentWiederholt, bedingungenErfuellt } from "./werte.js";
 import { fraktionVon } from "./zustand.js";
 
@@ -101,7 +101,7 @@ export function naechstenAusloeserAusfuehren(spiel) {
   const chance = wirksameChance(ausloeser.chance ?? 100, vorgemerkt.kettentiefe, daempfung);
   // sichere Fälle würfeln nicht, so bleibt die Zahlenfolge des Zufalls ungestört
   if (chance <= 0) return true;
-  if (chance < 100 && !mitProzentChance(spiel.zustand.zufallszustand, chance)) return true;
+  if (chance < 100 && !wurfProzent(spiel, "ausloeser", chance)) return true;
   const kontext = { quelleId: vorgemerkt.traegerinId, urheberFraktion: vorgemerkt.traegerinFraktion, zielId, ursache: "ausloeser", kettentiefe: vorgemerkt.kettentiefe + 1 };
   if (zielart === "feld") Object.assign(kontext, { ursprung: vorgemerkt.feld, zielfeld: vorgemerkt.feld });
   effektAnwenden(spiel, ausloeser.effekt, kontext);

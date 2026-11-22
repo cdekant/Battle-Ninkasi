@@ -27,7 +27,7 @@ Umsetzung: keine
 | Handlungsoptionen der KI | hoch | mittel | ja (Format der Daten) |
 | Schatzräume mit Schlüssel | hoch | gering (Plan des Laufs steht) | erledigt (Plan des Laufs) |
 | Fraktionen: Ruf und Beistand | hoch | gering | erledigt (Ruf und Beistand) |
-| Vorschau durch Simulation | hoch | mittel | ja |
+| Vorschau durch Simulation | hoch | mittel | erledigt (Würfe über eine Schnittstelle) |
 | Hellsicht, Spüren, Unsichtbarkeit | hoch | mittel | ja |
 | Zeitumkehr | hoch | mittel | ja |
 | Verwandlung | mittel | mittel | ja |
@@ -157,7 +157,8 @@ Umsetzung: offen
 + Braucht: einen Lauf der Wirkung auf einer Kopie des Zustands
 + Berührt: den Zufall: eine Kopie mit demselben Zufallszustand würfelt genau das, was gleich wirklich geschieht; die Vorschau verriete die Zukunft (eine ungewollte Hellsicht)
 + Umbaurisiko: mittel
-+ Vorkehrung: Würfe im Effektsystem über eine Schnittstelle laufen lassen, die eine Simulation gegen "kleinster Wurf", "größter Wurf" oder einen fremden Zufall tauschen kann; die Vorschau zeigt dann Spannen statt eines Ergebnisses
++ Vorkehrung (erledigt in 0.36.0, siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit): alle Würfe im Spiel laufen über eine Schnittstelle mit benannten Würfen, die eine Simulation gegen "kleinster Wurf", "größter Wurf" mit festgelegten Chancen oder einen fremden Zufall tauschen kann; die Vorschau zeigt dann Spannen statt eines Ergebnisses
++ Offen: die Simulation selbst, eine Kopie des Spiels samt Laufzeitdaten (Raumindex, Vormerkungen, Zwischenspeicher), auf der eine Wirkung läuft, ohne zu melden
 + Aus der Arbeitsliste hierher: vorher [Systemausbau.md](Systemausbau.md), Punkt 10 und Punkt 11 (Später)
 
 Umsetzung: offen

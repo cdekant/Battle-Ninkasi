@@ -21,7 +21,7 @@
 // Marker als Tags an Angriff oder Effekt: verfehlt_nie, unblockbar, ignoriert_ruestung
 // Regelwerte in daten/regeln.js (kampf).
 
-import { mitAnteil, mitProzentChance } from "../kern/zufall.js";
+import { wurfAnteil, wurfProzent } from "../kern/wurf.js";
 import { modifiziert, lebenswertName } from "../kern/werte.js";
 import { effektAnwenden, beteiligteAus } from "../kern/effekte.js";
 import { bausteinAnmelden } from "../kern/bausteine.js";
@@ -75,7 +75,6 @@ export function trefferanteil(spiel, { quelle, ziel, genauigkeit, gegen = "auswe
 // wurf wie bei trefferanteil, dazu kritchance? (Punkte zusätzlich zu denen der Quelle)
 // Hinterhalt: ein ahnungsloses Ziel (systeme/wahrnehmung.js) wird sicher getroffen, nicht geblockt und kritisch
 export function trefferwurf(spiel, wurf) {
-  const zufallszustand = spiel.zustand.zufallszustand;
   const { quelle, ziel, tags = [] } = wurf;
   if (quelle && istAhnungslos(ziel)) {
     melden(spiel, "hinterhalt", { quelle: bezugAuf(quelle), ziel: bezugAuf(ziel) });
@@ -84,13 +83,13 @@ export function trefferwurf(spiel, wurf) {
   const regeln = kampfregeln(spiel);
   const { zaehler, nenner } = trefferanteil(spiel, wurf);
   const trefferchance = anteilInProzent(zaehler, nenner);
-  if (!mitAnteil(zufallszustand, zaehler, nenner)) return { ergebnis: "ausgewichen", kritisch: false, hinterhalt: false, trefferchance };
+  if (!wurfAnteil(spiel, "treffer", zaehler, nenner)) return { ergebnis: "ausgewichen", kritisch: false, hinterhalt: false, trefferchance };
   if (!tags.includes("unblockbar")) {
     const blocken = kampfwert(spiel, ziel, "blocken", { gegenueberId: quelle?.id, tags });
-    if (mitAnteil(zufallszustand, blocken, blocken + regeln.halbwertBlocken)) return { ergebnis: "geblockt", kritisch: false, hinterhalt: false, trefferchance };
+    if (wurfAnteil(spiel, "blocken", blocken, blocken + regeln.halbwertBlocken)) return { ergebnis: "geblockt", kritisch: false, hinterhalt: false, trefferchance };
   }
   const kritchance = quelle ? kampfwert(spiel, quelle, "kritchance", { gegenueberId: ziel.id, tags }, wurf.kritchance ?? 0) : 0;
-  return { ergebnis: "treffer", kritisch: mitAnteil(zufallszustand, kritchance, kritchance + regeln.halbwertKritchance), hinterhalt: false, trefferchance };
+  return { ergebnis: "treffer", kritisch: wurfAnteil(spiel, "kritisch", kritchance, kritchance + regeln.halbwertKritchance), hinterhalt: false, trefferchance };
 }
 
 const tagsDesEffekts = (spiel, effektName) => spiel.daten.effekte?.[effektName]?.tags || [];
@@ -112,7 +111,7 @@ export function kostenDesProfils(spiel, profil) {
 
 // Welche Profile eine Aktion ausführt: ohne chance immer, sonst nach Wurf; kommt keines zum Zug, das erste
 function profileDerAktion(spiel, profile) {
-  const gewaehlt = profile.filter((profil) => profil.chance === undefined || mitProzentChance(spiel.zustand.zufallszustand, profil.chance));
+  const gewaehlt = profile.filter((profil) => profil.chance === undefined || wurfProzent(spiel, "angriffsprofil", profil.chance));
   return gewaehlt.length > 0 ? gewaehlt : profile.slice(0, 1);
 }
 

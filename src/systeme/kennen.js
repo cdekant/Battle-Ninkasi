@@ -15,7 +15,8 @@
 import { anmelden } from "../kern/register.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { modifiziert } from "../kern/werte.js";
-import { zufallErzeugen, zufallsGanzzahl, startwertAbleiten, mitAnteil } from "../kern/zufall.js";
+import { zufallErzeugen, zufallsGanzzahl, startwertAbleiten } from "../kern/zufall.js";
+import { wurfAnteil } from "../kern/wurf.js";
 import { spielerin } from "../kern/zustand.js";
 
 // Ordnet den unbekannten Typen ihre Etiketten zu (vor dem Erzeugen der ersten Ebene, kern/spiel.js)
@@ -65,7 +66,7 @@ export function beimAufhebenErkennen(spiel, wesen, typ) {
   if (wesen.id !== spiel.zustand.spielerinId || !istUnbekannt(spiel.zustand, typ)) return;
   const kennerschaft = kennerschaftVon(spiel, wesen);
   if (kennerschaft === 0) return;
-  if (mitAnteil(spiel.zustand.zufallszustand, kennerschaft, kennerschaft + schwierigkeitVon(spiel, typ))) erkennen(spiel, wesen, typ);
+  if (wurfAnteil(spiel, "erkennen", kennerschaft, kennerschaft + schwierigkeitVon(spiel, typ))) erkennen(spiel, wesen, typ);
 }
 
 // Chance als Bruch: mit jeder Benutzung steigt sie und nähert sich 100 % (dieselbe Form wie die Kampfwerte)
@@ -77,7 +78,7 @@ function vertrauterWerden(spiel, wesen, typ) {
   const wissen = spiel.zustand.wissen;
   wissen.vertrautheit[typ] = (wissen.vertrautheit[typ] ?? 0) + 1;
   const { zaehler, nenner } = erkennenChance(wissen.vertrautheit[typ], kennerschaftVon(spiel, wesen), schwierigkeitVon(spiel, typ));
-  if (mitAnteil(spiel.zustand.zufallszustand, zaehler, nenner)) erkennen(spiel, wesen, typ);
+  if (wurfAnteil(spiel, "erkennen", zaehler, nenner)) erkennen(spiel, wesen, typ);
 }
 
 // Unbekannte angelegte Gegenstände Ninkasis, je Typ einmal, ausgewählt nach istPassend

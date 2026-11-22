@@ -62,22 +62,35 @@ export function mitAnteil(zufallszustand, zaehler, nenner) {
   return zufallsGanzzahl(zufallszustand, 0, nenner - 1) < zaehler;
 }
 
-// Würfelausdruck wie "2W6", "1W6+2", "1W4-1", "5"
-export function wuerfeln(zufallszustand, ausdruck) {
+// Zerlegt einen Würfelausdruck in { anzahl, seiten, zuschlag } (ein fester Wert hat anzahl 0); wirft bei ungültigen
+function wuerfelausdruckZerlegen(ausdruck) {
   const treffer = /^\s*(?:(\d+)\s*[wWdD]\s*(\d+))?\s*([+-]\s*\d+)?\s*$/.exec(String(ausdruck));
   if (!treffer || (!treffer[1] && !treffer[3])) {
     const festwert = Number(ausdruck);
-    if (Number.isInteger(festwert)) return festwert;
+    if (Number.isInteger(festwert)) return { anzahl: 0, seiten: 0, zuschlag: festwert };
     throw new Error(`Ungültiger Würfelausdruck "${ausdruck}"`);
   }
   const [, anzahlText, seitenText, zuschlagText] = treffer;
+  return {
+    anzahl: anzahlText ? Number(anzahlText) : 0,
+    seiten: anzahlText ? Number(seitenText) : 0,
+    zuschlag: zuschlagText ? Number(zuschlagText.replace(/\s/g, "")) : 0,
+  };
+}
+
+// Würfelausdruck wie "2W6", "1W6+2", "1W4-1", "5"
+export function wuerfeln(zufallszustand, ausdruck) {
+  const { anzahl, seiten, zuschlag } = wuerfelausdruckZerlegen(ausdruck);
   let summe = 0;
-  if (anzahlText) {
-    const anzahl = Number(anzahlText), seiten = Number(seitenText);
-    for (let i = 0; i < anzahl; i++) summe += zufallsGanzzahl(zufallszustand, 1, seiten);
-  }
-  if (zuschlagText) summe += Number(zuschlagText.replace(/\s/g, ""));
-  return summe;
+  for (let i = 0; i < anzahl; i++) summe += zufallsGanzzahl(zufallszustand, 1, seiten);
+  return summe + zuschlag;
+}
+
+// Kleinster und größter Wurf eines Würfelausdrucks, ohne zu würfeln: { kleinster, groesster }
+// (ein Würfel mit 0 Seiten zeigt wie in zufallsGanzzahl immer 1)
+export function wuerfelSpanne(ausdruck) {
+  const { anzahl, seiten, zuschlag } = wuerfelausdruckZerlegen(ausdruck);
+  return { kleinster: anzahl + zuschlag, groesster: anzahl * Math.max(1, seiten) + zuschlag };
 }
 
 // Prüft einen Würfelausdruck, ohne zu würfeln (für die Datenprüfung)

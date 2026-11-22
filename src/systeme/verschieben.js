@@ -23,7 +23,7 @@ import { anmelden, holen } from "../kern/register.js";
 import { bausteinAnmelden, mengeBestimmen } from "../kern/bausteine.js";
 import { effektAnwenden } from "../kern/effekte.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
-import { zufallsGanzzahl } from "../kern/zufall.js";
+import { wurfAuswahl } from "../kern/wurf.js";
 import { istWesen, bewegungVon } from "../kern/zustand.js";
 import { lageOffenEntnehmen } from "../kern/raumindex.js";
 import { lebenswertName } from "../kern/werte.js";
@@ -121,7 +121,7 @@ bausteinAnmelden("tauschen", {}, (spiel, kontext) => {
 // Zufälliges Feld aus einer Liste in fester Reihenfolge oder null
 function zufallsfeld(spiel, felder) {
   if (!felder.length) return null;
-  return felder[zufallsGanzzahl(spiel.zustand.zufallszustand, 0, felder.length - 1)];
+  return wurfAuswahl(spiel, "zufallsfeld", felder);
 }
 
 function teleportziel(spiel, kontext, wesen, parameter) {

@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  zufallErzeugen, naechsteZufallszahl, zufallsGanzzahl, mitProzentChance, wuerfeln, istWuerfelausdruck, startwertAbleiten,
+  zufallErzeugen, naechsteZufallszahl, zufallsGanzzahl, mitProzentChance, wuerfeln, wuerfelSpanne, istWuerfelausdruck, startwertAbleiten,
 } from "../src/kern/zufall.js";
 
 const zahlenfolge = (zufallszustand, laenge) => Array.from({ length: laenge }, () => naechsteZufallszahl(zufallszustand));
@@ -57,6 +57,15 @@ test("wuerfeln: Festwerte und Bereiche der Würfelausdrücke", () => {
   }
   assert.throws(() => wuerfeln(zufallszustand, "W6"));
   assert.throws(() => wuerfeln(zufallszustand, "abc"));
+});
+
+test("wuerfelSpanne: kleinster und größter Wurf ohne zu würfeln", () => {
+  assert.deepEqual(wuerfelSpanne("2W6+3"), { kleinster: 5, groesster: 15 });
+  assert.deepEqual(wuerfelSpanne("1W4-1"), { kleinster: 0, groesster: 3 });
+  assert.deepEqual(wuerfelSpanne("3W8"), { kleinster: 3, groesster: 24 });
+  assert.deepEqual(wuerfelSpanne(5), { kleinster: 5, groesster: 5 });
+  assert.deepEqual(wuerfelSpanne("+2"), { kleinster: 2, groesster: 2 });
+  assert.throws(() => wuerfelSpanne("W6"));
 });
 
 test("istWuerfelausdruck erkennt gültige und ungültige Ausdrücke", () => {

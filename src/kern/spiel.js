@@ -3,6 +3,7 @@
 //   zustand: reine Daten (JSON), befehle: Aufzeichnung für den Spielstand,
 //   hoerer: Empfänger der Meldungen, zwischenspeicher: abgeleitete Nachschlagetabellen (nicht im Zustand),
 //   anstehendeAusloeser: vorgemerkte Auslöser, nach jedem Vorgang leer (siehe kern/vorgang.js)
+//   wurfquelle (freiwillig, nicht gespeichert): woher die Würfe kommen, ohne Angabe der Spiel-Zufall (siehe kern/wurf.js)
 
 import "./bausteine.js";
 import "./ausloeser.js";

@@ -2,7 +2,7 @@
 
 Stand: 2026-11-22
 
-Zuständig für: `index.html`, `package.json`, `lib/*`, `src/main.js`, `src/version.js`, `src/kern/spiel.js`, `src/kern/zustand.js`, `src/kern/zeit.js`, `src/kern/zufall.js`, `src/kern/ereignisse.js`, `src/kern/hakenkatalog.js`, `src/kern/register.js`, `src/kern/daten.js`, `src/kern/raumindex.js`, `src/kern/kurven.js`, `src/systeme/index.js`, `src/eingabe/speicherstand.js`, `daten/index.js`, `daten/regeln.js`, `daten/aktionen.js`
+Zuständig für: `index.html`, `package.json`, `lib/*`, `src/main.js`, `src/version.js`, `src/kern/spiel.js`, `src/kern/zustand.js`, `src/kern/zeit.js`, `src/kern/zufall.js`, `src/kern/wurf.js`, `src/kern/ereignisse.js`, `src/kern/hakenkatalog.js`, `src/kern/register.js`, `src/kern/daten.js`, `src/kern/raumindex.js`, `src/kern/kurven.js`, `src/systeme/index.js`, `src/eingabe/speicherstand.js`, `daten/index.js`, `daten/regeln.js`, `daten/aktionen.js`
 
 Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Entwicklung.md](Entwicklung.md), [Titelbildschirm.md](Titelbildschirm.md), [Grundlagen.md](Grundlagen.md), [Texte.md](Texte.md), [Ausblick.md](Ausblick.md)
 
@@ -179,13 +179,22 @@ Daten:
 
 Schnittstellen (`src/kern/zufall.js`):
 
-+ `zufallErzeugen`, `naechsteZufallszahl`, `zufallsGanzzahl(z, min, max)`, `mitProzentChance(z, prozent)`, `mitAnteil(z, zaehler, nenner)` (exakter Bruch), `wuerfeln(z, "1W6+2")`, `istWuerfelausdruck`, `startwertAbleiten(startwert, kennung)`
++ `zufallErzeugen`, `naechsteZufallszahl`, `zufallsGanzzahl(z, min, max)`, `mitProzentChance(z, prozent)`, `mitAnteil(z, zaehler, nenner)` (exakter Bruch), `wuerfeln(z, "1W6+2")`, `wuerfelSpanne("1W6+2")` (kleinster und größter Wurf, ohne zu würfeln), `istWuerfelausdruck`, `startwertAbleiten(startwert, kennung)`
 + Abgeleitete Startwerte: Spiel-Zufall (`"spiel"`), Plan des Laufs (`"plan"`), Grundriss (`"ebene.<tiefe>.<name>"`, bei einem neuen Versuch mit `.versuch<n>`), Türen, Objekte und Inhalt einer Ebene (`.tueren`, `.objekte`, `.inhalt` dahinter) haben eigene Quellen, damit die Ebene nicht vom Spielverlauf abhängt; ebenso die Etiketten unbekannter Gegenstände (`"etiketten"`); später z.B. Buchtexte aus Lauf-Startwert und Objekt-ID
+
+Schnittstellen (`src/kern/wurf.js`, seit 0.36.0):
+
++ Würfe im Spiel: `wurfGanzzahl(spiel, name, min, max)`, `wurfWuerfel(spiel, name, ausdruck)`, `wurfProzent(spiel, name, prozent)`, `wurfAnteil(spiel, name, zaehler, nenner)`, `wurfAuswahl(spiel, name, liste)`; jeder Wurf trägt einen kurzen Namen (`treffer`, `blocken`, `kritisch`, `schaden`, `heilen`, `menge`, `angriffsprofil`, `risiko`, `ausloeser`, `faehigkeitenwahl`, `bemerken`, `erkennen`, `falle_entdecken`, `abweichen`, `ziel_verfehlen`, `ausbreitung`, `gasabbau`, `entzuenden`, Auswahlen mit `_wohin` wie `kette_wohin`, dazu `zufallsfeld`); ein Wurf ohne Namen wirft
++ Quelle der Würfe: `spiel.wurfquelle`, ein Laufzeitfeld außerhalb des Zustands, nicht gespeichert; ohne Angabe oder mit `{ art: "zufall" }` der Spiel-Zufall, `{ art: "fremd", zufallszustand }` ein eigener Zufallszustand (für viele Simulationen, aus denen Spannen folgen), `{ art: "grenzen", mengen: "kleinste" | "groesste", chancen?: { <name>: true | false }, zufallszustand }` Würfel und Ganzzahlen am kleinsten oder größten Wurf, festgelegte Chancen ohne Wurf, nicht festgelegte Chancen und Auswahlen aus dem eigenen Zufallszustand
++ `mitWurfquelle(spiel, wurfquelle, funktion)` führt eine Funktion mit einer anderen Quelle aus und stellt die vorige danach wieder her, auch nach einem Fehler
++ Zweck: eine Vorschau, die eine Wirkung auf einer Kopie simuliert, verrät mit einer anderen Quelle nicht, was gleich wirklich fällt (siehe [Ausblick.md](Ausblick.md), Vorschau durch Simulation); die Simulation selbst (Kopie des Spiels samt Laufzeitdaten) ist noch nicht gebaut
 
 Regeln:
 
 + Regeln für die Logik: kein `Math.random()`, keine Uhrzeit, keine Winkelfunktionen, nur ganze Zahlen, feste Reihenfolge beim Durchlaufen von Sammlungen
 + Jede Änderung am Verfahren des Zufalls ändert die Zahlenfolge
++ Jeder Wurf während des Spiels läuft über `src/kern/wurf.js`; nur Generator, Schnittstelle und das Anlegen in `src/kern/spiel.js` fassen `zufallszustand` an (geprüft von `tests/wurf.test.js`); die Welterzeugung würfelt mit eigenen abgeleiteten Startwerten; im echten Spiel rufen die Wurffunktionen dieselben Funktionen in derselben Reihenfolge wie zuvor, die Zahlenfolge blieb mit 0.36.0 gleich
++ Sichere Fälle (Chance 0 oder 100) würfeln nicht, wo der Aufrufer sie vorher prüft; so bleibt die Zahlenfolge von solchen Fällen ungestört
 + Startwert eines neuen Laufs: zufällig (`crypto.getRandomValues` in `src/main.js`) oder über `?seed=` in der Adresse (Zahl, sonst aus dem Text abgeleitet); eine Abfrage im Titel nach dem Vorbild Brogue ist vorgesehen
 + Kosmetischer Zufall (Titelbild, Spruch im Titel, später Animationen, Partikel und Textvarianten) nutzt `Math.random()` nur in der Anzeige und berührt den Spiel-Zufall nie
 + rot.js hat einen eigenen, globalen Zufall; er wird nur für die Dungeon-Erzeugung benutzt und vorher mit einem abgeleiteten Startwert gesetzt (`RNG.setSeed` im Schritt `karte_digger`, `src/welt/ebenenschritte.js`)

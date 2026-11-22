@@ -10,7 +10,7 @@
 //              nur auf Ziele, die der Befehl zulässt; gibt es keins, bleibt der Befehl. Andere Befehle bleiben unverändert.
 
 import { anmelden, holen } from "../kern/register.js";
-import { mitProzentChance, zufallsGanzzahl } from "../kern/zufall.js";
+import { wurfProzent, wurfAuswahl } from "../kern/wurf.js";
 import { prozentVon } from "../kern/werte.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { ACHT_RICHTUNGEN, wesenAufFeld } from "../welt/geometrie.js";
@@ -22,14 +22,14 @@ function veraendererAnmelden(name, parameterBeschreibung, funktion) {
 }
 
 // Sichere Fälle würfeln nicht, so bleibt die Zahlenfolge des Zufalls ungestört
-function trittEin(spiel, chance) {
+function trittEin(spiel, wurfname, chance) {
   if (chance <= 0) return false;
-  return chance >= 100 || mitProzentChance(spiel.zustand.zufallszustand, chance);
+  return chance >= 100 || wurfProzent(spiel, wurfname, chance);
 }
 
 veraendererAnmelden("abweichen", { chance: "ganzzahl", freundeAngreifen: "wahrheitswert?" }, (spiel, akteur, befehl, parameter, staerkeProzent) => {
   if (befehl?.art !== "bewegen") return befehl;
-  if (!trittEin(spiel, prozentVon(parameter.chance, staerkeProzent))) return befehl;
+  if (!trittEin(spiel, "abweichen", prozentVon(parameter.chance, staerkeProzent))) return befehl;
   const bewegen = holen("befehle", "bewegen");
   const kandidaten = [];
   for (const richtung of ACHT_RICHTUNGEN) {
@@ -45,7 +45,7 @@ veraendererAnmelden("abweichen", { chance: "ganzzahl", freundeAngreifen: "wahrhe
   }
   if (!kandidaten.length) return befehl;
   melden(spiel, "abgewichen", { wer: bezugAuf(akteur) });
-  return kandidaten[zufallsGanzzahl(spiel.zustand.zufallszustand, 0, kandidaten.length - 1)];
+  return wurfAuswahl(spiel, "abweichen_wohin", kandidaten);
 });
 
 // Verrutschte Zielangaben zu einer Zielangabe, in fester Reihenfolge
@@ -75,12 +75,12 @@ function verrutschteZiele(spiel, akteur, ziel) {
 
 veraendererAnmelden("ziel_verfehlen", { chance: "ganzzahl" }, (spiel, akteur, befehl, parameter, staerkeProzent) => {
   if (befehl?.art !== "faehigkeit" || befehl.ziel === undefined) return befehl;
-  if (!trittEin(spiel, prozentVon(parameter.chance, staerkeProzent))) return befehl;
+  if (!trittEin(spiel, "ziel_verfehlen", prozentVon(parameter.chance, staerkeProzent))) return befehl;
   const faehigkeit = holen("befehle", "faehigkeit");
   const kandidaten = verrutschteZiele(spiel, akteur, befehl.ziel)
     .map((ziel) => ({ ...befehl, ziel }))
     .filter((kandidat) => !faehigkeit.pruefen(spiel, akteur, kandidat));
   if (!kandidaten.length) return befehl;
   melden(spiel, "abgewichen", { wer: bezugAuf(akteur) });
-  return kandidaten[zufallsGanzzahl(spiel.zustand.zufallszustand, 0, kandidaten.length - 1)];
+  return wurfAuswahl(spiel, "ziel_verfehlen_wohin", kandidaten);
 });

@@ -14,7 +14,7 @@
 import { anmelden } from "../kern/register.js";
 import { entitaetenImUmkreis, fraktionVon, istWesen, gesteuerteEntitaet } from "../kern/zustand.js";
 import { modifiziert, lebenswertName } from "../kern/werte.js";
-import { mitProzentChance } from "../kern/zufall.js";
+import { wurfProzent } from "../kern/wurf.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { bausteinAnmelden } from "../kern/bausteine.js";
 import { abstand, aufDerKarte, feldIndex, passierbar, gelaendeAuf } from "../welt/karte.js";
@@ -68,7 +68,7 @@ export function wahrnehmen(spiel, wesen) {
   const chance = regelnVon(spiel).bemerkenChance;
   for (const ziel of sichtbareFeinde(spiel, wesen)) {
     if (abstand(wesen.position, ziel.position) > heimlichkeitsweite(spiel, ziel)) continue;
-    const bemerkt = chance >= 100 || (chance > 0 && mitProzentChance(spiel.zustand.zufallszustand, chance));
+    const bemerkt = chance >= 100 || (chance > 0 && wurfProzent(spiel, "bemerken", chance));
     if (!bemerkt) continue;
     wecken(spiel, wesen, "jagt");
     melden(spiel, "bemerkt", { wer: bezugAuf(wesen), ziel: bezugAuf(ziel) });

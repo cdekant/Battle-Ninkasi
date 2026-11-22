@@ -9,7 +9,7 @@
 // Zielangabe nach Zielart: wesen und geschoss die Beute ({ id }), feld deren Feld (angekündigte Angriffe zielen so
 // auf das Feld beim Beginn), selbst keine, richtung zur Beute, nur wenn sie daneben steht.
 
-import { mitProzentChance } from "../kern/zufall.js";
+import { wurfProzent } from "../kern/wurf.js";
 import { bedingungenErfuellt } from "../kern/werte.js";
 import { fraktionVon } from "../kern/zustand.js";
 import { abstand } from "../welt/karte.js";
@@ -51,7 +51,7 @@ function eintragPasst(spiel, wesen, eintrag, beute) {
   if (faehigkeitPruefen(spiel, wesen, eintrag.name, zielangabe)) return null;
   if (trifftVerbuendete(spiel, wesen, definition.ziel, zielangabe)) return null;
   // erst würfeln, wenn sonst alles passt: so bleibt die Zahlenfolge des Zufalls von unbenutzbaren Einträgen unberührt
-  if (eintrag.chance !== undefined && eintrag.chance < 100 && !mitProzentChance(spiel.zustand.zufallszustand, eintrag.chance)) return null;
+  if (eintrag.chance !== undefined && eintrag.chance < 100 && !wurfProzent(spiel, "faehigkeitenwahl", eintrag.chance)) return null;
   const befehl = { art: "faehigkeit", faehigkeit: eintrag.name };
   if (zielangabe !== undefined) befehl.ziel = zielangabe;
   return befehl;

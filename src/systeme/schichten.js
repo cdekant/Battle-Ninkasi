@@ -25,7 +25,7 @@ import { anmelden } from "../kern/register.js";
 import { bausteinAnmelden } from "../kern/bausteine.js";
 import { effektAnwenden } from "../kern/effekte.js";
 import { melden } from "../kern/ereignisse.js";
-import { mitProzentChance, zufallsGanzzahl } from "../kern/zufall.js";
+import { wurfProzent, wurfAuswahl } from "../kern/wurf.js";
 import { bedingungenErfuellt } from "../kern/werte.js";
 import { entitaetenAuf, bewegungVon, istWesen, gesteuerteEntitaet } from "../kern/zustand.js";
 import { aufDerKarte, feldIndex, gelaendeAuf, passierbar } from "../welt/karte.js";
@@ -179,9 +179,9 @@ anmelden("welttick", "oberflaeche", (spiel) => {
     if (daten.jeTick) {
       for (const wesen of wesenAufIndex(spiel, index)) if (betroffenVonOberflaeche(daten, wesen)) aufWesenWirken(spiel, daten.jeTick, wesen, index, "oberflaeche", { art: "oberflaeche", name: eintrag.art });
     }
-    if (daten.ausbreitung && mitProzentChance(spiel.zustand.zufallszustand, daten.ausbreitung.chance)) {
+    if (daten.ausbreitung && wurfProzent(spiel, "ausbreitung", daten.ausbreitung.chance)) {
       const freie = nachbarIndizes(ebene, index).filter((nachbar) => !tabelle[nachbar] && passierbar(spiel, nachbar % ebene.breite, Math.floor(nachbar / ebene.breite)));
-      if (freie.length) tabelle[freie[zufallsGanzzahl(spiel.zustand.zufallszustand, 0, freie.length - 1)]] = { art: eintrag.art, menge: 1 };
+      if (freie.length) tabelle[wurfAuswahl(spiel, "ausbreitung_wohin", freie)] = { art: eintrag.art, menge: 1 };
     }
     if (daten.schwund && tabelle[index] && !ebene.schichten.feuer[index]) {
       tabelle[index].menge -= daten.schwund;
@@ -266,7 +266,7 @@ anmelden("welttick", "gas", (spiel) => {
     if (daten.abbau) {
       const hundertstel = eintrag.menge * daten.abbau;
       const rest = hundertstel % 100;
-      eintrag.menge -= Math.floor(hundertstel / 100) + (rest > 0 && zufallsGanzzahl(spiel.zustand.zufallszustand, 1, 100) <= rest ? 1 : 0);
+      eintrag.menge -= Math.floor(hundertstel / 100) + (rest > 0 && wurfProzent(spiel, "gasabbau", rest) ? 1 : 0);
     }
     if (eintrag.menge <= 0) {
       delete tabelle[index];
@@ -300,7 +300,7 @@ anmelden("welttick", "feuer", (spiel) => {
     for (const nachbar of nachbarIndizes(ebene, index)) {
       if (schichten.feuer[nachbar] || zuEntzuenden.has(nachbar)) continue;
       const chance = brennbarkeit(spiel, nachbar % ebene.breite, Math.floor(nachbar / ebene.breite));
-      if (chance > 0 && mitProzentChance(spiel.zustand.zufallszustand, chance)) zuEntzuenden.add(nachbar);
+      if (chance > 0 && wurfProzent(spiel, "entzuenden", chance)) zuEntzuenden.add(nachbar);
     }
   }
   // erst abbrennen lassen, dann die neuen Felder entzünden (sie brennen ab dem nächsten Welttick)

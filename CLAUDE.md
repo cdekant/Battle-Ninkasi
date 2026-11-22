@@ -29,7 +29,7 @@ Taste → `eingabe/eingabe.js` (Belegung → Aktion aus dem Aktionskatalog) → 
 ## Ordner
 
 + `index.html`, `src/main.js`: Einstieg im Browser, verdrahtet Logik, Anzeige und Eingabe; `src/version.js` einzige Quelle der Versionsnummer
-+ `src/kern/`: Spiel und Eingangstür (`spiel.js`), Zustand, Zeit, Zufall, Ereignisse und Haken, Register, Vorgang, Werte, Kurven, Effektsystem und Grundbausteine, Auslöser, Datenprüfung
++ `src/kern/`: Spiel und Eingangstür (`spiel.js`), Zustand, Zeit, Zufall und Würfe, Ereignisse und Haken, Register, Vorgang, Werte, Kurven, Effektsystem und Grundbausteine, Auslöser, Datenprüfung
 + `src/systeme/`: die Mechanik je Thema (Kampf, Bewegung, Zustände, Fähigkeiten, Inventar, Gelände, Wahrnehmung, Skills, Lernen u.a.); melden sich beim Import in Registern an (`systeme/index.js`)
 + `src/ki/`: Verhaltensmodule (`abwarten`, `jagen`, `fliehen`), Zielwahl, Schrittwahl, Wahl der Fähigkeiten
 + `src/welt/`: Plan des Laufs, Erzeugung der Ebenen in Schritten, Population, Karte, Feldschichten, Wegfindung, Geometrie

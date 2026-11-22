@@ -14,7 +14,7 @@
 import { bausteinAnmelden } from "../kern/bausteine.js";
 import { effektAnwenden } from "../kern/effekte.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
-import { zufallsGanzzahl } from "../kern/zufall.js";
+import { wurfAuswahl } from "../kern/wurf.js";
 import { lebenswertName } from "../kern/werte.js";
 import { flugbahn, linie } from "../welt/geometrie.js";
 import { musterFelder, entitaetenAufFeldern, verbuendeteUeberspringen, TRIFFT_ARTEN } from "./zielauswahl.js";
@@ -102,7 +102,7 @@ bausteinAnmelden("springen", { anzahl: "ganzzahl", reichweite: "ganzzahl", effek
     const umkreis = musterFelder(spiel, { art: "kreis", radius: parameter.reichweite }, { ursprung: position, zielpunkt: position, quelleId: kontext.quelleId });
     const kandidaten = entitaetenAufFeldern(spiel, umkreis, optionen).filter((entitaet) => !getroffeneIds.includes(entitaet.id) && lebt(entitaet));
     if (!kandidaten.length) break;
-    const naechstes = parameter.wahl === "zufaellig" ? kandidaten[zufallsGanzzahl(zustand.zufallszustand, 0, kandidaten.length - 1)] : kandidaten[0];
+    const naechstes = parameter.wahl === "zufaellig" ? wurfAuswahl(spiel, "kette_wohin", kandidaten) : kandidaten[0];
     const ankunft = feldKopie(naechstes.position);
     melden(spiel, "geschoss", { quelle: quellbezug(spiel, kontext), bahn: linie(position, ankunft).slice(1), aufschlag: ankunft });
     treffen(naechstes);

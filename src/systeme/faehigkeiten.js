@@ -39,7 +39,7 @@ import { modifiziert, hatWert, bedingungenErfuellt } from "../kern/werte.js";
 import { effektAnwenden, wertAendern } from "../kern/effekte.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { entitaetMitId, entitaetEntfernen, fraktionVon } from "../kern/zustand.js";
-import { zufallsGanzzahl } from "../kern/zufall.js";
+import { wurfGanzzahl } from "../kern/wurf.js";
 import { wertAufKurve } from "../kern/kurven.js";
 import { zielAufloesen, entitaetenAufFeldern } from "./zielauswahl.js";
 import { zustandSetzen, zustandBeenden } from "./zustaende.js";
@@ -156,7 +156,7 @@ export function risikoWuerfeln(spiel, wesen, tabellenName, x = undefined) {
   const wert = x ?? (hatWert(wesen, "pegel") ? wesen.werte.pegel.aktuell : 0);
   const chancen = tabelle.map((ausgang) => Math.max(0, wertAufKurve(ausgang.chance, wert)));
   if (chancen.every((chance) => chance === 0)) return null;
-  let wurf = zufallsGanzzahl(spiel.zustand.zufallszustand, 1, 100);
+  let wurf = wurfGanzzahl(spiel, "risiko", 1, 100);
   for (let i = 0; i < tabelle.length; i++) {
     if (wurf <= chancen[i]) return tabelle[i];
     wurf -= chancen[i];

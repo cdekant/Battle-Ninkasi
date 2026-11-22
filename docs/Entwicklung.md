@@ -78,6 +78,7 @@ Regeln:
 + Tests mit Fehlern in den Daten nutzen `rohdatenMitTesteintraegen`, nie den Spielinhalt
 + Tasten: die Belegung nennt physische Tasten (`KeyboardEvent.code`), Buchstaben in Fenstern und Zeichen ohne feste Lage gelten nach `KeyboardEvent.key`; wer das verwechselt, vertauscht auf der deutschen Tastatur Y und Z (siehe [Bedienung.md](Bedienung.md), Eingabe)
 + Logik ohne `Math.random()`, Uhrzeit und Winkelfunktionen (siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit), Kampfrechnung ohne `Math.exp` und `Math.pow` (siehe [Wesen.md](Wesen.md), Kampfwerte)
++ Neue Würfe im Spiel nie mit `spiel.zustand.zufallszustand`, sondern über `src/kern/wurf.js` mit einem Namen, sonst schlägt `tests/wurf.test.js` fehl (siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit)
 + Die Kartengeneratoren von rot.js brechen ohne `timeLimit: Infinity` nach Uhrzeit ab (siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit)
 
 ## Stand des Spielinhalts

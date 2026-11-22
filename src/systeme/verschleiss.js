@@ -13,7 +13,7 @@ import { bausteinAnmelden, mengeBestimmen } from "../kern/bausteine.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { entitaetMitId, entitaetEntfernen, entitaetAusDatensatz, ausDemInventarNehmen } from "../kern/zustand.js";
 import { kaputtVormerken, kaputtOffenEntnehmen } from "../kern/raumindex.js";
-import { zufallsGanzzahl } from "../kern/zufall.js";
+import { wurfAuswahl } from "../kern/wurf.js";
 import { anzahlVon, insInventar } from "./inventar.js";
 import { ausgeruestete, haltbarkeitProzent } from "./ausruestung.js";
 
@@ -52,7 +52,7 @@ bausteinAnmelden("abnutzen", { platz: "text?", wuerfel: "wuerfel|menge" }, (spie
   const kandidaten = ausgeruestete(spiel, ziel)
     .filter((gegenstand) => haltbarkeitVon(gegenstand) > 0 && (parameter.platz === undefined || gegenstand.ausruestung.platz === parameter.platz));
   if (!kandidaten.length) return;
-  const getroffen = kandidaten[zufallsGanzzahl(zustand.zufallszustand, 0, kandidaten.length - 1)];
+  const getroffen = wurfAuswahl(spiel, "abnutzen_wohin", kandidaten);
   const menge = Math.max(0, mengeBestimmen(spiel, kontext, parameter));
   if (menge === 0) return;
   const vorher = haltbarkeitVon(getroffen);
