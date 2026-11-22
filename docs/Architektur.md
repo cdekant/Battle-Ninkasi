@@ -137,7 +137,7 @@ Regeln:
 
 Daten (`src/kern/register.js`): feste Liste der Registerarten, jede eine Zuordnung Name → Eintrag:
 
-+ `befehle` (`{ pruefen, ausfuehren, ohneZeit? }`), `bausteine` (`(spiel, kontext, parameter) => void`), `ki` (`(spiel, akteur, ki) => befehl`), `modifikatorquellen` (`(spiel, entitaet) => [modifikator]`), `modifikatorbedingungen`, `befehlsveraenderer`, `zielmuster` (`(spiel, auswahl, parameter) => [{x, y}]`), `welttick`, `zeitereignisse`, `haken` (Listen je Name), `gefahren`, `zustandspruefungen` (`(spiel) => true`, wenn sie etwas verändert haben), `laufendeaktionen`, `beimErzeugen`, `ausloeserquellen`, `lernanlaesse`, `planschritte` (`(spiel, plan, zufall) => void`) und `ebenenschritte` (`{ braucht, liefert, verwirft?, ausfuehren }`), beide siehe [Welt.md](Welt.md), Plan des Laufs und [Welt.md](Welt.md), Ebenen
++ `befehle` (`{ pruefen, ausfuehren, ohneZeit? }`), `bausteine` (`(spiel, kontext, parameter) => void`), `ki` (`(spiel, akteur, ki) => befehl`), `modifikatorquellen` (`(spiel, entitaet) => [modifikator]`), `modifikatorbedingungen`, `befehlsveraenderer`, `zielmuster` (`(spiel, auswahl, parameter) => [{x, y}]`), `welttick`, `zeitereignisse`, `haken` (Listen je Name), `gefahren`, `zustandspruefungen` (`(spiel) => true`, wenn sie etwas verändert haben), `laufendeaktionen`, `beimErzeugen`, `ausloeserquellen`, `lernanlaesse`, `planschritte` (`(spiel, plan, zufall) => void`), `ebenenschritte` (`{ braucht, liefert, verwirft?, ausfuehren }`) und `mitnehmen` (`(spiel, ninkasi, wechsel) => [id]`), siehe [Welt.md](Welt.md), Plan des Laufs und [Welt.md](Welt.md), Ebenen
 
 Schnittstellen:
 

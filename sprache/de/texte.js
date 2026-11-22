@@ -90,6 +90,7 @@ export default {
   "log.falle_ausgeloest": "{wer.nom} tritt in {was.akk.ein}!",
   "log.benutzt": "{wer.nom} macht sich daran zu schaffen.",
   "log.ebene_gewechselt": "{wer.nom} steigt {richtung}. Tiefe {tiefe}.",
+  "log.gefolgt": "{wer.nom} folgt {wem.dat} über die Treppe.",
   "log.fallengelassen": "{wer.nom} lässt {was.akk} fallen.",
   "log.angelegt": "{wer.nom} legt {was.akk} an.",
   "log.fluch_entdeckt": "Ein Fluch! {was.nom} lässt sich nicht mehr ablegen.",

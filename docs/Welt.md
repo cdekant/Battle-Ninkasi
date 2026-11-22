@@ -111,6 +111,8 @@ Schnittstellen:
 + `eintraegeFuerTiefe`, `populationSetzen`, `freiesFeldZiehen` (`src/welt/population.js`)
 + Befehl `{ art: "treppe" }` (Taste `<` oder `>`), nur für Ninkasi, Ablehnung `keine_treppe`, Zeitkosten `aktionen.treppe`; Meldung `ebene_gewechselt` mit `tiefe` und `richtung`
 + `ebeneWechseln` (`src/systeme/ebenen.js`)
++ Register `mitnehmen` (seit 0.38.0): `(spiel, ninkasi, wechsel) => [id]` mit `wechsel = { von, nach, richtung }`; angemeldet sind `getragenes` (Ninkasi) und `verfolger` (`verfolgt(spiel, wesen, ninkasi)`); was ein Mitgenommener trägt, kommt immer mit; Begleiter melden später einen eigenen Eintrag an
++ Meldung `gefolgt` mit `wer` und `wem` je angekommenem Verfolger
 
 Regeln:
 
@@ -119,10 +121,11 @@ Regeln:
 + Schritte: `karte_digger` gräbt mit dem Digger; `karte_fest` übernimmt die feste Karte samt Treppen; `tueren` setzt an Raumzugängen mit `tuerChance` Prozent Türen; `treppen` setzt die Treppe hinauf in die Mitte des ersten Raums und die Treppe hinab in die Mitte des Raums, der davon am weitesten entfernt ist, jeweils nur, wenn es die Tiefe im Plan gibt; `gelaende_objekte` setzt Objekte nur ins Innere der Räume außer dem ersten, so sperren sie keinen Durchgang; `erreichbarkeit` verlangt, dass jedes Feld, das ein laufendes Wesen betreten kann (Türen zählen als offen), von der Treppe hinauf (sonst hinab, sonst der Mitte des ersten Raums) in acht Richtungen erreichbar ist; `ebene_anlegen` setzt `zustand.ebene`; `freie_felder` sammelt Bodenfelder außerhalb des ersten Raums und seines Rands ohne Zugänge; `population`, `gegenstaende` und `fallen` setzen darauf mit dem gemeinsamen Zufall `.inhalt`
 + Verwirft ein Schritt den Versuch, beginnt der Bau neu mit dem Schlüssel `ebene.<tiefe>.<name>.versuch<n>`, höchstens `regeln.ebenen.versuche` Mal, danach wirft die Erzeugung; der erste Versuch behält den Schlüssel ohne Zusatz, so blieben alle Ebenen beim Umbau in Schritte gleich (0.33.0)
 + Ninkasi legt die Erzeugung nicht an; zu Beginn steht Ninkasi auf der Treppe hinauf der Starttiefe (oder in der Mitte des ersten Raums)
-+ Wechsel: die alte Ebene kommt mit allen Entitäten außer Ninkasi und dem, was sie trägt, und deren Einträgen der Warteschlange (Akteure, gebundene Zeitereignisse) samt Zeitpunkt nach `abgelegteEbenen`; die Weltuhr gehört keiner Ebene und läuft weiter
++ Wechsel: die alte Ebene kommt mit allen Entitäten außer den Mitgenommenen und deren Einträgen der Warteschlange (Akteure, gebundene Zeitereignisse) samt Zeitpunkt nach `abgelegteEbenen`; die Weltuhr gehört keiner Ebene und läuft weiter
 + Verlassene Ebenen ruhen: bei der Rückkehr rücken alle Zeitangaben dort (Einträge, Beginn und Ende der Zustände) um die vergangene Zeit nach; noch nie besuchte Tiefen werden erzeugt und ihre Wesen eingereiht; Ninkasi kommt an der Gegentreppe an (wer hinabsteigt, an der Treppe hinauf), ist sie besetzt, am nächsten freien Feld
 + Der Wechsel verwirft den räumlichen Index (siehe [Architektur.md](Architektur.md), Leistung); nur hier wird Ninkasis Position deshalb direkt gesetzt, der Index entsteht danach neu; Gasquellen und andere Vorräte im `zwischenspeicher` hängen an der Ebene und entstehen ebenso neu
-+ Wesen folgen Ninkasi nicht über Treppen
++ Verfolger (Vorbilder Brogue und NetHack): ein Wesen folgt, wenn es höchstens `regeln.ebenen.folgen.abstand` (1) Felder entfernt steht, handeln und sich bewegen kann, nicht `folgt: false` trägt (Daten des Wesens) und Ninkasi jagt (KI `jagen` im Wachzustand `jagt`, sie ist sein Ziel nach `trifft`; ein Fliehender hat eine andere KI) oder von ihr beschworen ist; Helfer aus dem Beistand folgen nicht, ihr Beistand endet mit dem Kampf
++ Mitgenommene Wesen verlassen ihr Feld bis zur Ankunft, behalten ihren Platz in der Warteschlange (kein Freizug, ihr nächster Zug kommt wie geplant) und stehen nach ID geordnet auf dem nächsten freien, für sie betretbaren Feld bei Ninkasi; die KI kennt danach Ninkasis neue Position; ohne freies Feld bleiben sie samt Gepäck und Einträgen auf der alten Ebene an ihrem Platz
 + Population: je Wurf gewichtet unter den Einträgen der Tiefe, mit `tieferChance` aus einer bis zu `tieferBis` Tiefen tieferen; ein Rudel steht beieinander (jedes weitere Mitglied auf dem freien Feld, das dem ersten am nächsten liegt), Affixe sind Zustände beim Erzeugen; findet ein Wurf nichts, fällt er aus; bestellt eine Ebene mit Ninkasi mehr als `hoechstWesen`, ist das ein Datenfehler
 + Im Spielinhalt (Zahlen vorläufig): der Hub ist ein leerer Raum mit Treppe hinab (Dienste folgen), drei Kellertiefen mit 16 bis 20 Wesen, Essigbakterien in Rudeln von 1 bis 3, Fernkämpfer ab Tiefe 2 häufiger; Treppen haben noch keine Tiles
 
@@ -190,6 +193,6 @@ Regeln:
 ## Verweise
 
 + Spieldesign der Welt und des Hubs: [Grundlagen.md](Grundlagen.md); Darstellung von Karte und Schichten: [Anzeige.md](Anzeige.md); Tiles: [Tileset.md](Tileset.md)
-+ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 8 (u.a. Nachholen der Zeit verlassener Ebenen, Wesen folgen über Treppen, Dienste des Hubs, Tiles); Themenräume, Schatzräume, Quests und feste Strukturen als Ideen in [Ausblick.md](Ausblick.md), sie bauen auf den Plan des Laufs und die Schritte
++ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 8 (u.a. Nachholen der Zeit verlassener Ebenen, Dienste des Hubs, Tiles); Themenräume, Schatzräume, Quests und feste Strukturen als Ideen in [Ausblick.md](Ausblick.md), sie bauen auf den Plan des Laufs und die Schritte
 
 Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).

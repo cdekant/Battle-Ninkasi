@@ -108,6 +108,8 @@ export function zeilenAusMeldung(kontext, meldung) {
     }
     case "ebene_gewechselt":
       return geschehen(text("log.ebene_gewechselt", { ...meldung, richtung: text(meldung.richtung === "ab" ? "ui.hinab" : "ui.hinauf") }));
+    case "gefolgt":
+      return geschehen(text("log.gefolgt", meldung));
     case "population_voll":
       // ausdrücklicher Hinweis statt stillschweigend, auch auf der Konsole für die Entwicklung
       console.warn(`Obergrenze der Population erreicht (${meldung.hoechstWesen}), ${meldung.ausgefallen} Wesen entstehen nicht`);

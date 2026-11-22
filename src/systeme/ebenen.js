@@ -1,32 +1,58 @@
 // Mehrere Ebenen (siehe docs/Welt.md, Ebenen): Treppen, Wechsel der Ebene, verlassene Ebenen ruhen.
 // Befehl { art: "treppe" }: nur Ninkasi, auf einem Gelände mit treppe: "ab" oder "auf"; Ablehnung "keine_treppe",
 //   wenn dort keine Treppe ist oder es die Tiefe nicht gibt. Zeitkosten aktionen.treppe.
-// Wechsel: die alte Ebene wird samt ihrer Entitäten (alles außer Ninkasi und dem, was sie trägt) und deren Einträgen
-//   der Warteschlange (Akteure, gebundene Zeitereignisse) in zustand.abgelegteEbenen[tiefe] gelegt, mit dem Zeitpunkt.
+// Wechsel: die alte Ebene wird samt ihrer Entitäten (alles außer den Mitgenommenen) und deren Einträgen der
+//   Warteschlange (Akteure, gebundene Zeitereignisse) in zustand.abgelegteEbenen[tiefe] gelegt, mit dem Zeitpunkt.
+// Mitnehmen: das Register "mitnehmen" sammelt, wer mitkommt, je Eintrag (spiel, ninkasi, wechsel) => [id] mit
+//   wechsel = { von, nach, richtung }; angemeldet sind "getragenes" (Ninkasi selbst) und "verfolger" (wer neben ihr
+//   steht und sie jagt, und ihre Beschworenen, siehe verfolgt); was ein Mitgenommener trägt, kommt immer mit.
+//   Mitgenommene Wesen behalten ihren Platz in der Warteschlange und kommen auf das nächste freie, für sie betretbare
+//   Feld neben Ninkasi (Meldung "gefolgt"); findet sich keins, bleiben sie auf der alten Ebene an ihrem Platz.
 //   Kommt Ninkasi zurück, ruht die Ebene nachträglich: alle Zeitangaben dort (Einträge, Beginn und Ende der Zustände)
 //   rücken um die vergangene Zeit nach; noch nie besuchte Tiefen werden erzeugt (welt/ebene.js), ihre Wesen eingereiht.
 //   Ninkasi kommt an der Gegentreppe an (wer hinabsteigt, an der Treppe hinauf), ist sie besetzt, am nächsten freien
 //   Feld. Der Wechsel verwirft den räumlichen Index; die Position Ninkasis wird deshalb hier direkt gesetzt, der Index
 //   entsteht danach neu. Meldung "ebene_gewechselt". Die Weltuhr läuft weiter, sie gehört keiner Ebene.
 
-import { anmelden } from "../kern/register.js";
+import { anmelden, alle } from "../kern/register.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
-import { spielerin, entitaetenAuf, istWesen } from "../kern/zustand.js";
+import { spielerin, entitaetenAuf, entitaetenMitPosition, istWesen, kiVon, bewegungVon, fraktionVon } from "../kern/zustand.js";
 import { indexVerwerfen } from "../kern/raumindex.js";
 import { akteurEinreihen, eintraegeHerausnehmen, eintraegeEinfuegen } from "../kern/zeit.js";
-import { gelaendeAuf, betretbar } from "../welt/karte.js";
+import { gelaendeAuf, betretbar, abstand, oeffnetTueren } from "../welt/karte.js";
 import { naechstesFeldMit } from "../welt/wege.js";
 import { ebeneErzeugen } from "../welt/ebene.js";
 import { ebenennameFuer } from "../welt/plan.js";
 import { sichtfeldAktualisieren } from "./sicht.js";
 import { erinnerungAuffrischen } from "./erinnerung.js";
+import { istHandlungsunfaehig } from "./zustaende.js";
+import { istUnbeweglich } from "./bewegung.js";
+import { wachzustandVon } from "./wahrnehmung.js";
+import { trifftZu } from "./zielauswahl.js";
 
 const RICHTUNG = { ab: 1, auf: -1 };
 
-// Was Ninkasi mitnimmt: sie selbst und alles, was sie (auch verschachtelt) trägt
-function mitgenommen(zustand, ninkasi) {
-  const ids = new Set([ninkasi.id]);
-  const offen = [...(ninkasi.inventar || [])];
+// Ob ein Wesen Ninkasi über die Treppe folgt (Vorbilder Brogue und NetHack): es steht höchstens regeln.ebenen.folgen.abstand
+// Felder entfernt, kann handeln und sich bewegen, trägt nicht folgt: false, und es jagt sie (KI "jagen" im Wachzustand
+// "jagt", sie ist sein Ziel; wer flieht, hat eine andere KI) oder ist von ihr beschworen
+export function verfolgt(spiel, wesen, ninkasi) {
+  if (wesen.id === ninkasi.id || !istWesen(wesen) || !wesen.position || wesen.folgt === false) return false;
+  if (abstand(wesen.position, ninkasi.position) > spiel.daten.regeln.ebenen.folgen.abstand) return false;
+  if (istHandlungsunfaehig(spiel, wesen) || istUnbeweglich(wesen)) return false;
+  if (wesen.beschworenVon === ninkasi.id) return true;
+  const ki = kiVon(wesen);
+  if (ki?.modul !== "jagen" || wachzustandVon(wesen) !== "jagt") return false;
+  return trifftZu(spiel, ki.trifft ?? "feinde", { id: wesen.id, fraktion: fraktionVon(wesen) ?? null }, ninkasi);
+}
+
+anmelden("mitnehmen", "getragenes", (spiel, ninkasi) => [ninkasi.id]);
+anmelden("mitnehmen", "verfolger", (spiel, ninkasi) =>
+  entitaetenMitPosition(spiel.zustand).filter((wesen) => verfolgt(spiel, wesen, ninkasi)).map((wesen) => wesen.id));
+
+// Eine Entität und alles, was sie (auch verschachtelt) trägt
+function mitGetragenem(zustand, startIds) {
+  const ids = new Set();
+  const offen = [...startIds];
   while (offen.length) {
     const id = offen.pop();
     if (ids.has(id) || !zustand.entitaeten[id]) continue;
@@ -36,9 +62,13 @@ function mitgenommen(zustand, ninkasi) {
   return ids;
 }
 
-function ebeneAblegen(spiel, ninkasi) {
+// Alle IDs, die mitkommen: die der Einträge im Register und was sie tragen
+function mitgenommen(spiel, ninkasi, wechsel) {
+  return mitGetragenem(spiel.zustand, alle("mitnehmen").flatMap(([, eintrag]) => eintrag(spiel, ninkasi, wechsel)));
+}
+
+function ebeneAblegen(spiel, bleibt) {
   const zustand = spiel.zustand;
-  const bleibt = mitgenommen(zustand, ninkasi);
   const entitaeten = {};
   for (const [id, entitaet] of Object.entries(zustand.entitaeten)) {
     if (bleibt.has(Number(id))) continue;
@@ -88,13 +118,56 @@ function treppeIn(spiel, richtung) {
   return null;
 }
 
+// Legt ein mitgenommenes Wesen samt Getragenem und seinen Einträgen der Warteschlange zurück auf die verlassene Ebene
+function zuruecklassen(spiel, wesen, alteTiefe, altePosition) {
+  const zustand = spiel.zustand;
+  const abgelegt = zustand.abgelegteEbenen[alteTiefe];
+  const ids = mitGetragenem(zustand, [wesen.id]);
+  wesen.position = { x: altePosition.x, y: altePosition.y };
+  for (const id of ids) {
+    abgelegt.entitaeten[id] = zustand.entitaeten[id];
+    delete zustand.entitaeten[id];
+  }
+  const gehoertDazu = (eintrag) => (eintrag.art === "akteur" && ids.has(eintrag.akteurId)) || (eintrag.gebundenAn !== undefined && ids.has(eintrag.gebundenAn));
+  abgelegt.warteschlange.push(...eintraegeHerausnehmen(zustand, gehoertDazu));
+}
+
+// Stellt die mitgenommenen Wesen (außer Ninkasi) neben sie, in der Reihenfolge ihrer ID; ohne freies Feld bleiben sie
+// zurück; gibt die IDs der Angekommenen zurück
+function verfolgerAufstellen(spiel, ninkasi, alteTiefe, altePositionen) {
+  const zustand = spiel.zustand;
+  const angekommen = [];
+  for (const [id, altePosition] of altePositionen) {
+    const wesen = zustand.entitaeten[id];
+    const frei = naechstesFeldMit(spiel, ninkasi.position, (x, y) => betretbar(spiel, wesen, { x, y }) && !entitaetenAuf(zustand, x, y).some(istWesen), { bewegung: bewegungVon(wesen), oeffnetTueren: oeffnetTueren(wesen) });
+    if (!frei) {
+      zuruecklassen(spiel, wesen, alteTiefe, altePosition);
+      continue;
+    }
+    wesen.position = { x: frei.x, y: frei.y };
+    indexVerwerfen(zustand);
+    const ki = kiVon(wesen);
+    if (ki && "letzteBekanntePosition" in ki) ki.letzteBekanntePosition = { x: ninkasi.position.x, y: ninkasi.position.y };
+    angekommen.push(id);
+  }
+  return angekommen;
+}
+
 export function ebeneWechseln(spiel, zieltiefe) {
   const zustand = spiel.zustand;
   const ninkasi = spielerin(zustand);
-  const hinab = zieltiefe > zustand.tiefe;
+  const alteTiefe = zustand.tiefe;
+  const hinab = zieltiefe > alteTiefe;
   // was Ninkasi zuletzt gesehen hat, bleibt der verlassenen Ebene als Erinnerung (systeme/erinnerung.js)
   erinnerungAuffrischen(spiel, zustand.sichtbareFelder);
-  ebeneAblegen(spiel, ninkasi);
+  const mitgenommeneIds = mitgenommen(spiel, ninkasi, { von: alteTiefe, nach: zieltiefe, richtung: hinab ? "ab" : "auf" });
+  // die mitgenommenen Wesen verlassen ihr Feld bis zur Ankunft, damit sie auf der neuen Ebene nichts besetzen
+  const altePositionen = [...mitgenommeneIds].sort((idA, idB) => idA - idB)
+    .map((id) => zustand.entitaeten[id])
+    .filter((entitaet) => entitaet.id !== ninkasi.id && istWesen(entitaet) && entitaet.position)
+    .map((wesen) => [wesen.id, wesen.position]);
+  for (const [id] of altePositionen) delete zustand.entitaeten[id].position;
+  ebeneAblegen(spiel, mitgenommeneIds);
   zustand.tiefe = zieltiefe;
   if (zustand.abgelegteEbenen[zieltiefe]) ebeneZurueckholen(spiel, zieltiefe);
   else ebeneNeuErzeugen(spiel, zieltiefe);
@@ -108,9 +181,11 @@ export function ebeneWechseln(spiel, zieltiefe) {
     if (frei) ninkasi.position = frei;
     indexVerwerfen(zustand);
   }
+  const angekommen = verfolgerAufstellen(spiel, ninkasi, alteTiefe, altePositionen);
   zustand.sichtbareFelder = [];
   sichtfeldAktualisieren(spiel);
   melden(spiel, "ebene_gewechselt", { wer: bezugAuf(ninkasi), tiefe: zieltiefe, ebene: zustand.ebene.name, richtung: hinab ? "ab" : "auf" });
+  for (const id of angekommen) melden(spiel, "gefolgt", { wer: bezugAuf(zustand.entitaeten[id]), wem: bezugAuf(ninkasi) });
 }
 
 anmelden("befehle", "treppe", {

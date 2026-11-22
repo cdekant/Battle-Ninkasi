@@ -25,6 +25,7 @@ const ARTEN = [
   "lernanlaesse",       // Lernanlässe der Skills (systeme/lernen.js): { beschreibung }; Daten nennen sie in lernt
   "planschritte",       // Schritte des Plans des Laufs (welt/plan.js): (spiel, plan, zufall) => void, beim Start nacheinander
   "ebenenschritte",     // Schritte der Ebenenerzeugung (welt/ebene.js): { braucht, liefert, verwirft?, ausfuehren(spiel, bau) }
+  "mitnehmen",          // wer beim Ebenenwechsel mitkommt (systeme/ebenen.js): (spiel, ninkasi, wechsel) => [id]
 ];
 
 export const RANG_VORGABE = 100;

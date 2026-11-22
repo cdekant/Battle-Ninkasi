@@ -98,7 +98,7 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
     if (!istTextliste(wesen.faehigkeiten)) fehler.push(`${ort}: faehigkeiten muss eine Liste von Namen sein`);
     else for (const faehigkeit of wesen.faehigkeiten) if (!daten.faehigkeiten?.[faehigkeit]) fehler.push(`${ort}: Fähigkeit "${faehigkeit}" gibt es nicht`);
   }
-  pruefeParameter(daten, { bewegung: BEWEGUNGSARTEN, tueren: ["oeffnen", "nicht"], tragkraft: "ganzzahl?" }, wesen, ort, fehler);
+  pruefeParameter(daten, { bewegung: BEWEGUNGSARTEN, tueren: ["oeffnen", "nicht"], tragkraft: "ganzzahl?", folgt: "wahrheitswert?" }, wesen, ort, fehler);
   // gebundene EP und Eigenschaften, siehe systeme/lernen.js und systeme/skills.js
   pruefeParameter(daten, { ep: "ganzzahl?" }, wesen, ort, fehler);
   if (wesen.eigenschaften !== undefined) {
@@ -230,6 +230,7 @@ function pruefeRegeln(daten, regeln, fehler) {
   if (!istProzent(regeln.population?.tieferChance)) fehler.push("regeln.population.tieferChance muss eine ganze Zahl von 0 bis 100 sein");
   if (!istZahlAbNull(regeln.population?.tieferBis)) fehler.push("regeln.population.tieferBis muss eine ganze Zahl >= 0 sein");
   if (!istGanzzahl(regeln.ebenen?.versuche) || regeln.ebenen.versuche < 1) fehler.push("regeln.ebenen.versuche muss eine ganze Zahl >= 1 sein");
+  if (!istZahlAbNull(regeln.ebenen?.folgen?.abstand)) fehler.push("regeln.ebenen.folgen.abstand muss eine ganze Zahl >= 0 sein");
   if (!istObjekt(regeln.schichten)) fehler.push("regeln.schichten fehlt");
   else pruefeParameter(daten, { hoechstOberflaeche: "ganzzahl", hoechstGas: "ganzzahl" }, regeln.schichten, "regeln.schichten", fehler);
   if (!istObjekt(regeln.feuer)) fehler.push("regeln.feuer fehlt");

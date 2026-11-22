@@ -117,7 +117,6 @@ Offener Rest:
 + Abstraktes Nachholen verlassener Ebenen: Population wächst je vergangener Zeit logistisch auf eine Tragfähigkeit aus den Daten zu (Idee "Druck gegen endloses Rasten" in [Ausblick.md](Ausblick.md))
 + Benommenheit und Ersticken als Zustände statt Giftschaden, sobald es Zustände im Spielinhalt gibt
 + Bewusst noch ohne: Endosporen, die Feuer weckt (es gibt keine Endosporen), Licht durch Feuer (mit dem Licht), Fließen von Flüssigkeiten
-+ Wesen folgen Ninkasi über Treppen (Brogue: wer neben ihr steht, kommt mit); Vorkehrung für Begleiter in [Ausblick.md](Ausblick.md) (Begleiter und Befehle)
 + Sturz in einen Abgrund auf die Ebene darunter; bisher klemmt die Lageprüfung ein Wesen dort nur ein und drückt es aufs nächste freie Feld (siehe [Wesen.md](Wesen.md), Bewegung)
 + Dienste des Hubs (Spieldesign in [Grundlagen.md](Grundlagen.md)); bisher ein leerer Raum mit Treppe
 + Treppe per Maus (Reise zur Treppe und hinüber); bisher nur die Taste <>
@@ -203,9 +202,8 @@ Offen:
 
 ## 14. Vorkehrungen aus dem Ausblick
 
-Status: offen; Ideen und Begründungen in [Ausblick.md](Ausblick.md), hier nur die Arbeit, nach Dringlichkeit geordnet (zuerst, was mit jedem neuen System teurer wird); jede Vorkehrung bekommt vor der Umsetzung einen eigenen Plan; erledigt in 0.33.0: Plan des Laufs und Ebenenerzeugung in Schritten (siehe [Welt.md](Welt.md), Plan des Laufs und [Welt.md](Welt.md), Ebenen); erledigt in 0.34.0: gesteuerte Entität (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); erledigt in 0.35.0: Ruf, Beistand und Kampfzustand (siehe [Wesen.md](Wesen.md), Fraktionen und [Wesen.md](Wesen.md), Kampfzustand); erledigt in 0.36.0: Würfe über eine tauschbare Schnittstelle (siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit); erledigt in 0.37.0: Erinnerung der Karte (siehe [Welt.md](Welt.md), Sicht und Erinnerung)
+Status: offen; Ideen und Begründungen in [Ausblick.md](Ausblick.md), hier nur die Arbeit, nach Dringlichkeit geordnet (zuerst, was mit jedem neuen System teurer wird); jede Vorkehrung bekommt vor der Umsetzung einen eigenen Plan; erledigt in 0.33.0: Plan des Laufs und Ebenenerzeugung in Schritten (siehe [Welt.md](Welt.md), Plan des Laufs und [Welt.md](Welt.md), Ebenen); erledigt in 0.34.0: gesteuerte Entität (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); erledigt in 0.35.0: Ruf, Beistand und Kampfzustand (siehe [Wesen.md](Wesen.md), Fraktionen und [Wesen.md](Wesen.md), Kampfzustand); erledigt in 0.36.0: Würfe über eine tauschbare Schnittstelle (siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit); erledigt in 0.37.0: Erinnerung der Karte (siehe [Welt.md](Welt.md), Sicht und Erinnerung); erledigt in 0.38.0: Mitnehmen beim Ebenenwechsel mit Verfolgern (siehe [Welt.md](Welt.md), Ebenen)
 
-+ 1. Mitnehmen beim Ebenenwechsel erweiterbar (Register oder Haken), für Begleiter und Wesen, die Ninkasi über Treppen folgen (Rest aus Punkt 8)
-+ 2. Format der KI-Handlungen: Bewertung je Handlung mit Gewicht und Kurven, das heutige Format bleibt als Sonderfall gültig; dazu Vorrangbefehle für Begleiter
-+ 3. Lesefunktionen für Komponenten ohne Zahl (Angriffe, Plätze, Bewegungsart, Sicht, Türen), damit eine Gestalt sie überlagern kann (Verwandlung)
-+ 4. Regel für Wissen über Läufe hinweg festschreiben: was ein Lauf davon nutzt, kommt als Startoption in den Spielstand, die Logik liest die Ablage nie (siehe [Architektur.md](Architektur.md), Speichern)
++ 1. Format der KI-Handlungen: Bewertung je Handlung mit Gewicht und Kurven, das heutige Format bleibt als Sonderfall gültig; dazu Vorrangbefehle für Begleiter
++ 2. Lesefunktionen für Komponenten ohne Zahl (Angriffe, Plätze, Bewegungsart, Sicht, Türen), damit eine Gestalt sie überlagern kann (Verwandlung)
++ 3. Regel für Wissen über Läufe hinweg festschreiben: was ein Lauf davon nutzt, kommt als Startoption in den Spielstand, die Logik liest die Ablage nie (siehe [Architektur.md](Architektur.md), Speichern)

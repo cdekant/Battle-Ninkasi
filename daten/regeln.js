@@ -47,6 +47,7 @@ export default {
     schritteErzeugt: ["karte_digger", "tueren", "treppen", "gelaende_objekte", "erreichbarkeit", "ebene_anlegen", "freie_felder", "population", "gegenstaende", "fallen"],
     schritteFest: ["karte_fest", "erreichbarkeit", "ebene_anlegen"], // Ebenen mit fester karte, z.B. der Hub
     versuche: 10, // so viele Versuche mit neuem Zufall, wenn ein Schritt die Karte verwirft (z.B. Erreichbarkeit)
+    folgen: { abstand: 1 }, // so nah muss ein Verfolger bei Ninkasi stehen, um über die Treppe mitzukommen (src/systeme/ebenen.js)
   },
   // Fallen, siehe src/systeme/fallen.js; Zahlen vorläufig
   fallen: {

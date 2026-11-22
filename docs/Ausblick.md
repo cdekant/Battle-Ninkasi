@@ -32,7 +32,7 @@ Umsetzung: keine
 | Zeitumkehr | hoch | mittel | ja |
 | Verwandlung | mittel | mittel | ja |
 | Veränderbares Gelände | hoch | mittel | erledigt (Erinnerung der Karte) |
-| Begleiter und Befehle | hoch | gering bis mittel | ja (Treppen) |
+| Begleiter und Befehle | hoch | gering bis mittel | teils erledigt (Treppen), offen: Befehle |
 | Handel, Währung, Gespräch | hoch | gering bis mittel | ja (Befehle) |
 | Bestiarium, Glossar, Rezeptbuch | hoch | gering | ja (Regel wie Fortschritt) |
 | Erfolge | hoch | gering | nein |
@@ -73,9 +73,9 @@ Umsetzung: offen (nur die Vorkehrung steht)
 + Wichtigkeit: hoch, mindestens Begleiter mit Befehlen (2026-11-22)
 + Vorbilder: Dungeon Crawl Stone Soup (Rufe an Verbündete: folgen, warten, angreifen); Caves of Qud (Begleiter kämpfen auf Anweisung angriffslustig oder nur zur Verteidigung, eigene Taste für Begleiter, Wesen werden durch Überreden zu Begleitern); Brogue (befreite Gefangene werden Verbündete und lernen Fähigkeiten besiegter Gegner); Ancardia (warten, folgen, gehen, angreifen; ein wartender Begleiter versperrt ein Nest)
 + Braucht: Befehlsart `befehlen { zielId, anweisung }`, die nur die Anweisung am Begleiter setzt (die Eingangstür bleibt bei Ninkasi); KI-Modul `begleiten`, das die Anweisung liest; Mitnehmen über Treppen; Begleiter in der Seitenleiste und im Untersuchen
-+ Berührt: Ebenenwechsel (nimmt heute nur Ninkasi und Getragenes mit, siehe [Welt.md](Welt.md), Ebenen), Fraktionen (Begleiter gehören zur Fraktion `ninkasi`), Lernen (Zurechnung wie bei Beschworenen mit `beschworenVon`), Tod, Bot
++ Berührt: Ebenenwechsel (seit 0.38.0 über das Register `mitnehmen`, siehe [Welt.md](Welt.md), Ebenen), Fraktionen (Begleiter gehören zur Fraktion `ninkasi`), Lernen (Zurechnung wie bei Beschworenen mit `beschworenVon`), Tod, Bot
 + Umbaurisiko: gering bis mittel, das Mittlere wegen der Treppen
-+ Vorkehrung: was beim Ebenenwechsel mitkommt, erweiterbar machen (Register oder Haken statt fester Regel "Ninkasi und Getragenes"); damit ist auch der Rest "Wesen folgen Ninkasi über Treppen" aus [Systemausbau.md](Systemausbau.md), Punkt 8 gelöst
++ Vorkehrung (erledigt in 0.38.0, siehe [Welt.md](Welt.md), Ebenen): was beim Ebenenwechsel mitkommt, sammelt das Register `mitnehmen`; Begleiter melden dort einen eigenen Eintrag an; damit ist auch der Rest "Wesen folgen Ninkasi über Treppen" aus [Systemausbau.md](Systemausbau.md), Punkt 8 gelöst
 + Entschieden 2026-11-22: Begleiter handeln nach ihrer eigenen KI und nehmen Vorrangbefehle an (z.B. greif diesen an, warte hier, folge mir), die für eine Weile oder bis zum Widerruf vor ihrer eigenen Wahl gelten; festgehalten in [Grundlagen.md](Grundlagen.md), Spiel
 
 Umsetzung: offen
@@ -432,7 +432,7 @@ Stand 2026-11-22; die Quellen sind teils Wikis und Foren, die Einzelheiten könn
 
 + Caves of Qud: Domination (https://wiki.cavesofqud.com/wiki/Domination), Präkognition (https://wiki.cavesofqud.com/wiki/Precognition, https://wiki.cavesofqud.com/wiki/RNG), Hellsicht (https://wiki.cavesofqud.com/wiki/Clairvoyance), Handel und Wasser (https://wiki.cavesofqud.com/wiki/Trade), Wasserritual (https://wiki.cavesofqud.com/wiki/Water_Ritual), Gespräche als Daten (https://wiki.cavesofqud.com/wiki/Modding:Conversation), Befehle an Begleiter (https://freeholdgames.itch.io/cavesofqud/devlog/256042/feature-friday-may-21-2021)
 + Dungeon Crawl Stone Soup: Zot-Uhr statt Nahrung (https://crawl.develz.org/wordpress/?p=4829), Götter (https://sources.debian.org/src/crawl/2%3A0.34.0-1/docs/develop/god_creation.txt), Morgue (https://crawl.develz.org/tavern/viewtopic.php?p=223188)
-+ Brogue: Heimlichkeit und Licht (https://brogue.fandom.com/wiki/Stealth?oldid=5117), Folgen über Treppen (https://brogue.fandom.com/wiki/Stairdancing), Verbündete (https://www.pcgamer.com/au/why-i-love-drinking-random-potions-and-making-monkey-friends-in-brogue), gBrogue (https://github.com/gbelo/gBrogue), Brogue CE (https://raw.githubusercontent.com/tmewett/BrogueCE/master/CHANGELOG.md)
++ Brogue: Heimlichkeit und Licht (https://brogue.fandom.com/wiki/Stealth?oldid=5117), Folgen über Treppen (https://brogue.fandom.com/wiki/Stairdancing; dazu NetHack https://nethackwiki.com/wiki/Wander, DCSS-Forum https://crawl.develz.org/tavern/viewtopic.php?p=342509), Verbündete (https://www.pcgamer.com/au/why-i-love-drinking-random-potions-and-making-monkey-friends-in-brogue), gBrogue (https://github.com/gbelo/gBrogue), Brogue CE (https://raw.githubusercontent.com/tmewett/BrogueCE/master/CHANGELOG.md)
 + NetHack: Kartierung und Erkennen (https://nethackwiki.com/wiki/Rogue_(game)), Bones (https://nethackwiki.com/wiki/Bones)
 + Cogmind: Alarmstufe (https://www.indiedb.com/games/cogmind/news/adjustable-difficulty), Morgue (https://www.indiedb.com/games/cogmind/news/morgue-files)
 + Into the Breach: Zurücksetzen der Runde (https://kotaku.com/into-the-breach-the-kotaku-review-1823365331), Vorschau auf einer Kopie (https://forum.godotengine.org/t/into-the-breach-style-tactics-in-gdscript-rules-as-events-previews-on-a-cloned-board-and-attacks-that-move-when-pushed/146380)
