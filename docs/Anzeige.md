@@ -4,7 +4,7 @@ Stand: 2026-11-22
 
 Zuständig für: `src/anzeige/renderer.js`, `src/anzeige/kamera.js`, `src/anzeige/oberflaeche.js`, `src/anzeige/log.js`, `src/anzeige/logzeilen.js`, `src/anzeige/ankuendigungen.js`, `src/anzeige/animation.js`, `src/anzeige/pegelanzeige.js`, `src/anzeige/minikarte.js`, `src/anzeige/bedienzeile.js`, `src/anzeige/stil.css`, `src/systeme/wahrnehmbar.js`
 
-Mitprüfen bei Änderungen: [Bedienung.md](Bedienung.md), [Oberflaeche.md](Oberflaeche.md), [Tileset.md](Tileset.md)
+Mitprüfen bei Änderungen: [Bedienung.md](Bedienung.md), [Oberflaeche.md](Oberflaeche.md), [Tileset.md](Tileset.md), [Animationen.md](Animationen.md), [Texte.md](Texte.md), [Welt.md](Welt.md)
 
 ## Zweck
 

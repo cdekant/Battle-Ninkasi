@@ -15,6 +15,7 @@ Arbeitsliste der Strukturen, die Logik und Datenmodell noch brauchen, damit Fern
 + Nächste Schritte (Stand 2026-11-21): Browserprüfung von 0.30.0 bis 0.32.0 (Einstellungen, Tastenbelegung, Befehlszeile, Suche, Klicks in allen Fenstern, Titelbildschirm), dazu die kleinen Nacharbeiten an den Fenstern aus 0.27.0 und die Gestaltung des Titels; danach die Ideen aus [Titelbildschirm.md](Titelbildschirm.md) (Ruhmeshalle, Abspielen, Spielarten) neben den übrigen Schwerpunkten einordnen
 + Nächste Schwerpunkte (Stand 2026-11-20): Skillsystem (Punkt 13, Mechanik seit 0.26.0, Skillfenster seit 0.27.0, offen der Katalog), bevor Details der Reste angegangen werden (davon hängen Kennerschaft und Nachtsicht ab); danach Zustände im Spielinhalt (Punkt 3), dann Licht (Punkt 7), vor Inhalt und Balancing, weil es Heimlichkeit und Gefahr verschiebt; das Brausystem in einer eigenen Sitzung; Darstellung (Punkt 12) ist zurückgestellt
 + Licht lässt sich nachreichen: ohne Angabe gilt jedes Feld als hell, das Spiel verhält sich dann wie bisher
++ Ideen, über die noch nicht entschieden ist und die den Kern umbauen könnten, stehen mit ihren Vorkehrungen in [Ausblick.md](Ausblick.md); beschlossen kommen sie als Punkt hierher
 
 ## Bekannte Fehler
 
@@ -98,7 +99,7 @@ Entschieden: Vorgabe für Paare ohne Angabe ist feind, die Tabelle nennt Abweich
 Offener Rest:
 
 + Licht in der Wahrnehmung (Brogue: Heimlichkeitsweite im Licht doppelt, im Dunkeln halb), Spüren ohne Licht, Umherziehen wacher Wesen, Spur als Geruch (Brogue folgt der Spielerin über eine Duftkarte um Ecken, passend zu Mikroorganismen, die entlang von Wegen spüren); siehe Wahrnehmung in [Wesen.md](Wesen.md) und Licht in [Welt.md](Welt.md)
-+ Ruf bei ganzen Fraktionen (Spieldesign in [Grundlagen.md](Grundlagen.md))
++ Ruf bei ganzen Fraktionen: als Idee in [Ausblick.md](Ausblick.md) (Handel, Währung, Gespräch, Ruf)
 + Tile für den Fernkämpfer-Test (bisher nur Zeichen F), falls er im Spiel bleibt
 
 ## 8. Gelände, Feldschichten, Ebenen
@@ -112,15 +113,15 @@ Offener Rest:
 + Tiles für Türen, Treppen, Fallen, Gärbottich und Brandflasche, Darstellung der Schichten über Tiles (bisher Zeichen und Farben)
 + Reise und Erkunden halten mit `kein_weg`, wenn eine entdeckte Falle den einzigen Weg versperrt; später vielleicht mit Nachfrage, ob Ninkasi darübergehen soll
 + Ausdrückliches Suchen nach Fallen (mehrere Züge, doppeltes Entdecken), vielleicht zusammen mit dem Rasten
-+ Hebel mit Wirkung in der Ferne und verschlossene Türen mit Schlüssel: mit den Themenräumen (Punkt 10)
-+ Abstraktes Nachholen verlassener Ebenen: Population wächst je vergangener Zeit logistisch auf eine Tragfähigkeit aus den Daten zu (Punkt 10, Druck gegen endloses Rasten)
++ Hebel mit Wirkung in der Ferne und verschlossene Türen mit Schlüssel: mit den Themenräumen (Idee in [Ausblick.md](Ausblick.md))
++ Abstraktes Nachholen verlassener Ebenen: Population wächst je vergangener Zeit logistisch auf eine Tragfähigkeit aus den Daten zu (Idee "Druck gegen endloses Rasten" in [Ausblick.md](Ausblick.md))
 + Benommenheit und Ersticken als Zustände statt Giftschaden, sobald es Zustände im Spielinhalt gibt
 + Bewusst noch ohne: Endosporen, die Feuer weckt (es gibt keine Endosporen), Licht durch Feuer (mit dem Licht), Fließen von Flüssigkeiten
-+ Wesen folgen Ninkasi über Treppen (Brogue: wer neben ihr steht, kommt mit)
++ Wesen folgen Ninkasi über Treppen (Brogue: wer neben ihr steht, kommt mit); Vorkehrung für Begleiter in [Ausblick.md](Ausblick.md) (Begleiter und Befehle)
 + Sturz in einen Abgrund auf die Ebene darunter; bisher klemmt die Lageprüfung ein Wesen dort nur ein und drückt es aufs nächste freie Feld (siehe [Wesen.md](Wesen.md), Bewegung)
 + Dienste des Hubs (Spieldesign in [Grundlagen.md](Grundlagen.md)); bisher ein leerer Raum mit Treppe
 + Treppe per Maus (Reise zur Treppe und hinüber); bisher nur die Taste <>
-+ Mehr Ebenenarten und Gegner, damit die Population nach Tiefe etwas zu unterscheiden hat; Themenräume wie der Gärkeller (Punkt 10)
++ Mehr Ebenenarten und Gegner, damit die Population nach Tiefe etwas zu unterscheiden hat; Themenräume wie der Gärkeller (Idee in [Ausblick.md](Ausblick.md))
 
 ## 9. Gegenstände
 
@@ -146,15 +147,9 @@ Offener Rest:
 
 Status: offen, jeweils erst Spieldesign in [Grundlagen.md](Grundlagen.md) entscheiden
 
-+ Gunst der Nebengottheiten als Wert mit Geboten und Tabus (Vorbild DCSS)
-+ Fallen, Türen, Schlüssel, Hebel, Themenräume (Vorbild Brogue "Machines"); Struktur für Rätsel, die EP bringen
-+ Druck gegen endloses Rasten: Nahrungsuhr, Nachrücken oder Verderben (seit 0.23.0 wird Bier sauer); LP regenerieren immer, Pegelabbau und Psi-Schwund allein sind kein Druck
-+ Telepathie (Psi-Gedankenlesen als Wahrnehmungsart "Wesen durch Wände") und Unsichtbarkeit
-+ Filmriss als Mechanik: Zeitsprung, verlorene Erinnerung an erkundete Felder
+Seit 2026-11-22 stehen Gunst der Nebengottheiten, Themenräume und Rätsel, Druck gegen endloses Rasten, Telepathie und Unsichtbarkeit, Filmriss, Todesbericht, Prüfsumme der Daten und Vorschau durch Simulation als Ideen in [Ausblick.md](Ausblick.md); hier bleibt, was den Kern nicht berührt:
+
 + Gefahreneinschätzung beim Untersuchen (Untersuchen mit Beschreibung und Trefferchance ohne Spiel-Zufall seit 0.25.0)
-+ Todesbericht (Morgue) mit Todesursache und Statistik des Laufs; braucht die Urheberkette aus Punkt 2
-+ Prüfsumme der Daten im Spielstand, samt Mods: das Laden prüft bisher nur die Version, geänderte Daten ohne neue Version fallen nicht auf (siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit); der Schnappschuss ist seit 0.29.0 umgesetzt
-+ Vorschau durch Simulation auf einer Kopie des Zustands (Vorbild Desktop Dungeons), z.B. "wie viel Schaden macht dieser Angriff"; der Zustand ist JSON, die Kopie also billig
 + Leichen als Hinterlassenschaft: gärende Überreste, Nahrung für Mikroorganismen
 
 ## 11. Oberfläche
@@ -172,7 +167,7 @@ Offener Rest:
 
 Später:
 
-+ Vorschau von Wirkungen innerhalb eines Effekts (Brandkreis der Brandflasche, verschachtelte Trefferwürfe) über eine Simulation auf einer Kopie des Zustands (Punkt 10)
++ Vorschau von Wirkungen innerhalb eines Effekts (Brandkreis der Brandflasche, verschachtelte Trefferwürfe): als Idee in [Ausblick.md](Ausblick.md) (Vorschau durch Simulation)
 + Blocken in der angezeigten Chance
 
 ## 12. Darstellung
@@ -203,4 +198,18 @@ Offen:
 + Ortsbindung des Verteilens (`regeln.lernen.ort`), falls gewünscht
 + Lernanlässe für das Bewältigen von Fallen, Schlössern und Rezepten, mit diesen Systemen
 + Abzug einer Anforderung nur für den Angriff mit genau dieser Waffe (über Tags der Profile); bisher gilt er für die Trägerin insgesamt
-+ Magisch kartierte Felder: eigener Wert in `erkundet`, EP erst beim Sehen
++ Magisch kartierte Felder: als Idee in [Ausblick.md](Ausblick.md) (Hellsicht, Spüren, Unsichtbarkeit)
+
+## 14. Vorkehrungen aus dem Ausblick
+
+Status: offen; Ideen und Begründungen in [Ausblick.md](Ausblick.md), hier nur die Arbeit, nach Dringlichkeit geordnet (zuerst, was mit jedem neuen System teurer wird); jede Vorkehrung bekommt vor der Umsetzung einen eigenen Plan
+
++ 1. Plan des Laufs und Ebenenerzeugung in Schritten: beim Start aus dem Startwert festlegen, welche Tiefe welche Struktur, welchen Schatzraum, welche Quest bekommt; die Erzeugung einer Ebene als Folge von Schritten mit Register (Karte, Strukturen einsetzen, Erreichbarkeit prüfen, Türen, Fallen, Population); trägt Schatzräume, Quests, feste Strukturen und Themenräume
++ 2. Lesefunktion `gesteuerteEntitaet(zustand)` für die gesteuerte Entität, vorerst gleich Ninkasi, ohne neues Feld im Zustand: Eingangstür, Sicht, Kamera und Zielmodus fragen sie, alles andere weiter `spielerin()`; hält Besessenheit offen, ohne sie zu bauen (ob sie kommt, ist nicht entschieden)
++ 3. Ruf vorbereiten und Beistand: `zustand.ruf` je Fraktion mit Vorgabe 0, `beziehung` liest Schwellen aus `daten/regeln.js`; Wesen helfen Ninkasi gegen einen Feind ihrer eigenen Fraktion in Sicht
++ 4. Würfe über eine tauschbare Schnittstelle im Effektsystem (kleinster, größter Wurf, fremder Zufall), damit eine Vorschau durch Simulation nichts verrät
++ 5. Erinnerung der Karte: je Feld das zuletzt gesehene Gelände, die Anzeige zeigt es für nicht sichtbare Felder; `erkundet` mit Werten für gesehen und kartiert; Grundlage für veränderbares Gelände, Hellsicht und Filmriss
++ 6. Mitnehmen beim Ebenenwechsel erweiterbar (Register oder Haken), für Begleiter und Wesen, die Ninkasi über Treppen folgen (Rest aus Punkt 8)
++ 7. Format der KI-Handlungen: Bewertung je Handlung mit Gewicht und Kurven, das heutige Format bleibt als Sonderfall gültig; dazu Vorrangbefehle für Begleiter
++ 8. Lesefunktionen für Komponenten ohne Zahl (Angriffe, Plätze, Bewegungsart, Sicht, Türen), damit eine Gestalt sie überlagern kann (Verwandlung)
++ 9. Regel für Wissen über Läufe hinweg festschreiben: was ein Lauf davon nutzt, kommt als Startoption in den Spielstand, die Logik liest die Ablage nie (siehe [Architektur.md](Architektur.md), Speichern)

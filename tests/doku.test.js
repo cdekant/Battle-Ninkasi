@@ -1,6 +1,7 @@
 // Prüfung der Dokumentation (siehe docs/Entwicklung.md, Tests und Balancing, und CLAUDE.md, Dokumentation):
 // Verweise zeigen auf vorhandene Dateien und Abschnitte, jede Datei hat genau ein zuständiges Dokument, jedes
-// Dokument steht in CLAUDE.md, CLAUDE.md bleibt unter dem Limit. Ob etwas doppelt beschrieben ist, prüft das nicht.
+// Dokument steht in CLAUDE.md, CLAUDE.md bleibt unter dem Limit, "Mitprüfen" gilt in beide Richtungen, Design-Dokumente
+// nennen je Abschnitt ihre Umsetzung. Ob etwas doppelt beschrieben ist oder inhaltlich übereinstimmt, prüft das nicht.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -126,4 +127,48 @@ test("Doku: jedes Dokument nennt im Kopf, was mitzuprüfen ist", () => {
   const ohne = dokumente.filter((name) => !dokumenttexte[name].includes("Mitprüfen bei Änderungen:"));
   assert.deepEqual(ohne, []);
   assert.ok(statSync(doku).isDirectory());
+});
+
+// Die Arbeitsliste nennt "alle Dokumente, deren Punkte hier umgesetzt werden" und bleibt außen vor
+const ARBEITSLISTE = "Systemausbau.md";
+const verlinkteDokumente = (zeile) => [...zeile.matchAll(/\]\(([A-Za-z]+\.md)\)/g)].map(([, datei]) => datei);
+const mitpruefenVon = (name) =>
+  verlinkteDokumente(dokumenttexte[name].split("\n").find((zeile) => zeile.startsWith("Mitprüfen bei Änderungen:")) ?? "");
+
+test("Doku: Mitprüfen gilt in beide Richtungen", () => {
+  const einseitig = [];
+  for (const name of dokumente.filter((name) => name !== ARBEITSLISTE)) {
+    for (const nachbar of mitpruefenVon(name).filter((nachbar) => nachbar !== ARBEITSLISTE)) {
+      if (!mitpruefenVon(nachbar).includes(name)) einseitig.push(`${name} nennt ${nachbar}, nicht zurück`);
+    }
+  }
+  assert.deepEqual(einseitig, []);
+});
+
+// Design-Dokumente beschreiben keine Dateien (kein "Zuständig für:"); jeder Abschnitt nennt in einer Zeile
+// "Umsetzung:", wo das Entschiedene technisch beschrieben ist (siehe CLAUDE.md, Dokumentation)
+const ABSCHNITTE_OHNE_UMSETZUNG = ["Offen", "Offene Fragen", "Quellen", "Recherche", "Vorbilder", "Entscheidungen", "Stand der Umsetzung"];
+const UMSETZUNGSZEILE = /^Umsetzung: (siehe |teilweise, siehe |offen|keine)/;
+
+test("Doku: Design-Dokumente nennen je Abschnitt ihre Umsetzung, deren Dokumente stehen unter Mitprüfen", () => {
+  const designDokumente = dokumente.filter((name) => name !== ARBEITSLISTE && !dokumenttexte[name].includes("\nZuständig für:"));
+  const fehlend = [];
+  for (const name of designDokumente) {
+    const abschnitte = dokumenttexte[name].split(/\n(?=## )/).slice(1);
+    for (const abschnitt of abschnitte) {
+      const ueberschrift = abschnitt.split("\n")[0].slice(3).trim();
+      if (ABSCHNITTE_OHNE_UMSETZUNG.includes(ueberschrift)) continue;
+      const zeilen = abschnitt.split("\n").filter((zeile) => zeile.startsWith("Umsetzung:"));
+      if (zeilen.length !== 1 || !UMSETZUNGSZEILE.test(zeilen[0])) {
+        fehlend.push(`${name}, ${ueberschrift}: genau eine Zeile "Umsetzung: siehe|teilweise, siehe|offen|keine"`);
+        continue;
+      }
+      for (const ziel of verlinkteDokumente(zeilen[0])) {
+        if (ziel !== ARBEITSLISTE && ziel !== name && !mitpruefenVon(name).includes(ziel)) {
+          fehlend.push(`${name}, ${ueberschrift}: ${ziel} fehlt unter Mitprüfen`);
+        }
+      }
+    }
+  }
+  assert.deepEqual(fehlend, []);
 });

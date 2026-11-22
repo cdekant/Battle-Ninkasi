@@ -4,7 +4,7 @@ Stand: 2026-11-22
 
 Zuständig für: `src/eingabe/aktionskatalog.js`, `src/eingabe/befehlszeile.js`, `src/eingabe/belegung.js`, `src/eingabe/belegunganpassen.js`, `src/eingabe/charakter.js`, `src/eingabe/eingabe.js`, `src/eingabe/einstellungen.js`, `src/eingabe/einstellungsfenster.js`, `src/eingabe/einstellungskatalog.js`, `src/eingabe/erkunden.js`, `src/eingabe/erstellung.js`, `src/eingabe/esckette.js`, `src/eingabe/faehigkeiten.js`, `src/eingabe/fenster.js`, `src/eingabe/hilfe.js`, `src/eingabe/inventar.js`, `src/eingabe/karte.js`, `src/eingabe/laufen.js`, `src/eingabe/maus.js`, `src/eingabe/menue.js`, `src/eingabe/rasten.js`, `src/eingabe/reise.js`, `src/eingabe/schnellleiste.js`, `src/eingabe/texteingabe.js`, `src/eingabe/verlauf.js`, `src/eingabe/zielmodus.js`, `src/anzeige/fenster.js`, `src/anzeige/charakterfenster.js`, `src/anzeige/systemfenster.js`, `src/anzeige/einstellungsanzeige.js`, `src/systeme/vorschau.js`, `src/systeme/untersuchen.js`
 
-Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Oberflaeche.md](Oberflaeche.md), [Titelbildschirm.md](Titelbildschirm.md)
+Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Oberflaeche.md](Oberflaeche.md), [Titelbildschirm.md](Titelbildschirm.md), [Charakter.md](Charakter.md), [Gegenstaende.md](Gegenstaende.md), [Animationen.md](Animationen.md)
 
 ## Zweck
 

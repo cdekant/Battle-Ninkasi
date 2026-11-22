@@ -59,6 +59,7 @@ Spieldesign:
 + [docs/Animationen.md](docs/Animationen.md): Effektschicht, Kampfanimation, Kamera (zurückgestellt)
 + [docs/Texte.md](docs/Texte.md): Sprachdateien, Textkorpus, Literaturverzeichnis (`sprache/literatur.json`, Originale in `sprache/Literatur/` nicht im Repo)
 + [docs/Tileset.md](docs/Tileset.md): Artstyle-Fibel, Pixeldaten, Varianten; neue Tiles folgen der Fibel
++ [docs/Ausblick.md](docs/Ausblick.md): Ideen ohne Entscheidung, ihre Folgen für den Kern und Vorkehrungen, Recherche
 
 Technik:
 
@@ -75,13 +76,14 @@ Arbeitsliste: [docs/Systemausbau.md](docs/Systemausbau.md), fehlende Strukturen 
 
 ## Dokumentation
 
-Kaskade: CLAUDE.md gibt Prinzipien, Ordner und Wegweiser; jedes Dokument in `docs/` beschreibt sein Thema im Einzelnen. Jedes Dokument nennt im Kopf "Zuständig für" (Dateien und Ordner, die es beschreibt) und "Mitprüfen bei Änderungen" (Nachbardokumente).
+Kaskade: CLAUDE.md gibt Prinzipien, Ordner und Wegweiser; jedes Dokument in `docs/` beschreibt sein Thema im Einzelnen. Jedes Dokument nennt im Kopf "Mitprüfen bei Änderungen" (Nachbardokumente, gegenseitig); technische Dokumente zusätzlich "Zuständig für" (Dateien und Ordner, die sie beschreiben).
 
 + Jede Datei in `src/`, `daten/`, `sprache/`, `grafik/`, `lib/`, `werkzeuge/`, `tests/` und jedes Startskript hat genau ein zuständiges Dokument; neue Dateien bekommen es sofort, neue Dokumente einen Eintrag hier.
 + Wer eine Datei ändert, führt ihr zuständiges Dokument nach und prüft die Dokumente aus dessen "Mitprüfen"; ändern sich Prinzipien, Ordner oder Begriffe, auch CLAUDE.md.
 + Jede Aussage steht an genau einer Stelle; andere verweisen darauf, in Markdown als Link auf das Dokument mit dem Abschnitt dahinter, im Code als `siehe docs/<Dokument>.md, <Abschnitt>`.
++ Design-Dokumente (ohne "Zuständig für") sagen was und warum, technische wie (Daten, Schnittstellen, Regeln); Zahlen und Formeln stehen nur im technischen Dokument oder in `daten/regeln.js`. Jeder Design-Abschnitt endet mit "Umsetzung: siehe …", "teilweise, siehe …; offen: …", "offen" oder "keine"; dort Genanntes steht unter "Mitprüfen".
 + Widersprechen sich Doku und Code, wird das gemeldet und nicht still einseitig angepasst.
-+ Vor jedem Commit: Verweise zeigen auf vorhandene Dateien und Abschnitte, jede Datei ist zugeordnet, CLAUDE.md bleibt unter dem Limit (geprüft von `tests/doku.test.js` bei `node --test`); Tests und Bot laufen fehlerfrei. Doppeltes findet kein Test, das bleibt Handarbeit.
++ Vor jedem Commit: Verweise, Zuordnung, Köpfe, Umsetzungszeilen und Limit stimmen (geprüft von `tests/doku.test.js` bei `node --test`); Tests und Bot laufen fehlerfrei. Doppeltes und inhaltliche Widersprüche findet kein Test, das bleibt Handarbeit.
 
 ## Repository und Umgebung
 

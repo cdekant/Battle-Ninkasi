@@ -2,7 +2,7 @@
 
 Stand: 2026-11-21, Entwurf, Entscheidungen getroffen, teilweise umgesetzt (siehe Stand der Umsetzung)
 
-Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Bedienung.md](Bedienung.md)
+Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Bedienung.md](Bedienung.md), [Animationen.md](Animationen.md), [Titelbildschirm.md](Titelbildschirm.md)
 
 Schema der Oberfläche: Prinzipien, Layout, Leisten, Log, Fenster, Tastatur, Einstellungen. Alles hier ist Anzeige und Eingabe; die Logik kennt weder Fenster noch Leisten und bekommt nur gewöhnliche Befehle. Was heute umgesetzt ist, beschreibt [Anzeige.md](Anzeige.md) (Anzeige, Oberfläche), [Bedienung.md](Bedienung.md) (Eingabe, Zielmodus, Untersuchen); Bewegung und Effekte stehen in [Animationen.md](Animationen.md), die Arbeitsliste in Punkt 11 von [Systemausbau.md](Systemausbau.md). Entschiedenes und Offenes steht am Ende unter Entscheidungen.
 
@@ -33,6 +33,8 @@ Schema der Oberfläche: Prinzipien, Layout, Leisten, Log, Fenster, Tastatur, Ein
 11. Einstellungen nicht verstecken: vom ersten Start an erreichbar, alles Umstellbare ist Einstellung, gespeichert werden nur Abweichungen von der Vorgabe
 12. Layout und Stil sind getrennt: Zonen und Anordnung sind das eine, Farben, Rahmen und Schriften das andere
 
+Umsetzung: siehe [Anzeige.md](Anzeige.md), Oberfläche; siehe [Bedienung.md](Bedienung.md), Eingabe
+
 ## Klassen der Elemente
 
 Nach Fagerholt und Lorentzon ("Beyond the HUD", 2009): diegetisch (in Geschichte und Raum), nicht-diegetisch (weder noch), räumlich (im Raum, nicht in der Geschichte), meta (in der Geschichte, nicht im Raum).
@@ -43,6 +45,8 @@ Nach Fagerholt und Lorentzon ("Beyond the HUD", 2009): diegetisch (in Geschichte
 + Vorbereitet wird schon mit dem neuen Layout: eine eigene Effektschicht über der Karte und unter der Oberfläche, so dass die Effekte nur die Karte treffen und Texte lesbar bleiben; jeder Effekt hat einen eigenen Schalter in den Einstellungen, "Bewegung reduzieren" schaltet alle bewegten Effekte zugleich ab
 + Diegetisch: zunächst nichts; denkbar sind Rezeptbuch und Etiketten als Gegenstände der Welt
 
+Umsetzung: teilweise, siehe [Anzeige.md](Anzeige.md), Oberfläche (Effektschicht noch leer); offen: Metaeffekte, schwebende Zahlen, siehe [Systemausbau.md](Systemausbau.md), Punkt 12
+
 ## Prioritätsstufen
 
 | Stufe | Elemente | Ort |
@@ -51,6 +55,8 @@ Nach Fagerholt und Lorentzon ("Beyond the HUD", 2009): diegetisch (in Geschichte
 | Wichtig | MP, PP, Zustände, Schnellleiste mit Abklingzeit, Wesen in Sicht, Zielen und Untersuchen | Seitenleiste, Schnellleiste |
 | Information | Log, Minikarte, laufende Aktion, Heimlichkeit, Tiefe und Zeit | Log, Seitenleiste (Kopf mit Ort und Zeit) |
 | Hintergrund | Knöpfe, Hilfe, Version | Bedienzeile, Fenster |
+
+Umsetzung: siehe [Anzeige.md](Anzeige.md), Oberfläche
 
 ## Bestand und Neubeginn
 
@@ -64,13 +70,17 @@ Die Darstellung kann weitgehend neu entstehen, die Systeme darunter bleiben:
 + Umgesetzt in 0.31.0: Klicks in Fenstern
 + Umgesetzt in 0.32.0: Titelbildschirm, drei Speicherplätze, Fenster nach dem Lauf, Chronik, siehe [Titelbildschirm.md](Titelbildschirm.md)
 
+Umsetzung: keine, Rückblick auf die Versionen; Einzelheiten unter Stand der Umsetzung
+
 ## Bildschirme
 
 + Titel: Hauptmenü mit Titelbild ohne "Drücke eine Taste", Fortsetzen mit Vorschau, Neues Spiel, Einstellungen, Hilfe, Beenden; der erste Klick ist die Geste, die der Browser für Ton und Vollbild verlangt; Entwurf, Entscheidungen und Ideen in [Titelbildschirm.md](Titelbildschirm.md)
 + Idee: Intro-Film mit Lore und Vorgeschichte als Bildfolge in Pixelart (klein, im Stil) statt Video, jede Taste überspringt, eine Einstellung zeigt ihn nur beim ersten Start oder nie; mit Punkt 12 (Darstellung); Bild und Ton unter CC BY-NC-SA 4.0 in `LIZENZEN.md`
 + Charaktererstellung: Eigenschaften verteilen (Punkt 13, die Logik nimmt die Verteilung als Startoption)
 + Spiel: das Layout unten
-+ Nach dem Lauf (Tod oder Sieg): neuer Lauf, Titel, Aufzeichnung sichern oder abspielen, Laufbericht (Morgue, Punkt 10), Ruhmeshalle; siehe [Titelbildschirm.md](Titelbildschirm.md)
++ Nach dem Lauf (Tod oder Sieg): neuer Lauf, Titel, Aufzeichnung sichern oder abspielen, Laufbericht (Morgue, als Todesbericht in [Ausblick.md](Ausblick.md)), Ruhmeshalle; siehe [Titelbildschirm.md](Titelbildschirm.md)
+
+Umsetzung: teilweise, siehe [Titelbildschirm.md](Titelbildschirm.md), Stand der Umsetzung 0.32.0; siehe [Bedienung.md](Bedienung.md), Fenster; offen: Intro-Film, Laufbericht, Ruhmeshalle
 
 ## Layout
 
@@ -129,12 +139,16 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 + Seitenleiste links; die Knöpfe wandern mit ihr
 + Kompakt für kleine Fenster: Log 3 Zeilen, Wesen in Sicht als Fenster (Vorbild das "modale" Layout von Cogmind)
 
+Umsetzung: teilweise, siehe [Anzeige.md](Anzeige.md), Oberfläche; offen: Log oben, Seitenleiste links
+
 ## Bedienzeile
 
 + Am unteren Rand in jeder Variante dieselbe Zeile: links die Schnellleiste unter der Karte, rechts die Knöpfe unten in der Seitenleiste; so bleibt die Handbewegung beim Wechsel des Layouts gleich
 + Knöpfe für die Maus: klickbar, jeder mit Taste und kurzem Wort (z. B. "[i] Gepäck"), in zwei Reihen zu je vier, bei 400 px etwa 96 px je Knopf: Gepäck, Fähigkeiten, Charakter, Karte; Rasten, Erkunden, Hilfe, Menü
 + Die Knöpfe entstehen aus dem Aktionskatalog (siehe Tastatur)
 + Eine Kopfleiste gibt es nicht; Ort und Zeit (Tiefe, Ebene, Zug) stehen im Kopf der Seitenleiste wie bei Brogue, die Karte gewinnt so etwa 28 px Höhe
+
+Umsetzung: siehe [Anzeige.md](Anzeige.md), Oberfläche
 
 ## Seitenleiste
 
@@ -145,6 +159,8 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 + In Sicht: Wesen nach Abstand mit Wachzustand und Zuständen, "wirkt etwas" bei laufender Aktion; darüber Gefährten (Beschworene, Verbündete) mit LP
 + Seitenleiste und Karte heben sich beim Darüberfahren und beim Untersuchen gegenseitig hervor (Brogue)
 + Gepäck und Fähigkeitenliste stehen nicht mehr in der Seitenleiste, sondern in Fenstern; die Schnellleiste zeigt das Wichtigste davon
+
+Umsetzung: teilweise, siehe [Anzeige.md](Anzeige.md), Oberfläche; offen: Ausdauer, Helligkeit des eigenen Feldes
 
 ## Schnellleiste
 
@@ -158,6 +174,8 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 + Vorbelegung des Cursors nach der Art der Wirkung: schädlich auf den nächsten Feind in Sicht, nützlich auf den nächsten verletzten Gefährten bzw. Ninkasi selbst; lebt das zuletzt gewählte Ziel und ist in Sicht, gewinnt es; die Art steht als Angabe `zielvorgabe` ("feind", "gefaehrte", "selbst") in den Daten der Fähigkeit bzw. des Gegenstands, ohne Angabe folgt sie aus den Tags der Wirkung
 + Einstellung "sofort auslösen": mit vorbelegtem Ziel ohne Bestätigung wirken (Vorbild Shattered Pixel Dungeon), Vorgabe aus
 
+Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Schnellleiste; offen: Mindestpegel als Kante
+
 ## Log
 
 + Unten in zwei Spalten (Variante A): links das Geschehen (Erzählung, Bemerktes, Gehörtes, Hinweise), rechts der Kampf mit Zahlen (Trefferchance, Schaden, Abzug der Rüstung, Krit); Vorbild Cogmind mit getrenntem Kampflog
@@ -169,6 +187,8 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 + Das Log zeigt weiterhin nur, was Ninkasi wahrnimmt
 + Farben im Kampf nach der Seite, die handelt: Ninkasi in Grüntönen, Verbündete in Blautönen, Gegner in Rot, Orange, Gelb und Lila, Neutrale grau; der Ton folgt dem Ausgang (Treffer, Krit hell und fett, abgewehrt gedämpft), bei Gegnern Gelb für angekündigte Angriffe und Lila für Psi und Magie; Symbole bleiben, damit nichts nur an der Farbe hängt
 + Zahlen im Kampf in festen, schmalen Spalten mit kurzer Kopfzeile ("%", "DMG", "×", "–"): Chance, Schaden, Krit (Faktor), Abzug (Rüstung und Widerstand zusammen, die Aufteilung im Tooltip); Reflektieren und Absorbieren bekommen ihren Platz, sobald es sie gibt
+
+Umsetzung: siehe [Anzeige.md](Anzeige.md), Log
 
 ## Fenster
 
@@ -187,11 +207,15 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 + Bestätigung
 + Später: Handel und Dienste, Brauen mit Rezeptbuch, Gespräch (Händler, Nebengottheiten), Ritual und Schriftrollen schreiben, Journal (Ziel des Laufs)
 
+Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Fenster; offen: Handel, Brauen, Gespräch, Ritual, Journal
+
 ## Unterbrechungen
 
 + Ein Fenster, das bestätigt werden muss, nur bei Tod, einer Treppe ohne Rückweg und riskanten Handlungen (Lava, unbekannten Fluch anlegen, Angriff auf Neutrale); jede Bestätigung ist in den Einstellungen abschaltbar
 + Die Liste der bestätigungspflichtigen Fälle ist Daten und erweiterbar
 + Alles andere bleibt in Log und Karte
+
+Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Fenster (Bestätigung bei Neustart und Speicherplätzen); offen: Treppe ohne Rückweg, riskante Handlungen, Liste als Daten
 
 ## Esc als Kette
 
@@ -199,6 +223,8 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 2. Oberstes Fenster schließen
 3. Reise, Rasten oder Erkunden abbrechen
 4. Ist nichts davon offen: Spielmenü öffnen
+
+Umsetzung: siehe [Bedienung.md](Bedienung.md), Eingabe
 
 ## Tastatur
 
@@ -242,6 +268,8 @@ Vorschlag für die Vorgabe, Buchstaben nach der deutschen Aufschrift:
 
 + Die Leisten wechselt Umschalt+1 bis 5; Strg+1 bis 5 schied aus, weil es im Browser die Reiter wechselt und sich nicht sicher abfangen lässt
 
+Umsetzung: siehe [Bedienung.md](Bedienung.md), Eingabe
+
 ## Maus
 
 + Klickregeln wie bisher (aufheben, angreifen, reisen), dazu Klick auf Minikarte, Schaltflächen, Plätze der Schnellleiste und Wesen in der Seitenleiste
@@ -249,6 +277,8 @@ Vorschlag für die Vorgabe, Buchstaben nach der deutschen Aufschrift:
 + Rechtsklick auf ein Feld öffnet dessen ausführliche Beschreibung wie Untersuchen mit X, das Kontextmenü des Browsers wird dafür unterdrückt; der linke Klick handelt wie bisher
 + Mausrad zoomt über der Karte und blättert über Listen und Log
 + In Fenstern (seit 0.31.0): ein Klick wirkt wie die Taste des Eintrags oder Knopfs; der zweite Klick auf die gewählte Zeile wie Enter; Rechtsklick wie Esc; Klick außerhalb des obersten Fensters schließt es, außer Charaktererstellung und Bestätigung; Darüberfahren hebt nur hervor
+
+Umsetzung: siehe [Bedienung.md](Bedienung.md), Maus, Reise, Laufen, Rasten und Erkunden; siehe [Bedienung.md](Bedienung.md), Fenster
 
 ## Gamepad
 
@@ -260,6 +290,8 @@ Für später; vorbereiten kostet fast nichts, wenn drei Regeln von Anfang an gel
 
 Die eigentliche Anbindung (Gamepad-API im Takt von `src/main.js`, Belegung der Knöpfe, ein Ringmenü für die Schnellleiste, Knopfsymbole in Hilfe und Fußzeilen) wäre dann eine eigene, überschaubare Version.
 
+Umsetzung: offen
+
 ## Einstellungen
 
 + Anzeige: Zoom, Größe der Oberfläche, Schriftgröße, Vollbild, Layout (Variante A, B, kompakt), Seitenleiste links oder rechts, Log oben oder unten und seine Zeilen, Minikarte an oder aus, Verzögerung des Tooltips
@@ -268,6 +300,8 @@ Die eigentliche Anbindung (Gamepad-API im Takt von `src/main.js`, Belegung der K
 + Barrierefreiheit: Kontrast, Palette für Farbenblinde, Bewegung reduzieren (schaltet alle bewegten Effekte ab), jeder Metaeffekt einzeln an oder aus, Stärke der Metaeffekte
 + Später: Ton, Sprache, Gamepad
 + Gespeichert wird wie bisher nur die Abweichung von der Vorgabe (`src/eingabe/einstellungen.js`)
+
+Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Einstellungen; offen: Ton, Sprache, Gamepad, Metaeffekte, Seitenleiste links, Log oben
 
 ## Mechaniken, die noch kommen, und ihr Platz
 
@@ -282,6 +316,8 @@ Die Oberfläche lässt sich jetzt durchplanen; was noch fehlt, bekommt einen vor
 + Beschworene und Verbündete: Abschnitt Gefährten
 + Charaktererstellung, Titel, Tod mit Laufbericht, Bestenliste: eigene Bildschirme
 + Ziel des Laufs: Journal als Fenster
+
+Umsetzung: offen
 
 ## Festlegen, später, umschaltbar
 
@@ -304,6 +340,8 @@ Später festlegbar, ohne dass etwas bricht:
 Als Einstellung umschaltbar:
 
 + Layout-Variante, Seite der Seitenleiste, Lage und Zeilen des Logs, Minikarte, Schnellleiste an oder aus, Bestätigungen, Tooltip
+
+Umsetzung: keine, Grundsätze der Planung
 
 ## Stand der Umsetzung
 

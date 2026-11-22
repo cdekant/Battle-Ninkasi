@@ -4,7 +4,7 @@ Stand: 2026-11-22
 
 Zuständig für: `index.html`, `package.json`, `lib/*`, `src/main.js`, `src/version.js`, `src/kern/spiel.js`, `src/kern/zustand.js`, `src/kern/zeit.js`, `src/kern/zufall.js`, `src/kern/ereignisse.js`, `src/kern/hakenkatalog.js`, `src/kern/register.js`, `src/kern/daten.js`, `src/kern/raumindex.js`, `src/kern/kurven.js`, `src/systeme/index.js`, `src/eingabe/speicherstand.js`, `daten/index.js`, `daten/regeln.js`, `daten/aktionen.js`
 
-Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Entwicklung.md](Entwicklung.md), [Titelbildschirm.md](Titelbildschirm.md)
+Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Entwicklung.md](Entwicklung.md), [Titelbildschirm.md](Titelbildschirm.md), [Grundlagen.md](Grundlagen.md), [Texte.md](Texte.md), [Ausblick.md](Ausblick.md)
 
 ## Zweck
 
@@ -260,6 +260,6 @@ Messwerte:
 ## Verweise
 
 + Spieldesign: [Grundlagen.md](Grundlagen.md); Speicherplätze und Chronik aus Sicht der Spielerin: [Titelbildschirm.md](Titelbildschirm.md)
-+ Offen in [Systemausbau.md](Systemausbau.md): reservierter Haken `zug_beginn` (Punkt 1), Prüfsumme der Daten samt Mods (Punkt 10)
++ Offen in [Systemausbau.md](Systemausbau.md): reservierter Haken `zug_beginn` (Punkt 1); Prüfsumme der Daten samt Mods als Idee in [Ausblick.md](Ausblick.md)
 
 Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).

@@ -2,7 +2,7 @@
 
 Stand: 2026-11-20, Entwurf, zurückgestellt
 
-Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Oberflaeche.md](Oberflaeche.md)
+Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Oberflaeche.md](Oberflaeche.md), [Bedienung.md](Bedienung.md)
 
 Konzept für Bewegung und Effekte in der Anzeige: Effektschicht, Kampfanimation, Kamera. Alles hier ist reine Anzeige und berührt weder den Spielzustand noch den Spiel-Zufall; die Logik liefert über ihre Meldungen schon alles Nötige. Grafik (Varianten von Boden und Wand, bewegte Tiles) steht in [Tileset.md](Tileset.md), die Arbeitsliste in Punkt 12 von [Systemausbau.md](Systemausbau.md), Licht in [Welt.md](Welt.md) (Licht), [Wesen.md](Wesen.md) (Wahrnehmung).
 
@@ -11,6 +11,8 @@ Konzept für Bewegung und Effekte in der Anzeige: Effektschicht, Kampfanimation,
 + `src/anzeige/animation.js` spielt nur Geschossbahnen ab: nacheinander, ein helles Quadrat je Feld, Takt per `setTimeout` aus `src/main.js` (Einstellung `geschossPause`, 30 ms); jede Taste überspringt, die Taste wirkt trotzdem (siehe Zielmodus in [Bedienung.md](Bedienung.md))
 + Meldungen, an denen Animationen hängen können: `schaden` (mit `kritisch`, `immun`, `schadensart`), `verfehlt` (mit `grund`), `geheilt`, `wert_geaendert`, `tod`, `geschoss` (`bahn`, `aufschlag`), `flaeche` (`felder`), `hinterhalt`, `zustand_beginnt`, `zustand_endet`, `teleportiert`, `gestossen`, `gezogen`, `beschworen`, `verschwindet`, `entzuendet`, `erloschen`, `zerbrochen`
 + Das Log filtert schon nach dem, was Ninkasi wahrnimmt (`meldungWahrnehmbar` in `src/systeme/wahrnehmbar.js`); Animationen folgen derselben Regel
+
+Umsetzung: siehe [Anzeige.md](Anzeige.md), Anzeige; siehe [Bedienung.md](Bedienung.md), Zielmodus
 
 ## Teile
 
@@ -21,6 +23,8 @@ Konzept für Bewegung und Effekte in der Anzeige: Effektschicht, Kampfanimation,
 2. Varianten von Boden und Wand: siehe [Tileset.md](Tileset.md) (Varianten und Schmuck); der Aufwand liegt vor allem in der Grafik und kann neben Teil 1 in der Tilewerkstatt laufen
 3. Bewegte Tiles (siehe [Tileset.md](Tileset.md)), weiches Scrollen der Kamera; Licht gehört wegen der Wahrnehmung nicht hierher
 
+Umsetzung: offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 12
+
 ## Entschieden
 
 Der ganze Bereich ist zurückgestellt (Stand 2026-11-20); festgehalten ist, was beim Wiederaufnehmen gilt:
@@ -30,6 +34,8 @@ Der ganze Bereich ist zurückgestellt (Stand 2026-11-20); festgehalten ist, was 
 + Reise, Rasten und Erkunden: Vorgabe ist anhalten und alles nacheinander abspielen; das Gerüst stellt dafür Schalter bereit (z.B. Animationen unterwegs verkürzen oder überspringen)
 + Bewegte Tiles und Umgebungseffekte (lodernde Kesselfeuer, blubbernde Bottiche, wogendes Gas) laufen im Bildtakt auch dann, wenn keine Spielzeit vergeht; sie halten die Eingabe nie auf, nur Animationen aus Meldungen tun das; ihr Takt und Flackern kommen aus dem kosmetischen Zufall, die Logik bleibt unberührt
 + Reihenfolge: Gerüst, Kampfanimation, bewegte Tiles (alle drei brauchen den Bildtakt des Gerüsts); Varianten von Boden und Wand hängen nicht daran und sind gesondert zurückgestellt (siehe [Tileset.md](Tileset.md))
+
+Umsetzung: offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 12
 
 ## Recherche
 

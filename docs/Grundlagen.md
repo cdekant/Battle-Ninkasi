@@ -2,17 +2,19 @@
 
 Stand: 2026-11-18
 
-Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Architektur.md](Architektur.md)
+Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Architektur.md](Architektur.md), [Wesen.md](Wesen.md), [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md), [Tileset.md](Tileset.md), [Entwicklung.md](Entwicklung.md), [Ausblick.md](Ausblick.md)
 
 ## Spiel
 
 + Dungeon-Crawler/Roguelike, rundenbasiert
-+ Permadeath, kein dauerhafter Fortschritt zwischen den Läufen
-+ Gesteuert wird nur Ninkasi
++ Permadeath; dauerhafter Fortschritt zwischen den Läufen höchstens als Wissen (Rezepte, Bestiarium, Glossar), nie als stärkere Werte (entschieden 2026-11-22, Ideen in [Ausblick.md](Ausblick.md))
++ Gesteuert wird nur Ninkasi; Begleiter handeln selbst und nehmen von ihr Vorrangbefehle an (entschieden 2026-11-22, siehe Begleiter und Befehle in [Ausblick.md](Ausblick.md))
 + Zufällig erzeugte Dungeons
 + Hub: fester Ort zwischen den Ebenen mit Diensten (Händler u.a.), ähnliche Dienste unterwegs durch wandernde Händler und Nebengottheiten
 + Zielgruppe: zunächst nur privat, Steam als spätere Option, Steam Deck kein Ziel
 + Open Source: Code unter GPL-3.0-or-later, Texte und Grafik unter CC BY-NC-SA 4.0, siehe [LIZENZEN.md](../LIZENZEN.md)
+
+Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Dienste des Hubs, wandernde Händler und Nebengottheiten
 
 ## Spielkern
 
@@ -49,9 +51,13 @@ Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Architektur.md](Archi
 + Idee, noch nicht bestätigt: häufige Anwendung von Psi lässt Gegner erscheinen (Vorbild: Glimmer in Caves of Qud)
 + Vorschlag, noch nicht bestätigt: über einer Schwelle drohen Torkeln, Fehlschläge, Filmriss
 
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Stoffwechsel; siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten; siehe [Gegenstaende.md](Gegenstaende.md), Inventar; offen: Brausystem, Ausdauer, Schwellen und Risiken des Pegels
+
 ## Charakter
 
 + Charaktererstellung, Eigenschaften, Skills und EP: siehe [Charakter.md](Charakter.md)
+
+Umsetzung: siehe [Wesen.md](Wesen.md), Skills und Lernen
 
 ## Gegner
 
@@ -72,6 +78,8 @@ Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Architektur.md](Archi
 + Endosporen: ruhende Bakterien, erwachen später (Wärme, Feuer)
 + Protozoen und Amöben: einzelne Jäger, die andere Mikroorganismen fressen
 
+Umsetzung: teilweise, siehe [Entwicklung.md](Entwicklung.md), Stand des Spielinhalts; siehe [Wesen.md](Wesen.md), KI; offen: Mikroorganismen mit eigener Mechanik, Bosse
+
 ## Technik
 
 + Läuft im Browser (HTML, CSS, JavaScript)
@@ -87,6 +95,8 @@ Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Architektur.md](Archi
 + Texte zweisprachig über Sprachdateien, Textkorpus für erzeugte Texte
 + Details: [Architektur.md](Architektur.md) und die übrigen technischen Dokumente (Übersicht in CLAUDE.md), [Texte.md](Texte.md)
 
+Umsetzung: siehe [Architektur.md](Architektur.md), Grundsätze
+
 ## Tileset
 
 + Keine Zeichen als Platzhalter: Neue Entitäten kommen direkt als Tile ins Spiel
@@ -99,12 +109,16 @@ Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Architektur.md](Archi
 + Erstliste: Boden, Wand, Tür, Treppe, Ninkasi, zwei Gegner, Bier, Truhe, Falle
 + Arbeitsweise, Pixeldaten, Vorschau und Ablauf: [Tileset.md](Tileset.md)
 
+Umsetzung: siehe [Tileset.md](Tileset.md), Pixeldaten
+
 ## Design
 
 + Tonfall: bis ins Mark sarkastisch, schwarzer Humor, düster, blutig, mit einer guten Portion Sex/Pornographie
 + Farbwelt: Biertöne, Edelstahl, Kupfer, Stein
 + Dazu eine eigene Palette Signalfarben
 + Palette der Tiles festgelegt: `grafik/palette.js`, siehe [Tileset.md](Tileset.md)
+
+Umsetzung: teilweise, siehe [Tileset.md](Tileset.md), Artstyle-Fibel; offen: Signalfarben
 
 ## Offen
 

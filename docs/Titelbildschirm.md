@@ -64,7 +64,7 @@ Menü der ersten Version: Fortsetzen, Neues Spiel, Läufe (ab zwei belegten Plä
 
 Festgehalten, nicht eingeplant:
 
-+ Ruhmeshalle mit Laufbericht (Morgue, siehe Punkt 10 in [Systemausbau.md](Systemausbau.md)), Statistik des letzten Laufs und Gesamtstatistik, alles aus der Chronik
++ Ruhmeshalle mit Laufbericht (Morgue, als Todesbericht in [Ausblick.md](Ausblick.md)), Statistik des letzten Laufs und Gesamtstatistik, alles aus der Chronik
 + Weitere Zähler der Chronik, z.B. jemals entdeckte Bierrezepte oder besiegte Abstinenzler; ein neuer Zähler ist eine Zeile in `ZAEHLREGELN`
 + Abspieler für Aufzeichnungen, aus dem Titel und direkt nach dem Lauf; braucht nur die vollständigen Befehle im Spielstand und den aufbewahrten letzten Lauf, beides gibt es
 + Lauf mit festem Startwert (gibt es schon als `?seed=`, fehlt nur das Eingabefeld) und Bier des Tages (Startwert aus dem Datum)

@@ -38,7 +38,7 @@ Regeln:
 + Fallen lösen am Haken `betritt_feld` aus, nur für die Bewegungsarten in `ausloesenFuer` (Vorgabe `laufend`), Quelle die Falle, Ursache `falle`, eine Kettenstufe tiefer; danach gilt sie als entdeckt; Fallen wecken nicht und ziehen keinen Zorn auf sich (das gilt nur für Wesen als Urheberin)
 + Entdecken am Haken `zug_ende`, nur für Ninkasi: für jede verborgene Falle, die sie sieht und die höchstens `reichweite` entfernt ist, ein Wurf mit E / (E + Tarnung), E = Entdecken × 2 / (1 + Abstand); Entdecken ist ein Kampfwert (Vorgabe `entdeckenVorgabe`), Skills ändern ihn über Modifikatoren; Beispiel Entdecken 30 gegen Tarnung 30: daneben 50 %, auf 3 Felder 33 % je Zug
 + Die Anzeige zeigt Fallen erst, wenn sie bekannt sind; Wesen mit KI meiden alle Fallen, Reise und Erkunden die entdeckten (Option `meiden` der Wegfindung); liegt eine entdeckte Falle in einem Gang ohne Umweg, hält die Reise mit `kein_weg`
-+ Hebel mit Wirkung in der Ferne brauchen Themenräume ([Systemausbau.md](Systemausbau.md), Punkt 10)
++ Hebel mit Wirkung in der Ferne brauchen Themenräume (Idee in [Ausblick.md](Ausblick.md))
 + Im Spielinhalt (Zahlen vorläufig): Säuredüse (Tarnung 40, 2W4 Säure) und Klappergeschirr (Tarnung 20, Lärm 14, weckt die Nachbarschaft); Türen und Fallen haben noch keine Tiles, nur Zeichen
 
 ## Feldschichten
@@ -148,6 +148,6 @@ Regeln:
 ## Verweise
 
 + Spieldesign der Welt und des Hubs: [Grundlagen.md](Grundlagen.md); Darstellung von Karte und Schichten: [Anzeige.md](Anzeige.md); Tiles: [Tileset.md](Tileset.md)
-+ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 8 (u.a. Nachholen der Zeit verlassener Ebenen, Wesen folgen über Treppen, Dienste des Hubs, Tiles) und Punkt 10 (Themenräume)
++ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 8 (u.a. Nachholen der Zeit verlassener Ebenen, Wesen folgen über Treppen, Dienste des Hubs, Tiles); Themenräume als Idee in [Ausblick.md](Ausblick.md)
 
 Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).

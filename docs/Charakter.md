@@ -2,7 +2,7 @@
 
 Stand: 2026-11-20
 
-Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Bedienung.md](Bedienung.md)
+Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Bedienung.md](Bedienung.md), [Grundlagen.md](Grundlagen.md), [Entwicklung.md](Entwicklung.md)
 
 Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaft, Skillpunkte unabhängig vom späteren Lerntempo), DCSS (EP fließen in die benutzten Skills, Kosten anzeigen statt Formel), Caves of Qud (Eigenschaften dauerhaft und vorübergehend veränderbar), Tales of Maj'Eyal und Path of Exile (Skills wirken über Tags auch auf künftige Fähigkeiten). Die Mechanik ist seit 0.26.0 umgesetzt, mit den hier genannten vorläufigen Zahlen, beschrieben in [Wesen.md](Wesen.md) (Skills und Lernen); offen sind Skillfenster, Charaktererstellung und Skillkatalog (Punkt 13 in [Systemausbau.md](Systemausbau.md)).
 
@@ -19,6 +19,8 @@ Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaf
 + Vorschlag, noch nicht bestätigt: Makel dürfen zweischneidig sein, Nachteil mit verstecktem Vorteil
 + Vorschlag, noch nicht bestätigt: Makel geben wahlweise Eigenschaftspunkte oder EP und dürfen Eigenschaften auch unter 10 senken, für schärfere Profile
 
+Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Fenster; siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Makel und Vorzüge
+
 ## Startwerte
 
 + Vorläufig, Grundlage fürs Balancing: 100 LP, 100 MP, Pegel 0 ‰
@@ -26,6 +28,8 @@ Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaf
 + Mit Pegel 0 startet Ninkasi nüchtern: LP regenerieren langsam, MP am schnellsten, PP schwinden (Verläufe in [Grundlagen.md](Grundlagen.md))
 + PP (Psi-Punkte) vorläufig 0 von 100, Start- und Höchstwert noch offen
 + Der Pegel ist nach oben offen
+
+Umsetzung: siehe [Entwicklung.md](Entwicklung.md), Stand des Spielinhalts
 
 ## Eigenschaften
 
@@ -73,6 +77,8 @@ Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaf
   + Alchemie (Tränke, Gärung, Gifte): primär Braukunde, sekundär Klugheit
   + Göttliche Gabe (Altäre, Nebengottheiten): primär Braukunde, sekundär Sinnlichkeit
 + Vorschlag, noch nicht bestätigt: Psi sekundär Klugheit
+
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Neuverteilung im Lauf
 
 ## Skills
 
@@ -127,6 +133,8 @@ Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaf
 + Fundstück ohne passenden Skill: nutzbar, aber mit hohem Fehlschlagrisiko über eine Risikotabelle nach dem fehlenden Skill (Vorbild DCSS)
 + Vorschlag, noch nicht bestätigt: Ausnahmen nur für körpereigene Fähigkeiten ohne mögliches Fundstück (Kopfstoß, Bierfontäne, Rülpser)
 
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skillkatalog, siehe [Systemausbau.md](Systemausbau.md), Punkt 13
+
 ## Erfahrungspunkte (EP)
 
 ### Freie EP
@@ -162,6 +170,8 @@ Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaf
 + Teilende Mikroorganismen: Die Mutterzelle eröffnet einen gemeinsamen Topf für ihre ganze Abstammungslinie (vorläufig dreimal ihre EP); jede getötete Zelle bringt ihre EP, höchstens was noch im Topf ist; ist er leer, lohnt das Farmen des Essigbakterien-Pools nicht mehr
 + Nachrückende Gegner nicht ausgeschlossen, als eigenes, per Parameter einstellbares System (Rate, Obergrenze, EP-Faktor)
 + Vorschlag, noch nicht bestätigt: Varianten durch Affixe vervielfachen die Gegnertypen
+
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: nachrückende Gegner, Rätsel
 
 ## Offen
 

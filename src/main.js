@@ -581,7 +581,8 @@ function erstellungAbschliessen(startoptionen) {
   speichernJetzt();
 }
 
-// Fenster obenauf legen; nach dem Tod nur die, die nichts am Lauf ändern (Spielmenü, Hilfe, Verlauf)
+// Fenster obenauf legen; nach dem Tod nur die, die nichts am Lauf ändern (Spielmenü, Hilfe, Verlauf, Karte,
+// Einstellungen, Befehlszeile, Bestätigung und das Fenster "ende")
 const FENSTER_NACH_DEM_TOD = ["menue", "hilfe", "verlauf", "karte", "einstellungen", "befehlszeile", "bestaetigung", "ende"];
 function fensterAuf(art, zustand) {
   if (spiel.zustand.vorbei && !FENSTER_NACH_DEM_TOD.includes(art)) return;
