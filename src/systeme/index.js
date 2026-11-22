@@ -28,3 +28,4 @@ import "./verschleiss.js";
 import "./kennen.js";
 import "./skills.js";
 import "./lernen.js";
+import "./allmacht.js";

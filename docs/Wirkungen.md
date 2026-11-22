@@ -265,7 +265,7 @@ Schnittstellen:
 
 + `vorgangAbschliessen(spiel)` (`src/kern/vorgang.js`) nach jedem Vorgang (ausgeführter Befehl, Handler der Weltuhr, Zeitereignis): abwechselnd alle Zustandsprüfungen und der nächste vorgemerkte Auslöser, bis nichts mehr ansteht; mehr als 100000 Durchläufe werfen
 + Register `zustandspruefungen` (`(spiel) => true`, wenn etwas verändert wurde), in dieser Reihenfolge: `tod` (`src/systeme/tod.js`), `lage` (siehe [Wesen.md](Wesen.md), Bewegung), `kaputt` (siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß); später z.B. der Filmriss
-+ Haken `vor_tod` und `nach_tod` (mit der letzten Position), Meldung `tod` mit Urheberin, Ursache und Mittel aus `letzterVerlust`
++ Haken `vor_tod` und `nach_tod` (mit der letzten Position), Meldung `tod` mit Urheberin, Ursache und Mittel aus `letzterVerlust`; am `vor_tod` hängt als letzte die Allmacht, die Ninkasi im allmächtigen Lauf bewahrt (siehe [Architektur.md](Architektur.md), Spielarten)
 
 Regeln:
 

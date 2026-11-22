@@ -41,6 +41,9 @@ export default {
     tieferChance: 10, // Prozent je Wurf der Population: ein Gegner aus einer tieferen Tiefe
     tieferBis: 2, // höchstens so viele Tiefen tiefer
   },
+  // Spielart "allmaechtig", siehe src/systeme/allmacht.js: diese Ebene aus daten/ebenen.js ersetzt die Vorlage dieser
+  // Tiefe im Plan des Laufs, dort beginnt der Lauf
+  allmacht: { kammer: "testkammer", tiefe: 0 },
   // Erzeugung der Ebenen in Schritten, siehe src/welt/ebene.js und src/welt/ebenenschritte.js; eine Ebene in
   // daten/ebenen.js kann mit schritte eine eigene Folge nennen
   ebenen: {

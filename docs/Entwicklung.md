@@ -56,9 +56,9 @@ Schnittstellen:
 
 Regeln:
 
-+ Der Bot prüft nach jedem Befehl Invarianten (u.a. kein Wesen mit Lebenswert 0, nichts Getragenes ohne Trägerin, keine verwaisten Zeitereignisse, keine liegengebliebenen Auslöser, räumlicher Index und Heap stimmen, Lernstand ganzzahlig und vollständig verteilt), spielt jeden Lauf aus Startwert und Befehlsliste nach und vergleicht die Zustände; jeden vierten Lauf speichert er mitten im Lauf, lädt ihn und verlangt nach den übrigen Befehlen denselben Zustand
++ Der Bot prüft nach jedem Befehl Invarianten (u.a. kein Wesen mit Lebenswert 0, nichts Getragenes ohne Trägerin, keine verwaisten Zeitereignisse, keine liegengebliebenen Auslöser, räumlicher Index und Heap stimmen, Lernstand ganzzahlig und vollständig verteilt), spielt jeden Lauf aus Startwert und Befehlsliste nach und vergleicht die Zustände; jeden vierten Lauf speichert er mitten im Lauf, lädt ihn und verlangt nach den übrigen Befehlen denselben Zustand; jeder fünfte Lauf (Startwert % 5 = 3) spielt in der Testkammer (siehe [Architektur.md](Architektur.md), Spielarten) mit zufälligem Erzeugen und Tiefenwahl, auch in Tiefen, die es nicht gibt, und verlangt, dass Ninkasi nie stirbt und die Chronik nichts zählt
 + Erfolg heißt die letzte Zeile `... 0 Fehler`; jeder Fehler nennt Startwert und Befehl, damit er sich mit demselben Aufruf nachstellen lässt
-+ Die Zählungen am Ende (Fähigkeiten und lange Aktionen der Gegner, Würfe, Meldungen gezeigt, verborgen und gehört, Lernbefehle und Skillstufen, EP je Tiefe nach Herkunft) sind keine Prüfung, sondern ein grober Blick auf die Balance
++ Die Zählungen am Ende (Fähigkeiten und lange Aktionen der Gegner, Würfe, Meldungen gezeigt, verborgen und gehört, Lernbefehle und Skillstufen, EP je Tiefe nach Herkunft, Erzeugen und Tiefenwahl in der Testkammer) sind keine Prüfung, sondern ein grober Blick auf die Balance
 
 ## Ablauf einer Version
 
@@ -87,7 +87,7 @@ Regeln:
 
 Der Inhalt ist vorläufig und dient dem Ausprobieren der Systeme; alle Zahlen stehen in `daten/`. Geschichte: begonnen als 0.0.0; 0.1.0 Maus und Reise, 0.2.0 Tiles im Spiel, 0.3.0 Pegel in Promille, Psi-Punkte und Stoffwechsel, 0.4.0 Tod als Zustandsprüfung, danach der Systemausbau nach [Systemausbau.md](Systemausbau.md).
 
-+ Ebenen: Hub (Tiefe 0) als feste Karte, drei Kellertiefen zu 120x40 Feldern mit 16 bis 20 Wesen aus der Population (Essigbakterien in Rudeln, Fernkämpfer-Tests), 10 Bieren, einem Bierfass, 3 Brandflaschen, 3 Gärbottichen, je 6 Säuredüsen und Klappergeschirren, je einem Stück Ausrüstung (zwei Kupferringe), Türen an der Hälfte der Raumzugänge, Treppen hinauf und hinab (siehe [Welt.md](Welt.md), Ebenen)
++ Ebenen: Hub (Tiefe 0) als feste Karte, im allmächtigen Lauf an seiner Stelle die Testkammer (21x11 Felder, leer), drei Kellertiefen zu 120x40 Feldern mit 16 bis 20 Wesen aus der Population (Essigbakterien in Rudeln, Fernkämpfer-Tests), 10 Bieren, einem Bierfass, 3 Brandflaschen, 3 Gärbottichen, je 6 Säuredüsen und Klappergeschirren, je einem Stück Ausrüstung (zwei Kupferringe), Türen an der Hälfte der Raumzugänge, Treppen hinauf und hinab (siehe [Welt.md](Welt.md), Ebenen)
 + Ninkasi: 100 LP, 100 MP, 0 von 100 PP, Pegel 0 (nach oben offen), Sichtweite 8, Faust 1W6+2 stumpf mit Genauigkeit 80 (80 % gegen ein Wesen ohne Ausweichen), die vorläufige `testfaehigkeit`
 + Stoffwechsel je Welttick (`daten/ninkasi.js`): LP 0,3 nüchtern, 0,8 bei 1,5 ‰, darüber abnehmend; MP 0,8 nüchtern, 0 ab 3 ‰; PP Schwund 0,3 nüchtern, Stillstand von 0,5 bis 1,5 ‰, dann steigend bis 1,0 bei 4 ‰; danach Abbau des Pegels um 0,01 ‰; Schwellen 0,5, 1, 2 und 3 ‰ werden angezeigt und gemeldet, haben aber noch keine Wirkung; die Leiste zeigt zusätzlich das Optimum der LP
 + Essigbakterium: 15 LP, Biss 1W4 mit Genauigkeit 70, 10 gebundene EP, Verhaltensmodul `jagen`

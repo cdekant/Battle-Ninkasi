@@ -4,7 +4,7 @@ Stand: 2026-11-22
 
 Zuständig für: `src/eingabe/aktionskatalog.js`, `src/eingabe/befehlszeile.js`, `src/eingabe/belegung.js`, `src/eingabe/belegunganpassen.js`, `src/eingabe/charakter.js`, `src/eingabe/eingabe.js`, `src/eingabe/einstellungen.js`, `src/eingabe/einstellungsfenster.js`, `src/eingabe/einstellungskatalog.js`, `src/eingabe/erkunden.js`, `src/eingabe/erstellung.js`, `src/eingabe/esckette.js`, `src/eingabe/faehigkeiten.js`, `src/eingabe/fenster.js`, `src/eingabe/hilfe.js`, `src/eingabe/inventar.js`, `src/eingabe/karte.js`, `src/eingabe/laufen.js`, `src/eingabe/maus.js`, `src/eingabe/menue.js`, `src/eingabe/rasten.js`, `src/eingabe/reise.js`, `src/eingabe/schnellleiste.js`, `src/eingabe/texteingabe.js`, `src/eingabe/verlauf.js`, `src/eingabe/zielmodus.js`, `src/anzeige/fenster.js`, `src/anzeige/charakterfenster.js`, `src/anzeige/systemfenster.js`, `src/anzeige/einstellungsanzeige.js`, `src/systeme/vorschau.js`, `src/systeme/untersuchen.js`
 
-Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Oberflaeche.md](Oberflaeche.md), [Titelbildschirm.md](Titelbildschirm.md), [Charakter.md](Charakter.md), [Gegenstaende.md](Gegenstaende.md), [Animationen.md](Animationen.md), [Welt.md](Welt.md)
+Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Oberflaeche.md](Oberflaeche.md), [Titelbildschirm.md](Titelbildschirm.md), [Charakter.md](Charakter.md), [Gegenstaende.md](Gegenstaende.md), [Animationen.md](Animationen.md), [Welt.md](Welt.md), [Architektur.md](Architektur.md)
 
 ## Zweck
 
@@ -28,7 +28,7 @@ Schnittstellen:
 + `uebersetzen(tastenereignis, belegung, spiel)` (`src/eingabe/eingabe.js`) gibt `{ aktion, befehl? }` bzw. beim Laufen `{ aktion, richtung }`; `aktionsergebnis(aktion, spiel)` macht dasselbe für eine Aktion ohne Taste (Befehlszeile)
 + `aktionDerTaste`, `platzDerTaste`, `befehlDerAktion`, `tastenDerAktion` (`src/eingabe/aktionskatalog.js`); auch der Zielmodus liest die Bewegungstasten über den Katalog
 + `abweichungenAnwenden` baut beim Start und nach jeder Änderung die wirksame Belegung; `tasteSetzen` (meldet die verdrängte Aktion), `tasteEntfernen`, `aktionAufVorgabe`, `konfliktVon`, `tasteGesperrt`, `aenderbareTasten`, `abweichungenGueltig`
-+ Befehlszeile (`:`, `src/eingabe/befehlszeile.js`, Fensterart `befehlszeile`): Register der Quellen `befehlsquelleAnmelden(name, (kontext) => [{ schluessel, text, ziel }])`, bisher `aktionen` (ohne Laufen) und `einstellungen`; `befehlstreffer` liefert höchstens `HOECHSTE_TREFFER` = 10
++ Befehlszeile (`:`, `src/eingabe/befehlszeile.js`, Fensterart `befehlszeile`): Register der Quellen `befehlsquelleAnmelden(name, (kontext) => [{ schluessel, text, ziel }])`, bisher `aktionen` (ohne Laufen), `einstellungen` und `allmacht` (nur im allmächtigen Lauf: "Erzeugen: <Name>" für jedes Wesen und jeden Gegenstand aus `erzeugbareTypen`, "Nach Tiefe <n>" für jede Tiefe des Plans, siehe [Architektur.md](Architektur.md), Spielarten); `ziel` ist `{ aktion }`, `{ einstellung }` oder `{ befehl }`; `befehlstreffer` liefert höchstens `HOECHSTE_TREFFER` = 10
 + Texteingabe in Fenstern (`texteingabeTaste` in `src/eingabe/texteingabe.js`, höchstens 60 Zeichen): druckbare Zeichen hängen an, die Rücktaste löscht; `suchform` für Suchen ohne Rücksicht auf Groß- und Kleinschreibung, Umlaute als ae, oe, ue
 + Esc-Kette (`escSchritt({ zielModus, fensterStapel, laufenderAblauf })` in `src/eingabe/esckette.js`)
 
@@ -42,7 +42,7 @@ Regeln:
 + Esc als Kette: erst den Zielmodus abbrechen, dann das oberste Fenster schließen (das Fenster entscheidet selbst, z.B. erst zurück zur Liste), dann einen Ablauf abbrechen, sonst das Spielmenü öffnen
 + Eigene Belegung: neu belegt wird immer die physische Taste; hat ihr Zeichen schon eine Aktion (z.B. `.`), verliert das Zeichen sie (Zeichen gehen sonst vor); gespeichert werden nur Abweichungen; nicht belegbar sind Esc, Enter, Tab, `?`, die Funktionstasten und Umschalt, Strg, Alt allein; Umschalt+Richtung und Umschalt+1 bis 5 sind fest
 + Es gibt eine einzige Belegung: für eine Tastatur mit Ziffernblock, aber ohne ihn spielbar (vi-Tasten); Ziffernblock und Pfeile liegen zusätzlich auf der Bewegung; Belegungssätze gibt es nicht
-+ Befehlszeile: Treffer am Anfang des Texts zuerst, dann am Wortanfang oder am Anfang der ID, dann als Teilwort in Text oder ID, bei gleichem Rang alphabetisch; Tab übernimmt, Pfeile wählen, Enter führt aus (eine Aktion wie ihre Taste, eine Einstellung öffnet das Einstellungsfenster an diesem Eintrag); später können sich Bierrezepte, Lore-Texte oder Bücher als Quelle anmelden; Zusatzangaben wie `:zoom 32` folgen später
++ Befehlszeile: Treffer am Anfang des Texts zuerst, dann am Wortanfang oder am Anfang der ID, dann als Teilwort in Text oder ID, bei gleichem Rang alphabetisch; Tab übernimmt, Pfeile wählen, Enter führt aus (eine Aktion wie ihre Taste, eine Einstellung öffnet das Einstellungsfenster an diesem Eintrag, ein Befehl geht durch die Eingangstür); später können sich Bierrezepte, Lore-Texte oder Bücher als Quelle anmelden; Zusatzangaben wie `:zoom 32` folgen später
 + Einstellungen haben Vorgaben in `src/eingabe/einstellungen.js`; der Browser speichert nur Abweichungen davon (siehe Einstellungen)
 
 ## Maus, Reise, Laufen, Rasten und Erkunden

@@ -42,7 +42,7 @@ Taste → `eingabe/eingabe.js` (Belegung → Aktion aus dem Aktionskatalog) → 
 
 ## Grundbegriffe
 
-+ Entität, gesteuerte Entität, Komponente, Wert, Zeitmodell, Ereignis, Haken, Register, Speichern: [docs/Architektur.md](docs/Architektur.md)
++ Entität, gesteuerte Entität, Komponente, Wert, Zeitmodell, Ereignis, Haken, Register, Spielart, Speichern: [docs/Architektur.md](docs/Architektur.md)
 + Wirkungsart, Effekt, Baustein, Modifikator, Auslöser, Zustand, Zielmuster, Fähigkeit, lange Aktion, Vorgang: [docs/Wirkungen.md](docs/Wirkungen.md)
 + Kampfwert, Angriffsprofil, Kampfzustand, Fraktion, Ruf, Beistand, Wahrnehmung, Verhaltensmodul, Handlung, Vorrangbefehl, Bewegungsart, Skill, Lernpunkte: [docs/Wesen.md](docs/Wesen.md)
 + Gelände, Feldschicht, Plan des Laufs, Ebene, Ebenenschritt, Tiefe, Erinnerung der Karte: [docs/Welt.md](docs/Welt.md); Stapel, Ladung, Platz, Verschleiß, Etikett: [docs/Gegenstaende.md](docs/Gegenstaende.md)
@@ -63,7 +63,7 @@ Spieldesign:
 
 Technik:
 
-+ [docs/Architektur.md](docs/Architektur.md): Kern (Grundsätze, Datenfluss, Befehle, Entitäten, Zeit, Ereignisse, Register, Daten, Wiederholbarkeit, Speichern, Versionen, Leistung)
++ [docs/Architektur.md](docs/Architektur.md): Kern (Grundsätze, Datenfluss, Befehle, Entitäten, Zeit, Ereignisse, Register, Daten, Wiederholbarkeit, Spielarten, Speichern, Versionen, Leistung)
 + [docs/Wirkungen.md](docs/Wirkungen.md): Wirkungsarten, Effekte, Modifikatoren, Auslöser, Zustände, Zielauswahl, Fähigkeiten, lange Aktionen, Tod
 + [docs/Wesen.md](docs/Wesen.md): Kampfwerte, Fraktionen, Wahrnehmung, KI, Bewegung, Stoffwechsel, Skills und Lernen
 + [docs/Welt.md](docs/Welt.md): Gelände, Feldschichten, Ebenen, Wegfindung, Sicht, Licht, Gefahrenprüfung

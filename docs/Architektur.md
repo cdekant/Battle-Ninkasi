@@ -2,9 +2,9 @@
 
 Stand: 2026-11-22
 
-Zuständig für: `index.html`, `package.json`, `lib/*`, `src/main.js`, `src/version.js`, `src/kern/spiel.js`, `src/kern/zustand.js`, `src/kern/zeit.js`, `src/kern/zufall.js`, `src/kern/wurf.js`, `src/kern/ereignisse.js`, `src/kern/hakenkatalog.js`, `src/kern/register.js`, `src/kern/daten.js`, `src/kern/raumindex.js`, `src/kern/kurven.js`, `src/systeme/index.js`, `src/eingabe/speicherstand.js`, `daten/index.js`, `daten/regeln.js`, `daten/aktionen.js`
+Zuständig für: `index.html`, `package.json`, `lib/*`, `src/main.js`, `src/version.js`, `src/kern/spiel.js`, `src/kern/zustand.js`, `src/kern/zeit.js`, `src/kern/zufall.js`, `src/kern/wurf.js`, `src/kern/ereignisse.js`, `src/kern/hakenkatalog.js`, `src/kern/register.js`, `src/kern/daten.js`, `src/kern/raumindex.js`, `src/kern/kurven.js`, `src/systeme/index.js`, `src/systeme/allmacht.js`, `src/eingabe/speicherstand.js`, `daten/index.js`, `daten/regeln.js`, `daten/aktionen.js`
 
-Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Entwicklung.md](Entwicklung.md), [Titelbildschirm.md](Titelbildschirm.md), [Grundlagen.md](Grundlagen.md), [Texte.md](Texte.md), [Ausblick.md](Ausblick.md)
+Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Entwicklung.md](Entwicklung.md), [Titelbildschirm.md](Titelbildschirm.md), [Grundlagen.md](Grundlagen.md), [Texte.md](Texte.md), [Ausblick.md](Ausblick.md), [Welt.md](Welt.md), [Bedienung.md](Bedienung.md)
 
 ## Zweck
 
@@ -175,7 +175,7 @@ Daten:
 
 + Spielstand (`spielstand` in `src/kern/spiel.js`): `{ version, startwert, optionen, befehle }`; `optionen` sind die Startoptionen (Eigenschaften aus der Charaktererstellung und seit 0.32.0 die Spielart); Laden heißt Nachspielen ohne Anzeige (`nachspielen`)
 + Vorgesehen, noch nicht umgesetzt: eine Prüfsumme der Daten (samt Mods) im Spielstand; bisher prüft das Laden nur die Version
-+ Spielart (`optionen.spielart`, Liste `SPIELARTEN` in `src/kern/spiel.js`, Vorgabe und bisher einzige "normal"; eine unbekannte wirft): gehört zum Lauf, nicht zu den Einstellungen, und lässt sich im Lauf nicht wechseln; künftige Spielarten (weich, friedlich, allmächtig, eigene Regeln wie die Häufigkeit der Monster) liest die Logik aus den Startoptionen, so bleibt der Lauf wiederholbar und die Chronik weiß, wie gespielt wurde (siehe [Titelbildschirm.md](Titelbildschirm.md))
++ Spielart in den Startoptionen: siehe Abschnitt Spielarten
 + Spiel-Zufall: eigener Generator sfc32 (`src/kern/zufall.js`), nur ganze Zahlen, Zustand aus vier 32-Bit-Zahlen im Spielzustand (`zufallszustand`)
 
 Schnittstellen (`src/kern/zufall.js`):
@@ -196,12 +196,38 @@ Regeln:
 + Jede Änderung am Verfahren des Zufalls ändert die Zahlenfolge
 + Jeder Wurf während des Spiels läuft über `src/kern/wurf.js`; nur Generator, Schnittstelle und das Anlegen in `src/kern/spiel.js` fassen `zufallszustand` an (geprüft von `tests/wurf.test.js`); die Welterzeugung würfelt mit eigenen abgeleiteten Startwerten; im echten Spiel rufen die Wurffunktionen dieselben Funktionen in derselben Reihenfolge wie zuvor, die Zahlenfolge blieb mit 0.36.0 gleich
 + Sichere Fälle (Chance 0 oder 100) würfeln nicht, wo der Aufrufer sie vorher prüft; so bleibt die Zahlenfolge von solchen Fällen ungestört
-+ Startwert eines neuen Laufs: zufällig (`crypto.getRandomValues` in `src/main.js`) oder über `?seed=` in der Adresse (Zahl, sonst aus dem Text abgeleitet); eine Abfrage im Titel nach dem Vorbild Brogue ist vorgesehen
++ Startwert eines neuen Laufs: zufällig (`crypto.getRandomValues` in `src/main.js`) oder über `?seed=` in der Adresse (Zahl, sonst aus dem Text abgeleitet), ebenso `?spielart=` (nur eine aus `SPIELARTEN`); beide gelten nur mit einem leeren Platz; eine Abfrage im Titel nach dem Vorbild Brogue ist vorgesehen
 + Kosmetischer Zufall (Titelbild, Spruch im Titel, später Animationen, Partikel und Textvarianten) nutzt `Math.random()` nur in der Anzeige und berührt den Spiel-Zufall nie
 + rot.js hat einen eigenen, globalen Zufall; er wird nur für die Dungeon-Erzeugung benutzt und vorher mit einem abgeleiteten Startwert gesetzt (`RNG.setSeed` im Schritt `karte_digger`, `src/welt/ebenenschritte.js`)
 + Fallstrick: Die Kartengeneratoren von rot.js (Digger, Uniform) brechen nach einer Zeitgrenze ab (`timeLimit`, gemessen mit `Date.now()`); sie wird deshalb immer auf `Infinity` gesetzt
 + Jede Änderung an Code oder Daten macht alte Spielstände ungültig; passt die Version nicht, wirft das Laden mit klarer Meldung
 + Nebennutzen: Spielstand als Fehlerbericht, Aufzeichnungen zum Anschauen, "Seed des Tages", automatische Tests
+
+## Spielarten
+
+Vorbilder: DCSS (Wizard Mode zum Prüfen, Läufe darin zählen nicht), NetHack (Explore Mode); Ideen für weitere Spielarten in [Titelbildschirm.md](Titelbildschirm.md), Ideen für später.
+
+Daten:
+
++ `optionen.spielart` (Liste `SPIELARTEN` in `src/kern/spiel.js`: "normal" als Vorgabe und "allmaechtig" seit 0.41.0; eine unbekannte wirft)
++ Regelwerte `regeln.allmacht`: `kammer` (Ebene aus `daten/ebenen.js`, "testkammer", ein leerer Raum mit Treppe hinab) und `tiefe` (0, sonst der Hub); geprüft beim Laden
+
+Schnittstellen (`src/systeme/allmacht.js`, seit 0.41.0):
+
++ `istAllmaechtig(spiel)`, `erzeugbareTypen(daten)` → `{ wesen, gegenstaende }` (nach Namen geordnet, ohne abstrakte Vorlagen und ohne Ninkasi)
++ Planschritt `testkammer` (siehe [Welt.md](Welt.md), Plan des Laufs): setzt im allmächtigen Lauf die Kammer als Vorlage ihrer Tiefe und `plan.starttiefe` auf diese Tiefe
++ Befehl `erzeugen { typ }`, ohne Zeit: ein Wesen auf das nächste freie, für es betretbare Feld neben Ninkasi (handelt nach einer Aktion Wartezeit), ein Gegenstand in ihr Gepäck; Meldung `erzeugt { wer, was, wohin: "feld" | "gepaeck" }`; Ablehnungen `nicht_allmaechtig`, `unbekannter_typ`, `kein_freies_feld`, `population_voll` (Obergrenze `regeln.population.hoechstWesen`)
++ Befehl `tiefe_waehlen { tiefe }`: Wechsel in jede Tiefe des Plans wie über eine Treppe (`ebeneWechseln`, siehe [Welt.md](Welt.md), Ebenen), Zeitkosten `aktionen.treppe`; Ablehnungen `nicht_allmaechtig`, `keine_tiefe`, `schon_dort`
++ Haken `vor_tod` mit Rang 1000: im allmächtigen Lauf füllt er Ninkasis Lebenswert auf und bricht den Tod ab, Meldung `allmacht_bewahrt` (siehe [Wirkungen.md](Wirkungen.md), Tod und Zustandsprüfung)
+
+Regeln:
+
++ Eine Spielart gehört zum Lauf, nicht zu den Einstellungen, und lässt sich im Lauf nicht wechseln; die Logik liest sie aus den Startoptionen, so bleibt auch ein Testlauf wiederholbar und die Chronik weiß, wie gespielt wurde; künftige Spielarten (weich, friedlich, eigene Regeln wie die Häufigkeit der Monster) kommen ebenso
++ Allmächtig heißt Testkammer: der Lauf beginnt in der Kammer, die übrigen Tiefen sind dieselben wie im normalen Lauf mit demselben Startwert, weil jede Ebene aus eigenen abgeleiteten Startwerten entsteht; man prüft also die echten Ebenen
++ Unverwundbar heißt: Schaden wirkt wie sonst (die Zahlen bleiben prüfbar), nur der Tod fällt aus; die Allmacht läuft als letzte am Haken, damit andere Rettungen zuerst greifen
++ Erzeugen und Tiefe wählen gehen nur an Ninkasi selbst und laufen wie alles über die Eingangstür, sie stehen also in der Aufzeichnung
++ Getrennte Wertung: die Chronik trägt den Lauf mit seiner Spielart ein, die Zähler zählen nicht mit (siehe [Titelbildschirm.md](Titelbildschirm.md), Stand der Umsetzung 0.41.0)
++ Bedienung: Erzeugen und Tiefen über die Befehlszeile (siehe [Bedienung.md](Bedienung.md), Eingabe)
 
 ## Speichern
 
@@ -217,7 +243,7 @@ Schnittstellen:
 + `schnappschuss(spiel)` (Spielstand plus Kopie des reinen JSON-Zustands) und `ausSchnappschuss(daten, stand)` in `src/kern/spiel.js`; `speicherstandLesen`, `platzVorschau`, `platzSpielbar`, `platzFuerNeuesSpiel`, `zuletztGespielt` in `src/eingabe/speicherstand.js` (ohne DOM und ohne `localStorage`)
 + `src/main.js` schreibt: gesammelt höchstens alle 300 ms nach einem Befehl und sofort beim Verlassen der Seite (`pagehide`), nicht während der Charaktererstellung; der Platz des laufenden Spiels ist `aktuelleStelle`
 + Ende eines Laufs (`laufAbschliessen` in `src/main.js`, einmal je Lauf): nach dem Tod oder beim Aufgeben über "Neuer Lauf" ein Eintrag in die Chronik, der ganze Stand bleibt als `battle-ninkasi.letzter_lauf` für ein späteres Abspielen, der Platz wird frei
-+ Chronik (`src/eingabe/chronik.js`): `{ format, laeufe, zaehler }`, Läufe mit Version, Startwert, Spielart, Datum, Tiefe, Zügen, Befehlen, Ergebnis und Ursache (höchstens 500, die Zähler bleiben); Zähler frei benannt (`besiegt.<typ>` für Siege Ninkasis, `gesehen.<typ>` einmal je Lauf und Art, `tode`, `laeufe`), erhoben in der Oberfläche aus den Meldungen (Tabelle `ZAEHLREGELN`) und dem Sichtfeld nach jedem Befehl, nie in der Logik; Freischaltungen sind Bedingungen `{ zaehler, mindestens }` (`freigeschaltet`), zuerst für Titelbilder, später für Erfolge, Bestiarium und Kompendium
++ Chronik (`src/eingabe/chronik.js`): `{ format, laeufe, zaehler }`, Läufe mit Version, Startwert, Spielart, Datum, Tiefe, Zügen, Befehlen, Ergebnis und Ursache (höchstens 500, die Zähler bleiben); Zähler frei benannt (`besiegt.<typ>` für Siege Ninkasis, `gesehen.<typ>` einmal je Lauf und Art, `tode`, `laeufe`), erhoben in der Oberfläche aus den Meldungen (Tabelle `ZAEHLREGELN`) und dem Sichtfeld nach jedem Befehl, nie in der Logik; Läufe der Spielarten in `SPIELARTEN_OHNE_ZAEHLER` (bisher "allmaechtig", Abfrage `zaehltMit(spiel)`) stehen in `laeufe`, zählen aber in keinem Zähler, auch nicht in `laeufe`; Freischaltungen sind Bedingungen `{ zaehler, mindestens }` (`freigeschaltet`), zuerst für Titelbilder, später für Erfolge, Bestiarium und Kompendium
 
 Regeln:
 

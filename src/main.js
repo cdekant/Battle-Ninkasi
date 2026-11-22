@@ -14,7 +14,7 @@ import { einstellungsfensterOeffnen } from "./eingabe/einstellungsfenster.js";
 import { befehlszeileOeffnen } from "./eingabe/befehlszeile.js";
 import "./anzeige/einstellungsanzeige.js";
 import vorgaben from "./eingabe/einstellungen.js";
-import { datenLaden, neuesSpiel, befehlGeben } from "./kern/spiel.js";
+import { datenLaden, neuesSpiel, befehlGeben, SPIELARTEN } from "./kern/spiel.js";
 import { entitaetenAuf, istWesen } from "./kern/zustand.js";
 import { hoererAnmelden } from "./kern/ereignisse.js";
 import { startwertAbleiten } from "./kern/zufall.js";
@@ -152,15 +152,16 @@ function platzLoeschen(stelle) {
 // der eine Platz bis 0.31.0 passt zu keiner neueren Version
 try { localStorage.removeItem(SPEICHERSCHLUESSEL_ALTER_LAUF); } catch { /* ohne Speicher weiter */ }
 
-// ?seed= aus der Adresse lesen und entfernen (auch das frühere &neu)
-function startwertAusUrl() {
-  const startwertText = new URLSearchParams(location.search).get("seed");
+// ?seed= und ?spielart= aus der Adresse lesen und entfernen (auch das frühere &neu); eine unbekannte Spielart zählt nicht
+function startAusUrl() {
+  const parameter = new URLSearchParams(location.search);
+  const startwertText = parameter.get("seed"), spielartText = parameter.get("spielart");
   const adresse = new URL(location.href);
-  adresse.searchParams.delete("seed");
-  adresse.searchParams.delete("neu");
+  for (const name of ["seed", "spielart", "neu"]) adresse.searchParams.delete(name);
   history.replaceState(null, "", adresse);
-  if (startwertText === null || startwertText === "") return null;
-  return /^\d+$/.test(startwertText) ? Number(startwertText) >>> 0 : startwertAbleiten(0, startwertText);
+  const startwert = startwertText === null || startwertText === "" ? null
+    : /^\d+$/.test(startwertText) ? Number(startwertText) >>> 0 : startwertAbleiten(0, startwertText);
+  return { startwert, spielart: SPIELARTEN.includes(spielartText) ? spielartText : null };
 }
 
 function zufaelligerStartwert() {
@@ -566,9 +567,15 @@ function platzFortsetzen(stelle) {
   zeichnen();
 }
 
-// Neuer Lauf auf einem Platz: erst die Charaktererstellung über der Karte des Laufs, vorbelegt mit der letzten Verteilung
-function starten(stelle, startwert) {
+// Neuer Lauf auf einem Platz: erst die Charaktererstellung über der Karte des Laufs, vorbelegt mit der letzten Verteilung;
+// die Testkammer (Spielart "allmaechtig") beginnt gleich, mit den Eigenschaften aus den Daten
+function starten(stelle, startwert, spielart = "normal") {
   aktuelleStelle = stelle;
+  if (spielart !== "normal") {
+    fensterStapel = [];
+    laufBeginnen(startwert, { spielart });
+    return speichernJetzt();
+  }
   const erstellung = erstellungOeffnen(daten, letzteEigenschaftenLaden());
   fensterStapel = fensterOeffnen([], "erstellung", erstellung);
   laufBeginnen(startwert, { eigenschaften: erstellung.eigenschaften });
@@ -597,13 +604,13 @@ function fensteraktionAusfuehren(aktion) {
     // ein Lauf, der nicht zu Ende ist, geht als aufgegeben in die Chronik; der neue nimmt denselben Platz
     if (!spiel.zustand.vorbei) laufAbschliessen("aufgegeben");
     fensterStapel = [];
-    return starten(aktuelleStelle, zufaelligerStartwert());
+    return starten(aktuelleStelle, zufaelligerStartwert(), spiel.optionen.spielart);
   }
   if (art === "zum_titel") return titelZeigen();
   if (art === "fortsetzen") return platzFortsetzen(werte.stelle);
   if (art === "neuesSpiel") {
     fensterStapel = [];
-    return starten(werte.stelle, zufaelligerStartwert());
+    return starten(werte.stelle, zufaelligerStartwert(), werte.spielart);
   }
   if (art === "platzLoeschen") {
     platzLoeschen(werte.stelle);
@@ -806,8 +813,9 @@ function aktionAusfuehren(ergebnis) {
 }
 
 // Ziel eines Treffers der Befehlszeile (eingabe/befehlszeile.js): eine Aktion wie ihre Taste, eine Einstellung öffnet
-// das Einstellungsfenster an diesem Eintrag
+// das Einstellungsfenster an diesem Eintrag, ein Befehl (allmächtiger Lauf) geht durch die Eingangstür
 function befehlszeileAusfuehren(ziel) {
+  if (ziel.befehl) return befehlGebenUndZeichnen(ziel.befehl);
   if (ziel.einstellung) {
     fensterStapel = fensterOeffnen([], "einstellungen", einstellungsfensterOeffnen(ziel.einstellung));
     return zeichnen();
@@ -1003,8 +1011,9 @@ Promise.all(korpusliste.map((name) => fetch(`sprache/de/korpus/${name}`).then((a
   })
   .catch(() => { /* ohne Spruch */ });
 
-// Start: mit ?seed= gleich ein Lauf auf dem ersten freien Platz, sonst (oder ohne freien Platz) der Titel
-const startwertDerAdresse = startwertAusUrl();
+// Start: mit ?seed= oder ?spielart= gleich ein Lauf auf dem ersten freien Platz, sonst (oder ohne freien Platz) der Titel
+const startDerAdresse = startAusUrl();
 const freieStelle = platzFuerNeuesSpiel(plaetze);
-if (startwertDerAdresse !== null && freieStelle !== null && !plaetze[freieStelle]) starten(freieStelle, startwertDerAdresse);
-else titelZeigen();
+if ((startDerAdresse.startwert !== null || startDerAdresse.spielart) && freieStelle !== null && !plaetze[freieStelle]) {
+  starten(freieStelle, startDerAdresse.startwert ?? zufaelligerStartwert(), startDerAdresse.spielart ?? "normal");
+} else titelZeigen();

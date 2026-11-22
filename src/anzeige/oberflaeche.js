@@ -240,9 +240,11 @@ export class Oberflaeche {
     return liste.map((wesen) => `<li data-wesen="${wesen.id}"${wesen.id === hervorgehobenId ? ' class="hervorgehoben"' : ""}>${balken(nomenForm(wesen, "nom", "ohne"), wesen.werte.lp.aktuell, hoechstwert(spiel, wesen, "lp"), "lp klein")}${mitZusatz ? this.gegnerZusatz(spiel, wesen) : ""}</li>`).join("");
   }
 
-  // Kopf der Seitenleiste: Ort und Zeit
+  // Kopf der Seitenleiste: Ort und Zeit, dahinter eine andere Spielart als "normal" (z.B. Testkammer)
   kopfHtml(spiel) {
-    return this.texte.text("ui.ort_und_zeit", { tiefe: spiel.zustand.tiefe, zug: spielerin(spiel.zustand).zuege ?? 0 });
+    const ortUndZeit = this.texte.text("ui.ort_und_zeit", { tiefe: spiel.zustand.tiefe, zug: spielerin(spiel.zustand).zuege ?? 0 });
+    const spielart = spiel.optionen?.spielart ?? "normal";
+    return spielart === "normal" ? ortUndZeit : `${ortUndZeit} · ${this.texte.text(`ui.spielart.${spielart}`)}`;
   }
 
   // ziel: null | { modus, vorschau } (eingabe/zielmodus.js; beim Untersuchen ist vorschau null)

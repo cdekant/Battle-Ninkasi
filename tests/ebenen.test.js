@@ -162,7 +162,7 @@ test("Erzeugung in Schritten: dieselben Ebenen wie vorher", () => {
 
 test("Plan des Laufs: beim Start aus Startwert und Daten, eigene Planschritte erreichen die Ebenenschritte", () => {
   const spiel = neuesSpiel(DATEN, 7);
-  assert.deepEqual(spiel.zustand.plan, { tiefen: DATEN.abfolge.map((vorlage) => ({ vorlage, inhalte: [] })) });
+  assert.deepEqual(spiel.zustand.plan, { starttiefe: DATEN.starttiefe, tiefen: DATEN.abfolge.map((vorlage) => ({ vorlage, inhalte: [] })) });
 
   const planschritt = (planSpiel, plan, zufall) => { plan.tiefen[2].inhalte.push({ art: "testschatz", wurf: zufall[0] }); };
   const gesehen = [];

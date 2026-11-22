@@ -1,6 +1,7 @@
 // Plan des Laufs (siehe docs/Welt.md, Plan des Laufs): beim Start aus dem Startwert festgelegt, was jede Tiefe
 // bekommt, bevor die erste Ebene entsteht; Ebenen entstehen erst beim ersten Betreten und lesen dann ihren Eintrag.
-// zustand.plan = { tiefen: [{ vorlage, inhalte: [] }] }
+// zustand.plan = { starttiefe, tiefen: [{ vorlage, inhalte: [] }] }
+//   starttiefe: wo der Lauf beginnt (Schritt "abfolge" überträgt daten.starttiefe, die Testkammer setzt ihre Tiefe)
 //   vorlage: Name der Ebene aus daten/ebenen.js (Schritt "abfolge" überträgt daten.abfolge)
 //   inhalte: was Schritte des Plans für diese Tiefe vorsehen (z.B. später Schatzraum, Schlüssel, Quest, Struktur),
 //     jeder Eintrag ein Datenobjekt mit art; die Ebenenschritte lesen es aus bau.planEintrag
@@ -11,7 +12,7 @@ import { anmelden, alle } from "../kern/register.js";
 import { startwertAbleiten, zufallErzeugen } from "../kern/zufall.js";
 
 export function laufPlanen(spiel) {
-  const plan = { tiefen: [] };
+  const plan = { starttiefe: spiel.daten.starttiefe, tiefen: [] };
   const zufall = zufallErzeugen(startwertAbleiten(spiel.zustand.startwert, "plan"));
   for (const [, schritt] of alle("planschritte")) schritt(spiel, plan, zufall);
   spiel.zustand.plan = plan;
@@ -27,5 +28,6 @@ export function planEintragFuer(zustand, tiefe) {
 }
 
 anmelden("planschritte", "abfolge", (spiel, plan) => {
+  plan.starttiefe = spiel.daten.starttiefe;
   plan.tiefen = spiel.daten.abfolge.map((vorlage) => ({ vorlage, inhalte: [] }));
 });

@@ -1,6 +1,7 @@
 // Dummer Bot: spielt mit zufälligen Befehlen, prüft Invarianten und Wiederholbarkeit.
 // Aufruf: node werkzeuge/bot.js [läufe=20] [befehle=3000] [erster Startwert=1]
 // Für jeden Lauf: spielen, dann aus Startwert und Befehlsliste nachspielen und Zustände vergleichen.
+// Jeder fünfte Lauf (Startwert % 5 === 3) spielt in der Testkammer (Spielart "allmaechtig") mit Erzeugen und Tiefenwahl.
 
 import rohdaten from "../daten/index.js";
 import texte from "../sprache/de/texte.js";
@@ -19,7 +20,8 @@ import { erkundenBeginnen, naechsterErkundungsschritt } from "../src/eingabe/erk
 import { laufenBeginnen, naechsterLaufschritt } from "../src/eingabe/laufen.js";
 import { neueLeisten, leistenNachfuehren, aktivePlaetze, platzZustand, platzAusloesen, platzBelegen, plaetzeTauschen, platzLeeren, leisteWechseln, ANZAHL_LEISTEN } from "../src/eingabe/schnellleiste.js";
 import { speicherstandText, speicherstandLesen, vorschauAusSpiel, platzVorschau } from "../src/eingabe/speicherstand.js";
-import { neueChronik, chronikGueltig, meldungZaehlen, sichtungenZaehlen, laufEintragen, zaehlerstand } from "../src/eingabe/chronik.js";
+import { neueChronik, chronikGueltig, meldungZaehlen, sichtungenZaehlen, laufEintragen, zaehlerstand, zaehltMit } from "../src/eingabe/chronik.js";
+import { istAllmaechtig, erzeugbareTypen } from "../src/systeme/allmacht.js";
 import { titelOeffnen, laeufeOeffnen } from "../src/eingabe/titel.js";
 import { titelHtml } from "../src/anzeige/titel.js";
 import { minikartenBild } from "../src/anzeige/minikarte.js";
@@ -240,6 +242,7 @@ function zufallsEigenschaften(botZufall) {
 function zufallsbefehl(botZufall, spiel) {
   const gesteuerte = gesteuerteEntitaet(spiel.zustand);
   const wurf = zufallsGanzzahl(botZufall, 1, 100);
+  if (istAllmaechtig(spiel) && wurf >= 98) return allmachtsbefehl(botZufall, spiel, wurf);
   if (wurf <= 5) return { art: "warten" };
   if (wurf <= 10) return { art: "aufheben" };
   if (wurf <= 13 && gesteuerte.werte.lp.aktuell < 70) return { art: "trinken", gegenstandId: erstesGetraenk(spiel.zustand, gesteuerte) };
@@ -270,6 +273,20 @@ function zufallsbefehl(botZufall, spiel) {
     return { art: "lernen", skill: namen[zufallsGanzzahl(botZufall, 0, namen.length - 1)], ep: zufallsGanzzahl(botZufall, 1, gesteuerte.freieEp) };
   }
   return { art: "bewegen", dx: zufallsGanzzahl(botZufall, -1, 1), dy: zufallsGanzzahl(botZufall, -1, 1) };
+}
+
+// Testkammer: meist etwas erzeugen (Wesen oder Gegenstand), sonst in eine zufällige Tiefe wechseln, auch eine, die es
+// nicht gibt, so werden die Ablehnungen mitgeprüft
+let anzahlErzeugt = 0, anzahlTiefenwahl = 0, anzahlBewahrt = 0;
+function allmachtsbefehl(botZufall, spiel, wurf) {
+  if (wurf === 100) {
+    anzahlTiefenwahl++;
+    return { art: "tiefe_waehlen", tiefe: zufallsGanzzahl(botZufall, -1, spiel.zustand.plan.tiefen.length) };
+  }
+  const { wesen, gegenstaende } = erzeugbareTypen(spiel.daten);
+  const typen = [...wesen, ...gegenstaende];
+  anzahlErzeugt++;
+  return { art: "erzeugen", typ: typen[zufallsGanzzahl(botZufall, 0, typen.length - 1)] };
 }
 
 // Freie EP wie im Browser über das Skillfenster (eingabe/charakter.js): einen Skill wählen, dann Enter, Umschalt+Enter
@@ -433,7 +450,7 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
     // jeder zweite Lauf mit eigener Verteilung der Eigenschaften (Startoption, gehört zum Spielstand)
     // jeder vierte über die Tasten der Charaktererstellung
     const verteilung = startwert % 4 === 0 ? eigenschaftenUeberErstellung(zufallErzeugen(startwert + 2_000_000)) : zufallsEigenschaften(zufallErzeugen(startwert + 1_000_000));
-    const optionen = startwert % 2 === 0 ? { eigenschaften: verteilung } : {};
+    const optionen = { ...(startwert % 2 === 0 ? { eigenschaften: verteilung } : {}), ...(startwert % 5 === 3 ? { spielart: "allmaechtig" } : {}) };
     const spiel = neuesSpiel(daten, startwert, optionen);
     botLog = new Log(ohneDom(), anzeigetexte);
     botLeisten = leistenNachfuehren(spiel, neueLeisten());
@@ -458,6 +475,7 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
       if (meldung.art === "getrunken") getrunkeneBiere++;
       if (meldung.art === "geworfen") anzahlWuerfe++;
       if (meldung.art === "angelegt") anzahlAngelegt++;
+      if (meldung.art === "allmacht_bewahrt") anzahlBewahrt++;
       if (meldung.art === "faehigkeit" && meldung.wer.id === spiel.zustand.spielerinId) ninkasisFaehigkeiten++;
       if (meldung.wer?.id === spiel.zustand.spielerinId) return;
       if (meldung.art === "faehigkeit") gegnerfaehigkeiten.gewirkt++;
@@ -503,7 +521,9 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
     laufEintragen(botChronik, spiel, { ergebnis: spiel.zustand.vorbei ? "tod" : "aufgegeben", datum: 0, version: "bot" });
     if (JSON.stringify(chronikGueltig(JSON.parse(JSON.stringify(botChronik)))) !== JSON.stringify(botChronik)) throw new Error("Chronik übersteht JSON nicht");
     if (zaehlerstand(botChronik, "tode") !== (spiel.zustand.vorbei ? 1 : 0)) throw new Error("Chronik zählt die Tode falsch");
-    if (!gesehen.size) throw new Error("Chronik hat keine Wesenart gesehen");
+    if (zaehltMit(spiel) && !gesehen.size) throw new Error("Chronik hat keine Wesenart gesehen");
+    if (!zaehltMit(spiel) && Object.keys(botChronik.zaehler).length) throw new Error("Chronik zählt im allmächtigen Lauf mit");
+    if (istAllmaechtig(spiel) && spiel.zustand.vorbei) throw new Error("Ninkasi stirbt im allmächtigen Lauf");
     const vorschau = platzVorschau(speicherstandText(spiel, { leisten: botLeisten, gesehen, gespeichertAm: 1 }));
     if (vorschau.grund || vorschau.vorschau.tiefe !== spiel.zustand.tiefe) throw new Error("Vorschau des Speicherplatzes falsch");
     const nachgespielt = nachspielen(daten, JSON.parse(JSON.stringify(spielstand(spiel))));
@@ -537,5 +557,6 @@ const budget = Object.entries(epJeTiefe).sort(([links], [rechts]) => links - rec
   .join("; ");
 console.log(`EP je Lauf: ${budget}`);
 console.log(`Speichern: ${anzahlGeladen} Läufe mitten im Lauf gespeichert und geladen`);
+console.log(`Testkammer: ${anzahlErzeugt} Mal erzeugt, ${anzahlTiefenwahl} Mal Tiefe gewählt, ${anzahlBewahrt} Mal vor dem Tod bewahrt`);
 console.log(`${anzahlLaeufe} Läufe, ${anzahlTode} tot, ${anzahlFehler} Fehler`);
 process.exitCode = anzahlFehler ? 1 : 0;

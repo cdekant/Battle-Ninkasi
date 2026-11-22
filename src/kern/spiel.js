@@ -37,8 +37,9 @@ export function datenLaden(rohdaten, sprache) {
 }
 
 // Spielarten (docs/Titelbildschirm.md): eine Spielart gehört zum Lauf, nicht zu den Einstellungen, und lässt sich im
-// Lauf nicht wechseln; bisher nur "normal", weitere (weich, friedlich, allmächtig, eigene Regeln) kommen als Startoption
-export const SPIELARTEN = ["normal"];
+// Lauf nicht wechseln; "normal" und "allmaechtig" (Testkammer, systeme/allmacht.js), weitere (weich, friedlich,
+// eigene Regeln) kommen als Startoption
+export const SPIELARTEN = ["normal", "allmaechtig"];
 
 // optionen: { eigenschaften?, spielart? } aus der Charaktererstellung (Eigenschaften geprüft in systeme/lernen.js
 // lernenEinrichten) und der Wahl des Laufs; sie gehören zum Spielstand, damit das Nachspielen denselben Lauf erzeugt
@@ -53,9 +54,9 @@ export function neuesSpiel(daten, startwert, optionen = {}) {
   // der Plan des Laufs steht fest, bevor die erste Ebene entsteht (welt/plan.js)
   laufPlanen(spiel);
 
-  // Ninkasi beginnt auf der Treppe hinauf der Starttiefe (oder in der Mitte des ersten Raums, der dort liegt)
-  zustand.tiefe = daten.starttiefe;
-  const { treppeAuf, treppeAb } = ebeneErzeugen(spiel, daten.starttiefe);
+  // Ninkasi beginnt auf der Treppe hinauf der Starttiefe des Plans (oder auf der Treppe hinab, wenn es keine gibt)
+  zustand.tiefe = zustand.plan.starttiefe;
+  const { treppeAuf, treppeAb } = ebeneErzeugen(spiel, zustand.tiefe);
   const ninkasi = entitaetAusDatensatz(zustand, "ninkasi", daten.wesen.ninkasi, treppeAuf ?? treppeAb);
   zustand.spielerinId = ninkasi.id;
   lernenEinrichten(spiel, ninkasi, optionen.eigenschaften);

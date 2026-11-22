@@ -1,13 +1,16 @@
 // Befehlszeile (Taste ":"; siehe docs/Oberflaeche.md, Tastatur): Fensterart "befehlszeile", reine Tastenlogik ohne DOM.
-// Die Treffer kommen aus einem Register von Quellen (befehlsquelleAnmelden): bisher Aktionen und Einstellungen; später
+// Die Treffer kommen aus einem Register von Quellen (befehlsquelleAnmelden): Aktionen, Einstellungen und im allmächtigen
+// Lauf Erzeugen und Tiefe wählen (systeme/allmacht.js); später
 // melden sich Bierrezepte, Lore-Texte oder Bücher als weitere Quelle an, ohne dass sich hier etwas ändert.
 //   Quelle: (kontext) => [{ schluessel, text, ziel }]; kontext { spiel, texte, belegung }
-//   ziel:   { aktion } (src/main.js führt sie aus) oder { einstellung } (öffnet das Einstellungsfenster dort)
+//   ziel:   { aktion } (src/main.js führt sie aus), { einstellung } (öffnet das Einstellungsfenster dort) oder
+//           { befehl } (src/main.js gibt ihn über die Eingangstür)
 // Zustand { eingabe, gewaehlt }: Tippen sucht, Pfeile wählen, Tab übernimmt den gewählten Treffer in die Eingabe,
 // Enter führt ihn aus (ergebnis.befehlszeile = ziel), Esc schließt. Zusatzangaben (":zoom 32") folgen später.
 
 import { AKTIONEN } from "./aktionskatalog.js";
 import { EINSTELLUNGEN } from "./einstellungskatalog.js";
+import { istAllmaechtig, erzeugbareTypen } from "../systeme/allmacht.js";
 import { fensterartAnmelden } from "./fenster.js";
 import { texteingabeTaste, suchform } from "./texteingabe.js";
 
@@ -48,6 +51,22 @@ befehlsquelleAnmelden("aktionen", ({ texte }) => Object.entries(AKTIONEN)
 
 befehlsquelleAnmelden("einstellungen", ({ texte }) => Object.keys(EINSTELLUNGEN)
   .map((id) => ({ schluessel: id, text: `${texte.text("befehlszeile.einstellung")}: ${texte.text(`einstellung.${id}`)}`, ziel: { einstellung: id } })));
+
+// Allmächtiger Lauf: jedes Wesen und jeder Gegenstand zum Erzeugen, jede Tiefe des Plans zum Hinwechseln
+befehlsquelleAnmelden("allmacht", ({ spiel, texte }) => {
+  if (!spiel || !istAllmaechtig(spiel)) return [];
+  const { wesen, gegenstaende } = erzeugbareTypen(spiel.daten);
+  const erzeugen = (typ, datensatz) => ({
+    schluessel: `erzeugen.${typ}`,
+    text: `${texte.text("befehlszeile.erzeugen")}: ${texte.nomenForm({ text: datensatz.text }, "nom", "ohne")}`,
+    ziel: { befehl: { art: "erzeugen", typ } },
+  });
+  return [
+    ...wesen.map((typ) => erzeugen(typ, spiel.daten.wesen[typ])),
+    ...gegenstaende.map((typ) => erzeugen(typ, spiel.daten.gegenstaende[typ])),
+    ...spiel.zustand.plan.tiefen.map((_, tiefe) => ({ schluessel: `tiefe.${tiefe}`, text: texte.text("befehlszeile.tiefe", { tiefe }), ziel: { befehl: { art: "tiefe_waehlen", tiefe } } })),
+  ];
+});
 
 export function befehlszeileOeffnen() {
   return { eingabe: "", gewaehlt: 0 };

@@ -4,7 +4,7 @@ Stand: 2026-11-22
 
 Zuständig für: `src/welt/ebene.js`, `src/welt/ebenenschritte.js`, `src/welt/plan.js`, `src/welt/population.js`, `src/welt/karte.js`, `src/welt/schichten.js`, `src/welt/wege.js`, `src/systeme/gelaende.js`, `src/systeme/fallen.js`, `src/systeme/schichten.js`, `src/systeme/ebenen.js`, `src/systeme/sicht.js`, `src/systeme/erinnerung.js`, `src/systeme/gefahr.js`, `daten/gelaende.js`, `daten/fallen.js`, `daten/schichten.js`, `daten/ebenen.js`, `daten/populationen.js`
 
-Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Anzeige.md](Anzeige.md), [Grundlagen.md](Grundlagen.md), [Bedienung.md](Bedienung.md), [Ausblick.md](Ausblick.md)
+Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Anzeige.md](Anzeige.md), [Grundlagen.md](Grundlagen.md), [Bedienung.md](Bedienung.md), [Ausblick.md](Ausblick.md), [Architektur.md](Architektur.md)
 
 ## Zweck
 
@@ -78,12 +78,12 @@ Vorbilder: Brogue (Schatzräume über die Tiefen verteilt und ausgeglichen), DCS
 
 Daten:
 
-+ Im Zustand: `plan = { tiefen: [{ vorlage, inhalte: [] }] }`; `vorlage` ist der Name einer Ebene aus `daten/ebenen.js`, `inhalte` sind Datenobjekte mit `art`, die Schritte des Plans für die Tiefe vorsehen (bisher keine)
++ Im Zustand: `plan = { starttiefe, tiefen: [{ vorlage, inhalte: [] }] }`; `starttiefe` ist die Tiefe, in der der Lauf beginnt (`neuesSpiel` liest sie); `vorlage` ist der Name einer Ebene aus `daten/ebenen.js`, `inhalte` sind Datenobjekte mit `art`, die Schritte des Plans für die Tiefe vorsehen (bisher keine)
 
 Schnittstellen (`src/welt/plan.js`):
 
 + `laufPlanen(spiel)` in `neuesSpiel` nach den Etiketten und vor der ersten Ebene; `ebenennameFuer(zustand, tiefe)` (null, wenn es die Tiefe nicht gibt), `planEintragFuer(zustand, tiefe)`
-+ Register `planschritte`: `(spiel, plan, zufall) => void`, in Anmeldereihenfolge mit einem gemeinsamen Zufall `"plan"`; bisher nur `abfolge`, der `daten.abfolge` überträgt
++ Register `planschritte`: `(spiel, plan, zufall) => void`, in Anmeldereihenfolge mit einem gemeinsamen Zufall `"plan"`; bisher `abfolge`, der `daten.abfolge` und `daten.starttiefe` überträgt, und `testkammer`, der im allmächtigen Lauf die Vorlage einer Tiefe ersetzt und dort beginnen lässt (siehe [Architektur.md](Architektur.md), Spielarten)
 
 Regeln:
 
@@ -127,7 +127,7 @@ Regeln:
 + Verfolger (Vorbilder Brogue und NetHack): ein Wesen folgt, wenn es höchstens `regeln.ebenen.folgen.abstand` (1) Felder entfernt steht, handeln und sich bewegen kann, nicht `folgt: false` trägt (Daten des Wesens) und Ninkasi jagt (KI `jagen` im Wachzustand `jagt`, sie ist sein Ziel nach `trifft`; ein Fliehender hat eine andere KI) oder von ihr beschworen ist; Helfer aus dem Beistand folgen nicht, ihr Beistand endet mit dem Kampf
 + Mitgenommene Wesen verlassen ihr Feld bis zur Ankunft, behalten ihren Platz in der Warteschlange (kein Freizug, ihr nächster Zug kommt wie geplant) und stehen nach ID geordnet auf dem nächsten freien, für sie betretbaren Feld bei Ninkasi; die KI kennt danach Ninkasis neue Position; ohne freies Feld bleiben sie samt Gepäck und Einträgen auf der alten Ebene an ihrem Platz
 + Population: je Wurf gewichtet unter den Einträgen der Tiefe, mit `tieferChance` aus einer bis zu `tieferBis` Tiefen tieferen; ein Rudel steht beieinander (jedes weitere Mitglied auf dem freien Feld, das dem ersten am nächsten liegt), Affixe sind Zustände beim Erzeugen; findet ein Wurf nichts, fällt er aus; bestellt eine Ebene mit Ninkasi mehr als `hoechstWesen`, ist das ein Datenfehler
-+ Im Spielinhalt (Zahlen vorläufig): der Hub ist ein leerer Raum mit Treppe hinab (Dienste folgen), drei Kellertiefen mit 16 bis 20 Wesen, Essigbakterien in Rudeln von 1 bis 3, Fernkämpfer ab Tiefe 2 häufiger; Treppen haben noch keine Tiles
++ Im Spielinhalt (Zahlen vorläufig): der Hub ist ein leerer Raum mit Treppe hinab (Dienste folgen), die Testkammer des allmächtigen Laufs ein größerer, der ihn in Tiefe 0 ersetzt, drei Kellertiefen mit 16 bis 20 Wesen, Essigbakterien in Rudeln von 1 bis 3, Fernkämpfer ab Tiefe 2 häufiger; Treppen haben noch keine Tiles
 
 ## Wegfindung
 

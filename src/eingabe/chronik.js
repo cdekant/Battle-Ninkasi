@@ -4,12 +4,20 @@
 //   { format, laeufe: [{ version, startwert, spielart, datum, tiefe, zuege, befehle, ergebnis, ursache }], zaehler: { name: zahl } }
 // Zähler sind frei benannt ("besiegt.<typ>", "gesehen.<typ>", "tode", "laeufe"); erhoben werden sie in der Oberfläche
 // aus den Meldungen der Logik (ZAEHLREGELN) und aus dem Sichtfeld, nie in der Logik. Gezählt wird nur beim echten
-// Spielen: Laden eines Schnappschusses meldet nichts, ein späterer Abspieler zählt nicht mit.
+// Spielen: Laden eines Schnappschusses meldet nichts, ein späterer Abspieler zählt nicht mit. Läufe der Spielarten in
+// SPIELARTEN_OHNE_ZAEHLER (allmächtig) stehen mit ihrer Spielart in laeufe, zählen aber nicht (getrennte Wertung).
 // Freischaltungen (Titelbilder, später Erfolge, Bestiarium) sind Bedingungen auf Zählern: { zaehler, mindestens }.
 
 export const SPEICHERSCHLUESSEL_CHRONIK = "battle-ninkasi.chronik";
 export const CHRONIK_FORMAT = 1;
 export const HOECHSTENS_LAEUFE = 500; // älteste Einträge fallen heraus, die Zähler bleiben
+
+export const SPIELARTEN_OHNE_ZAEHLER = ["allmaechtig"];
+
+// Ob der Lauf in die Zähler eingeht
+export function zaehltMit(spiel) {
+  return !SPIELARTEN_OHNE_ZAEHLER.includes(spiel.optionen?.spielart ?? "normal");
+}
 
 export function neueChronik() {
   return { format: CHRONIK_FORMAT, laeufe: [], zaehler: {} };
@@ -42,6 +50,7 @@ export const ZAEHLREGELN = {
 
 // Eine Meldung der Logik zählen (als Hörer angemeldet in src/main.js)
 export function meldungZaehlen(chronik, spiel, meldung) {
+  if (!zaehltMit(spiel)) return;
   const name = ZAEHLREGELN[meldung.art]?.(meldung, spiel);
   if (name) zaehlerErhoehen(chronik, name);
 }
@@ -51,7 +60,7 @@ export function meldungZaehlen(chronik, spiel, meldung) {
 // auch "getroffen".
 export function sichtungenZaehlen(chronik, spiel, gesehen) {
   const zustand = spiel.zustand;
-  if (!zustand.sichtbareFelder || !zustand.ebene) return;
+  if (!zustand.sichtbareFelder || !zustand.ebene || !zaehltMit(spiel)) return;
   const sichtbar = new Set(zustand.sichtbareFelder);
   for (const entitaet of Object.values(zustand.entitaeten)) {
     if (!entitaet.position || entitaet.fraktion === undefined || entitaet.id === zustand.spielerinId || gesehen.has(entitaet.typ)) continue;
@@ -77,7 +86,7 @@ export function laufEintragen(chronik, spiel, { ergebnis, datum, version, todesm
     ursache: todesmeldung ? { quelle: todesmeldung.quelle?.typ ?? null, ursache: todesmeldung.ursache ?? null } : null,
   });
   if (chronik.laeufe.length > HOECHSTENS_LAEUFE) chronik.laeufe.splice(0, chronik.laeufe.length - HOECHSTENS_LAEUFE);
-  zaehlerErhoehen(chronik, "laeufe");
+  if (zaehltMit(spiel)) zaehlerErhoehen(chronik, "laeufe");
 }
 
 // Bedingung einer Freischaltung: null (immer frei) oder { zaehler, mindestens }

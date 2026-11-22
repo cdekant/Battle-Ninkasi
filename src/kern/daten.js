@@ -230,6 +230,8 @@ function pruefeRegeln(daten, regeln, fehler) {
   if (!istGanzzahl(regeln.population?.hoechstWesen) || regeln.population.hoechstWesen < 1) fehler.push("regeln.population.hoechstWesen muss eine ganze Zahl >= 1 sein");
   if (!istProzent(regeln.population?.tieferChance)) fehler.push("regeln.population.tieferChance muss eine ganze Zahl von 0 bis 100 sein");
   if (!istZahlAbNull(regeln.population?.tieferBis)) fehler.push("regeln.population.tieferBis muss eine ganze Zahl >= 0 sein");
+  if (!daten.ebenen?.[regeln.allmacht?.kammer]) fehler.push("regeln.allmacht.kammer muss eine Ebene aus daten/ebenen.js sein");
+  if (!istZahlAbNull(regeln.allmacht?.tiefe) || regeln.allmacht.tiefe >= (daten.abfolge?.length ?? 0)) fehler.push("regeln.allmacht.tiefe muss eine Tiefe der abfolge sein");
   if (!istGanzzahl(regeln.ebenen?.versuche) || regeln.ebenen.versuche < 1) fehler.push("regeln.ebenen.versuche muss eine ganze Zahl >= 1 sein");
   if (!istZahlAbNull(regeln.ebenen?.folgen?.abstand)) fehler.push("regeln.ebenen.folgen.abstand muss eine ganze Zahl >= 0 sein");
   if (!istObjekt(regeln.schichten)) fehler.push("regeln.schichten fehlt");

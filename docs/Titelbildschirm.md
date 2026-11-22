@@ -74,7 +74,7 @@ Festgehalten, nicht eingeplant:
 + Sprachknopf, die aktive Sprache ist markiert
 + Spielarten: Tutorial, Sprint, Stufen nach dem Sieg, eigene Regeln (z.B. Häufigkeit der Monster)
 + Weicher Modus: beim Tod zurück zum letzten gesicherten Stand
-+ Friedlicher Modus (keine Feinde oder keine Angriffe) und allmächtiger Modus (zum Erkunden und Prüfen)
++ Friedlicher Modus (keine Feinde oder keine Angriffe); der allmächtige Modus (zum Erkunden und Prüfen) ist seit 0.41.0 als Testkammer umgesetzt
 + Intro-Film mit Menüeintrag "Vorgeschichte" und Einstellung (nur beim ersten Start oder nie), jederzeit nachrüstbar
 
 ## Was schon jetzt zu beachten ist
@@ -100,6 +100,14 @@ Damit die Ideen später ohne Umbau dazukommen:
 + Chronik, letzter Lauf und Spielart wie unter "Was schon jetzt zu beachten ist", Einzelheiten unter Speichern in [Architektur.md](Architektur.md)
 + Abweichungen vom Plan: Vollbild beim ersten Klick entfällt, weil Vollbild keine Einstellung ist, sondern ein Knopf; die Quelle unter dem Spruch ist der Titel des Korpustexts, nicht das Literaturverzeichnis; `?seed=` gilt nur mit einem leeren Platz
 + Die Gestaltung (Breite der Spalten, Verlauf, Schriftgrößen) steht in CSS-Variablen und wird nach der Prüfung im Browser nachgestellt
+
+## Stand der Umsetzung 0.41.0
+
++ Menü: nach Neues Spiel der Eintrag Testkammer, ein neuer Lauf der Spielart "allmaechtig" (siehe [Architektur.md](Architektur.md), Spielarten) ohne Charaktererstellung, mit den Eigenschaften aus den Daten; er nimmt einen Platz wie Neues Spiel, sind alle belegt, öffnet sich `laeufe` zum Ersetzen (Zustand mit `spielart`); die Aktion ist dann `{ art: "neuesSpiel", stelle, spielart }`
++ Ebenso `?spielart=allmaechtig` in der Adresse, auch zusammen mit `?seed=`
++ Neuer Lauf aus dem Spielmenü oder nach dem Lauf behält die Spielart
++ Der Platz zeigt die Spielart hinter der Vorschau ("Platz 1: Tiefe 0, Zug 12, 22.11.2026 (Testkammer)"), der Kopf der Seitenleiste ebenso hinter Ort und Zeit
++ Chronik: der Lauf steht mit Spielart in `laeufe`, die Zähler (auch `laeufe`, `tode`, `besiegt.<typ>`, `gesehen.<typ>`) zählen nicht mit, Testen schaltet also keine Titelbilder frei
 
 ## Offen
 

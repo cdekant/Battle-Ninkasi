@@ -60,15 +60,16 @@ test("Speicherplätze: neues Spiel nimmt den ersten leeren, dann einen veraltete
 });
 
 test("Titel: Einträge nach den Plätzen, Fortsetzen nimmt den letzten Lauf, Esc schließt nicht", () => {
-  assert.deepEqual(titelEintraege([null, null, null]), ["neues_spiel", "einstellungen", "hilfe", "beenden"]);
-  assert.deepEqual(titelEintraege([spielbar(1), null, null]), ["fortsetzen", "neues_spiel", "einstellungen", "hilfe", "beenden"]);
-  assert.deepEqual(titelEintraege([veraltet, spielbar(1), null]), ["fortsetzen", "neues_spiel", "laeufe", "einstellungen", "hilfe", "beenden"], "Läufe ab zwei belegten Plätzen");
+  assert.deepEqual(titelEintraege([null, null, null]), ["neues_spiel", "testkammer", "einstellungen", "hilfe", "beenden"]);
+  assert.deepEqual(titelEintraege([spielbar(1), null, null]), ["fortsetzen", "neues_spiel", "testkammer", "einstellungen", "hilfe", "beenden"]);
+  assert.deepEqual(titelEintraege([veraltet, spielbar(1), null]), ["fortsetzen", "neues_spiel", "testkammer", "laeufe", "einstellungen", "hilfe", "beenden"], "Läufe ab zwei belegten Plätzen");
   const plaetze = [spielbar(1), null, spielbar(8)];
   assert.deepEqual(titelTaste(titelOeffnen(), { code: "Enter" }, { plaetze }).aktion, { art: "fortsetzen", stelle: 2 }, "Fortsetzen ist vorgewählt");
   assert.deepEqual(titelTaste(titelOeffnen(), { code: "KeyB", zeichen: "b" }, { plaetze }).aktion, { art: "neuesSpiel", stelle: 1 });
   assert.deepEqual(titelTaste(titelOeffnen(), { code: "Escape" }, { plaetze }).zustand, titelOeffnen());
-  assert.equal(titelTaste(titelOeffnen(), { code: "KeyF", zeichen: "f" }, { plaetze }).aktion, "beenden");
-  assert.equal(titelTaste(titelOeffnen(), { code: "KeyD", zeichen: "d" }, { plaetze }).oeffnen.art, "einstellungen");
+  assert.deepEqual(titelTaste(titelOeffnen(), { code: "KeyC", zeichen: "c" }, { plaetze }).aktion, { art: "neuesSpiel", stelle: 1, spielart: "allmaechtig" }, "Testkammer");
+  assert.equal(titelTaste(titelOeffnen(), { code: "KeyG", zeichen: "g" }, { plaetze }).aktion, "beenden");
+  assert.equal(titelTaste(titelOeffnen(), { code: "KeyE", zeichen: "e" }, { plaetze }).oeffnen.art, "einstellungen");
   assert.deepEqual(titelKlick(titelOeffnen(), { stelle: 0 }, { plaetze }).aktion, { art: "fortsetzen", stelle: 0 }, "Klick auf einen Platz");
   assert.deepEqual(titelKlick(titelOeffnen(), { stelle: 1 }, { plaetze }).aktion, { art: "neuesSpiel", stelle: 1 }, "Klick auf einen freien Platz");
 });
@@ -82,6 +83,10 @@ test("Läufe: alle belegt verdrängt einen Lauf mit Nachfrage; veraltete fragen;
   const nachfrage = fensterTaste(stapel, { code: "KeyB", zeichen: "b" }, { plaetze: voll });
   assert.deepEqual(nachfrage.stapel.map(({ art }) => art), ["titel", "laeufe", "bestaetigung"]);
   assert.deepEqual(fensterTaste(nachfrage.stapel, { code: "KeyJ", zeichen: "j" }, {}).aktion, { art: "neuesSpiel", stelle: 1 });
+  const testkammer = titelTaste(titelOeffnen(), { code: "KeyC", zeichen: "c" }, { plaetze: voll });
+  assert.deepEqual(testkammer.oeffnen.zustand, { gewaehlt: 0, zweck: "ersetzen", spielart: "allmaechtig" }, "Testkammer ersetzt einen Lauf");
+  const ersetzen = laeufeTaste(testkammer.oeffnen.zustand, { code: "KeyA", zeichen: "a" }, { plaetze: voll });
+  assert.deepEqual(ersetzen.oeffnen.zustand.aktion, { art: "neuesSpiel", stelle: 0, spielart: "allmaechtig" });
   const mitAltem = [spielbar(1), veraltet, null];
   assert.equal(laeufeTaste(laeufeOeffnen("fortsetzen", mitAltem), { code: "KeyB", zeichen: "b" }, { plaetze: mitAltem }).oeffnen.zustand.frage, "laeufe.veraltet_frage");
   assert.deepEqual(laeufeTaste(laeufeOeffnen("fortsetzen", mitAltem), { code: "KeyC", zeichen: "c" }, { plaetze: mitAltem }).aktion, { art: "neuesSpiel", stelle: 2 }, "freier Platz beginnt neu");
@@ -147,12 +152,12 @@ test("Chronik: Siege Ninkasis und Tode zählen, Sichtungen einmal je Lauf, Läuf
 });
 
 test("Spielart: Startoption mit Vorgabe normal, unbekannte wirft, Nachspielen behält sie", () => {
-  assert.deepEqual(SPIELARTEN, ["normal"]);
+  assert.deepEqual(SPIELARTEN, ["normal", "allmaechtig"]);
   const spiel = neuesSpiel(daten, 11);
   assert.equal(spiel.optionen.spielart, "normal");
   befehlGeben(spiel, { art: "warten" });
   assert.equal(nachspielen(daten, spielstand(spiel)).optionen.spielart, "normal");
-  assert.throws(() => neuesSpiel(daten, 11, { spielart: "allmaechtig" }), /Unbekannte Spielart/);
+  assert.throws(() => neuesSpiel(daten, 11, { spielart: "weich" }), /Unbekannte Spielart/);
 });
 
 test("Korpus: Liste passt zum Ordner, Kopf und Verse ohne Sprecher, Sätze höchstens drei Verse, ein Spruch", () => {
