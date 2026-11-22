@@ -34,6 +34,8 @@ import { reiseBeginnen, naechsterReiseschritt } from "./eingabe/reise.js";
 import { rastenBeginnen, naechsterRastschritt } from "./eingabe/rasten.js";
 import { erkundenBeginnen, naechsterErkundungsschritt } from "./eingabe/erkunden.js";
 import { laufenBeginnen, naechsterLaufschritt } from "./eingabe/laufen.js";
+import { arenakampfBeginnen, naechsterArenaschritt } from "./eingabe/arenakampf.js";
+import { aufstellungAus } from "./systeme/arena.js";
 import { neueLeisten, leistenNachfuehren, platzAusloesen, platzBelegen, platzLeeren, plaetzeTauschen, leisteWechseln, ohneSchluessel, aktivePlaetze } from "./eingabe/schnellleiste.js";
 import { ANZAHL_PLAETZE, speicherschluesselPlatz, SPEICHERSCHLUESSEL_ALTER_LAUF, SPEICHERSCHLUESSEL_LETZTER_LAUF, speicherstandText, speicherstandLesen, platzVorschau, platzFuerNeuesSpiel } from "./eingabe/speicherstand.js";
 import { SPEICHERSCHLUESSEL_CHRONIK, chronikGueltig, meldungZaehlen, sichtungenZaehlen, laufEintragen } from "./eingabe/chronik.js";
@@ -152,16 +154,20 @@ function platzLoeschen(stelle) {
 // der eine Platz bis 0.31.0 passt zu keiner neueren Version
 try { localStorage.removeItem(SPEICHERSCHLUESSEL_ALTER_LAUF); } catch { /* ohne Speicher weiter */ }
 
-// ?seed= und ?spielart= aus der Adresse lesen und entfernen (auch das frühere &neu); eine unbekannte Spielart zählt nicht
+// ?seed= und ?spielart= aus der Adresse lesen und entfernen (auch das frühere &neu); eine unbekannte Spielart zählt nicht;
+// für die Arena dazu ?arena= (Name aus daten/arenen.js, Vorgabe die erste) und ?auto=1 (automatisch kämpfen)
 function startAusUrl() {
   const parameter = new URLSearchParams(location.search);
   const startwertText = parameter.get("seed"), spielartText = parameter.get("spielart");
+  const arenaText = parameter.get("arena"), automatisch = parameter.get("auto") === "1";
   const adresse = new URL(location.href);
-  for (const name of ["seed", "spielart", "neu"]) adresse.searchParams.delete(name);
+  for (const name of ["seed", "spielart", "neu", "arena", "auto"]) adresse.searchParams.delete(name);
   history.replaceState(null, "", adresse);
   const startwert = startwertText === null || startwertText === "" ? null
     : /^\d+$/.test(startwertText) ? Number(startwertText) >>> 0 : startwertAbleiten(0, startwertText);
-  return { startwert, spielart: SPIELARTEN.includes(spielartText) ? spielartText : null };
+  const spielart = SPIELARTEN.includes(spielartText) ? spielartText : null;
+  if (spielart !== "arena") return { startwert, spielart };
+  return { startwert, spielart: { spielart, arena: arenaText in rohdaten.arenen ? arenaText : Object.keys(rohdaten.arenen)[0], automatisch } };
 }
 
 function zufaelligerStartwert() {
@@ -364,7 +370,7 @@ function speichernJetzt() {
   clearTimeout(speicherZeitgeber);
   speicherZeitgeber = null;
   if (!spiel || aktuelleStelle === null || fensterStapel.some(({ art }) => art === "erstellung")) return;
-  if (spiel.zustand.vorbei) return laufAbschliessen("tod");
+  if (spiel.zustand.vorbei) return laufAbschliessen(spiel.zustand.ergebnis ?? "tod");
   try {
     localStorage.setItem(speicherschluesselPlatz(aktuelleStelle), speicherstandText(spiel, { leisten, logzeilen: log.zeilen, gesehen: gesehenImLauf, gespeichertAm: Date.now() }));
   } catch { /* ohne Speicher weiter */ }
@@ -375,7 +381,7 @@ function speichernVormerken() {
 }
 window.addEventListener("pagehide", speichernJetzt);
 
-// Ende eines Laufs (Tod oder aufgegeben), einmal je Lauf: Eintrag in die Chronik, die Aufzeichnung bleibt als letzter
+// Ende eines Laufs (Tod, Sieg in der Arena oder aufgegeben), einmal je Lauf: Eintrag in die Chronik, die Aufzeichnung bleibt als letzter
 // Lauf für ein späteres Abspielen, der Platz wird frei
 function laufAbschliessen(ergebnis) {
   if (!spiel || abgeschlosseneSpiele.has(spiel) || !spiel.befehle.length) return;
@@ -394,14 +400,14 @@ function chronikMelden(meldung) {
   if (meldung.art === "tod" && meldung.opfer.id === spiel.zustand.spielerinId) todesmeldung = meldung;
 }
 
-// Nach jedem angenommenen Befehl: Schnellleiste nachführen, Sichtungen zählen, speichern; nach dem Tod Ninkasis das
-// Fenster "ende"
+// Nach jedem angenommenen Befehl: Schnellleiste nachführen, Sichtungen zählen, speichern; nach dem Tod Ninkasis oder dem
+// Sieg in der Arena das Fenster "ende"
 function nachDemBefehl() {
   leisten = leistenNachfuehren(spiel, leisten);
   sichtungenZaehlen(chronik, spiel, gesehenImLauf);
   speichernVormerken();
   if (spiel.zustand.vorbei && !abgeschlosseneSpiele.has(spiel)) {
-    laufAbschliessen("tod");
+    laufAbschliessen(spiel.zustand.ergebnis ?? "tod");
     fensterStapel = fensterOeffnen([], "ende", endeOeffnen());
   }
 }
@@ -508,6 +514,11 @@ function ablaufStarten(beginn, naechsterSchritt) {
   ablaufTakt();
 }
 
+// Automatischer Kampf in der Arena nach der Taktik der Aufstellung (eingabe/arenakampf.js), im Takt der Reise
+function autokampfStarten() {
+  ablaufStarten(arenakampfBeginnen(spiel), naechsterArenaschritt);
+}
+
 // Ein Lauf mit Startoptionen (Charaktererstellung); dieselbe Ebene wie in der Vorschau, die Eigenschaften
 // ändern an der Erzeugung nichts
 function laufBeginnen(startwert, optionen) {
@@ -567,10 +578,25 @@ function platzFortsetzen(stelle) {
   zeichnen();
 }
 
+// Wurde die laufende Arena automatisch begonnen? "Nochmal" und Neustart beginnen dann wieder so
+let arenaAutomatisch = false;
+
 // Neuer Lauf auf einem Platz: erst die Charaktererstellung über der Karte des Laufs, vorbelegt mit der letzten Verteilung;
-// die Testkammer (Spielart "allmaechtig") beginnt gleich, mit den Eigenschaften aus den Daten
-function starten(stelle, startwert, spielart = "normal") {
+// die Testkammer (Spielart "allmaechtig") und die Arena beginnen gleich, mit den Eigenschaften aus den Daten.
+// wahl: Name der Spielart oder { spielart, arena?, aufstellung?, automatisch?, taktik? } (eingabe/arenawahl.js); die
+// Arena nimmt die Aufstellung aus aufstellung (Nochmal, Neustart) oder aus dem Namen arena mit der gewählten Taktik
+function starten(stelle, startwert, wahl = "normal") {
+  const { spielart = "normal", ...zusatz } = typeof wahl === "string" ? { spielart: wahl } : wahl;
   aktuelleStelle = stelle;
+  if (spielart === "arena") {
+    const aufstellung = zusatz.aufstellung ?? { ...aufstellungAus(daten, zusatz.arena), ...(zusatz.taktik ? { taktik: zusatz.taktik } : {}) };
+    arenaAutomatisch = Boolean(zusatz.automatisch);
+    fensterStapel = [];
+    laufBeginnen(startwert, { spielart, arena: aufstellung });
+    speichernJetzt();
+    if (arenaAutomatisch) autokampfStarten();
+    return;
+  }
   if (spielart !== "normal") {
     fensterStapel = [];
     laufBeginnen(startwert, { spielart });
@@ -598,19 +624,31 @@ function fensterAuf(art, zustand) {
 }
 
 // Aktionen, die ein Fenster zurückgibt (eingabe/menue.js, eingabe/titel.js): ein Name oder { art, ... }
+// Wahl für einen neuen Lauf derselben Art: in der Arena dieselbe Aufstellung, wieder automatisch, wenn sie so begann
+function gleicheWahl() {
+  if (spiel.optionen.spielart !== "arena") return spiel.optionen.spielart;
+  return { spielart: "arena", aufstellung: spiel.optionen.arena, automatisch: arenaAutomatisch };
+}
+
 function fensteraktionAusfuehren(aktion) {
   const { art, ...werte } = typeof aktion === "string" ? { art: aktion } : aktion;
   if (art === "neustart") {
     // ein Lauf, der nicht zu Ende ist, geht als aufgegeben in die Chronik; der neue nimmt denselben Platz
     if (!spiel.zustand.vorbei) laufAbschliessen("aufgegeben");
     fensterStapel = [];
-    return starten(aktuelleStelle, zufaelligerStartwert(), spiel.optionen.spielart);
+    return starten(aktuelleStelle, zufaelligerStartwert(), gleicheWahl());
+  }
+  // nach einem Kampf in der Arena: dieselbe Aufstellung mit dem nächsten Startwert
+  if (art === "nochmal") {
+    fensterStapel = [];
+    return starten(aktuelleStelle, (spiel.zustand.startwert + 1) >>> 0, gleicheWahl());
   }
   if (art === "zum_titel") return titelZeigen();
   if (art === "fortsetzen") return platzFortsetzen(werte.stelle);
   if (art === "neuesSpiel") {
     fensterStapel = [];
-    return starten(werte.stelle, zufaelligerStartwert(), werte.spielart);
+    const { stelle, ...wahl } = werte;
+    return starten(stelle, zufaelligerStartwert(), wahl.spielart ? wahl : "normal");
   }
   if (art === "platzLoeschen") {
     platzLoeschen(werte.stelle);
@@ -804,6 +842,7 @@ function aktionAusfuehren(ergebnis) {
   if (aktion === "rasten") return ablaufStarten(rastenBeginnen(spiel, einstellungen), naechsterRastschritt);
   if (aktion === "erkunden") return ablaufStarten(erkundenBeginnen(spiel, einstellungen), naechsterErkundungsschritt);
   if (aktion === "laufen") return ablaufStarten(laufenBeginnen(spiel, ergebnis.richtung, einstellungen), naechsterLaufschritt);
+  if (aktion === "autokampf") return autokampfStarten();
   // nach dem Tod öffnet Enter das Fenster "ende" wieder
   if (aktion === "neustart") {
     if (spiel.zustand.vorbei) fensterAuf("ende", endeOeffnen());

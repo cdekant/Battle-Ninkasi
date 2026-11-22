@@ -1,4 +1,4 @@
-// Titelbildschirm und Wahl der Läufe (eingabe/titel.js, docs/Titelbildschirm.md). Liest nur.
+// Titelbildschirm, Wahl der Läufe und der Arena (eingabe/titel.js, eingabe/arenawahl.js, docs/Titelbildschirm.md). Liest nur.
 // Der Titel ist eine eigene Ebene (#titel in index.html) über der ganzen Seite: das Bild füllt das Fenster und darf
 // seitlich und in der Höhe beschnitten werden (object-fit: cover, Fokuspunkt je Bild aus anzeige/titelbilder.js);
 // links Name und Menü, rechts die Speicherplätze und ein Spruch aus dem Korpus, beide Spalten nur als weicher Verlauf
@@ -9,6 +9,7 @@
 import { fensterinhaltAnmelden, buchstabeHtml, buchstabeAttribut, zielAttribut } from "./fenster.js";
 import { titelEintraege } from "../eingabe/titel.js";
 import { ANZAHL_PLAETZE } from "../eingabe/speicherstand.js";
+import { arenenListe, taktikDerWahl } from "../eingabe/arenawahl.js";
 
 const escapeHtml = (text) => String(text).replace(/[&<>"]/g, (zeichen) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[zeichen]);
 
@@ -80,5 +81,32 @@ fensterinhaltAnmelden("laeufe", ({ texte, plaetze = [] }, zustand) => {
     liste: `${zustand.zweck === "ersetzen" ? `<p>${text("laeufe.alle_belegt")}</p>` : ""}<ul>${zeilen.join("")}</ul>`,
     fuss: text("laeufe.fuss"),
     knoepfe,
+  };
+});
+
+// Wahl der Arena (eingabe/arenawahl.js): die Arenen mit ihren Wellen, darunter von Hand oder automatisch und die Taktik
+function wellenText(texte, arena) {
+  const { text } = texte;
+  const teile = [];
+  if (arena.wellen?.length) teile.push(text("arenawahl.wellen", { anzahl: arena.wellen.length }));
+  if (arena.population) teile.push(text(arena.population.alle ? "arenawahl.population_alle" : "arenawahl.population", { tiefe: arena.population.tiefe, anzahl: arena.population.wellen ?? 0 }));
+  return teile.join(", ");
+}
+
+fensterinhaltAnmelden("arenawahl", ({ texte, daten }, zustand) => {
+  const { text } = texte;
+  const arenen = arenenListe(daten);
+  const zeilen = arenen.map((name, stelle) => `<li${stelle === zustand.gewaehlt ? ' class="gewaehlt"' : ""}${zielAttribut({ stelle })}>${buchstabeHtml(stelle)}${escapeHtml(text(daten.arenen[name].text))} <span class="leise">${escapeHtml(wellenText(texte, daten.arenen[name]))}</span></li>`);
+  const gewaehlteArena = arenen[zustand.gewaehlt];
+  const taktik = gewaehlteArena ? taktikDerWahl(daten, zustand, gewaehlteArena) : null;
+  const modus = zustand.automatisch ? text("arenawahl.automatisch", { taktik: taktik ? text(daten.taktiken[taktik].text) : "-" }) : text("arenawahl.von_hand");
+  return {
+    titel: text("arenawahl.titel"),
+    liste: `<ul>${zeilen.join("") || `<li class="leise">${text("ui.leer")}</li>`}</ul><p>${escapeHtml(modus)}</p>`,
+    fuss: text("arenawahl.fuss"),
+    knoepfe: [
+      { taste: { code: "Space" }, text: text(zustand.automatisch ? "arenawahl.knopf_hand" : "arenawahl.knopf_automatisch") },
+      ...(zustand.automatisch ? [{ taste: { code: "Tab" }, text: text("arenawahl.knopf_taktik") }] : []),
+    ],
   };
 });

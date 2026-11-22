@@ -1,7 +1,9 @@
 // Dummer Bot: spielt mit zufälligen Befehlen, prüft Invarianten und Wiederholbarkeit.
 // Aufruf: node werkzeuge/bot.js [läufe=20] [befehle=3000] [erster Startwert=1]
 // Für jeden Lauf: spielen, dann aus Startwert und Befehlsliste nachspielen und Zustände vergleichen.
-// Jeder fünfte Lauf (Startwert % 5 === 3) spielt in der Testkammer (Spielart "allmaechtig") mit Erzeugen und Tiefenwahl.
+// Jeder fünfte Lauf (Startwert % 5 === 3) spielt in der Testkammer (Spielart "allmaechtig") mit Erzeugen und Tiefenwahl,
+// jeder fünfte (Startwert % 5 === 4) in einer Arena (Spielart "arena"), abwechselnd mit Taktik (eingabe/arenakampf.js)
+// und mit zufälligen Befehlen.
 
 import rohdaten from "../daten/index.js";
 import texte from "../sprache/de/texte.js";
@@ -22,6 +24,9 @@ import { neueLeisten, leistenNachfuehren, aktivePlaetze, platzZustand, platzAusl
 import { speicherstandText, speicherstandLesen, vorschauAusSpiel, platzVorschau } from "../src/eingabe/speicherstand.js";
 import { neueChronik, chronikGueltig, meldungZaehlen, sichtungenZaehlen, laufEintragen, zaehlerstand, zaehltMit } from "../src/eingabe/chronik.js";
 import { istAllmaechtig, erzeugbareTypen } from "../src/systeme/allmacht.js";
+import { istArena, aufstellungAus } from "../src/systeme/arena.js";
+import { arenakampfBeginnen, naechsterArenaschritt } from "../src/eingabe/arenakampf.js";
+import { arenawahlOeffnen, arenawahlTaste } from "../src/eingabe/arenawahl.js";
 import { titelOeffnen, laeufeOeffnen } from "../src/eingabe/titel.js";
 import { titelHtml } from "../src/anzeige/titel.js";
 import { minikartenBild } from "../src/anzeige/minikarte.js";
@@ -144,6 +149,11 @@ function menueBedienen(spiel) {
   for (const zeichen of "hilf") zeile = befehlszeileTaste(zeile, { code: "KeyX", zeichen }, umgebung).zustand;
   fensterZeichnen(spiel, "befehlszeile", zeile);
   if (!befehlszeileTaste(zeile, { code: "Enter" }, umgebung).befehlszeile) throw new Error("Befehlszeile ohne Ziel für hilf");
+}
+
+// Feinde Ninkasis, die noch auf der Karte stehen (für die Prüfung des Siegs in der Arena)
+function feindeImSpiel(spiel) {
+  return alleEntitaeten(spiel.zustand).some((entitaet) => entitaet.ki && entitaet.position && entitaet.fraktion !== "ninkasi");
 }
 
 function invariantenPruefen(spiel) {
@@ -278,6 +288,9 @@ function zufallsbefehl(botZufall, spiel) {
 // Testkammer: meist etwas erzeugen (Wesen oder Gegenstand), sonst in eine zufällige Tiefe wechseln, auch eine, die es
 // nicht gibt, so werden die Ablehnungen mitgeprüft
 let anzahlErzeugt = 0, anzahlTiefenwahl = 0, anzahlBewahrt = 0;
+// Arena: Läufe nach Ausgang, Wellen
+const arenaAusgaenge = { sieg: 0, tod: 0, offen: 0 };
+let arenaWellen = 0;
 function allmachtsbefehl(botZufall, spiel, wurf) {
   if (wurf === 100) {
     anzahlTiefenwahl++;
@@ -450,7 +463,9 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
     // jeder zweite Lauf mit eigener Verteilung der Eigenschaften (Startoption, gehört zum Spielstand)
     // jeder vierte über die Tasten der Charaktererstellung
     const verteilung = startwert % 4 === 0 ? eigenschaftenUeberErstellung(zufallErzeugen(startwert + 2_000_000)) : zufallsEigenschaften(zufallErzeugen(startwert + 1_000_000));
-    const optionen = { ...(startwert % 2 === 0 ? { eigenschaften: verteilung } : {}), ...(startwert % 5 === 3 ? { spielart: "allmaechtig" } : {}) };
+    const arenen = Object.keys(daten.arenen);
+    const arena = startwert % 5 === 4 ? { spielart: "arena", arena: aufstellungAus(daten, arenen[Math.floor(startwert / 5) % arenen.length]) } : {};
+    const optionen = { ...(startwert % 2 === 0 ? { eigenschaften: verteilung } : {}), ...(startwert % 5 === 3 ? { spielart: "allmaechtig" } : {}), ...arena };
     const spiel = neuesSpiel(daten, startwert, optionen);
     botLog = new Log(ohneDom(), anzeigetexte);
     botLeisten = leistenNachfuehren(spiel, neueLeisten());
@@ -486,7 +501,16 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
       if (meldung.art === "geworfen") gegnerfaehigkeiten.geworfen++;
     });
     const botZufall = zufallErzeugen(startwert);
+    // jede zweite Arena kämpft nach der Taktik wie der automatische Kampf im Browser, mit gelegentlichen Zufallsbefehlen
+    const arenaAblauf = istArena(spiel) && startwert % 10 === 4 ? arenakampfBeginnen(spiel).ablauf : null;
     while (spiel.befehle.length < hoechsteBefehlszahl && !spiel.zustand.vorbei) {
+      if (arenaAblauf && zufallsGanzzahl(botZufall, 1, 10) > 1) {
+        const schritt = naechsterArenaschritt(spiel, arenaAblauf);
+        if (schritt.halt) break;
+        if (!befehlGeben(spiel, schritt.befehl).ok) befehlGeben(spiel, { art: "warten" });
+        invariantenPruefen(spiel);
+        continue;
+      }
       if (zufallsGanzzahl(botZufall, 1, 100) <= 3) {
         const haltegrund = ablaufWaehlen(botZufall, spiel);
         reisenNachHaltegrund[haltegrund] = (reisenNachHaltegrund[haltegrund] || 0) + 1;
@@ -521,11 +545,25 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
       if (JSON.stringify(geladeneKopie.zustand) !== JSON.stringify(spiel.zustand)) throw new Error("Geladene Kopie ergibt anderen Zustand");
       anzahlGeladen++;
     }
-    laufEintragen(botChronik, spiel, { ergebnis: spiel.zustand.vorbei ? "tod" : "aufgegeben", datum: 0, version: "bot" });
+    laufEintragen(botChronik, spiel, { ergebnis: spiel.zustand.ergebnis ?? (spiel.zustand.vorbei ? "tod" : "aufgegeben"), datum: 0, version: "bot" });
     if (JSON.stringify(chronikGueltig(JSON.parse(JSON.stringify(botChronik)))) !== JSON.stringify(botChronik)) throw new Error("Chronik übersteht JSON nicht");
-    if (zaehlerstand(botChronik, "tode") !== (spiel.zustand.vorbei ? 1 : 0)) throw new Error("Chronik zählt die Tode falsch");
+    if (zaehlerstand(botChronik, "tode") !== (zaehltMit(spiel) && spiel.zustand.vorbei ? 1 : 0)) throw new Error("Chronik zählt die Tode falsch");
     if (zaehltMit(spiel) && !gesehen.size) throw new Error("Chronik hat keine Wesenart gesehen");
-    if (!zaehltMit(spiel) && Object.keys(botChronik.zaehler).length) throw new Error("Chronik zählt im allmächtigen Lauf mit");
+    if (!zaehltMit(spiel) && Object.keys(botChronik.zaehler).length) throw new Error("Chronik zählt im allmächtigen Lauf oder in der Arena mit");
+    if (istArena(spiel)) {
+      arenaAusgaenge[spiel.zustand.ergebnis === "sieg" ? "sieg" : spiel.zustand.vorbei ? "tod" : "offen"]++;
+      arenaWellen += spiel.zustand.arena.welle + (spiel.zustand.ergebnis === "sieg" ? 1 : 0);
+      if (spiel.zustand.ergebnis === "sieg" && feindeImSpiel(spiel)) throw new Error("Sieg in der Arena, aber noch Feinde da");
+      // Endfenster mit Nochmal und die Wahl der Arena mit allen Schaltern zeichnen (fehlende Texte fallen auf)
+      fensterZeichnen(spiel, "ende", endeOeffnen());
+      let wahl = arenawahlOeffnen();
+      for (const code of ["ArrowDown", "Space", "Tab", "Tab"]) {
+        wahl = arenawahlTaste(wahl, { code }, { daten, plaetze: [] }).zustand;
+        fensterZeichnen(spiel, "arenawahl", wahl);
+      }
+      const start = arenawahlTaste(wahl, { code: "Enter" }, { daten, plaetze: [null, null, null] }).aktion;
+      if (start?.spielart !== "arena" || !daten.arenen[start.arena] || !daten.taktiken[start.taktik]) throw new Error("Wahl der Arena startet nichts Gültiges");
+    }
     if (istAllmaechtig(spiel) && spiel.zustand.vorbei) throw new Error("Ninkasi stirbt im allmächtigen Lauf");
     const vorschau = platzVorschau(speicherstandText(spiel, { leisten: botLeisten, gesehen, gespeichertAm: 1 }));
     if (vorschau.grund || vorschau.vorschau.tiefe !== spiel.zustand.tiefe) throw new Error("Vorschau des Speicherplatzes falsch");
@@ -533,12 +571,12 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
     const zustaendeGleich = JSON.stringify(nachgespielt.zustand) === JSON.stringify(spiel.zustand);
     if (!zustaendeGleich) throw new Error("Nachspielen ergibt anderen Zustand");
     const ninkasi = spielerin(spiel.zustand);
-    if (spiel.zustand.vorbei) anzahlTode++;
+    if (spiel.zustand.vorbei && spiel.zustand.ergebnis !== "sieg") anzahlTode++;
     console.log(
       `${String(startwert).padStart(9)}  ${String(spiel.befehle.length).padStart(7)}  ${String(spiel.zustand.zeit).padStart(7)}  ` +
       `${String(ninkasi.werte.lp.aktuell).padStart(3)}  ${String(ninkasi.werte.mp.aktuell).padStart(3)}  ${String(ninkasi.werte.pp.aktuell).padStart(3)}  ` +
       `${String(ninkasi.werte.pegel.aktuell).padStart(5)}  ${String(getoetet).padStart(7)}  ` +
-      `${String(getrunkeneBiere).padStart(5)}  ${spiel.zustand.vorbei ? "tot" : "lebt"}, nachgespielt ok`
+      `${String(getrunkeneBiere).padStart(5)}  ${spiel.zustand.ergebnis === "sieg" ? "Sieg in der Arena" : spiel.zustand.vorbei ? "tot" : "lebt"}, nachgespielt ok`
     );
   } catch (fehler) {
     anzahlFehler++;
@@ -561,5 +599,6 @@ const budget = Object.entries(epJeTiefe).sort(([links], [rechts]) => links - rec
 console.log(`EP je Lauf: ${budget}`);
 console.log(`Speichern: ${anzahlGeladen} Läufe mitten im Lauf gespeichert und geladen`);
 console.log(`Testkammer: ${anzahlErzeugt} Mal erzeugt, ${anzahlTiefenwahl} Mal Tiefe gewählt, ${anzahlBewahrt} Mal vor dem Tod bewahrt`);
+console.log(`Arena: ${arenaAusgaenge.sieg} Siege, ${arenaAusgaenge.tod} Tode, ${arenaAusgaenge.offen} offen, ${arenaWellen} Wellen geschafft`);
 console.log(`${anzahlLaeufe} Läufe, ${anzahlTode} tot, ${anzahlFehler} Fehler`);
 process.exitCode = anzahlFehler ? 1 : 0;

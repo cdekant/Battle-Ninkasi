@@ -2,7 +2,7 @@
 
 Titelbildschirm, Fenster nach dem Lauf und die Ideen, die daran hängen; umgesetzt in 0.32.0, Stand 2026-11-21. Der Rahmen (Bildschirme, Fenster, Tasten) steht in [Oberflaeche.md](Oberflaeche.md), das Speichern unter Speichern in [Architektur.md](Architektur.md).
 
-Zuständig für: `src/eingabe/titel.js`, `src/eingabe/chronik.js`, `src/anzeige/titel.js`, `src/anzeige/titelbilder.js`
+Zuständig für: `src/eingabe/titel.js`, `src/eingabe/arenawahl.js`, `src/eingabe/chronik.js`, `src/anzeige/titel.js`, `src/anzeige/titelbilder.js`
 
 Mitprüfen bei Änderungen: [Oberflaeche.md](Oberflaeche.md), [Bedienung.md](Bedienung.md), [Architektur.md](Architektur.md)
 
@@ -108,6 +108,16 @@ Damit die Ideen später ohne Umbau dazukommen:
 + Neuer Lauf aus dem Spielmenü oder nach dem Lauf behält die Spielart
 + Der Platz zeigt die Spielart hinter der Vorschau ("Platz 1: Tiefe 0, Zug 12, 22.11.2026 (Testkammer)"), der Kopf der Seitenleiste ebenso hinter Ort und Zeit
 + Chronik: der Lauf steht mit Spielart in `laeufe`, die Zähler (auch `laeufe`, `tode`, `besiegt.<typ>`, `gesehen.<typ>`) zählen nicht mit, Testen schaltet also keine Titelbilder frei
+
+## Stand der Umsetzung 0.43.0
+
++ Menü: nach Testkammer der Eintrag Arena; er öffnet die Fensterart `arenawahl` (`src/eingabe/arenawahl.js`, Anzeige in `src/anzeige/titel.js`) mit den Arenen aus `daten/arenen.js` (Name, Zahl der Wellen oder die Population), darunter von Hand oder automatisch und bei automatisch die Taktik (Spielart und Aufstellung siehe [Architektur.md](Architektur.md), Spielarten)
++ Bedienung: Buchstabe oder Pfeile und Enter starten, Leertaste schaltet zwischen von Hand und automatisch, Tab wechselt die Taktik (Vorgabe die der Arena), Esc schließt; Klick wählt, der zweite startet; Knöpfe für Leertaste und Tab
++ Start wie Testkammer: ein Platz, sind alle belegt, `laeufe` zum Ersetzen (Zustand mit `spielart` und `zusatz`); die Aktion ist `{ art: "neuesSpiel", stelle, spielart: "arena", arena, automatisch, taktik }`; die gewählte Taktik geht in die Aufstellung (`taktik`), bleibt also im Spielstand
++ Adresse: `?spielart=arena`, dazu `?arena=<name>` (Vorgabe die erste) und `?auto=1`
++ Nach dem Kampf öffnet sich `ende` auch beim Sieg (Titel "Die Arena ist leer", Bilanz mit Wellen und Zügen); statt Neuer Lauf heißt der erste Eintrag Nochmal: dieselbe Aufstellung mit dem nächsten Startwert, wieder automatisch, wenn die Arena so begann; Neustart aus dem Spielmenü behält ebenso die Aufstellung
++ Chronik: Ergebnis "sieg" oder "tod", gezählt wird nicht (`SPIELARTEN_OHNE_ZAEHLER`)
++ Offen: eigene Aufstellungen im Browser (Kurzform in der Befehlszeile wie im Werkzeug, oder ein Fenster zum Zusammenstellen), Varianten der Arenen in der Wahl
 
 ## Offen
 

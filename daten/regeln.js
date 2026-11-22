@@ -19,6 +19,9 @@ export default {
   },
   // KI, siehe src/ki/handlungen.js und src/ki/nutzen.js: Zwecke der Handlung nutzen; benannte Kurven für die Bewertung
   // (Promille), die alle Wesen teilen; Zahlen vorläufig
+  // Spielart "arena", siehe src/systeme/arena.js: Abstand der ersten Welle (Felder nach rechts), Wachzustand der Gegner,
+  // Grenze für Werkzeug und Bot (Befehle bis zum Patt)
+  arena: { abstand: 5, wachzustand: "jagt", grenzeBefehle: 500 },
   ki: {
     zwecke: ["heilen", "angriff"],
     kurven: {

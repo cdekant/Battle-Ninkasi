@@ -214,7 +214,7 @@ Status: offen, festgelegt 2026-11-22; bevor konkrete Inhalte angelegt werden (Ge
 Werkzeuge:
 
 + 1. erledigt in 0.41.0: Spielart "allmächtig" mit Testkammer (siehe [Architektur.md](Architektur.md), Spielarten); offen: ein Feld zum Erzeugen über den Zielmodus wählen, Wesen und Gegenstände entfernen
-+ 2. Arena-Simulation (vorgesehen in [Entwicklung.md](Entwicklung.md), Bot und Werkzeuge): Ninkasi mit Ausrüstung und Skills X gegen Gegner Y, tausendfach; dazu Reihen wie "alle Gegner aus der Population von Tiefe 1 hintereinander" ohne Rast dazwischen; Siegquote, verbrauchte LP, MP und Getränke, Zeit bis zum Sieg; Ausgabe als Tabellen
++ 2. erledigt in 0.43.0: Arena als Spielart von Hand und automatisch, Werkzeug `werkzeuge/arena.js` mit Varianten, Reihen aus der Population und Wilson-Intervall (siehe [Architektur.md](Architektur.md), Spielarten und [Entwicklung.md](Entwicklung.md), Bot und Werkzeuge); offen: eigene Aufstellungen im Browser (siehe [Titelbildschirm.md](Titelbildschirm.md), Stand der Umsetzung 0.43.0), bessere Taktiken (Abstand halten, Engpass suchen), Statistiken über erzeugte Dungeons
 + 3. Kompendium: Vorschlag, noch zu entscheiden: ein Werkzeug für die Entwicklung mit allen Daten als Tabellen und den Lücken (fehlende Tiles, Texte, Grammatik); der Textkorpus als eigener Teil desselben Werkzeugs oder als eigenes Werkzeug (Abdeckung der Texte je Eintrag, siehe [Texte.md](Texte.md)); Bestiarium, Glossar und Lore des Laufs dagegen nicht im Werkzeug, sondern im Spiel für die Spielerin, aus Chronik und Spielstand (siehe [Ausblick.md](Ausblick.md), Bestiarium, Glossar, Rezeptbuch); beide nutzen dieselben Beschreibungsfunktionen, damit Werkzeug und Spiel dasselbe zeigen
 
 Schutz:

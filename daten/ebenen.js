@@ -29,6 +29,37 @@ export default {
       "#####################",
     ],
   },
+  // Arenen der Spielart "arena" (src/systeme/arena.js, daten/arenen.js): ohne Treppen, Ninkasi beginnt links in der
+  // mittleren Zeile, die Gegner stehen ihr gegenüber; ohne Erreichbarkeitsprüfung, die eine Treppe als Ausgang braucht
+  arena_offen: {
+    schritte: ["karte_fest", "ebene_anlegen"],
+    karte: [
+      "###################",
+      "#.................#",
+      "#.................#",
+      "#.................#",
+      "#.................#",
+      "#.................#",
+      "#.................#",
+      "#.................#",
+      "#.................#",
+      "#.................#",
+      "###################",
+    ],
+  },
+  // ein Gang vor einem Raum: Rudel kommen nur einzeln heran
+  arena_gang: {
+    schritte: ["karte_fest", "ebene_anlegen"],
+    karte: [
+      "#####################",
+      "#############.......#",
+      "#############.......#",
+      "#...................#",
+      "#############.......#",
+      "#############.......#",
+      "#####################",
+    ],
+  },
   keller: {
     breite: 120,
     hoehe: 40,

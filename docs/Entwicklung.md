@@ -2,7 +2,7 @@
 
 Stand: 2026-11-22
 
-Zuständig für: `starten.py`, `starten.bat`, `tests/*`, `werkzeuge/bot.js`, `werkzeuge/messung.js`
+Zuständig für: `starten.py`, `starten.bat`, `tests/*`, `werkzeuge/bot.js`, `werkzeuge/messung.js`, `werkzeuge/arena.js`
 
 Mitprüfen bei Änderungen: [Architektur.md](Architektur.md), [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md)
 
@@ -35,7 +35,7 @@ Daten:
 Schnittstellen:
 
 + `node --test` im Hauptverzeichnis
-+ Vorgesehen: Arena-Simulationen (Ninkasi mit Ausrüstung und Skills X gegen Gegner Y, tausendfach; Siegquote, verbrauchte LP, Zeit bis zum Sieg), Statistiken über erzeugte Dungeons je Startwert (Items, Getränke, Gegner pro Ebene, Weglängen), Ausgabe als Tabellen, Auswertung und Diagramme mit Python
++ Arena-Simulation seit 0.43.0 (siehe Bot und Werkzeuge); vorgesehen: Statistiken über erzeugte Dungeons je Startwert (Items, Getränke, Gegner pro Ebene, Weglängen), Ausgabe als Tabellen, Auswertung und Diagramme mit Python
 
 Regeln:
 
@@ -52,13 +52,20 @@ Schnittstellen:
 
 + `node werkzeuge/bot.js [Läufe=20] [Befehle=3000] [erster Startwert=1]`: der dumme Bot spielt mit zufälligen Befehlen, auch über Reise, Laufen, Rasten, Erkunden, Treppen, Fähigkeiten, Werfen, Lernen, Untersuchen und die Klicks aller Fenster
 + `node werkzeuge/messung.js [Gegner] [Befehle] [Startwert] [Türen in Prozent] [Brandherde]`: Leistung bei vielen Gegnern (siehe [Architektur.md](Architektur.md), Leistung)
++ `node werkzeuge/arena.js <Arena | Kurzform> [Kämpfe=1000] [erster Startwert=1] [--taktik name] [--karte name] [--ninkasi variante] [--gegner variante] [--json datei]`: Arena-Simulation; ohne Argument nennt es Arenen und Taktiken; eine Arena aus `daten/arenen.js` läuft mit allen Paaren ihrer Varianten (eine Zeile je Paar), `--ninkasi` und `--gegner` beschränken; die Kurzform nach DCSS ("3 essigbakterium, fernkaempfer_test" ist eine Welle, "/" trennt Wellen) kämpft in `arena_offen` mit der Taktik `nahkampf`; Spielart und Aufstellung siehe [Architektur.md](Architektur.md), Spielarten
++ Exportiert für Tests und spätere Werkzeuge (Machtkurve): `kampfAusfuehren(daten, aufstellung, startwert, taktik?)`, `auswerten(kaempfe)`, `wilson(erfolge, anzahl)`, `quantil(werte, anteil)`, `kurzformLesen(daten, text)`, `variantenpaare(daten, name, wahl)`
 + `node werkzeuge/tiles-ableiten.js`: leitet die kleinen Tile-Sätze ab und schreibt `grafik/tileset.js` (siehe [Tileset.md](Tileset.md))
 
 Regeln:
 
 + Der Bot prüft nach jedem Befehl Invarianten (u.a. kein Wesen mit Lebenswert 0, nichts Getragenes ohne Trägerin, keine verwaisten Zeitereignisse, keine liegengebliebenen Auslöser, räumlicher Index und Heap stimmen, Lernstand ganzzahlig und vollständig verteilt), spielt jeden Lauf aus Startwert und Befehlsliste nach und vergleicht die Zustände; jeden vierten Lauf speichert er mitten im Lauf, lädt ihn und verlangt nach den übrigen Befehlen denselben Zustand; jeder fünfte Lauf (Startwert % 5 = 3) spielt in der Testkammer (siehe [Architektur.md](Architektur.md), Spielarten) mit zufälligem Erzeugen und Tiefenwahl, auch in Tiefen, die es nicht gibt, und verlangt, dass Ninkasi nie stirbt und die Chronik nichts zählt
++ Jeder fünfte Lauf (Startwert % 5 = 4) spielt eine Arena aus `daten/arenen.js` der Reihe nach; jede zweite davon kämpft wie der automatische Kampf im Browser nach der Taktik (eingabe/arenakampf.js) mit gelegentlichen Zufallsbefehlen, die übrigen zufällig; nach dem Lauf zeichnet er das Endfenster und die Wahl der Arena mit allen Schaltern und verlangt nach einem Sieg, dass kein Feind mehr steht
++ Arena-Simulation: Ninkasi kämpft nach einer Taktik (`taktikbefehl`, siehe [Wesen.md](Wesen.md), KI); lehnt die Logik einen Befehl ab, wartet sie (Spalte "abgel."); nach `regeln.arena.grenzeBefehle` Befehlen gilt der Kampf als Patt; jeder Kampf folgt aus seinem Startwert und lässt sich wiederholen
++ Gemessen je Kampf aus den Meldungen: Ausgang (Sieg, Tod, Patt), geschaffte Wellen, Befehle, Zeit in Zeiteinheiten, eigene Züge, LP-Verlust (Anfang minus Ende), Schaden erlitten und ausgeteilt, geheilte LP, MP-Verbrauch, Getränke, Würfe, Fähigkeiten, Treffer (Schadensmeldungen Ninkasis) und Fehlschläge
++ Ausgabe je Zeile: Siegquote mit Wilson-Intervall 95 % (verlässlich auch nahe 0 und 100 %; bei 1000 Kämpfen etwa plus minus 3 Prozentpunkte), Tode, Patt, Zeit und LP-Verlust als Median, P10 und P90 über die Siege, Getränke, Würfe, Fähigkeiten und Ablehnungen im Mittel, Trefferquote; mit `--json` dazu alle Einzelkämpfe samt Startwert für Python
++ Die Taktik spielt einfach und gierig, die Siegquote gilt also für diese Taktik, nicht für eine gute Spielerin; jede Zeile nennt die Taktik (Vorbilder: [Bot für einen Roguelike](https://solodevstack.com/blog/balancing-a-roguelike-with-a-bot-that-plays-1000-games), [Spielstärke der Bots](https://steinmetz.union.edu/node/6383), [Wilson-Intervall](https://www.npmjs.org/package/wilson-score-rank))
 + Erfolg heißt die letzte Zeile `... 0 Fehler`; jeder Fehler nennt Startwert und Befehl, damit er sich mit demselben Aufruf nachstellen lässt
-+ Die Zählungen am Ende (Fähigkeiten, lange Aktionen, Getränke und Würfe der Gegner, Würfe Ninkasis, Meldungen gezeigt, verborgen und gehört, Lernbefehle und Skillstufen, EP je Tiefe nach Herkunft, Erzeugen und Tiefenwahl in der Testkammer) sind keine Prüfung, sondern ein grober Blick auf die Balance
++ Die Zählungen am Ende (Fähigkeiten, lange Aktionen, Getränke und Würfe der Gegner, Würfe Ninkasis, Meldungen gezeigt, verborgen und gehört, Lernbefehle und Skillstufen, EP je Tiefe nach Herkunft, Erzeugen und Tiefenwahl in der Testkammer, Ausgänge und Wellen der Arenen) sind keine Prüfung, sondern ein grober Blick auf die Balance
 
 ## Ablauf einer Version
 
@@ -92,6 +99,7 @@ Der Inhalt ist vorläufig und dient dem Ausprobieren der Systeme; alle Zahlen st
 + Stoffwechsel je Welttick (`daten/ninkasi.js`): LP 0,3 nüchtern, 0,8 bei 1,5 ‰, darüber abnehmend; MP 0,8 nüchtern, 0 ab 3 ‰; PP Schwund 0,3 nüchtern, Stillstand von 0,5 bis 1,5 ‰, dann steigend bis 1,0 bei 4 ‰; danach Abbau des Pegels um 0,01 ‰; Schwellen 0,5, 1, 2 und 3 ‰ werden angezeigt und gemeldet, haben aber noch keine Wirkung; die Leiste zeigt zusätzlich das Optimum der LP
 + Essigbakterium: 15 LP, Biss 1W4 mit Genauigkeit 70, 10 gebundene EP, Verhaltensmodul `jagen`
 + Fernkämpfer-Test (ab 0.15.0, Zeichen F, noch ohne Tile): Testgegner für die KI mit Fähigkeiten, 10 LP, hält 3 Felder Abstand, Säurespucke (Geschoss über Verbündete, Abklingzeit 3) und angekündigter Säureschwall (Kreis mit Radius 1 auf das Feld beim Beginn, 3 Schritte, durch Schaden unterbrechbar, 30 %); trägt ein Bier und trinkt es ab 0.42.0 unter 80 % LP mit 50 % Chance (Handlung `nutzen`, siehe [Wesen.md](Wesen.md), KI)
++ Arenen (ab 0.43.0, `daten/arenen.js`): Essigbakterien (drei, mit Varianten Ninkasi nackt, gerüstet, geübt und Gegner drei oder fünf), Fernkämpfer in zwei Wellen (mit zwei Bier), Rudel im Engpass (sechs Essigbakterien vor dem Gang), Reihe aus dem Keller (sechs Rudel aus Tiefe 1, mit Bier und Brandflaschen, Taktik `fernkampf`), alle Gegner des Kellers; Taktiken `nahkampf` und `fernkampf` (`daten/taktiken.js`); erster Befund mit 200 Kämpfen: drei Essigbakterien besiegt Ninkasi immer, fünf zu etwa 60 %, Ausrüstung und Skills ändern daran wenig; acht Essigbakterien und drei Fernkämpfer nie
 + Bier: +20 LP, Pegel +0,5 ‰, wird zur leeren Flasche; Getränke, Ausrüstung und Verderben siehe [Gegenstaende.md](Gegenstaende.md)
 + Alle Aktionen kosten bisher 100 (`daten/aktionen.js`), abweichend nur Angriffsprofile der Waffen
 + Auslöser sind im System vorhanden, im Spielinhalt aber noch nicht benutzt

@@ -2,7 +2,7 @@
 
 Stand: 2026-11-22
 
-Zuständig für: `src/eingabe/aktionskatalog.js`, `src/eingabe/befehlszeile.js`, `src/eingabe/belegung.js`, `src/eingabe/belegunganpassen.js`, `src/eingabe/charakter.js`, `src/eingabe/eingabe.js`, `src/eingabe/einstellungen.js`, `src/eingabe/einstellungsfenster.js`, `src/eingabe/einstellungskatalog.js`, `src/eingabe/erkunden.js`, `src/eingabe/erstellung.js`, `src/eingabe/esckette.js`, `src/eingabe/faehigkeiten.js`, `src/eingabe/fenster.js`, `src/eingabe/hilfe.js`, `src/eingabe/inventar.js`, `src/eingabe/karte.js`, `src/eingabe/laufen.js`, `src/eingabe/maus.js`, `src/eingabe/menue.js`, `src/eingabe/rasten.js`, `src/eingabe/reise.js`, `src/eingabe/schnellleiste.js`, `src/eingabe/texteingabe.js`, `src/eingabe/verlauf.js`, `src/eingabe/zielmodus.js`, `src/anzeige/fenster.js`, `src/anzeige/charakterfenster.js`, `src/anzeige/systemfenster.js`, `src/anzeige/einstellungsanzeige.js`, `src/systeme/vorschau.js`, `src/systeme/untersuchen.js`
+Zuständig für: `src/eingabe/aktionskatalog.js`, `src/eingabe/befehlszeile.js`, `src/eingabe/belegung.js`, `src/eingabe/belegunganpassen.js`, `src/eingabe/charakter.js`, `src/eingabe/eingabe.js`, `src/eingabe/einstellungen.js`, `src/eingabe/einstellungsfenster.js`, `src/eingabe/einstellungskatalog.js`, `src/eingabe/erkunden.js`, `src/eingabe/arenakampf.js`, `src/eingabe/erstellung.js`, `src/eingabe/esckette.js`, `src/eingabe/faehigkeiten.js`, `src/eingabe/fenster.js`, `src/eingabe/hilfe.js`, `src/eingabe/inventar.js`, `src/eingabe/karte.js`, `src/eingabe/laufen.js`, `src/eingabe/maus.js`, `src/eingabe/menue.js`, `src/eingabe/rasten.js`, `src/eingabe/reise.js`, `src/eingabe/schnellleiste.js`, `src/eingabe/texteingabe.js`, `src/eingabe/verlauf.js`, `src/eingabe/zielmodus.js`, `src/anzeige/fenster.js`, `src/anzeige/charakterfenster.js`, `src/anzeige/systemfenster.js`, `src/anzeige/einstellungsanzeige.js`, `src/systeme/vorschau.js`, `src/systeme/untersuchen.js`
 
 Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Oberflaeche.md](Oberflaeche.md), [Titelbildschirm.md](Titelbildschirm.md), [Charakter.md](Charakter.md), [Gegenstaende.md](Gegenstaende.md), [Animationen.md](Animationen.md), [Welt.md](Welt.md), [Architektur.md](Architektur.md)
 
@@ -35,7 +35,7 @@ Schnittstellen:
 Regeln:
 
 + Vorgabe für die Bewegung seit 0.28.0 nach den vi-Tasten der Roguelikes, nach der Lage der Taste: h j k l für links, unten, oben, rechts, y u b n für die Diagonalen (auf der deutschen Tastatur liegt y auf der Aufschrift Z, Code `KeyY`), `.` wartet; Ziffernblock (5 wartet) und Pfeiltasten bleiben belegt; Umschalt plus Richtung läuft
-+ Weitere Tasten: Leertaste setzt eine unterbrochene lange Aktion fort (`fortsetzen`), r rastet bis voll, o erkundet automatisch, i öffnet das Inventarfenster (siehe [Gegenstaende.md](Gegenstaende.md), Inventar), f das Fähigkeitenfenster, c Charakter und Skills, Tab den Verlauf, ? die Hilfe, x untersucht, `<` oder `>` nimmt die Treppe, `:` öffnet die Befehlszeile, 1 bis 0 die Plätze der Schnellleiste, Umschalt+1 bis 5 wechselt die Leiste (auch bei offenem Fenster), d lässt fallen und w wirft (beide über das Inventar), m öffnet die Übersichtskarte, Esc die Esc-Kette; die Hilfe nennt Buchstaben klein, wie sie ohne Umschalt getippt werden
++ Weitere Tasten: Leertaste setzt eine unterbrochene lange Aktion fort (`fortsetzen`), r rastet bis voll, o erkundet automatisch, a kämpft in der Arena automatisch, i öffnet das Inventarfenster (siehe [Gegenstaende.md](Gegenstaende.md), Inventar), f das Fähigkeitenfenster, c Charakter und Skills, Tab den Verlauf, ? die Hilfe, x untersucht, `<` oder `>` nimmt die Treppe, `:` öffnet die Befehlszeile, 1 bis 0 die Plätze der Schnellleiste, Umschalt+1 bis 5 wechselt die Leiste (auch bei offenem Fenster), d lässt fallen und w wirft (beide über das Inventar), m öffnet die Übersichtskarte, Esc die Esc-Kette; die Hilfe nennt Buchstaben klein, wie sie ohne Umschalt getippt werden
 + `aktionDerTaste` sucht in dieser Reihenfolge: Umschalt-Tasten (gehen allem vor), Zeichen (gehen den physischen Tasten vor), Tasten, weitere Tasten
 + Buchstaben in den Fenstern gelten nach dem Zeichen der Taste (`KeyboardEvent.key`, `buchstabeDerTaste` in `src/eingabe/inventar.js`), so passen sie zu jeder Tastaturbelegung; die Belegung selbst nennt physische Tasten (`KeyboardEvent.code`)
 + Offene Fenster und der Zielmodus bekommen jede Taste, bevor die Belegung greift; während ein Fenster Text oder eine Taste aufnimmt, fängt `src/main.js` weder `?` noch Umschalt+Ziffer ab
@@ -50,12 +50,12 @@ Regeln:
 Daten:
 
 + Klickregeln (`KLICKREGELN` in `src/eingabe/maus.js`), geordnet, die erste passende greift: `aufheben` (eigenes Feld mit Gegenstand), `angreifen` (angrenzender sichtbarer Feind), `reisen` (sonst); weitere Regeln (Kessel, Händler) kommen in die Liste
-+ Ablauf: Zustand in `src/main.js`, je Art ein Kern ohne Timer und DOM: Reise (`src/eingabe/reise.js`), Laufen (`src/eingabe/laufen.js`, mit `bemerkt`), Rasten (`src/eingabe/rasten.js`), Erkunden (`src/eingabe/erkunden.js`)
++ Ablauf: Zustand in `src/main.js`, je Art ein Kern ohne Timer und DOM: Reise (`src/eingabe/reise.js`), Laufen (`src/eingabe/laufen.js`, mit `bemerkt`), Rasten (`src/eingabe/rasten.js`), Erkunden (`src/eingabe/erkunden.js`), automatischer Kampf in der Arena (`src/eingabe/arenakampf.js`, seit 0.43.0)
 + Einstellungen dazu: `reisePause` (Takt), `reiseTrotzFeinden`, `reiseHalt` (Vorgabe `gegner_in_sicht`, `schaden`, `gegenstand`), `rastenBis` (Vorgabe LP und MP), `rastenTrotzFeinden`, `rastenHalt` (`gegner_in_sicht`, `schaden`), `rastenHoechstens` (1000)
 
 Schnittstellen:
 
-+ `klickDeuten(spiel, feld, regeln)`; je Ablauf ein Beginn und ein Schritt: `reiseBeginnen`/`naechsterReiseschritt`, `laufenBeginnen`/`naechsterLaufschritt` (dazu `bemerkenswerteNachbarn`), `rastenBeginnen`/`naechsterRastschritt`, `erkundenBeginnen`/`naechsterErkundungsschritt`; jeder Schritt liefert einen gewöhnlichen Befehl oder einen Haltegrund
++ `klickDeuten(spiel, feld, regeln)`; je Ablauf ein Beginn und ein Schritt: `reiseBeginnen`/`naechsterReiseschritt`, `laufenBeginnen`/`naechsterLaufschritt` (dazu `bemerkenswerteNachbarn`), `rastenBeginnen`/`naechsterRastschritt`, `erkundenBeginnen`/`naechsterErkundungsschritt`, `arenakampfBeginnen`/`naechsterArenaschritt` (dazu `arenataktik`); jeder Schritt liefert einen gewöhnlichen Befehl oder einen Haltegrund
 + `unterwegsPruefen(spiel, ablauf, haltgruende)` in `src/eingabe/reise.js`: die Prüfung nach jedem Schritt, gemeinsam für alle Abläufe (Gefahrenprüfungen aus dem Register `gefahren`, siehe [Welt.md](Welt.md), Gefahrenprüfung)
 + Erkunden nutzt die Breitensuche `naechstesFeldMit` in `src/welt/wege.js`
 
@@ -69,6 +69,7 @@ Regeln:
 + Laufen (Umschalt plus Richtung) geht geradeaus; beginnt nicht vor einem Hindernis (`versperrt`); hält wie die Reise, vor einem Hindernis (`hindernis`) oder Wesen (`versperrt`), vor einer bekannten Falle oder Gefahr (`gefahr_voraus`) und wenn neben Ninkasi eine Tür, eine Treppe oder ein Gegenstand neu in Reichweite kommt (`bemerkenswert`; schon Bemerktes hält nicht noch einmal); das Halten an Abzweigungen in Gängen fehlt noch
 + Rasten wartet, bis die Vorräte aus `rastenBis` voll sind; beginnt seit 0.28.0 auch mit bekannten Feinden in Sicht (`rastenTrotzFeinden`), nicht aber, wenn schon alles voll ist; hält bei `rastenHalt` und nach höchstens `rastenHoechstens` Schritten, falls sich nichts mehr füllt (z.B. MP bei hohem Pegel)
 + Erkunden geht zum nächsten bekannten Feld am Rand des nie Gesehenen, nur über bekannte Felder (ein kartiertes, ungesehenes Gebiet wird also auch erkundet), nächster Rand per Breitensuche, bei jedem Schritt neu gewählt; hält wie die Reise und wenn nichts mehr zu erkunden ist
++ Automatischer Kampf (Aktion `autokampf`, Taste a): nur in der Arena (sonst "keine_arena"); jeder Schritt ist der Befehl der Taktik aus der Aufstellung (`optionen.arena.taktik`, siehe [Wesen.md](Wesen.md), KI), handlungsunfähig wartet Ninkasi; hält, wenn der Lauf vorbei ist, und wie jeder Ablauf bei jeder Taste; a beginnt wieder, so lässt sich jederzeit zwischen Hand und Automatik wechseln; im Takt `reisePause`; beginnt die Arena automatisch (siehe [Titelbildschirm.md](Titelbildschirm.md), Stand der Umsetzung 0.43.0), läuft er gleich nach dem Start
 + Im Zielmodus setzt die Maus den Cursor, ein Klick bestätigt; der Tooltip zeigt beim Darüberfahren die Kurzfassung des Feldes (siehe Untersuchen)
 
 ## Fenster
@@ -215,7 +216,7 @@ Regeln:
 
 ## Tests
 
-+ `tests/aktionskatalog.test.js` (Katalog, Belegung, Übersetzen), `tests/einstellungen.test.js` (Katalog, eigene Belegung), `tests/fenster.test.js` und `tests/fensterklick.test.js` (Fensterstapel, Fensterarten, Klicks über `data-taste` und `data-ziel`), `tests/oberflaeche.test.js` (Esc-Kette, Menü, Verlauf, dazu Log, Seitenleiste und Minikarte aus [Anzeige.md](Anzeige.md)), `tests/schnellleiste.test.js`, `tests/zielmodus.test.js` (Cursor, Zielvorgabe, Vorschau), `tests/untersuchen.test.js`, `tests/ablaeufe.test.js` (Reise, Laufen, Rasten, Erkunden)
++ `tests/aktionskatalog.test.js` (Katalog, Belegung, Übersetzen), `tests/einstellungen.test.js` (Katalog, eigene Belegung), `tests/fenster.test.js` und `tests/fensterklick.test.js` (Fensterstapel, Fensterarten, Klicks über `data-taste` und `data-ziel`), `tests/arena.test.js` (automatischer Kampf), `tests/oberflaeche.test.js` (Esc-Kette, Menü, Verlauf, dazu Log, Seitenleiste und Minikarte aus [Anzeige.md](Anzeige.md)), `tests/schnellleiste.test.js`, `tests/zielmodus.test.js` (Cursor, Zielvorgabe, Vorschau), `tests/untersuchen.test.js`, `tests/ablaeufe.test.js` (Reise, Laufen, Rasten, Erkunden)
 + Der Bot benutzt Abläufe, Zielmodus, Untersuchen und alle Fenster am echten Spielstand (siehe [Entwicklung.md](Entwicklung.md), Bot und Werkzeuge)
 
 ## Verweise

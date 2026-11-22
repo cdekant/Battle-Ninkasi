@@ -25,6 +25,7 @@ const ARTEN = [
   "ausloeserquellen",   // weitere Auslöser einer Entität nach Zuständen und Ausrüstung: (spiel, entitaet) => [{ ausloeser, schluessel }]
   "lernanlaesse",       // Lernanlässe der Skills (systeme/lernen.js): { beschreibung }; Daten nennen sie in lernt
   "planschritte",       // Schritte des Plans des Laufs (welt/plan.js): (spiel, plan, zufall) => void, beim Start nacheinander
+  "laufbeginn",         // beim Start nach dem Einrichten Ninkasis (kern/spiel.js neuesSpiel): (spiel, ninkasi) => void, z.B. Arena
   "ebenenschritte",     // Schritte der Ebenenerzeugung (welt/ebene.js): { braucht, liefert, verwirft?, ausfuehren(spiel, bau) }
   "mitnehmen",          // wer beim Ebenenwechsel mitkommt (systeme/ebenen.js): (spiel, ninkasi, wechsel) => [id]
   "kihandlungen",       // Handlungen der KI (ki/handlungen.js): { parameter, befehl(spiel, wesen, beute, eintrag) }

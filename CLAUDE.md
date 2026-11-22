@@ -31,13 +31,13 @@ Taste → `eingabe/eingabe.js` (Belegung → Aktion aus dem Aktionskatalog) → 
 + `index.html`, `src/main.js`: Einstieg im Browser, verdrahtet Logik, Anzeige und Eingabe; `src/version.js` einzige Quelle der Versionsnummer
 + `src/kern/`: Spiel und Eingangstür (`spiel.js`), Zustand, Zeit, Zufall und Würfe, Ereignisse und Haken, Register, Vorgang, Werte, Kurven, Effektsystem und Grundbausteine, Auslöser, Datenprüfung
 + `src/systeme/`: die Mechanik je Thema (Kampf, Bewegung, Zustände, Fähigkeiten, Inventar, Gelände, Wahrnehmung, Skills, Lernen u.a.); melden sich beim Import in Registern an (`systeme/index.js`)
-+ `src/ki/`: Verhaltensmodule (`abwarten`, `jagen`, `fliehen`), Handlungen mit Bewertung, Nutzen nach Zweck, Verfolgen, Vorrang, Zielwahl, Schrittwahl
++ `src/ki/`: Verhaltensmodule (`abwarten`, `jagen`, `fliehen`), Handlungen mit Bewertung, Nutzen nach Zweck, Taktik der gesteuerten Entität, Verfolgen, Vorrang, Zielwahl, Schrittwahl
 + `src/welt/`: Plan des Laufs, Erzeugung der Ebenen in Schritten, Population, Karte, Feldschichten, Wegfindung, Geometrie
 + `src/eingabe/`: Aktionskatalog, Belegung, Fensterstapel und Fensterarten, Maus, Abläufe (Reise, Laufen, Rasten, Erkunden), Zielmodus, Einstellungen, Speicherstand; reine Tastenlogik ohne DOM
 + `src/anzeige/`: Renderer, Tilebilder, Kamera, Seitenleiste, Log, Fensterinhalte, Titel, Texte und Grammatik, `stil.css`
 + `daten/`: Inhalte als JS-Daten, gesammelt in `daten/index.js`; Regelwerte für das Balancing in `daten/regeln.js`
 + `sprache/`: Texte, Grammatik und Korpus je Sprache; `grafik/`: Palette und Tiles als Pixeldaten; `lib/`: rot.js mit Lizenz
-+ `tests/`: Unittests, `tests/hilfen.js` baut kleine Testspiele; `werkzeuge/`: Bot, Messung, Ableiten der Tiles
++ `tests/`: Unittests, `tests/hilfen.js` baut kleine Testspiele; `werkzeuge/`: Bot, Messung, Arena-Simulation, Ableiten der Tiles
 + `Artwork/`: Konzeptbilder (siehe unten)
 
 ## Grundbegriffe

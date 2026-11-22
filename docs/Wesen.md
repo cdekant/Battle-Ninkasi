@@ -2,7 +2,7 @@
 
 Stand: 2026-11-22
 
-Zuständig für: `src/systeme/kampf.js`, `src/systeme/kampfzustand.js`, `src/systeme/fraktionen.js`, `src/systeme/wahrnehmung.js`, `src/systeme/bewegung.js`, `src/systeme/verschieben.js`, `src/systeme/werfen.js`, `src/systeme/skills.js`, `src/systeme/lernen.js`, `src/systeme/stoffwechsel.js`, `src/ki/*`, `daten/gegner.js`, `daten/ninkasi.js`, `daten/fraktionen.js`, `daten/schadensarten.js`, `daten/eigenschaften.js`, `daten/skills.js`, `daten/wurfgegenstaende.js`
+Zuständig für: `src/systeme/kampf.js`, `src/systeme/kampfzustand.js`, `src/systeme/fraktionen.js`, `src/systeme/wahrnehmung.js`, `src/systeme/bewegung.js`, `src/systeme/verschieben.js`, `src/systeme/werfen.js`, `src/systeme/skills.js`, `src/systeme/lernen.js`, `src/systeme/stoffwechsel.js`, `src/ki/*`, `daten/gegner.js`, `daten/ninkasi.js`, `daten/fraktionen.js`, `daten/schadensarten.js`, `daten/eigenschaften.js`, `daten/skills.js`, `daten/wurfgegenstaende.js`, `daten/taktiken.js`
 
 Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Charakter.md](Charakter.md), [Grundlagen.md](Grundlagen.md), [Ausblick.md](Ausblick.md)
 
@@ -143,6 +143,7 @@ Schnittstellen:
 + Zielwahl `naechstesSichtbaresZiel`, `istZielFuer` (`src/ki/ziele.js`); Schrittwahl `schrittWeg` (`src/ki/schritte.js`) für Flucht und Abstand
 + `src/ki/handlungen.js`: `handlungWaehlen(spiel, wesen, ki, beute)` (Befehl, `VERFOLGEN` oder `null`), `wertung`; Register `kihandlungen` (`{ parameter, befehl(spiel, wesen, beute, eintrag) }`, ohne Nebenwirkungen, weil die Wahl alle Einträge fragt) und `kieingaben` (`(spiel, wesen, beute) => ganze Zahl`)
 + `faehigkeitsbefehl` (`src/ki/faehigkeitenwahl.js`): der Befehl einer Fähigkeit gegen die Beute oder `null`
++ `taktikbefehl(spiel, taktik)` (`src/ki/taktik.js`, seit 0.43.0): der Befehl, mit dem die gesteuerte Entität nach einer Taktik aus `daten/taktiken.js` kämpft (`{ text, handlungen, wahl? }` im Format der Handlungen, geprüft wie die KI eines jagenden Wesens); Beute ist der nächste sichtbare Feind, die Wahl läuft über `handlungWaehlen`, kommt keine Handlung in Frage oder heißt sie `verfolgen`, setzt sie nach und greift an (`verfolgungsbefehl` mit einer Wegwerf-KI, der Zustand bleibt unberührt); sieht sie keinen Feind, geht sie zum nächsten, den es gibt, sonst wartet sie; genutzt vom automatischen Kampf in der Arena, vom Werkzeug `werkzeuge/arena.js` und vom Bot (siehe [Architektur.md](Architektur.md), Spielarten); Taktiken vorläufig `nahkampf` (trinkt unter 40 % LP, sonst Nahkampf) und `fernkampf` (dazu ab Abstand 2 `nutzen` mit Zweck `angriff`: Fähigkeiten, dann Würfe; dafür trägt die `testfaehigkeit` den Zweck `angriff`)
 + `nutzbefehl(spiel, wesen, zweck, beute)` (`src/ki/nutzen.js`): der Befehl für `nutzen` oder `null`; Register `nutzungen` (`{ feld, befehl(spiel, wesen, beute, gegenstand) }`, ohne Nebenwirkungen): ein Gegenstand dient einem Zweck über eine Nutzung, wenn `gegenstand[feld].zweck` ihn enthält; angemeldet von den Systemen, die den Befehl kennen: `trinken` (Feld `trinkbar`, `src/systeme/inventar.js`), `werfen` (Feld `wurf`, `src/systeme/werfen.js`)
 + `verfolgungsbefehl`, `angriffDaneben` (`src/ki/verfolgen.js`); `geltenderVorrang`, `vorrangBefehl` (`src/ki/vorrang.js`)
 + `kiVon` (`src/kern/zustand.js`) liefert die wirksame KI, auch eine überlagerte
@@ -256,7 +257,7 @@ Regeln:
 
 ## Tests
 
-+ `tests/kampf.test.js` (Trefferwurf, Blocken, Krit, Schadensrechnung, Profile), `tests/fraktionen.test.js` (Beziehungen, Zorn, Ruf, Kampfzustand, Beistand), `tests/wahrnehmung.test.js` (Wachzustand, Bemerken, Lärm, Hinterhalt), `tests/faehigkeitenwahl.test.js`, `tests/verhalten.test.js`, `tests/handlungen.test.js` und `tests/nutzen.test.js` (KI), `tests/verschieben.test.js` (Bewegungsarten, Stoßen, Ziehen, Tauschen, Teleportieren, Lage, Werfen), `tests/wege.test.js`, `tests/stoffwechsel.test.js`, `tests/skills.test.js` und `tests/lernen.test.js`
++ `tests/kampf.test.js` (Trefferwurf, Blocken, Krit, Schadensrechnung, Profile), `tests/fraktionen.test.js` (Beziehungen, Zorn, Ruf, Kampfzustand, Beistand), `tests/wahrnehmung.test.js` (Wachzustand, Bemerken, Lärm, Hinterhalt), `tests/faehigkeitenwahl.test.js`, `tests/verhalten.test.js`, `tests/handlungen.test.js`, `tests/nutzen.test.js` und `tests/arena.test.js` (KI, Taktik), `tests/verschieben.test.js` (Bewegungsarten, Stoßen, Ziehen, Tauschen, Teleportieren, Lage, Werfen), `tests/wege.test.js`, `tests/stoffwechsel.test.js`, `tests/skills.test.js` und `tests/lernen.test.js`
 
 ## Verweise
 

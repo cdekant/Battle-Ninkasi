@@ -83,7 +83,7 @@ Daten:
 Schnittstellen (`src/welt/plan.js`):
 
 + `laufPlanen(spiel)` in `neuesSpiel` nach den Etiketten und vor der ersten Ebene; `ebenennameFuer(zustand, tiefe)` (null, wenn es die Tiefe nicht gibt), `planEintragFuer(zustand, tiefe)`
-+ Register `planschritte`: `(spiel, plan, zufall) => void`, in Anmeldereihenfolge mit einem gemeinsamen Zufall `"plan"`; bisher `abfolge`, der `daten.abfolge` und `daten.starttiefe` überträgt, und `testkammer`, der im allmächtigen Lauf die Vorlage einer Tiefe ersetzt und dort beginnen lässt (siehe [Architektur.md](Architektur.md), Spielarten)
++ Register `planschritte`: `(spiel, plan, zufall) => void`, in Anmeldereihenfolge mit einem gemeinsamen Zufall `"plan"`; bisher `abfolge`, der `daten.abfolge` und `daten.starttiefe` überträgt, `testkammer`, der im allmächtigen Lauf die Vorlage einer Tiefe ersetzt und dort beginnen lässt, und `arena`, der in der Arena nur die Tiefe 0 mit ihrer Karte plant (beide siehe [Architektur.md](Architektur.md), Spielarten)
 
 Regeln:
 

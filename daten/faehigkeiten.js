@@ -6,7 +6,7 @@
 export default {
   // Vorläufig für Ninkasi: Fläche auf ein Feld in Sicht, Trefferwurf je Wesen, sie selbst bleibt verschont
   testfaehigkeit: {
-    text: "faehigkeit.testfaehigkeit", tags: ["magie"], verbrauch: { mp: 10 }, abklingzeit: 2,
+    text: "faehigkeit.testfaehigkeit", zweck: ["angriff"], tags: ["magie"], verbrauch: { mp: 10 }, abklingzeit: 2,
     ziel: { art: "feld", reichweite: 6, muster: { art: "kreis", radius: 1 }, trifft: "wesen", ohneUrheber: true }, wirkung: "testfaehigkeit",
   },
   // Geschoss über Verbündete hinweg, mit Trefferwurf

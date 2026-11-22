@@ -62,21 +62,31 @@ export function populationSetzen(spiel, bau, zufall) {
   if (platzierung.ausgefallen) melden(spiel, "population_voll", { wesen: null, hoechstWesen, ausgefallen: platzierung.ausgefallen });
 }
 
+// Ein Wurf auf eine Populationstabelle: gelegentlich aus der Tiefe (regeln.population.tieferChance), gewichtet unter
+// den Einträgen der Tiefe, dazu die Größe des Rudels; { eintrag, rudel } oder null, wenn die Tiefe nichts hat.
+// Auch für die Wellen der Arena (systeme/arena.js)
+export function rudelZiehen(spiel, tabelle, tiefe, zufall) {
+  const regeln = spiel.daten.regeln.population;
+  let zugTiefe = tiefe;
+  if (regeln.tieferChance > 0 && mitProzentChance(zufall, regeln.tieferChance)) zugTiefe += zufallsGanzzahl(zufall, 1, regeln.tieferBis);
+  let kandidaten = eintraegeFuerTiefe(tabelle, zugTiefe);
+  if (!kandidaten.length) kandidaten = eintraegeFuerTiefe(tabelle, tiefe);
+  if (!kandidaten.length) return null;
+  const eintrag = gewichtetZiehen(zufall, kandidaten);
+  return { eintrag, rudel: rudelgroesse(zufall, eintrag) };
+}
+
+export const rudelgroesse = (zufall, eintrag) => (eintrag.rudel ? zufallsGanzzahl(zufall, eintrag.rudel[0], eintrag.rudel[1]) : 1);
+
 function tabelleSetzen(spiel, bau, zufall, gegnerSetzen) {
   const population = bau.ebenendaten.population;
   const tabelle = spiel.daten.populationen[population.tabelle];
-  const regeln = spiel.daten.regeln.population;
   let offen = zufallsGanzzahl(zufall, population.anzahl[0], population.anzahl[1]);
   for (let versuch = 0; offen > 0 && versuch < 1000; versuch++) {
-    // gelegentlich ein Gegner aus der Tiefe
-    let zugTiefe = bau.tiefe;
-    if (regeln.tieferChance > 0 && mitProzentChance(zufall, regeln.tieferChance)) zugTiefe += zufallsGanzzahl(zufall, 1, regeln.tieferBis);
-    let kandidaten = eintraegeFuerTiefe(tabelle, zugTiefe);
-    if (!kandidaten.length) kandidaten = eintraegeFuerTiefe(tabelle, bau.tiefe);
+    const gezogen = rudelZiehen(spiel, tabelle, bau.tiefe, zufall);
     // nichts für diese Tiefe: der Wurf fällt aus, der nächste versucht es wieder (höchstens 1000 Versuche)
-    if (!kandidaten.length) continue;
-    const eintrag = gewichtetZiehen(zufall, kandidaten);
-    const rudel = eintrag.rudel ? zufallsGanzzahl(zufall, eintrag.rudel[0], eintrag.rudel[1]) : 1;
+    if (!gezogen) continue;
+    const { eintrag, rudel } = gezogen;
     let anfuehrerin = null;
     for (let mitglied = 0; mitglied < Math.min(rudel, offen); mitglied++) {
       const feld = anfuehrerin ? freiesFeldNahe(bau, anfuehrerin.position) : freiesFeldZiehen(bau, zufall);

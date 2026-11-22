@@ -12,7 +12,7 @@ export const SPEICHERSCHLUESSEL_CHRONIK = "battle-ninkasi.chronik";
 export const CHRONIK_FORMAT = 1;
 export const HOECHSTENS_LAEUFE = 500; // älteste Einträge fallen heraus, die Zähler bleiben
 
-export const SPIELARTEN_OHNE_ZAEHLER = ["allmaechtig"];
+export const SPIELARTEN_OHNE_ZAEHLER = ["allmaechtig", "arena"];
 
 // Ob der Lauf in die Zähler eingeht
 export function zaehltMit(spiel) {

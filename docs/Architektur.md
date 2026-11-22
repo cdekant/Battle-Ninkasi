@@ -2,7 +2,7 @@
 
 Stand: 2026-11-22
 
-Zuständig für: `index.html`, `package.json`, `lib/*`, `src/main.js`, `src/version.js`, `src/kern/spiel.js`, `src/kern/zustand.js`, `src/kern/zeit.js`, `src/kern/zufall.js`, `src/kern/wurf.js`, `src/kern/ereignisse.js`, `src/kern/hakenkatalog.js`, `src/kern/register.js`, `src/kern/daten.js`, `src/kern/raumindex.js`, `src/kern/kurven.js`, `src/systeme/index.js`, `src/systeme/allmacht.js`, `src/eingabe/speicherstand.js`, `daten/index.js`, `daten/regeln.js`, `daten/aktionen.js`
+Zuständig für: `index.html`, `package.json`, `lib/*`, `src/main.js`, `src/version.js`, `src/kern/spiel.js`, `src/kern/zustand.js`, `src/kern/zeit.js`, `src/kern/zufall.js`, `src/kern/wurf.js`, `src/kern/ereignisse.js`, `src/kern/hakenkatalog.js`, `src/kern/register.js`, `src/kern/daten.js`, `src/kern/raumindex.js`, `src/kern/kurven.js`, `src/systeme/index.js`, `src/systeme/allmacht.js`, `src/systeme/arena.js`, `src/eingabe/speicherstand.js`, `daten/index.js`, `daten/arenen.js`, `daten/regeln.js`, `daten/aktionen.js`
 
 Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Entwicklung.md](Entwicklung.md), [Titelbildschirm.md](Titelbildschirm.md), [Grundlagen.md](Grundlagen.md), [Texte.md](Texte.md), [Ausblick.md](Ausblick.md), [Welt.md](Welt.md), [Bedienung.md](Bedienung.md)
 
@@ -139,7 +139,7 @@ Regeln:
 
 Daten (`src/kern/register.js`): feste Liste der Registerarten, jede eine Zuordnung Name → Eintrag:
 
-+ `befehle` (`{ pruefen, ausfuehren, ohneZeit? }`), `bausteine` (`(spiel, kontext, parameter) => void`), `ki` (`(spiel, akteur, ki) => befehl`), `modifikatorquellen` (`(spiel, entitaet) => [modifikator]`), `modifikatorbedingungen`, `befehlsveraenderer`, `zielmuster` (`(spiel, auswahl, parameter) => [{x, y}]`), `welttick`, `zeitereignisse`, `haken` (Listen je Name), `gefahren`, `zustandspruefungen` (`(spiel) => true`, wenn sie etwas verändert haben), `laufendeaktionen`, `beimErzeugen`, `ausDaten` (siehe Entitäten und Komponenten), `ausloeserquellen`, `lernanlaesse`, `planschritte` (`(spiel, plan, zufall) => void`), `ebenenschritte` (`{ braucht, liefert, verwirft?, ausfuehren }`) und `mitnehmen` (`(spiel, ninkasi, wechsel) => [id]`), siehe [Welt.md](Welt.md), Plan des Laufs und [Welt.md](Welt.md), Ebenen; `kihandlungen`, `kieingaben` und `nutzungen`, siehe [Wesen.md](Wesen.md), KI
++ `befehle` (`{ pruefen, ausfuehren, ohneZeit? }`), `bausteine` (`(spiel, kontext, parameter) => void`), `ki` (`(spiel, akteur, ki) => befehl`), `modifikatorquellen` (`(spiel, entitaet) => [modifikator]`), `modifikatorbedingungen`, `befehlsveraenderer`, `zielmuster` (`(spiel, auswahl, parameter) => [{x, y}]`), `welttick`, `zeitereignisse`, `haken` (Listen je Name), `gefahren`, `zustandspruefungen` (`(spiel) => true`, wenn sie etwas verändert haben), `laufendeaktionen`, `beimErzeugen`, `ausDaten` (siehe Entitäten und Komponenten), `laufbeginn` (`(spiel, ninkasi) => void`, in `neuesSpiel` nach dem Einrichten Ninkasis, siehe Spielarten), `ausloeserquellen`, `lernanlaesse`, `planschritte` (`(spiel, plan, zufall) => void`), `ebenenschritte` (`{ braucht, liefert, verwirft?, ausfuehren }`) und `mitnehmen` (`(spiel, ninkasi, wechsel) => [id]`), siehe [Welt.md](Welt.md), Plan des Laufs und [Welt.md](Welt.md), Ebenen; `kihandlungen`, `kieingaben` und `nutzungen`, siehe [Wesen.md](Wesen.md), KI
 
 Schnittstellen:
 
@@ -210,7 +210,7 @@ Vorbilder: DCSS (Wizard Mode zum Prüfen, Läufe darin zählen nicht), NetHack (
 
 Daten:
 
-+ `optionen.spielart` (Liste `SPIELARTEN` in `src/kern/spiel.js`: "normal" als Vorgabe und "allmaechtig" seit 0.41.0; eine unbekannte wirft)
++ `optionen.spielart` (Liste `SPIELARTEN` in `src/kern/spiel.js`: "normal" als Vorgabe, "allmaechtig" seit 0.41.0, "arena" seit 0.43.0; eine unbekannte wirft)
 + Regelwerte `regeln.allmacht`: `kammer` (Ebene aus `daten/ebenen.js`, "testkammer", ein leerer Raum mit Treppe hinab) und `tiefe` (0, sonst der Hub); geprüft beim Laden
 
 Schnittstellen (`src/systeme/allmacht.js`, seit 0.41.0):
@@ -229,6 +229,20 @@ Regeln:
 + Erzeugen und Tiefe wählen gehen nur an Ninkasi selbst und laufen wie alles über die Eingangstür, sie stehen also in der Aufzeichnung
 + Getrennte Wertung: die Chronik trägt den Lauf mit seiner Spielart ein, die Zähler zählen nicht mit (siehe [Titelbildschirm.md](Titelbildschirm.md), Stand der Umsetzung 0.41.0)
 + Bedienung: Erzeugen und Tiefen über die Befehlszeile (siehe [Bedienung.md](Bedienung.md), Eingabe)
+
+Arena (seit 0.43.0, `src/systeme/arena.js`; Vorbild DCSS mit `crawl -arena "3 rat v 2 kobold"`):
+
++ `optionen.spielart: "arena"` mit `optionen.arena`, der Aufstellung: `{ name?, varianten?, karte, taktik?, abstand?, wachzustand?, start?: { x, y }, ninkasi?: { eigenschaften?, skills?: { name: stufe }, ausruestung?: [typ], gepaeck?: [{ typ, anzahl? }], werte?: { name: wert } }, wellen?: [[{ typ, anzahl? }]], population?: { tabelle?, tiefe, wellen?, alle? } }`; geprüft beim Laden der Daten und beim Start (`arenaFehler` in `src/kern/daten.js`), ein Fehler wirft
++ Benannte Aufstellungen in `daten/arenen.js`, dazu `text` und `varianten: { ninkasi?: { name: Teil von ninkasi }, gegner?: { name: { wellen?, population? } } }`; `aufstellungAus(daten, name, { ninkasi?, gegner? })` macht daraus die Startoption (Ninkasis Variante ergänzt ihren Teil, die der Gegner ersetzt Wellen und Population)
++ Karten in `daten/ebenen.js`: `arena_offen` (offener Raum) und `arena_gang` (Gang vor einem Raum), feste Karten ohne Treppen und ohne Erreichbarkeitsprüfung (`schritte: ["karte_fest", "ebene_anlegen"]`)
++ Regelwerte `regeln.arena`: `abstand` (5, Felder der ersten Welle rechts von Ninkasi), `wachzustand` ("jagt"), `grenzeBefehle` (500, Patt für Werkzeug und Bot)
++ Planschritt `arena`: der Plan hat nur die Tiefe 0 mit der Karte der Aufstellung
++ Laufbeginn (Register `laufbeginn`): Ninkasi steht auf `start` (Vorgabe das erste begehbare Feld der mittleren Zeile von links), bekommt die Eigenschaften, die Skills bis zur Stufe (über die EP, Voraussetzungen gelten, sonst wirft der Start), das Gepäck, die angelegte Ausrüstung (über die Regeln des Befehls `anlegen`) und die Anfangswerte; die Wellen stehen danach fest in `zustand.arena = { welle, wellen }`: erst die festen, dann aus der Population mit dem Zufall `"arena"` (`alle`: jeder Eintrag der Tiefe einmal mit gewürfelter Rudelgröße, `wellen`: so viele Rudel, gezogen wie in einer Ebene, siehe [Welt.md](Welt.md), Ebenen); ohne Tabelle die der Ebene, die `daten.abfolge` an der Tiefe nennt
++ Die erste Welle steht `abstand` Felder rechts von Ninkasi, jede weitere ihr gegenüber (an der Mitte der Karte gespiegelt), je Wesen das nächste freie Feld, das es jetzt betreten kann; Wachzustand nach `wachzustand`; Affixe würfeln mit dem Wurf `arena_affix`; die Obergrenze der Population gilt
++ Zustandsprüfung `arena`: lebt kein Feind Ninkasis mehr, kommt die nächste Welle ohne Rast (Meldung `arena_welle { welle, von }`); nach der letzten endet der Lauf mit `zustand.ergebnis = "sieg"` (Meldung `arena_sieg { wellen }`); der Tod endet ihn wie sonst, ohne Ergebnis
++ `istArena(spiel)`, `feindeInDerArena(spiel)`
++ Wer Ninkasi steuert, weiß die Logik nicht: von Hand, automatisch im Browser (siehe [Bedienung.md](Bedienung.md), Maus, Reise, Laufen, Rasten und Erkunden), im Werkzeug `werkzeuge/arena.js` (siehe [Entwicklung.md](Entwicklung.md), Bot und Werkzeuge); die Taktik liegt in `src/ki/taktik.js` (siehe [Wesen.md](Wesen.md), KI)
++ Chronik: wie die Testkammer eingetragen, aber nicht gezählt; Ergebnis "sieg" oder "tod" (siehe [Titelbildschirm.md](Titelbildschirm.md), Stand der Umsetzung 0.43.0)
 
 ## Speichern
 

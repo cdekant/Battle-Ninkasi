@@ -37,11 +37,11 @@ export function datenLaden(rohdaten, sprache) {
 }
 
 // Spielarten (docs/Titelbildschirm.md): eine Spielart gehört zum Lauf, nicht zu den Einstellungen, und lässt sich im
-// Lauf nicht wechseln; "normal" und "allmaechtig" (Testkammer, systeme/allmacht.js), weitere (weich, friedlich,
-// eigene Regeln) kommen als Startoption
-export const SPIELARTEN = ["normal", "allmaechtig"];
+// Lauf nicht wechseln; "normal", "allmaechtig" (Testkammer, systeme/allmacht.js) und "arena" (Kämpfe nach einer
+// Aufstellung in optionen.arena, systeme/arena.js), weitere (weich, friedlich, eigene Regeln) kommen als Startoption
+export const SPIELARTEN = ["normal", "allmaechtig", "arena"];
 
-// optionen: { eigenschaften?, spielart? } aus der Charaktererstellung (Eigenschaften geprüft in systeme/lernen.js
+// optionen: { eigenschaften?, spielart?, arena? } aus der Charaktererstellung (Eigenschaften geprüft in systeme/lernen.js
 // lernenEinrichten) und der Wahl des Laufs; sie gehören zum Spielstand, damit das Nachspielen denselben Lauf erzeugt
 export function neuesSpiel(daten, startwert, optionen = {}) {
   const startoptionen = { spielart: "normal", ...structuredClone(optionen) };
@@ -60,6 +60,7 @@ export function neuesSpiel(daten, startwert, optionen = {}) {
   const ninkasi = ausDatenErzeugen(spiel, "wesen", "ninkasi", treppeAuf ?? treppeAb);
   zustand.spielerinId = ninkasi.id;
   lernenEinrichten(spiel, ninkasi, optionen.eigenschaften);
+  for (const [, handler] of alleImRegister("laufbeginn")) handler(spiel, ninkasi);
   for (const entitaet of alleEntitaeten(zustand)) {
     if (entitaet.id === zustand.spielerinId || entitaet.ki) akteurEinreihen(zustand, entitaet.id, 0);
   }

@@ -257,6 +257,12 @@ function pruefeRegeln(daten, regeln, fehler) {
   else pruefeParameter(daten, { entdeckenVorgabe: "ganzzahl", reichweite: "ganzzahl" }, regeln.fallen, "regeln.fallen", fehler);
   pruefeLernregeln(daten, regeln.lernen, fehler);
   if (!istTextliste(regeln.ki?.zwecke)) fehler.push("regeln.ki.zwecke muss eine Liste von Namen sein");
+  // Spielart "arena", siehe systeme/arena.js
+  if (!istObjekt(regeln.arena)) fehler.push("regeln.arena fehlt");
+  else {
+    pruefeParameter(daten, { abstand: "ganzzahl", grenzeBefehle: "ganzzahl", wachzustand: ARENA_WACHZUSTAENDE }, regeln.arena, "regeln.arena", fehler);
+    if (istGanzzahl(regeln.arena.abstand) && regeln.arena.abstand < 1) fehler.push("regeln.arena.abstand muss eine ganze Zahl > 0 sein");
+  }
   if (!istObjekt(regeln.ki?.kurven)) fehler.push("regeln.ki.kurven muss ein Objekt { name: Kurve } sein");
   else for (const [name, kurve] of Object.entries(regeln.ki.kurven)) fehler.push(...promillekurvenfehler(kurve, `regeln.ki.kurven.${name}`));
   if (!regeln.kampf) return fehler.push("regeln.kampf fehlt");
@@ -1042,6 +1048,109 @@ function pruefeAbfolge(daten, fehler) {
   }
 }
 
+// Taktiken für Ninkasi in der Arena (ki/taktik.js): { text, handlungen, wahl? } im Format der KI
+function pruefeTaktiken(daten, sprache, fehler) {
+  for (const [name, taktik] of Object.entries(daten.taktiken || {})) {
+    const ort = `taktiken.${name}`;
+    if (!istObjekt(taktik)) { fehler.push(`${ort}: muss ein Objekt { text, handlungen } sein`); continue; }
+    pruefeText(sprache.texte, taktik.text, ort, fehler);
+    if (!Array.isArray(taktik.handlungen)) fehler.push(`${ort}: handlungen muss eine Liste sein`);
+    // geprüft wie die KI eines jagenden Wesens; das Modul selbst braucht die Taktik nicht
+    pruefeKi(daten, { modul: "jagen", handlungen: taktik.handlungen, wahl: taktik.wahl }, ort, fehler);
+  }
+}
+
+const ARENA_WACHZUSTAENDE = ["jagt", "wach", "schlaeft"];
+
+// Aufstellung einer Arena (systeme/arena.js): die Felder aus optionen.arena; auch für die Startoptionen geprüft
+export function arenaFehler(daten, aufstellung, ort = "arena") {
+  const fehler = [];
+  if (!istObjekt(aufstellung)) return [`${ort}: Aufstellung muss ein Objekt sein`];
+  if (!daten.ebenen[aufstellung.karte]?.karte) fehler.push(`${ort}: karte muss eine Ebene mit fester Karte aus daten/ebenen.js sein`);
+  if (aufstellung.taktik !== undefined && !daten.taktiken?.[aufstellung.taktik]) fehler.push(`${ort}: Taktik "${aufstellung.taktik}" gibt es nicht`);
+  if (aufstellung.abstand !== undefined && !(istGanzzahl(aufstellung.abstand) && aufstellung.abstand > 0)) fehler.push(`${ort}: abstand muss eine ganze Zahl > 0 sein`);
+  if (aufstellung.wachzustand !== undefined && !ARENA_WACHZUSTAENDE.includes(aufstellung.wachzustand)) fehler.push(`${ort}: wachzustand muss eines von ${ARENA_WACHZUSTAENDE.join(", ")} sein`);
+  if (aufstellung.start !== undefined && !(istObjekt(aufstellung.start) && istGanzzahl(aufstellung.start.x) && istGanzzahl(aufstellung.start.y))) fehler.push(`${ort}: start muss { x, y } sein`);
+  pruefeArenaNinkasi(daten, aufstellung.ninkasi ?? {}, `${ort}.ninkasi`, fehler);
+  const wellen = aufstellung.wellen ?? [];
+  if (!Array.isArray(wellen)) fehler.push(`${ort}: wellen muss eine Liste von Wellen [{ typ, anzahl? }] sein`);
+  else wellen.forEach((welle, nummer) => pruefeArenaWelle(daten, welle, `${ort}.wellen[${nummer}]`, fehler));
+  if (aufstellung.population !== undefined) pruefeArenaPopulation(daten, aufstellung.population, `${ort}.population`, fehler);
+  if (Array.isArray(wellen) && !wellen.length && aufstellung.population === undefined) fehler.push(`${ort}: braucht wellen oder population`);
+  return fehler;
+}
+
+function pruefeArenaNinkasi(daten, ninkasi, ort, fehler) {
+  if (!istObjekt(ninkasi)) return fehler.push(`${ort}: muss ein Objekt sein`);
+  for (const [name, wert] of Object.entries(ninkasi.eigenschaften ?? {})) {
+    if (!daten.eigenschaften?.[name]) fehler.push(`${ort}.eigenschaften: Eigenschaft "${name}" gibt es nicht`);
+    else if (!(istGanzzahl(wert) && wert >= 1)) fehler.push(`${ort}.eigenschaften.${name} muss eine ganze Zahl >= 1 sein`);
+  }
+  for (const [name, stufe] of Object.entries(ninkasi.skills ?? {})) {
+    if (!daten.skills?.[name]) fehler.push(`${ort}.skills: Skill "${name}" gibt es nicht`);
+    else if (!(istGanzzahl(stufe) && stufe >= 1 && stufe <= 5)) fehler.push(`${ort}.skills.${name}: Stufe muss eine ganze Zahl von 1 bis 5 sein`);
+  }
+  if (ninkasi.ausruestung !== undefined && !istTextliste(ninkasi.ausruestung)) fehler.push(`${ort}: ausruestung muss eine Liste von Typen sein`);
+  for (const typ of istTextliste(ninkasi.ausruestung) ? ninkasi.ausruestung : []) {
+    if (!daten.gegenstaende[typ]?.ausruestung) fehler.push(`${ort}.ausruestung: "${typ}" ist kein Gegenstand zum Anlegen`);
+  }
+  if (ninkasi.gepaeck !== undefined && !Array.isArray(ninkasi.gepaeck)) fehler.push(`${ort}: gepaeck muss eine Liste [{ typ, anzahl? }] sein`);
+  (Array.isArray(ninkasi.gepaeck) ? ninkasi.gepaeck : []).forEach((eintrag, nummer) => {
+    const gegenstand = daten.gegenstaende[eintrag?.typ];
+    if (!gegenstand || gegenstand.abstrakt) fehler.push(`${ort}.gepaeck[${nummer}]: Gegenstand "${eintrag?.typ}" gibt es nicht`);
+    if (eintrag?.anzahl !== undefined && !(istGanzzahl(eintrag.anzahl) && eintrag.anzahl > 0)) fehler.push(`${ort}.gepaeck[${nummer}]: anzahl muss eine ganze Zahl > 0 sein`);
+  });
+  const werte = daten.wesen.ninkasi?.werte ?? {};
+  for (const [name, wert] of Object.entries(ninkasi.werte ?? {})) {
+    if (!werte[name]) fehler.push(`${ort}.werte: Ninkasi hat keinen Wert "${name}"`);
+    else if (!istZahlAbNull(wert)) fehler.push(`${ort}.werte.${name} muss eine ganze Zahl >= 0 sein`);
+  }
+}
+
+function pruefeArenaWelle(daten, welle, ort, fehler) {
+  if (!Array.isArray(welle) || !welle.length) return fehler.push(`${ort}: eine Welle ist eine nicht leere Liste [{ typ, anzahl? }]`);
+  welle.forEach((eintrag, nummer) => {
+    const wesen = daten.wesen[eintrag?.typ];
+    if (!wesen || wesen.abstrakt || eintrag.typ === "ninkasi") fehler.push(`${ort}[${nummer}]: Wesen "${eintrag?.typ}" gibt es nicht als Gegner`);
+    if (eintrag?.anzahl !== undefined && !(istGanzzahl(eintrag.anzahl) && eintrag.anzahl > 0)) fehler.push(`${ort}[${nummer}]: anzahl muss eine ganze Zahl > 0 sein`);
+  });
+}
+
+// Populationstabelle einer Arena ({ tabelle?, tiefe, ... }): angegeben, sonst die der Ebene in daten.abfolge an der Tiefe
+export function arenaTabelle(daten, population) {
+  return population.tabelle ?? daten.ebenen[daten.abfolge?.[population.tiefe]]?.population?.tabelle ?? null;
+}
+
+function pruefeArenaPopulation(daten, population, ort, fehler) {
+  if (!istObjekt(population)) return fehler.push(`${ort}: muss { tiefe, wellen?, alle? } sein`);
+  if (!istZahlAbNull(population.tiefe)) fehler.push(`${ort}: tiefe muss eine ganze Zahl >= 0 sein`);
+  if (population.wellen !== undefined && !(istGanzzahl(population.wellen) && population.wellen > 0)) fehler.push(`${ort}: wellen muss eine ganze Zahl > 0 sein`);
+  if (population.alle !== undefined && typeof population.alle !== "boolean") fehler.push(`${ort}: alle muss true oder false sein`);
+  if (population.wellen === undefined && !population.alle) fehler.push(`${ort}: braucht wellen oder alle: true`);
+  const tabelle = arenaTabelle(daten, population);
+  if (!tabelle || !daten.populationen?.[tabelle]) fehler.push(`${ort}: keine Populationstabelle ${population.tabelle ? `"${population.tabelle}"` : "für diese Tiefe"}`);
+}
+
+// Arenen (daten/arenen.js): Aufstellung mit text und varianten { ninkasi?: { name: Teil von ninkasi }, gegner?: { name: { wellen?, population? } } }
+function pruefeArenen(daten, sprache, fehler) {
+  for (const [name, arena] of Object.entries(daten.arenen || {})) {
+    const ort = `arenen.${name}`;
+    if (!istObjekt(arena)) { fehler.push(`${ort}: muss ein Objekt sein`); continue; }
+    pruefeText(sprache.texte, arena.text, ort, fehler);
+    const { text, varianten = {}, ...aufstellung } = arena;
+    fehler.push(...arenaFehler(daten, aufstellung, ort));
+    if (!istObjekt(varianten)) { fehler.push(`${ort}: varianten muss { ninkasi?, gegner? } sein`); continue; }
+    for (const [art, liste] of Object.entries(varianten)) {
+      if (!["ninkasi", "gegner"].includes(art) || !istObjekt(liste)) { fehler.push(`${ort}.varianten.${art}: nur ninkasi und gegner, je ein Objekt { name: Variante }`); continue; }
+      for (const [variante, teil] of Object.entries(liste)) {
+        const stelle = `${ort}.varianten.${art}.${variante}`;
+        if (art === "ninkasi") pruefeArenaNinkasi(daten, { ...aufstellung.ninkasi, ...teil }, stelle, fehler);
+        else fehler.push(...arenaFehler(daten, { ...aufstellung, wellen: teil?.wellen ?? [], population: teil?.population }, stelle));
+      }
+    }
+  }
+}
+
 // Gibt { daten, fehler } zurück; daten mit aufgelösten Vorlagen.
 // sprache: { texte, nomenPruefen? }, nomenPruefen(eintrag, ort) gibt eine Liste von Fehlern zurück
 export function vorbereiten(rohdaten, sprache = {}) {
@@ -1067,6 +1176,8 @@ export function vorbereiten(rohdaten, sprache = {}) {
   for (const [name, falle] of Object.entries(daten.fallen || {})) pruefeFalle(daten, sprache, name, falle, fehler);
   for (const [name, ebene] of Object.entries(daten.ebenen)) pruefeEbene(daten, name, ebene, fehler);
   pruefeAbfolge(daten, fehler);
+  pruefeTaktiken(daten, sprache, fehler);
+  pruefeArenen(daten, sprache, fehler);
   for (const [name, gelaende] of Object.entries(daten.gelaende)) {
     pruefeText(sprache.texte, gelaende.text, `gelaende.${name}`, fehler);
     if (typeof gelaende.kennung !== "string" || gelaende.kennung.length !== 1) fehler.push(`gelaende.${name}: kennung muss genau ein Zeichen sein`);

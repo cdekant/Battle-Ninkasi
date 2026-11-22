@@ -44,6 +44,7 @@ export default {
     Digit0: "schnellplatz_10",
     KeyR: "rasten", // bis LP und MP voll sind
     KeyO: "erkunden", // automatisch erkunden
+    KeyA: "autokampf", // in der Arena automatisch kämpfen; jede Taste hält an
     Escape: "abbrechen", // Esc-Kette: Zielmodus, Fenster, Ablauf, sonst Spielmenü (eingabe/esckette.js)
     KeyI: "inventar", // Inventarfenster (eingabe/inventar.js)
     KeyF: "faehigkeiten", // Fähigkeitenfenster (eingabe/faehigkeiten.js)

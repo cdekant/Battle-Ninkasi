@@ -23,6 +23,7 @@ import { einstellungsfensterOeffnen, tastenZeilen } from "../src/eingabe/einstel
 import { befehlszeileOeffnen } from "../src/eingabe/befehlszeile.js";
 import { menueOeffnen, endeOeffnen } from "../src/eingabe/menue.js";
 import { titelOeffnen, laeufeOeffnen } from "../src/eingabe/titel.js";
+import { arenawahlOeffnen } from "../src/eingabe/arenawahl.js";
 import { titelHtml } from "../src/anzeige/titel.js";
 import { verlaufOeffnen } from "../src/eingabe/verlauf.js";
 import { inventarTaste, inventarKlick } from "../src/eingabe/inventar.js";
@@ -72,6 +73,8 @@ const FENSTER = (daten) => [
   ["laeufe", laeufeOeffnen("fortsetzen")],
   ["laeufe", laeufeOeffnen("ersetzen")],
   ["ende", endeOeffnen()],
+  ["arenawahl", arenawahlOeffnen()],
+  ["arenawahl", { ...arenawahlOeffnen(), automatisch: true }],
 ];
 
 test("Jedes Fenster: data-taste und data-ziel lassen sich auslösen, ohne zu werfen; × außer bei der Erstellung", () => {
@@ -130,7 +133,7 @@ test("Titel: jedes data-taste und data-ziel der Titelebene lässt sich auslösen
   const html = titelHtml(umgebung, stapel);
   const tasten = attributwerte(html, "taste");
   const ziele = attributwerte(html, "ziel");
-  assert.equal(tasten.length, 7, "sieben Einträge mit zwei belegten Plätzen");
+  assert.equal(tasten.length, 8, "acht Einträge mit zwei belegten Plätzen");
   assert.equal(ziele.length, 3, "drei Plätze");
   assert.ok(!tasten.some((taste) => taste.code === "Escape"));
   for (const taste of tasten) assert.ok(fensterTaste(stapel, taste, umgebung).stapel, JSON.stringify(taste));

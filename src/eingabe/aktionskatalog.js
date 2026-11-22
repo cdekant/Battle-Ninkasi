@@ -42,6 +42,7 @@ export const AKTIONEN = {
   ...Object.fromEntries(Array.from({ length: ANZAHL_LEISTEN_IM_KATALOG }, (_, leiste) => [`leiste_${leiste + 1}`, { text: "aktion.leiste", gruppe: "schnellleiste", leiste }])),
   rasten: { text: "aktion.rasten", gruppe: "ablaeufe", knopf: "knopf.rasten" },
   erkunden: { text: "aktion.erkunden", gruppe: "ablaeufe", knopf: "knopf.erkunden" },
+  autokampf: { text: "aktion.autokampf", gruppe: "ablaeufe" }, // nur in der Arena: Ninkasi kämpft nach der Taktik (eingabe/arenakampf.js)
   abbrechen: { text: "aktion.abbrechen", gruppe: "ablaeufe", knopf: "knopf.menue" }, // Esc-Kette (eingabe/esckette.js)
   inventar: { text: "aktion.inventar", gruppe: "fenster", knopf: "knopf.inventar" },
   faehigkeiten: { text: "aktion.faehigkeiten", gruppe: "fenster", knopf: "knopf.faehigkeiten" },

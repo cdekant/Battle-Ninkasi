@@ -4,16 +4,21 @@
 //   menue:        Zustand { gewaehlt }; Buchstabe wählt direkt, Pfeile oder j/k bewegen, Enter bestätigt, Esc schließt
 //   bestaetigung: Zustand { frage, werte?, aktion }; j oder Enter bestätigt (gibt aktion zurück), n oder Esc schließt;
 //                 aktion ist ein Name oder ein Objekt { art, ... } (z.B. { art: "neuesSpiel", stelle })
-//   ende:         nach dem Tod Ninkasis: neuer Lauf, zum Titel, Verlauf; Esc schließt, Enter öffnet es wieder
+//   ende:         nach dem Tod Ninkasis: neuer Lauf, zum Titel, Verlauf; in der Arena (nach Sieg oder Tod) statt des
+//                 neuen Laufs "nochmal" (dieselbe Aufstellung, nächster Startwert); Esc schließt, Enter öffnet es wieder
 // Neustart fragt nach (abschaltbar, Einstellung neustartNachfragen); Hilfe und Einstellungen legen sich über das Menü.
 
 import { BUCHSTABEN, buchstabeDerTaste } from "./inventar.js";
 import { fensterartAnmelden } from "./fenster.js";
 import { einstellungsfensterOeffnen } from "./einstellungsfenster.js";
 import { verlaufOeffnen } from "./verlauf.js";
+import { istArena } from "../systeme/arena.js";
 
 export const MENUE_EINTRAEGE = ["fortsetzen", "hilfe", "einstellungen", "neustart", "zum_titel", "beenden"];
 export const ENDE_EINTRAEGE = ["neustart", "zum_titel", "verlauf"];
+export const ENDE_EINTRAEGE_ARENA = ["nochmal", "zum_titel", "verlauf"];
+
+export const endeEintraege = (spiel) => (spiel && istArena(spiel) ? ENDE_EINTRAEGE_ARENA : ENDE_EINTRAEGE);
 
 const HOCH = ["ArrowUp", "KeyK"];
 const RUNTER = ["ArrowDown", "KeyJ"];
@@ -65,14 +70,16 @@ export function endeOeffnen() {
   return { gewaehlt: 0 };
 }
 
-export function endeTaste(zustand, taste) {
+// kontext.spiel: in der Arena andere Einträge (endeEintraege)
+export function endeTaste(zustand, taste, kontext = {}) {
   if (taste.code === "Escape") return { zustand: null };
-  const { gewaehlt, waehlen } = listeBedienen(zustand.gewaehlt, ENDE_EINTRAEGE.length, taste);
+  const eintraege = endeEintraege(kontext.spiel);
+  const { gewaehlt, waehlen } = listeBedienen(zustand.gewaehlt, eintraege.length, taste);
   if (waehlen === null) return { zustand: { gewaehlt } };
-  if (ENDE_EINTRAEGE[waehlen] === "verlauf") return { zustand: { gewaehlt }, oeffnen: { art: "verlauf", zustand: verlaufOeffnen() } };
-  return { zustand: null, aktion: ENDE_EINTRAEGE[waehlen] };
+  if (eintraege[waehlen] === "verlauf") return { zustand: { gewaehlt }, oeffnen: { art: "verlauf", zustand: verlaufOeffnen() } };
+  return { zustand: null, aktion: eintraege[waehlen] };
 }
 
 fensterartAnmelden("menue", { taste: (zustand, taste, kontext) => menueTaste(zustand, taste, kontext) });
 fensterartAnmelden("bestaetigung", { taste: (zustand, taste) => bestaetigungTaste(zustand, taste) });
-fensterartAnmelden("ende", { taste: (zustand, taste) => endeTaste(zustand, taste) });
+fensterartAnmelden("ende", { taste: (zustand, taste, kontext) => endeTaste(zustand, taste, kontext) });

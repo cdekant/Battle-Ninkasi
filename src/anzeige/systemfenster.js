@@ -4,7 +4,7 @@
 
 import { fensterinhaltAnmelden, buchstabeHtml, buchstabeAttribut } from "./fenster.js";
 import { logzeileHtml } from "./log.js";
-import { MENUE_EINTRAEGE, ENDE_EINTRAEGE } from "../eingabe/menue.js";
+import { MENUE_EINTRAEGE, endeEintraege } from "../eingabe/menue.js";
 import { spielerin } from "../kern/zustand.js";
 import { VERLAUF_FILTER, VERLAUF_SEITE, passtZumFilter } from "../eingabe/verlauf.js";
 import { PUNKTFARBEN } from "./minikarte.js";
@@ -29,13 +29,19 @@ fensterinhaltAnmelden("bestaetigung", ({ texte }, zustand) => ({
   knoepfe: [{ taste: { code: "KeyJ", zeichen: "j" }, text: texte.text("ui.knopf.ja") }, { taste: { code: "KeyN", zeichen: "n" }, text: texte.text("ui.knopf.nein") }],
 }));
 
-// Nach dem Tod Ninkasis (eingabe/menue.js endeTaste); später kommen Laufbericht, Abspielen und Ruhmeshalle dazu
+// Nach dem Tod Ninkasis oder dem Sieg in der Arena (eingabe/menue.js endeTaste); später kommen Laufbericht, Abspielen
+// und Ruhmeshalle dazu
 fensterinhaltAnmelden("ende", ({ spiel, texte }, zustand) => {
   const { text } = texte;
-  const zeilen = ENDE_EINTRAEGE.map((eintrag, stelle) => `<li${stelle === zustand.gewaehlt ? ' class="gewaehlt"' : ""}${buchstabeAttribut(stelle)}>${buchstabeHtml(stelle)}${text(`ende.${eintrag}`)}</li>`);
+  const zeilen = endeEintraege(spiel).map((eintrag, stelle) => `<li${stelle === zustand.gewaehlt ? ' class="gewaehlt"' : ""}${buchstabeAttribut(stelle)}>${buchstabeHtml(stelle)}${text(`ende.${eintrag}`)}</li>`);
+  const zuege = spielerin(spiel.zustand)?.zuege ?? 0;
+  const arena = spiel.zustand.arena;
+  const bilanz = arena
+    ? text("ende.bilanz_arena", { welle: spiel.zustand.ergebnis === "sieg" ? arena.wellen.length : arena.welle, von: arena.wellen.length, zuege })
+    : text("ende.bilanz", { tiefe: spiel.zustand.tiefe, zuege });
   return {
-    titel: text("ende.titel"),
-    liste: `<p>${text("ende.bilanz", { tiefe: spiel.zustand.tiefe, zuege: spielerin(spiel.zustand)?.zuege ?? 0 })}</p><ul>${zeilen.join("")}</ul>`,
+    titel: text(spiel.zustand.ergebnis === "sieg" ? "ende.titel_sieg" : "ende.titel"),
+    liste: `<p>${bilanz}</p><ul>${zeilen.join("")}</ul>`,
     fuss: text("ende.fuss"),
   };
 });

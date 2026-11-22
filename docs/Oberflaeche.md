@@ -254,6 +254,7 @@ Vorschlag für die Vorgabe, Buchstaben nach der deutschen Aufschrift:
 | x | Untersuchen | umgesetzt |
 | r | Rasten | umgesetzt |
 | o | Erkunden | umgesetzt |
+| a | in der Arena automatisch kämpfen | umgesetzt in 0.43.0 |
 | m | Übersichtskarte | 0.29.0 |
 | Umschalt + 1 bis 5 | Leiste wechseln | 0.29.0 |
 | < > | Treppe | 0.28.0 nach dem Zeichen |
