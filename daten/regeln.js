@@ -27,11 +27,18 @@ export default {
     // höchstens so viele Felder länger ist; sonst wartet er (src/ki/jagen.js, Vorbild Brogue)
     umwegHoechstens: 4,
   },
-  // Population, siehe src/systeme/beschwoerung.js und src/welt/ebene.js (Tabellen in daten/populationen.js)
+  // Population, siehe src/systeme/beschwoerung.js und src/welt/population.js (Tabellen in daten/populationen.js)
   population: {
     hoechstWesen: 500, // mehr Wesen entstehen nicht (Beschwören, Erzeugen der Ebene), Meldung population_voll
     tieferChance: 10, // Prozent je Wurf der Population: ein Gegner aus einer tieferen Tiefe
     tieferBis: 2, // höchstens so viele Tiefen tiefer
+  },
+  // Erzeugung der Ebenen in Schritten, siehe src/welt/ebene.js und src/welt/ebenenschritte.js; eine Ebene in
+  // daten/ebenen.js kann mit schritte eine eigene Folge nennen
+  ebenen: {
+    schritteErzeugt: ["karte_digger", "tueren", "treppen", "gelaende_objekte", "erreichbarkeit", "ebene_anlegen", "freie_felder", "population", "gegenstaende", "fallen"],
+    schritteFest: ["karte_fest", "erreichbarkeit", "ebene_anlegen"], // Ebenen mit fester karte, z.B. der Hub
+    versuche: 10, // so viele Versuche mit neuem Zufall, wenn ein Schritt die Karte verwirft (z.B. Erreichbarkeit)
   },
   // Fallen, siehe src/systeme/fallen.js; Zahlen vorläufig
   fallen: {

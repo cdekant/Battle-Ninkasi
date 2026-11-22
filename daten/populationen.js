@@ -1,4 +1,4 @@
-// Populationstabellen (Aufbau siehe src/welt/ebene.js): { typ, gewicht, tiefe: [von, bis], rudel?, affixe? }.
+// Populationstabellen (Aufbau siehe src/welt/population.js): { typ, gewicht, tiefe: [von, bis], rudel?, affixe? }.
 // Je Wurf gewichtet unter den Einträgen der Tiefe, gelegentlich aus einer tieferen (regeln.population). Vorläufig, bis
 // es mehr Gegner gibt: Essigbakterien in Rudeln, Fernkämpfer werden nach unten häufiger.
 export default {

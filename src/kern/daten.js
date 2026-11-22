@@ -227,6 +227,7 @@ function pruefeRegeln(daten, regeln, fehler) {
   if (!istGanzzahl(regeln.population?.hoechstWesen) || regeln.population.hoechstWesen < 1) fehler.push("regeln.population.hoechstWesen muss eine ganze Zahl >= 1 sein");
   if (!istProzent(regeln.population?.tieferChance)) fehler.push("regeln.population.tieferChance muss eine ganze Zahl von 0 bis 100 sein");
   if (!istZahlAbNull(regeln.population?.tieferBis)) fehler.push("regeln.population.tieferBis muss eine ganze Zahl >= 0 sein");
+  if (!istGanzzahl(regeln.ebenen?.versuche) || regeln.ebenen.versuche < 1) fehler.push("regeln.ebenen.versuche muss eine ganze Zahl >= 1 sein");
   if (!istObjekt(regeln.schichten)) fehler.push("regeln.schichten fehlt");
   else pruefeParameter(daten, { hoechstOberflaeche: "ganzzahl", hoechstGas: "ganzzahl" }, regeln.schichten, "regeln.schichten", fehler);
   if (!istObjekt(regeln.feuer)) fehler.push("regeln.feuer fehlt");
@@ -884,8 +885,29 @@ function pruefeKarte(daten, karte, ort, fehler) {
   if (fremde.length) fehler.push(`${ort}: karte enthält unbekannte Kennungen ${fremde.join(" ")}`);
 }
 
+// Folge der Ebenenschritte (welt/ebene.js): jeder angemeldet, was er braucht, liefert ein früherer, verwerfende
+// Schritte vor dem, der die Ebene anlegt, und am Ende muss eine Ebene stehen
+function pruefeSchrittfolge(schritte, ort, fehler) {
+  if (!istTextliste(schritte) || !schritte.length) return fehler.push(`${ort} muss eine Liste von Ebenenschritten sein`);
+  const geliefert = new Set();
+  for (const schrittName of schritte) {
+    if (!hat("ebenenschritte", schrittName)) {
+      fehler.push(`${ort}: Ebenenschritt "${schrittName}" ist nicht angemeldet`);
+      continue;
+    }
+    const schritt = holen("ebenenschritte", schrittName);
+    for (const teil of schritt.braucht) if (!geliefert.has(teil)) fehler.push(`${ort}: "${schrittName}" braucht ${teil}, das kein früherer Schritt liefert`);
+    if (schritt.verwirft && geliefert.has("ebene")) fehler.push(`${ort}: "${schrittName}" kann den Versuch verwerfen und muss vor dem Anlegen der Ebene stehen`);
+    for (const teil of schritt.liefert) geliefert.add(teil);
+  }
+  if (!geliefert.has("ebene")) fehler.push(`${ort}: kein Schritt legt die Ebene an`);
+}
+
 function pruefeEbene(daten, name, ebene, fehler) {
   const ort = `ebenen.${name}`;
+  const vorgabe = ebene.karte !== undefined ? "schritteFest" : "schritteErzeugt";
+  if (ebene.schritte !== undefined) pruefeSchrittfolge(ebene.schritte, `${ort}.schritte`, fehler);
+  else if (daten.regeln?.ebenen) pruefeSchrittfolge(daten.regeln.ebenen[vorgabe], `regeln.ebenen.${vorgabe} (für ${ort})`, fehler);
   if (ebene.karte !== undefined) pruefeKarte(daten, ebene.karte, `${ort}`, fehler);
   else for (const masz of ["breite", "hoehe"]) {
     if (!istGanzzahl(ebene[masz]) || ebene[masz] < 10) fehler.push(`${ort}: ${masz} muss eine ganze Zahl >= 10 sein`);

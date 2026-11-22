@@ -18,6 +18,7 @@ import { modifiziert, prozentVon } from "./werte.js";
 import { melden, bezugAuf, hakenAusloesen } from "./ereignisse.js";
 import { vorgangAbschliessen } from "./vorgang.js";
 import { ebeneErzeugen } from "../welt/ebene.js";
+import { laufPlanen } from "../welt/plan.js";
 import { sichtfeldAktualisieren } from "../systeme/sicht.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 import { aktionAbbrechen, laufendeAktionVorDemZug } from "../systeme/laufendeAktionen.js";
@@ -48,6 +49,8 @@ export function neuesSpiel(daten, startwert, optionen = {}) {
   zustand.zufallszustand = zufallErzeugen(startwertAbleiten(zustand.startwert, "spiel"));
   // vor der ersten Ebene, damit schon ihre Gegenstände ihr Etikett tragen (systeme/kennen.js)
   etikettenZuordnen(spiel);
+  // der Plan des Laufs steht fest, bevor die erste Ebene entsteht (welt/plan.js)
+  laufPlanen(spiel);
 
   // Ninkasi beginnt auf der Treppe hinauf der Starttiefe (oder in der Mitte des ersten Raums, der dort liegt)
   zustand.tiefe = daten.starttiefe;

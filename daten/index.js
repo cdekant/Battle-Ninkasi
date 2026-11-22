@@ -40,7 +40,7 @@ export default {
   etiketten,
   eigenschaften,
   skills,
-  // Tiefen von oben nach unten: 0 ist der Hub, das Spiel beginnt in starttiefe (src/welt/ebene.js, src/systeme/ebenen.js)
+  // Tiefen von oben nach unten: 0 ist der Hub, das Spiel beginnt in starttiefe; der Plan des Laufs übernimmt sie (src/welt/plan.js)
   abfolge: ["hub", "keller", "keller", "keller"],
   starttiefe: 1,
   zeichen,

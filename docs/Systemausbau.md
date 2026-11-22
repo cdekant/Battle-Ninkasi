@@ -202,14 +202,13 @@ Offen:
 
 ## 14. Vorkehrungen aus dem Ausblick
 
-Status: offen; Ideen und Begründungen in [Ausblick.md](Ausblick.md), hier nur die Arbeit, nach Dringlichkeit geordnet (zuerst, was mit jedem neuen System teurer wird); jede Vorkehrung bekommt vor der Umsetzung einen eigenen Plan
+Status: offen; Ideen und Begründungen in [Ausblick.md](Ausblick.md), hier nur die Arbeit, nach Dringlichkeit geordnet (zuerst, was mit jedem neuen System teurer wird); jede Vorkehrung bekommt vor der Umsetzung einen eigenen Plan; erledigt in 0.33.0: Plan des Laufs und Ebenenerzeugung in Schritten (siehe [Welt.md](Welt.md), Plan des Laufs und [Welt.md](Welt.md), Ebenen)
 
-+ 1. Plan des Laufs und Ebenenerzeugung in Schritten: beim Start aus dem Startwert festlegen, welche Tiefe welche Struktur, welchen Schatzraum, welche Quest bekommt; die Erzeugung einer Ebene als Folge von Schritten mit Register (Karte, Strukturen einsetzen, Erreichbarkeit prüfen, Türen, Fallen, Population); trägt Schatzräume, Quests, feste Strukturen und Themenräume
-+ 2. Lesefunktion `gesteuerteEntitaet(zustand)` für die gesteuerte Entität, vorerst gleich Ninkasi, ohne neues Feld im Zustand: Eingangstür, Sicht, Kamera und Zielmodus fragen sie, alles andere weiter `spielerin()`; hält Besessenheit offen, ohne sie zu bauen (ob sie kommt, ist nicht entschieden)
-+ 3. Ruf vorbereiten und Beistand: `zustand.ruf` je Fraktion mit Vorgabe 0, `beziehung` liest Schwellen aus `daten/regeln.js`; Wesen helfen Ninkasi gegen einen Feind ihrer eigenen Fraktion in Sicht
-+ 4. Würfe über eine tauschbare Schnittstelle im Effektsystem (kleinster, größter Wurf, fremder Zufall), damit eine Vorschau durch Simulation nichts verrät
-+ 5. Erinnerung der Karte: je Feld das zuletzt gesehene Gelände, die Anzeige zeigt es für nicht sichtbare Felder; `erkundet` mit Werten für gesehen und kartiert; Grundlage für veränderbares Gelände, Hellsicht und Filmriss
-+ 6. Mitnehmen beim Ebenenwechsel erweiterbar (Register oder Haken), für Begleiter und Wesen, die Ninkasi über Treppen folgen (Rest aus Punkt 8)
-+ 7. Format der KI-Handlungen: Bewertung je Handlung mit Gewicht und Kurven, das heutige Format bleibt als Sonderfall gültig; dazu Vorrangbefehle für Begleiter
-+ 8. Lesefunktionen für Komponenten ohne Zahl (Angriffe, Plätze, Bewegungsart, Sicht, Türen), damit eine Gestalt sie überlagern kann (Verwandlung)
-+ 9. Regel für Wissen über Läufe hinweg festschreiben: was ein Lauf davon nutzt, kommt als Startoption in den Spielstand, die Logik liest die Ablage nie (siehe [Architektur.md](Architektur.md), Speichern)
++ 1. Lesefunktion `gesteuerteEntitaet(zustand)` für die gesteuerte Entität, vorerst gleich Ninkasi, ohne neues Feld im Zustand: Eingangstür, Sicht, Kamera und Zielmodus fragen sie, alles andere weiter `spielerin()`; hält Besessenheit offen, ohne sie zu bauen (ob sie kommt, ist nicht entschieden)
++ 2. Ruf vorbereiten und Beistand: `zustand.ruf` je Fraktion mit Vorgabe 0, `beziehung` liest Schwellen aus `daten/regeln.js`; Wesen helfen Ninkasi gegen einen Feind ihrer eigenen Fraktion in Sicht
++ 3. Würfe über eine tauschbare Schnittstelle im Effektsystem (kleinster, größter Wurf, fremder Zufall), damit eine Vorschau durch Simulation nichts verrät
++ 4. Erinnerung der Karte: je Feld das zuletzt gesehene Gelände, die Anzeige zeigt es für nicht sichtbare Felder; `erkundet` mit Werten für gesehen und kartiert; Grundlage für veränderbares Gelände, Hellsicht und Filmriss
++ 5. Mitnehmen beim Ebenenwechsel erweiterbar (Register oder Haken), für Begleiter und Wesen, die Ninkasi über Treppen folgen (Rest aus Punkt 8)
++ 6. Format der KI-Handlungen: Bewertung je Handlung mit Gewicht und Kurven, das heutige Format bleibt als Sonderfall gültig; dazu Vorrangbefehle für Begleiter
++ 7. Lesefunktionen für Komponenten ohne Zahl (Angriffe, Plätze, Bewegungsart, Sicht, Türen), damit eine Gestalt sie überlagern kann (Verwandlung)
++ 8. Regel für Wissen über Läufe hinweg festschreiben: was ein Lauf davon nutzt, kommt als Startoption in den Spielstand, die Logik liest die Ablage nie (siehe [Architektur.md](Architektur.md), Speichern)

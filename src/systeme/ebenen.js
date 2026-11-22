@@ -16,7 +16,8 @@ import { indexVerwerfen } from "../kern/raumindex.js";
 import { akteurEinreihen, eintraegeHerausnehmen, eintraegeEinfuegen } from "../kern/zeit.js";
 import { gelaendeAuf, betretbar } from "../welt/karte.js";
 import { naechstesFeldMit } from "../welt/wege.js";
-import { ebeneErzeugen, ebenennameFuer } from "../welt/ebene.js";
+import { ebeneErzeugen } from "../welt/ebene.js";
+import { ebenennameFuer } from "../welt/plan.js";
 import { sichtfeldAktualisieren } from "./sicht.js";
 
 const RICHTUNG = { ab: 1, auf: -1 };
@@ -112,7 +113,7 @@ anmelden("befehle", "treppe", {
   pruefen(spiel, akteur) {
     if (akteur.id !== spiel.zustand.spielerinId) return "ungueltig";
     const richtung = gelaendeAuf(spiel, akteur.position.x, akteur.position.y)?.treppe;
-    if (!richtung || !ebenennameFuer(spiel.daten, spiel.zustand.tiefe + RICHTUNG[richtung])) return "keine_treppe";
+    if (!richtung || !ebenennameFuer(spiel.zustand, spiel.zustand.tiefe + RICHTUNG[richtung])) return "keine_treppe";
     return null;
   },
   ausfuehren(spiel, akteur) {

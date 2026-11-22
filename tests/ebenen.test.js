@@ -1,6 +1,10 @@
-// Mehrere Ebenen: Start auf der Treppe, Wechsel, verlassene Ebenen ruhen, Hub, Population nach Tiefe
+// Mehrere Ebenen: Start auf der Treppe, Wechsel, verlassene Ebenen ruhen, Hub, Population nach Tiefe;
+// Plan des Laufs und Erzeugung in Schritten
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { anmelden, abmelden } from "../src/kern/register.js";
+import { unerreichbareFelder } from "../src/welt/ebenenschritte.js";
 import "../src/kern/spiel.js"; // meldet Bausteine, Systeme und Verhaltensmodule an
 import rohdaten from "../daten/index.js";
 import texte from "../sprache/de/texte.js";
@@ -10,7 +14,7 @@ import { spielerin, alleEntitaeten, istWesen } from "../src/kern/zustand.js";
 import { indexPruefen } from "../src/kern/raumindex.js";
 import { warteschlangeGueltig } from "../src/kern/zeit.js";
 import { gelaendeAuf } from "../src/welt/karte.js";
-import { eintraegeFuerTiefe } from "../src/welt/ebene.js";
+import { eintraegeFuerTiefe } from "../src/welt/population.js";
 import { ebeneWechseln } from "../src/systeme/ebenen.js";
 import { zustandSetzen } from "../src/systeme/zustaende.js";
 import { vorbereiten } from "../src/kern/daten.js";
@@ -87,7 +91,7 @@ test("Treppe: nur auf einer Treppe, nur für Ninkasi, nicht über die Abfolge hi
 
   const hub = neuesSpiel(DATEN, 5);
   ebeneWechseln(hub, 0);
-  hub.daten = { ...hub.daten, abfolge: ["hub"] };
+  hub.zustand.plan.tiefen = hub.zustand.plan.tiefen.slice(0, 1);
   assert.equal(befehlGeben(hub, { art: "treppe" }).grund, "keine_treppe", "ohne Tiefe darunter");
 });
 
@@ -129,6 +133,93 @@ test("Datenprüfung: Abfolge, Starttiefe, feste Karte, Population und Tabellen",
     [(daten) => { daten.populationen.testtabelle[0].affixe = [{ zustand: "gibt_es_nicht", chance: 10 }]; }, 'Zustand "gibt_es_nicht"'],
     [(daten) => { daten.gelaende.testgelaende.treppe = "seitwaerts"; }, "treppe muss"],
     [(daten) => { daten.regeln.population.tieferChance = 120; }, "tieferChance"],
+    [(daten) => { daten.regeln.ebenen.versuche = 0; }, "regeln.ebenen.versuche"],
+    [(daten) => { daten.ebenen.testkarte.schritte = ["karte_fest", "zauberei", "ebene_anlegen"]; }, 'Ebenenschritt "zauberei" ist nicht angemeldet'],
+    [(daten) => { daten.ebenen.testebene.schritte = ["karte_digger", "ebene_anlegen", "population"]; }, '"population" braucht freie_felder'],
+    [(daten) => { daten.ebenen.testkarte.schritte = ["karte_fest", "ebene_anlegen", "erreichbarkeit"]; }, "muss vor dem Anlegen der Ebene stehen"],
+    [(daten) => { daten.ebenen.testkarte.schritte = ["karte_fest", "erreichbarkeit"]; }, "kein Schritt legt die Ebene an"],
+    [(daten) => { daten.regeln.ebenen.schritteFest = []; }, "regeln.ebenen.schritteFest (für ebenen.hub)"],
   ];
   for (const [aendern, teilDerMeldung] of erwartet) assert.ok(pruefen(aendern).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
+});
+
+// Fingerabdruck der Ebenen aus 0.32.0, vor der Erzeugung in Schritten: der Umbau ändert keine Ebene. Ändern neue
+// Inhalte oder Regeln die Ebenen absichtlich, werden die Werte hier neu festgehalten.
+test("Erzeugung in Schritten: dieselben Ebenen wie vorher", () => {
+  const erwartet = { 1: "4806893f0e872822", 2: "1d86a38ea2a6b033", 3: "038dce44ef54f3e4", 42: "434e4018ee5c9957", 4711: "94fe6a9317291104" };
+  for (const [startwert, fingerabdruck] of Object.entries(erwartet)) {
+    const spiel = neuesSpiel(DATEN, Number(startwert));
+    for (const tiefe of [2, 3, 0]) ebeneWechseln(spiel, tiefe);
+    const { ebene, abgelegteEbenen, entitaeten } = spiel.zustand;
+    const ergebnis = createHash("sha256").update(JSON.stringify({ ebene, abgelegt: abgelegteEbenen, entitaeten })).digest("hex").slice(0, 16);
+    assert.equal(ergebnis, fingerabdruck, `Startwert ${startwert}`);
+  }
+});
+
+test("Plan des Laufs: beim Start aus Startwert und Daten, eigene Planschritte erreichen die Ebenenschritte", () => {
+  const spiel = neuesSpiel(DATEN, 7);
+  assert.deepEqual(spiel.zustand.plan, { tiefen: DATEN.abfolge.map((vorlage) => ({ vorlage, inhalte: [] })) });
+
+  const planschritt = (planSpiel, plan, zufall) => { plan.tiefen[2].inhalte.push({ art: "testschatz", wurf: zufall[0] }); };
+  const gesehen = [];
+  const ebenenschritt = { braucht: ["ebene"], liefert: [], ausfuehren: (schrittSpiel, bau) => gesehen.push({ tiefe: bau.tiefe, inhalte: bau.planEintrag.inhalte }) };
+  anmelden("planschritte", "testschatz", planschritt);
+  anmelden("ebenenschritte", "testschatz", ebenenschritt);
+  try {
+    const roh = rohdatenMitTesteintraegen();
+    roh.ebenen.keller.schritte = [...roh.regeln.ebenen.schritteErzeugt, "testschatz"];
+    const daten = datenLaden(roh, {});
+    const erste = neuesSpiel(daten, 7), zweite = neuesSpiel(daten, 7);
+    assert.deepEqual(erste.zustand.plan, zweite.zustand.plan, "wiederholbar");
+    assert.equal(erste.zustand.plan.tiefen[2].inhalte[0].art, "testschatz");
+    ebeneWechseln(erste, 2);
+    assert.deepEqual(gesehen.map((eintrag) => eintrag.tiefe), [1, 1, 2]);
+    assert.equal(gesehen[2].inhalte[0].art, "testschatz", "die Ebene liest ihren Eintrag im Plan");
+  } finally {
+    abmelden("planschritte", "testschatz");
+    abmelden("ebenenschritte", "testschatz");
+  }
+});
+
+test("Schritte aus den Daten: eine Ebene ohne Population, Gegenstände und Fallen", () => {
+  const roh = rohdatenMitTesteintraegen();
+  roh.ebenen.keller.schritte = ["karte_digger", "tueren", "treppen", "gelaende_objekte", "erreichbarkeit", "ebene_anlegen"];
+  const spiel = neuesSpiel(datenLaden(roh, {}), 3);
+  assert.deepEqual(alleEntitaeten(spiel.zustand).map((entitaet) => entitaet.id), [spiel.zustand.spielerinId]);
+  assert.equal(treppeUnter(spiel), "auf");
+});
+
+test("Erreichbarkeit: Inseln verwerfen den Versuch, der nächste würfelt neu; ohne Erfolg ein Fehler", () => {
+  const insel = ["#####", "#.#.#", "#####"];
+  const mitInsel = (zeilen) => zeilen.map((zeile) => [...zeile]);
+  assert.deepEqual(unerreichbareFelder({ daten: DATEN }, mitInsel(insel), { x: 1, y: 1 }), [{ x: 3, y: 1 }]);
+  assert.deepEqual(unerreichbareFelder({ daten: DATEN }, mitInsel(["#####", "#.+.#", "#####"]), { x: 1, y: 1 }), [], "Türen zählen als offen");
+  assert.deepEqual(unerreichbareFelder({ daten: DATEN }, mitInsel(["####", "#.##", "##.#", "####"]), { x: 1, y: 1 }), [], "diagonal verbunden");
+
+  const versuche = [];
+  anmelden("ebenenschritte", "testkarte_insel", {
+    braucht: [], liefert: ["karte", "treppen"],
+    ausfuehren(spiel, bau) {
+      versuche.push(bau.schluessel);
+      bau.zeilen = mitInsel(bau.versuch === 1 ? insel : ["#####", "#...#", "#####"]);
+      bau.treppen = { treppeAuf: null, treppeAb: { x: 1, y: 1 } };
+    },
+  });
+  try {
+    const roh = rohdatenMitTesteintraegen();
+    roh.ebenen.testinsel = { breite: 10, hoehe: 10, gelaende: { wand: "wand", boden: "boden" }, schritte: ["testkarte_insel", "erreichbarkeit", "ebene_anlegen"] };
+    roh.abfolge = ["testinsel"];
+    roh.starttiefe = 0;
+    const spiel = neuesSpiel(datenLaden(roh, {}), 1);
+    assert.deepEqual(versuche, ["ebene.0.testinsel", "ebene.0.testinsel.versuch2"]);
+    assert.equal(spiel.zustand.ebene.felder[1], "#...#");
+
+    const immerInsel = rohdatenMitTesteintraegen();
+    immerInsel.ebenen.inselkarte = { karte: insel };
+    immerInsel.abfolge = ["inselkarte"];
+    immerInsel.starttiefe = 0;
+    assert.throws(() => neuesSpiel(datenLaden(immerInsel, {}), 1), /nach 10 Versuchen keine gültige Karte/);
+  } finally {
+    abmelden("ebenenschritte", "testkarte_insel");
+  }
 });

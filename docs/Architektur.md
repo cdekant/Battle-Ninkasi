@@ -58,7 +58,7 @@ Regeln:
 
 Daten (`src/kern/zustand.js`):
 
-+ Zustand: `{ startwert, zeit, naechsteId, naechsteZustandsnummer, einreihungszaehler, warteschlange, entitaeten, spielerinId, vorbei, ebene, tiefe, abgelegteEbenen, sichtbareFelder, zufallszustand, wissen }`; `tiefe` und `abgelegteEbenen` siehe [Welt.md](Welt.md), Ebenen, `wissen` siehe [Gegenstaende.md](Gegenstaende.md), Unbekanntes
++ Zustand: `{ startwert, zeit, naechsteId, naechsteZustandsnummer, einreihungszaehler, warteschlange, entitaeten, spielerinId, vorbei, ebene, tiefe, plan, abgelegteEbenen, sichtbareFelder, zufallszustand, wissen }`; `tiefe` und `abgelegteEbenen` siehe [Welt.md](Welt.md), Ebenen, `plan` siehe [Welt.md](Welt.md), Plan des Laufs, `wissen` siehe [Gegenstaende.md](Gegenstaende.md), Unbekanntes
 + Spiel: `{ daten, zustand, optionen, befehle, hoerer, zwischenspeicher, anstehendeAusloeser }`; nur `zustand`, `optionen` und `befehle` sind Lauf, der Rest ist abgeleitet oder flüchtig
 + Eine Entität ist eine ID plus Komponenten, z.B. Position, Werte, Inventar, KI, Fraktion, Handel, Braukessel, Sicht; `entitaetAusDatensatz` übernimmt alle Felder eines Datensatzes außer `vorlage`, `abstrakt` und `werte` als Komponenten, `werte` werden über `werteAusDaten` aufgebaut
 + Wesen können in den Daten außerdem `tags`, feste `modifikatoren` und `auren` tragen, siehe [Wirkungen.md](Wirkungen.md), Modifikatoren
@@ -135,7 +135,7 @@ Regeln:
 
 Daten (`src/kern/register.js`): feste Liste der Registerarten, jede eine Zuordnung Name → Eintrag:
 
-+ `befehle` (`{ pruefen, ausfuehren, ohneZeit? }`), `bausteine` (`(spiel, kontext, parameter) => void`), `ki` (`(spiel, akteur, ki) => befehl`), `modifikatorquellen` (`(spiel, entitaet) => [modifikator]`), `modifikatorbedingungen`, `befehlsveraenderer`, `zielmuster` (`(spiel, auswahl, parameter) => [{x, y}]`), `welttick`, `zeitereignisse`, `haken` (Listen je Name), `gefahren`, `zustandspruefungen` (`(spiel) => true`, wenn sie etwas verändert haben), `laufendeaktionen`, `beimErzeugen`, `ausloeserquellen`, `lernanlaesse`
++ `befehle` (`{ pruefen, ausfuehren, ohneZeit? }`), `bausteine` (`(spiel, kontext, parameter) => void`), `ki` (`(spiel, akteur, ki) => befehl`), `modifikatorquellen` (`(spiel, entitaet) => [modifikator]`), `modifikatorbedingungen`, `befehlsveraenderer`, `zielmuster` (`(spiel, auswahl, parameter) => [{x, y}]`), `welttick`, `zeitereignisse`, `haken` (Listen je Name), `gefahren`, `zustandspruefungen` (`(spiel) => true`, wenn sie etwas verändert haben), `laufendeaktionen`, `beimErzeugen`, `ausloeserquellen`, `lernanlaesse`, `planschritte` (`(spiel, plan, zufall) => void`) und `ebenenschritte` (`{ braucht, liefert, verwirft?, ausfuehren }`), beide siehe [Welt.md](Welt.md), Plan des Laufs und [Welt.md](Welt.md), Ebenen
 
 Schnittstellen:
 
@@ -178,7 +178,7 @@ Daten:
 Schnittstellen (`src/kern/zufall.js`):
 
 + `zufallErzeugen`, `naechsteZufallszahl`, `zufallsGanzzahl(z, min, max)`, `mitProzentChance(z, prozent)`, `mitAnteil(z, zaehler, nenner)` (exakter Bruch), `wuerfeln(z, "1W6+2")`, `istWuerfelausdruck`, `startwertAbleiten(startwert, kennung)`
-+ Abgeleitete Startwerte: Spiel-Zufall (`"spiel"`), Grundriss (`"ebene.<tiefe>.<name>"`), Türen, Objekte und Inhalt einer Ebene (`.tueren`, `.objekte`, `.inhalt` dahinter) haben eigene Quellen, damit die Ebene nicht vom Spielverlauf abhängt; ebenso die Etiketten unbekannter Gegenstände (`"etiketten"`); später z.B. Buchtexte aus Lauf-Startwert und Objekt-ID
++ Abgeleitete Startwerte: Spiel-Zufall (`"spiel"`), Plan des Laufs (`"plan"`), Grundriss (`"ebene.<tiefe>.<name>"`, bei einem neuen Versuch mit `.versuch<n>`), Türen, Objekte und Inhalt einer Ebene (`.tueren`, `.objekte`, `.inhalt` dahinter) haben eigene Quellen, damit die Ebene nicht vom Spielverlauf abhängt; ebenso die Etiketten unbekannter Gegenstände (`"etiketten"`); später z.B. Buchtexte aus Lauf-Startwert und Objekt-ID
 
 Regeln:
 
@@ -186,7 +186,7 @@ Regeln:
 + Jede Änderung am Verfahren des Zufalls ändert die Zahlenfolge
 + Startwert eines neuen Laufs: zufällig (`crypto.getRandomValues` in `src/main.js`) oder über `?seed=` in der Adresse (Zahl, sonst aus dem Text abgeleitet); eine Abfrage im Titel nach dem Vorbild Brogue ist vorgesehen
 + Kosmetischer Zufall (Titelbild, Spruch im Titel, später Animationen, Partikel und Textvarianten) nutzt `Math.random()` nur in der Anzeige und berührt den Spiel-Zufall nie
-+ rot.js hat einen eigenen, globalen Zufall; er wird nur für die Dungeon-Erzeugung benutzt und vorher mit einem abgeleiteten Startwert gesetzt (`RNG.setSeed` in `src/welt/ebene.js`)
++ rot.js hat einen eigenen, globalen Zufall; er wird nur für die Dungeon-Erzeugung benutzt und vorher mit einem abgeleiteten Startwert gesetzt (`RNG.setSeed` im Schritt `karte_digger`, `src/welt/ebenenschritte.js`)
 + Fallstrick: Die Kartengeneratoren von rot.js (Digger, Uniform) brechen nach einer Zeitgrenze ab (`timeLimit`, gemessen mit `Date.now()`); sie wird deshalb immer auf `Infinity` gesetzt
 + Jede Änderung an Code oder Daten macht alte Spielstände ungültig; passt die Version nicht, wirft das Laden mit klarer Meldung
 + Nebennutzen: Spielstand als Fehlerbericht, Aufzeichnungen zum Anschauen, "Seed des Tages", automatische Tests

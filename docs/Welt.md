@@ -2,13 +2,13 @@
 
 Stand: 2026-11-22
 
-Zuständig für: `src/welt/ebene.js`, `src/welt/karte.js`, `src/welt/schichten.js`, `src/welt/wege.js`, `src/systeme/gelaende.js`, `src/systeme/fallen.js`, `src/systeme/schichten.js`, `src/systeme/ebenen.js`, `src/systeme/sicht.js`, `src/systeme/gefahr.js`, `daten/gelaende.js`, `daten/fallen.js`, `daten/schichten.js`, `daten/ebenen.js`, `daten/populationen.js`
+Zuständig für: `src/welt/ebene.js`, `src/welt/ebenenschritte.js`, `src/welt/plan.js`, `src/welt/population.js`, `src/welt/karte.js`, `src/welt/schichten.js`, `src/welt/wege.js`, `src/systeme/gelaende.js`, `src/systeme/fallen.js`, `src/systeme/schichten.js`, `src/systeme/ebenen.js`, `src/systeme/sicht.js`, `src/systeme/gefahr.js`, `daten/gelaende.js`, `daten/fallen.js`, `daten/schichten.js`, `daten/ebenen.js`, `daten/populationen.js`
 
 Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Anzeige.md](Anzeige.md), [Grundlagen.md](Grundlagen.md)
 
 ## Zweck
 
-Die Karte und was auf ihr liegt: Gelände mit Türen und Fallen, Feldschichten (Oberfläche, Gas, Feuer), Ebenen und Treppen, Wegfindung, Sichtweite, Licht und die Gefahrenprüfung. Jeder Abschnitt nennt, soweit vorhanden, Daten, Schnittstellen und Regeln.
+Die Karte und was auf ihr liegt: Gelände mit Türen und Fallen, Feldschichten (Oberfläche, Gas, Feuer), der Plan des Laufs, Ebenen und Treppen, Wegfindung, Sichtweite, Licht und die Gefahrenprüfung. Jeder Abschnitt nennt, soweit vorhanden, Daten, Schnittstellen und Regeln.
 
 ## Gelände
 
@@ -72,27 +72,53 @@ Regeln:
 + Anzeige: farbige Überlagerung auf sichtbaren Feldern, Oberfläche und Feuer unter den Entitäten, Gas darüber mit der Menge zunehmend deckend; Farben in `zeichen.schichten`; Tiles folgen
 + Im Spielinhalt (Zahlen vorläufig): die Säuredüse hinterlässt Säure (verätzt 1W3 je Tick, trocknet); drei Gärbottiche je Ebene im Inneren der Räume (Gelände-Objekte, sperren keinen Durchgang) geben CO2 ab, das sich hinter geschlossenen Türen sammelt; drei Brandflaschen je Ebene zerspringen beim Wurf zu Hochprozentigem und entzünden es; Feuer 1W6, Rauch ab 40 undurchsichtig, ab 60 Husten; Benommenheit und Ersticken sind vorläufig Giftschaden, bis es Zustände im Spielinhalt gibt
 
+## Plan des Laufs
+
+Vorbilder: Brogue (Schatzräume über die Tiefen verteilt und ausgeglichen), DCSS (Vaults und Zweige mit Bedingungen nach Tiefe); Ideen, die darauf bauen (Schatzräume mit Schlüssel, Questsystem, feste Strukturen): [Ausblick.md](Ausblick.md).
+
+Daten:
+
++ Im Zustand: `plan = { tiefen: [{ vorlage, inhalte: [] }] }`; `vorlage` ist der Name einer Ebene aus `daten/ebenen.js`, `inhalte` sind Datenobjekte mit `art`, die Schritte des Plans für die Tiefe vorsehen (bisher keine)
+
+Schnittstellen (`src/welt/plan.js`):
+
++ `laufPlanen(spiel)` in `neuesSpiel` nach den Etiketten und vor der ersten Ebene; `ebenennameFuer(zustand, tiefe)` (null, wenn es die Tiefe nicht gibt), `planEintragFuer(zustand, tiefe)`
++ Register `planschritte`: `(spiel, plan, zufall) => void`, in Anmeldereihenfolge mit einem gemeinsamen Zufall `"plan"`; bisher nur `abfolge`, der `daten.abfolge` überträgt
+
+Regeln:
+
++ Der Plan steht fest, bevor die erste Ebene entsteht, und folgt allein aus Startwert und Daten; eine Ebene, die erst beim ersten Betreten entsteht, liest ihren Eintrag (`bau.planEintrag`), so kann etwas auf einer Tiefe feststehen, die noch nicht erzeugt ist (z.B. ein Schlüssel zwei Tiefen tiefer)
++ Der Plan gehört zum Zustand und nicht nur zu den Daten, damit ihn spätere Ereignisse im Lauf ändern können (z.B. eine Quest, die im Hub vergeben wird); weil sie aus Befehlen folgen, bleibt der Lauf wiederholbar
++ Treppen und der Befehl `treppe` fragen den Plan, ob es eine Tiefe gibt, nicht `daten.abfolge`
+
 ## Ebenen
 
 Vorbilder: Brogue und DCSS (Ebenen bleiben erhalten, Treppen verbinden sie), Grundlagen (Hub zwischen den Ebenen).
 
 Daten:
 
-+ Abfolge der Tiefen in `daten/index.js`: `abfolge: ["hub", "keller", "keller", "keller"]` (Tiefe 0 ist der Hub), `starttiefe: 1`; mehrere Tiefen dürfen dieselbe Vorlage aus `daten/ebenen.js` nutzen
-+ Ebene (`daten/ebenen.js`): feste `karte` (Zeilen aus Geländekennungen, z.B. der Hub) oder `breite`, `hoehe` und Parameter für den Digger von rot.js (`digger`), dazu `gelaende`, `gelaendeObjekte` (z.B. Gärbottiche), `tuerChance`, `fallen`, `gegenstaende` und `population: { tabelle, anzahl: [min, max] }` oder eine feste Liste `gegner`
++ Abfolge der Tiefen in `daten/index.js`: `abfolge: ["hub", "keller", "keller", "keller"]` (Tiefe 0 ist der Hub), `starttiefe: 1`; mehrere Tiefen dürfen dieselbe Vorlage aus `daten/ebenen.js` nutzen; der Plan des Laufs übernimmt sie
++ Ebene (`daten/ebenen.js`): feste `karte` (Zeilen aus Geländekennungen, z.B. der Hub) oder `breite`, `hoehe` und Parameter für den Digger von rot.js (`digger`), dazu `gelaende` (Rollen `wand`, `boden`, `tuer`, `treppeAuf`, `treppeAb`; Vorgaben `wand`, `boden`, `tuer_zu`, `treppe_auf`, `treppe_ab`), `gelaendeObjekte` (z.B. Gärbottiche), `tuerChance`, `fallen`, `gegenstaende` und `population: { tabelle, anzahl: [min, max] }` oder eine feste Liste `gegner`; wahlweise `schritte`, die Folge der Ebenenschritte
++ Vorgaben der Schritte in `regeln.ebenen`: `schritteErzeugt` (`karte_digger`, `tueren`, `treppen`, `gelaende_objekte`, `erreichbarkeit`, `ebene_anlegen`, `freie_felder`, `population`, `gegenstaende`, `fallen`), `schritteFest` für Ebenen mit `karte` (`karte_fest`, `erreichbarkeit`, `ebene_anlegen`), `versuche` 10
 + Population (`daten/populationen.js`): Einträge `{ typ, gewicht, tiefe: [von, bis], rudel?: [min, max], affixe?: [{ zustand, chance }] }`; Regelwerte `regeln.population` (`tieferChance` 10, `tieferBis` 2, `hoechstWesen` 500)
 + Im Zustand: `ebene` (die aktuelle), `tiefe`, `abgelegteEbenen[tiefe]` (verlassene Ebenen mit ihren Entitäten und Einträgen der Warteschlange samt Zeitpunkt)
++ Baukontext (`src/welt/ebene.js`), den die Schritte nacheinander füllen: `{ tiefe, name, ebenendaten, planEintrag, versuch, schluessel, zufall(name), zeilen, raeume, tuerFelder, treppen, freieFelder }`; er lebt nur während der Erzeugung und gehört nicht zum Zustand
 
 Schnittstellen:
 
-+ `ebeneErzeugen(spiel, tiefe)` (`src/welt/ebene.js`) gibt die Treppen zurück (`{ treppeAuf, treppeAb }`); `ebenennameFuer`, `eintraegeFuerTiefe`
++ `ebeneErzeugen(spiel, tiefe)` (`src/welt/ebene.js`) gibt die Treppen zurück (`{ treppeAuf, treppeAb }`); `schritteDerEbene(daten, ebenendaten)`
++ Register `ebenenschritte` (`src/welt/ebenenschritte.js`): `{ braucht: [teil], liefert: [teil], verwirft?, ausfuehren(spiel, bau) }`, Teile sind `karte`, `raeume`, `treppen`, `ebene`, `freie_felder`; ein Schritt mit `verwirft` darf `NEUER_VERSUCH` zurückgeben; `unerreichbareFelder(spiel, zeilen, start)`, `kennungFuer(spiel, bau, rolle)`
++ `eintraegeFuerTiefe`, `populationSetzen`, `freiesFeldZiehen` (`src/welt/population.js`)
 + Befehl `{ art: "treppe" }` (Taste `<` oder `>`), nur für Ninkasi, Ablehnung `keine_treppe`, Zeitkosten `aktionen.treppe`; Meldung `ebene_gewechselt` mit `tiefe` und `richtung`
 + `ebeneWechseln` (`src/systeme/ebenen.js`)
 
 Regeln:
 
-+ Jede Tiefe bekommt ihren eigenen abgeleiteten Zufall (`ebene.<tiefe>.<name>`, dazu `.tueren`, `.objekte`, `.inhalt`, siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit), ist je Startwert also wiederholbar und doch verschieden
-+ Erzeugung: eine feste Karte wird übernommen; sonst Digger mit Treppe hinauf in der Mitte des ersten Raums und Treppe hinab in der Mitte des Raums, der davon am weitesten entfernt ist, jeweils nur, wenn es die Tiefe gibt; Ninkasi legt die Erzeugung nicht an; zu Beginn steht Ninkasi auf der Treppe hinauf der Starttiefe (oder in der Mitte des ersten Raums)
++ Jede Tiefe bekommt ihren eigenen abgeleiteten Zufall (`ebene.<tiefe>.<name>` für den Digger, `bau.zufall(name)` dahinter, z.B. `.tueren`, `.objekte`, `.inhalt`, siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit), ist je Startwert also wiederholbar und doch verschieden; nie aus dem Spielverlauf
++ Erzeugung in Schritten: die Folge aus `schritte` der Ebene, sonst die Vorgabe; die Datenprüfung verlangt, dass jeder Schritt angemeldet ist, ein früherer liefert, was er braucht, ein verwerfender Schritt vor `ebene_anlegen` steht (dann steht noch nichts im Zustand) und am Ende eine Ebene angelegt ist
++ Schritte: `karte_digger` gräbt mit dem Digger; `karte_fest` übernimmt die feste Karte samt Treppen; `tueren` setzt an Raumzugängen mit `tuerChance` Prozent Türen; `treppen` setzt die Treppe hinauf in die Mitte des ersten Raums und die Treppe hinab in die Mitte des Raums, der davon am weitesten entfernt ist, jeweils nur, wenn es die Tiefe im Plan gibt; `gelaende_objekte` setzt Objekte nur ins Innere der Räume außer dem ersten, so sperren sie keinen Durchgang; `erreichbarkeit` verlangt, dass jedes Feld, das ein laufendes Wesen betreten kann (Türen zählen als offen), von der Treppe hinauf (sonst hinab, sonst der Mitte des ersten Raums) in acht Richtungen erreichbar ist; `ebene_anlegen` setzt `zustand.ebene`; `freie_felder` sammelt Bodenfelder außerhalb des ersten Raums und seines Rands ohne Zugänge; `population`, `gegenstaende` und `fallen` setzen darauf mit dem gemeinsamen Zufall `.inhalt`
++ Verwirft ein Schritt den Versuch, beginnt der Bau neu mit dem Schlüssel `ebene.<tiefe>.<name>.versuch<n>`, höchstens `regeln.ebenen.versuche` Mal, danach wirft die Erzeugung; der erste Versuch behält den Schlüssel ohne Zusatz, so blieben alle Ebenen beim Umbau in Schritte gleich (0.33.0)
++ Ninkasi legt die Erzeugung nicht an; zu Beginn steht Ninkasi auf der Treppe hinauf der Starttiefe (oder in der Mitte des ersten Raums)
 + Wechsel: die alte Ebene kommt mit allen Entitäten außer Ninkasi und dem, was sie trägt, und deren Einträgen der Warteschlange (Akteure, gebundene Zeitereignisse) samt Zeitpunkt nach `abgelegteEbenen`; die Weltuhr gehört keiner Ebene und läuft weiter
 + Verlassene Ebenen ruhen: bei der Rückkehr rücken alle Zeitangaben dort (Einträge, Beginn und Ende der Zustände) um die vergangene Zeit nach; noch nie besuchte Tiefen werden erzeugt und ihre Wesen eingereiht; Ninkasi kommt an der Gegentreppe an (wer hinabsteigt, an der Treppe hinauf), ist sie besetzt, am nächsten freien Feld
 + Der Wechsel verwirft den räumlichen Index (siehe [Architektur.md](Architektur.md), Leistung); nur hier wird Ninkasis Position deshalb direkt gesetzt, der Index entsteht danach neu; Gasquellen und andere Vorräte im `zwischenspeicher` hängen an der Ebene und entstehen ebenso neu
@@ -143,11 +169,11 @@ Regeln:
 
 ## Tests
 
-+ `tests/gelaende.test.js` (Türen, Benutzen, Fallen, Entdecken), `tests/schichten.test.js` (Oberfläche, Gas, Feuer), `tests/ebenen.test.js` (Erzeugung, Treppen, Ruhen, Population), `tests/wege.test.js`, `tests/gefahr.test.js`, `tests/geometrie.test.js`
++ `tests/gelaende.test.js` (Türen, Benutzen, Fallen, Entdecken), `tests/schichten.test.js` (Oberfläche, Gas, Feuer), `tests/ebenen.test.js` (Plan des Laufs, Erzeugung in Schritten samt Vergleich mit den Ebenen vor dem Umbau, Erreichbarkeit, Treppen, Ruhen, Population), `tests/wege.test.js`, `tests/gefahr.test.js`, `tests/geometrie.test.js`
 
 ## Verweise
 
 + Spieldesign der Welt und des Hubs: [Grundlagen.md](Grundlagen.md); Darstellung von Karte und Schichten: [Anzeige.md](Anzeige.md); Tiles: [Tileset.md](Tileset.md)
-+ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 8 (u.a. Nachholen der Zeit verlassener Ebenen, Wesen folgen über Treppen, Dienste des Hubs, Tiles); Themenräume als Idee in [Ausblick.md](Ausblick.md)
++ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 8 (u.a. Nachholen der Zeit verlassener Ebenen, Wesen folgen über Treppen, Dienste des Hubs, Tiles); Themenräume, Schatzräume, Quests und feste Strukturen als Ideen in [Ausblick.md](Ausblick.md), sie bauen auf den Plan des Laufs und die Schritte
 
 Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).

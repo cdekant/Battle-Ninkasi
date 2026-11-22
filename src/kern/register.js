@@ -23,6 +23,8 @@ const ARTEN = [
   "beimErzeugen",       // nach dem Erzeugen jeder Entität: (zustand, entitaet) => void, z.B. Verderben einplanen, Etikett
   "ausloeserquellen",   // weitere Auslöser einer Entität nach Zuständen und Ausrüstung: (spiel, entitaet) => [{ ausloeser, schluessel }]
   "lernanlaesse",       // Lernanlässe der Skills (systeme/lernen.js): { beschreibung }; Daten nennen sie in lernt
+  "planschritte",       // Schritte des Plans des Laufs (welt/plan.js): (spiel, plan, zufall) => void, beim Start nacheinander
+  "ebenenschritte",     // Schritte der Ebenenerzeugung (welt/ebene.js): { braucht, liefert, verwirft?, ausfuehren(spiel, bau) }
 ];
 
 export const RANG_VORGABE = 100;

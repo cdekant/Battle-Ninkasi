@@ -25,7 +25,7 @@ Umsetzung: keine
 |---|---|---|---|
 | Steuerung anderer Wesen | mittel, offen | hoch, mit Lesefunktion gering | ja (Lesefunktion) |
 | Handlungsoptionen der KI | hoch | mittel | ja (Format der Daten) |
-| Schatzräume mit Schlüssel | hoch | mittel | ja (Plan des Laufs) |
+| Schatzräume mit Schlüssel | hoch | gering (Plan des Laufs steht) | erledigt (Plan des Laufs) |
 | Fraktionen: Ruf und Beistand | hoch | gering bis mittel | ja (Ruf vorbereiten) |
 | Vorschau durch Simulation | hoch | mittel | ja |
 | Hellsicht, Spüren, Unsichtbarkeit | hoch | mittel | ja |
@@ -39,11 +39,11 @@ Umsetzung: keine
 | Ausrüstung und Effekte am Tile | hoch | gering | ja (Daten fürs Aussehen) |
 | Wurfweite nach Skill und Gewicht | ungeklärt | gering | nein |
 | Krankheiten | ungeklärt | gering | nein |
-| Questsystem | hoch | mittel | ja (Plan des Laufs, Ziele über Haken) |
-| Feste Strukturen | ungeklärt | mittel | ja (Erzeugung in Schritten) |
+| Questsystem | hoch | gering bis mittel | teils erledigt (Plan des Laufs), offen: Ziele über Haken |
+| Feste Strukturen | ungeklärt | gering bis mittel | erledigt (Erzeugung in Schritten) |
 | Nachrückende Gegner | ungeklärt | gering | nein |
 | Fortschritt über Läufe | höchstens Wissen | gering, mit einer Regel | ja (Regel) |
-| Themenräume und Rätsel | mittel | mittel | später |
+| Themenräume und Rätsel | mittel | gering bis mittel | erledigt (Erzeugung in Schritten) |
 | Licht | hoch | gering | nein |
 | Todesbericht | hoch | gering | nein |
 | Prüfsumme der Daten | hoch | gering | nein |
@@ -167,9 +167,9 @@ Umsetzung: offen
 + Wichtigkeit: mittel (Struktur für Rätsel, die EP bringen)
 + Vorbilder: Brogue (Machines: Räume aus Bausteinen mit Hebeln, Schlüsseln, Käfigen, Fallen; ein Schlüssel öffnet einen Altarraum anderswo auf der Ebene)
 + Braucht: Ebenenerzeugung in Schritten aus Daten (Räume einsetzen, Bezüge zwischen Feldern wie Hebel und Tor); Hebel mit Wirkung in der Ferne, verschlossene Türen mit Schlüssel; Lernanlass "Rätsel gelöst"
-+ Berührt: `src/welt/ebene.js` (heute ein Durchgang mit dem Digger von rot.js, dann Inhalte), veränderbares Gelände (zerstörbare Wände umgehen Sperren)
-+ Umbaurisiko: mittel
-+ Vorkehrung: keine sofort; vor dem ersten Themenraum die Erzeugung in Schritte mit Register teilen
++ Berührt: die Ebenenerzeugung (seit 0.33.0 in Schritten mit Register, siehe [Welt.md](Welt.md), Ebenen), veränderbares Gelände (zerstörbare Wände umgehen Sperren)
++ Umbaurisiko: gering bis mittel; ein Themenraum ist ein neuer Ebenenschritt, Bezüge zwischen Feldern wie Hebel und Tor fehlen noch
++ Vorkehrung: erledigt in 0.33.0 (Erzeugung in Schritten mit Register)
 + Aus der Arbeitsliste hierher: vorher [Systemausbau.md](Systemausbau.md), Punkt 10
 
 Umsetzung: offen
@@ -178,11 +178,11 @@ Umsetzung: offen
 
 + Wichtigkeit: ungeklärt, gewünscht (2026-11-22): feste Bauwerke mit Grundmuster in den zufälligen Ebenen, z.B. Sudhäuser
 + Vorbilder: Minecraft (Bauwerke aus Vorlagen: ein Startstück aus einem gewichteten Pool, Anschlusspunkte im Stück nennen den Pool für das nächste Stück, so wächst ein Dorf aus Häusern und Wegen; ein Ersatzpool schließt eine Kette sauber ab); Dungeon Crawl Stone Soup (Vaults als Text in `.des`-Dateien: Karte aus Zeichen, Zeichen als Platzhalter für Gegner, Gegenstände und Gelände aus Tabellen, Ersetzungen mit Zufall, Tiefe als Bedingung, frei platziert oder als ganze Ebene, Rand als Pflicht); Brogue (Machines, siehe Themenräume)
-+ Vorhanden: feste Karten als Zeilen aus Kennungen, bisher nur für eine ganze Ebene (der Hub in `daten/ebenen.js`, `festeKarte` in `src/welt/ebene.js`); die übrigen Ebenen baut der Digger von rot.js in einem Stück, danach kommen Türen, Fallen und Population
++ Vorhanden: feste Karten als Zeilen aus Kennungen, bisher nur für eine ganze Ebene (der Hub in `daten/ebenen.js`, Schritt `karte_fest`); seit 0.33.0 entsteht jede Ebene in Schritten aus einem Register samt Prüfung der Erreichbarkeit und neuem Versuch (siehe [Welt.md](Welt.md), Ebenen)
 + Braucht: Strukturen als Daten im selben Format wie der Hub, dazu eine Legende für Platzhalter (Gegner aus einer Tabelle, Gegenstand, Falle, Gelände mit Zufall); Bedingungen (Tiefe, Ebenenart, höchstens einmal je Lauf) und Gewichte; einen Schritt der Erzeugung, der eine Struktur in die fertige Karte stempelt (Platz suchen, drehen oder spiegeln, Eingänge an Gänge anbinden), danach eine Prüfung, dass alles Begehbare erreichbar bleibt, sonst ein neuer Versuch mit abgeleitetem Zufall; später zusammengesetzte Strukturen aus Teilen nach Minecraft (Sudhalle, Lager, Gärkeller)
 + Berührt: `src/welt/ebene.js`, Themenräume (eine Struktur kann einen Themenraum enthalten), Schatzräume und Questsystem (der Plan des Laufs legt fest, welche Tiefe welche Struktur bekommt), Population (in Strukturen eigene Regeln), Nachrückende Gegner (nicht in Strukturen), veränderbares Gelände (geschützte Wände)
-+ Umbaurisiko: mittel, auf die Ebenenerzeugung beschränkt
-+ Vorkehrung: dieselbe wie bei den Themenräumen, die Erzeugung in Schritte mit Register teilen; das Kartenformat des Hubs als gemeinsames Format für Strukturen behalten
++ Umbaurisiko: gering bis mittel, auf die Ebenenerzeugung beschränkt; eine Struktur ist ein neuer Ebenenschritt zwischen Karte und `erreichbarkeit`
++ Vorkehrung: erledigt in 0.33.0 (Erzeugung in Schritten mit Register, Erreichbarkeit mit neuem Versuch); weiter gilt: das Kartenformat des Hubs als gemeinsames Format für Strukturen behalten
 
 Umsetzung: offen
 
@@ -290,8 +290,8 @@ Umsetzung: offen
 + Braucht: einen Plan des Laufs: Ebenen entstehen erst beim ersten Betreten (siehe [Welt.md](Welt.md), Ebenen), ein Schlüssel zwei Ebenen tiefer muss aber feststehen, bevor jene erzeugt wird; der Plan folgt beim Start aus dem Startwert (welche Tiefe welchen Schatzraum hat, wo sein Schlüssel liegt) und jede Erzeugung einer Ebene liest ihn; Schlüssel als Gegenstand mit Bezug auf seinen Raum; Türen, die nur dieser Schlüssel öffnet und die gegen Zerstören geschützt sind
 + Berührt: `src/welt/ebene.js` (erzeugt jede Ebene für sich mit eigenem abgeleitetem Zufall), Themenräume, veränderbares Gelände (Schutz der Wände), Verschleiß (ein Schlüssel darf nicht zerfressen werden), Fallenlassen und Sturz in den Abgrund (verlorener Schlüssel)
 + Regelfrage: was mit einem verlorenen Schlüssel geschieht (kehrt zurück, ist unzerstörbar, oder Pech)
-+ Umbaurisiko: mittel
-+ Vorkehrung: den Plan des Laufs als Teil des Zustands anlegen, sobald die Ebenenerzeugung umgebaut wird; Ebenen nie aus dem Spielverlauf würfeln, nur aus Startwert und Plan (gilt heute schon für das Gelände)
++ Umbaurisiko: gering, seit es den Plan des Laufs gibt
++ Vorkehrung: erledigt in 0.33.0 (Plan des Laufs im Zustand, siehe [Welt.md](Welt.md), Plan des Laufs); weiter gilt: Ebenen nie aus dem Spielverlauf würfeln, nur aus Startwert und Plan
 
 Umsetzung: offen
 
@@ -372,8 +372,8 @@ Umsetzung: offen
 + Braucht: Quests als Daten (Vorlage mit Rollen wie Auftraggeber, Ziel, Gegenstand, Ort; Bedingungen für das Erscheinen nach Tiefe); erzeugte Quests aus Vorlagen mit Platzhaltern, die die Erzeugung aus dem Inhalt füllt; Ziele als Auslöser auf vorhandene Haken und Meldungen (töten, bringen, erreichen, brauen, sprechen, beschützen); Stand der Quests im Zustand; Belohnungen als Effekte (Gegenstände, EP als Lernanlass, Ruf, Wissen); Fensterart Journal; Annehmen und Abgeben über Gespräch
 + Berührt: Ebenenerzeugung (das Ziel einer Quest kann auf einer noch nicht erzeugten Ebene liegen: derselbe Plan des Laufs wie bei den Schatzräumen), Gespräch, Ruf, Lernen (gebundene EP nur für Bewältigtes, eine Quest ist Bewältigtes), Texte und Grammatik (Platzhalter in Aufträgen), Bestiarium und Rezeptbuch (Wissen als Belohnung)
 + Regelfragen: was geschieht, wenn ein Questziel ohne Ninkasi verschwindet (ein anderer tötet den Gesuchten, Säure zerfrisst den Gegenstand); ob Quests scheitern können oder eine Frist haben (passt zum Druck gegen endloses Rasten)
-+ Umbaurisiko: mittel, vor allem wegen des Plans des Laufs
-+ Vorkehrung: den Plan des Laufs von Anfang an so anlegen, dass er Schatzräume und Quests aufnimmt; Meldungen und Haken tragen weiter Urheber, Art und Ort, damit Questziele nur Auslöser sind; Questgegenstände als Gegenstände mit einem Kennzeichen, das Verschleiß und Zerstören verhindert
++ Umbaurisiko: gering bis mittel; der Plan des Laufs steht seit 0.33.0 und nimmt Quests in `inhalte` auf
++ Vorkehrung: der Plan des Laufs ist erledigt (siehe [Welt.md](Welt.md), Plan des Laufs); weiter gilt: Meldungen und Haken tragen weiter Urheber, Art und Ort, damit Questziele nur Auslöser sind; Questgegenstände als Gegenstände mit einem Kennzeichen, das Verschleiß und Zerstören verhindert
 
 Umsetzung: offen
 
@@ -409,6 +409,7 @@ Umsetzung: offen
 + 2026-11-22: Begleiter nehmen Vorrangbefehle an ([Grundlagen.md](Grundlagen.md), Spiel)
 + 2026-11-22: die Vorkehrungen stehen nach Dringlichkeit als Punkt 14 in [Systemausbau.md](Systemausbau.md)
 + 2026-11-22: für Besessenheit nur die leichte Vorkehrung (Lesefunktion statt zweitem Feld); ob sie kommt, bleibt offen
++ 2026-11-22: Plan des Laufs im Zustand, Folge der Ebenenschritte in den Daten (mit Vorgabe in `daten/regeln.js` und Prüfung von `braucht`), Erreichbarkeit mit neuem Versuch; umgesetzt in 0.33.0
 
 ## Recherche
 

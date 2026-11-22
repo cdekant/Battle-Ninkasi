@@ -58,7 +58,11 @@ function gelaendeBetretbar(gelaende, bewegungsart) {
 // Ob ein Feld für eine Bewegungsart betretbar ist (ohne Rücksicht auf Wesen darauf); eine geschlossene Tür zählt
 // wie die offene, wenn oeffnetTueren gilt
 export function betretbarFuer(spiel, x, y, bewegungsart = "laufend", oeffnetTueren = true) {
-  const gelaende = gelaendeAuf(spiel, x, y);
+  return gelaendeBetretbarFuer(spiel, gelaendeAuf(spiel, x, y), bewegungsart, oeffnetTueren);
+}
+
+// Wie betretbarFuer, aber für ein Gelände statt eines Felds (z.B. beim Erzeugen, bevor die Ebene im Zustand steht)
+export function gelaendeBetretbarFuer(spiel, gelaende, bewegungsart = "laufend", oeffnetTueren = true) {
   if (!gelaende) return false;
   if (gelaendeBetretbar(gelaende, bewegungsart)) return true;
   const offen = oeffnetTueren && gelaende.tuer?.offen ? spiel.daten.gelaende[gelaende.tuer.offen] : null;

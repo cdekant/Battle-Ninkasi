@@ -32,7 +32,7 @@ Taste → `eingabe/eingabe.js` (Belegung → Aktion aus dem Aktionskatalog) → 
 + `src/kern/`: Spiel und Eingangstür (`spiel.js`), Zustand, Zeit, Zufall, Ereignisse und Haken, Register, Vorgang, Werte, Kurven, Effektsystem und Grundbausteine, Auslöser, Datenprüfung
 + `src/systeme/`: die Mechanik je Thema (Kampf, Bewegung, Zustände, Fähigkeiten, Inventar, Gelände, Wahrnehmung, Skills, Lernen u.a.); melden sich beim Import in Registern an (`systeme/index.js`)
 + `src/ki/`: Verhaltensmodule (`abwarten`, `jagen`, `fliehen`), Zielwahl, Schrittwahl, Wahl der Fähigkeiten
-+ `src/welt/`: Erzeugung der Ebenen, Karte, Feldschichten, Wegfindung, Geometrie
++ `src/welt/`: Plan des Laufs, Erzeugung der Ebenen in Schritten, Population, Karte, Feldschichten, Wegfindung, Geometrie
 + `src/eingabe/`: Aktionskatalog, Belegung, Fensterstapel und Fensterarten, Maus, Abläufe (Reise, Laufen, Rasten, Erkunden), Zielmodus, Einstellungen, Speicherstand; reine Tastenlogik ohne DOM
 + `src/anzeige/`: Renderer, Tilebilder, Kamera, Seitenleiste, Log, Fensterinhalte, Titel, Texte und Grammatik, `stil.css`
 + `daten/`: Inhalte als JS-Daten, gesammelt in `daten/index.js`; Regelwerte für das Balancing in `daten/regeln.js`
@@ -45,7 +45,7 @@ Taste → `eingabe/eingabe.js` (Belegung → Aktion aus dem Aktionskatalog) → 
 + Entität, Komponente, Wert, Zeitmodell, Ereignis, Haken, Register, Speichern: [docs/Architektur.md](docs/Architektur.md)
 + Wirkungsart, Effekt, Baustein, Modifikator, Auslöser, Zustand, Zielmuster, Fähigkeit, lange Aktion, Vorgang: [docs/Wirkungen.md](docs/Wirkungen.md)
 + Kampfwert, Angriffsprofil, Fraktion, Wahrnehmung, Verhaltensmodul, Bewegungsart, Skill, Lernpunkte: [docs/Wesen.md](docs/Wesen.md)
-+ Gelände, Feldschicht, Ebene, Tiefe: [docs/Welt.md](docs/Welt.md); Stapel, Ladung, Platz, Verschleiß, Etikett: [docs/Gegenstaende.md](docs/Gegenstaende.md)
++ Gelände, Feldschicht, Plan des Laufs, Ebene, Ebenenschritt, Tiefe: [docs/Welt.md](docs/Welt.md); Stapel, Ladung, Platz, Verschleiß, Etikett: [docs/Gegenstaende.md](docs/Gegenstaende.md)
 + Aktion, Belegung, Fensterart, Fensterstapel, Ablauf, Zielmodus, Schnellleiste: [docs/Bedienung.md](docs/Bedienung.md)
 
 ## Dokumente
