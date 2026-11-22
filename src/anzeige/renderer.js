@@ -9,6 +9,7 @@ const DECKKRAFT_ERINNERT = 0.35; // bekannte, aber gerade nicht sichtbare Felder
 import { istBekannt } from "../systeme/fallen.js";
 import { erinnerteDingeAuf } from "../systeme/erinnerung.js";
 import { schichtenVon, feldVonIndex } from "../welt/schichten.js";
+import { aussehenVon } from "../kern/zustand.js";
 
 // Deckkraft der Feldschichten: Oberfläche und Feuer fest, Gas mit der Menge zunehmend bis höchstens GAS_DECKKRAFT
 const OBERFLAECHE_DECKKRAFT = 0.4, FEUER_DECKKRAFT = 0.6, GAS_DECKKRAFT = 0.6, GAS_VOLL = 100;
@@ -112,13 +113,14 @@ export class Renderer {
     for (const entitaet of zeichenreihenfolge) {
       const bildX = entitaet.position.x - kamera.x, bildY = entitaet.position.y - kamera.y;
       if (bildX < 0 || bildY < 0 || bildX >= ansicht.breite || bildY >= ansicht.hoehe) continue;
-      const zeichenEintrag = entitaet.falle ? zeichensatz.fallen?.[entitaet.typ] : istWesen(entitaet) ? zeichensatz.wesen[entitaet.typ] : zeichensatz.gegenstaende[entitaet.typ];
+      const aussehen = aussehenVon(entitaet);
+      const zeichenEintrag = entitaet.falle ? zeichensatz.fallen?.[aussehen] : istWesen(entitaet) ? zeichensatz.wesen[aussehen] : zeichensatz.gegenstaende[aussehen];
       // Tiles sind durchsichtig und liegen auf dem schon gezeichneten Boden; ein Zeichen braucht den Hintergrund
       // des Bodens nur, wenn der Boden selbst als Zeichen gezeichnet wurde
       const bodenName = gelaendeNameNachKennung[ebene.felder[entitaet.position.y][entitaet.position.x]];
       const bodenAlsZeichen = !this.tilebild(bodenName, zoom);
       const hintergrund = bodenAlsZeichen ? zeichensatz.gelaende[bodenName]?.hintergrund : undefined;
-      this.feldZeichnen(bildX, bildY, zoom, entitaet.typ, { ...zeichenEintrag, hintergrund }, 1);
+      this.feldZeichnen(bildX, bildY, zoom, aussehen, { ...zeichenEintrag, hintergrund }, 1);
     }
 
     // Gas schwebt über allem

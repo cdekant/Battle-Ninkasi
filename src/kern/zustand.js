@@ -114,7 +114,8 @@ export function entitaetEntfernen(zustand, id) {
   gebundeneEreignisseEntfernen(zustand, id);
 }
 
-// Wirksame Fraktion und KI: die des jüngsten Zustands, der sie überlagert (systeme/zustaende.js), sonst die eigene
+// Wirksame Komponente (Fraktion, KI, Bewegungsart und die übrigen ohne Zahl): die des jüngsten Zustands, der sie
+// überlagert (systeme/zustaende.js), sonst die eigene
 function juengsteUeberlagerung(entitaet, feld) {
   const zustaende = entitaet?.zustaende || [];
   for (let position = zustaende.length - 1; position >= 0; position--) {
@@ -139,6 +140,30 @@ export function kiVon(entitaet) {
 // Wirksame Bewegungsart (siehe welt/karte.js): die des jüngsten überlagernden Zustands, sonst die eigene, Vorgabe "laufend"
 export function bewegungVon(entitaet) {
   return juengsteUeberlagerung(entitaet, "bewegung") ?? "laufend";
+}
+
+// Komponenten ohne Zahl nur über diese Lesefunktionen (Vorkehrung für Verwandlung, siehe docs/Architektur.md,
+// Entitäten und Komponenten); Zustände tragen die Felder bisher nicht, dann gilt die eigene Komponente
+export function plaetzeVon(entitaet) {
+  return juengsteUeberlagerung(entitaet, "plaetze") ?? {};
+}
+
+export function tuerenVon(entitaet) {
+  return juengsteUeberlagerung(entitaet, "tueren") ?? "oeffnen";
+}
+
+export function sichtVon(entitaet) {
+  return juengsteUeberlagerung(entitaet, "sicht") ?? null;
+}
+
+// Die eigenen Angriffsprofile ohne Waffen; alle Profile liefert angriffeVon in systeme/kampf.js
+export function eigeneAngriffeVon(entitaet) {
+  return juengsteUeberlagerung(entitaet, "angriffe") ?? [];
+}
+
+// Name, unter dem die Anzeige Zeichen und Tile sucht (daten/zeichen.js, grafik/); Vorgabe der Typ
+export function aussehenVon(entitaet) {
+  return juengsteUeberlagerung(entitaet, "aussehen") ?? entitaet.typ;
 }
 
 // Ninkasi: wer lernt, wer weiß, wessen Tod den Lauf beendet, wessen Züge die Bilanz zählt

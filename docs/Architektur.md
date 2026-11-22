@@ -69,7 +69,7 @@ Daten (`src/kern/zustand.js`):
 Schnittstellen:
 
 + Erzeugen: `entitaetErzeugen`, `entitaetAusDatensatz`; danach laufen die Handler des Registers `beimErzeugen` (`(zustand, entitaet) => void`), auch für einen abgespaltenen Teil eines Stapels; so planen Gegenstände ihr Verderben ein und bekommen ihr Etikett
-+ Lesen: `entitaetMitId`, `alleEntitaeten`, `entitaetenAuf`, `entitaetenImUmkreis`, `entitaetenMitPosition`, `spielerin`, `gesteuerteEntitaet`, `istGesteuert`, `istWesen`, `fraktionVon`, `kiVon`, `bewegungVon`, `anzahlWesen`
++ Lesen: `entitaetMitId`, `alleEntitaeten`, `entitaetenAuf`, `entitaetenImUmkreis`, `entitaetenMitPosition`, `spielerin`, `gesteuerteEntitaet`, `istGesteuert`, `istWesen`, `fraktionVon`, `kiVon`, `bewegungVon`, `plaetzeVon`, `tuerenVon`, `sichtVon`, `eigeneAngriffeVon`, `aussehenVon`, `anzahlWesen`
 + Entfernen: `entitaetEntfernen` (mit gebundenen Zeitereignissen), `ausDemInventarNehmen`
 
 Regeln:
@@ -78,6 +78,7 @@ Regeln:
 + Beispiele: Psi-Kontrolle ändert die Fraktion; Kulturhefe als Verbündete ist ein Dateneintrag; ein Phage tauscht beim Befall Komponenten des Bakteriums aus; ein wandernder Händler hat eine Handelskomponente und eine friedliche Fraktion
 + Der gesamte Zustand ist reine Daten und als JSON serialisierbar (keine Funktionen, keine DOM-Objekte)
 + Zwei Rollen, eine Figur: `gesteuerteEntitaet(zustand)` ist, wer Befehle über die Eingangstür bekommt, wessen Sicht gilt und wem Kamera, Zielmodus, Abläufe, Seitenleiste, Gepäck, Fähigkeiten und Schnellleiste folgen; `spielerin(zustand)` ist Ninkasi, die lernt, weiß (Kennen), deren Tod den Lauf beendet und deren Züge die Bilanz zählt; freie EP und Skills zeigt die Seitenleiste von Ninkasi. Vorerst ist die gesteuerte Entität immer Ninkasi, ohne eigenes Feld im Zustand; `istGesteuert(zustand, entitaet)` ersetzt den Vergleich mit `spielerinId`. Vorkehrung für Besessenheit, siehe [Ausblick.md](Ausblick.md), Steuerung anderer Wesen
++ Komponenten ohne Zahl (Fraktion, KI, Bewegungsart, Plätze, Türen, Sicht, eigene Angriffe, Aussehen) liest der Code nur über ihre Lesefunktionen in `src/kern/zustand.js`; jede nimmt den Wert des jüngsten Zustands, der das Feld trägt, sonst den der Entität. Zustände tragen bisher nur `fraktion`, `ki` und `bewegung` (siehe [Wirkungen.md](Wirkungen.md), Zustände); die übrigen Felder sind die Vorkehrung für Verwandlung (siehe [Ausblick.md](Ausblick.md), Verwandlung), die Datenprüfung lässt sie an Zuständen noch nicht zu. `aussehenVon` liefert den Namen, unter dem die Anzeige Zeichen und Tile sucht, Vorgabe der Typ. Zahlenwerte gehen über Modifikatoren (siehe [Wirkungen.md](Wirkungen.md), Modifikatoren)
 + Positionen ändern sich nur über `positionSetzen` (`src/kern/raumindex.js`), damit der räumliche Index stimmt; Wesen bewegt `versetzen` (siehe [Wesen.md](Wesen.md), Bewegung)
 
 ## Zeitmodell
@@ -265,7 +266,7 @@ Messwerte:
 
 ## Tests
 
-+ `tests/zeit.test.js` (Warteschlange, Gleichstand, Heap), `tests/zufall.test.js` (sfc32, Würfel, Anteile), `tests/register.test.js` (Ränge, Vorrat), `tests/kurven.test.js`, `tests/daten.test.js` (Datenprüfung), `tests/speichern.test.js` (Schnappschuss, Speicherstand, Plätze), `tests/leistung.test.js` (räumlicher Index), `tests/ausloeser.test.js` und `tests/tod.test.js` (Vorgang), `tests/gesteuert.test.js` (gesteuerte Entität; Dateien für Eingabe, Sicht, Kamera und Zielmodus fragen nicht `spielerin()`)
++ `tests/zeit.test.js` (Warteschlange, Gleichstand, Heap), `tests/zufall.test.js` (sfc32, Würfel, Anteile), `tests/register.test.js` (Ränge, Vorrat), `tests/kurven.test.js`, `tests/daten.test.js` (Datenprüfung), `tests/speichern.test.js` (Schnappschuss, Speicherstand, Plätze), `tests/leistung.test.js` (räumlicher Index), `tests/ausloeser.test.js` und `tests/tod.test.js` (Vorgang), `tests/gesteuert.test.js` (gesteuerte Entität; Dateien für Eingabe, Sicht, Kamera und Zielmodus fragen nicht `spielerin()`), `tests/komponenten.test.js` (Lesefunktionen der Komponenten ohne Zahl mit Überlagerung; Wächter gegen direkte Zugriffe in `src/` mit einer Liste begründeter Ausnahmen)
 + Der Bot prüft Wiederholbarkeit (Nachspielen), Index und Heap nach jedem Befehl und das Laden mitten im Lauf (siehe [Entwicklung.md](Entwicklung.md), Bot und Werkzeuge)
 
 ## Verweise

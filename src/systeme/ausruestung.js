@@ -20,7 +20,7 @@
 
 import { anmelden } from "../kern/register.js";
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
-import { entitaetMitId } from "../kern/zustand.js";
+import { entitaetMitId, plaetzeVon } from "../kern/zustand.js";
 import { modifikatorSkaliert } from "../kern/werte.js";
 import { bausteinAnmelden } from "../kern/bausteine.js";
 
@@ -57,7 +57,7 @@ function aufDemPlatz(spiel, wesen, platz) {
 // Was abgelegt werden muss, damit der Gegenstand passt (älteste zuerst), oder null, wenn er nie passt
 export function zuTauschen(spiel, wesen, gegenstand) {
   const { platz } = gegenstand.ausruestung;
-  const stellen = wesen.plaetze?.[platz] ?? 0;
+  const stellen = plaetzeVon(wesen)[platz] ?? 0;
   if (belegtVon(gegenstand) > stellen) return null;
   const dort = aufDemPlatz(spiel, wesen, platz);
   let frei = stellen - dort.reduce((summe, angelegt) => summe + belegtVon(angelegt), 0);

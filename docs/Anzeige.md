@@ -20,7 +20,7 @@ Daten:
 
 Schnittstellen:
 
-+ `Renderer` (`src/anzeige/renderer.js`): zeichnet die Karte auf ein Canvas und liest den Zustand nur; `ansicht(zoom)` passt das Canvas an seinen Container an und gibt den Ausschnitt in Feldern; Bilder aus `src/anzeige/tilebilder.js`, beim Start gebaut, Fehler im Tileset erscheinen wie Datenfehler
++ `Renderer` (`src/anzeige/renderer.js`): zeichnet die Karte auf ein Canvas und liest den Zustand nur; `ansicht(zoom)` passt das Canvas an seinen Container an und gibt den Ausschnitt in Feldern; Bilder aus `src/anzeige/tilebilder.js`, beim Start gebaut, Fehler im Tileset erscheinen wie Datenfehler; Zeichen und Tile einer Entität sucht er unter `aussehenVon` (Vorgabe der Typ, siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); was die Erinnerung festhält, steht schon als Typ darin
 + Markierungen über der Karte: Wegvorschau, Feld unter dem Zeiger, die Zielfelder angekündigter Angriffe sichtbarer Gegner (rötlich, `angekuendigteFelder` in `src/anzeige/ankuendigungen.js`, beim Zeichnen aus `laufendeAktion` berechnet, nicht gespeichert), die Vorschau des Zielmodus und das fliegende Geschoss (`src/anzeige/animation.js`, siehe [Bedienung.md](Bedienung.md), Zielmodus)
 + Wahrnehmbarkeit (`src/systeme/wahrnehmbar.js`, reine Lesefunktionen mit Tests): `meldungWahrnehmbar`, `geraeuschGehoert`, `richtungZu` (acht Himmelsrichtungen)
 

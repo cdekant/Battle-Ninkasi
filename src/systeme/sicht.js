@@ -8,12 +8,12 @@ import { feldIndex, aufDerKarte, abstand } from "../welt/karte.js";
 import { sichtdurchlaessig } from "../welt/schichten.js";
 import { sichtlinieFrei } from "../welt/geometrie.js";
 import { modifiziert } from "../kern/werte.js";
-import { gesteuerteEntitaet, istGesteuert, entitaetenMitPosition, entitaetenImUmkreis } from "../kern/zustand.js";
+import { gesteuerteEntitaet, istGesteuert, sichtVon, entitaetenMitPosition, entitaetenImUmkreis } from "../kern/zustand.js";
 import { epFuerErkundung } from "./lernen.js";
 import { erinnerungAuffrischen } from "./erinnerung.js";
 
 export function reichweiteSicht(spiel, entitaet) {
-  return modifiziert(spiel, entitaet, "reichweiteSicht", entitaet.sicht ? entitaet.sicht.reichweite : 0);
+  return modifiziert(spiel, entitaet, "reichweiteSicht", sichtVon(entitaet)?.reichweite ?? 0);
 }
 
 export function sichtfeldAktualisieren(spiel) {

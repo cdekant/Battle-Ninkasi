@@ -51,7 +51,7 @@ Daten:
 Schnittstellen (`src/systeme/ausruestung.js`):
 
 + Befehle `anlegen { gegenstandId }` und `ablegen { gegenstandId }`; Ablehnungen `nicht_im_gepaeck`, `nicht_anlegbar`, `schon_angelegt`, `kein_platz`, `nicht_angelegt`, `verflucht`; Meldungen `angelegt`, `abgelegt`, `fluch_entdeckt`, `fluch_aufgehoben`
-+ `ausgeruestete`, `istAngelegt`, `zuTauschen`, `fluchHindert`, `waffenprofile` (für `angriffeVon` in `src/systeme/kampf.js`), `haltbarkeitProzent`
++ `ausgeruestete`, `istAngelegt`, `zuTauschen` (Plätze aus `plaetzeVon`, siehe [Architektur.md](Architektur.md), Entitäten und Komponenten), `fluchHindert`, `waffenprofile` (für `angriffeVon` in `src/systeme/kampf.js`), `haltbarkeitProzent`
 + Modifikatorquelle `ausruestung` (Quelle `ausruestung:<id>`); Auslöser der Ausrüstung in der Kaskade (siehe [Wirkungen.md](Wirkungen.md), Auslöser); Baustein `fluch_aufheben`
 + Haken `gegenstand_benutzt` mit `gegenstandId` und `art` (`trinken`, `werfen`, `anlegen`, `ablegen`)
 

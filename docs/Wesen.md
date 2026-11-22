@@ -27,7 +27,7 @@ Daten:
 
 Schnittstellen (`src/systeme/kampf.js`):
 
-+ `angriffeVon(spiel, wesen)`: einziger Zugriff auf die Profile; angelegte Waffen ersetzen die eigenen (siehe [Gegenstaende.md](Gegenstaende.md), Ausrüstung)
++ `angriffeVon(spiel, wesen)`: einziger Zugriff auf die Profile; angelegte Waffen ersetzen die eigenen (siehe [Gegenstaende.md](Gegenstaende.md), Ausrüstung), die eigenen kommen aus `eigeneAngriffeVon` (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten)
 + `kampfwert(spiel, wesen, name)`: über Modifikatoren mit gleichnamigem Ziel, nie unter 0
 + `trefferanteil(spiel, { quelle, ziel, genauigkeit, gegen, tags })` liefert die Trefferchance als Bruch ohne zu würfeln, Grundlage für Vorschau, Tooltip und KI; `anteilInProzent` nur für die Anzeige
 + Baustein `trefferwurf { genauigkeit, effekt, gegen?, sonst?, kritchance? }` für Fernkampf, Magie, Psi und Flächen; `gegen` Vorgabe `ausweichen`, Psi z.B. `willenskraft`; `sonst` wirkt bei einem Fehlschlag, z.B. halber Schaden einer Explosion, der man ausweicht (Vorbild Rettungswurf); wo kein Wurf passt, lassen die Daten ihn weg
@@ -171,7 +171,7 @@ Daten:
 Schnittstellen:
 
 + `versetzen(spiel, wesen, feld, art, { urheberId, kettentiefe })` (`src/systeme/bewegung.js`) für alles, was Wesen bewegt, mit den Haken `verlaesst_feld` und `betritt_feld` (Ziel das bewegte Wesen, Quelle wer es bewegt, `position` das Feld, `art`); `istUnbeweglich`
-+ `betretbar(spiel, wesen, feld)` (`src/welt/karte.js`) gilt für Schritte, Wege (Option `bewegung` in `src/welt/wege.js`), Schrittwahl der KI, Beschwören, Reise und Erkunden; `bewegungVon` (`src/kern/zustand.js`) liefert die wirksame Bewegungsart wie bei Fraktion und KI
++ `betretbar(spiel, wesen, feld)` (`src/welt/karte.js`) gilt für Schritte, Wege (Option `bewegung` in `src/welt/wege.js`), Schrittwahl der KI, Beschwören, Reise und Erkunden; `bewegungVon` (`src/kern/zustand.js`) liefert die wirksame Bewegungsart wie bei Fraktion und KI, `oeffnetTueren` (`src/welt/karte.js`) fragt `tuerenVon`
 + Bausteine (`src/systeme/verschieben.js`):
   + `stossen { weite, wuerfel|menge, art? }`: weg vom Ursprung entlang der verlängerten Linie durch das Ziel (Schlag: die Angreiferin, Explosion: die Mitte; liegt der Ursprung auf dem Ziel, zählt die Quelle); Meldung `gestossen`
   + `ziehen { weite }`: zum Ursprung hin, höchstens bis daneben, Hindernisse halten ohne Schaden auf; Meldung `gezogen`

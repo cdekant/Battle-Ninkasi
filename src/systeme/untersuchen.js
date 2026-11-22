@@ -6,7 +6,7 @@
 // Wesen: LP, Zustände mit Restdauer in Zügen, Wachzustand, laufende Aktion, Trefferchance in beide Richtungen
 // (erstes Angriffsprofil, systeme/vorschau.js). Ninkasi selbst dazu mit der Aufschlüsselung ihrer Werte.
 
-import { gesteuerteEntitaet, entitaetenAuf, istWesen } from "../kern/zustand.js";
+import { gesteuerteEntitaet, entitaetenAuf, istWesen, sichtVon } from "../kern/zustand.js";
 import { feldBekannt, feldIndex, gelaendeName, bekannterGelaendeName } from "../welt/karte.js";
 import { schichtAuf } from "../welt/schichten.js";
 import { hatHoechstwert, hoechstwert, modifikatorenAufgeschluesselt, verrechnet, lebenswertName } from "../kern/werte.js";
@@ -114,7 +114,7 @@ export function herkunftVon(wesen, quelle) {
 // Grundwert eines Werts für die Aufschlüsselung
 function grundwertVon(spiel, wesen, name) {
   if (HOECHSTWERTE.includes(name)) return wesen.werte[name].grundwert;
-  if (name === "reichweiteSicht") return wesen.sicht?.reichweite ?? 0;
+  if (name === "reichweiteSicht") return sichtVon(wesen)?.reichweite ?? 0;
   if (name === "genauigkeit") return angriffeVon(spiel, wesen)[0]?.genauigkeit ?? 0;
   if (name === "heimlichkeit") return wesen.kampfwerte?.heimlichkeit ?? spiel.daten.regeln.wahrnehmung.heimlichkeitVorgabe;
   return wesen.kampfwerte?.[name] ?? 0;

@@ -72,6 +72,7 @@ Regeln:
 ## Stolpersteine
 
 + `gesteuerteEntitaet` oder `spielerin`: wer handelt, was sie sieht und bei sich hat, fragt `gesteuerteEntitaet`; wer lernt, weiß, stirbt und die Bilanz des Laufs fragt `spielerin` (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); `tests/gesteuert.test.js` nennt die Dateien, die nur die gesteuerte Entität fragen dürfen
++ Komponenten ohne Zahl (`plaetze`, `tueren`, `sicht`, `angriffe`, `bewegung`, `aussehen`) nie direkt an der Entität lesen, sondern über ihre Lesefunktion (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); `tests/komponenten.test.js` meldet direkte Zugriffe, gewollte Ausnahmen (Datenprüfung, Gegenstände, Regelwerte, Vorlagen) stehen dort in einer Liste
 + Python unter Windows: `Path.write_text` schreibt CRLF; immer `newline="\n"` angeben (Repo durchgängig LF, `.gitattributes`)
 + Python-Skripte mit Umlauten als Datei ausführen, nie über die Shell-Eingabe (stdin), sonst werden die Umlaute verfälscht
 + Der erste Schritt einer langen Aktion läuft sofort; `schritte: N` lässt dem Ziel N-1 Züge (siehe [Wirkungen.md](Wirkungen.md), Lange Aktionen)

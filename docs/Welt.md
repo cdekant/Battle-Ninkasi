@@ -143,7 +143,7 @@ Regeln:
 
 ## Sichtweite
 
-+ Die Sichtweite (`reichweiteSicht` in `src/systeme/sicht.js`, Modifikatoren auf `reichweiteSicht`) ergibt sich aus Grundwert, Skills und Zuständen; Hindernisse begrenzt der Schattenwurf des Sichtfelds
++ Die Sichtweite (`reichweiteSicht` in `src/systeme/sicht.js`, Modifikatoren auf `reichweiteSicht`) ergibt sich aus Grundwert (`sicht.reichweite` über `sichtVon`), Skills und Zuständen; Hindernisse begrenzt der Schattenwurf des Sichtfelds
 + Ist sie größer als der Ausschnitt, wird nicht herausgezoomt; die Liste "In Sicht" der Seitenleiste nennt alle sichtbaren Wesen; Markierungen am Kartenrand für Gegner außerhalb des Ausschnitts sind vorgesehen, noch nicht umgesetzt
 
 ## Sicht und Erinnerung

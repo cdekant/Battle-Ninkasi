@@ -30,7 +30,7 @@ Umsetzung: keine
 | Vorschau durch Simulation | hoch | mittel | erledigt (Würfe über eine Schnittstelle) |
 | Hellsicht, Spüren, Unsichtbarkeit | hoch | mittel | teils erledigt (Erinnerung, Kartieren), offen: Art der Wahrnehmung |
 | Zeitumkehr | hoch | mittel | ja |
-| Verwandlung | mittel | mittel | ja |
+| Verwandlung | mittel | mittel | erledigt (Lesefunktionen) |
 | Veränderbares Gelände | hoch | mittel | erledigt (Erinnerung der Karte) |
 | Begleiter und Befehle | hoch | gering bis mittel | teils erledigt (Treppen, Vorrang an der KI), offen: Befehl und Begleiter |
 | Handel, Währung, Gespräch | hoch | gering bis mittel | ja (Befehle) |
@@ -88,7 +88,7 @@ Umsetzung: offen
 + Braucht: einen Zustand "Gestalt", der Komponenten überlagert statt sie zu ersetzen: Angriffe, Plätze, Bewegungsart, Sicht, Türen öffnen, Zeichen und Tile; Zahlenwerte gehen schon über Modifikatoren
 + Berührt: Systeme, die Komponenten ohne Zahl direkt aus der Entität lesen (`angriffe`, `plaetze`, `bewegung`, `tueren`, `sicht`); Ausrüstung (was mit angelegten Dingen auf fehlenden Plätzen geschieht); Anzeige
 + Umbaurisiko: mittel
-+ Vorkehrung: Komponenten ohne Zahl über Lesefunktionen holen (wie schon `angriffeVon` in `src/systeme/kampf.js`), damit später eine Stelle die Gestalt berücksichtigt; Plätze stehen schon am Wesen (`daten/ninkasi.js`), das passt
++ Vorkehrung (erledigt in 0.40.0, siehe [Architektur.md](Architektur.md), Entitäten und Komponenten): Komponenten ohne Zahl über Lesefunktionen mit Überlagerung durch Zustände, auch das Aussehen für Zeichen und Tile; ein Test wacht über direkte Zugriffe. Offen für die Gestalt selbst: die Felder an Zuständen zulassen, was mit angelegten Dingen auf fehlenden Plätzen geschieht und wie Waffen und Angriffe der Gestalt zusammenspielen (`angriffeVon` ist die einzige Stelle)
 
 Umsetzung: offen
 

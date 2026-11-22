@@ -27,7 +27,7 @@ import { effektAnwenden, beteiligteAus } from "../kern/effekte.js";
 import { bausteinAnmelden } from "../kern/bausteine.js";
 import { anmelden } from "../kern/register.js";
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
-import { fraktionVon, istWesen } from "../kern/zustand.js";
+import { fraktionVon, istWesen, eigeneAngriffeVon } from "../kern/zustand.js";
 
 export { istWesen };
 import { musterFelder, entitaetenAufFeldern } from "./zielauswahl.js";
@@ -94,10 +94,10 @@ export function trefferwurf(spiel, wurf) {
 
 const tagsDesEffekts = (spiel, effektName) => spiel.daten.effekte?.[effektName]?.tags || [];
 
-// Die Angriffsprofile eines Wesens; einziger Zugriff, später kommen hier die Profile der Waffen dazu
-// Angelegte Waffen ersetzen die eigenen Profile (die Faust), siehe systeme/ausruestung.js
+// Die Angriffsprofile eines Wesens; einziger Zugriff. Angelegte Waffen ersetzen die eigenen Profile (die Faust),
+// siehe systeme/ausruestung.js
 export function angriffeVon(spiel, wesen) {
-  return waffenprofile(spiel, wesen) ?? wesen.angriffe ?? [];
+  return waffenprofile(spiel, wesen) ?? eigeneAngriffeVon(wesen);
 }
 
 export function kannAngreifen(spiel, wesen) {

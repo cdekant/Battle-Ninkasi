@@ -15,7 +15,7 @@
 // Geschosse fliegen durch, was durchsichtig ist, außer geschossdurchlaessig: false; mit geschossdurchlaessig: true
 //   auch durch Undurchsichtiges (welt/geometrie.js flugbahn)
 
-import { bewegungVon } from "../kern/zustand.js";
+import { bewegungVon, tuerenVon } from "../kern/zustand.js";
 
 export function feldIndex(ebene, x, y) {
   return y * ebene.breite + x;
@@ -94,7 +94,7 @@ export function gelaendeBetretbarFuer(spiel, gelaende, bewegungsart = "laufend",
 }
 
 export function oeffnetTueren(wesen) {
-  return (wesen.tueren ?? "oeffnen") === "oeffnen";
+  return tuerenVon(wesen) === "oeffnen";
 }
 
 // Ob ein Wesen mit seiner wirksamen Bewegungsart das Feld betreten (oder darauf stehen) kann
