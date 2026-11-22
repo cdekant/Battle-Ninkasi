@@ -227,6 +227,8 @@ Regeln:
 + Beim Start der Seite erscheint der Titel (siehe [Titelbildschirm.md](Titelbildschirm.md)); Fortsetzen lädt einen Platz, die Charaktererstellung entfällt, das Log nennt das Fortsetzen; ein Platz aus einer anderen Version oder unlesbar heißt im Titel veraltet und lässt sich nur ersetzen oder löschen; lässt sich ein Zustand nicht einsetzen, wird der Platz gelöscht und der Titel sagt es
 + `?seed=` beginnt gleich einen Lauf mit diesem Startwert auf dem ersten leeren Platz (sonst erscheint der Titel) und verschwindet danach aus der Adresse; der Startwert wird nicht in die Adresse geschrieben
 + Die Chronik ist getrennt von den Plätzen und ohne Aufzeichnungen, damit sie neue Versionen übersteht
++ Wissen über Läufe hinweg (seit 0.40.1 als Regel): die Chronik ist die einzige Ablage außerhalb des Laufs; Wissen nur zum Zeigen (Bestiarium, Glossar) liest die Anzeige direkt aus ihr, ohne Eintrag im Spielstand; Wissen mit Wirkung auf die Logik (ein bekanntes Rezept erlaubt das Brauen, ein Gegenstand ist schon erkannt) übernimmt die Oberfläche beim Start des Laufs als Startoption `optionen.vorwissen`, die Logik liest nur `spiel.optionen` und nie die Ablage (geprüft von `tests/ablage.test.js`)
++ Das Vorwissen gilt, wie es beim Start war: was während des Laufs in die Chronik kommt, wirkt erst im nächsten Lauf; das Feld `vorwissen` und sein Format legt das erste System an, das es braucht
 
 ## Versionen
 
@@ -266,7 +268,7 @@ Messwerte:
 
 ## Tests
 
-+ `tests/zeit.test.js` (Warteschlange, Gleichstand, Heap), `tests/zufall.test.js` (sfc32, Würfel, Anteile), `tests/register.test.js` (Ränge, Vorrat), `tests/kurven.test.js`, `tests/daten.test.js` (Datenprüfung), `tests/speichern.test.js` (Schnappschuss, Speicherstand, Plätze), `tests/leistung.test.js` (räumlicher Index), `tests/ausloeser.test.js` und `tests/tod.test.js` (Vorgang), `tests/gesteuert.test.js` (gesteuerte Entität; Dateien für Eingabe, Sicht, Kamera und Zielmodus fragen nicht `spielerin()`), `tests/komponenten.test.js` (Lesefunktionen der Komponenten ohne Zahl mit Überlagerung; Wächter gegen direkte Zugriffe in `src/` mit einer Liste begründeter Ausnahmen)
++ `tests/zeit.test.js` (Warteschlange, Gleichstand, Heap), `tests/zufall.test.js` (sfc32, Würfel, Anteile), `tests/register.test.js` (Ränge, Vorrat), `tests/kurven.test.js`, `tests/daten.test.js` (Datenprüfung), `tests/speichern.test.js` (Schnappschuss, Speicherstand, Plätze), `tests/leistung.test.js` (räumlicher Index), `tests/ausloeser.test.js` und `tests/tod.test.js` (Vorgang), `tests/gesteuert.test.js` (gesteuerte Entität; Dateien für Eingabe, Sicht, Kamera und Zielmodus fragen nicht `spielerin()`), `tests/komponenten.test.js` (Lesefunktionen der Komponenten ohne Zahl mit Überlagerung; Wächter gegen direkte Zugriffe in `src/` mit einer Liste begründeter Ausnahmen), `tests/ablage.test.js` (die Logik in `src/kern/`, `src/systeme/`, `src/ki/` und `src/welt/` nennt weder Chronik noch Browserspeicher)
 + Der Bot prüft Wiederholbarkeit (Nachspielen), Index und Heap nach jedem Befehl und das Laden mitten im Lauf (siehe [Entwicklung.md](Entwicklung.md), Bot und Werkzeuge)
 
 ## Verweise

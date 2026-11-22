@@ -42,7 +42,7 @@ Umsetzung: keine
 | Questsystem | hoch | gering bis mittel | teils erledigt (Plan des Laufs), offen: Ziele über Haken |
 | Feste Strukturen | ungeklärt | gering bis mittel | erledigt (Erzeugung in Schritten) |
 | Nachrückende Gegner | ungeklärt | gering | nein |
-| Fortschritt über Läufe | höchstens Wissen | gering, mit einer Regel | ja (Regel) |
+| Fortschritt über Läufe | höchstens Wissen | gering, mit einer Regel | erledigt (Regel) |
 | Themenräume und Rätsel | mittel | gering bis mittel | erledigt (Erzeugung in Schritten) |
 | Licht | hoch | gering | nein |
 | Todesbericht | hoch | gering | nein |
@@ -109,11 +109,11 @@ Umsetzung: offen
 + Braucht: eine Ablage außerhalb des Laufs (die Chronik gibt es, siehe [Titelbildschirm.md](Titelbildschirm.md)), Freischaltungen als Daten (Rezepte, Hub-Gebäude)
 + Berührt: Wiederholbarkeit: liest die Logik die Ablage direkt, spielt ein geladener Lauf anders als der aufgezeichnete
 + Umbaurisiko: gering, wenn die Regel unten gilt; hoch, sobald ein System die Ablage direkt liest
-+ Vorkehrung: Regel festhalten: was ein Lauf aus der Ablage nutzt, geht beim Start als Startoption in den Spielstand ein (wie heute Eigenschaften), die Logik liest die Ablage nie
++ Vorkehrung (erledigt in 0.40.1, siehe [Architektur.md](Architektur.md), Speichern): Regel festhalten: was ein Lauf aus der Ablage nutzt, geht beim Start als Startoption in den Spielstand ein (wie heute Eigenschaften), die Logik liest die Ablage nie
 + Festgehalten in [Grundlagen.md](Grundlagen.md), Spiel
 + Verwandt: Dienste des Hubs (offen in [Grundlagen.md](Grundlagen.md), Spiel)
 
-Umsetzung: offen
+Umsetzung: offen (nur die Vorkehrung steht)
 
 ## Veränderbares Gelände
 
