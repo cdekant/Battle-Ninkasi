@@ -11,7 +11,7 @@ import "../systeme/index.js";
 import "../ki/index.js";
 import VERSION from "../version.js";
 import { vorbereiten, Datenfehler } from "./daten.js";
-import { neuerZustand, entitaetMitId, alleEntitaeten, spielerin, gesteuerteEntitaet, kiVon, entitaetAusDatensatz } from "./zustand.js";
+import { neuerZustand, entitaetMitId, alleEntitaeten, spielerin, gesteuerteEntitaet, kiVon, ausDatenErzeugen } from "./zustand.js";
 import { zufallErzeugen, startwertAbleiten } from "./zufall.js";
 import { WELTTICK, einreihen, ersterEintrag, ersterEintragEntnehmen, akteurEinreihen } from "./zeit.js";
 import { holen, hat, alle as alleImRegister } from "./register.js";
@@ -57,7 +57,7 @@ export function neuesSpiel(daten, startwert, optionen = {}) {
   // Ninkasi beginnt auf der Treppe hinauf der Starttiefe des Plans (oder auf der Treppe hinab, wenn es keine gibt)
   zustand.tiefe = zustand.plan.starttiefe;
   const { treppeAuf, treppeAb } = ebeneErzeugen(spiel, zustand.tiefe);
-  const ninkasi = entitaetAusDatensatz(zustand, "ninkasi", daten.wesen.ninkasi, treppeAuf ?? treppeAb);
+  const ninkasi = ausDatenErzeugen(spiel, "wesen", "ninkasi", treppeAuf ?? treppeAb);
   zustand.spielerinId = ninkasi.id;
   lernenEinrichten(spiel, ninkasi, optionen.eigenschaften);
   for (const entitaet of alleEntitaeten(zustand)) {

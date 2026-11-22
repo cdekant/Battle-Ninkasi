@@ -426,7 +426,7 @@ function ablaufWaehlen(botZufall, spiel) {
 let anzahlTode = 0, anzahlFehler = 0, anzahlGeladen = 0;
 const reisenNachHaltegrund = {};
 // Fähigkeiten der Gegner: gewirkt, lange Aktionen begonnen und abgebrochen
-const gegnerfaehigkeiten = { gewirkt: 0, begonnen: 0, abgebrochen: 0 };
+const gegnerfaehigkeiten = { gewirkt: 0, begonnen: 0, abgebrochen: 0, getrunken: 0, geworfen: 0 };
 // Untersuchen wie mit Taste X: Ninkasis Feld mit ihren Werten, dann per Tab das nächste Wesen und ein Feld daneben;
 // würfelt nicht, damit der Lauf derselbe bleibt
 function untersuchen(spiel) {
@@ -472,8 +472,9 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
       if (geraeuschGehoert(spiel, meldung)) meldungenFuerNinkasi.gehoert++;
       else if (meldung.art !== "laerm") meldungenFuerNinkasi[meldungWahrnehmbar(spiel, meldung) ? "gezeigt" : "verborgen"]++;
       if (meldung.art === "tod" && meldung.opfer.id !== spiel.zustand.spielerinId) getoetet++;
-      if (meldung.art === "getrunken") getrunkeneBiere++;
-      if (meldung.art === "geworfen") anzahlWuerfe++;
+      const vonNinkasi = meldung.wer?.id === spiel.zustand.spielerinId;
+      if (meldung.art === "getrunken" && vonNinkasi) getrunkeneBiere++;
+      if (meldung.art === "geworfen" && vonNinkasi) anzahlWuerfe++;
       if (meldung.art === "angelegt") anzahlAngelegt++;
       if (meldung.art === "allmacht_bewahrt") anzahlBewahrt++;
       if (meldung.art === "faehigkeit" && meldung.wer.id === spiel.zustand.spielerinId) ninkasisFaehigkeiten++;
@@ -481,6 +482,8 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
       if (meldung.art === "faehigkeit") gegnerfaehigkeiten.gewirkt++;
       if (meldung.art === "aktion_beginnt") gegnerfaehigkeiten.begonnen++;
       if (meldung.art === "aktion_abgebrochen") gegnerfaehigkeiten.abgebrochen++;
+      if (meldung.art === "getrunken") gegnerfaehigkeiten.getrunken++;
+      if (meldung.art === "geworfen") gegnerfaehigkeiten.geworfen++;
     });
     const botZufall = zufallErzeugen(startwert);
     while (spiel.befehle.length < hoechsteBefehlszahl && !spiel.zustand.vorbei) {
@@ -544,7 +547,7 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
 }
 const haltegruende = Object.entries(reisenNachHaltegrund).map(([grund, anzahl]) => `${grund} ${anzahl}`).join(", ");
 console.log(`\nAbläufe nach Haltegrund: ${haltegruende}`);
-console.log(`Fähigkeiten der Gegner: ${gegnerfaehigkeiten.gewirkt} gewirkt, ${gegnerfaehigkeiten.begonnen} lange Aktionen begonnen, ${gegnerfaehigkeiten.abgebrochen} abgebrochen; ${anzahlAngelegt} Mal angelegt, ${anzahlWuerfe} Würfe Ninkasis, ${ninkasisFaehigkeiten} Fähigkeiten Ninkasis`);
+console.log(`Fähigkeiten der Gegner: ${gegnerfaehigkeiten.gewirkt} gewirkt, ${gegnerfaehigkeiten.begonnen} lange Aktionen begonnen, ${gegnerfaehigkeiten.abgebrochen} abgebrochen, ${gegnerfaehigkeiten.getrunken} Mal getrunken, ${gegnerfaehigkeiten.geworfen} Mal geworfen; ${anzahlAngelegt} Mal angelegt, ${anzahlWuerfe} Würfe Ninkasis, ${ninkasisFaehigkeiten} Fähigkeiten Ninkasis`);
 console.log(`Meldungen für Ninkasi: ${meldungenFuerNinkasi.gezeigt} gezeigt, ${meldungenFuerNinkasi.verborgen} verborgen, ${meldungenFuerNinkasi.gehoert} gehört`);
 console.log(`Lernen: ${anzahlLernbefehle} Lernbefehle (${anzahlUeberFenster} über das Skillfenster), ${anzahlGelernt} angenommen, ${anzahlSkillstufen} Skillstufen erreicht`);
 if (fehlendeTexte.size) {

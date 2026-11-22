@@ -17,6 +17,14 @@ export default {
     rufToetungEigene: -25, // Tötung eines Wesens: Ruf bei seiner eigenen Fraktion
     rufNurMitZeugen: true, // eine Tötung zählt für eine Fraktion nur, wenn eines ihrer Wesen Täterin oder Opfer sieht
   },
+  // KI, siehe src/ki/handlungen.js und src/ki/nutzen.js: Zwecke der Handlung nutzen; benannte Kurven für die Bewertung
+  // (Promille), die alle Wesen teilen; Zahlen vorläufig
+  ki: {
+    zwecke: ["heilen", "angriff"],
+    kurven: {
+      heilenNachLp: [[0, 1000], [20, 1000], [80, 0]], // eigene LP in Prozent: dringend bis 20 %, ab 80 % gar nicht
+    },
+  },
   // Wahrnehmung, siehe src/systeme/wahrnehmung.js; Vorbild Brogue, alle Zahlen vorläufig
   wahrnehmung: {
     heimlichkeitVorgabe: 7, // Heimlichkeitsweite ohne eigenen Kampfwert heimlichkeit

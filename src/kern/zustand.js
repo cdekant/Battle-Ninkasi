@@ -45,8 +45,8 @@ export function entitaetErzeugen(zustand, komponenten) {
   return entitaet;
 }
 
-// Felder eines Datensatzes, die keine Komponenten sind
-const KEINE_KOMPONENTEN = new Set(["vorlage", "abstrakt", "werte"]);
+// Felder eines Datensatzes, die keine Komponenten sind; ausstattung legt systeme/inventar.js beim Erzeugen aus Daten an
+const KEINE_KOMPONENTEN = new Set(["vorlage", "abstrakt", "werte", "ausstattung"]);
 
 // Entität aus einem geprüften Datensatz (Wesen oder Gegenstand)
 export function entitaetAusDatensatz(zustand, typ, datensatz, position) {
@@ -58,6 +58,16 @@ export function entitaetAusDatensatz(zustand, typ, datensatz, position) {
   if (datensatz.werte) komponenten.werte = werteAusDaten(datensatz.werte);
   if (position) komponenten.position = { x: position.x, y: position.y };
   return entitaetErzeugen(zustand, komponenten);
+}
+
+// Wesen oder Gegenstand aus spiel.daten[bereich][typ] ("wesen" | "gegenstaende"); danach ergänzen die Systeme, was nur
+// aus den Daten folgt (Register "ausDaten", z.B. die Ausstattung eines Wesens). Alles, was im Spiel aus Daten entsteht,
+// geht hier durch, außer Gegenstände, die nur einen anderen ersetzen (Rückstand, Verderben)
+export function ausDatenErzeugen(spiel, bereich, typ, position) {
+  const datensatz = spiel.daten[bereich][typ];
+  const entitaet = entitaetAusDatensatz(spiel.zustand, typ, datensatz, position);
+  for (const [, handler] of alle("ausDaten")) handler(spiel, entitaet, datensatz);
+  return entitaet;
 }
 
 export function entitaetMitId(zustand, id) {

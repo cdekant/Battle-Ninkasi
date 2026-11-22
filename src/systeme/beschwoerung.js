@@ -11,7 +11,7 @@
 //                 Zustände, die an das Ziel als Quelle gebunden sind, enden; wirkt nicht auf Ninkasi
 
 import { bausteinAnmelden } from "../kern/bausteine.js";
-import { entitaetAusDatensatz, entitaetEntfernen, anzahlWesen } from "../kern/zustand.js";
+import { ausDatenErzeugen, entitaetEntfernen, anzahlWesen } from "../kern/zustand.js";
 import { akteurEinreihen } from "../kern/zeit.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { betretbarFuer } from "../welt/karte.js";
@@ -32,7 +32,7 @@ bausteinAnmelden("beschwoeren", { wesen: "wesen", anzahl: "ganzzahl?", muster: "
   const platz = Math.max(0, spiel.daten.regeln.population.hoechstWesen - anzahlWesen(zustand));
   if (gewuenscht > platz) melden(spiel, "population_voll", { wesen: parameter.wesen, hoechstWesen: spiel.daten.regeln.population.hoechstWesen, ausgefallen: gewuenscht - platz });
   for (const feld of freieFelder.slice(0, Math.min(gewuenscht, platz))) {
-    const beschworen = entitaetAusDatensatz(zustand, parameter.wesen, spiel.daten.wesen[parameter.wesen], feld);
+    const beschworen = ausDatenErzeugen(spiel, "wesen", parameter.wesen, feld);
     if (kontext.urheberFraktion != null) beschworen.fraktion = kontext.urheberFraktion;
     if (kontext.urheberId != null) beschworen.beschworenVon = kontext.urheberId;
     const mutter = parameter.abstammung ? zustand.entitaeten[kontext.quelleId] : null;

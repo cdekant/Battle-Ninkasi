@@ -14,7 +14,7 @@
 // Beide Befehle gehen nur an Ninkasi selbst.
 
 import { anmelden, RANG_VORGABE } from "../kern/register.js";
-import { entitaetAusDatensatz, anzahlWesen, spielerin } from "../kern/zustand.js";
+import { ausDatenErzeugen, anzahlWesen, spielerin } from "../kern/zustand.js";
 import { akteurEinreihen } from "../kern/zeit.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { lebenswertName, hoechstwert, wertBegrenztAendern } from "../kern/werte.js";
@@ -47,7 +47,8 @@ function artDesTyps(daten, typ) {
 
 function freiesFeldFuer(spiel, ninkasi, typ) {
   const bewegung = spiel.daten.wesen[typ].bewegung ?? "laufend";
-  return naechstesFeldMit(spiel, ninkasi.position, (x, y) => betretbarFuer(spiel, x, y, bewegung) && wesenAufFeld(spiel, { x, y }).length === 0, { bewegung });
+  // nur Felder, die jetzt offen sind: auf einer geschlossenen Tür stünde das Wesen in der Wand
+  return naechstesFeldMit(spiel, ninkasi.position, (x, y) => betretbarFuer(spiel, x, y, bewegung, false) && wesenAufFeld(spiel, { x, y }).length === 0, { bewegung });
 }
 
 function nurNinkasiAllmaechtig(spiel, akteur) {
@@ -85,12 +86,12 @@ anmelden("befehle", "erzeugen", {
   ausfuehren(spiel, akteur, befehl) {
     const zustand = spiel.zustand;
     if (artDesTyps(spiel.daten, befehl.typ) === "gegenstand") {
-      const neu = entitaetAusDatensatz(zustand, befehl.typ, spiel.daten.gegenstaende[befehl.typ], null);
+      const neu = ausDatenErzeugen(spiel, "gegenstaende", befehl.typ, null);
       melden(spiel, "erzeugt", { wer: bezugAuf(akteur), was: bezugAuf(neu), wohin: "gepaeck" });
       insInventar(spiel, akteur, neu);
       return;
     }
-    const wesen = entitaetAusDatensatz(zustand, befehl.typ, spiel.daten.wesen[befehl.typ], freiesFeldFuer(spiel, akteur, befehl.typ));
+    const wesen = ausDatenErzeugen(spiel, "wesen", befehl.typ, freiesFeldFuer(spiel, akteur, befehl.typ));
     if (wesen.ki) akteurEinreihen(zustand, wesen.id, spiel.daten.aktionen.warten);
     melden(spiel, "erzeugt", { wer: bezugAuf(akteur), was: bezugAuf(wesen), wohin: "feld" });
   },

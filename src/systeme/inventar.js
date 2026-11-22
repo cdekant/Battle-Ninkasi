@@ -10,11 +10,14 @@
 //   gewicht           in Gramm, mit Ladungen zuzüglich gewichtJe je Ladung; die Last ist die Summe über das Gepäck
 //   verdirbt: { nach, wird }  nach so vielen Zeiteinheiten wird der Gegenstand zu wird (systeme/verschleiss.js); der
 //                     Zeitpunkt steht in verdirbtUm, fließen Stapel zusammen, gilt ihr nach Anzahl gewichteter Durchschnitt
+// Ausstattung am Wesen: ausstattung: [{ typ, anzahl? }]  was es beim Erzeugen aus Daten im Gepäck hat (Vorgabe anzahl 1),
+//   z.B. Bier zum Heilen für einen Gegner; stapelbare fließen zu einem Stapel zusammen
+// Nutzung für die KI (Register "nutzungen", ki/nutzen.js): trinkbar.zweck sagt, wozu ein Wesen den Gegenstand trinkt
 // Tragkraft: wesen.tragkraft, sonst regeln.tragen.tragkraft, mit Modifikatoren auf "tragkraft"; Überladung verteuert das
 //   Bewegen in Stufen (regeln.tragen.stufen: [{ ab: Prozent der Tragkraft, kosten: Prozent mehr }]), verboten ist nichts.
 
 import { anmelden } from "../kern/register.js";
-import { entitaetenAuf, entitaetMitId, entitaetEntfernen, entitaetErzeugen, entitaetAusDatensatz, positionSetzen, ausDemInventarNehmen } from "../kern/zustand.js";
+import { entitaetenAuf, entitaetMitId, entitaetEntfernen, entitaetErzeugen, entitaetAusDatensatz, ausDatenErzeugen, positionSetzen, ausDemInventarNehmen } from "../kern/zustand.js";
 import { effektAnwenden } from "../kern/effekte.js";
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
 import { modifiziert } from "../kern/werte.js";
@@ -34,6 +37,14 @@ anmelden("beimErzeugen", "verderben", (zustand, entitaet) => {
   entitaet.verdirbtUm ??= zustand.zeit + entitaet.verdirbt.nach;
   verderbenEinplanen(zustand, entitaet);
 });
+
+anmelden("ausDaten", "ausstattung", (spiel, wesen, datensatz) => {
+  for (const { typ, anzahl = 1 } of datensatz.ausstattung || []) {
+    for (let i = 0; i < anzahl; i++) insInventar(spiel, wesen, ausDatenErzeugen(spiel, "gegenstaende", typ, null));
+  }
+});
+
+anmelden("nutzungen", "trinken", { feld: "trinkbar", befehl: (spiel, wesen, beute, gegenstand) => ({ art: "trinken", gegenstandId: gegenstand.id }) });
 
 export const anzahlVon = (gegenstand) => gegenstand.anzahl ?? 1;
 export const ladungenVon = (gegenstand) => (gegenstand.ladungen ? gegenstand.ladungen.aktuell ?? gegenstand.ladungen.hoechstens : null);

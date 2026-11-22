@@ -127,10 +127,13 @@ Vorbilder: Brogue (Monster mit Abstand, `MONST_MAINTAINS_DISTANCE`; kein Bolt du
 Daten:
 
 + KI-Komponente: `ki: { modul, trifft?, wachzustand?, handlungen?, wahl?, vorrang?, ...Parameter des Moduls }` (seit 0.39.0; `faehigkeiten` und `abstandHalten` an der KI gibt es nicht mehr, die Datenprüfung nennt den Ersatz)
-+ Handlungen: `handlungen: [{ handlung, gewicht? (Vorgabe 100), chance? (Prozent), abstandAb?, abstandBis?, wenn?, bewertung?: [{ eingabe, kurve }], ...Parameter der Handlung }]`; Grundhandlungen `faehigkeit { name }` (das Wesen muss die Fähigkeit kennen, `faehigkeiten` am Wesen), `abstand_halten { abstand }`, `fliehen`, `warten`, `verfolgen`
++ Handlungen: `handlungen: [{ handlung, gewicht? (Vorgabe 100), chance? (Prozent), abstandAb?, abstandBis?, wenn?, bewertung?: [{ eingabe, kurve }], ...Parameter der Handlung }]`; Grundhandlungen `faehigkeit { name }` (das Wesen muss die Fähigkeit kennen, `faehigkeiten` am Wesen), `nutzen { zweck }` (seit 0.42.0, eine eigene Fähigkeit oder einen Gegenstand im Gepäck, der dem Zweck dient), `abstand_halten { abstand }`, `fliehen`, `warten`, `verfolgen`
 + Wahl: `wahl: "erste"` (Vorgabe) | `"beste"` | `"gewichtet"` | `{ gewichtetUnterBesten: n }`
-+ Eingaben der Bewertung: `abstand` (Schachbrett zur Beute), `eigeneLpProzent`, `beuteLpProzent`, `feindeInSicht`, `verbuendeteInSicht`; Kurven wie überall (`src/kern/kurven.js`), Werte in Promille von 0 bis 1000
++ Eingaben der Bewertung: `abstand` (Schachbrett zur Beute), `eigeneLpProzent`, `beuteLpProzent`, `feindeInSicht`, `verbuendeteInSicht`; Kurven wie überall (`src/kern/kurven.js`), Werte in Promille von 0 bis 1000; statt der Stützpunkte kann `kurve` den Namen einer Kurve aus `regeln.ki.kurven` tragen, die alle Wesen teilen (vorläufig `heilenNachLp`: dringend bis 20 % LP, ab 80 % gar nicht)
++ Zwecke: `regeln.ki.zwecke` (vorläufig `heilen`, `angriff`); `zweck: [name]` an einer Fähigkeit und an den Nutzungen eines Gegenstands (`trinkbar.zweck`, `wurf.zweck`) sagt, wozu die KI sie mit `nutzen` wählt; die Datenprüfung kennt nur Zwecke aus der Liste
++ Ausstattung: `ausstattung: [{ typ, anzahl? }]` am Wesen legt beim Erzeugen Gegenstände ins Gepäck (siehe [Gegenstaende.md](Gegenstaende.md), Inventar)
 + Beispiel: `{ handlung: "fliehen", bewertung: [{ eingabe: "eigeneLpProzent", kurve: [[0, 1000], [30, 1000], [31, 0]] }] }` vor den Angriffen: unter 31 % LP flieht das Wesen
++ Beispiel: `{ handlung: "nutzen", zweck: "heilen", chance: 50, bewertung: [{ eingabe: "eigeneLpProzent", kurve: "heilenNachLp" }] }` (Fernkämpfer-Test mit einem Bier in der Ausstattung): unter 80 % LP trinkt es in der Hälfte der Fälle
 + Vorrangbefehl (Laufzeit, für Begleiter): `vorrang: { anweisung: "angreifen" | "warten" | "folgen", zielId?, bis? }`; gesetzt wird er später über einen Befehl Ninkasis, die KI liest ihn schon
 + Regelwert `regeln.bewegung.umwegHoechstens` (4)
 
@@ -140,6 +143,7 @@ Schnittstellen:
 + Zielwahl `naechstesSichtbaresZiel`, `istZielFuer` (`src/ki/ziele.js`); Schrittwahl `schrittWeg` (`src/ki/schritte.js`) für Flucht und Abstand
 + `src/ki/handlungen.js`: `handlungWaehlen(spiel, wesen, ki, beute)` (Befehl, `VERFOLGEN` oder `null`), `wertung`; Register `kihandlungen` (`{ parameter, befehl(spiel, wesen, beute, eintrag) }`, ohne Nebenwirkungen, weil die Wahl alle Einträge fragt) und `kieingaben` (`(spiel, wesen, beute) => ganze Zahl`)
 + `faehigkeitsbefehl` (`src/ki/faehigkeitenwahl.js`): der Befehl einer Fähigkeit gegen die Beute oder `null`
++ `nutzbefehl(spiel, wesen, zweck, beute)` (`src/ki/nutzen.js`): der Befehl für `nutzen` oder `null`; Register `nutzungen` (`{ feld, befehl(spiel, wesen, beute, gegenstand) }`, ohne Nebenwirkungen): ein Gegenstand dient einem Zweck über eine Nutzung, wenn `gegenstand[feld].zweck` ihn enthält; angemeldet von den Systemen, die den Befehl kennen: `trinken` (Feld `trinkbar`, `src/systeme/inventar.js`), `werfen` (Feld `wurf`, `src/systeme/werfen.js`)
 + `verfolgungsbefehl`, `angriffDaneben` (`src/ki/verfolgen.js`); `geltenderVorrang`, `vorrangBefehl` (`src/ki/vorrang.js`)
 + `kiVon` (`src/kern/zustand.js`) liefert die wirksame KI, auch eine überlagerte
 
@@ -153,6 +157,8 @@ Regeln:
 + Verbündete schonen: zählt unter den Betroffenen aus `zielAufloesen` ein anderes Wesen als verbündet, unterbleibt die Fähigkeit, außer die Zielart trifft ausdrücklich `verbuendete`; mit `ueberVerbuendete` an der Zielart fliegen Geschosse darüber
 + Zielangabe nach Zielart: `wesen` und `geschoss` die Beute, `feld` ihr Feld (angekündigte Angriffe zielen so auf das Feld beim Beginn), `selbst` keine, `richtung` zur Beute, nur wenn sie daneben steht
 + Umweg: steht auf dem nächsten Feld des Weges ein Wesen, das kein Ziel ist (ein Verbündeter im Gang), sucht der Jäger einen Weg um alle Wesen herum (`wesenMeiden`) und nimmt ihn, wenn er höchstens `umwegHoechstens` Felder länger ist; sonst wartet er (Vorbild Brogue); so gehen Rudel um den Vordermann herum, ohne sich in langen Gängen zu verlaufen
++ `nutzen { zweck }`: erst die eigenen Fähigkeiten mit dem Zweck in der Reihenfolge von `faehigkeiten` (wie die Handlung `faehigkeit`, also mit derselben Zielangabe gegen die Beute), dann die Gegenstände im Gepäck in dessen Reihenfolge; das erste, das einen Befehl liefert, gilt; trinken geht immer, geworfen wird auf die Beute nur, wenn die Bahn sie als erstes Wesen trifft (kein Verbündeter davor, kein Fluch); ob sich das Nutzen lohnt, sagt die Bewertung, nicht die Handlung
++ Grenze: eine Fähigkeit zielt immer nach der Beute; eine Heilfähigkeit taugt für `nutzen` nur mit der Zielart `selbst`, eine mit Zielart `wesen` käme nie in Frage
 + `abstand_halten { abstand: n }`: steht die Beute näher als n, weicht das Wesen zurück (in die Ecke gedrängt kein Befehl, dann greift es normal an), auf genau n Feldern wartet es, bei mehr kommt die Handlung nicht in Frage
 + Ungültige Befehle der KI werden zu `warten`; handlungsunfähige Wesen warten (siehe [Architektur.md](Architektur.md), Zeitmodell)
 
@@ -250,7 +256,7 @@ Regeln:
 
 ## Tests
 
-+ `tests/kampf.test.js` (Trefferwurf, Blocken, Krit, Schadensrechnung, Profile), `tests/fraktionen.test.js` (Beziehungen, Zorn, Ruf, Kampfzustand, Beistand), `tests/wahrnehmung.test.js` (Wachzustand, Bemerken, Lärm, Hinterhalt), `tests/faehigkeitenwahl.test.js` und `tests/verhalten.test.js` (KI), `tests/verschieben.test.js` (Bewegungsarten, Stoßen, Ziehen, Tauschen, Teleportieren, Lage, Werfen), `tests/wege.test.js`, `tests/stoffwechsel.test.js`, `tests/skills.test.js` und `tests/lernen.test.js`
++ `tests/kampf.test.js` (Trefferwurf, Blocken, Krit, Schadensrechnung, Profile), `tests/fraktionen.test.js` (Beziehungen, Zorn, Ruf, Kampfzustand, Beistand), `tests/wahrnehmung.test.js` (Wachzustand, Bemerken, Lärm, Hinterhalt), `tests/faehigkeitenwahl.test.js`, `tests/verhalten.test.js`, `tests/handlungen.test.js` und `tests/nutzen.test.js` (KI), `tests/verschieben.test.js` (Bewegungsarten, Stoßen, Ziehen, Tauschen, Teleportieren, Lage, Werfen), `tests/wege.test.js`, `tests/stoffwechsel.test.js`, `tests/skills.test.js` und `tests/lernen.test.js`
 
 ## Verweise
 

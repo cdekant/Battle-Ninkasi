@@ -6,6 +6,8 @@
 //   mit effekt zerbricht der Gegenstand am Aufschlag (Meldung "zerbrochen") und der Effekt wirkt dort: Ziel ist das
 //   getroffene Wesen, sonst wirkt er nur aufs Feld (Ursache "wurf"); ob er treffen muss, sagen seine Daten (trefferwurf)
 //   ohne effekt landet der Gegenstand auf dem Aufschlagfeld (Meldung "gelandet")
+// Nutzung für die KI (Register "nutzungen", ki/nutzen.js): wurf.zweck sagt, wozu ein Wesen den Gegenstand auf seine Beute
+//   wirft; nur wenn die Bahn die Beute als erstes Wesen trifft (kein Verbündeter davor)
 // Am Aufschlag entsteht Lärm (regeln.wahrnehmung.laermWurf): Wache gehen ihm nach, so taugt ein Wurf als Ablenkung.
 
 import { anmelden } from "../kern/register.js";
@@ -59,5 +61,15 @@ anmelden("befehle", "werfen", {
     }
     laermMachen(spiel, aufschlag, spiel.daten.regeln.wahrnehmung.laermWurf, akteur.id, "aufschlag");
     return "werfen";
+  },
+});
+
+anmelden("nutzungen", "werfen", {
+  feld: "wurf",
+  befehl(spiel, wesen, beute, gegenstand) {
+    if (fluchHindert(spiel, wesen, gegenstand.id)) return null;
+    const aufloesung = wurfbahn(spiel, wesen, gegenstand, { id: beute.id });
+    if (!aufloesung.ok || aufloesung.bahn.getroffene[0] !== beute.id) return null;
+    return { art: "werfen", gegenstandId: gegenstand.id, ziel: { id: beute.id } };
   },
 });

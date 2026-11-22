@@ -10,7 +10,7 @@ import { spielerin, entitaetMitId } from "../src/kern/zustand.js";
 import { wertBegrenztAendern, hoechstwert } from "../src/kern/werte.js";
 import { vorgangAbschliessen } from "../src/kern/vorgang.js";
 import { hoererAnmelden } from "../src/kern/ereignisse.js";
-import { abstand } from "../src/welt/karte.js";
+import { abstand, passierbar } from "../src/welt/karte.js";
 import { erzeugbareTypen, istAllmaechtig } from "../src/systeme/allmacht.js";
 import { neueChronik, meldungZaehlen, sichtungenZaehlen, laufEintragen, zaehlerstand, zaehltMit } from "../src/eingabe/chronik.js";
 import { befehlseintraege } from "../src/eingabe/befehlszeile.js";
@@ -65,6 +65,26 @@ test("Allmacht: Erzeugen setzt ein Wesen neben Ninkasi und legt einen Gegenstand
 
   assert.deepEqual(befehlGeben(spiel, { art: "erzeugen", typ: "ninkasi" }), { ok: false, grund: "unbekannter_typ" });
   assert.deepEqual(befehlGeben(spiel, { art: "erzeugen", typ: "gibtesnicht" }), { ok: false, grund: "unbekannter_typ" });
+});
+
+test("Allmacht: Erzeugen setzt kein Wesen auf eine geschlossene Tür", () => {
+  const spiel = allmaechtig();
+  const ninkasi = spielerin(spiel.zustand);
+  const ebene = spiel.zustand.ebene;
+  // alle Nachbarfelder werden geschlossene Türen; das Wesen muss weiter weg auf ein offenes Feld
+  const tuer = daten.gelaende.tuer_zu.kennung;
+  for (let dy = -1; dy <= 1; dy++) {
+    const y = ninkasi.position.y + dy;
+    const zeile = ebene.felder[y].split("");
+    for (let dx = -1; dx <= 1; dx++) if (dx || dy) zeile[ninkasi.position.x + dx] = tuer;
+    ebene.felder[y] = zeile.join("");
+  }
+  const meldungen = [];
+  hoererAnmelden(spiel, (meldung) => meldungen.push(meldung));
+  assert.ok(befehlGeben(spiel, { art: "erzeugen", typ: "essigbakterium" }).ok);
+  const neuesWesen = entitaetMitId(spiel.zustand, meldungen.find((meldung) => meldung.art === "erzeugt").was.id);
+  assert.ok(passierbar(spiel, neuesWesen.position.x, neuesWesen.position.y), "nicht auf der Tür");
+  assert.ok(abstand(neuesWesen.position, ninkasi.position) > 1);
 });
 
 test("Allmacht: Tiefe wählen wechselt in jede Tiefe des Plans", () => {

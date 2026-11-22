@@ -6,7 +6,7 @@
 // Alle Gegner höchstens bis zur Obergrenze der Population (regeln.population.hoechstWesen).
 
 import { zufallsGanzzahl, mitProzentChance } from "../kern/zufall.js";
-import { entitaetAusDatensatz, anzahlWesen } from "../kern/zustand.js";
+import { ausDatenErzeugen, anzahlWesen } from "../kern/zustand.js";
 import { melden } from "../kern/ereignisse.js";
 import { zustandSetzen } from "../systeme/zustaende.js";
 import { abstandQuadrat } from "./geometrie.js";
@@ -53,7 +53,7 @@ export function populationSetzen(spiel, bau, zufall) {
     }
     if (!feld) return null;
     platzierung.wesen++;
-    return entitaetAusDatensatz(zustand, typ, spiel.daten.wesen[typ], feld);
+    return ausDatenErzeugen(spiel, "wesen", typ, feld);
   };
   for (const gegnerEintrag of bau.ebenendaten.gegner || []) {
     for (let i = 0; i < gegnerEintrag.anzahl; i++) gegnerSetzen(gegnerEintrag.typ, platzierung.wesen < hoechstWesen ? freiesFeldZiehen(bau, zufall) : null);

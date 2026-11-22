@@ -21,6 +21,7 @@ const ARTEN = [
   "zustandspruefungen", // Prüfungen nach jedem Vorgang: (spiel) => true, wenn sie etwas verändert haben
   "laufendeaktionen",   // Arten langer Aktionen: { schrittkosten, abschliessen, abbrechen } (systeme/laufendeAktionen.js)
   "beimErzeugen",       // nach dem Erzeugen jeder Entität: (zustand, entitaet) => void, z.B. Verderben einplanen, Etikett
+  "ausDaten",           // nach dem Erzeugen aus Daten (kern/zustand.js ausDatenErzeugen): (spiel, entitaet, datensatz) => void, z.B. Ausstattung
   "ausloeserquellen",   // weitere Auslöser einer Entität nach Zuständen und Ausrüstung: (spiel, entitaet) => [{ ausloeser, schluessel }]
   "lernanlaesse",       // Lernanlässe der Skills (systeme/lernen.js): { beschreibung }; Daten nennen sie in lernt
   "planschritte",       // Schritte des Plans des Laufs (welt/plan.js): (spiel, plan, zufall) => void, beim Start nacheinander
@@ -28,6 +29,7 @@ const ARTEN = [
   "mitnehmen",          // wer beim Ebenenwechsel mitkommt (systeme/ebenen.js): (spiel, ninkasi, wechsel) => [id]
   "kihandlungen",       // Handlungen der KI (ki/handlungen.js): { parameter, befehl(spiel, wesen, beute, eintrag) }
   "kieingaben",         // Eingaben der Bewertung (ki/handlungen.js): (spiel, wesen, beute) => ganze Zahl
+  "nutzungen",          // wie die KI einen Gegenstand nutzt (ki/nutzen.js): { feld, befehl(spiel, wesen, beute, gegenstand) }
 ];
 
 export const RANG_VORGABE = 100;

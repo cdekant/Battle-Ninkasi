@@ -2,7 +2,7 @@
 // Löst Vorlagen auf (Vererbung über "vorlage") und prüft Pflichtfelder, Typen und Verweise.
 // Fehler werden gesammelt und zusammen gemeldet.
 
-import { hat, holen } from "./register.js";
+import { hat, holen, alle } from "./register.js";
 import { istWuerfelausdruck } from "./zufall.js";
 import { kurvenfehler } from "./kurven.js";
 import { HAKENKATALOG, AUSLOESER_ROLLEN, AUSLOESER_ZIELE } from "./hakenkatalog.js";
@@ -121,6 +121,15 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
       if (!plaetze.includes(platz)) fehler.push(`${ort}.plaetze: Platz "${platz}" steht nicht in regeln.ausruestung.plaetze`);
       if (!istZahlAbNull(anzahl)) fehler.push(`${ort}.plaetze.${platz} muss eine ganze Zahl >= 0 sein`);
     }
+  }
+  // Ausstattung, siehe systeme/inventar.js
+  if (wesen.ausstattung !== undefined) {
+    if (!Array.isArray(wesen.ausstattung)) fehler.push(`${ort}: ausstattung muss eine Liste [{ typ, anzahl? }] sein`);
+    else wesen.ausstattung.forEach((eintrag, nummer) => {
+      const gegenstand = daten.gegenstaende[eintrag?.typ];
+      if (!gegenstand || gegenstand.abstrakt) fehler.push(`${ort}.ausstattung[${nummer}]: Gegenstand "${eintrag?.typ}" gibt es nicht`);
+      if (eintrag?.anzahl !== undefined && !(istGanzzahl(eintrag.anzahl) && eintrag.anzahl > 0)) fehler.push(`${ort}.ausstattung[${nummer}]: anzahl muss eine ganze Zahl > 0 sein`);
+    });
   }
   if (wesen.ki) pruefeKi(daten, wesen.ki, `${ort}.ki`, fehler, istTextliste(wesen.faehigkeiten) ? wesen.faehigkeiten : []);
   if (wesen.stoffwechsel) pruefeStoffwechsel(wesen, ort, fehler);
@@ -247,6 +256,9 @@ function pruefeRegeln(daten, regeln, fehler) {
   if (!istObjekt(regeln.fallen)) fehler.push("regeln.fallen fehlt");
   else pruefeParameter(daten, { entdeckenVorgabe: "ganzzahl", reichweite: "ganzzahl" }, regeln.fallen, "regeln.fallen", fehler);
   pruefeLernregeln(daten, regeln.lernen, fehler);
+  if (!istTextliste(regeln.ki?.zwecke)) fehler.push("regeln.ki.zwecke muss eine Liste von Namen sein");
+  if (!istObjekt(regeln.ki?.kurven)) fehler.push("regeln.ki.kurven muss ein Objekt { name: Kurve } sein");
+  else for (const [name, kurve] of Object.entries(regeln.ki.kurven)) fehler.push(...promillekurvenfehler(kurve, `regeln.ki.kurven.${name}`));
   if (!regeln.kampf) return fehler.push("regeln.kampf fehlt");
   for (const [feld, untergrenze] of Object.entries(KAMPFREGELN)) {
     const wert = regeln.kampf[feld];
@@ -343,6 +355,11 @@ function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
   pruefeText(sprache.texte, gegenstand.text, ort, fehler);
   pruefeNomen(sprache, gegenstand.text, fehler);
   if (gegenstand.trinkbar) pruefeEffektVerweis(daten, gegenstand.trinkbar.effekt, `${ort}.trinkbar`, fehler);
+  // Zwecke der Nutzungen für die KI, siehe ki/nutzen.js
+  for (const [, nutzung] of alle("nutzungen")) {
+    const zwecke = gegenstand[nutzung.feld]?.zweck;
+    if (zwecke !== undefined) pruefeZwecke(daten, zwecke, `${ort}.${nutzung.feld}`, fehler);
+  }
   if (gegenstand.tags !== undefined && !istTextliste(gegenstand.tags)) fehler.push(`${ort}: tags muss eine Liste von Texten sein`);
   // Stapel, Ladungen, Behälter, Gewicht, siehe systeme/inventar.js
   pruefeParameter(daten, { stapelbar: "wahrheitswert?", gewicht: "ganzzahl?" }, gegenstand, ort, fehler);
@@ -481,6 +498,20 @@ function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
 
 const istTextliste = (wert) => Array.isArray(wert) && wert.every((eintrag) => typeof eintrag === "string");
 
+// Zwecke für die Handlung nutzen der KI (ki/nutzen.js): eine Liste aus regeln.ki.zwecke
+function pruefeZwecke(daten, zwecke, ort, fehler) {
+  const bekannte = daten.regeln?.ki?.zwecke || [];
+  if (!istTextliste(zwecke)) return fehler.push(`${ort}: zweck muss eine Liste von Zwecken sein`);
+  for (const zweck of zwecke) if (!bekannte.includes(zweck)) fehler.push(`${ort}: Zweck "${zweck}" steht nicht in regeln.ki.zwecke`);
+}
+
+// Kurve der Bewertung in Promille von 0 bis 1000 (ki/handlungen.js)
+function promillekurvenfehler(kurve, ort) {
+  const meldungen = kurvenfehler(kurve, ort);
+  if (!meldungen.length && kurve.some(([, wert]) => wert < 0 || wert > 1000)) meldungen.push(`${ort}: Werte in Promille von 0 bis 1000`);
+  return meldungen;
+}
+
 const BEDINGUNGEN_MIT_EIGENSCHAFT = ["eigenschaft_ab", "eigenschaft_unter"];
 
 // Modifikatoren: [{ ziel, art, betrag, tag?, wenn? }], siehe kern/werte.js
@@ -540,6 +571,7 @@ function pruefeFaehigkeit(daten, sprache, name, faehigkeit, fehler) {
   const art = faehigkeit.art ?? "aktiv";
   if (!FAEHIGKEITSARTEN.includes(art)) fehler.push(`${ort}: art muss eines von ${FAEHIGKEITSARTEN.join(", ")} sein`);
   if (faehigkeit.tags !== undefined && !istTextliste(faehigkeit.tags)) fehler.push(`${ort}: tags muss eine Liste von Texten sein`);
+  if (faehigkeit.zweck !== undefined) pruefeZwecke(daten, faehigkeit.zweck, ort, fehler);
   if (faehigkeit.verbrauch !== undefined) pruefeVorratsmengen(faehigkeit.verbrauch, `${ort}: verbrauch`, fehler);
   if (faehigkeit.zeit !== undefined && !(istGanzzahl(faehigkeit.zeit) && faehigkeit.zeit > 0)) fehler.push(`${ort}: zeit muss eine ganze Zahl > 0 sein`);
   if (faehigkeit.zeit === undefined && daten.aktionen.faehigkeit === undefined) fehler.push(`${ort}: ohne zeit braucht es aktionen.faehigkeit`);
@@ -842,6 +874,7 @@ function pruefeKi(daten, ki, ort, fehler, bekannte = null) {
     pruefeParameter(daten, { abstandAb: "ganzzahl?", abstandBis: "ganzzahl?", gewicht: "ganzzahl?", ...holen("kihandlungen", eintrag.handlung).parameter }, eintrag, stelle, fehler);
     if (eintrag.chance !== undefined && !istProzent(eintrag.chance)) fehler.push(`${stelle}: chance muss eine ganze Zahl von 0 bis 100 sein`);
     if (eintrag.handlung === "abstand_halten" && istGanzzahl(eintrag.abstand) && eintrag.abstand < 1) fehler.push(`${stelle}: abstand muss eine ganze Zahl > 0 sein`);
+    if (eintrag.handlung === "nutzen" && typeof eintrag.zweck === "string") pruefeZwecke(daten, [eintrag.zweck], stelle, fehler);
     if (eintrag.handlung === "faehigkeit" && typeof eintrag.name === "string") {
       if (!daten.faehigkeiten?.[eintrag.name]) fehler.push(`${stelle}: Fähigkeit "${eintrag.name}" gibt es nicht`);
       else if (bekannte && !bekannte.includes(eintrag.name)) fehler.push(`${stelle}: das Wesen kennt die Fähigkeit "${eintrag.name}" nicht (faehigkeiten)`);
@@ -856,9 +889,9 @@ function pruefeKi(daten, ki, ort, fehler, bekannte = null) {
       const bewertungsort = `${stelle}.bewertung[${bewertungsnummer}]`;
       if (!istObjekt(bewertung)) return fehler.push(`${bewertungsort}: Eintrag muss ein Objekt { eingabe, kurve } sein`);
       if (!hat("kieingaben", bewertung.eingabe)) fehler.push(`${bewertungsort}: Eingabe "${bewertung.eingabe}" ist nicht angemeldet`);
-      const kurvenmeldungen = kurvenfehler(bewertung.kurve, `${bewertungsort}.kurve`);
-      fehler.push(...kurvenmeldungen);
-      if (!kurvenmeldungen.length && bewertung.kurve.some(([, wert]) => wert < 0 || wert > 1000)) fehler.push(`${bewertungsort}.kurve: Werte in Promille von 0 bis 1000`);
+      if (typeof bewertung.kurve === "string") {
+        if (!daten.regeln?.ki?.kurven?.[bewertung.kurve]) fehler.push(`${bewertungsort}: Kurve "${bewertung.kurve}" steht nicht in regeln.ki.kurven`);
+      } else fehler.push(...promillekurvenfehler(bewertung.kurve, `${bewertungsort}.kurve`));
     });
   });
 }

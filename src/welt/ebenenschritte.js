@@ -24,7 +24,7 @@ import RNG from "../../lib/rot/rng.js";
 import Digger from "../../lib/rot/map/digger.js";
 import { anmelden } from "../kern/register.js";
 import { startwertAbleiten, zufallsGanzzahl } from "../kern/zufall.js";
-import { entitaetAusDatensatz } from "../kern/zustand.js";
+import { ausDatenErzeugen } from "../kern/zustand.js";
 import { gelaendeBetretbarFuer } from "./karte.js";
 import { abstandQuadrat } from "./geometrie.js";
 import { ebenennameFuer } from "./plan.js";
@@ -208,7 +208,7 @@ function aufFreieFelderSetzen(spiel, bau, eintraege, datenteil) {
   for (const eintrag of eintraege || []) {
     for (let i = 0; i < eintrag.anzahl; i++) {
       const feld = freiesFeldZiehen(bau, zufall);
-      if (feld) entitaetAusDatensatz(spiel.zustand, eintrag.typ, spiel.daten[datenteil][eintrag.typ], feld);
+      if (feld) ausDatenErzeugen(spiel, datenteil, eintrag.typ, feld);
     }
   }
 }

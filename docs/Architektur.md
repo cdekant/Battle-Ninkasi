@@ -69,6 +69,7 @@ Daten (`src/kern/zustand.js`):
 Schnittstellen:
 
 + Erzeugen: `entitaetErzeugen`, `entitaetAusDatensatz`; danach laufen die Handler des Registers `beimErzeugen` (`(zustand, entitaet) => void`), auch für einen abgespaltenen Teil eines Stapels; so planen Gegenstände ihr Verderben ein und bekommen ihr Etikett
++ Erzeugen aus Daten: `ausDatenErzeugen(spiel, bereich, typ, position)` (`bereich` `"wesen"` oder `"gegenstaende"`) erzeugt aus `spiel.daten[bereich][typ]` und lässt danach die Handler des Registers `ausDaten` (`(spiel, entitaet, datensatz) => void`) ergänzen, was nur aus den Daten folgt, z.B. die Ausstattung eines Wesens (siehe [Gegenstaende.md](Gegenstaende.md), Inventar); alles, was im Spiel aus Daten entsteht (Start, Ebenen, Population, Beschwören, Allmacht), geht hier durch, außer Gegenständen, die nur einen anderen ersetzen (Rückstand, Verderben); Felder eines Datensatzes, die keine Komponenten werden: `vorlage`, `abstrakt`, `werte` (werden umgerechnet), `ausstattung`
 + Lesen: `entitaetMitId`, `alleEntitaeten`, `entitaetenAuf`, `entitaetenImUmkreis`, `entitaetenMitPosition`, `spielerin`, `gesteuerteEntitaet`, `istGesteuert`, `istWesen`, `fraktionVon`, `kiVon`, `bewegungVon`, `plaetzeVon`, `tuerenVon`, `sichtVon`, `eigeneAngriffeVon`, `aussehenVon`, `anzahlWesen`
 + Entfernen: `entitaetEntfernen` (mit gebundenen Zeitereignissen), `ausDemInventarNehmen`
 
@@ -138,7 +139,7 @@ Regeln:
 
 Daten (`src/kern/register.js`): feste Liste der Registerarten, jede eine Zuordnung Name → Eintrag:
 
-+ `befehle` (`{ pruefen, ausfuehren, ohneZeit? }`), `bausteine` (`(spiel, kontext, parameter) => void`), `ki` (`(spiel, akteur, ki) => befehl`), `modifikatorquellen` (`(spiel, entitaet) => [modifikator]`), `modifikatorbedingungen`, `befehlsveraenderer`, `zielmuster` (`(spiel, auswahl, parameter) => [{x, y}]`), `welttick`, `zeitereignisse`, `haken` (Listen je Name), `gefahren`, `zustandspruefungen` (`(spiel) => true`, wenn sie etwas verändert haben), `laufendeaktionen`, `beimErzeugen`, `ausloeserquellen`, `lernanlaesse`, `planschritte` (`(spiel, plan, zufall) => void`), `ebenenschritte` (`{ braucht, liefert, verwirft?, ausfuehren }`) und `mitnehmen` (`(spiel, ninkasi, wechsel) => [id]`), siehe [Welt.md](Welt.md), Plan des Laufs und [Welt.md](Welt.md), Ebenen
++ `befehle` (`{ pruefen, ausfuehren, ohneZeit? }`), `bausteine` (`(spiel, kontext, parameter) => void`), `ki` (`(spiel, akteur, ki) => befehl`), `modifikatorquellen` (`(spiel, entitaet) => [modifikator]`), `modifikatorbedingungen`, `befehlsveraenderer`, `zielmuster` (`(spiel, auswahl, parameter) => [{x, y}]`), `welttick`, `zeitereignisse`, `haken` (Listen je Name), `gefahren`, `zustandspruefungen` (`(spiel) => true`, wenn sie etwas verändert haben), `laufendeaktionen`, `beimErzeugen`, `ausDaten` (siehe Entitäten und Komponenten), `ausloeserquellen`, `lernanlaesse`, `planschritte` (`(spiel, plan, zufall) => void`), `ebenenschritte` (`{ braucht, liefert, verwirft?, ausfuehren }`) und `mitnehmen` (`(spiel, ninkasi, wechsel) => [id]`), siehe [Welt.md](Welt.md), Plan des Laufs und [Welt.md](Welt.md), Ebenen; `kihandlungen`, `kieingaben` und `nutzungen`, siehe [Wesen.md](Wesen.md), KI
 
 Schnittstellen:
 

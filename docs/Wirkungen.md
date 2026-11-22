@@ -193,10 +193,11 @@ Vorbilder: Tales of Maj'Eyal (aktive Talente mit Kosten und Abklingzeit, aufrech
 
 Daten:
 
-+ Fähigkeit (`daten/faehigkeiten.js`, umgesetzt in `src/systeme/faehigkeiten.js`): `{ text, art?, tags?, verbrauch?, material?, zeit?, abklingzeit?, voraussetzungen?, ziel?, zielvorgabe?, wirkung?, zustand?, risiko?, skill?, anforderung?, ausbau?, dauer?, beimAbbruch?, ankuendigung?, unterbrechbar? }`; Wesen kennen sie als Liste `faehigkeiten: ["name"]`
++ Fähigkeit (`daten/faehigkeiten.js`, umgesetzt in `src/systeme/faehigkeiten.js`): `{ text, art?, tags?, zweck?, verbrauch?, material?, zeit?, abklingzeit?, voraussetzungen?, ziel?, zielvorgabe?, wirkung?, zustand?, risiko?, skill?, anforderung?, ausbau?, dauer?, beimAbbruch?, ankuendigung?, unterbrechbar? }`; Wesen kennen sie als Liste `faehigkeiten: ["name"]`
   + `art`: `aktiv` (Vorgabe) wirkt einmal; `aufrecht` setzt `zustand` an der Wirkenden, erneutes Benutzen beendet ihn ohne Kosten; den laufenden Preis trägt der Zustand als `unterhalt` (siehe Zustände)
   + `verbrauch: { mp, pp, pegel, ... }` aus den Vorräten; `material: [{ typ, anzahl }]` aus dem Inventar, wird verbraucht
   + `zeit`: Grundkosten, Vorgabe `aktionen.faehigkeit`
+  + `zweck: [name]`: wozu die KI sie mit der Handlung `nutzen` wählt (siehe [Wesen.md](Wesen.md), KI)
   + `abklingzeit`: eigene Züge der Wirkenden (Zugzähler, siehe [Architektur.md](Architektur.md), Zeitmodell); am Wesen `abklingendBis: { name: zugnummer }`
   + `voraussetzungen`: Bedingungen aus dem Register `modifikatorbedingungen`, z.B. `pegel_unter` (nüchtern), `pegel_ab`, `skill_ab`, `eigenschaft_ab`
   + `ziel`: Zielart wie in `zielAufloesen` (siehe Zielauswahl); `zielvorgabe` ("feind", "gefaehrte", "selbst") belegt den Cursor im Zielmodus vor (siehe [Bedienung.md](Bedienung.md), Zielmodus)

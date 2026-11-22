@@ -16,7 +16,8 @@ export default {
     angriffe: [{ name: "biss", genauigkeit: 70, effekt: "biss_klein" }],
   },
 
-  // Testgegner für die KI mit Fähigkeiten: hält Abstand, spuckt und kündigt einen Säureschwall an; vorläufig
+  // Testgegner für die KI mit Fähigkeiten und Gepäck: hält Abstand, spuckt, kündigt einen Säureschwall an und trinkt
+  // bei wenig LP sein Bier; vorläufig
   fernkaempfer_test: {
     vorlage: "bakterium",
     text: "wesen.fernkaempfer_test",
@@ -24,9 +25,11 @@ export default {
     ep: 15,
     angriffe: [{ name: "biss", genauigkeit: 60, effekt: "biss_klein" }],
     faehigkeiten: ["saeurespucke", "saeureschwall"],
+    ausstattung: [{ typ: "bier" }],
     ki: {
-      // der Reihe nach (wahl "erste"): Schwall, sonst Spucke, sonst Abstand halten, sonst nachsetzen
+      // der Reihe nach (wahl "erste"): unter 80 % LP zur Hälfte trinken, sonst Schwall, Spucke, Abstand halten, nachsetzen
       handlungen: [
+        { handlung: "nutzen", zweck: "heilen", chance: 50, bewertung: [{ eingabe: "eigeneLpProzent", kurve: "heilenNachLp" }] },
         { handlung: "faehigkeit", name: "saeureschwall", chance: 30, abstandAb: 2, abstandBis: 5 },
         { handlung: "faehigkeit", name: "saeurespucke", abstandAb: 2 },
         { handlung: "abstand_halten", abstand: 3 },

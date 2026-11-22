@@ -18,6 +18,8 @@ Daten:
 
 + Am Gegenstand: `stapelbar: true`, `ladungen: { hoechstens, gewichtJe? }` (Stand in `ladungen.aktuell`, Vorgabe `hoechstens`), `wirdZu: Typ` (Behälter nach dem letzten Gebrauch), `gewicht` in Gramm; an der Entität `anzahl` (Vorgabe 1) und `getragenVon`
 + Am Wesen: `inventar: [IDs]`, `tragkraft` (sonst `regeln.tragen.tragkraft`, 20000 g)
++ Ausstattung in den Daten eines Wesens: `ausstattung: [{ typ, anzahl? }]` (Vorgabe `anzahl` 1), keine Komponente; beim Erzeugen aus Daten liegt sie im Gepäck
++ Zweck für die KI: `zweck: [name]` an `trinkbar` (und an `wurf`, siehe [Wesen.md](Wesen.md), KI)
 + Regelwert `regeln.tragen.stufen`: ab 100 % der Tragkraft kostet Bewegen 25 % mehr, ab 150 % 100 % mehr
 + Getränke in `daten/getraenke.js`, Wurfgegenstände in `daten/wurfgegenstaende.js`
 
@@ -26,16 +28,18 @@ Schnittstellen (`src/systeme/inventar.js`):
 + Befehle `aufheben`, `trinken { gegenstandId }`, `fallenlassen { gegenstandId }` (der ganze Stapel aufs eigene Feld, Angelegtes wird dabei abgelegt, Meldung `fallengelassen`, Zeitkosten `aktionen.fallenlassen`)
 + `insInventar` (fließt in einen gleichen Stapel), `einenAbnehmen` (spaltet einen ab), `anzahlVon`, `ladungenVon`, `einzelgewicht`, `lastVon`, `tragkraftVon`, `lastZuschlag` (wirkt in `zeitkosten`, siehe [Architektur.md](Architektur.md), Befehle), `erstesGetraenk`, `verderbenEinplanen`
 + `ausDemInventarNehmen` in `src/kern/zustand.js` nimmt einen Gegenstand aus Inventar und Ausrüstung
++ Handler `ausstattung` im Register `ausDaten` (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); Nutzung `trinken` im Register `nutzungen` (siehe [Wesen.md](Wesen.md), KI)
 
 Regeln:
 
 + Beim Aufheben fließt ein Gegenstand in einen Stapel, der in allen übrigen Komponenten gleich ist, so stapeln sich z.B. Sauerbier und Bier nicht; nur der Zeitpunkt des Verderbens zählt nicht, er wird gemittelt (siehe Verschleiß); auf dem Boden fließt nichts zusammen
 + Trinken, Werfen und Material für Fähigkeiten nehmen ein Stück, Fallenlassen den ganzen Stapel; Trinken nimmt bei Ladungen eine Ladung; ein Gegenstand mit Ladungen stapelt sich nicht
++ Ausstattung geht über `insInventar`, stapelbare fließen also zu einem Stapel zusammen; ein Wesen lässt sie beim Tod fallen wie alles im Gepäck (siehe [Wirkungen.md](Wirkungen.md), Tod und Zustandsprüfung)
 + Nach dem letzten Gebrauch kommt `wirdZu` ins Gepäck (Bier zu leerer Flasche, Bierfass zu Fass), Grundlage für das Brauen
 + Gewicht mit Ladungen zuzüglich `gewichtJe` je Ladung; die Last ist die Summe über das Gepäck, Angelegtes eingeschlossen
 + Tragkraft mit Modifikatoren auf `tragkraft` (Skills folgen); verboten ist nichts, Überladung verteuert nur das Bewegen, nach allen Modifikatoren
 + Anzeige: das Inventarfenster zeigt Stapel (x 3), Ladungen (19/20), Angelegtes und die Last (Last 3,2 / 20 kg, rot "überladen"), die Seitenleiste nur die Last
-+ Im Spielinhalt (Zahlen vorläufig): Bier 900 g, stapelbar, wird zur leeren Flasche (400 g, stapelbar) und verdirbt zu Sauerbier; Bierfass mit 20 Schlucken zu einer Halben, 2 kg Holz und 500 g je Schluck, voll 12 kg, wird zum Fass; Brandflasche 900 g, stapelbar; Ausrüstung von 20 g (Kupferring) bis 6 kg (Fasshammer)
++ Im Spielinhalt (Zahlen vorläufig): Bier 900 g, stapelbar, wird zur leeren Flasche (400 g, stapelbar) und verdirbt zu Sauerbier; Bierfass mit 20 Schlucken zu einer Halben, 2 kg Holz und 500 g je Schluck, voll 12 kg, wird zum Fass; Brandflasche 900 g, stapelbar; Bier und Bierfass dienen dem Zweck `heilen`, die Brandflasche `angriff`; der Fernkämpfer-Test trägt ein Bier; Ausrüstung von 20 g (Kupferring) bis 6 kg (Fasshammer)
 
 ## Ausrüstung
 
@@ -120,7 +124,7 @@ Regeln:
 
 ## Tests
 
-+ `tests/inventar.test.js` (Stapel, Ladungen, Behälter, Last), `tests/ausruestung.test.js` (Plätze, Tauschen, Waffen, Sets, Flüche), `tests/verschleiss.test.js` (Verderben, Haltbarkeit, kaputt), `tests/kennen.test.js` (Etiketten, Vertrautheit, Erkennen)
++ `tests/inventar.test.js` (Stapel, Ladungen, Behälter, Last), `tests/nutzen.test.js` (Ausstattung, Zwecke), `tests/ausruestung.test.js` (Plätze, Tauschen, Waffen, Sets, Flüche), `tests/verschleiss.test.js` (Verderben, Haltbarkeit, kaputt), `tests/kennen.test.js` (Etiketten, Vertrautheit, Erkennen)
 
 ## Verweise
 

@@ -2,6 +2,7 @@
 // Vorbild: Utility-KI nach Dave Mark (Infinite Axis Utility System), ganzzahlig.
 // Daten an der KI:
 //   handlungen: [{ handlung, gewicht?, chance?, abstandAb?, abstandBis?, wenn?, bewertung?: [{ eingabe, kurve }], ...Parameter }]
+//   kurve: Stützpunkte oder der Name einer Kurve aus regeln.ki.kurven
 //   wahl: "erste" (Vorgabe) | "beste" | "gewichtet" | { gewichtetUnterBesten: n }
 // Ein Eintrag kommt in Frage, wenn gewicht und chance nicht 0 sind, der Abstand zur Beute (Schachbrett) zwischen
 // abstandAb und abstandBis liegt, die Bedingungen in wenn gelten (Gegenüber ist die Beute), die Handlung einen Befehl
@@ -27,6 +28,7 @@ import { sieht, kandidatenInSicht } from "../systeme/sicht.js";
 import { abwarten } from "./abwarten.js";
 import { schrittWeg } from "./schritte.js";
 import { faehigkeitsbefehl } from "./faehigkeitenwahl.js";
+import { nutzbefehl } from "./nutzen.js";
 
 export const VERFOLGEN = Object.freeze({ verfolgen: true });
 export const WAHLREGELN = ["erste", "beste", "gewichtet"];
@@ -39,6 +41,7 @@ function handlungAnmelden(name, parameter, befehl) {
 
 // Grundhandlungen
 handlungAnmelden("faehigkeit", { name: "text" }, (spiel, wesen, beute, eintrag) => faehigkeitsbefehl(spiel, wesen, eintrag.name, beute));
+handlungAnmelden("nutzen", { zweck: "text" }, (spiel, wesen, beute, eintrag) => nutzbefehl(spiel, wesen, eintrag.zweck, beute));
 handlungAnmelden("abstand_halten", { abstand: "ganzzahl" }, (spiel, wesen, beute, eintrag) => {
   // zu nah: zurückweichen (in die Ecke gedrängt kein Befehl, dann greift es an); genau richtig: warten; zu weit: null
   const entfernung = abstand(wesen.position, beute.position);
@@ -72,11 +75,15 @@ anmelden("kieingaben", "beuteLpProzent", (spiel, wesen, beute) => lpProzent(spie
 anmelden("kieingaben", "feindeInSicht", (spiel, wesen) => sichtbareNach(spiel, wesen, "feinde"));
 anmelden("kieingaben", "verbuendeteInSicht", (spiel, wesen) => sichtbareNach(spiel, wesen, "verbuendete"));
 
+// Stützpunkte einer Kurve der Bewertung: angegeben oder benannt (regeln.ki.kurven)
+export const kurveAufloesen = (spiel, kurve) => (typeof kurve === "string" ? spiel.daten.regeln.ki.kurven[kurve] : kurve);
+
 // Wertung eines Eintrags (ganze Zahl >= 0)
 export function wertung(spiel, wesen, beute, eintrag) {
   let ergebnis = eintrag.gewicht ?? GEWICHT_VORGABE;
   for (const { eingabe, kurve } of eintrag.bewertung || []) {
-    const promille = Math.min(PROMILLE, Math.max(0, wertAufKurve(kurve, holen("kieingaben", eingabe)(spiel, wesen, beute))));
+    const stelle = holen("kieingaben", eingabe)(spiel, wesen, beute);
+    const promille = Math.min(PROMILLE, Math.max(0, wertAufKurve(kurveAufloesen(spiel, kurve), stelle)));
     ergebnis = Math.floor((ergebnis * promille) / PROMILLE);
   }
   return ergebnis;
