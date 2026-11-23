@@ -190,6 +190,26 @@ test("Zustände: Felder, Verweise und Kreise über Beginn und Ende werden geprü
   assert.ok(kreis.some((meldung) => meldung.includes("setzen > setzen")));
 });
 
+test("Ersatzwirkungen werden geprüft: Haken mit ersatzErlaubt, Ziel, Chance, Effekt", () => {
+  const mitErsatz = (ersatz) => {
+    const daten = structuredClone(rohdaten);
+    daten.zustaende = { ...daten.zustaende, test: { text: "test", ersatz } };
+    return vorbereiten(daten).fehler;
+  };
+  assert.deepEqual(mitErsatz([{ bei: "vor_tod", effekt: "biss_klein", verbrauchen: true }, { bei: "vor_schaden", ziel: "quelle", tag: "feuer", chance: 50 }]), []);
+  const erwartet = [
+    [{ bei: "nach_schaden" }, "keine Ersatzwirkungen erlaubt"],
+    [{ bei: "gibt_es_nicht" }, "nicht im Katalog"],
+    [{ bei: "vor_tod", ziel: "feld" }, "ziel"],
+    [{ bei: "vor_tod", chance: 120 }, "chance"],
+    [{ bei: "vor_tod", effekt: "gibt_es_nicht" }, "gibt_es_nicht"],
+    [{ bei: "vor_tod", verbrauchen: "ja" }, "verbrauchen"],
+  ];
+  for (const [eintrag, teilDerMeldung] of erwartet) {
+    assert.ok(mitErsatz([eintrag]).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
+  }
+});
+
 test("Verhalten in Zuständen und Beschwören werden geprüft", () => {
   const mitZustand = (zustand, effekte = {}) => {
     const daten = rohdatenMitTesteintraegen();

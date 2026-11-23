@@ -16,7 +16,7 @@ Vorbilder: NetHack (Last in Stufen, jede bremst mehr), Brogue und DCSS (Stapel g
 
 Daten:
 
-+ Am Gegenstand: `stapelbar: true`, `ladungen: { hoechstens, gewichtJe? }` (Stand in `ladungen.aktuell`, Vorgabe `hoechstens`), `wirdZu: Typ` (Behälter nach dem letzten Gebrauch), `gewicht` in Gramm, `lesbar: { effekt, bleibt? }` (Schriftrolle, Braubuch); an der Entität `anzahl` (Vorgabe 1) und `getragenVon`
++ Am Gegenstand: `stapelbar: true`, `ladungen: { hoechstens, gewichtJe? }` (Stand in `ladungen.aktuell`, Vorgabe `hoechstens`), `wirdZu: Typ` (Behälter nach dem letzten Gebrauch), `gewicht` in Gramm, `lesbar: { effekt, bleibt? }` (Schriftrolle, Braubuch), `ersatz` (passive Ersatzwirkung aus dem Gepäck, siehe [Wirkungen.md](Wirkungen.md), Ersatzwirkungen); an der Entität `anzahl` (Vorgabe 1) und `getragenVon`
 + Am Wesen: `inventar: [IDs]`, `tragkraft` (sonst `regeln.tragen.tragkraft`, 20000 g)
 + Ausstattung in den Daten eines Wesens: `ausstattung: [{ typ, anzahl? }]` (Vorgabe `anzahl` 1), keine Komponente; beim Erzeugen aus Daten liegt sie im Gepäck
 + Zweck für die KI: `zweck: [name]` an `trinkbar` (und an `wurf`, siehe [Wesen.md](Wesen.md), KI)
@@ -26,7 +26,7 @@ Daten:
 Schnittstellen (`src/systeme/inventar.js`):
 
 + Befehle `aufheben`, `trinken { gegenstandId }`, `lesen { gegenstandId }` (Ablehnungen `nicht_im_gepaeck`, `nicht_lesbar`, Meldung `gelesen`, Zeitkosten `aktionen.lesen`), `fallenlassen { gegenstandId }` (der ganze Stapel aufs eigene Feld, Angelegtes wird dabei abgelegt, Meldung `fallengelassen`, Zeitkosten `aktionen.fallenlassen`)
-+ `insInventar` (fließt in einen gleichen Stapel), `einenAbnehmen` (spaltet einen ab), `anzahlVon`, `ladungenVon`, `einzelgewicht`, `lastVon`, `tragkraftVon`, `lastZuschlag` (wirkt in `zeitkosten`, siehe [Architektur.md](Architektur.md), Befehle), `erstesGetraenk`, `verderbenEinplanen`
++ `insInventar` (fließt in einen gleichen Stapel), `einenAbnehmen` (spaltet einen ab), `einStueckVerbrauchen` (ein Stück oder eine Ladung, danach `wirdZu`; Trinken und Ersatzwirkungen), `anzahlVon`, `ladungenVon`, `einzelgewicht`, `lastVon`, `tragkraftVon`, `lastZuschlag` (wirkt in `zeitkosten`, siehe [Architektur.md](Architektur.md), Befehle), `erstesGetraenk`, `verderbenEinplanen`
 + `ausDemInventarNehmen` in `src/kern/zustand.js` nimmt einen Gegenstand aus Inventar und Ausrüstung
 + Handler `ausstattung` im Register `ausDaten` (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); Nutzung `trinken` im Register `nutzungen` (siehe [Wesen.md](Wesen.md), KI)
 
@@ -62,7 +62,7 @@ Schnittstellen (`src/systeme/ausruestung.js`):
 Regeln:
 
 + Waffen in den Händen, Rüstung und Schmuck an Kopf, Brust, Beinen, Hals und zwei Fingern
-+ Nur Angelegtes wirkt: Modifikatoren, Auslöser und gewährte Fähigkeiten gelten erst nach dem Anlegen, ein Wechsel kostet also Zeit; aus dem Gepäck gehen nur Trinken, Lesen, Werfen und Material
++ Nur Angelegtes wirkt: Modifikatoren, Auslöser, Ersatzwirkungen (`ausruestung.ersatz`) und gewährte Fähigkeiten gelten erst nach dem Anlegen, ein Wechsel kostet also Zeit; aus dem Gepäck gehen nur Trinken, Lesen, Werfen, Material und passive Ersatzwirkungen (`ersatz` am Gegenstand, z.B. Phönixbier)
 + Ist der Platz voll, legt derselbe Befehl `anlegen` die ältesten Gegenstände dort ab, bis genug frei ist, und kostet beides (`aktionen.anlegen` plus je `aktionen.ablegen`)
 + Angelegte Gegenstände stapeln sich nicht und sind kein Material; beim Tod fällt alles mit dem Inventar zu Boden
 + Modifikatoren wirken z.B. als Rüstung und als Abzug aufs Ausweichen bei schwerer Rüstung; Sets über die Bedingung `traegt_tag { tag, anzahl }` an einem gewöhnlichen Modifikator

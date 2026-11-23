@@ -35,6 +35,7 @@ Regeln:
 + Das Log zeigt nur, was Ninkasi wahrnimmt: Meldungen mit ihr als Beteiligter (`wer`, `ziel`, `quelle`, `opfer`, `was`, `mit`, `auf`, `traegerin`, `vorher`), Meldungen, bei denen ein beteiligter Bezug mit `ort` oder ein Feld (`ursprung`, `aufschlag`, `bahn`, `felder`) gerade sichtbar ist, und Meldungen ganz ohne Ort (Pegel, Hinweise); `bemerkt` nur, wenn sie das bemerkende Wesen sieht
 + Hören: Lärm, der Ninkasis Feld erreicht (`gesteuerteHoert` an der Meldung `laerm`) und dessen Ursprung sie nicht sieht, schreibt das Log als vage Zeile mit grober Richtung, je nach `geraeusch` Kampflärm, Klirren oder ein Geräusch, höchstens eine Zeile je 100 Zeiteinheiten; wer dort was tut, sagt es nicht
 + Texte zu Zuständen: `log.zustand_beginnt` und `log.zustand_endet` allgemein, ein Zustand kann eigene mitbringen (`log.zustand.<name>.beginnt` bzw. `.endet`); dazu `abgewichen`, `beschworen` (ohne Urheberin `log.erschienen`) und `verschwindet`
++ Ersatzwirkungen (`ersatz_gewirkt`): eigener Text der Ersatzwirkung, sonst `log.ersatz.<haken>.<herkunft>` mit der Herkunft `gegenstand`, `zustand` oder `selbst`; an `vor_schaden` als Abwehr in der Kampfspalte, an `vor_tod` als Heilung im Geschehen
 
 ## Oberfläche
 

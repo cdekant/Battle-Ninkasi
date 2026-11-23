@@ -2,7 +2,7 @@
 
 Stand: 2026-11-23
 
-Zuständig für: `src/kern/effekte.js`, `src/kern/bausteine.js`, `src/kern/ausloeser.js`, `src/kern/vorgang.js`, `src/kern/werte.js`, `src/systeme/modifikatoren.js`, `src/systeme/zustaende.js`, `src/systeme/befehlsveraenderer.js`, `src/systeme/beschwoerung.js`, `src/systeme/zielauswahl.js`, `src/systeme/zielbausteine.js`, `src/systeme/faehigkeiten.js`, `src/systeme/laufendeAktionen.js`, `src/systeme/tod.js`, `src/welt/geometrie.js`, `daten/effekte.js`
+Zuständig für: `src/kern/effekte.js`, `src/kern/bausteine.js`, `src/kern/ausloeser.js`, `src/kern/vorgang.js`, `src/kern/werte.js`, `src/systeme/modifikatoren.js`, `src/systeme/zustaende.js`, `src/systeme/befehlsveraenderer.js`, `src/systeme/beschwoerung.js`, `src/systeme/zielauswahl.js`, `src/systeme/zielbausteine.js`, `src/systeme/faehigkeiten.js`, `src/systeme/laufendeAktionen.js`, `src/systeme/tod.js`, `src/systeme/ersatz.js`, `src/welt/geometrie.js`, `daten/effekte.js`
 
 Mitprüfen bei Änderungen: [Architektur.md](Architektur.md), [Wesen.md](Wesen.md), [Gegenstaende.md](Gegenstaende.md), [Grundlagen.md](Grundlagen.md)
 
@@ -117,13 +117,40 @@ Regeln:
 + Ketten: Befehle und Welt wirken auf Kettenstufe 0, der Effekt eines Auslösers eine Stufe tiefer als sein Ereignis; die Chance sinkt je Stufe auf `daempfung` Prozent (einheitlich gerundet: 100, 50, 25, 13, 7 ...), ab der höchsten Kettentiefe wird nichts mehr vorgemerkt
 + Sichere Chancen (0 und 100) würfeln nicht, damit die Zahlenfolge des Zufalls ungestört bleibt
 + Kettenreaktionen der Welt (Feuer greift auf Gas über, Fässer explodieren nacheinander) laufen nicht über Auslöser, sondern über die Zeit (Weltuhr, Zeitereignisse); sie sind von der Kettengrenze nicht betroffen und für die Spielerin sichtbar
-+ Ersatzwirkungen aus Daten ("Phönixbier verhindert einmal den Tod") sind ein eigener Typ, da sie sofort wirken müssen; offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 4
++ An Haken "davor" greifen statt Auslösern die Ersatzwirkungen ein, weil sie sofort wirken müssen (siehe Ersatzwirkungen)
+
+## Ersatzwirkungen
+
+Vorbilder: NetHack (das Amulett des Lebens rettet angelegt einmal und zerfällt), Slay the Spire (die Fee in der Flasche wirkt aus dem Vorrat, ohne Heilung rettet nichts), Caves of Qud (`BeforeDieEvent` an Teilen eines Objekts).
+
+Daten:
+
++ `ersatz: [{ bei, effekt?, ziel?, tag?, wenn?, chance?, verbrauchen?, text? }]` am Wesen, an einem Zustand, an Ausrüstung (`ausruestung.ersatz`, wirkt nur angelegt) und am Gegenstand selbst (wirkt aus dem Gepäck, siehe [Gegenstaende.md](Gegenstaende.md), Inventar), z.B. Phönixbier `{ bei: "vor_tod", effekt: "phoenix", verbrauchen: true }`, Barriere als Zustand mit `stapel: "aufaddieren"` und `{ bei: "vor_schaden", verbrauchen: true }`
+  + `bei`: Haken aus dem Katalog mit `ersatzErlaubt` (heute `vor_tod` und `vor_schaden`, siehe [Architektur.md](Architektur.md), Ereignisse)
+  + `effekt` (freiwillig) wirkt sofort, eine Kettenstufe tiefer, Quelle die Trägerin, Ursache `ersatz`; `ziel` (`ERSATZ_ZIELE`): `selbst` (Vorgabe) oder `quelle`, wer den Schaden bringt (Gegenschlag)
+  + `tag`: nur, wenn das Ereignis dieses Tag oder diese Schadensart trägt (ein Feuerschild); an `vor_tod` gibt es keine Tags
+  + `wenn` wie an Auslösern, Gegenüber ist die Quelle des Ereignisses; `chance` in Prozent, Vorgabe 100, ohne Dämpfung, Wurf `ersatz` nur zwischen 0 und 100
+  + `verbrauchen` (Vorgabe `false`); `text`: eigener Schlüssel der Meldung
+
+Schnittstellen (`src/systeme/ersatz.js`):
+
++ Je Haken mit `ersatzErlaubt` ein Handler mit Rang `RANG_ERSATZ` 400 (`src/kern/hakenkatalog.js`), die Regel je Haken in `JE_HAKEN`; fehlt sie, bricht schon das Laden ab
++ Register `ersatzquellen` (`(spiel, entitaet) => [{ eintrag, schluessel, gegenstandId? | zustand?, verbrauchen(kettentiefe) }]`), bisher ohne Eintrag
++ Meldung `ersatz_gewirkt { wer, quelle, haken, was | zustand, text }`; `einStueckVerbrauchen` in `src/systeme/inventar.js`
+
+Regeln:
+
++ Gefragt wird nur das Ziel des Ereignisses, in der Kaskade der Auslöser: eigene, die der Zustände, der angelegten Gegenstände, der Gegenstände im Gepäck, dann `ersatzquellen`; je Ereignis wirkt höchstens eine, und keine wirkt wieder, solange ihr eigener Effekt läuft
++ `vor_tod`: nach dem Effekt wird der Tod abgebrochen; gewirkt hat die Ersatzwirkung nur, wenn der Lebenswert danach über 0 liegt, sonst wird sie nicht verbraucht und die nächste gefragt; sie läuft vor der Allmacht
++ `vor_schaden`: fängt den Treffer ganz ab, nach dem Widerstand und nur bei Schaden über 0, was Rüstung oder Immunität auf 0 bringen, verbraucht sie also nicht; den Marker `unblockbar` achtet sie (siehe [Wesen.md](Wesen.md), Kampfwerte)
++ Verbrauchen: am Wesen fällt der Eintrag weg; ein Zustand verliert einen Stapel (mit seinem Anteil der Stärke), der letzte endet mit dem Grund `verbraucht`; ein Gegenstand gibt ein Stück oder eine Ladung ab, danach `wirdZu`, ein angelegter wird dabei abgelegt
++ Ein unbekannter Gegenstand wird erkannt, sobald seine Ersatzwirkung wirkt; die Meldung nennt dann seinen Namen
 
 ## Zustände
 
 Daten:
 
-+ Zustand (`datenproben/zustaende.js`, mit Vorlagen): `{ text, tags, dauer, stapel, hoechstStapel, verlauf, modifikatoren, auren, jeTick, beimBeginn, beimEnde, beimAblauf, ausloeser, gebundenAnQuelle, unterhalt, handlungsunfaehig, befehl, ki, fraktion, faehigkeiten }`
++ Zustand (`datenproben/zustaende.js`, mit Vorlagen): `{ text, tags, dauer, stapel, hoechstStapel, verlauf, modifikatoren, auren, jeTick, beimBeginn, beimEnde, beimAblauf, ausloeser, ersatz, gebundenAnQuelle, unterhalt, handlungsunfaehig, befehl, ki, fraktion, faehigkeiten }`
   + `dauer` in Zeiteinheiten, ohne Angabe unbegrenzt bis zum Entfernen
   + `stapel`: `erneuern` (Vorgabe: eine Instanz, höhere Stärke, längere Dauer), `aufaddieren` (Stärken addiert bis `hoechstStapel` Anwendungen, Dauer erneuert), `staerkster` (nur eine mindestens gleich starke Anwendung ersetzt, sonst nichts), `einzeln` (eigene Instanzen mit eigenem Ende, höchstens `hoechstStapel`)
   + `verlauf`: `gleichbleibend` (Vorgabe), `abklingend`, `ansteigend` oder eine eigene Kurve `[[anteilProzent, staerkeProzent], ...]` über den Anteil der verstrichenen Dauer
@@ -135,7 +162,7 @@ Daten:
 Schnittstellen:
 
 + Bausteine `zustand_setzen { zustand, dauer?, staerke? }` und `zustand_entfernen { zustand?, tag? }` auf das Ziel
-+ Haken `zustand_beginnt` und `zustand_endet` (mit `grund`: `abgelaufen`, `entfernt`, `quelle_tot`, `unterhalt`), Meldungen gleichen Namens
++ Haken `zustand_beginnt` und `zustand_endet` (mit `grund`: `abgelaufen`, `entfernt`, `quelle_tot`, `unterhalt`, `verbraucht`), Meldungen gleichen Namens
 + Zeitereignis `zustand_ende`, gebunden an die Trägerin; Modifikatorquelle `zustaende`; `modifikatorSkaliert` in `src/kern/werte.js`
 + Register `befehlsveraenderer` (`src/systeme/befehlsveraenderer.js`, aufgerufen am Haken `vor_befehl`), mitgeliefert: `ziel_verfehlen { chance }` für Verwirrung beim Befehl `faehigkeit` (das Ziel rutscht auf ein anderes Wesen daneben, ein Feld auf ein Nachbarfeld, eine Richtung um 45°, nur auf Ziele, die der Befehl zulässt) und `abweichen { chance, freundeAngreifen? }` für Torkeln und Verwirrung: ein Schritt geht mit der Chance, skaliert mit der Stärke, auf ein zufälliges anderes freies Nachbarfeld (im Gang also zurück), gibt es keins, wie gewollt; ein Feind dort wird angegriffen, ein Verbündeter nur mit `freundeAngreifen`, sonst zählt sein Feld nicht als frei
 + `fraktionVon` und `kiVon` (`src/kern/zustand.js`) liefern die des jüngsten überlagernden Zustands, sonst die eigene
@@ -275,7 +302,7 @@ Schnittstellen:
 
 + `vorgangAbschliessen(spiel)` (`src/kern/vorgang.js`) nach jedem Vorgang (ausgeführter Befehl, Handler der Weltuhr, Zeitereignis): abwechselnd alle Zustandsprüfungen und der nächste vorgemerkte Auslöser, bis nichts mehr ansteht; mehr als 100000 Durchläufe werfen
 + Register `zustandspruefungen` (`(spiel) => true`, wenn etwas verändert wurde), in dieser Reihenfolge: `tod` (`src/systeme/tod.js`), `lage` (siehe [Wesen.md](Wesen.md), Bewegung), `aufrecht_ohne_quelle` (siehe Fähigkeiten), `kaputt` (siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß); später z.B. der Filmriss
-+ Haken `vor_tod` und `nach_tod` (mit der letzten Position), Meldung `tod` mit Urheberin, Ursache und Mittel aus `letzterVerlust`; am `vor_tod` hängt als letzte die Allmacht, die Ninkasi im allmächtigen Lauf bewahrt (siehe [Architektur.md](Architektur.md), Spielarten)
++ Haken `vor_tod` und `nach_tod` (mit der letzten Position), Meldung `tod` mit Urheberin, Ursache und Mittel aus `letzterVerlust`; am `vor_tod` hängen die Ersatzwirkungen (siehe dort) und als letzte die Allmacht, die Ninkasi im allmächtigen Lauf bewahrt (siehe [Architektur.md](Architektur.md), Spielarten)
 
 Regeln:
 
@@ -288,11 +315,11 @@ Regeln:
 
 ## Tests
 
-+ `tests/werte.test.js` und `tests/modifikatoren.test.js` (Verrechnung, Quellen, Bedingungen, Auren), `tests/ausloeser.test.js` (Kaskade, Ketten, Dämpfung), `tests/zustaende.test.js` (Stapelregeln, Verlauf, Unterhalt, Überlagerung), `tests/beschwoerung.test.js`, `tests/zielauswahl.test.js`, `tests/zielbausteine.test.js` und `tests/geometrie.test.js` (Muster, Linien, Kreis, Kegel), `tests/faehigkeiten.test.js` (Verbrauch, Risiko, Ausbau, gewährte und gelehrte Fähigkeiten), `tests/laufendeAktionen.test.js`, `tests/tod.test.js`, `tests/verhalten.test.js` (Befehlsveränderer)
++ `tests/werte.test.js` und `tests/modifikatoren.test.js` (Verrechnung, Quellen, Bedingungen, Auren), `tests/ausloeser.test.js` (Kaskade, Ketten, Dämpfung), `tests/zustaende.test.js` (Stapelregeln, Verlauf, Unterhalt, Überlagerung), `tests/beschwoerung.test.js`, `tests/zielauswahl.test.js`, `tests/zielbausteine.test.js` und `tests/geometrie.test.js` (Muster, Linien, Kreis, Kegel), `tests/faehigkeiten.test.js` (Verbrauch, Risiko, Ausbau, gewährte und gelehrte Fähigkeiten), `tests/laufendeAktionen.test.js`, `tests/tod.test.js`, `tests/ersatz.test.js` (Barriere, Phönix, Kaskade, Verbrauch), `tests/verhalten.test.js` (Befehlsveränderer)
 
 ## Verweise
 
 + Spieldesign der Fähigkeiten, des Pegels und des Brauens: [Grundlagen.md](Grundlagen.md); Skills, die Fähigkeiten ausbauen: [Charakter.md](Charakter.md)
-+ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkte 4 und 6 (Ersatzwirkungen, Teilung) und Punkt 8 (u.a. `zug_beginn`, Ladungen als Verbrauch, Lesen mit Ziel); erster Auslöser im Inhalt in Punkt 14
++ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 6 (Teilung) und Punkt 8 (u.a. `zug_beginn`, Ladungen als Verbrauch, Lesen mit Ziel); erster Auslöser im Inhalt in Punkt 14
 
 Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

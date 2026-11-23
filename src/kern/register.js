@@ -24,6 +24,7 @@ const ARTEN = [
   "beimErzeugen",       // nach dem Erzeugen jeder Entität: (zustand, entitaet) => void, z.B. Verderben einplanen, Etikett
   "ausDaten",           // nach dem Erzeugen aus Daten (kern/zustand.js ausDatenErzeugen): (spiel, entitaet, datensatz) => void, z.B. Ausstattung
   "ausloeserquellen",   // weitere Auslöser einer Entität nach Zuständen und Ausrüstung: (spiel, entitaet) => [{ ausloeser, schluessel }]
+  "ersatzquellen",      // weitere Ersatzwirkungen einer Entität nach dem Gepäck (systeme/ersatz.js): (spiel, entitaet) => [{ eintrag, schluessel, gegenstandId? | zustand?, verbrauchen(kettentiefe) }]
   "lernanlaesse",       // Lernanlässe der Skills (systeme/lernen.js): { beschreibung }; Daten nennen sie in lernt
   "planschritte",       // Schritte des Plans des Laufs (welt/plan.js): (spiel, plan, zufall) => void, beim Start nacheinander
   "laufbeginn",         // beim Start nach dem Einrichten Ninkasis (kern/spiel.js neuesSpiel): (spiel, ninkasi) => void, z.B. Arena

@@ -10,6 +10,7 @@ import "./ausruestung.js";
 import "./stoffwechsel.js";
 import "./gefahr.js";
 import "./tod.js";
+import "./ersatz.js";
 import "./zielauswahl.js";
 import "./zielbausteine.js";
 import "./zustaende.js";

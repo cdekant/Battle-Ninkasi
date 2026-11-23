@@ -22,7 +22,7 @@ Daten:
   + `ausweichen`: Verteidigung gegen körperliche Angriffe und Geschosse; `willenskraft`: Verteidigung gegen Psi (und Magie, wo die Daten es sagen) (`VERTEIDIGUNGEN`)
   + `blocken`: fängt einen schon gelungenen Treffer ganz ab (Schild, Schleimhülle); `ruestung`: fester Abzug je Treffer; `kritchance`: Chance der Angreiferin auf einen Krit
 + Dazu `widerstaende: { saeure: 100, feuer: -50 }` und `immun: ["psi"]` am Wesen
-+ Marker als Tags an Angriff oder Effekt (`MARKER`): `verfehlt_nie` (kein Trefferwurf), `unblockbar` (kein Blocken; künftige Ersatzwirkungen wie ein Schild, der den Treffer abfängt, sollen ihn ebenso achten), `ignoriert_ruestung`
++ Marker als Tags an Angriff oder Effekt (`MARKER`): `verfehlt_nie` (kein Trefferwurf), `unblockbar` (kein Blocken und keine Ersatzwirkung, die den Treffer abfängt, siehe [Wirkungen.md](Wirkungen.md), Ersatzwirkungen), `ignoriert_ruestung`
 + Regelwerte `regeln.kampf`: `grundverteidigung` 20, `halbwertWiderstand` 100, `halbwertBlocken` 50, `halbwertKritchance` 50, `kritfaktor` 150 (x1,5), `mindestschadenNachRuestung` 1; alle Zahlen vorläufig
 
 Schnittstellen (`src/systeme/kampf.js`):
@@ -32,7 +32,7 @@ Schnittstellen (`src/systeme/kampf.js`):
 + `trefferanteil(spiel, { quelle, ziel, genauigkeit, gegen, tags })` liefert die Trefferchance als Bruch ohne zu würfeln, Grundlage für Vorschau, Tooltip und KI; `anteilInProzent` nur für die Anzeige
 + Baustein `trefferwurf { genauigkeit, effekt, gegen?, sonst?, kritchance? }` für Fernkampf, Magie, Psi und Flächen; `gegen` Vorgabe `ausweichen`, Psi z.B. `willenskraft`; `sonst` wirkt bei einem Fehlschlag, z.B. halber Schaden einer Explosion, der man ausweicht (Vorbild Rettungswurf); wo kein Wurf passt, lassen die Daten ihn weg
 + Baustein `angreifen { profil? }` siehe [Wirkungen.md](Wirkungen.md), Effektsystem
-+ Haken: `vor_angriff` vor jedem einzelnen Angriff mit dem Namen des Profils (`angriff`), ein Abbruch lässt diesen Angriff aus (Furcht, Ladehemmung); `verfehlt` (mit `grund` `ausgewichen` oder `geblockt`), `nach_treffer` (mit `kritisch`), `vor_schaden` mit den Rängen der Schadensrechnung (`RANG_ANGREIFER` 50, `RANG_RUESTUNG` 200, `RANG_WIDERSTAND` 300 in `src/kern/hakenkatalog.js`)
++ Haken: `vor_angriff` vor jedem einzelnen Angriff mit dem Namen des Profils (`angriff`), ein Abbruch lässt diesen Angriff aus (Furcht, Ladehemmung); `verfehlt` (mit `grund` `ausgewichen` oder `geblockt`), `nach_treffer` (mit `kritisch`), `vor_schaden` mit den Rängen der Schadensrechnung (`RANG_ANGREIFER` 50, `RANG_RUESTUNG` 200, `RANG_WIDERSTAND` 300, `RANG_ERSATZ` 400 in `src/kern/hakenkatalog.js`)
 + Meldungen: `verfehlt` (mit `grund` und `trefferchance`), `hinterhalt`, `schaden` mit `schadensart`, `kritisch`, `kritfaktor` (Prozent, ohne Krit `null`), `ruestungAbzug`, `widerstanden`, `immun` und `trefferchance` (aus dem Trefferwurf davor, im Effektkontext weitergereicht, ohne Trefferwurf `null`); das Log zeigt die Art, eigene Zeilen für Krit, Immunität und Blocken und die Zahlen in der Kampfspalte (siehe [Anzeige.md](Anzeige.md), Log)
 
 Regeln:
@@ -45,7 +45,7 @@ Regeln:
 + Ablauf eines Angriffs: Trefferwurf, Blocken, Krit-Wurf; das Ergebnis nennt `trefferchance` (Prozent vor dem Blocken, gegen Ahnungslose 100, nur für das Log); Treffer wirken den Effekt mit `kritisch` im Kontext
 + Trefferchance: `genauigkeit / (genauigkeit + verteidigung + grundverteidigung)`; die Genauigkeit über Modifikatoren der Quelle (ohne Quelle, z.B. bei einer Falle, unverändert), die Verteidigung nach `gegen`; die Grundverteidigung sorgt dafür, dass auch ein Ziel ohne eigene Verteidigung nicht sicher getroffen wird; Genauigkeit 80 gegen Ausweichen 0 trifft so zu 80 %, gegen 80 zu 44 %
 + Blocken: `blocken / (blocken + halbwertBlocken)`; Kritchance ebenso mit `halbwertKritchance`, die `kritchance` des Angriffs kommt zu der des Wesens
-+ Schadensrechnung am Haken `vor_schaden`, feste Ränge: Angreiferin (50: Modifikator `schaden` mit den Tags und der Schadensart, danach Krit mit `kritfaktor`), Handler ohne Rang (100, z.B. Abfangen), Rüstung (200), Widerstand und Immunität (300)
++ Schadensrechnung am Haken `vor_schaden`, feste Ränge: Angreiferin (50: Modifikator `schaden` mit den Tags und der Schadensart, danach Krit mit `kritfaktor`), Handler ohne Rang (100, z.B. Abfangen), Rüstung (200), Widerstand und Immunität (300), Ersatzwirkungen (400, eine Barriere fängt nur, was danach noch Schaden ist)
 + Krit: Modifikatoren auf `kritfaktor` heben ihn nach oben offen; er wirkt vor der Rüstung, Krits schlagen sich also besser durch Panzer
 + Rüstung: fester Abzug, ein Treffer mit Schaden behält mindestens `mindestschadenNachRuestung`; `ruestung` wirkt nur gegen Arten mit `ruestung: true`, `ruestung.<art>` aus Modifikatoren gegen genau diese Art, z.B. eine säurefeste Schürze mit `ruestung.saeure`; den Abzug auf das Ausweichen nennt jede Rüstung selbst als Modifikator auf `ausweichen` in ihren Daten
 + Widerstand R in Punkten aus `widerstaende` und Modifikatoren auf `widerstand` mit der Art als Tag (ohne Tag gegen alles): Schaden × H / (H + R); mit dem Halbwert H 100 halbieren 100 Punkte, 300 Punkte lassen ein Viertel; negative Punkte machen verwundbar, Schaden × (H − 2R) / (H − R), das nähert sich dem Doppelten (−100 Punkte: x1,5); einmal gerundet

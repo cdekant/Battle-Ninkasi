@@ -17,6 +17,7 @@ import { WACHZUSTAENDE } from "../systeme/wahrnehmung.js";
 import { WAHLREGELN } from "../ki/handlungen.js";
 import { UNTERBRECHUNGSGRUENDE } from "../systeme/laufendeAktionen.js";
 import { BEWEGUNGSARTEN } from "../welt/karte.js";
+import { ERSATZ_ZIELE } from "../systeme/ersatz.js";
 import { HOECHSTE_STUFE, ANZAHL_TIERS, eigenschaftenPruefen } from "../systeme/skills.js";
 
 // Vorbelegung des Cursors im Zielmodus (eingabe/zielmodus.js)
@@ -137,6 +138,7 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
     fehler.push(`${ort}: beimTod.inventar muss eines von ${HINTERLASSENSCHAFT_REGELN.join(", ")} sein`);
   }
   if (wesen.ausloeser !== undefined) pruefeAusloeser(daten, wesen.ausloeser, ort, fehler);
+  if (wesen.ersatz !== undefined) pruefeErsatz(daten, wesen.ersatz, ort, fehler);
   if (wesen.tags !== undefined && !istTextliste(wesen.tags)) fehler.push(`${ort}: tags muss eine Liste von Texten sein`);
   if (wesen.modifikatoren !== undefined) pruefeModifikatoren(daten, wesen.modifikatoren, `${ort}.modifikatoren`, fehler);
   if (wesen.auren !== undefined) pruefeAuren(daten, wesen.auren, ort, fehler);
@@ -202,6 +204,25 @@ function pruefeAusloeser(daten, liste, ort, fehler) {
     if (ausloeser.wenn !== undefined) {
       if (!Array.isArray(ausloeser.wenn)) fehler.push(`${eintragOrt}: wenn muss eine Liste sein`);
       else pruefeBedingungen(daten, ausloeser.wenn, `${eintragOrt}.wenn`, fehler);
+    }
+  });
+}
+
+// Ersatzwirkungen, siehe systeme/ersatz.js
+function pruefeErsatz(daten, liste, ort, fehler) {
+  if (!Array.isArray(liste)) return fehler.push(`${ort}: ersatz muss eine Liste sein`);
+  liste.forEach((eintrag, nummer) => {
+    const eintragOrt = `${ort}.ersatz[${nummer}]`;
+    if (!istObjekt(eintrag)) return fehler.push(`${eintragOrt}: muss ein Objekt { bei, ... } sein`);
+    const haken = HAKENKATALOG[eintrag.bei];
+    if (!haken) fehler.push(`${eintragOrt}: Haken "${eintrag.bei}" steht nicht im Katalog`);
+    else if (!haken.ersatzErlaubt) fehler.push(`${eintragOrt}: am Haken "${eintrag.bei}" sind keine Ersatzwirkungen erlaubt`);
+    if (eintrag.ziel !== undefined && !ERSATZ_ZIELE.includes(eintrag.ziel)) fehler.push(`${eintragOrt}: ziel muss eines von ${ERSATZ_ZIELE.join(", ")} sein`);
+    if (eintrag.chance !== undefined && !istProzent(eintrag.chance)) fehler.push(`${eintragOrt}: chance muss eine ganze Zahl von 0 bis 100 sein`);
+    pruefeParameter(daten, { effekt: "effekt?", tag: "text?", verbrauchen: "wahrheitswert?", text: "text?" }, eintrag, eintragOrt, fehler);
+    if (eintrag.wenn !== undefined) {
+      if (!Array.isArray(eintrag.wenn)) fehler.push(`${eintragOrt}: wenn muss eine Liste sein`);
+      else pruefeBedingungen(daten, eintrag.wenn, `${eintragOrt}.wenn`, fehler);
     }
   });
 }
@@ -397,12 +418,15 @@ function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
       if (ausruestung.angriffe !== undefined) pruefeAngriffe(daten, ausruestung.angriffe, `${ort}.ausruestung`, fehler);
       if (ausruestung.modifikatoren !== undefined) pruefeModifikatoren(daten, ausruestung.modifikatoren, `${ort}.ausruestung.modifikatoren`, fehler);
       if (ausruestung.ausloeser !== undefined) pruefeAusloeser(daten, ausruestung.ausloeser, `${ort}.ausruestung`, fehler);
+      if (ausruestung.ersatz !== undefined) pruefeErsatz(daten, ausruestung.ersatz, `${ort}.ausruestung`, fehler);
       if (ausruestung.faehigkeiten !== undefined) pruefeFaehigkeitsliste(daten, ausruestung.faehigkeiten, `${ort}.ausruestung`, fehler);
       // Anforderungen, siehe systeme/skills.js
       if (ausruestung.anforderung !== undefined) pruefeAnforderung(daten, ausruestung.anforderung, `${ort}.ausruestung.anforderung`, fehler);
       if (ausruestung.abzugJePunkt !== undefined) pruefeAnforderungsabzug(daten, ausruestung.abzugJePunkt, `${ort}.ausruestung.abzugJePunkt`, fehler);
     }
   }
+  // Ersatzwirkung aus dem Gepäck (passiv, z.B. Phönixbier), siehe systeme/ersatz.js
+  if (gegenstand.ersatz !== undefined) pruefeErsatz(daten, gegenstand.ersatz, ort, fehler);
   // Werfen, siehe systeme/werfen.js
   if (gegenstand.wurf !== undefined) {
     if (!istObjekt(gegenstand.wurf)) fehler.push(`${ort}: wurf muss ein Objekt { effekt?, reichweite? } sein`);
@@ -965,6 +989,7 @@ function pruefeZustand(daten, sprache, name, zustand, fehler) {
   if (zustand.modifikatoren !== undefined) pruefeModifikatoren(daten, zustand.modifikatoren, `${ort}.modifikatoren`, fehler);
   if (zustand.auren !== undefined) pruefeAuren(daten, zustand.auren, ort, fehler);
   if (zustand.ausloeser !== undefined) pruefeAusloeser(daten, zustand.ausloeser, ort, fehler);
+  if (zustand.ersatz !== undefined) pruefeErsatz(daten, zustand.ersatz, ort, fehler);
   if (zustand.unterhalt !== undefined) pruefeVorratsmengen(zustand.unterhalt, `${ort}: unterhalt`, fehler);
   if (zustand.faehigkeiten !== undefined) pruefeFaehigkeitsliste(daten, zustand.faehigkeiten, ort, fehler);
 }

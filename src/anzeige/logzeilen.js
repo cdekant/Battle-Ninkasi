@@ -151,6 +151,14 @@ export function zeilenAusMeldung(kontext, meldung) {
       const schluessel = hatSchluessel(eigenerSchluessel) ? eigenerSchluessel : `log.zustand_${vorgang}`;
       return geschehen(text(schluessel, { ...meldung, zustand: kontext.zustandsname(meldung.zustand) }));
     }
+    // Ersatzwirkungen (systeme/ersatz.js): eigener Text, sonst nach Haken und Herkunft (gegenstand, zustand, selbst)
+    case "ersatz_gewirkt": {
+      const herkunft = meldung.was ? "gegenstand" : meldung.zustand ? "zustand" : "selbst";
+      const schluessel = meldung.text && hatSchluessel(meldung.text) ? meldung.text : `log.ersatz.${meldung.haken}.${herkunft}`;
+      const zeilentext = text(schluessel, { ...meldung, zustand: meldung.zustand ? kontext.zustandsname(meldung.zustand) : null });
+      if (meldung.haken === "vor_schaden") return kampf(zeilentext, "abgewehrt", seiteVon(spiel, meldung.quelle), "abgewehrt");
+      return geschehen(zeilentext, "heilung");
+    }
     case "beschworen":
       return geschehen(text(meldung.wer ? "log.beschworen" : "log.erschienen", meldung));
     // Skillsystem (systeme/skills.js, systeme/lernen.js): nur, was Ninkasi selbst lernt

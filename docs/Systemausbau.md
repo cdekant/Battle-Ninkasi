@@ -16,16 +16,15 @@ Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und wäh
 
 Stand 2026-11-23, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer Wirkung auf den Inhalt, das Kleine und Breite zuerst:
 
-1. Ersatzwirkungen (Punkt 4)
-2. KI: Unterstützung und Umherziehen (Punkt 7)
-3. Teilung und Wachstum (Punkt 6), braucht Punkt 7
-4. Licht und Wahrnehmung (Punkt 3)
-5. Englisch, Mehrzahl und Glossar (Punkt 9)
-6. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
-7. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
-8. Danach der Inhalt (Punkt 14)
+1. KI: Unterstützung und Umherziehen (Punkt 7)
+2. Teilung und Wachstum (Punkt 6), braucht Punkt 7
+3. Licht und Wahrnehmung (Punkt 3)
+4. Englisch, Mehrzahl und Glossar (Punkt 9)
+5. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
+6. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
+7. Danach der Inhalt (Punkt 14)
 
-Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 5 (gewährte und gelehrte Fähigkeiten) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
+Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
 
 Die Proben des Probedurchstichs stehen in `tests/probedurchstich.test.js`; jede Lücke dort ist ein Test mit `todo` und dem Punkt, der sie schließt, mit einem Entwurf der Daten (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing). Wer einen Punkt umsetzt, nimmt dort das `todo` weg.
 
@@ -45,15 +44,6 @@ Status: offen, erst Recherche, dann neu designen und überarbeiten
 + Licht durch Feuer; Nachtsicht und Fernsicht als Modifikatorziele für spätere Skills
 + Offene Fragen des Spieldesigns in [Grundlagen.md](Grundlagen.md), Offen
 + Die Ideen an den genannten Stellen werden dabei an einer Stelle zusammengeführt
-
-## 4. Ersatzwirkungen
-
-Status: offen, erst Recherche
-
-+ Probe: das Phönixbier im Gepäck verhindert einmal den Tod und ist dann verbraucht
-
-+ Wirkungen aus Daten, die sofort an einem Haken "davor" eingreifen und sich verbrauchen können, z.B. "Phönixbier verhindert einmal den Tod", "Schild fängt einen Treffer ab"; heute gibt es dafür nur Code-Handler am Haken `vor_tod` (siehe [Wirkungen.md](Wirkungen.md), Auslöser)
-+ Sie achten den Marker `unblockbar` (siehe [Wesen.md](Wesen.md), Kampfwerte)
 
 ## 6. Teilung und Wachstum
 
@@ -80,6 +70,8 @@ Status: offen, jeweils mit dem ersten Bedarf
 + Ladungen als Verbrauch einer gewährten Fähigkeit (Zauberstab, Regel in [Grundlagen.md](Grundlagen.md), Spielkern): Entwurf `verbrauch: { ladungen: 1 }`, bezahlt vom zuerst angelegten Gegenstand der Quelle, der noch Ladungen hat; jede gewährte Fähigkeit kennt ihre Quelle (`gegenstandId`, siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten); das Fähigkeitenfenster zeigt die Summe der Ladungen
 + Lesen mit Ziel: eine Rolle wirkt eine Fähigkeit einmal, ohne sie zu lehren (Entwurf `lesbar: { faehigkeit }`, Befehl `lesen { gegenstandId, ziel? }` über den Zielmodus); heute wirkt ein lesbarer Gegenstand nur auf die Leserin
 + Haken `zug_beginn` in Betrieb nehmen
++ Ersatzwirkungen an weiteren Haken "davor" (z.B. `vor_angriff` für ein Ausweichen aus Daten) und eine Barriere als Puffer mit Fassungsvermögen statt ganzer Treffer (Entwurf `fasst`, Vorbild ToME), siehe [Wirkungen.md](Wirkungen.md), Ersatzwirkungen
++ Auslöser mit Filter auf den Grund des Ereignisses (`verfehlt` mit `grund: "geblockt"`), etwa für Verschleiß eines Schilds beim Blocken; Verschleiß durch Gebrauch bleibt bis dahin ausgeschlossen (siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß)
 + Angefressene Waffen: wie sie schwächer werden, braucht einen Eingriff in die Schadensrechnung (siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß)
 + Sturz in einen Abgrund auf die Ebene darunter (siehe [Wesen.md](Wesen.md), Bewegung)
 + Abzug einer Anforderung nur für den Angriff mit genau dieser Waffe (über Tags der Profile)

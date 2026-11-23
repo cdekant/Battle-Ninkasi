@@ -32,7 +32,7 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Dienste des Hubs,
   + Regeneration und Schwund sind für jeden Vorrat möglich; Skills, Schriftrollen, Items und Zustände passen Rate, Schwund und Lage der Verläufe an, siehe Stoffwechsel in [Wesen.md](Wesen.md)
 + Folge: Auf Magie bereitet man sich nüchtern vor, Psi braucht für Regeneration und Wirksamkeit einen möglichst hohen Pegel, bei dem das Risiko steigt; Mischbuilds müssen ihren Rausch planen
 + Meditieren und Schriftrollen schreiben nur nüchtern
-+ Gegenstände wirken nur angelegt, das Gepäck ist Vorrat: Waffen, Rüstung, Schmuck und Zauberstäbe geben ihre Werte und Fähigkeiten erst in der Hand oder am Körper, ein Wechsel kostet Zeit; aus dem Gepäck wird nur getrunken, gelesen, geworfen und verbraucht
++ Gegenstände wirken nur angelegt, das Gepäck ist Vorrat: Waffen, Rüstung, Schmuck und Zauberstäbe geben ihre Werte und Fähigkeiten erst in der Hand oder am Körper, ein Wechsel kostet Zeit; aus dem Gepäck wird nur getrunken, gelesen, geworfen und verbraucht; Ausnahmen sind passive Wirkungen wie ein Bier, das einmal vor dem Tod bewahrt
 + Ein Zauberstab bezahlt seine Fähigkeit mit eigenen Ladungen statt mit den Vorräten der Trägerin; trägt sie zwei gleiche, wird zuerst der zuerst angelegte geleert
 + Fähigkeiten aus Fundstücken: ein angelegter Gegenstand gewährt sie, solange er angelegt ist; ein Lehrstück (Schriftrolle, HACCP-Aushang) lehrt sie dauerhaft, gelernt ist gelernt; daneben gibt es Verbrauchsgegenstände, die einmal wirken
 + Vorschlag, noch nicht bestätigt: Bier füllt LP, Wein füllt MP, Brand füllt PP oder wirkt nur über den Pegel; jedes Getränk hebt den Pegel nach seinem Alkoholgehalt

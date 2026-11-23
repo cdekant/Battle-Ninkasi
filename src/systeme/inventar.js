@@ -139,6 +139,22 @@ function rueckstandAblegen(spiel, traegerin, gegenstand) {
   insInventar(spiel, traegerin, rueckstand);
 }
 
+// Verbraucht ein Stück aus dem Gepäck (auch ein angelegtes, es wird dabei abgelegt): bei Ladungen eine Ladung (ein
+// Schluck aus dem Fass), sonst eines vom Stapel; nach dem letzten bleibt, was wirdZu sagt
+export function einStueckVerbrauchen(spiel, traegerin, gegenstand) {
+  if (gegenstand.ladungen) {
+    gegenstand.ladungen.aktuell = ladungenVon(gegenstand) - 1;
+    if (gegenstand.ladungen.aktuell > 0) return;
+    ausDemInventarNehmen(traegerin, gegenstand.id);
+    entitaetEntfernen(spiel.zustand, gegenstand.id);
+    rueckstandAblegen(spiel, traegerin, gegenstand);
+    return;
+  }
+  const verbraucht = einenAbnehmen(spiel, traegerin, gegenstand);
+  entitaetEntfernen(spiel.zustand, verbraucht.id);
+  rueckstandAblegen(spiel, traegerin, verbraucht);
+}
+
 function aufhebbarHier(spiel, akteur) {
   return entitaetenAuf(spiel.zustand, akteur.position.x, akteur.position.y).find((entitaet) => entitaet.aufhebbar) || null;
 }
@@ -172,19 +188,7 @@ anmelden("befehle", "trinken", {
     melden(spiel, "getrunken", { wer: bezugAuf(akteur), was: bezugAuf(gegenstand) });
     benutzt(spiel, akteur, gegenstand, "trinken");
     const effekt = gegenstand.trinkbar.effekt, typ = gegenstand.typ;
-    if (gegenstand.ladungen) {
-      // ein Schluck aus dem Fass; nach dem letzten bleibt, was wirdZu sagt
-      gegenstand.ladungen.aktuell = ladungenVon(gegenstand) - 1;
-      if (gegenstand.ladungen.aktuell <= 0) {
-        ausDemInventarNehmen(akteur, gegenstand.id);
-        entitaetEntfernen(spiel.zustand, gegenstand.id);
-        rueckstandAblegen(spiel, akteur, gegenstand);
-      }
-    } else {
-      const getrunken = einenAbnehmen(spiel, akteur, gegenstand);
-      entitaetEntfernen(spiel.zustand, getrunken.id);
-      rueckstandAblegen(spiel, akteur, getrunken);
-    }
+    einStueckVerbrauchen(spiel, akteur, gegenstand);
     // wer trinkt, merkt, was es war (Vorbild Brogue); erkannt vor der Wirkung, damit deren Meldungen den Namen tragen
     erkennen(spiel, akteur, typ);
     effektAnwenden(spiel, effekt, { quelleId: akteur.id, zielId: akteur.id, ursache: "trinken", mittel: { art: "gegenstand", name: typ } });

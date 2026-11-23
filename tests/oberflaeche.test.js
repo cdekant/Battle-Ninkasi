@@ -77,6 +77,17 @@ test("Logzeilen: Kampf mit Seite, Ton und Zahlen, Geschehen mit Art", () => {
   for (const zeile of [krit, verfehlt, tod, eigenerTod, pegel]) assert.ok(zeile.art in ARTEN);
 });
 
+test("Logzeilen: Ersatzwirkungen nach Haken und Herkunft", () => {
+  const { ninkasi, feind, kontext } = aufstellen();
+  const zeile = (zusatz) => zeilenAusMeldung(kontext, { art: "ersatz_gewirkt", wer: bezugAuf(ninkasi), quelle: bezugAuf(feind), was: null, zustand: null, text: null, ...zusatz })[0];
+  const abgefangen = zeile({ haken: "vor_schaden" });
+  assert.deepEqual([abgefangen.spalte, abgefangen.art, abgefangen.seite], ["kampf", "abgewehrt", "gegner"]);
+  assert.match(abgefangen.text, /fängt den Treffer ab/);
+  const bewahrt = zeile({ haken: "vor_tod", quelle: null, was: { id: 999, typ: "bier", text: "gegenstand.bier" } });
+  assert.deepEqual([bewahrt.spalte, bewahrt.art], ["geschehen", "heilung"]);
+  assert.match(bewahrt.text, /Bier bewahrt .* vor dem Tod/);
+});
+
 test("Log: Zugmarke, gleiche Zeilen zusammengefasst, zwei Spalten, Strich zwischen den Zügen", () => {
   const { spiel, ninkasi } = aufstellen();
   const log = new Log(ohneDom(), texte);

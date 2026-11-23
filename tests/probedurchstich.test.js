@@ -243,8 +243,8 @@ test("Psi: stärker mit Pegel, Glimmer steigt bei der Wirkenden, ab 3 ‰ schlä
 
 // 5. Ein Gegenstand mit Ersatzwirkung (Punkt 4)
 
-test("Phönixbier: verhindert einmal den Tod und ist dann verbraucht", { todo: "Punkt 4: Ersatzwirkungen aus Daten gibt es nicht, nur Code am Haken vor_tod" }, () => {
-  // Entwurf: ersatz: [{ bei: "vor_tod", effekt, verbrauchen: true }] am Gegenstand im Gepäck
+test("Phönixbier: verhindert einmal den Tod und ist dann verbraucht", () => {
+  // ersatz am Gegenstand wirkt aus dem Gepäck (passiv), siehe docs/Wirkungen.md, Ersatzwirkungen
   const { spiel, ninkasi } = aufstellen({
     effekte: { phoenix: { schritte: [{ baustein: "heilen", menge: 10 }] }, toedlich: { schritte: [{ baustein: "schaden", art: "stumpf", menge: 500 }] } },
   });
