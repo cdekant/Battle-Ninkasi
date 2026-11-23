@@ -6,6 +6,11 @@ import { effektAnwenden } from "../src/kern/effekte.js";
 import { vorgangAbschliessen } from "../src/kern/vorgang.js";
 import { fraktionVon } from "../src/kern/zustand.js";
 import { nahkampf } from "../src/systeme/kampf.js";
+import { faehigkeitPruefen } from "../src/systeme/faehigkeiten.js";
+import { wirkungVorab } from "../src/kern/bausteine.js";
+import { befehlGeben } from "../src/kern/spiel.js";
+import { akteurEinreihen } from "../src/kern/zeit.js";
+import { allesSichtbar } from "./hilfen.js";
 
 const KARTE = [
   "#########",
@@ -21,6 +26,12 @@ const EFFEKTE = {
   speere_rufen: { schritte: [{ baustein: "beschwoeren", wesen: "geisterspeer", anzahl: 8, zustand: "beschworen" }] },
   verschwinden: { schritte: [{ baustein: "verschwinden" }] },
   toedlich: { schritte: [{ baustein: "schaden", menge: 100 }] },
+  hefe_und_hieb: { schritte: [{ baustein: "beschwoeren", wesen: "bierhefe" }, { baustein: "schaden", menge: 1 }] },
+};
+
+const FAEHIGKEITEN = {
+  hefe_rufen: { text: "f.hefe_rufen", ziel: { art: "selbst" }, wirkung: "hefe_rufen" },
+  hefe_und_hieb: { text: "f.hefe_und_hieb", ziel: { art: "wesen", reichweite: 5 }, wirkung: "hefe_und_hieb" },
 };
 
 const ZUSTAENDE = {
@@ -32,7 +43,7 @@ const WESEN = {
   geisterspeer: { text: "wesen.geisterspeer", fraktion: "geister", werte: { lp: { grundwert: 1 } }, ki: { modul: "jagen", letzteBekanntePosition: null } },
 };
 
-const spielBauen = () => miniSpiel(KARTE, { effekte: EFFEKTE, zustaende: ZUSTAENDE, wesen: WESEN });
+const spielBauen = (optionen = {}) => miniSpiel(KARTE, { effekte: EFFEKTE, zustaende: ZUSTAENDE, wesen: WESEN, faehigkeiten: FAEHIGKEITEN, ...optionen });
 const beschworene = (spiel, typ) => Object.values(spiel.zustand.entitaeten).filter((entitaet) => entitaet.typ === typ);
 
 test("Beschwören: auf freien Feldern um die Beschwörerin, mit ihrer Fraktion, eingereiht und mit Zustand", () => {
@@ -46,6 +57,34 @@ test("Beschwören: auf freien Feldern um die Beschwörerin, mit ihrer Fraktion, 
     assert.deepEqual([fraktionVon(hefe), hefe.beschworenVon, hefe.zustaende[0].name], ["ninkasi", ninkasi.id, "beschworen"]);
     assert.ok(spiel.zustand.warteschlange.some((eintrag) => eintrag.art === "akteur" && eintrag.akteurId === hefe.id && eintrag.zeit === 100));
   }
+});
+
+test("Vorabprüfung: ohne freies Feld oder an der Obergrenze lehnt die Fähigkeit mit kein_platz ab, ohne Zeit zu kosten", () => {
+  const spiel = spielBauen({ regeln: { population: { hoechstWesen: 3 } } });
+  const ninkasi = spielerinSetzen(spiel, 2, 2);
+  ninkasi.faehigkeiten = ["hefe_rufen", "hefe_und_hieb"];
+  akteurEinreihen(spiel.zustand, ninkasi.id, 0);
+  allesSichtbar(spiel);
+  const feind = wesen(spiel, 5, 2, "verderber");
+  assert.equal(faehigkeitPruefen(spiel, ninkasi, "hefe_rufen"), null, "Platz für eine dritte");
+  wesen(spiel, 6, 2, "verderber");
+  assert.equal(faehigkeitPruefen(spiel, ninkasi, "hefe_rufen"), "kein_platz", "Population voll");
+  assert.equal(faehigkeitPruefen(spiel, ninkasi, "hefe_und_hieb", { id: feind.id }), null, "ein anderer Schritt wirkt noch");
+  const zeit = spiel.zustand.zeit;
+  const meldungen = meldungenMitschneiden(spiel);
+  befehlGeben(spiel, { art: "faehigkeit", faehigkeit: "hefe_rufen" });
+  assert.equal(spiel.zustand.zeit, zeit);
+  assert.ok(meldungen.some((meldung) => meldung.art === "abgelehnt" && meldung.grund === "kein_platz"));
+});
+
+test("Vorabprüfung: ringsum besetzt heißt kein_platz, wirkungVorab fragt nur Schritte mit Vorabprüfung", () => {
+  const spiel = spielBauen();
+  const ninkasi = spielerinSetzen(spiel, 1, 1);
+  ninkasi.faehigkeiten = ["hefe_rufen"];
+  for (const [x, y] of [[2, 1], [1, 2], [2, 2]]) wesen(spiel, x, y, "verderber");
+  assert.equal(faehigkeitPruefen(spiel, ninkasi, "hefe_rufen"), "kein_platz");
+  assert.equal(wirkungVorab(spiel, "hefe_rufen", { quelleId: ninkasi.id }), "kein_platz");
+  assert.equal(wirkungVorab(spiel, "toedlich", { quelleId: ninkasi.id }), null);
 });
 
 test("Tötet eine beschworene Hefe, zählt der Tod für die Beschwörerin", () => {

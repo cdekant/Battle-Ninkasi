@@ -6,7 +6,9 @@
 //                 (Quelle ist die Beschwörerin, dauer für den Zustand), z.B. mit gebundenAnQuelle und
 //                 beimEnde "verschwinden"; höchstens bis zur Obergrenze regeln.population.hoechstWesen, darüber
 //                 entsteht nichts und es kommt die Meldung "population_voll";
-//                 abstammung: true (Zellteilung) gibt dem neuen Wesen den EP-Topf der Quelle (systeme/lernen.js)
+//                 abstammung: true (Zellteilung) gibt dem neuen Wesen den EP-Topf der Quelle (systeme/lernen.js);
+//                 lebt die Urheberin nicht mehr (Auslöser an nach_tod, Zerfall), bekommen sie kein beschworenVon,
+//                 aber ihre Fraktion; Vorabprüfung: "kein_platz", wenn kein Feld frei oder die Population voll ist
 //   verschwinden: entfernt das Ziel ohne Tod: keine Meldung "tod", kein nach_tod, keine Hinterlassenschaft;
 //                 Zustände, die an das Ziel als Quelle gebunden sind, enden; wirkt nicht auf Ninkasi
 
@@ -20,21 +22,33 @@ import { musterFelder } from "./zielauswahl.js";
 import { zustandSetzen, quelleEntfaellt } from "./zustaende.js";
 import { topfVon } from "./lernen.js";
 
+// Freie Felder des Musters für das Wesen, in der Reihenfolge des Musters
+function freieFelderFuer(spiel, kontext, parameter) {
+  const auswahl = { ursprung: kontext.ursprung, zielpunkt: kontext.zielfeld ?? kontext.ursprung, quelleId: kontext.quelleId };
+  const bewegung = spiel.daten.wesen[parameter.wesen].bewegung ?? "laufend";
+  return musterFelder(spiel, parameter.muster ?? { art: "angrenzend" }, auswahl)
+    .filter((feld) => betretbarFuer(spiel, feld.x, feld.y, bewegung) && wesenAufFeld(spiel, feld).length === 0);
+}
+
+const platzInDerPopulation = (spiel) => Math.max(0, spiel.daten.regeln.population.hoechstWesen - anzahlWesen(spiel.zustand));
+
+function keinPlatz(spiel, kontext, parameter) {
+  if (!kontext.ursprung || platzInDerPopulation(spiel) === 0 || freieFelderFuer(spiel, kontext, parameter).length === 0) return "kein_platz";
+  return null;
+}
+
 bausteinAnmelden("beschwoeren", { wesen: "wesen", anzahl: "ganzzahl?", muster: "muster?", zustand: "zustand?", dauer: "ganzzahl?", abstammung: "wahrheitswert?" }, (spiel, kontext, parameter) => {
   if (!kontext.ursprung) return;
   const zustand = spiel.zustand;
-  const auswahl = { ursprung: kontext.ursprung, zielpunkt: kontext.zielfeld ?? kontext.ursprung, quelleId: kontext.quelleId };
-  const bewegung = spiel.daten.wesen[parameter.wesen].bewegung ?? "laufend";
-  const freieFelder = musterFelder(spiel, parameter.muster ?? { art: "angrenzend" }, auswahl)
-    .filter((feld) => betretbarFuer(spiel, feld.x, feld.y, bewegung) && wesenAufFeld(spiel, feld).length === 0);
+  const freieFelder = freieFelderFuer(spiel, kontext, parameter);
   const urheber = zustand.entitaeten[kontext.urheberId];
   const gewuenscht = Math.min(freieFelder.length, parameter.anzahl ?? 1);
-  const platz = Math.max(0, spiel.daten.regeln.population.hoechstWesen - anzahlWesen(zustand));
+  const platz = platzInDerPopulation(spiel);
   if (gewuenscht > platz) melden(spiel, "population_voll", { wesen: parameter.wesen, hoechstWesen: spiel.daten.regeln.population.hoechstWesen, ausgefallen: gewuenscht - platz });
   for (const feld of freieFelder.slice(0, Math.min(gewuenscht, platz))) {
     const beschworen = ausDatenErzeugen(spiel, "wesen", parameter.wesen, feld);
     if (kontext.urheberFraktion != null) beschworen.fraktion = kontext.urheberFraktion;
-    if (kontext.urheberId != null) beschworen.beschworenVon = kontext.urheberId;
+    if (urheber) beschworen.beschworenVon = urheber.id;
     const mutter = parameter.abstammung ? zustand.entitaeten[kontext.quelleId] : null;
     if (mutter) beschworen.topfId = topfVon(spiel, mutter);
     if (beschworen.ki) akteurEinreihen(zustand, beschworen.id, spiel.daten.aktionen?.warten ?? 100);
@@ -46,7 +60,7 @@ bausteinAnmelden("beschwoeren", { wesen: "wesen", anzahl: "ganzzahl?", muster: "
       });
     }
   }
-});
+}, { vorab: keinPlatz });
 
 bausteinAnmelden("verschwinden", {}, (spiel, kontext) => {
   const zustand = spiel.zustand;

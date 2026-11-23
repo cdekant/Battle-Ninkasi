@@ -2,11 +2,11 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import "../src/kern/spiel.js"; // meldet Systeme, Bedingungen und Quellen an
 import { miniSpiel, wesen, weltLaufenLassen } from "./hilfen.js";
-import { modifiziert, hoechstwert, werteAusDaten, modifikatorenAufgeschluesselt } from "../src/kern/werte.js";
+import { modifiziert, hoechstwert, werteAusDaten, modifikatorenAufgeschluesselt, bedingungenErfuellt } from "../src/kern/werte.js";
 import { anmelden, abmelden } from "../src/kern/register.js";
 import { zustandSetzen } from "../src/systeme/zustaende.js";
 import { nahkampf } from "../src/systeme/kampf.js";
-import { positionSetzen } from "../src/kern/zustand.js";
+import { positionSetzen, entitaetErzeugen } from "../src/kern/zustand.js";
 
 const KARTE = ["########", "#......#", "########"];
 const KARTE_MIT_WAND = ["#######", "#..#..#", "#######"];
@@ -44,6 +44,20 @@ test("wert_unter_prozent misst am Grundwert, so kann ein Modifikator auf denselb
   assert.equal(hoechstwert(spiel, verzweifelte, "lp"), 150);
   verzweifelte.werte.lp.aktuell = 30;
   assert.equal(hoechstwert(spiel, verzweifelte, "lp"), 100);
+});
+
+test("anzahl_unter: zählt Wesen des eigenen oder genannten Typs, mit linie nur die eigene Abstammungslinie", () => {
+  const spiel = miniSpiel(KARTE);
+  const zelle = wesen(spiel, 1, 1, "verderber", 5, { typ: "zelle" });
+  const tochter = wesen(spiel, 2, 1, "verderber", 5, { typ: "zelle", topfId: zelle.id });
+  wesen(spiel, 3, 1, "verderber", 5, { typ: "zelle" }); // eine fremde Linie
+  wesen(spiel, 4, 1, "verderber", 5, { typ: "hefe" });
+  entitaetErzeugen(spiel.zustand, { typ: "zelle", position: { x: 5, y: 1 } }); // ein Gegenstand zählt nicht
+  const gilt = (entitaet, parameter) => bedingungenErfuellt(spiel, entitaet, [{ bedingung: "anzahl_unter", ...parameter }]);
+  assert.deepEqual([gilt(zelle, { anzahl: 3 }), gilt(zelle, { anzahl: 4 })], [false, true], "drei Zellen");
+  assert.deepEqual([gilt(zelle, { anzahl: 1, wesen: "hefe" }), gilt(zelle, { anzahl: 2, wesen: "hefe" })], [false, true]);
+  assert.deepEqual([gilt(tochter, { anzahl: 2, linie: true }), gilt(tochter, { anzahl: 3, linie: true })], [false, true], "Mutter und Tochter");
+  assert.equal(gilt(zelle, { anzahl: 2, linie: true }), false, "die Mutter ohne topfId beginnt die Linie der Tochter");
 });
 
 test("gegenueber_tag: Genauigkeit nur gegen Bakterien, im Nahkampf über die Umstände", () => {

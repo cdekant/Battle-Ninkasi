@@ -169,7 +169,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skil
 + Der Pegel beeinflusst das Lernen nicht
 + EP pro Ebene weitgehend begrenzt, Ausnahme: Gegner, die durch Psi erscheinen, bringen EP
 + Keine verminderten EP für schwache oder wiederholte Gegner: Weil nur Bewältigtes EP bringt, ist Farmen ohnehin eingeschränkt; jeder Gegner bringt seinen festen Wert
-+ Teilende Mikroorganismen: die ganze Abstammungslinie einer Mutterzelle teilt einen begrenzten Topf an EP; ist er leer, lohnt das Farmen nicht mehr (siehe [Wesen.md](Wesen.md), Skills und Lernen; die Teilung selbst ist offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 6)
++ Teilende Mikroorganismen: die ganze Abstammungslinie einer Mutterzelle teilt einen begrenzten Topf an EP; ist er leer, lohnt das Farmen nicht mehr (siehe [Wesen.md](Wesen.md), Skills und Lernen; die Teilung selbst siehe [Wirkungen.md](Wirkungen.md), Effektsystem)
 + Nachrückende Gegner sind nicht ausgeschlossen, mit eigenem EP-Faktor (Idee in [Ausblick.md](Ausblick.md), Nachrückende Gegner)
 + Vorschlag, noch nicht bestätigt: Varianten durch Affixe vervielfachen die Gegnertypen
 

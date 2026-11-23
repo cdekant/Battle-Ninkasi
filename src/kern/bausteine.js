@@ -4,13 +4,15 @@
 //   "text", "ganzzahl", "wahrheitswert", "effekt", "muster", "zustand", "wesen", "schadensart", mit "?" am Ende freiwillig;
 //   eine Liste nennt die erlaubten Werte (freiwillig); "wuerfel|menge" siehe mengeBestimmen
 // brauchtZiel: der Baustein wirkt auf ein Wesen und wird ohne Ziel übersprungen.
+// vorab (freiwillig): (spiel, kontext, parameter) => Grund oder null; sagt vor dem Benutzen, dass der Schritt jetzt
+//   nichts bewirken würde (z.B. beschwoeren: "kein_platz"); gefragt von wirkungVorab
 // Bausteine mit Zielauswahl (fuer_jedes_ziel, auf_feld, geschoss, springen) stehen in systeme/zielbausteine.js,
 // zustand_setzen und zustand_entfernen in systeme/zustaende.js.
 
-import { anmelden } from "./register.js";
+import { anmelden, holen } from "./register.js";
 import { wurfWuerfel, wurfProzent } from "./wurf.js";
 import { hakenAusloesen, melden, bezugAuf } from "./ereignisse.js";
-import { effektAnwenden, wertAendern, ursprungAus, beteiligteAus } from "./effekte.js";
+import { effektAnwenden, wertAendern, ursprungAus, beteiligteAus, kontextVervollstaendigen } from "./effekte.js";
 import { prozentVon, prozentWiederholt, geteiltGerundet } from "./werte.js";
 
 // Menge eines Schritts:
@@ -31,10 +33,27 @@ export function mengeBestimmen(spiel, kontext, parameter, wurfname = "menge") {
   return menge;
 }
 
-export function bausteinAnmelden(name, parameterBeschreibung, funktion, { brauchtZiel = false } = {}) {
+export function bausteinAnmelden(name, parameterBeschreibung, funktion, { brauchtZiel = false, vorab = null } = {}) {
   funktion.parameter = parameterBeschreibung;
   funktion.brauchtZiel = brauchtZiel;
+  funktion.vorab = vorab;
   anmelden("bausteine", name, funktion);
+}
+
+// Grund, aus dem ein Effekt jetzt ganz ohne Folge bliebe, oder null: nur wenn jeder Schritt auf oberster Ebene eine
+// Vorabprüfung hat und sie einen Grund nennt (der erste zählt); Schritte ohne Vorabprüfung gelten als wirksam
+export function wirkungVorab(spiel, effektName, kontext) {
+  const effekt = spiel.daten.effekte[effektName];
+  if (!effekt?.schritte?.length) return null;
+  const vollerKontext = kontextVervollstaendigen(spiel, kontext, effekt);
+  let ersterGrund = null;
+  for (const schritt of effekt.schritte) {
+    const vorab = holen("bausteine", schritt.baustein).vorab;
+    const grund = vorab ? vorab(spiel, vollerKontext, schritt) : null;
+    if (!grund) return null;
+    ersterGrund ??= grund;
+  }
+  return ersterGrund;
 }
 
 const MENGE = { wuerfel: "wuerfel|menge", auf: ["ziel", "quelle"] };

@@ -13,6 +13,9 @@
 //   traegt_tag { tag, anzahl? }     mindestens anzahl (Vorgabe 1) angelegte Gegenstände tragen den Tag (Sets)
 //   hat_zustand { zustand }         die Entität trägt den Zustand
 //   ohne_zustand { zustand }        die Entität trägt den Zustand nicht, z.B. damit eine Bossphase nur einmal beginnt
+//   anzahl_unter { anzahl, wesen?, linie? }  weniger als anzahl Wesen vom Typ wesen (Vorgabe der eigene) auf der
+//                                   Ebene, mit linie: true nur der eigenen Abstammungslinie (topfId, systeme/lernen.js);
+//                                   z.B. Obergrenze einer Art für die Teilung
 // Bedingungen des Skillsystems (skill_ab, eigenschaft_ab, eigenschaft_unter) stehen in systeme/skills.js; die
 // beiden zu Eigenschaften lesen als Ausnahme den wirksamen Wert samt Modifikatoren.
 //
@@ -25,7 +28,7 @@
 // Quelle der Modifikatoren: "aura:<id der Trägerin>" bzw. "aura:zustand:<nummer>".
 
 import { anmelden } from "../kern/register.js";
-import { fraktionVon } from "../kern/zustand.js";
+import { fraktionVon, istWesen } from "../kern/zustand.js";
 import { modifikatorSkaliert, hatWert } from "../kern/werte.js";
 import { traegerinnenIds } from "../kern/raumindex.js";
 import { inReichweite, sichtlinieFrei } from "../welt/geometrie.js";
@@ -71,6 +74,20 @@ const traegtZustand = (entitaet, name) => (entitaet.zustaende || []).some((insta
 bedingungAnmelden("hat_zustand", { zustand: "zustand" }, (spiel, entitaet, parameter) => traegtZustand(entitaet, parameter.zustand));
 
 bedingungAnmelden("ohne_zustand", { zustand: "zustand" }, (spiel, entitaet, parameter) => !traegtZustand(entitaet, parameter.zustand));
+
+// Eine Linie ist die topfId; wer noch keine hat, ist der Anfang seiner eigenen
+const linieVon = (entitaet) => entitaet.topfId ?? entitaet.id;
+
+bedingungAnmelden("anzahl_unter", { anzahl: "ganzzahl", wesen: "wesen?", linie: "wahrheitswert?" }, (spiel, entitaet, parameter) => {
+  const typ = parameter.wesen ?? entitaet.typ;
+  let gezaehlt = 0;
+  for (const andere of Object.values(spiel.zustand.entitaeten)) {
+    if (andere.typ !== typ || !istWesen(andere)) continue;
+    if (parameter.linie && linieVon(andere) !== linieVon(entitaet)) continue;
+    if (++gezaehlt >= parameter.anzahl) return false;
+  }
+  return true;
+});
 
 // Alle Auren einer Trägerin: eigene und die ihrer Zustände, je mit Stärke in Prozent und Quelle
 function aurenVon(spiel, traegerin) {

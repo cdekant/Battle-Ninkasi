@@ -16,14 +16,13 @@ Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und wäh
 
 Stand 2026-11-23, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer Wirkung auf den Inhalt, das Kleine und Breite zuerst:
 
-1. Teilung und Wachstum (Punkt 6)
-2. Licht und Wahrnehmung (Punkt 3)
-3. Englisch, Mehrzahl und Glossar (Punkt 9)
-4. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
-5. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
-6. Danach der Inhalt (Punkt 14)
+1. Licht und Wahrnehmung (Punkt 3)
+2. Englisch, Mehrzahl und Glossar (Punkt 9)
+3. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
+4. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
+5. Danach der Inhalt (Punkt 14)
 
-Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 7 (KI: Unterstützung und Umherziehen) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
+Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
 
 Die Proben des Probedurchstichs stehen in `tests/probedurchstich.test.js`; jede Lücke dort ist ein Test mit `todo` und dem Punkt, der sie schließt, mit einem Entwurf der Daten (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing). Wer einen Punkt umsetzt, nimmt dort das `todo` weg.
 
@@ -44,17 +43,6 @@ Status: offen, erst Recherche, dann neu designen und überarbeiten
 + Offene Fragen des Spieldesigns in [Grundlagen.md](Grundlagen.md), Offen
 + Die Ideen an den genannten Stellen werden dabei an einer Stelle zusammengeführt
 
-## 6. Teilung und Wachstum
-
-Status: offen, erst Recherche und Spieldesign
-
-+ Mechanismen der Mikroorganismen (siehe [Grundlagen.md](Grundlagen.md), Gegner): Zweiteilung (aus einer Zelle werden zwei), Sprossung (die Mutterzelle bleibt und bekommt eine Tochter), Myzel (Feld für Feld), Phagen (Befall macht ein Wesen zu einem anderen)
-+ Entscheiden, ob Teilung ein Verhaltensmodul ist (so [Wirkungen.md](Wirkungen.md), Effektsystem) oder der Baustein `beschwoeren` mit `abstammung` (so [Wesen.md](Wesen.md), Skills und Lernen); danach eine der beiden Stellen anpassen; der Probedurchstich zeigt: Zweiteilung und Sprossung gehen schon als Fähigkeit mit `beschwoeren` und `abstammung`, die die KI wählt, solange sie ihre Beute sieht; offen bleiben Myzel und Phagen
-+ Entschieden im Probedurchstich: eine Teilung ergibt zwei Wesen mit vollen Werten (LP, MP, PP); geteilt wird nur, solange die KI ihre Beute sieht, ohne Sicht führt sie keine Handlungen aus
-+ Obergrenze je Wesen: sieht eine Zelle Ninkasi, ohne sie zu erreichen, teilt sie sich bis zur Obergrenze aller Wesen (`regeln.population.hoechstWesen`); Probe: eine Art hört bei ihrer eigenen Obergrenze auf, Entwurf als Bedingung `anzahl_unter { wesen, anzahl }` an der Fähigkeit
-+ EP über den Topf je Abstammungslinie, Verhalten an der Obergrenze der Population, Leistung bei vielen Zellen
-
-
 ## 8. Kleinere Reste der Systeme
 
 Status: offen, jeweils mit dem ersten Bedarf
@@ -72,6 +60,7 @@ Status: offen, jeweils mit dem ersten Bedarf
 + Index im `zwischenspeicher`, welche Entitäten Auslöser für einen Haken tragen (Vorbild "WantEvent" in Caves of Qud), erst wenn mehr als die Beteiligten gefragt werden
 + Nach dem Anspielen prüfen, ob die Sichtlinie Ersatzlinien oder einen symmetrischen Schattenwurf braucht (siehe [Wirkungen.md](Wirkungen.md), Zielauswahl)
 + Gewichtung `anteil` der gebundenen EP zum Vergleich mit `erste`; Ortsbindung des Verteilens (`regeln.lernen.ort`), falls gewünscht
++ Leistung, wenn viele Wesen zugleich jagen (etwa nach Teilungen um Ninkasi): 389 Wesen etwa 12 ms je Befehl gegen das Ziel 2 ms für 300 (siehe [Entwicklung.md](Entwicklung.md), Messwerte); mit dem ersten Inhalt, der so viele Teilende bringt, Zielwahl der Handlungen und Umkreissuche verbessern, dazu einen Zähler je Typ für `anzahl_unter`
 
 ## 9. Englisch, Mehrzahl und Glossar
 

@@ -43,7 +43,7 @@
 //   hintereinander; wirkt: false heißt, die Fähigkeit selbst wirkt nicht; der Verbrauch ist in jedem Fall bezahlt.
 
 import { anmelden, alle } from "../kern/register.js";
-import { bausteinAnmelden } from "../kern/bausteine.js";
+import { bausteinAnmelden, wirkungVorab } from "../kern/bausteine.js";
 import { modifiziert, hatWert, bedingungenErfuellt } from "../kern/werte.js";
 import { effektAnwenden, wertAendern } from "../kern/effekte.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
@@ -167,6 +167,11 @@ export function faehigkeitPruefen(spiel, wesen, name, zielangabe) {
   if (definition.ziel) {
     const aufloesung = zielAufloesen(spiel, wesen, definition.ziel, zielangabe);
     if (!aufloesung.ok) return aufloesung.grund;
+    if (definition.wirkung) {
+      const kontext = { quelleId: wesen.id, zielId: aufloesung.zielId ?? null, ursprung: aufloesung.ursprung, zielfeld: aufloesung.zielpunkt };
+      const grund = wirkungVorab(spiel, definition.wirkung, kontext);
+      if (grund) return grund;
+    }
   }
   return null;
 }

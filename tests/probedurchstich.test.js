@@ -18,6 +18,7 @@ import { vorgangAbschliessen } from "../src/kern/vorgang.js";
 import { werteAusDaten, modifiziert, modifikatorHinzufuegen } from "../src/kern/werte.js";
 import { fraktionVon } from "../src/kern/zustand.js";
 import { zustandSetzen, hatZustand } from "../src/systeme/zustaende.js";
+import { faehigkeitPruefen } from "../src/systeme/faehigkeiten.js";
 import { wahrnehmen } from "../src/systeme/wahrnehmung.js";
 import { schichtAuf } from "../src/welt/schichten.js";
 import { nahkampf } from "../src/systeme/kampf.js";
@@ -34,6 +35,13 @@ const RAUM = [
 const EFFEKTE = {
   // 1. Teilung
   sprossen: { schritte: [{ baustein: "beschwoeren", wesen: "hefezelle_probe", abstammung: true }] },
+  gallerte_teilen: { schritte: [{ baustein: "beschwoeren", wesen: "gallerte_probe", abstammung: true }] },
+  myzel_wachsen: { schritte: [{ baustein: "oberflaeche_setzen", art: "myzel_probe", menge: 1 }] },
+  sporen_freisetzen: { schritte: [{ baustein: "gas_setzen", art: "sporen_probe", menge: 6 }] },
+  zerfallen: { schritte: [{ baustein: "beschwoeren", wesen: "faulkeim_probe", anzahl: 2 }] },
+  zweite_phase: { schritte: [{ baustein: "zustand_setzen", zustand: "raserei_probe" }, { baustein: "beschwoeren", wesen: "faulkeim_probe" }] },
+  hieb_probe: { schritte: [{ baustein: "schaden", art: "magie", menge: 1 }] },
+  schwerer_hieb_probe: { schritte: [{ baustein: "schaden", art: "magie", menge: 11 }] },
   // 3. Zauber über die Zeit
   hopfensud_giessen: { schritte: [{ baustein: "oberflaeche_setzen", art: "hopfensud", menge: 3, muster: { art: "kreis", radius: 1 } }] },
   hopfensud_beruhigt: { schritte: [{ baustein: "zustand_setzen", zustand: "beruhigt" }] },
@@ -53,6 +61,7 @@ const EFFEKTE = {
 };
 
 const ZUSTAENDE = {
+  raserei_probe: { text: "zustand.raserei_probe", modifikatoren: [{ ziel: "genauigkeit", art: "plus", betrag: 20 }] },
   beruhigt: { text: "zustand.beruhigt", dauer: 200, modifikatoren: [{ ziel: "kosten.alle", art: "prozent", betrag: 50 }] },
   gesegnet: { text: "zustand.gesegnet", dauer: 1000, modifikatoren: [{ ziel: "genauigkeit", art: "plus", betrag: 10 }] },
   hopfenaura: {
@@ -83,11 +92,35 @@ const WESEN = {
     text: "wesen.hefezelle_probe", fraktion: "verderber", werte: { lp: { grundwert: 8 } }, ep: 4, sicht: { reichweite: 9 },
     faehigkeiten: ["sprossen"], ki: { modul: "jagen", letzteBekanntePosition: null, handlungen: [{ handlung: "faehigkeit", name: "sprossen" }] },
   },
+  // Teilung beim Treffer (Gallerte in Brogue, Pudding in NetHack): jeder Schaden teilt, bis die Linie vier zählt
+  gallerte_probe: {
+    text: "wesen.gallerte_probe", fraktion: "verderber", werte: { lp: { grundwert: 10 } }, ep: 4,
+    ausloeser: [{ bei: "nach_schaden", rolle: "ziel", effekt: "gallerte_teilen", wenn: [{ bedingung: "anzahl_unter", anzahl: 4, linie: true }] }],
+  },
+  // Myzel: der Schimmel lässt es nach jedem eigenen Zug wachsen, beim Tod setzt er Sporen frei
+  schimmel_probe: {
+    text: "wesen.schimmel_probe", fraktion: "verderber", werte: { lp: { grundwert: 6 } }, ep: 4,
+    ausloeser: [{ bei: "zug_ende", effekt: "myzel_wachsen" }, { bei: "nach_tod", rolle: "ziel", ziel: "feld", effekt: "sporen_freisetzen" }],
+  },
+  // Zerfall: aus den Resten eines Bakteriums entstehen zwei Faulkeime
+  bakterium_probe: {
+    text: "wesen.bakterium_probe", fraktion: "verderber", werte: { lp: { grundwert: 6 } }, ep: 4,
+    ausloeser: [{ bei: "nach_tod", rolle: "ziel", ziel: "feld", effekt: "zerfallen" }],
+  },
+  faulkeim_probe: { text: "wesen.faulkeim_probe", fraktion: "verderber", werte: { lp: { grundwert: 3 } }, ep: 1 },
+  // Bossphase: unter der Hälfte der LP einmal Raserei und ein Begleiter
+  boss_probe: {
+    text: "wesen.boss_probe", fraktion: "verderber", werte: { lp: { grundwert: 20 } }, ep: 20,
+    ausloeser: [{ bei: "nach_schaden", rolle: "ziel", effekt: "zweite_phase", wenn: [{ bedingung: "wert_unter_prozent", wert: "lp", prozent: 50 }, { bedingung: "ohne_zustand", zustand: "raserei_probe" }] }],
+  },
 };
 
 const SCHICHTEN = {
-  oberflaechen: { hopfensud: { text: "oberflaeche.hopfensud", schwund: 1, hoechstens: 3, jeTick: "hopfensud_beruhigt" } },
-  gase: {},
+  oberflaechen: {
+    hopfensud: { text: "oberflaeche.hopfensud", schwund: 1, hoechstens: 3, jeTick: "hopfensud_beruhigt" },
+    myzel_probe: { text: "oberflaeche.myzel_probe", ausbreitung: { chance: 100 } },
+  },
+  gase: { sporen_probe: { text: "gas.sporen_probe", abbau: 1 } },
 };
 
 function aufstellen({ regeln, gegenstaende = {}, effekte = {}, zustaende = {}, faehigkeiten = {} } = {}) {
@@ -111,7 +144,17 @@ const hefezelle = (spiel, x, y, wachzustand = "jagt") => {
   zelle.ki.wachzustand = wachzustand;
   return zelle;
 };
-const zellen = (spiel) => Object.values(spiel.zustand.entitaeten).filter((entitaet) => entitaet.typ === "hefezelle_probe");
+const alleVom = (spiel, typ) => Object.values(spiel.zustand.entitaeten).filter((entitaet) => entitaet.typ === typ);
+const zellen = (spiel) => alleVom(spiel, "hefezelle_probe");
+// Ein Wesen aus WESEN mit Werten nach den Daten
+const probewesen = (spiel, typ, x, y) => {
+  const { werte, fraktion, ...rest } = structuredClone(WESEN[typ]);
+  return wesen(spiel, x, y, fraktion, werte.lp.grundwert, { ...rest, typ });
+};
+const treffen = (spiel, quelle, ziel, effekt = "hieb_probe") => {
+  effektAnwenden(spiel, effekt, { quelleId: quelle.id, zielId: ziel.id });
+  vorgangAbschliessen(spiel);
+};
 
 test("Datenprüfung: die Daten der gelungenen Proben sind gültig", () => {
   const daten = structuredClone(rohdaten);
@@ -121,12 +164,13 @@ test("Datenprüfung: die Daten der gelungenen Proben sind gültig", () => {
   Object.assign(daten.risiken, RISIKEN);
   Object.assign(daten.wesen, WESEN);
   Object.assign(daten.schichten.oberflaechen, SCHICHTEN.oberflaechen);
-  daten.zeichen.wesen.hefezelle_probe = { zeichen: "h", farbe: "#ffffff" };
-  daten.zeichen.schichten.hopfensud = { zeichen: "~", farbe: "#88aa44" };
+  Object.assign(daten.schichten.gase, SCHICHTEN.gase);
+  for (const typ of Object.keys(WESEN)) daten.zeichen.wesen[typ] = { zeichen: "h", farbe: "#ffffff" };
+  for (const art of ["hopfensud", "myzel_probe", "sporen_probe"]) daten.zeichen.schichten[art] = { zeichen: "~", farbe: "#88aa44" };
   assert.deepEqual(vorbereiten(daten).fehler, []);
 });
 
-// 1. Ein Bakterium, das sich teilt (Punkt 6)
+// 1. Teilung und Wachstum: Zellen, die sich teilen, Myzel, Zerfall und Bossphase
 
 // Entschieden: eine Teilung ergibt zwei Wesen mit vollen Werten, Zweiteilung und Sprossung gehen also gleich
 test("Teilung: eine jagende Zelle sprosst über eine Fähigkeit, die Tochter teilt Fraktion und EP-Topf", () => {
@@ -144,13 +188,11 @@ test("Teilung: eine jagende Zelle sprosst über eine Fähigkeit, die Tochter tei
   assert.ok(ninkasi);
 });
 
-test("Teilung: über der Obergrenze der Population entsteht nichts", () => {
+test("Teilung: an der Obergrenze der Population versucht es keine Zelle, statt einen Zug zu verlieren", () => {
   const { spiel } = aufstellen({ regeln: { population: { hoechstWesen: 2 } } });
-  const meldungen = meldungenMitschneiden(spiel);
   const mutter = hefezelle(spiel, 6, 2);
-  befehlAusfuehren(spiel, mutter, entscheiden(spiel, mutter));
+  assert.notEqual(entscheiden(spiel, mutter)?.faehigkeit, "sprossen");
   assert.equal(zellen(spiel).length, 1);
-  assert.ok(meldungen.some((meldung) => meldung.art === "population_voll"));
 });
 
 // Entschieden: Handlungen nur, solange die KI ihre Beute sieht
@@ -160,12 +202,72 @@ test("Teilung: ohne Beute in Sicht teilt sich nichts", () => {
   assert.notEqual(entscheiden(spiel, mutter)?.faehigkeit, "sprossen");
 });
 
-test("Teilung: eine Art hört bei ihrer eigenen Obergrenze auf", { todo: "Punkt 6: sieht eine Zelle Ninkasi, ohne sie zu erreichen, teilt sie sich bis zur Obergrenze aller Wesen" }, () => {
-  // Entwurf: Bedingung "anzahl_unter { wesen, anzahl }" als voraussetzung der Fähigkeit
-  const { spiel } = aufstellen({ faehigkeiten: { sprossen: { ...FAEHIGKEITEN.sprossen, voraussetzungen: [{ bedingung: "anzahl_unter", wesen: "hefezelle_probe", anzahl: 2 }] } } });
+test("Teilung: eine Art hört bei ihrer eigenen Obergrenze auf", () => {
+  const { spiel } = aufstellen({ faehigkeiten: { sprossen: { ...FAEHIGKEITEN.sprossen, voraussetzungen: [{ bedingung: "anzahl_unter", anzahl: 2 }] } } });
   const mutter = hefezelle(spiel, 6, 2);
+  assert.equal(entscheiden(spiel, mutter)?.faehigkeit, "sprossen", "allein darunter");
   hefezelle(spiel, 8, 2);
-  assert.notEqual(entscheiden(spiel, mutter)?.faehigkeit, "sprossen");
+  assert.notEqual(entscheiden(spiel, mutter)?.faehigkeit, "sprossen", "zu zweit an der Grenze");
+});
+
+test("Teilung: eine Linie hört bei ihrer eigenen Obergrenze auf, eine fremde Linie nicht", () => {
+  const { spiel } = aufstellen({ faehigkeiten: { sprossen: { ...FAEHIGKEITEN.sprossen, voraussetzungen: [{ bedingung: "anzahl_unter", anzahl: 2, linie: true }] } } });
+  const mutter = hefezelle(spiel, 6, 2);
+  befehlAusfuehren(spiel, mutter, entscheiden(spiel, mutter));
+  vorgangAbschliessen(spiel);
+  const [, tochter] = zellen(spiel);
+  const fremde = hefezelle(spiel, 9, 3);
+  assert.equal(faehigkeitPruefen(spiel, tochter, "sprossen"), "voraussetzung", "Mutter und Tochter sind zwei");
+  assert.equal(entscheiden(spiel, fremde)?.faehigkeit, "sprossen", "die fremde Linie zählt nur sich");
+});
+
+// Teilung beim Treffer über einen Auslöser, nach den Gallerten in Brogue und den Puddings in NetHack
+test("Teilung beim Treffer: jeder Schaden teilt die Gallerte, bis ihre Linie vier zählt, jede Teilung mit vollen LP", () => {
+  const { spiel, ninkasi } = aufstellen();
+  const gallerte = probewesen(spiel, "gallerte_probe", 6, 2);
+  for (let i = 0; i < 5; i++) treffen(spiel, ninkasi, gallerte);
+  const gallerten = alleVom(spiel, "gallerte_probe");
+  assert.equal(gallerten.length, 4);
+  assert.equal(gallerte.werte.lp.aktuell, 5);
+  assert.ok(gallerten.every((andere) => andere.topfId === gallerte.id), "eine Linie mit einem EP-Topf");
+  assert.ok(gallerten.filter((andere) => andere !== gallerte).every((tochter) => tochter.werte.lp.aktuell === 10));
+});
+
+// Myzel und Sporen nur aus Daten: Oberfläche mit Ausbreitung, Auslöser an zug_ende und nach_tod
+test("Myzel: der Schimmel lässt Myzel wachsen, beim Tod setzt er Sporen auf seinem Feld frei", () => {
+  const { spiel, ninkasi } = aufstellen();
+  const schimmel = probewesen(spiel, "schimmel_probe", 6, 2);
+  befehlAusfuehren(spiel, schimmel, { art: "warten" });
+  vorgangAbschliessen(spiel);
+  assert.equal(schichtAuf(spiel, "oberflaeche", 6, 2)?.art, "myzel_probe");
+  treffen(spiel, ninkasi, schimmel, "schwerer_hieb_probe");
+  assert.equal(spiel.zustand.entitaeten[schimmel.id], undefined);
+  assert.deepEqual([schichtAuf(spiel, "gas", 6, 2)?.art, schichtAuf(spiel, "gas", 6, 2)?.menge], ["sporen_probe", 6]);
+});
+
+// Zweite Phase eines Kampfes: aus den Resten entstehen neue Wesen
+test("Zerfall: aus den Resten eines Bakteriums entstehen zwei Faulkeime in seiner Fraktion, ohne Beschwörerin", () => {
+  const { spiel, ninkasi } = aufstellen();
+  const bakterium = probewesen(spiel, "bakterium_probe", 6, 2);
+  treffen(spiel, ninkasi, bakterium, "schwerer_hieb_probe");
+  const faulkeime = alleVom(spiel, "faulkeim_probe");
+  assert.equal(spiel.zustand.entitaeten[bakterium.id], undefined);
+  assert.equal(faulkeime.length, 2);
+  assert.ok(faulkeime.every((keim) => fraktionVon(keim) === "verderber" && keim.beschworenVon === undefined));
+  assert.ok(faulkeime.every((keim) => Math.max(Math.abs(keim.position.x - 6), Math.abs(keim.position.y - 2)) <= 1), "um sein Feld");
+});
+
+test("Bossphase: unter der Hälfte der LP einmal Raserei und ein Begleiter, beim nächsten Treffer nicht noch einmal", () => {
+  const { spiel, ninkasi } = aufstellen();
+  const boss = probewesen(spiel, "boss_probe", 6, 2);
+  treffen(spiel, ninkasi, boss);
+  assert.equal(hatZustand(boss, "raserei_probe"), false, "über der Hälfte");
+  treffen(spiel, ninkasi, boss, "schwerer_hieb_probe");
+  assert.equal(hatZustand(boss, "raserei_probe"), true);
+  treffen(spiel, ninkasi, boss);
+  const begleiter = alleVom(spiel, "faulkeim_probe");
+  assert.equal(begleiter.length, 1);
+  assert.equal(begleiter[0].beschworenVon, boss.id);
 });
 
 // 2. Ein Kontrolleur mit Taschenlampe im Dunkeln (Punkt 3)

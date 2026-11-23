@@ -106,6 +106,7 @@ export default {
   "log.abgelehnt.zu_wenig_lp": "Zu wenig LP.",
   "log.abgelehnt.zu_wenig_pegel": "Dafür ist sie zu nüchtern.",
   "log.abgelehnt.material_fehlt": "Es fehlt an Zutaten.",
+  "log.abgelehnt.kein_platz": "Dafür ist hier kein Platz.",
   "log.abgelehnt.unbeweglich": "Ninkasi kommt nicht vom Fleck.",
   "log.abgelehnt.nichts_zu_werfen": "Nichts zum Werfen da.",
   "log.abgelehnt.nichts_zu_benutzen": "Da gibt es nichts zu bedienen.",

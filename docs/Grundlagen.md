@@ -77,12 +77,12 @@ Umsetzung: siehe [Wesen.md](Wesen.md), Skills und Lernen
 + Bakterien: Zweiteilung in zwei gleiche Zellen, schnelles Wachstum (Milchsäure, Essig, Fäulnis)
 + Hefen: Sprossung, die Mutterzelle bleibt und sprosst weiter; Kulturhefe als möglicher Verbündeter, wilde Hefe (Brettanomyces) als Verderber
 + Schimmel: kaum beweglich, Myzel wächst Feld für Feld, setzt beim Tod Sporen frei (Vorbild: Flechte in Brogue)
-+ Bakteriophagen: befallen Bakterien und machen sie zu neuen Phagen, Gegner, der Gegner frisst
++ Zerfall: aus den Resten besiegter Mikroorganismen entstehen neue, lästige Wesen (zweite Phase eines Kampfes)
 + Biofilm: Kolonie, die sich gemeinsam panzert, einzeln schwach, im Verbund zäh
 + Endosporen: ruhende Bakterien, erwachen später (Wärme, Feuer)
 + Protozoen und Amöben: einzelne Jäger, die andere Mikroorganismen fressen
 
-Umsetzung: teilweise, siehe [Entwicklung.md](Entwicklung.md), Probeinhalt; siehe [Wesen.md](Wesen.md), KI; offen: Mikroorganismen mit eigener Mechanik, Bosse
+Umsetzung: teilweise, siehe [Entwicklung.md](Entwicklung.md), Probeinhalt; siehe [Wesen.md](Wesen.md), KI; Teilung, Sprossung, Myzel, Zerfall und Bossphasen gehen aus Daten, siehe [Wirkungen.md](Wirkungen.md), Effektsystem; offen: die Mikroorganismen und Bosse als Inhalt
 
 ## Technik
 

@@ -6,7 +6,7 @@
 //   abschaltbar mit durchWaende: true; Linie und Strahl enden an undurchsichtigen Feldern
 // Getroffen werden Entitäten auf den Feldern nach trifft, aus Sicht der Urheberin:
 //   "alle" (auch Gegenstände), "wesen", "feinde", "verbuendete" (nach der Beziehung, systeme/fraktionen.js)
-// Zielarten für Fähigkeiten (Punkt 6) und Vorschau: siehe zielAufloesen.
+// Zielarten für Fähigkeiten und Vorschau: siehe zielAufloesen.
 
 import { anmelden, holen } from "../kern/register.js";
 import { entitaetenAuf, fraktionVon, istWesen, istGesteuert } from "../kern/zustand.js";
