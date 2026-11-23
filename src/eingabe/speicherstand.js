@@ -1,15 +1,15 @@
 // Speicherstand des Browsers (siehe docs/Architektur.md, Speichern): Kern ohne DOM und ohne localStorage, damit er
 // testbar ist; src/main.js schreibt und liest die Texte unter den Schlüsseln der Speicherplätze.
-//   { version, startwert, optionen, befehle, zustand, vorschau, oberflaeche: { leisten, log, gesehen } }
+//   { version, pruefsumme, startwert, optionen, befehle, zustand, vorschau, oberflaeche: { leisten, log, gesehen } }
 // Spielstand (Startwert, Startoptionen, Befehle) ist die verbindliche Aufzeichnung; der Schnappschuss des Zustands
 // lädt sofort, ohne Nachspielen (kern/spiel.js ausSchnappschuss). Die Teile vorschau und oberflaeche liest die Logik
 // nie: vorschau zeigt der Titel, ohne den Zustand einzusetzen; gesehen sind die Wesenarten, die die Chronik in diesem
 // Lauf schon gezählt hat (eingabe/chronik.js).
 // Drei Speicherplätze für nebeneinander laufende Läufe (seit 0.32.0); ein Platz ist ein Lauf, keine Sicherung.
-// Passt die Version nicht oder ist der Text kaputt, gibt es einen Grund statt eines Spiels.
+// Passen Version oder Prüfsumme der Daten nicht oder ist der Text kaputt, gibt es einen Grund statt eines Spiels.
 
 import VERSION from "../version.js";
-import { schnappschuss, ausSchnappschuss } from "../kern/spiel.js";
+import { schnappschuss, ausSchnappschuss, spielstandUnpassend } from "../kern/spiel.js";
 import { spielerin } from "../kern/zustand.js";
 import { leistenGueltig } from "./schnellleiste.js";
 
@@ -37,7 +37,8 @@ export function speicherstandText(spiel, { leisten, logzeilen = [], gesehen = []
 }
 
 // Liest einen Speicherstand: { spiel, oberflaeche: { leisten, log, gesehen } } oder { grund, version? };
-// grund: "kaputt" (kein lesbarer Stand), "version" (andere Version), "fehler" (Zustand lässt sich nicht einsetzen)
+// grund: "kaputt" (kein lesbarer Stand), "version" (andere Version), "daten" (andere Prüfsumme der Daten),
+// "fehler" (Zustand lässt sich nicht einsetzen)
 export function speicherstandLesen(daten, text) {
   let stand;
   try {
@@ -46,7 +47,9 @@ export function speicherstandLesen(daten, text) {
     return { grund: "kaputt" };
   }
   if (!stand || typeof stand !== "object" || !stand.zustand) return { grund: "kaputt" };
-  if (stand.version !== VERSION) return { grund: "version", version: String(stand.version) };
+  const unpassend = spielstandUnpassend(daten, stand);
+  if (unpassend === "version") return { grund: "version", version: String(stand.version) };
+  if (unpassend === "daten") return { grund: "daten" };
   try {
     const spiel = ausSchnappschuss(daten, stand);
     const log = Array.isArray(stand.oberflaeche?.log) ? stand.oberflaeche.log : [];
@@ -58,8 +61,9 @@ export function speicherstandLesen(daten, text) {
 }
 
 // Was der Titel über einen Platz wissen muss, ohne den Zustand einzusetzen: null (leer), { vorschau } oder
-// { vorschau?, grund: "kaputt" | "version", version? } (veraltet oder unlesbar, nur noch zu löschen oder zu ersetzen)
-export function platzVorschau(text) {
+// { vorschau?, grund: "kaputt" | "version" | "daten", version? } (veraltet oder unlesbar, nur noch zu löschen oder zu
+// ersetzen); pruefsumme: die der geladenen Daten
+export function platzVorschau(text, pruefsumme) {
   if (!text) return null;
   let stand;
   try {
@@ -70,6 +74,7 @@ export function platzVorschau(text) {
   if (!stand || typeof stand !== "object" || !stand.zustand) return { grund: "kaputt" };
   const vorschau = stand.vorschau && typeof stand.vorschau === "object" ? stand.vorschau : null;
   if (stand.version !== VERSION) return { vorschau, grund: "version", version: String(stand.version) };
+  if (stand.pruefsumme !== pruefsumme) return { vorschau, grund: "daten" };
   return { vorschau: vorschau ?? { tiefe: null, zuege: null, gespeichertAm: null } };
 }
 

@@ -225,9 +225,10 @@ export function warteschlangeAbarbeiten(spiel) {
   }
 }
 
-// Spielstand = Version + Startwert + Startoptionen + Befehlsliste; Laden heißt Nachspielen ohne Anzeige
+// Spielstand = Version + Prüfsumme der Daten + Startwert + Startoptionen + Befehlsliste; Laden heißt Nachspielen ohne
+// Anzeige
 export function spielstand(spiel) {
-  return { version: VERSION, startwert: spiel.zustand.startwert, optionen: structuredClone(spiel.optionen ?? {}), befehle: structuredClone(spiel.befehle) };
+  return { version: VERSION, pruefsumme: spiel.daten.pruefsumme, startwert: spiel.zustand.startwert, optionen: structuredClone(spiel.optionen ?? {}), befehle: structuredClone(spiel.befehle) };
 }
 
 // Schnappschuss = Spielstand + Kopie des Zustands (reines JSON); Fortsetzen daraus braucht kein Nachspielen.
@@ -237,14 +238,29 @@ export function schnappschuss(spiel) {
   return { ...spielstand(spiel), zustand: structuredClone(spiel.zustand) };
 }
 
+// Passt ein Spielstand zu dieser Version und diesen Daten? null oder der Grund: "version" oder "daten" (Prüfsumme der
+// Daten weicht ab, kern/pruefsumme.js); streng, weil ein Zustand per Namen auf die Daten verweist und ein Lauf aus
+// alten und neuen Daten nicht mehr nachspielbar wäre
+export function spielstandUnpassend(daten, stand) {
+  if (stand.version !== VERSION) return "version";
+  if (stand.pruefsumme !== daten.pruefsumme) return "daten";
+  return null;
+}
+
+function spielstandPruefen(daten, stand) {
+  const grund = spielstandUnpassend(daten, stand);
+  if (grund === "version") throw new Error(`Spielstand von Version ${stand.version}, dieses Spiel ist ${VERSION}`);
+  if (grund === "daten") throw new Error(`Spielstand mit Prüfsumme der Daten ${stand.pruefsumme}, diese Daten haben ${daten.pruefsumme}`);
+}
+
 export function ausSchnappschuss(daten, stand) {
-  if (stand.version !== VERSION) throw new Error(`Spielstand von Version ${stand.version}, dieses Spiel ist ${VERSION}`);
+  spielstandPruefen(daten, stand);
   if (!stand.zustand) throw new Error("Spielstand ohne Zustand");
   return { daten, zustand: structuredClone(stand.zustand), optionen: structuredClone(stand.optionen ?? {}), befehle: structuredClone(stand.befehle ?? []), hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
 }
 
 export function nachspielen(daten, stand) {
-  if (stand.version !== VERSION) throw new Error(`Spielstand von Version ${stand.version}, dieses Spiel ist ${VERSION}`);
+  spielstandPruefen(daten, stand);
   const spiel = neuesSpiel(daten, stand.startwert, stand.optionen ?? {});
   stand.befehle.forEach((befehl, nummer) => {
     const ergebnis = befehlGeben(spiel, befehl);

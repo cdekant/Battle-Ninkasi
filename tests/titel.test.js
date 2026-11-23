@@ -16,7 +16,7 @@ import { endeOeffnen, endeTaste, ENDE_EINTRAEGE } from "../src/eingabe/menue.js"
 import { fensterOeffnen, fensterTaste } from "../src/eingabe/fenster.js";
 import "../src/eingabe/hilfe.js";
 import "../src/eingabe/verlauf.js";
-import { neueChronik, chronikGueltig, meldungZaehlen, sichtungenZaehlen, laufEintragen, zaehlerstand, freigeschaltet, HOECHSTENS_LAEUFE } from "../src/eingabe/chronik.js";
+import { neueChronik, chronikGueltig, meldungZaehlen, sichtungenZaehlen, laufEintragen, zaehlerstand, freigeschaltet, HOECHSTENS_LAEUFE, CHRONIK_FORMAT, CHRONIK_MIGRATIONEN } from "../src/eingabe/chronik.js";
 import { korpustextZerlegen, saetzeAus, spruchWaehlen } from "../src/anzeige/korpus.js";
 import { TITELBILDER, titelbildWaehlen } from "../src/anzeige/titelbilder.js";
 import { titelHtml, speicherplatzText } from "../src/anzeige/titel.js";
@@ -36,7 +36,7 @@ test("Speicherstand: Vorschau ohne Zustand lesen, gesehene Arten kommen zurück,
   const spiel = neuesSpiel(daten, 7);
   befehlGeben(spiel, { art: "warten" });
   const text = speicherstandText(spiel, { leisten: neueLeisten(), gesehen: new Set(["essigbakterium"]), gespeichertAm: 1234 });
-  const platz = platzVorschau(text);
+  const platz = platzVorschau(text, daten.pruefsumme);
   assert.deepEqual(platz.vorschau, vorschauAusSpiel(spiel, 1234));
   assert.equal(platz.vorschau.zuege, spielerin(spiel.zustand).zuege);
   assert.ok(platzSpielbar(platz));
@@ -47,6 +47,10 @@ test("Speicherstand: Vorschau ohne Zustand lesen, gesehene Arten kommen zurück,
   assert.equal(alt.grund, "version");
   assert.equal(alt.version, "0.0.1");
   assert.ok(!platzSpielbar(alt));
+  const andereDaten = platzVorschau(text, "00000000");
+  assert.equal(andereDaten.grund, "daten", "andere Prüfsumme der Daten");
+  assert.deepEqual(andereDaten.vorschau, platz.vorschau);
+  assert.ok(!platzSpielbar(andereDaten));
 });
 
 test("Speicherplätze: neues Spiel nimmt den ersten leeren, dann einen veralteten Platz; zuletzt gespielt", () => {
@@ -91,6 +95,8 @@ test("Läufe: alle belegt verdrängt einen Lauf mit Nachfrage; veraltete fragen;
   const mitAltem = [spielbar(1), veraltet, null];
   assert.equal(laeufeTaste(laeufeOeffnen("fortsetzen", mitAltem), { code: "KeyB", zeichen: "b" }, { plaetze: mitAltem }).oeffnen.zustand.frage, "laeufe.veraltet_frage");
   assert.deepEqual(laeufeTaste(laeufeOeffnen("fortsetzen", mitAltem), { code: "KeyC", zeichen: "c" }, { plaetze: mitAltem }).aktion, { art: "neuesSpiel", stelle: 2 }, "freier Platz beginnt neu");
+  const mitAnderenDaten = [{ vorschau: null, grund: "daten" }, null, null];
+  assert.equal(laeufeTaste(laeufeOeffnen("fortsetzen", mitAnderenDaten), { code: "KeyA", zeichen: "a" }, { plaetze: mitAnderenDaten }).oeffnen.zustand.frage, "laeufe.daten_frage", "andere Daten fragen eigens");
   assert.deepEqual(laeufeTaste({ gewaehlt: 0, zweck: "fortsetzen" }, { code: "Delete" }, { plaetze: mitAltem }).oeffnen.zustand.aktion, { art: "platzLoeschen", stelle: 0 });
   assert.equal(laeufeTaste({ gewaehlt: 2, zweck: "fortsetzen" }, { code: "Delete" }, { plaetze: mitAltem }).oeffnen, undefined, "ein leerer Platz ist nicht zu löschen");
   assert.equal(laeufeKlick({ gewaehlt: 0, zweck: "fortsetzen" }, { stelle: 2 }, { plaetze: mitAltem }).zustand.gewaehlt, 2, "erster Klick wählt");
@@ -118,6 +124,7 @@ test("Titel: eigene Ebene mit Bild, Menü, Plätzen und Spruch; Fenster darüber
   assert.match(hilfe, /<h1>Hilfe/, "der Titel steht nicht im Weg durch den Stapel");
   assert.match(hilfe, /drei Plätze/);
   assert.equal(speicherplatzText(texte, plaetze[0], 0), "Platz 1: Tiefe 1, Zug 10, 21.11.2026");
+  assert.equal(speicherplatzText(texte, { vorschau: null, grund: "daten" }, 1), "Platz 2: Daten geändert, nicht mehr spielbar");
 });
 
 test("Chronik: Siege Ninkasis und Tode zählen, Sichtungen einmal je Lauf, Läufe mit Ergebnis, Freischaltung", () => {
@@ -140,7 +147,7 @@ test("Chronik: Siege Ninkasis und Tode zählen, Sichtungen einmal je Lauf, Läuf
   assert.equal(zaehlerstand(chronik, "gesehen.ninkasi"), 0);
   const echt = neuesSpiel(daten, 3);
   laufEintragen(chronik, echt, { ergebnis: "tod", datum: 1, version: "test", todesmeldung: { quelle: { typ: "abstinenzler" }, ursache: "schlag" } });
-  assert.deepEqual(chronik.laeufe[0], { version: "test", startwert: 3, spielart: "normal", datum: 1, tiefe: echt.zustand.tiefe, zuege: 0, befehle: 0, ergebnis: "tod", ursache: { quelle: "abstinenzler", ursache: "schlag" } });
+  assert.deepEqual(chronik.laeufe[0], { version: "test", pruefsumme: daten.pruefsumme, startwert: 3, spielart: "normal", datum: 1, tiefe: echt.zustand.tiefe, zuege: 0, befehle: 0, ergebnis: "tod", ursache: { quelle: "abstinenzler", ursache: "schlag" } });
   for (let i = 0; i < HOECHSTENS_LAEUFE + 5; i++) laufEintragen(chronik, echt, { ergebnis: "aufgegeben", datum: 2, version: "test" });
   assert.equal(chronik.laeufe.length, HOECHSTENS_LAEUFE, "älteste fallen heraus");
   assert.equal(zaehlerstand(chronik, "laeufe"), HOECHSTENS_LAEUFE + 6, "der Zähler bleibt");
@@ -148,8 +155,17 @@ test("Chronik: Siege Ninkasis und Tode zählen, Sichtungen einmal je Lauf, Läuf
   assert.ok(freigeschaltet(chronik, { zaehler: "besiegt.essigbakterium", mindestens: 1 }));
   assert.ok(!freigeschaltet(chronik, { zaehler: "besiegt.abstinenzler", mindestens: 1 }));
   assert.deepEqual(chronikGueltig(JSON.parse(JSON.stringify(chronik))), chronik, "übersteht JSON");
-  assert.deepEqual(chronikGueltig({ format: 99 }), neueChronik());
+  assert.deepEqual(chronikGueltig({ format: CHRONIK_FORMAT + 1 }), { ...neueChronik(), neueresFormat: true }, "neueres Format bleibt unberührt");
+  assert.deepEqual(chronikGueltig({ laeufe: [], zaehler: {} }), neueChronik(), "ohne Format unlesbar");
   assert.deepEqual(chronikGueltig({ format: 1, laeufe: [], zaehler: { gut: 2, schlecht: -1, text: "x" } }).zaehler, { gut: 2 });
+});
+
+test("Chronik: jedes ältere Format hat eine Migration, eine Migration führt genau ein Format weiter", () => {
+  for (let format = 1; format < CHRONIK_FORMAT; format++) assert.equal(typeof CHRONIK_MIGRATIONEN[format], "function", `Migration aus Format ${format} fehlt`);
+  for (const format of Object.keys(CHRONIK_MIGRATIONEN).map(Number)) {
+    assert.ok(Number.isInteger(format) && format >= 1 && format < CHRONIK_FORMAT, `Migration aus Format ${format} passt nicht`);
+    assert.equal(CHRONIK_MIGRATIONEN[format]({ format, laeufe: [], zaehler: {} }).format, format + 1);
+  }
 });
 
 test("Spielart: Startoption mit Vorgabe normal, unbekannte wirft, Nachspielen behält sie", () => {

@@ -39,6 +39,8 @@ import { aufstellungAus } from "./systeme/arena.js";
 import { neueLeisten, leistenNachfuehren, platzAusloesen, platzBelegen, platzLeeren, plaetzeTauschen, leisteWechseln, ohneSchluessel, aktivePlaetze } from "./eingabe/schnellleiste.js";
 import { ANZAHL_PLAETZE, speicherschluesselPlatz, SPEICHERSCHLUESSEL_ALTER_LAUF, SPEICHERSCHLUESSEL_LETZTER_LAUF, speicherstandText, speicherstandLesen, platzVorschau, platzFuerNeuesSpiel } from "./eingabe/speicherstand.js";
 import { SPEICHERSCHLUESSEL_CHRONIK, chronikGueltig, meldungZaehlen, sichtungenZaehlen, laufEintragen } from "./eingabe/chronik.js";
+import { eigenschaftenUmbenennen } from "./eingabe/umbenennen.js";
+import umbenennungen from "../daten/umbenennungen.js";
 import "./eingabe/karte.js";
 import { escSchritt } from "./eingabe/esckette.js";
 import { menueOeffnen, endeOeffnen } from "./eingabe/menue.js";
@@ -115,7 +117,7 @@ let belegung = abweichungenAnwenden(belegungsVorgabe, belegungsabweichungen);
 // Letzte Verteilung der Eigenschaften, Vorbelegung der nächsten Charaktererstellung (geprüft in erstellungOeffnen)
 function letzteEigenschaftenLaden() {
   try {
-    return JSON.parse(localStorage.getItem(SPEICHERSCHLUESSEL_EIGENSCHAFTEN) || "null");
+    return eigenschaftenUmbenennen(JSON.parse(localStorage.getItem(SPEICHERSCHLUESSEL_EIGENSCHAFTEN) || "null"), umbenennungen);
   } catch {
     return null;
   }
@@ -127,12 +129,14 @@ function letzteEigenschaftenSpeichern(eigenschaften) {
 // Chronik über alle Läufe (eingabe/chronik.js); gespeichert mit den Läufen
 function chronikLaden() {
   try {
-    return chronikGueltig(JSON.parse(localStorage.getItem(SPEICHERSCHLUESSEL_CHRONIK) || "null"));
+    return chronikGueltig(JSON.parse(localStorage.getItem(SPEICHERSCHLUESSEL_CHRONIK) || "null"), umbenennungen);
   } catch {
     return chronikGueltig(null);
   }
 }
+// eine Chronik aus einem neueren Format bleibt unberührt (eingabe/chronik.js chronikGueltig)
 function chronikSpeichern() {
+  if (chronik.neueresFormat) return;
   try { localStorage.setItem(SPEICHERSCHLUESSEL_CHRONIK, JSON.stringify(chronik)); } catch { /* ohne Speicher weiter */ }
 }
 const chronik = chronikLaden();
@@ -141,7 +145,7 @@ const chronik = chronikLaden();
 function plaetzeLesen() {
   return Array.from({ length: ANZAHL_PLAETZE }, (_, stelle) => {
     try {
-      return platzVorschau(localStorage.getItem(speicherschluesselPlatz(stelle)));
+      return platzVorschau(localStorage.getItem(speicherschluesselPlatz(stelle)), daten.pruefsumme);
     } catch {
       return null;
     }

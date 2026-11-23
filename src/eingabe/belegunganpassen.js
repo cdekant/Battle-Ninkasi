@@ -8,16 +8,20 @@
 // Nicht belegbar (GESPERRT): Esc, Enter und Tab (Fenster, Zielmodus), ?, die Funktionstasten des Browsers und
 // Umschalt, Strg, Alt allein. Umschalt+Ziffer (Leisten) und Umschalt+Richtung (Laufen) sind fest.
 
-import { tastenDerAktion } from "./aktionskatalog.js";
+import { AKTIONEN, tastenDerAktion } from "./aktionskatalog.js";
 
 const GESPERRTE_CODES = ["Escape", "Enter", "NumpadEnter", "Tab", "ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "AltLeft", "AltRight", "MetaLeft", "MetaRight", "CapsLock", "ContextMenu"];
 const GESPERRTE_ZEICHEN = ["?"];
 
 export const leereAbweichungen = () => ({ tasten: {}, zeichen: {} });
 
+// Gespeicherte Abweichungen prüfen; Aktionen, die der Katalog nicht mehr kennt (umbenannt oder entfernt), fallen weg,
+// statt mitgeschleppt zu werden (siehe docs/Architektur.md, Speichern)
 export function abweichungenGueltig(abweichungen) {
   const gueltig = abweichungen && typeof abweichungen.tasten === "object" && typeof abweichungen.zeichen === "object";
-  return gueltig ? structuredClone(abweichungen) : leereAbweichungen();
+  if (!gueltig) return leereAbweichungen();
+  const bekannt = ([, aktion]) => aktion === null || Object.hasOwn(AKTIONEN, aktion);
+  return { tasten: Object.fromEntries(Object.entries(abweichungen.tasten).filter(bekannt)), zeichen: Object.fromEntries(Object.entries(abweichungen.zeichen).filter(bekannt)) };
 }
 
 export function tasteGesperrt(taste) {

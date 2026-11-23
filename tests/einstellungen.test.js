@@ -11,7 +11,7 @@ import vorgaben from "../src/eingabe/einstellungen.js";
 import belegungsVorgabe from "../src/eingabe/belegung.js";
 import { datenLaden, neuesSpiel } from "../src/kern/spiel.js";
 import { REITER, EINSTELLUNGEN, einstellungLesen, einstellungSetzen, einstellungSchritt, einstellungVorgabe } from "../src/eingabe/einstellungskatalog.js";
-import { abweichungenAnwenden, tasteSetzen, tasteEntfernen, aktionAufVorgabe, konfliktVon, tasteGesperrt, leereAbweichungen, aenderbareTasten } from "../src/eingabe/belegunganpassen.js";
+import { abweichungenAnwenden, abweichungenGueltig, tasteSetzen, tasteEntfernen, aktionAufVorgabe, konfliktVon, tasteGesperrt, leereAbweichungen, aenderbareTasten } from "../src/eingabe/belegunganpassen.js";
 import { einstellungsfensterOeffnen, einstellungsfensterTaste, tastenZeilen, ALLE_AUF_VORGABE } from "../src/eingabe/einstellungsfenster.js";
 import { befehlstreffer, befehlseintraege, befehlsquelleAnmelden, befehlszeileOeffnen, befehlszeileTaste } from "../src/eingabe/befehlszeile.js";
 import { verlaufOeffnen, verlaufTaste, passtZumFilter } from "../src/eingabe/verlauf.js";
@@ -71,6 +71,12 @@ test("Belegung: neue Taste ersetzt die alte, Konflikt verdrängt, Zeichen verlie
   assert.deepEqual(aenderbareTasten(belegungsVorgabe, "laufen"), [], "Umschalt+Richtung ist fest");
   for (const taste of [{ code: "Escape" }, { code: "Enter" }, { code: "Tab" }, { code: "F5" }, { code: "Minus", zeichen: "?" }]) assert.ok(tasteGesperrt(taste), JSON.stringify(taste));
   assert.ok(!tasteGesperrt({ code: "KeyQ", zeichen: "q" }));
+});
+
+test("Belegung: gespeicherte Abweichungen verlieren Aktionen, die der Katalog nicht mehr kennt", () => {
+  const gelesen = abweichungenGueltig({ tasten: { KeyQ: "warten", KeyW: "gibt_es_nicht", KeyE: null }, zeichen: { "ä": "alte_aktion" } });
+  assert.deepEqual(gelesen, { tasten: { KeyQ: "warten", KeyE: null }, zeichen: {} });
+  assert.deepEqual(abweichungenGueltig(null), leereAbweichungen());
 });
 
 test("Einstellungsfenster: Reiter, Ändern, Vorgabe, Knopf; Tasten mit Aufnahme, Sperre, Konflikt und Vorgabe für alle", () => {

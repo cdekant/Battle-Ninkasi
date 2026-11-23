@@ -81,6 +81,9 @@ function platzWaehlen(stelle, plaetze, zweck, spielart = "normal", zusatz = {}) 
   if (zweck === "ersetzen" && platzSpielbar(platz)) {
     return { oeffnen: { art: "bestaetigung", zustand: { frage: "laeufe.ersetzen_frage", werte: nummer, aktion: neuesSpielAktion(stelle, spielart, zusatz) } } };
   }
+  if (platz?.grund === "daten") {
+    return { oeffnen: { art: "bestaetigung", zustand: { frage: "laeufe.daten_frage", werte: nummer, aktion: neuesSpielAktion(stelle, spielart, zusatz) } } };
+  }
   if (platz?.grund) {
     return { oeffnen: { art: "bestaetigung", zustand: { frage: "laeufe.veraltet_frage", werte: { ...nummer, version: platz.version ?? "?" }, aktion: neuesSpielAktion(stelle, spielart, zusatz) } } };
   }

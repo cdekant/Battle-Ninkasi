@@ -13,13 +13,14 @@ import { arenenListe, taktikDerWahl } from "../eingabe/arenawahl.js";
 
 const escapeHtml = (text) => String(text).replace(/[&<>"]/g, (zeichen) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[zeichen]);
 
-// Eine Zeile über einen Speicherplatz: leer, veraltet, unlesbar oder Tiefe, Zug und Datum, dahinter eine andere
+// Eine Zeile über einen Speicherplatz: leer, veraltet (Version oder Daten), unlesbar oder Tiefe, Zug und Datum, dahinter eine andere
 // Spielart als "normal"
 export function speicherplatzText(texte, platz, stelle) {
   const { text } = texte;
   const nummer = stelle + 1;
   if (!platz) return text("laeufe.leer", { platz: nummer });
   if (platz.grund === "version") return text("laeufe.veraltet", { platz: nummer, version: platz.version });
+  if (platz.grund === "daten") return text("laeufe.daten_geaendert", { platz: nummer });
   if (platz.grund) return text("laeufe.kaputt", { platz: nummer });
   const { tiefe, zuege, gespeichertAm, spielart = "normal" } = platz.vorschau;
   const datum = gespeichertAm ? new Date(gespeichertAm).toLocaleDateString(text("sprache.code")) : "?";

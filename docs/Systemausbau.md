@@ -219,7 +219,7 @@ Werkzeuge:
 
 Schutz:
 
-+ 4. Schutzmechanismen als eigene Sitzung mit eigenem Plan: stabile Typnamen (die Chronik zählt `besiegt.<typ>` und `gesehen.<typ>`, Umbenennen verliert die Zähler; Regel oder Tabelle der Umbenennungen), Prüfsumme der Daten (siehe [Ausblick.md](Ausblick.md), Prüfsumme der Daten), weitere Kandidaten dort erst sammeln (Format der Chronik, Wächtertests wie `tests/ablage.test.js`, Namen in Registern bei Mods)
++ 4. erledigt in 0.45.0: Prüfsumme der Daten im Spielstand, streng (siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit), stabile Namen mit Namensbuch und Umbenennungen (siehe [Architektur.md](Architektur.md), Inhalte als Daten), Migrationen der Chronik (siehe [Architektur.md](Architektur.md), Speichern); offen: die gesammelten Kandidaten (siehe [Ausblick.md](Ausblick.md), Schutz der Ablagen)
 
 Spieldesign, jeweils zuerst in [Grundlagen.md](Grundlagen.md) oder [Charakter.md](Charakter.md) entscheiden:
 

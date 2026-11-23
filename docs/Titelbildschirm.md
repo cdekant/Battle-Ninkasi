@@ -83,7 +83,7 @@ Damit die Ideen später ohne Umbau dazukommen:
 
 + Spielarten und eigene Regeln laufen über die Startoptionen des Spielstands (`optionen`), die die Logik bei `neuesSpiel` bekommt; so bleiben sie Teil der Aufzeichnung und wiederholbar
 + Ruhmeshalle und Statistik lesen die Chronik (seit 0.32.0): getrennt vom Lauf, Ergebnisse statt Aufzeichnungen, so übersteht sie neue Versionen
-+ Aufzeichnungen lassen sich nur mit derselben Version abspielen, weil jede Änderung an Code oder Daten den Lauf verändert; die Ruhmeshalle merkt sich die Version; alte Versionen werden nicht vorgehalten, wer eine alte Aufzeichnung sehen will, holt den Git-Tag der Version
++ Aufzeichnungen lassen sich nur mit derselben Version und derselben Prüfsumme der Daten abspielen, weil jede Änderung an Code oder Daten den Lauf verändert; die Ruhmeshalle merkt sich die Version; alte Versionen werden nicht vorgehalten, wer eine alte Aufzeichnung sehen will, holt den Git-Tag der Version
 + Freischaltbare Titelbilder, Erfolge und das Bestiarium lesen dieselben Zähler der Chronik (`gesehen.<typ>`, `besiegt.<typ>`); eine Freischaltung ist eine Bedingung `{ zaehler, mindestens }`
 + Das Datum für das Bier des Tages wird außerhalb der Logik in einen Startwert verwandelt
 + Läufe in weichem, friedlichem oder allmächtigem Modus tragen ihre Spielart in der Chronik und werden getrennt gewertet; der weiche Modus ist eine Spielart, auch wenn die Logik von ihm wenig merkt (beim Tod bietet die Oberfläche einen früheren Schnappschuss an)
@@ -118,6 +118,11 @@ Damit die Ideen später ohne Umbau dazukommen:
 + Nach dem Kampf öffnet sich `ende` auch beim Sieg (Titel "Die Arena ist leer", Bilanz mit Wellen und Zügen); statt Neuer Lauf heißt der erste Eintrag Nochmal: dieselbe Aufstellung mit dem nächsten Startwert, wieder automatisch, wenn die Arena so begann; Neustart aus dem Spielmenü behält ebenso die Aufstellung
 + Chronik: Ergebnis "sieg" oder "tod", gezählt wird nicht (`SPIELARTEN_OHNE_ZAEHLER`)
 + Offen: eigene Aufstellungen im Browser (Kurzform in der Befehlszeile wie im Werkzeug, oder ein Fenster zum Zusammenstellen), Varianten der Arenen in der Wahl
+
+## Stand der Umsetzung 0.45.0
+
++ Ein Platz mit anderer Prüfsumme der Daten heißt "Platz 2: Daten geändert, nicht mehr spielbar" und lässt sich wie ein veralteter nur ersetzen (eigene Nachfrage `laeufe.daten_frage`) oder löschen; Neues Spiel nimmt ihn wie einen veralteten
++ Die Chronik trägt je Lauf die Prüfsumme der Daten, für das spätere Abspielen; ihr Format lässt sich migrieren, Namen in ihren Zählern folgen den Umbenennungen (siehe [Architektur.md](Architektur.md), Speichern)
 
 ## Offen
 

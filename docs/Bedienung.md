@@ -1,6 +1,6 @@
 # Battle Ninkasi - Bedienung
 
-Stand: 2026-11-22
+Stand: 2026-11-23
 
 Zuständig für: `src/eingabe/aktionskatalog.js`, `src/eingabe/befehlszeile.js`, `src/eingabe/belegung.js`, `src/eingabe/belegunganpassen.js`, `src/eingabe/charakter.js`, `src/eingabe/eingabe.js`, `src/eingabe/einstellungen.js`, `src/eingabe/einstellungsfenster.js`, `src/eingabe/einstellungskatalog.js`, `src/eingabe/erkunden.js`, `src/eingabe/arenakampf.js`, `src/eingabe/erstellung.js`, `src/eingabe/esckette.js`, `src/eingabe/faehigkeiten.js`, `src/eingabe/fenster.js`, `src/eingabe/hilfe.js`, `src/eingabe/inventar.js`, `src/eingabe/karte.js`, `src/eingabe/laufen.js`, `src/eingabe/maus.js`, `src/eingabe/menue.js`, `src/eingabe/rasten.js`, `src/eingabe/reise.js`, `src/eingabe/schnellleiste.js`, `src/eingabe/texteingabe.js`, `src/eingabe/verlauf.js`, `src/eingabe/zielmodus.js`, `src/anzeige/fenster.js`, `src/anzeige/charakterfenster.js`, `src/anzeige/systemfenster.js`, `src/anzeige/einstellungsanzeige.js`, `src/systeme/vorschau.js`, `src/systeme/untersuchen.js`
 
@@ -40,6 +40,7 @@ Regeln:
 + Buchstaben in den Fenstern gelten nach dem Zeichen der Taste (`KeyboardEvent.key`, `buchstabeDerTaste` in `src/eingabe/inventar.js`), so passen sie zu jeder Tastaturbelegung; die Belegung selbst nennt physische Tasten (`KeyboardEvent.code`)
 + Offene Fenster und der Zielmodus bekommen jede Taste, bevor die Belegung greift; während ein Fenster Text oder eine Taste aufnimmt, fängt `src/main.js` weder `?` noch Umschalt+Ziffer ab
 + Esc als Kette: erst den Zielmodus abbrechen, dann das oberste Fenster schließen (das Fenster entscheidet selbst, z.B. erst zurück zur Liste), dann einen Ablauf abbrechen, sonst das Spielmenü öffnen
++ Eigene Belegung: gespeicherte Abweichungen auf Aktionen, die der Katalog nicht mehr kennt (umbenannt oder entfernt), fallen beim Lesen weg (`abweichungenGueltig`, seit 0.45.0; siehe [Architektur.md](Architektur.md), Speichern)
 + Eigene Belegung: neu belegt wird immer die physische Taste; hat ihr Zeichen schon eine Aktion (z.B. `.`), verliert das Zeichen sie (Zeichen gehen sonst vor); gespeichert werden nur Abweichungen; nicht belegbar sind Esc, Enter, Tab, `?`, die Funktionstasten und Umschalt, Strg, Alt allein; Umschalt+Richtung und Umschalt+1 bis 5 sind fest
 + Es gibt eine einzige Belegung: für eine Tastatur mit Ziffernblock, aber ohne ihn spielbar (vi-Tasten); Ziffernblock und Pfeile liegen zusätzlich auf der Bewegung; Belegungssätze gibt es nicht
 + Befehlszeile: Treffer am Anfang des Texts zuerst, dann am Wortanfang oder am Anfang der ID, dann als Teilwort in Text oder ID, bei gleichem Rang alphabetisch; Tab übernimmt, Pfeile wählen, Enter führt aus (eine Aktion wie ihre Taste, eine Einstellung öffnet das Einstellungsfenster an diesem Eintrag, ein Befehl geht durch die Eingangstür); später können sich Bierrezepte, Lore-Texte oder Bücher als Quelle anmelden; Zusatzangaben wie `:zoom 32` folgen später

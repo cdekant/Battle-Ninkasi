@@ -2,7 +2,7 @@
 
 Stand: 2026-11-23
 
-Zuständig für: `starten.py`, `starten.bat`, `tests/*`, `werkzeuge/bot.js`, `werkzeuge/messung.js`, `werkzeuge/arena.js`, `werkzeuge/kompendium.js`, `werkzeuge/kompendium.html`, `werkzeuge/luecken.js`
+Zuständig für: `starten.py`, `starten.bat`, `tests/*`, `werkzeuge/bot.js`, `werkzeuge/messung.js`, `werkzeuge/arena.js`, `werkzeuge/kompendium.js`, `werkzeuge/kompendium.html`, `werkzeuge/luecken.js`, `werkzeuge/namensbuch.js`
 
 Mitprüfen bei Änderungen: [Architektur.md](Architektur.md), [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md), [Anzeige.md](Anzeige.md), [Texte.md](Texte.md)
 
@@ -54,6 +54,7 @@ Schnittstellen:
 + `node werkzeuge/messung.js [Gegner] [Befehle] [Startwert] [Türen in Prozent] [Brandherde]`: Leistung bei vielen Gegnern (siehe [Architektur.md](Architektur.md), Leistung)
 + `node werkzeuge/arena.js <Arena | Kurzform> [Kämpfe=1000] [erster Startwert=1] [--taktik name] [--karte name] [--ninkasi variante] [--gegner variante] [--json datei]`: Arena-Simulation; ohne Argument nennt es Arenen und Taktiken; eine Arena aus `daten/arenen.js` läuft mit allen Paaren ihrer Varianten (eine Zeile je Paar), `--ninkasi` und `--gegner` beschränken; die Kurzform nach DCSS ("3 essigbakterium, fernkaempfer_test" ist eine Welle, "/" trennt Wellen) kämpft in `arena_offen` mit der Taktik `nahkampf`; Spielart und Aufstellung siehe [Architektur.md](Architektur.md), Spielarten
 + Exportiert für Tests und spätere Werkzeuge (Machtkurve): `kampfAusfuehren(daten, aufstellung, startwert, taktik?)`, `auswerten(kaempfe)`, `wilson(erfolge, anzahl)`, `quantil(werte, anteil)`, `kurzformLesen(daten, text)`, `variantenpaare(daten, name, wahl)`
++ `node werkzeuge/namensbuch.js` (seit 0.45.0): führt `daten/namensbuch.js` nach, neue Namen kommen nach `vorlaeufig`, vorläufige, die es nicht mehr gibt, fallen weg, feste bleiben immer stehen; danach nennt es die übrigen Fehler (Rückgabewert 1); exportiert `NAMENSBUCH_ARTEN`, `namenDerDaten`, `namensbuchFehler`, `namensbuchNachgefuehrt`, `namensbuchText` für `tests/namensbuch.test.js` (Regel siehe [Architektur.md](Architektur.md), Inhalte als Daten)
 + `node werkzeuge/tiles-ableiten.js`: leitet die kleinen Tile-Sätze ab und schreibt `grafik/tileset.js` (siehe [Tileset.md](Tileset.md))
 
 Regeln:
@@ -86,7 +87,7 @@ Regeln:
 ## Ablauf einer Version
 
 1. Plan mit Empfehlungen vorlegen, Freigabe abwarten
-2. Umsetzen mit Tests; neue Dateien bekommen ein zuständiges Dokument
+2. Umsetzen mit Tests; neue Dateien bekommen ein zuständiges Dokument; neue oder entfernte Namen in den Daten mit `node werkzeuge/namensbuch.js` ins Namensbuch, ein umbenannter oder entfernter fester Name mit Eintrag in `daten/umbenennungen.js`
 3. Doku nach den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md) nachführen, umgesetzte Punkte aus [Systemausbau.md](Systemausbau.md) streichen
 4. Nummer in `src/version.js` erhöhen (Schema siehe [Architektur.md](Architektur.md), Versionen)
 5. `node --test` und `node werkzeuge/bot.js` fehlerfrei
@@ -97,6 +98,8 @@ Regeln:
 + `gesteuerteEntitaet` oder `spielerin`: wer handelt, was sie sieht und bei sich hat, fragt `gesteuerteEntitaet`; wer lernt, weiß, stirbt und die Bilanz des Laufs fragt `spielerin` (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); `tests/gesteuert.test.js` nennt die Dateien, die nur die gesteuerte Entität fragen dürfen
 + Komponenten ohne Zahl (`plaetze`, `tueren`, `sicht`, `angriffe`, `bewegung`, `aussehen`) nie direkt an der Entität lesen, sondern über ihre Lesefunktion (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); `tests/komponenten.test.js` meldet direkte Zugriffe, gewollte Ausnahmen (Datenprüfung, Steckbriefe, Gegenstände, Regelwerte, Vorlagen) stehen dort in einer Liste
 + Wissen aus früheren Läufen nie in der Logik aus der Chronik holen, sondern beim Start als Startoption `optionen.vorwissen` übergeben, sonst schlägt `tests/ablage.test.js` fehl (siehe [Architektur.md](Architektur.md), Speichern)
++ Einen festen Namen aus `daten/namensbuch.js` nie still umbenennen oder löschen, sonst verlieren die Chronik und andere Ablagen ihn; dafür gibt es `daten/umbenennungen.js`, `tests/namensbuch.test.js` meldet das Vergessen (siehe [Architektur.md](Architektur.md), Inhalte als Daten)
++ Eine Änderung in den Spieldaten macht die Speicherplätze veraltet (Prüfsumme der Daten, siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit); Texte in `sprache/` nicht
 + Python unter Windows: `Path.write_text` schreibt CRLF; immer `newline="\n"` angeben (Repo durchgängig LF, `.gitattributes`)
 + Python-Skripte mit Umlauten als Datei ausführen, nie über die Shell-Eingabe (stdin), sonst werden die Umlaute verfälscht
 + Der erste Schritt einer langen Aktion läuft sofort; `schritte: N` lässt dem Ziel N-1 Züge (siehe [Wirkungen.md](Wirkungen.md), Lange Aktionen)
@@ -119,7 +122,7 @@ Der Inhalt ist vorläufig und dient dem Ausprobieren der Systeme; alle Zahlen st
 + Bier: +20 LP, Pegel +0,5 ‰, wird zur leeren Flasche; Getränke, Ausrüstung und Verderben siehe [Gegenstaende.md](Gegenstaende.md)
 + Alle Aktionen kosten bisher 100 (`daten/aktionen.js`), abweichend nur Angriffsprofile der Waffen
 + Auslöser sind im System vorhanden, im Spielinhalt aber noch nicht benutzt
-+ Noch nicht enthalten: ganzzahlige Skalierung mit Rand, Umschauen, Markierungen für Gegner außerhalb des Ausschnitts, Prüfsumme der Daten, Englisch
++ Noch nicht enthalten: ganzzahlige Skalierung mit Rand, Umschauen, Markierungen für Gegner außerhalb des Ausschnitts, Englisch
 
 ## Verweise
 

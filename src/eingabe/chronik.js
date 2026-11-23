@@ -1,12 +1,17 @@
 // Chronik (siehe docs/Titelbildschirm.md): was über alle Läufe hinweg bleibt, getrennt von den Speicherplätzen und
 // ohne Aufzeichnungen, damit sie neue Versionen übersteht. Kern ohne DOM und ohne localStorage; src/main.js speichert
 // sie unter SPEICHERSCHLUESSEL_CHRONIK.
-//   { format, laeufe: [{ version, startwert, spielart, datum, tiefe, zuege, befehle, ergebnis, ursache }], zaehler: { name: zahl } }
+//   { format, laeufe: [{ version, pruefsumme, startwert, spielart, datum, tiefe, zuege, befehle, ergebnis, ursache }],
+//     zaehler: { name: zahl } }
 // Zähler sind frei benannt ("besiegt.<typ>", "gesehen.<typ>", "tode", "laeufe"); erhoben werden sie in der Oberfläche
 // aus den Meldungen der Logik (ZAEHLREGELN) und aus dem Sichtfeld, nie in der Logik. Gezählt wird nur beim echten
 // Spielen: Laden eines Schnappschusses meldet nichts, ein späterer Abspieler zählt nicht mit. Läufe der Spielarten in
 // SPIELARTEN_OHNE_ZAEHLER (allmächtig) stehen mit ihrer Spielart in laeufe, zählen aber nicht (getrennte Wertung).
 // Freischaltungen (Titelbilder, später Erfolge, Bestiarium) sind Bedingungen auf Zählern: { zaehler, mindestens }.
+// Ein neues Format bringt eine Migration aus dem vorigen mit (CHRONIK_MIGRATIONEN), damit keine Chronik verloren geht;
+// Namen in den Zählern folgen beim Lesen den Umbenennungen (daten/umbenennungen.js, eingabe/umbenennen.js).
+
+import { nameNachUmbenennung } from "./umbenennen.js";
 
 export const SPEICHERSCHLUESSEL_CHRONIK = "battle-ninkasi.chronik";
 export const CHRONIK_FORMAT = 1;
@@ -19,15 +24,41 @@ export function zaehltMit(spiel) {
   return !SPIELARTEN_OHNE_ZAEHLER.includes(spiel.optionen?.spielart ?? "normal");
 }
 
+// Migrationen: je altem Format n eine Funktion (chronik des Formats n) => chronik des Formats n + 1; ein neues Format
+// heißt CHRONIK_FORMAT erhöhen und die Migration aus dem vorigen hier eintragen (geprüft von tests/titel.test.js)
+export const CHRONIK_MIGRATIONEN = {};
+
+// Welche Art von Namen hinter dem Punkt eines Zählers steht, für die Umbenennungen
+export const ZAEHLER_MIT_NAMEN = { besiegt: "wesen", gesehen: "wesen" };
+
 export function neueChronik() {
   return { format: CHRONIK_FORMAT, laeufe: [], zaehler: {} };
 }
 
-// Gespeicherte Chronik prüfen; Unlesbares ergibt eine neue, ungültige Zähler fallen weg
-export function chronikGueltig(roh) {
-  if (!roh || typeof roh !== "object" || roh.format !== CHRONIK_FORMAT || !Array.isArray(roh.laeufe) || !roh.zaehler || typeof roh.zaehler !== "object") return neueChronik();
-  const zaehler = Object.fromEntries(Object.entries(roh.zaehler).filter(([, wert]) => Number.isInteger(wert) && wert >= 0));
-  return { format: CHRONIK_FORMAT, laeufe: roh.laeufe.filter((lauf) => lauf && typeof lauf === "object"), zaehler };
+// Name eines Zählers nach den Umbenennungen ("besiegt.<typ>" mit dem neuen Typ)
+export function zaehlerUmbenennen(name, umbenennungen) {
+  const punkt = name.indexOf(".");
+  const art = punkt > 0 ? ZAEHLER_MIT_NAMEN[name.slice(0, punkt)] : undefined;
+  return art ? `${name.slice(0, punkt + 1)}${nameNachUmbenennung(umbenennungen, art, name.slice(punkt + 1))}` : name;
+}
+
+// Gespeicherte Chronik prüfen: ältere Formate migrieren, Namen umbenennen (Zähler zusammengelegt), ungültige Zähler
+// fallen weg; Unlesbares ergibt eine neue. Eine Chronik aus einem neueren Format (ein älteres Spiel nach einem
+// neueren) lässt sich nicht lesen und darf nicht überschrieben werden: dann eine neue mit neueresFormat: true, die
+// src/main.js nicht speichert
+export function chronikGueltig(roh, umbenennungen = {}) {
+  if (!roh || typeof roh !== "object") return neueChronik();
+  if (Number.isInteger(roh.format) && roh.format > CHRONIK_FORMAT) return { ...neueChronik(), neueresFormat: true };
+  let chronik = roh;
+  while (Number.isInteger(chronik?.format) && chronik.format < CHRONIK_FORMAT && CHRONIK_MIGRATIONEN[chronik.format]) chronik = CHRONIK_MIGRATIONEN[chronik.format](chronik);
+  if (!chronik || chronik.format !== CHRONIK_FORMAT || !Array.isArray(chronik.laeufe) || !chronik.zaehler || typeof chronik.zaehler !== "object") return neueChronik();
+  const zaehler = {};
+  for (const [name, wert] of Object.entries(chronik.zaehler)) {
+    if (!Number.isInteger(wert) || wert < 0) continue;
+    const neuerName = zaehlerUmbenennen(name, umbenennungen);
+    zaehler[neuerName] = (zaehler[neuerName] ?? 0) + wert;
+  }
+  return { format: CHRONIK_FORMAT, laeufe: chronik.laeufe.filter((lauf) => lauf && typeof lauf === "object"), zaehler };
 }
 
 export function zaehlerstand(chronik, name) {
@@ -76,6 +107,7 @@ export function laufEintragen(chronik, spiel, { ergebnis, datum, version, todesm
   const ninkasi = spiel.zustand.entitaeten[spiel.zustand.spielerinId];
   chronik.laeufe.push({
     version,
+    pruefsumme: spiel.daten?.pruefsumme ?? null,
     startwert: spiel.zustand.startwert,
     spielart: spiel.optionen.spielart ?? "normal",
     datum,

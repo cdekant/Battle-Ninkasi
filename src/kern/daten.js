@@ -5,6 +5,7 @@
 import { hat, holen, alle } from "./register.js";
 import { istWuerfelausdruck } from "./zufall.js";
 import { kurvenfehler } from "./kurven.js";
+import { pruefsummeBerechnen } from "./pruefsumme.js";
 import { HAKENKATALOG, AUSLOESER_ROLLEN, AUSLOESER_ZIELE } from "./hakenkatalog.js";
 import { HINTERLASSENSCHAFT_REGELN, MODIFIKATORARTEN } from "./werte.js";
 import { TRIFFT_ARTEN, ZIELARTEN } from "../systeme/zielauswahl.js";
@@ -1151,11 +1152,12 @@ function pruefeArenen(daten, sprache, fehler) {
   }
 }
 
-// Gibt { daten, fehler } zurück; daten mit aufgelösten Vorlagen.
-// sprache: { texte, nomenPruefen? }, nomenPruefen(eintrag, ort) gibt eine Liste von Fehlern zurück
+// Gibt { daten, fehler } zurück; daten mit aufgelösten Vorlagen und der Prüfsumme der Rohdaten (daten.pruefsumme,
+// ohne Sprache, siehe kern/pruefsumme.js). sprache: { texte, nomenPruefen? }, nomenPruefen(eintrag, ort) gibt eine
+// Liste von Fehlern zurück
 export function vorbereiten(rohdaten, sprache = {}) {
   const fehler = [];
-  const daten = { ...rohdaten };
+  const daten = { ...rohdaten, pruefsumme: pruefsummeBerechnen(rohdaten) };
   daten.wesen = vorlagenAufloesen(rohdaten.wesen, "wesen", fehler);
   daten.gegenstaende = vorlagenAufloesen(rohdaten.gegenstaende, "gegenstaende", fehler);
   daten.zustaende = vorlagenAufloesen(rohdaten.zustaende || {}, "zustaende", fehler);

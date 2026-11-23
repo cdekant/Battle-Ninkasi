@@ -565,7 +565,7 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
       if (start?.spielart !== "arena" || !daten.arenen[start.arena] || !daten.taktiken[start.taktik]) throw new Error("Wahl der Arena startet nichts Gültiges");
     }
     if (istAllmaechtig(spiel) && spiel.zustand.vorbei) throw new Error("Ninkasi stirbt im allmächtigen Lauf");
-    const vorschau = platzVorschau(speicherstandText(spiel, { leisten: botLeisten, gesehen, gespeichertAm: 1 }));
+    const vorschau = platzVorschau(speicherstandText(spiel, { leisten: botLeisten, gesehen, gespeichertAm: 1 }), daten.pruefsumme);
     if (vorschau.grund || vorschau.vorschau.tiefe !== spiel.zustand.tiefe) throw new Error("Vorschau des Speicherplatzes falsch");
     const nachgespielt = nachspielen(daten, JSON.parse(JSON.stringify(spielstand(spiel))));
     const zustaendeGleich = JSON.stringify(nachgespielt.zustand) === JSON.stringify(spiel.zustand);

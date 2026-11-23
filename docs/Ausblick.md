@@ -1,6 +1,6 @@
 # Battle Ninkasi - Ausblick
 
-Stand: 2026-11-22
+Stand: 2026-11-23
 
 Mitprüfen bei Änderungen: [Grundlagen.md](Grundlagen.md), [Architektur.md](Architektur.md), [Systemausbau.md](Systemausbau.md), [Wesen.md](Wesen.md), [Welt.md](Welt.md), [Charakter.md](Charakter.md)
 
@@ -46,7 +46,8 @@ Umsetzung: keine
 | Themenräume und Rätsel | mittel | gering bis mittel | erledigt (Erzeugung in Schritten) |
 | Licht | hoch | gering | nein |
 | Todesbericht | hoch | gering | nein |
-| Prüfsumme der Daten | hoch | gering | nein |
+| Prüfsumme der Daten | hoch | gering | erledigt (0.45.0) |
+| Schutz der Ablagen | ungeklärt | gering | teils erledigt (stabile Namen, Format der Chronik), offen: Kandidaten |
 | Druck gegen endloses Rasten | ungeklärt | gering | nein |
 | Gunst der Nebengottheiten | ungeklärt | gering | nein |
 | Filmriss | ungeklärt | gering | erledigt (Erinnerung der Karte) |
@@ -219,8 +220,19 @@ Umsetzung: offen
 + Umbaurisiko: gering
 + Vorkehrung: keine; die Daten sind Objekte mit fester Reihenfolge der Schlüssel, eine Prüfsumme über ihre JSON-Form ist stabil
 + Aus der Arbeitsliste hierher: vorher [Systemausbau.md](Systemausbau.md), Punkt 10
++ Umgesetzt in 0.45.0, streng: eine andere Prüfsumme macht den Platz veraltet
 
-Umsetzung: offen
+Umsetzung: siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit
+
+## Schutz der Ablagen
+
++ Wichtigkeit: ungeklärt; gesammelt 2026-11-23 aus [Systemausbau.md](Systemausbau.md), Punkt 15
++ Inhalt: was außerhalb eines Laufs liegt (Chronik, Einstellungen, Belegung, später Vorwissen und Mods), soll Änderungen an Code und Daten überstehen; erledigt in 0.45.0: stabile Namen mit Namensbuch und Umbenennungen, Migrationen der Chronik, Belegung ohne unbekannte Aktionen
++ Kandidaten: Namensräume für Mods in den Registern (Vorsatz `<mod>.`, Fehler bei doppelter Anmeldung), erst mit dem ersten Mod; ein Katalog der Wächtertests (Ablage, Komponenten, gesteuerte Entität, Würfe, Namensbuch) an einer Stelle; Migrationen auch für Einstellungen und Belegung, sobald sich ihr Format zum ersten Mal ändert; Fix-Versionen mit gleicher Prüfsumme der Daten behalten ihre Plätze (dann ist die Prüfsumme der eigentliche Schutz); eine Prüfsumme des Codes (bisher leistet das die Version); Freischaltungen gegen das Namensbuch prüfen (ein Zähler `besiegt.<typ>` mit unbekanntem Typ)
++ Umbaurisiko: gering
++ Vorkehrung: keine
+
+Umsetzung: teilweise, siehe [Architektur.md](Architektur.md), Speichern; offen: die Kandidaten
 
 ## Druck gegen endloses Rasten
 
@@ -425,6 +437,7 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Sicht und Erinnerung; offen: ob 
 + 2026-11-22: die Vorkehrungen stehen nach Dringlichkeit als Punkt 14 in [Systemausbau.md](Systemausbau.md)
 + 2026-11-22: für Besessenheit nur die leichte Vorkehrung (Lesefunktion statt zweitem Feld); ob sie kommt, bleibt offen
 + 2026-11-22: Kartierung zeigt Gelände, auf Wunsch auch Schätze, bringt aber keine EP; die EP kommen erst beim Sehen (Weg a unter EP für Erkundung)
++ 2026-11-23: Prüfsumme der Daten streng (anderer Stand heißt veraltet), Nachspielen ebenso; Namensbuch mit den Stufen fest und vorläufig, fest zuerst Ninkasi und die Eigenschaften; Migrationen der Chronik; umgesetzt in 0.45.0
 + 2026-11-22: Plan des Laufs im Zustand, Folge der Ebenenschritte in den Daten (mit Vorgabe in `daten/regeln.js` und Prüfung von `braucht`), Erreichbarkeit mit neuem Versuch; umgesetzt in 0.33.0
 
 ## Recherche
