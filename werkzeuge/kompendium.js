@@ -7,9 +7,10 @@
 
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
-import { rohdaten, texteDe as texte, probenamen, probentexte } from "../src/inhalt.js";
+import { rohdaten, texte as texteJeSprache, texteDe as texte, probenamen, probentexte } from "../src/inhalt.js";
 import grammatik from "../sprache/de/grammatik.js";
-import korpusliste from "../sprache/de/korpus/index.js";
+import korpuslisteDe from "../sprache/de/korpus/index.js";
+import korpuslisteEn from "../sprache/en/korpus/index.js";
 import tileset from "../grafik/tileset.js";
 import { erstelleGrammatik } from "../src/anzeige/grammatik.js";
 import { erstelleTexte } from "../src/anzeige/texte.js";
@@ -19,13 +20,16 @@ import { ARTEN, eintragsnamen, steckbrief } from "../src/anzeige/beschreibung.js
 import { lueckenFinden } from "./luecken.js";
 
 const hauptverzeichnis = new URL("../", import.meta.url);
+// Korpus aller Sprachen, benannt als <sprache>/<datei>
+const KORPUSLISTEN = { de: korpuslisteDe, en: korpuslisteEn };
 
 // Alle Quellen wie im Browser, aus den Dateien gelesen
 export function quellenLaden() {
-  const korpus = korpusliste.map((datei) => korpustextZerlegen(datei, readFileSync(new URL(`sprache/de/korpus/${datei}`, hauptverzeichnis), "utf8")));
+  const korpus = Object.entries(KORPUSLISTEN).flatMap(([code, liste]) => liste.map((datei) =>
+    korpustextZerlegen(`${code}/${datei}`, readFileSync(new URL(`sprache/${code}/korpus/${datei}`, hauptverzeichnis), "utf8"))));
   const literatur = JSON.parse(readFileSync(new URL("sprache/literatur.json", hauptverzeichnis), "utf8"));
   const sprache = { texte, nomenPruefen: erstelleGrammatik(grammatik).pruefen };
-  return { rohdaten, sprache, tileset, korpus, literatur, probenamen, probentexte };
+  return { rohdaten, sprache, tileset, korpus, literatur, probenamen, probentexte, uebersetzungen: { en: texteJeSprache.en } };
 }
 
 // Lücken als Textzeilen, nach Gruppe geordnet

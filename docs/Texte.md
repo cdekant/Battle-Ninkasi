@@ -17,6 +17,7 @@ Grobskizze, auszuarbeiten.
 + Texte des Probeinhalts in `sprache/de/proben.js`, ohne englische Fassung; `src/inhalt.js` legt sie zu denen des Grundgerüsts, doppelte Schlüssel sind ein Fehler (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
 + Rückfall: fehlt im Englischen ein Schlüssel, gilt der deutsche Text mit der deutschen Grammatik (`erstelleTexte(texte, grammatik, rueckfall)` in `src/anzeige/texte.js`); so erscheinen die Proben im Englischen deutsch, bis echter Inhalt sie ersetzt
 + Sprachwahl: Einstellung `sprache` (siehe [Bedienung.md](Bedienung.md), Einstellungen); `src/main.js` baut die Texte einmal beim Laden und setzt `lang` an `<html>`, ein Wechsel lädt die Seite neu; Log-Zeilen bleiben in der Sprache, in der sie entstanden sind
++ Tastennamen (`taste.<code>`) folgen der Tastatur der Sprache: deutsch die deutsche (KeyY heißt z, BracketRight +), englisch die US-Tastatur (y, `]`); Hilfetexte nennen Tasten, deren Aufschrift von der Tastatur abhängt, nicht mit ihrem Zeichen
 + Schadensarten stehen als einfache Wörter unter `schaden.<art>` (z.B. `schaden.saeure`: "Säure"); das Log setzt sie als `{art}` ein
 + Etiketten unbekannter Gegenstände (`datenproben/etiketten.js`, siehe Unbekanntes in [Gegenstaende.md](Gegenstaende.md)) sind Hauptwörter unter `etikett.<name>`; ein unbekannter Gegenstand nennt sein Etikett statt seines Namens (Bezug mit `etikett`)
 + Ein Satz, dessen Verb der Zahl folgt, hat eine zweite Fassung `<schluessel>.mehrzahl` ("Hier liegen 3 Biere"); `textNachZahl(schluessel, anzahl, werte)` wählt sie, wenn die Anzahl größer als 1 ist und es sie gibt
@@ -83,13 +84,18 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 | `de/korpus/trinklied.md` | Nachdichtung | `sallaberger2020ninkasi` | eigener Text, CC BY-NC-SA 4.0; sumerisches Original gemeinfrei |
 | `de/korpus/ninkasi-hymne-b.md` | Nachdichtung, andere Lesart | `etcsl4231ninkasi` | eigener Text, CC BY-NC-SA 4.0; sumerisches Original gemeinfrei |
 | `de/korpus/trinklied-b.md` | Nachdichtung, freiere Bilder | `sallaberger2020ninkasi` | eigener Text, CC BY-NC-SA 4.0; sumerisches Original gemeinfrei |
+| `en/korpus/ninkasi-hymne.md` | Nachdichtung, aus der deutschen übertragen | `sallaberger2020ninkasi` | eigener Text, CC BY-NC-SA 4.0; sumerisches Original gemeinfrei |
+| `en/korpus/ninkasi-hymne-b.md` | Nachdichtung, aus der deutschen übertragen | `etcsl4231ninkasi` | eigener Text, CC BY-NC-SA 4.0; sumerisches Original gemeinfrei |
+| `en/korpus/trinklied.md` | Nachdichtung, aus der deutschen übertragen | `sallaberger2020ninkasi` | eigener Text, CC BY-NC-SA 4.0; sumerisches Original gemeinfrei |
+| `en/korpus/trinklied-b.md` | Nachdichtung, aus der deutschen übertragen | `sallaberger2020ninkasi` | eigener Text, CC BY-NC-SA 4.0; sumerisches Original gemeinfrei |
 
 + Varianten desselben Originals tragen die Endung `-b`, `-c` usw.; sie folgen einer anderen Lesart oder anderen Bildern und erweitern so den Wortschatz der Markow-Ketten
++ Die englischen Korpustexte sind aus unseren deutschen Nachdichtungen übertragen, im selben altertümlichen Ton (thou, hath) und mit denselben Dateinamen; aus den modernen Übersetzungen der Fachquellen stammt kein Wortlaut
 + Weitere Fachquellen ohne eigene Nachdichtung: `sallaberger2012bierbrauen` (auf ZORA nicht gefunden, keine freie Lizenz bekannt, daher keine wörtlichen Zitate)
 
 ## Offen
 
-+ Korpustexte noch nicht an Spielinhalte gekoppelt (Brauschritte, Fundstücke); das Spiel liest sie zur Laufzeit (`sprache/de/korpus/index.js` als Liste der Dateien, `src/anzeige/korpus.js` zerlegt in Kopf, Strophen und Sätze) und zeigt einen Satz als Spruch im Titel; ein neuer Korpustext braucht seine Zeile in der Liste
++ Korpustexte noch nicht an Spielinhalte gekoppelt (Brauschritte, Fundstücke); das Spiel liest die der gewählten Sprache zur Laufzeit (`sprache/<sprache>/korpus/index.js` als Liste der Dateien, `src/anzeige/korpus.js` zerlegt in Kopf, Strophen und Sätze) und zeigt einen Satz als Spruch im Titel; ein neuer Korpustext braucht seine Zeile in der Liste
 + Laden von `sprache/literatur.json` im Spiel (`fetch` oder `import … with { type: "json" }`); den Kopf der Korpustexte und ihre Quellenschlüssel prüft das Kompendium (siehe [Entwicklung.md](Entwicklung.md), Kompendium)
 + Abdeckung der Texte je Eintrag (welcher Gegner, welches Getränk hat Beschreibung, Fundtext, Zitat), sobald Korpus und Inhalte gekoppelt sind; als Reiter des Kompendiums
 + Wo erzeugte Texte vorkommen: Bücher, Schriftrollen, Inschriften, HACCP-Aushänge, Händlergerede

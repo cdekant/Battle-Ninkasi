@@ -38,7 +38,8 @@ export const TILES_AUSSTEHEND = ["gelaende.tuer_zu", "gelaende.tuer_offen", "gel
 const PROBENSAMMLUNG = { oberflaechen: "schichten.oberflaechen", gase: "schichten.gase" };
 
 // quellen: { rohdaten, sprache: { texte, nomenPruefen? }, tileset?, korpus?: [{ name, kopf }], literatur?: [{ id }],
-//            probenamen?: { <sammlung>: [name] }, probentexte?: [schluessel] }
+//            probenamen?: { <sammlung>: [name] }, probentexte?: [schluessel], uebersetzungen?: { <sprache>: texte } }
+// uebersetzungen: weitere Sprachen; jeder Schlüssel der deutschen Texte, der dort fehlt, ist eine Lücke der Gruppe texte
 export function lueckenFinden(quellen) {
   const luecken = [];
   const melden = (gruppe, stufe, ort, meldung) => luecken.push({ gruppe, stufe, ort, meldung });
@@ -57,7 +58,13 @@ export function lueckenFinden(quellen) {
   verweisLuecken(quellen.rohdaten, melden, stufeAm);
   if (quellen.sprache?.texte) {
     const probentexte = new Set(quellen.probentexte ?? []);
-    textLuecken(quellen.rohdaten, quellen.sprache.texte, melden, (schluessel) => (!streng || probentexte.has(schluessel) ? "warnung" : "fehler"));
+    const stufeFuer = (schluessel) => (!streng || probentexte.has(schluessel) ? "warnung" : "fehler");
+    textLuecken(quellen.rohdaten, quellen.sprache.texte, melden, stufeFuer);
+    for (const [code, texte] of Object.entries(quellen.uebersetzungen ?? {})) {
+      for (const schluessel of Object.keys(quellen.sprache.texte)) {
+        if (!(schluessel in texte)) melden("texte", stufeFuer(schluessel), schluessel, `fehlt in ${code}`);
+      }
+    }
   }
   if (quellen.korpus) korpusLuecken(quellen.korpus, quellen.literatur ?? [], melden);
   return luecken;

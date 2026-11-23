@@ -55,7 +55,7 @@ test("ein Schlüssel hat in beiden Sprachen dieselbe Art und dieselben Platzhalt
   assert.deepEqual(fehler, []);
 });
 
-test("das Grundgerüst hat in beiden Sprachen dieselben Schlüssel", { todo: "Punkt 9b: englische Texte" }, () => {
+test("das Grundgerüst hat in beiden Sprachen dieselben Schlüssel", () => {
   const nurDeutsch = Object.keys(texteDesGrundgeruests.de).filter((schluessel) => !(schluessel in texteDesGrundgeruests.en));
   assert.deepEqual(nurDeutsch, []);
 });

@@ -50,7 +50,8 @@ import { titelHtml } from "./anzeige/titel.js";
 import { titelbildWaehlen } from "./anzeige/titelbilder.js";
 import { titeleffekteAnlegen } from "./anzeige/titeleffekte.js";
 import { korpustextZerlegen, spruchWaehlen } from "./anzeige/korpus.js";
-import korpusliste from "../sprache/de/korpus/index.js";
+import korpuslisteDe from "../sprache/de/korpus/index.js";
+import korpuslisteEn from "../sprache/en/korpus/index.js";
 import { verlaufOeffnen } from "./eingabe/verlauf.js";
 import "./eingabe/inventar.js";
 import "./eingabe/faehigkeiten.js";
@@ -1061,8 +1062,9 @@ titelElement.addEventListener("contextmenu", (mausereignis) => {
   if (oberstesFenster(fensterStapel)?.art !== "titel") klickAusserhalbDesFensters();
 });
 
-// Spruch aus dem Korpus: die Texte kommen nach; fehlen sie, bleibt der Titel ohne Spruch
-Promise.all(korpusliste.map((name) => fetch(`sprache/de/korpus/${name}`).then((antwort) => (antwort.ok ? antwort.text() : Promise.reject(new Error(name))))
+// Spruch aus dem Korpus der gewählten Sprache: die Texte kommen nach; fehlen sie, bleibt der Titel ohne Spruch
+const KORPUSLISTEN = { de: korpuslisteDe, en: korpuslisteEn };
+Promise.all(KORPUSLISTEN[sprache].map((name) => fetch(`sprache/${sprache}/korpus/${name}`).then((antwort) => (antwort.ok ? antwort.text() : Promise.reject(new Error(name))))
   .then((text) => korpustextZerlegen(name, text))))
   .then((korpustexte) => {
     spruch = spruchWaehlen(korpustexte, Math.random());

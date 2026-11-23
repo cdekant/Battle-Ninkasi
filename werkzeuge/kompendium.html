@@ -78,9 +78,10 @@
 </main>
 
 <script type="module">
-  import { rohdaten, texteDe as texte, probenamen, probentexte } from "../src/inhalt.js";
+  import { rohdaten, texte as texteJeSprache, texteDe as texte, probenamen, probentexte } from "../src/inhalt.js";
   import grammatik from "../sprache/de/grammatik.js";
-  import korpusliste from "../sprache/de/korpus/index.js";
+  import korpuslisteDe from "../sprache/de/korpus/index.js";
+  import korpuslisteEn from "../sprache/en/korpus/index.js";
   import tileset from "../grafik/tileset.js";
   import { vorbereiten } from "../src/kern/daten.js";
   import { erstelleGrammatik } from "../src/anzeige/grammatik.js";
@@ -94,10 +95,11 @@
   const sprachregeln = erstelleGrammatik(grammatik);
   const sprache = { texte, nomenPruefen: sprachregeln.pruefen };
   const textzugriff = erstelleTexte(texte, sprachregeln);
-  const korpus = await Promise.all(korpusliste.map(async (datei) => korpustextZerlegen(datei, await (await fetch(`../sprache/de/korpus/${datei}`)).text())));
+  const korpusdateien = Object.entries({ de: korpuslisteDe, en: korpuslisteEn }).flatMap(([code, liste]) => liste.map((datei) => `${code}/${datei}`));
+  const korpus = await Promise.all(korpusdateien.map(async (datei) => korpustextZerlegen(datei, await (await fetch(`../sprache/${datei.replace("/", "/korpus/")}`)).text())));
   const literatur = await (await fetch("../sprache/literatur.json")).json();
   const { daten, fehler } = vorbereiten(rohdaten, sprache);
-  const luecken = lueckenFinden({ rohdaten, sprache, tileset, korpus, literatur, probenamen, probentexte });
+  const luecken = lueckenFinden({ rohdaten, sprache, tileset, korpus, literatur, probenamen, probentexte, uebersetzungen: { en: texteJeSprache.en } });
   if (fehler.length) {
     const anzeige = document.getElementById("fehler");
     anzeige.textContent = `Die Datenprüfung meldet ${fehler.length} Fehler, siehe Reiter Lücken.`;

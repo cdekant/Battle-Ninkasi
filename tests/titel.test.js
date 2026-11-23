@@ -5,7 +5,8 @@ import assert from "node:assert/strict";
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { rohdaten, texteDe } from "../src/inhalt.js";
 import grammatikDe from "../sprache/de/grammatik.js";
-import korpusliste from "../sprache/de/korpus/index.js";
+import korpuslisteDe from "../sprache/de/korpus/index.js";
+import korpuslisteEn from "../sprache/en/korpus/index.js";
 import { datenLaden, neuesSpiel, befehlGeben, spielstand, nachspielen, SPIELARTEN } from "../src/kern/spiel.js";
 import { spielerin } from "../src/kern/zustand.js";
 import { speicherstandText, speicherstandLesen, platzVorschau, platzFuerNeuesSpiel, zuletztGespielt, platzSpielbar, vorschauAusSpiel, ANZAHL_PLAETZE } from "../src/eingabe/speicherstand.js";
@@ -177,19 +178,21 @@ test("Spielart: Startoption mit Vorgabe normal, unbekannte wirft, Nachspielen be
   assert.throws(() => neuesSpiel(daten, 11, { spielart: "weich" }), /Unbekannte Spielart/);
 });
 
-test("Korpus: Liste passt zum Ordner, Kopf und Verse ohne Sprecher, Sätze höchstens drei Verse, ein Spruch", () => {
-  const imOrdner = readdirSync("sprache/de/korpus").filter((name) => name.endsWith(".md")).sort();
-  assert.deepEqual([...korpusliste].sort(), imOrdner);
-  const korpustexte = korpusliste.map((name) => korpustextZerlegen(name, readFileSync(`sprache/de/korpus/${name}`, "utf8")));
-  for (const korpustext of korpustexte) {
-    assert.ok(korpustext.kopf.titel, korpustext.name);
-    for (const strophe of korpustext.strophen) for (const vers of strophe) assert.doesNotMatch(vers, /^\(|"/, vers);
-  }
-  const saetze = korpustexte.flatMap((korpustext) => saetzeAus(korpustext));
-  assert.ok(saetze.length >= 20, `nur ${saetze.length} Sätze`);
-  for (const satz of saetze) {
-    assert.ok(satz.verse.length >= 1 && satz.verse.length <= 3);
-    assert.ok(!satz.verse.some((vers) => vers.includes("...")), "keine Lücken");
+test("Korpus je Sprache: Liste passt zum Ordner, Kopf und Verse ohne Sprecher, Sätze höchstens drei Verse, ein Spruch", () => {
+  for (const [code, korpusliste] of Object.entries({ de: korpuslisteDe, en: korpuslisteEn })) {
+    const imOrdner = readdirSync(`sprache/${code}/korpus`).filter((name) => name.endsWith(".md")).sort();
+    assert.deepEqual([...korpusliste].sort(), imOrdner, code);
+    const korpustexte = korpusliste.map((name) => korpustextZerlegen(name, readFileSync(`sprache/${code}/korpus/${name}`, "utf8")));
+    for (const korpustext of korpustexte) {
+      assert.ok(korpustext.kopf.titel, korpustext.name);
+      for (const strophe of korpustext.strophen) for (const vers of strophe) assert.doesNotMatch(vers, /^\(|"/, vers);
+    }
+    const saetze = korpustexte.flatMap((korpustext) => saetzeAus(korpustext));
+    assert.ok(saetze.length >= 20, `${code}: nur ${saetze.length} Sätze`);
+    for (const satz of saetze) {
+      assert.ok(satz.verse.length >= 1 && satz.verse.length <= 3);
+      assert.ok(!satz.verse.some((vers) => vers.includes("...")), "keine Lücken");
+    }
   }
   const zerlegt = korpustextZerlegen("probe.md", "---\ntitel: Probe\n---\n\n(Chor:) \"Eins, zwei,\ndrei.\"\n\nVier\nfünf,\nsechs,\nsieben,\nacht.\n");
   assert.deepEqual(zerlegt.strophen, [["Eins, zwei,", "drei."], ["Vier", "fünf,", "sechs,", "sieben,", "acht."]]);

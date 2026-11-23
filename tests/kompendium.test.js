@@ -85,3 +85,14 @@ test("Kompendium: die Textausgabe ordnet nach Gruppe und zählt die Fehler", () 
   ]);
   assert.deepEqual(zeilen, ["tiles (1)", "  wesen.x: kein Tile, nur Zeichen", "daten (1)", "  FEHLER effekte.y: schritte fehlen", "2 Lücken, davon 1 Fehler"]);
 });
+
+test("Kompendium: ein Schlüssel, der in einer Übersetzung fehlt, ist eine Lücke, beim Probeinhalt eine Warnung", () => {
+  const luecken = lueckenFinden({
+    rohdaten,
+    sprache: { texte: { ...texte, "ui.neu": "Neu" } },
+    probenamen: {},
+    probentexte: ["wesen.essigbakterium"],
+    uebersetzungen: { en: Object.fromEntries(Object.keys(texte).filter((schluessel) => schluessel !== "wesen.essigbakterium").map((schluessel) => [schluessel, texte[schluessel]])) },
+  }).filter((luecke) => luecke.gruppe === "texte" && luecke.meldung === "fehlt in en");
+  assert.deepEqual(luecken.map(({ ort, stufe }) => [ort, stufe]), [["wesen.essigbakterium", "warnung"], ["ui.neu", "fehler"]]);
+});
