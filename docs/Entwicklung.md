@@ -1,14 +1,14 @@
 # Battle Ninkasi - Entwicklung
 
-Stand: 2026-11-22
+Stand: 2026-11-23
 
-Zuständig für: `starten.py`, `starten.bat`, `tests/*`, `werkzeuge/bot.js`, `werkzeuge/messung.js`, `werkzeuge/arena.js`
+Zuständig für: `starten.py`, `starten.bat`, `tests/*`, `werkzeuge/bot.js`, `werkzeuge/messung.js`, `werkzeuge/arena.js`, `werkzeuge/kompendium.js`, `werkzeuge/kompendium.html`, `werkzeuge/luecken.js`
 
-Mitprüfen bei Änderungen: [Architektur.md](Architektur.md), [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md)
+Mitprüfen bei Änderungen: [Architektur.md](Architektur.md), [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md), [Anzeige.md](Anzeige.md), [Texte.md](Texte.md)
 
 ## Zweck
 
-Arbeitsweise am Code: Starten, Tests und Balancing, Bot und Werkzeuge, Ablauf einer Version, Stolpersteine und der Stand des Spielinhalts. Jeder Abschnitt nennt, soweit vorhanden, Daten, Schnittstellen und Regeln.
+Arbeitsweise am Code: Starten, Tests und Balancing, Bot und Werkzeuge, Kompendium, Ablauf einer Version, Stolpersteine und der Stand des Spielinhalts. Jeder Abschnitt nennt, soweit vorhanden, Daten, Schnittstellen und Regeln.
 
 ## Starten
 
@@ -67,6 +67,22 @@ Regeln:
 + Erfolg heißt die letzte Zeile `... 0 Fehler`; jeder Fehler nennt Startwert und Befehl, damit er sich mit demselben Aufruf nachstellen lässt
 + Die Zählungen am Ende (Fähigkeiten, lange Aktionen, Getränke und Würfe der Gegner, Würfe Ninkasis, Meldungen gezeigt, verborgen und gehört, Lernbefehle und Skillstufen, EP je Tiefe nach Herkunft, Erzeugen und Tiefenwahl in der Testkammer, Ausgänge und Wellen der Arenen) sind keine Prüfung, sondern ein grober Blick auf die Balance
 
+## Kompendium
+
+Werkzeug der Entwicklung: alle Inhalte aus `daten/` als Tabellen und was ihnen noch fehlt. Bestiarium, Lore, Bierrezepte und Bierwissen für die Spielerin gehören nicht hierher, sondern ins Spiel; sie nutzen dieselben Steckbriefe (siehe [Anzeige.md](Anzeige.md), Beschreibung).
+
+Schnittstellen:
+
++ `werkzeuge/kompendium.html` über den lokalen Server (`http://localhost:8000/werkzeuge/kompendium.html`): ein Reiter für die Lücken, je Art aus `ARTEN` (Wesen, Gegenstände, Gelände, Fallen, Oberflächen, Gase, Zustände, Fähigkeiten, Effekte, Skills, Eigenschaften, Fraktionen, Schadensarten, Etiketten, Populationen, Ebenen, Arenen, Taktiken) einer und einer für den Korpus; Tabellen mit Bild (Tile aus dem Satz 32, sonst das Zeichen), Name aus der Sprachdatei, den Merkmalen des Steckbriefs und den Lücken des Eintrags; sortierbar über die Kopfzeile, filterbar über alle Spalten; der gewählte Reiter steht im Anker der Adresse; die Zahl am Reiter ist gelb, wenn ein Eintrag Lücken hat
++ `node werkzeuge/kompendium.js [Art]`: ohne Art alle Lücken nach Gruppe, Rückgabewert 1 bei einer Lücke der Stufe Fehler; mit Art die Steckbriefe als Liste; exportiert `quellenLaden()` und `lueckenText(luecken)`
++ `lueckenFinden({ rohdaten, sprache, tileset?, korpus?, literatur? })` in `werkzeuge/luecken.js`: reine Funktion, Lücken als `{ gruppe, stufe, ort, meldung }`; Browser und Node laden die Quellen selbst (Korpus und Literatur dort per `fetch`, hier aus den Dateien)
+
+Regeln:
+
++ Gruppen: `daten` (jede Meldung der Datenprüfung, Stufe Fehler), `tiles` (Eintrag aus `daten/zeichen.js` ohne Tile in einem oder allen Sätzen, Tile ohne Eintrag), `verweise` (Wesen, Gegenstand, Effekt, Zustand, Fähigkeit, Falle, Oberfläche oder Gas, dessen Name sonst nirgends in den Daten steht, weder als Wert noch als Schlüssel; Vorlagen und vom Code verwendete Einträge in `VOM_CODE_VERWENDET` ausgenommen), `texte` (Textschlüssel mit dem Vorsatz eines Datenbereichs wie `wesen.`, den kein Eintrag nennt), `korpus` (Kopf unvollständig, `art` unbekannt, Quelle fehlt in `sprache/literatur.json`, Stufe Fehler)
++ Stufe Warnung für alles, was Testinhalte bis zum Abschluss von [Systemausbau.md](Systemausbau.md), Punkt 15 sein dürfen; der Spielinhalt hat keine Lücke der Stufe Fehler (geprüft von `tests/kompendium.test.js`)
++ Die Verweisprüfung ist eine Näherung: ein Name, der zufällig wie ein anderer Text in den Daten lautet, gilt als verwendet
+
 ## Ablauf einer Version
 
 1. Plan mit Empfehlungen vorlegen, Freigabe abwarten
@@ -79,7 +95,7 @@ Regeln:
 ## Stolpersteine
 
 + `gesteuerteEntitaet` oder `spielerin`: wer handelt, was sie sieht und bei sich hat, fragt `gesteuerteEntitaet`; wer lernt, weiß, stirbt und die Bilanz des Laufs fragt `spielerin` (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); `tests/gesteuert.test.js` nennt die Dateien, die nur die gesteuerte Entität fragen dürfen
-+ Komponenten ohne Zahl (`plaetze`, `tueren`, `sicht`, `angriffe`, `bewegung`, `aussehen`) nie direkt an der Entität lesen, sondern über ihre Lesefunktion (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); `tests/komponenten.test.js` meldet direkte Zugriffe, gewollte Ausnahmen (Datenprüfung, Gegenstände, Regelwerte, Vorlagen) stehen dort in einer Liste
++ Komponenten ohne Zahl (`plaetze`, `tueren`, `sicht`, `angriffe`, `bewegung`, `aussehen`) nie direkt an der Entität lesen, sondern über ihre Lesefunktion (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); `tests/komponenten.test.js` meldet direkte Zugriffe, gewollte Ausnahmen (Datenprüfung, Steckbriefe, Gegenstände, Regelwerte, Vorlagen) stehen dort in einer Liste
 + Wissen aus früheren Läufen nie in der Logik aus der Chronik holen, sondern beim Start als Startoption `optionen.vorwissen` übergeben, sonst schlägt `tests/ablage.test.js` fehl (siehe [Architektur.md](Architektur.md), Speichern)
 + Python unter Windows: `Path.write_text` schreibt CRLF; immer `newline="\n"` angeben (Repo durchgängig LF, `.gitattributes`)
 + Python-Skripte mit Umlauten als Datei ausführen, nie über die Shell-Eingabe (stdin), sonst werden die Umlaute verfälscht

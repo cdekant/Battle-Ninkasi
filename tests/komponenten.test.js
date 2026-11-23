@@ -63,6 +63,7 @@ test("angriffeVon nimmt ohne Waffe die eigenen Profile über die Lesefunktion", 
 const ZUGRIFF = /(?:\.|\?\.)(plaetze|tueren|sicht|angriffe|bewegung|aussehen)\b/g;
 const ERLAUBT = [
   /^src\/kern\/daten\.js$/, // Datenprüfung liest die Datensätze, nicht Entitäten
+  /^src\/anzeige\/beschreibung\.js$/, // Steckbriefe lesen die Datensätze, nicht Entitäten
 ];
 const ERLAUBTE_ZUGRIFFE = [
   /ausruestung\.angriffe\b/, // Profile an Gegenständen

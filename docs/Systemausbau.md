@@ -1,6 +1,6 @@
 # Battle Ninkasi - Systemausbau
 
-Stand: 2026-11-22
+Stand: 2026-11-23
 
 Mitprüfen bei Änderungen: alle Dokumente, deren Punkte hier umgesetzt werden
 
@@ -215,7 +215,7 @@ Werkzeuge:
 
 + 1. erledigt in 0.41.0: Spielart "allmächtig" mit Testkammer (siehe [Architektur.md](Architektur.md), Spielarten); offen: ein Feld zum Erzeugen über den Zielmodus wählen, Wesen und Gegenstände entfernen
 + 2. erledigt in 0.43.0: Arena als Spielart von Hand und automatisch, Werkzeug `werkzeuge/arena.js` mit Varianten, Reihen aus der Population und Wilson-Intervall (siehe [Architektur.md](Architektur.md), Spielarten und [Entwicklung.md](Entwicklung.md), Bot und Werkzeuge); offen: eigene Aufstellungen im Browser (siehe [Titelbildschirm.md](Titelbildschirm.md), Stand der Umsetzung 0.43.0), bessere Taktiken (Abstand halten, Engpass suchen), Statistiken über erzeugte Dungeons
-+ 3. Kompendium: Vorschlag, noch zu entscheiden: ein Werkzeug für die Entwicklung mit allen Daten als Tabellen und den Lücken (fehlende Tiles, Texte, Grammatik); der Textkorpus als eigener Teil desselben Werkzeugs oder als eigenes Werkzeug (Abdeckung der Texte je Eintrag, siehe [Texte.md](Texte.md)); Bestiarium, Glossar und Lore des Laufs dagegen nicht im Werkzeug, sondern im Spiel für die Spielerin, aus Chronik und Spielstand (siehe [Ausblick.md](Ausblick.md), Bestiarium, Glossar, Rezeptbuch); beide nutzen dieselben Beschreibungsfunktionen, damit Werkzeug und Spiel dasselbe zeigen
++ 3. erledigt in 0.44.0: Kompendium als Werkzeug im Browser und in Node mit allen Daten als Tabellen und den Lücken (Datenprüfung, Tiles, Verweise, Texte, Korpus), dazu Steckbriefe als gemeinsame Beschreibungsfunktionen (siehe [Entwicklung.md](Entwicklung.md), Kompendium und [Anzeige.md](Anzeige.md), Beschreibung); offen: Abdeckung der Texte je Eintrag (siehe [Texte.md](Texte.md), Offen), Bestiarium, Lore, Bierrezepte und Bierwissen im Spiel aus Chronik und Spielstand mit denselben Steckbriefen (siehe [Ausblick.md](Ausblick.md), Bestiarium, Glossar, Rezeptbuch)
 
 Schutz:
 

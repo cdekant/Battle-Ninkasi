@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ninkasi Kompendium</title>
+<style>
+  /* Werkbank im Keller wie grafik/vorschau.html: dunkle Fläche, Daten in Monospace, Pixel ungeglättet */
+  :root {
+    --grund: #0f0b0c;
+    --flaeche: #1a1415;
+    --linie: #3a2f2c;
+    --text: #e8dcc8;
+    --leise: #a8988a;
+    --akzent: #f0b84a;
+    --warnung: #d9a441;
+    --fehler: #e0473f;
+    --schrift-titel: "Palatino Linotype", Georgia, serif;
+    --schrift-text: "Segoe UI", system-ui, sans-serif;
+    --schrift-daten: Consolas, ui-monospace, monospace;
+    color-scheme: dark;
+  }
+  html { background: var(--grund); }
+  body { background: var(--grund); color: var(--text); font: 14px/1.5 var(--schrift-text); margin: 0; padding: 24px 16px 64px; }
+  main { max-width: 1400px; margin: 0 auto; display: grid; gap: 20px; }
+  header { display: grid; gap: 4px; }
+  h1 { font: 400 2rem/1.2 var(--schrift-titel); color: var(--akzent); margin: 0; }
+  p { margin: 0; color: var(--leise); max-width: 75ch; }
+  .etikett { font: 600 0.72rem/1 var(--schrift-daten); letter-spacing: 0.08em; text-transform: uppercase; color: var(--leise); }
+  nav { display: flex; flex-wrap: wrap; gap: 6px; }
+  nav button, .werkzeugleiste input {
+    font: 600 0.82rem/1 var(--schrift-daten); background: var(--flaeche); color: var(--text);
+    border: 1px solid var(--linie); border-radius: 4px; padding: 7px 10px;
+  }
+  nav button { cursor: pointer; }
+  nav button[aria-pressed="true"] { border-color: var(--akzent); color: var(--akzent); }
+  nav button .zahl { color: var(--leise); font-weight: 400; margin-left: 4px; }
+  nav button .zahl.mit-luecken { color: var(--warnung); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
+  .werkzeugleiste { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .werkzeugleiste input { min-width: 16rem; font-weight: 400; }
+  .buehne { overflow-x: auto; border: 1px solid var(--linie); border-radius: 4px; }
+  table { border-collapse: collapse; width: 100%; font: 0.82rem/1.4 var(--schrift-daten); }
+  th, td { text-align: left; vertical-align: top; padding: 6px 10px; border-bottom: 1px solid var(--linie); }
+  th { position: sticky; top: 0; background: var(--flaeche); color: var(--leise); font-weight: 600; cursor: pointer; white-space: nowrap; user-select: none; }
+  th[aria-sort="ascending"]::after { content: " ▲"; color: var(--akzent); }
+  th[aria-sort="descending"]::after { content: " ▼"; color: var(--akzent); }
+  td.name { font-weight: 600; white-space: nowrap; }
+  td .anzeigename { display: block; font-weight: 400; color: var(--leise); }
+  td .vorlage { color: var(--leise); font-weight: 400; }
+  td ul { margin: 0; padding: 0; list-style: none; }
+  td.json { color: var(--leise); max-width: 40ch; overflow-wrap: anywhere; }
+  tr.mit-luecken td.name { box-shadow: inset 3px 0 0 var(--warnung); }
+  tr.mit-fehler td.name { box-shadow: inset 3px 0 0 var(--fehler); }
+  .bild { width: 32px; height: 32px; display: grid; place-items: center; font: 700 1.3rem/1 var(--schrift-daten); border-radius: 2px; }
+  canvas { image-rendering: pixelated; display: block; }
+  .stufe-fehler { color: var(--fehler); font-weight: 600; }
+  .stufe-warnung { color: var(--warnung); }
+  .luecken-im-eintrag { color: var(--warnung); }
+  #fehler { color: var(--fehler); font-family: var(--schrift-daten); white-space: pre-wrap; }
+  .vers { margin: 0; color: var(--text); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="etikett">Battle Ninkasi · Werkzeug der Entwicklung</span>
+    <h1>Kompendium</h1>
+    <p>Alle Inhalte aus <code>daten/</code> als Tabellen und was ihnen noch fehlt. Gelesen aus denselben Dateien wie das Spiel; dieselben Lücken gibt <code>node werkzeuge/kompendium.js</code> aus.</p>
+    <p id="fehler" hidden></p>
+  </header>
+  <nav id="reiter" aria-label="Bereiche"></nav>
+  <div class="werkzeugleiste">
+    <input id="filter" type="search" placeholder="Filtern …" aria-label="Zeilen filtern">
+    <span id="anzahl" class="etikett"></span>
+  </div>
+  <div class="buehne" id="inhalt"></div>
+</main>
+
+<script type="module">
+  import rohdaten from "../daten/index.js";
+  import texte from "../sprache/de/texte.js";
+  import grammatik from "../sprache/de/grammatik.js";
+  import korpusliste from "../sprache/de/korpus/index.js";
+  import tileset from "../grafik/tileset.js";
+  import { vorbereiten } from "../src/kern/daten.js";
+  import { erstelleGrammatik } from "../src/anzeige/grammatik.js";
+  import { erstelleTexte } from "../src/anzeige/texte.js";
+  import { korpustextZerlegen } from "../src/anzeige/korpus.js";
+  import { pixelZuRgba } from "../src/anzeige/tilebilder.js";
+  import { ARTEN, eintragsnamen, steckbrief } from "../src/anzeige/beschreibung.js";
+  import { lueckenFinden } from "./luecken.js";
+
+  // Quellen wie werkzeuge/kompendium.js, Korpus und Literatur per fetch
+  const sprachregeln = erstelleGrammatik(grammatik);
+  const sprache = { texte, nomenPruefen: sprachregeln.pruefen };
+  const textzugriff = erstelleTexte(texte, sprachregeln);
+  const korpus = await Promise.all(korpusliste.map(async (datei) => korpustextZerlegen(datei, await (await fetch(`../sprache/de/korpus/${datei}`)).text())));
+  const literatur = await (await fetch("../sprache/literatur.json")).json();
+  const { daten, fehler } = vorbereiten(rohdaten, sprache);
+  const luecken = lueckenFinden({ rohdaten, sprache, tileset, korpus, literatur });
+  if (fehler.length) {
+    const anzeige = document.getElementById("fehler");
+    anzeige.textContent = `Die Datenprüfung meldet ${fehler.length} Fehler, siehe Reiter Lücken.`;
+    anzeige.hidden = false;
+  }
+
+  // Lücken je Eintrag: Ort "art.name" oder "art.name.feld…"; Tiles und Verweise nennen die Art wie ARTEN
+  function lueckenVon(art, name) {
+    const anfang = `${art === "oberflaechen" || art === "gase" ? "schichten" : art}.${name}`;
+    const auchAls = `${art}.${name}`;
+    return luecken.filter(({ ort }) => [anfang, auchAls].some((vorne) => ort === vorne || ort.startsWith(vorne + ".") || ort.startsWith(vorne + "[")));
+  }
+
+  function element(name, eigenschaften = {}, ...kinder) {
+    const knoten = Object.assign(document.createElement(name), eigenschaften);
+    for (const kind of kinder) if (kind !== null && kind !== undefined) knoten.append(kind);
+    return knoten;
+  }
+
+  // Bild eines Eintrags: Tile aus dem größten Satz bis 32 px, sonst das Zeichen in seinen Farben
+  const satzFuerTabelle = Math.max(...Object.keys(tileset.saetze).map(Number).filter((groesse) => groesse <= 32));
+  function bildVon(name, zeichen) {
+    const tile = tileset.saetze[satzFuerTabelle]?.[name];
+    if (tile) {
+      const leinwand = element("canvas", { width: tile.groesse, height: tile.groesse });
+      leinwand.getContext("2d").putImageData(new ImageData(pixelZuRgba(tile, tileset.palette), tile.groesse, tile.groesse), 0, 0);
+      return leinwand;
+    }
+    if (!zeichen) return null;
+    const feld = element("div", { className: "bild", textContent: zeichen.zeichen ?? "" });
+    feld.style.color = zeichen.farbe;
+    feld.style.background = zeichen.hintergrund ?? (zeichen.zeichen ? "transparent" : zeichen.farbe);
+    return feld;
+  }
+
+  function anzeigenameVon(brief) {
+    if (!brief.text || !textzugriff.hatSchluessel(brief.text)) return "";
+    return textzugriff.nomenForm({ text: brief.text }, "nom", "ohne");
+  }
+
+  // Zelle eines Merkmals: Listen untereinander, JSON gedämpft
+  function zelle(wert) {
+    if (wert === undefined) return element("td");
+    if (Array.isArray(wert)) return element("td", {}, element("ul", {}, ...wert.map((teil) => element("li", { textContent: teil }))));
+    const text = String(wert);
+    return element("td", { className: /^[[{]/.test(text) ? "json" : "", textContent: text });
+  }
+
+  // Sortierbare Tabelle: spalten [{ titel, wert(zeile) → Text oder Zahl zum Sortieren, zelle(zeile) → td }]
+  let sortierung = { spalte: 0, aufsteigend: true };
+  function tabelle(spalten, zeilen, zeilenklasse = () => "") {
+    const filter = document.getElementById("filter").value.trim().toLowerCase();
+    const sichtbar = zeilen.filter((zeile) => !filter || spalten.some((spalte) => String(spalte.wert(zeile) ?? "").toLowerCase().includes(filter)));
+    const { spalte, aufsteigend } = sortierung;
+    if (spalten[spalte]) {
+      sichtbar.sort((a, b) => {
+        const links = spalten[spalte].wert(a) ?? "", rechts = spalten[spalte].wert(b) ?? "";
+        const vergleich = typeof links === "number" && typeof rechts === "number" ? links - rechts : String(links).localeCompare(String(rechts), "de");
+        return aufsteigend ? vergleich : -vergleich;
+      });
+    }
+    document.getElementById("anzahl").textContent = `${sichtbar.length} von ${zeilen.length} Zeilen`;
+    const kopf = element("tr", {}, ...spalten.map((eintrag, nummer) => {
+      const th = element("th", { textContent: eintrag.titel, tabIndex: 0, scope: "col" });
+      if (nummer === spalte) th.setAttribute("aria-sort", aufsteigend ? "ascending" : "descending");
+      const umsortieren = () => {
+        sortierung = { spalte: nummer, aufsteigend: nummer === spalte ? !aufsteigend : true };
+        zeigen();
+      };
+      th.addEventListener("click", umsortieren);
+      th.addEventListener("keydown", (ereignis) => { if (ereignis.key === "Enter") umsortieren(); });
+      return th;
+    }));
+    return element("table", {}, element("thead", {}, kopf), element("tbody", {}, ...sichtbar.map((zeile) => {
+      const tr = element("tr", { className: zeilenklasse(zeile) }, ...spalten.map((eintrag) => eintrag.zelle(zeile)));
+      return tr;
+    })));
+  }
+
+  const listenwert = (wert) => (Array.isArray(wert) ? wert.join(" ") : wert);
+
+  function artAnzeigen(art) {
+    const briefe = eintragsnamen(daten, art).map((name) => ({ ...steckbrief(daten, art, name), luecken: lueckenVon(art, name) }));
+    const felder = [...new Set(briefe.flatMap((brief) => Object.keys(brief.merkmale)))];
+    const spalten = [
+      { titel: "Name", wert: (brief) => brief.name, zelle: (brief) => element("td", { className: "name" },
+        brief.name, brief.abstrakt ? element("span", { className: "vorlage", textContent: " Vorlage" }) : null,
+        element("span", { className: "anzeigename", textContent: anzeigenameVon(brief) })) },
+      ...(ARTEN[art].zeichen ? [{ titel: "Bild", wert: (brief) => brief.zeichen?.zeichen ?? "", zelle: (brief) => element("td", {}, bildVon(brief.name, brief.zeichen)) }] : []),
+      ...felder.map((feld) => ({ titel: feld, wert: (brief) => listenwert(brief.merkmale[feld]), zelle: (brief) => zelle(brief.merkmale[feld]) })),
+      { titel: "Lücken", wert: (brief) => brief.luecken.length, zelle: (brief) => element("td", { className: "luecken-im-eintrag" },
+        element("ul", {}, ...brief.luecken.map((luecke) => element("li", { className: `stufe-${luecke.stufe}`, textContent: luecke.meldung })))) },
+    ];
+    return tabelle(spalten, briefe, (brief) => (brief.luecken.some((luecke) => luecke.stufe === "fehler") ? "mit-fehler" : brief.luecken.length ? "mit-luecken" : ""));
+  }
+
+  function lueckenAnzeigen() {
+    const spalten = ["gruppe", "stufe", "ort", "meldung"].map((feld) => ({
+      titel: feld,
+      wert: (luecke) => luecke[feld],
+      zelle: (luecke) => element("td", { className: feld === "stufe" ? `stufe-${luecke.stufe}` : "", textContent: luecke[feld] }),
+    }));
+    return tabelle(spalten, luecken);
+  }
+
+  function korpusAnzeigen() {
+    const spalten = [
+      { titel: "Datei", wert: (text) => text.name, zelle: (text) => element("td", { className: "name", textContent: text.name }) },
+      ...["titel", "art", "quelle", "lizenz"].map((feld) => ({ titel: feld, wert: (text) => text.kopf[feld], zelle: (text) => zelle(text.kopf[feld]) })),
+      { titel: "Strophen", wert: (text) => text.strophen.length, zelle: (text) => zelle(text.strophen.length) },
+      { titel: "Verse", wert: (text) => text.strophen.flat().length, zelle: (text) => zelle(text.strophen.flat().length) },
+      { titel: "Anfang", wert: (text) => text.strophen[0]?.[0], zelle: (text) => element("td", {}, ...(text.strophen[0] ?? []).slice(0, 2).map((vers) => element("p", { className: "vers", textContent: vers }))) },
+      { titel: "Lücken", wert: (text) => lueckenVon("korpus", text.name).length, zelle: (text) => element("td", {},
+        element("ul", {}, ...lueckenVon("korpus", text.name).map((luecke) => element("li", { className: `stufe-${luecke.stufe}`, textContent: luecke.meldung })))) },
+    ];
+    return tabelle(spalten, korpus);
+  }
+
+  // Reiter: Lücken, jede Art, Korpus; der gewählte steht im Anker der Adresse
+  const reiter = [
+    { name: "luecken", titel: "Lücken", anzahl: luecken.length, mitLuecken: luecken.length > 0, zeigen: lueckenAnzeigen },
+    ...Object.keys(ARTEN).map((art) => ({
+      name: art, titel: art, anzahl: eintragsnamen(daten, art).length,
+      mitLuecken: eintragsnamen(daten, art).some((name) => lueckenVon(art, name).length), zeigen: () => artAnzeigen(art),
+    })),
+    { name: "korpus", titel: "korpus", anzahl: korpus.length, mitLuecken: luecken.some((luecke) => luecke.gruppe === "korpus"), zeigen: korpusAnzeigen },
+  ];
+  let gewaehlt = reiter.find((eintrag) => `#${eintrag.name}` === location.hash) ?? reiter[0];
+
+  function zeigen() {
+    for (const knopf of document.querySelectorAll("#reiter button")) knopf.setAttribute("aria-pressed", String(knopf.dataset.name === gewaehlt.name));
+    document.getElementById("inhalt").replaceChildren(gewaehlt.zeigen());
+  }
+
+  document.getElementById("reiter").append(...reiter.map((eintrag) => {
+    const knopf = element("button", { type: "button" }, eintrag.titel, element("span", { className: `zahl${eintrag.mitLuecken ? " mit-luecken" : ""}`, textContent: eintrag.anzahl }));
+    knopf.dataset.name = eintrag.name;
+    knopf.addEventListener("click", () => {
+      gewaehlt = eintrag;
+      sortierung = { spalte: 0, aufsteigend: true };
+      history.replaceState(null, "", `#${eintrag.name}`);
+      zeigen();
+    });
+    return knopf;
+  }));
+  document.getElementById("filter").addEventListener("input", zeigen);
+  zeigen();
+</script>
+</body>
+</html>

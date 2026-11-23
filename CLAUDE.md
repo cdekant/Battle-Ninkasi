@@ -37,7 +37,7 @@ Taste → `eingabe/eingabe.js` (Belegung → Aktion aus dem Aktionskatalog) → 
 + `src/anzeige/`: Renderer, Tilebilder, Kamera, Seitenleiste, Log, Fensterinhalte, Titel, Texte und Grammatik, `stil.css`
 + `daten/`: Inhalte als JS-Daten, gesammelt in `daten/index.js`; Regelwerte für das Balancing in `daten/regeln.js`
 + `sprache/`: Texte, Grammatik und Korpus je Sprache; `grafik/`: Palette und Tiles als Pixeldaten; `lib/`: rot.js mit Lizenz
-+ `tests/`: Unittests, `tests/hilfen.js` baut kleine Testspiele; `werkzeuge/`: Bot, Messung, Arena-Simulation, Ableiten der Tiles
++ `tests/`: Unittests, `tests/hilfen.js` baut kleine Testspiele; `werkzeuge/`: Bot, Messung, Arena-Simulation, Kompendium mit Lücken, Ableiten der Tiles
 + `Artwork/`: Konzeptbilder (siehe unten)
 
 ## Grundbegriffe

@@ -1,10 +1,10 @@
 # Battle Ninkasi - Anzeige
 
-Stand: 2026-11-22
+Stand: 2026-11-23
 
-Zuständig für: `src/anzeige/renderer.js`, `src/anzeige/kamera.js`, `src/anzeige/oberflaeche.js`, `src/anzeige/log.js`, `src/anzeige/logzeilen.js`, `src/anzeige/ankuendigungen.js`, `src/anzeige/animation.js`, `src/anzeige/pegelanzeige.js`, `src/anzeige/minikarte.js`, `src/anzeige/bedienzeile.js`, `src/anzeige/stil.css`, `src/systeme/wahrnehmbar.js`
+Zuständig für: `src/anzeige/renderer.js`, `src/anzeige/kamera.js`, `src/anzeige/oberflaeche.js`, `src/anzeige/log.js`, `src/anzeige/logzeilen.js`, `src/anzeige/ankuendigungen.js`, `src/anzeige/animation.js`, `src/anzeige/pegelanzeige.js`, `src/anzeige/minikarte.js`, `src/anzeige/bedienzeile.js`, `src/anzeige/beschreibung.js`, `src/anzeige/stil.css`, `src/systeme/wahrnehmbar.js`
 
-Mitprüfen bei Änderungen: [Bedienung.md](Bedienung.md), [Oberflaeche.md](Oberflaeche.md), [Tileset.md](Tileset.md), [Animationen.md](Animationen.md), [Texte.md](Texte.md), [Welt.md](Welt.md)
+Mitprüfen bei Änderungen: [Bedienung.md](Bedienung.md), [Oberflaeche.md](Oberflaeche.md), [Tileset.md](Tileset.md), [Animationen.md](Animationen.md), [Texte.md](Texte.md), [Welt.md](Welt.md), [Entwicklung.md](Entwicklung.md)
 
 ## Zweck
 
@@ -103,9 +103,20 @@ Regeln:
 + Zahlen im Kampf: Trefferchance (die Logik meldet `trefferchance` an `schaden` und `verfehlt`, in Prozent vor dem Blocken; ohne Trefferwurf `null`), Schaden, Krit-Faktor (`kritfaktor` an `schaden`, sonst `null`), Abzug der Rüstung, Widerstand (siehe [Wesen.md](Wesen.md), Kampfwerte)
 + Der Verlauf (Tab) zeigt das ganze Log als Fenster mit Filter nach Spalte oder Art (siehe [Bedienung.md](Bedienung.md), Fenster)
 
+## Beschreibung
+
+Steckbriefe der Inhalte als Daten (`src/anzeige/beschreibung.js`), ohne DOM und ohne Texte der Sprache; erster Nutzer ist das Kompendium (siehe [Entwicklung.md](Entwicklung.md), Kompendium), später Bestiarium, Lore, Bierrezepte und Bierwissen im Spiel (Ideen in [Ausblick.md](Ausblick.md), Bestiarium, Glossar, Rezeptbuch), damit Werkzeug und Spiel dasselbe zeigen. Der Unterschied zum Untersuchen: ein Steckbrief beschreibt den Eintrag in den Daten, das Untersuchen ein Wesen im laufenden Spiel (siehe [Bedienung.md](Bedienung.md), Untersuchen).
+
+Schnittstellen:
+
++ `ARTEN`: Art der Inhalte zu `{ eintraege(daten), zeichen? }`, also wo die Einträge liegen und unter welchem Bereich von `daten/zeichen.js` ihr Bild steht; eine neue Datenart bekommt hier eine Zeile
++ `eintragsnamen(daten, art)`, `steckbrief(daten, art, name)`: `{ art, name, text, abstrakt, zeichen, merkmale }` aus vorbereiteten Daten (Vorlagen aufgelöst), `null` für einen unbekannten Namen; `text` ist der Textschlüssel des Namens, die Anzeige setzt ihn mit `nomenForm` ein
++ Merkmale: `{ feld: wert }` mit Zahl, Text, Wahrheitswert oder Liste von Texten; Wesen (Fraktion, Werte, EP, Angriffe, Fähigkeiten, Kampfwerte, Widerstände, Immunität, Sicht, Bewegung, Verhalten, Ausstattung, Tags, Vorkommen), Gegenstände (Gewicht, Platz, Angriffe, Modifikatoren, Trinken, Wurf, Zweck, Stapel, Ladungen, Haltbarkeit, wird zu, Verderben, Tags) und Effekte (Schritte) eigens, alle übrigen Arten mit allen Feldern, Verschachteltes als kurzes JSON; leere Merkmale fehlen
++ Kurzformen: `angriffKurz` ("biss 70 % → biss_klein", Kosten nur abweichend von 100), `modifikatorKurz` ("ruestung +2", "regeneration.lp +20 %", Bedingungen in Klammern), `schrittKurz` ("schaden art=saeure wuerfel=1W4"), `vorkommenVon(daten, typ)` (Populationen mit Tiefe wie "keller 1–3", Arenen als "arena name")
+
 ## Tests
 
-+ `tests/oberflaeche.test.js` (Seite, Logzeilen, Log, Anzeige von Menü, Seitenleiste und Bedienzeile, Minikarte), `tests/pegelanzeige.test.js`, `tests/untersuchen.test.js` (Wahrnehmbarkeit der Meldungen), `tests/tilebilder.test.js` und `tests/tiles-ableiten.test.js` (siehe [Tileset.md](Tileset.md))
++ `tests/oberflaeche.test.js` (Seite, Logzeilen, Log, Anzeige von Menü, Seitenleiste und Bedienzeile, Minikarte), `tests/pegelanzeige.test.js`, `tests/untersuchen.test.js` (Wahrnehmbarkeit der Meldungen), `tests/tilebilder.test.js` und `tests/tiles-ableiten.test.js` (siehe [Tileset.md](Tileset.md)), `tests/kompendium.test.js` (Steckbriefe und Lücken)
 
 ## Verweise
 

@@ -1,10 +1,10 @@
 # Battle Ninkasi - Texte und Textkorpus
 
-Stand: 2026-11-19
+Stand: 2026-11-23
 
 Zuständig für: `sprache/*`, `src/anzeige/texte.js`, `src/anzeige/grammatik.js`, `src/anzeige/korpus.js`
 
-Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Architektur.md](Architektur.md)
+Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Architektur.md](Architektur.md), [Entwicklung.md](Entwicklung.md)
 
 Grobskizze, auszuarbeiten.
 
@@ -66,7 +66,8 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 ## Offen
 
 + Korpustexte noch nicht an Spielinhalte gekoppelt (Brauschritte, Fundstücke); seit 0.32.0 liest das Spiel sie zur Laufzeit (`sprache/de/korpus/index.js` als Liste der Dateien, `src/anzeige/korpus.js` zerlegt in Kopf, Strophen und Sätze) und zeigt einen Satz als Spruch im Titel; ein neuer Korpustext braucht seine Zeile in der Liste
-+ Laden von `sprache/literatur.json` im Spiel (`fetch` oder `import … with { type: "json" }`) und Prüfung unbekannter Quellenschlüssel
++ Laden von `sprache/literatur.json` im Spiel (`fetch` oder `import … with { type: "json" }`); den Kopf der Korpustexte und ihre Quellenschlüssel prüft seit 0.44.0 das Kompendium (siehe [Entwicklung.md](Entwicklung.md), Kompendium)
++ Abdeckung der Texte je Eintrag (welcher Gegner, welches Getränk hat Beschreibung, Fundtext, Zitat), sobald Korpus und Inhalte gekoppelt sind; als Reiter des Kompendiums
 + Wo erzeugte Texte vorkommen: Bücher, Schriftrollen, Inschriften, HACCP-Aushänge, Händlergerede
 + Mehrzahl und Adjektive im Detail
 + Anrede in Oberflächentexten: die Hilfe zur Charaktererstellung spricht die Spielerin mit "du" an und sagt "Run", die übrigen Texte sprechen über Ninkasi in der dritten Person und sagen "Lauf"; einheitlich festlegen
