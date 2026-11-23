@@ -4,11 +4,14 @@
 // Aufruf: node werkzeuge/kompendium.js [Art]
 //   ohne Art: alle Lücken nach Gruppe; Rückgabewert 1, wenn eine Lücke der Stufe "fehler" dabei ist
 //   mit Art (wesen, gegenstaende, effekte …): die Steckbriefe dieser Art
+//   woerterbuch [de|en]: das Glossar als Wörterbuch, nach der genannten Sprache sortiert (Vorgabe de)
 
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { rohdaten, texte as texteJeSprache, texteDe as texte, probenamen, probentexte } from "../src/inhalt.js";
 import grammatik from "../sprache/de/grammatik.js";
+import grammatikEn from "../sprache/en/grammatik.js";
+import { woerterbuch } from "../src/anzeige/glossar.js";
 import korpuslisteDe from "../sprache/de/korpus/index.js";
 import korpuslisteEn from "../sprache/en/korpus/index.js";
 import tileset from "../grafik/tileset.js";
@@ -57,10 +60,21 @@ function steckbriefeText(daten, art) {
   return zeilen;
 }
 
+// Wörterbuch als Textzeilen: Begriff, Übersetzung und Erklärung in der Sprache der Sortierung
+export function woerterbuchText(sprache = "de") {
+  const deutsch = erstelleTexte(texte, erstelleGrammatik(grammatik));
+  const englisch = erstelleTexte(texteJeSprache.en, erstelleGrammatik(grammatikEn), { texte, grammatik: erstelleGrammatik(grammatik) });
+  const andere = sprache === "de" ? "en" : "de";
+  const zugriffe = sprache === "de" ? { de: deutsch, en: englisch } : { en: englisch, de: deutsch };
+  return woerterbuch(rohdaten.glossar, zugriffe).map((zeile) => `${zeile[sprache].begriff} (${zeile[andere].begriff}), ${zeile[sprache].gebiet}: ${zeile[sprache].erklaerung}`);
+}
+
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const quellen = quellenLaden();
   const art = process.argv[2];
-  if (art) {
+  if (art === "woerterbuch") {
+    console.log(woerterbuchText(process.argv[3] === "en" ? "en" : "de").join("\n"));
+  } else if (art) {
     if (!ARTEN[art]) {
       console.log(`Art "${art}" gibt es nicht: ${Object.keys(ARTEN).join(", ")}`);
       process.exit(1);

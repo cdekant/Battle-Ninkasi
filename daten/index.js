@@ -13,6 +13,7 @@ import fraktionen from "./fraktionen.js";
 import schichten from "./schichten.js";
 import eigenschaften from "./eigenschaften.js";
 import taktiken from "./taktiken.js";
+import glossar from "./glossar.js";
 
 export default {
   wesen: { ...ninkasi },
@@ -34,6 +35,7 @@ export default {
   skills: {},
   arenen: {},
   taktiken,
+  glossar,
   // Tiefen von oben nach unten: 0 ist der Hub, das Spiel beginnt in starttiefe; der Plan des Laufs übernimmt sie (src/welt/plan.js)
   abfolge: ["hub"],
   starttiefe: 0,

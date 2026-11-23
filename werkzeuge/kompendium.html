@@ -80,6 +80,8 @@
 <script type="module">
   import { rohdaten, texte as texteJeSprache, texteDe as texte, probenamen, probentexte } from "../src/inhalt.js";
   import grammatik from "../sprache/de/grammatik.js";
+  import grammatikEn from "../sprache/en/grammatik.js";
+  import { woerterbuch } from "../src/anzeige/glossar.js";
   import korpuslisteDe from "../sprache/de/korpus/index.js";
   import korpuslisteEn from "../sprache/en/korpus/index.js";
   import tileset from "../grafik/tileset.js";
@@ -95,6 +97,8 @@
   const sprachregeln = erstelleGrammatik(grammatik);
   const sprache = { texte, nomenPruefen: sprachregeln.pruefen };
   const textzugriff = erstelleTexte(texte, sprachregeln);
+  const textzugriffEn = erstelleTexte(texteJeSprache.en, erstelleGrammatik(grammatikEn), { texte, grammatik: sprachregeln });
+  const woerter = woerterbuch(rohdaten.glossar, { de: textzugriff, en: textzugriffEn });
   const korpusdateien = Object.entries({ de: korpuslisteDe, en: korpuslisteEn }).flatMap(([code, liste]) => liste.map((datei) => `${code}/${datei}`));
   const korpus = await Promise.all(korpusdateien.map(async (datei) => korpustextZerlegen(datei, await (await fetch(`../sprache/${datei.replace("/", "/korpus/")}`)).text())));
   const literatur = await (await fetch("../sprache/literatur.json")).json();
@@ -222,7 +226,20 @@
     return tabelle(spalten, korpus);
   }
 
-  // Reiter: Lücken, jede Art, Korpus; der gewählte steht im Anker der Adresse
+  // Wörterbuch aus dem Glossar (src/anzeige/glossar.js): sortierbar nach Deutsch oder Englisch, also de-en und en-de
+  function woerterbuchAnzeigen() {
+    const spalte = (titel, wert, klasse = "") => ({ titel, wert, zelle: (zeile) => element("td", { className: klasse, textContent: wert(zeile) }) });
+    const spalten = [
+      spalte("Deutsch", (zeile) => zeile.de.begriff, "name"),
+      spalte("English", (zeile) => zeile.en.begriff, "name"),
+      spalte("Gebiet", (zeile) => zeile.de.gebiet),
+      spalte("Erklärung", (zeile) => zeile.de.erklaerung),
+      spalte("Explanation", (zeile) => zeile.en.erklaerung),
+    ];
+    return tabelle(spalten, woerter);
+  }
+
+  // Reiter: Lücken, jede Art, Korpus, Wörterbuch; der gewählte steht im Anker der Adresse
   const reiter = [
     { name: "luecken", titel: "Lücken", anzahl: luecken.length, mitLuecken: luecken.length > 0, zeigen: lueckenAnzeigen },
     ...Object.keys(ARTEN).map((art) => ({
@@ -230,6 +247,7 @@
       mitLuecken: eintragsnamen(daten, art).some((name) => lueckenVon(art, name).length), zeigen: () => artAnzeigen(art),
     })),
     { name: "korpus", titel: "korpus", anzahl: korpus.length, mitLuecken: luecken.some((luecke) => luecke.gruppe === "korpus"), zeigen: korpusAnzeigen },
+    { name: "woerterbuch", titel: "wörterbuch", anzahl: woerter.length, mitLuecken: false, zeigen: woerterbuchAnzeigen },
   ];
   let gewaehlt = reiter.find((eintrag) => `#${eintrag.name}` === location.hash) ?? reiter[0];
 

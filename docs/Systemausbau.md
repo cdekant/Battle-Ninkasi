@@ -16,12 +16,11 @@ Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und wäh
 
 Stand 2026-11-23, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer Wirkung auf den Inhalt, das Kleine und Breite zuerst:
 
-1. Englisch, Mehrzahl und Glossar (Punkt 9)
-2. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
-3. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
-4. Danach der Inhalt (Punkt 14)
+1. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
+2. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
+3. Danach der Inhalt (Punkt 14)
 
-Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 3 (Licht, Wahrnehmungsarten, Spüren und Duft), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
+Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 3 (Licht, Wahrnehmungsarten, Spüren und Duft), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen), Punkt 9 (Englisch, Mehrzahl und Glossar) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
 
 Die Proben des Probedurchstichs stehen in `tests/probedurchstich.test.js`; jede Lücke dort ist ein Test mit `todo` und dem Punkt, der sie schließt, mit einem Entwurf der Daten (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing). Wer einen Punkt umsetzt, nimmt dort das `todo` weg.
 
@@ -49,12 +48,6 @@ Status: offen, jeweils mit dem ersten Bedarf
 + Gewichtung `anteil` der gebundenen EP zum Vergleich mit `erste`; Ortsbindung des Verteilens (`regeln.lernen.ort`), falls gewünscht
 + Leistung, wenn viele Wesen zugleich jagen (etwa nach Teilungen um Ninkasi): 389 Wesen etwa 12 ms je Befehl gegen das Ziel 2 ms für 300 (siehe [Entwicklung.md](Entwicklung.md), Messwerte); mit dem ersten Inhalt, der so viele Teilende bringt, Zielwahl der Handlungen und Umkreissuche verbessern, dazu einen Zähler je Typ für `anzahl_unter`
 
-## 9. Englisch, Mehrzahl und Glossar
-
-Status: in Arbeit; erledigt sind 9a (Grammatik mit Mehrzahl und Adjektiven, englische Grammatik, Sprachwahl, Prüfung der Sprachdateien, Anrede, siehe [Texte.md](Texte.md), Grammatik) und 9b (englische Texte und Korpus, siehe [Texte.md](Texte.md), Sprachdateien); jeder neue Text entsteht ab jetzt in beiden Sprachen
-
-+ 9c, Glossar der Fachbegriffe des Brauens als Daten (`daten/glossar.js` mit Textschlüsseln, Begriff und Erklärung in beiden Sprachdateien), etwa 40 Kernbegriffe; daraus ein Wörterbuch de-en und en-de als Reiter des Kompendiums, später das Glossar im Spiel (siehe [Ausblick.md](Ausblick.md), Bestiarium, Glossar, Rezeptbuch)
-
 ## 10. Spieldesign vor dem Inhalt
 
 Status: offen; jeweils zuerst in [Grundlagen.md](Grundlagen.md) oder [Charakter.md](Charakter.md) entscheiden, mit Recherche bei anderen Spielen
@@ -80,6 +73,7 @@ Status: offen
 + Testkammer: ein Feld zum Erzeugen über den Zielmodus wählen, Wesen und Gegenstände entfernen (siehe [Architektur.md](Architektur.md), Spielarten)
 + Arena: eigene Aufstellungen im Browser (siehe [Titelbildschirm.md](Titelbildschirm.md), Ideen für später), bessere Taktiken (Abstand halten, Engpass suchen), Statistiken über erzeugte Dungeons (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing)
 + Kompendium: Abdeckung der Texte je Eintrag (siehe [Texte.md](Texte.md), Offen)
++ Skill für Begriffe des Glossars: legt einen Begriff an allen drei Stellen an (`daten/glossar.js`, beide Sprachdateien), mit Prüfung von Name und Gebiet und dem Test des Glossars; die Texte schreibt die Nutzerin bzw. der Nutzer, der Skill entwirft nur auf Zuruf (siehe [Texte.md](Texte.md), Glossar)
 + Schutz der Ablagen: die gesammelten Kandidaten, darunter eine Prüfsumme des Codes im Spielstand, damit auch eine Codeänderung ohne neue Version alte Stände ungültig macht (siehe [Ausblick.md](Ausblick.md), Schutz der Ablagen)
 + Messung der Leistung mit dem heutigen Stand wiederholen (siehe [Architektur.md](Architektur.md), Leistung)
 

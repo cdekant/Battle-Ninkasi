@@ -1051,6 +1051,22 @@ function pruefeZustand(daten, sprache, name, zustand, fehler) {
   if (zustand.faehigkeiten !== undefined) pruefeFaehigkeitsliste(daten, zustand.faehigkeiten, ort, fehler);
 }
 
+// Glossar (daten/glossar.js): je Begriff ein Gebiet und ein Text, dazu <text>.erklaerung und glossargebiet.<gebiet>
+function pruefeGlossar(daten, sprache, fehler) {
+  if (daten.glossar === undefined) return;
+  if (!istObjekt(daten.glossar)) return fehler.push("glossar: muss ein Objekt sein");
+  for (const [name, eintrag] of Object.entries(daten.glossar)) {
+    const ort = `glossar.${name}`;
+    if (!istObjekt(eintrag)) { fehler.push(`${ort}: muss ein Objekt sein`); continue; }
+    const fremd = Object.keys(eintrag).filter((feld) => !["gebiet", "text"].includes(feld));
+    if (fremd.length) fehler.push(`${ort}: unbekannte Felder ${fremd.join(", ")}`);
+    pruefeText(sprache.texte, eintrag.text, ort, fehler);
+    if (typeof eintrag.text === "string") pruefeText(sprache.texte, `${eintrag.text}.erklaerung`, `${ort}.erklaerung`, fehler);
+    if (typeof eintrag.gebiet !== "string") fehler.push(`${ort}: gebiet fehlt`);
+    else pruefeText(sprache.texte, `glossargebiet.${eintrag.gebiet}`, `${ort}.gebiet`, fehler);
+  }
+}
+
 // Feste Karte: gleich lange Zeilen aus Kennungen bekannter Gelände
 function pruefeKarte(daten, karte, ort, fehler) {
   if (!Array.isArray(karte) || !karte.length || !karte.every((zeile) => typeof zeile === "string" && zeile.length === karte[0].length)) {
@@ -1276,6 +1292,7 @@ export function vorbereiten(rohdaten, sprache = {}) {
   pruefeAbfolge(daten, fehler);
   pruefeTaktiken(daten, sprache, fehler);
   pruefeArenen(daten, sprache, fehler);
+  pruefeGlossar(daten, sprache, fehler);
   for (const [name, gelaende] of Object.entries(daten.gelaende)) {
     pruefeText(sprache.texte, gelaende.text, `gelaende.${name}`, fehler);
     if (typeof gelaende.kennung !== "string" || gelaende.kennung.length !== 1) fehler.push(`gelaende.${name}: kennung muss genau ein Zeichen sein`);

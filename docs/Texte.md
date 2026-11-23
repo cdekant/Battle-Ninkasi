@@ -2,7 +2,7 @@
 
 Stand: 2026-11-23
 
-Zuständig für: `sprache/*`, `src/anzeige/texte.js`, `src/anzeige/grammatik.js`, `src/anzeige/korpus.js`
+Zuständig für: `sprache/*`, `src/anzeige/texte.js`, `src/anzeige/grammatik.js`, `src/anzeige/korpus.js`, `src/anzeige/glossar.js`, `daten/glossar.js`
 
 Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Architektur.md](Architektur.md), [Entwicklung.md](Entwicklung.md)
 
@@ -47,6 +47,25 @@ Regeln:
 + Adjektive stehen vor dem Hauptwort, zuerst die aus Zuständen (Affixe), dann die festen des Hauptworts: "ein gereiztes Essigbakterium", "einer leeren Flasche"; ein Zustand nennt sein Adjektiv mit `adjektiv` (siehe [Wirkungen.md](Wirkungen.md), Zustände); Adjektive kommen aus derselben Sprache wie ihr Hauptwort
 + Englisch: a oder an nach dem ersten gezeigten Wort, also dem ersten Adjektiv oder dem Hauptwort ("an empty bottle"); `artikel` am Eintrag geht vor, dann die Ausnahmen, dann der Anfangsbuchstabe; Genitiv mit "'s", in der Mehrzahl auf s nur mit "'"
 + Listen zeigen Stapel mit der Zahl in der Mehrzahl ("3 Biere"), ein einzelnes Stück eines Stapels in der Einzahl (Werfen, Schnellleiste, Überschrift im Inventar)
+
+## Glossar
+
+Daten:
+
++ `daten/glossar.js` im Grundgerüst: `{ <name>: { gebiet, text } }`, z.B. `malz: { gebiet: "maelzen", text: "glossar.malz" }`; Gebiete bisher Rohstoffe, Mälzen, Sudhaus, Gärung, Keller, Verderb und Hygiene, Bierarten, Geschichte
++ In beiden Sprachdateien: `glossar.<name>` (der Begriff, ein einfacher Text), `glossar.<name>.erklaerung` (ein Satz, enzyklopädisch, ernsthaft und informativ) und `glossargebiet.<gebiet>`
+
+Schnittstellen:
+
++ `glossarEintraege(glossar, texte)` in `src/anzeige/glossar.js`: `[{ name, gebiet, begriff, erklaerung }]` in einer Sprache, nach dem Begriff sortiert
++ `woerterbuch(glossar, { de: texte, en: texte })`: je Begriff die Texte aller Sprachen, sortiert nach der ersten; im Kompendium als Reiter Wörterbuch und als `node werkzeuge/kompendium.js woerterbuch [de|en]` (siehe [Entwicklung.md](Entwicklung.md), Kompendium)
+
+Regeln:
+
++ Die Datenprüfung verlangt je Begriff `text`, `text.erklaerung` und den Text des Gebiets, andere Felder sind ein Fehler; die Erklärungen zählen im Kompendium als genannt
++ Ein Begriff entsteht in beiden Sprachen zugleich, die Erklärung frei in jeder Sprache geschrieben; die englischen Begriffe sind die der Brauer (wort, grist, liquor), wo es keinen gibt, bleibt der deutsche (krausen)
++ Die Begriffe sind Inhalt und kommen von der Nutzerin bzw. dem Nutzer; die vorhandenen sind ein Startbestand, ein Skill zum Anlegen folgt mit Punkt 11 (siehe [Systemausbau.md](Systemausbau.md))
++ Das Glossar im Spiel kommt später (siehe [Ausblick.md](Ausblick.md), Bestiarium, Glossar, Rezeptbuch)
 
 ## Erzeugte Texte
 
