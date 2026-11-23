@@ -85,6 +85,16 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 10
 
 ## Offen
 
+Die Ebenen des Spieldesigns, über die noch zu sprechen ist; der Rahmen (Länge und Ziel eines Laufs, was zwei Läufe unterscheidet) steht oben:
+
++ Kreisläufe auf drei Zeitskalen: im Zug Kampf, Stellung und Tempo, darin die Zeitskala, also wann etwas schnell oder langsam ist; auf der Ebene erkunden, Vorräte verbrauchen, rasten und weiterziehen; im Lauf stärker werden durch Skills, Ausrüstung und Brauen gegen eine wachsende Bedrohung
++ Spannungen: echte Entscheidungen statt einer offensichtlich besten Wahl; vor allem der Pegel (nüchtern vorbereiten für Magie oder Rausch für Psi), dazu Risiko gegen Ertrag, Rasten gegen Zeitdruck, Erkunden gegen Gefahr
++ Ökonomie: für jede Ressource Quellen und Senken (LP, MP, PP, Pegel, EP, Zutaten, Gegenstände, Zeit); ein geschlossener Kreislauf, in dem das Brauen die Quelle ist und Skills als Hebel wirken, ohne etwas, das sich endlos anhäuft, etwa durch endloses Rasten
++ Machtkurve: wie Ninkasis Stärke und die Bedrohung je Tiefe gegeneinander wachsen, bezogen auf ihre Grundausstattung auf der ersten Tiefe; daraus ein Budget je Tiefe für Gegner, Beute und Fähigkeiten; darin der Befund der Arena, dass Ausrüstung und Skills bisher wenig ändern, als Frage des Designs, nicht der Zahlen
++ Inhaltsplan grob: Thema je Tiefe, Gegnerfamilien und ihre Rollen (z.B. Mikroorganismen mit eigener Mechanik), Bosse, Rolle des Hubs; nur die Gerüstpunkte, keine einzelnen Gegner
+
+Einzelfragen:
+
 + Welche Systeme tieferen Kapiteln vorbehalten bleiben
 + Welche Figuren in den Hub ziehen können, wodurch sie es tun und was eine Stufe des Hubs ausmacht
 + Wann der Hopfen ins Spiel kommt: Skills wie HopHead und Reinheitsgebot erst mit dem ersten Hopfenfund freischalten oder höher im Skillbaum aufhängen
