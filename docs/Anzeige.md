@@ -31,7 +31,7 @@ Regeln:
 + Das Canvas hat die Auflösung des Geräts (`devicePixelRatio`), gezeichnet wird in CSS-Pixeln; bei 200 % (4K) wird so jedes Tile-Pixel doppelt; Ziel ist ganzzahlige Skalierung (1080p 1:1, 4K doppelt, dazwischen 1:1 mit Rand), offen ist ein Verhältnis wie 125 % unter Windows, bei dem ein Tile-Pixel kein ganzzahliges Vielfaches eines Bildschirmpixels ist
 + Zoom ist eine Einstellung mit frei festlegbaren Stufen; scharf bleibt Pixelart nur in ganzzahligen Vielfachen ihrer Auflösung (16 als 16, 32, 48, 64 px; 32 als 32, 64, 96 px)
 + Der Renderer zeichnet ein Tile, wenn ein Satz scharf zur Zoomstufe passt (Zoom ist ganzzahliges Vielfaches, größter Satz zuerst; fehlt dort das Tile, der nächste), sonst das Zeichen
-+ Keine Zeichen als Platzhalter: jede neue Entität kommt direkt als Tile ins Spiel (Ablauf in [Tileset.md](Tileset.md)); das Zeichen bleibt nur Absicherung, falls ein Tile fehlt
++ Das Zeichen ist die Absicherung, falls ein Tile fehlt; wann ein Tile Pflicht ist, steht in [Tileset.md](Tileset.md), Ablauf
 + Das Log zeigt nur, was Ninkasi wahrnimmt: Meldungen mit ihr als Beteiligter (`wer`, `ziel`, `quelle`, `opfer`, `was`, `mit`, `auf`, `traegerin`, `vorher`), Meldungen, bei denen ein beteiligter Bezug mit `ort` oder ein Feld (`ursprung`, `aufschlag`, `bahn`, `felder`) gerade sichtbar ist, und Meldungen ganz ohne Ort (Pegel, Hinweise); `bemerkt` nur, wenn sie das bemerkende Wesen sieht
 + Hören: Lärm, der Ninkasis Feld erreicht (`gesteuerteHoert` an der Meldung `laerm`) und dessen Ursprung sie nicht sieht, schreibt das Log als vage Zeile mit grober Richtung, je nach `geraeusch` Kampflärm, Klirren oder ein Geräusch, höchstens eine Zeile je 100 Zeiteinheiten; wer dort was tut, sagt es nicht
 + Texte zu Zuständen: `log.zustand_beginnt` und `log.zustand_endet` allgemein, ein Zustand kann eigene mitbringen (`log.zustand.<name>.beginnt` bzw. `.endet`); dazu `abgewichen`, `beschworen` (ohne Urheberin `log.erschienen`) und `verschwindet`
@@ -41,7 +41,7 @@ Regeln:
 Daten:
 
 + Zonen als CSS-Grid (`src/anzeige/stil.css`), Maße als Variablen in `rem` (`--breite-seite`, `--hoehe-log`, `--hoehe-bedienzeile`), Farben als Variablen, getrennt vom Layout; Layout als `data-layout` an `#spiel` (Einstellung `layout`: "a", "b", "kompakt")
-+ Elemente: Karte, Seitenleiste (`#seitenkopf`, `#minikarte`, `#seiteninhalt`), Log, Bedienzeile; über der Karte eine noch leere Effektschicht (`#effektschicht`, für die Metaeffekte aus [Animationen.md](Animationen.md)), der Tooltip (`#tooltip`) und die Fenster; der Titel in `#titel`
++ Elemente: Karte, Seitenleiste (`#seitenkopf`, `#minikarte`, `#seiteninhalt`), Log, Bedienzeile; über der Karte eine noch leere Effektschicht (`#effektschicht`, für die Metaeffekte, siehe [Oberflaeche.md](Oberflaeche.md), Klassen der Elemente), der Tooltip (`#tooltip`) und die Fenster; der Titel in `#titel`
 + Punktfarben der Minikarte (`PUNKTFARBEN`): Feind rot, Gefährte blau, neutral grau, Ninkasi weiß
 
 Schnittstellen:
@@ -78,7 +78,7 @@ Regeln:
 + Eine Kamera ist immer eingebaut: ist der Ausschnitt größer als das Level, ist das ganze Level sichtbar und steht mittig, sonst scrollt die Karte; Zoomstufen sind nur Kameraeinstellungen
 + Folgen mit Randabstand: die Kamera bewegt sich erst, wenn Ninkasi näher als ein Viertel des Ausschnitts an den Rand kommt; am Levelrand bleibt sie stehen, jenseits des Levels ist nichts zu sehen
 + Feldweises Springen; weiches Scrollen später als reine Anzeige (siehe [Animationen.md](Animationen.md))
-+ Vorgesehen, noch nicht umgesetzt: Umschauen (Karte frei verschieben per Maus oder Taste, ein Anzeige-Zustand) und weitere austauschbare, einstellbare Verhaltensweisen (Zentrieren, Springen)
++ Vorgesehen, noch nicht umgesetzt: Umschauen (Karte frei verschieben per Maus oder Taste, ein Anzeige-Zustand), weitere austauschbare, einstellbare Verhaltensweisen (Zentrieren, Springen) und Markierungen am Kartenrand für Gegner außerhalb des Ausschnitts
 
 ## Log
 
@@ -120,7 +120,7 @@ Schnittstellen:
 
 ## Verweise
 
-+ Schema und Stand der Umsetzung der Oberfläche: [Oberflaeche.md](Oberflaeche.md); Effektschicht, Kampfanimation und weiches Scrollen: [Animationen.md](Animationen.md)
-+ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 11 (Oberfläche) und Punkt 12 (Darstellung)
++ Schema der Oberfläche: [Oberflaeche.md](Oberflaeche.md); Effektschicht, Kampfanimation und weiches Scrollen: [Animationen.md](Animationen.md)
++ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 12 (Oberfläche) und Punkt 13 (Darstellung)
 
 Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).

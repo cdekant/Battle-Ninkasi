@@ -54,7 +54,7 @@ Spieldesign:
 
 + [docs/Grundlagen.md](docs/Grundlagen.md): Spiel, Spielkern, Charakter, Gegner, Technik, Design, offene Fragen
 + [docs/Charakter.md](docs/Charakter.md): Eigenschaften, Skills, EP und Charaktererstellung
-+ [docs/Oberflaeche.md](docs/Oberflaeche.md): Schema der Oberfläche (Layout, Log, Fenster, Tastatur nach vi), Entscheidungen, Stand der Umsetzung
++ [docs/Oberflaeche.md](docs/Oberflaeche.md): Schema der Oberfläche (Layout, Log, Fenster, Tastatur nach vi)
 + [docs/Titelbildschirm.md](docs/Titelbildschirm.md): Titel, Speicherplätze, Chronik, Ideen für später
 + [docs/Animationen.md](docs/Animationen.md): Effektschicht, Kampfanimation, Kamera (zurückgestellt)
 + [docs/Texte.md](docs/Texte.md): Sprachdateien, Textkorpus, Literaturverzeichnis (`sprache/literatur.json`, Originale in `sprache/Literatur/` nicht im Repo)
@@ -72,7 +72,7 @@ Technik:
 + [docs/Bedienung.md](docs/Bedienung.md): Eingabe, Maus und Abläufe, Fenster, Schnellleiste, Zielmodus, Untersuchen, Einstellungen
 + [docs/Entwicklung.md](docs/Entwicklung.md): Starten, Tests, Bot, Werkzeuge, Ablauf einer Version, Stolpersteine, Stand des Spielinhalts
 
-Arbeitsliste: [docs/Systemausbau.md](docs/Systemausbau.md), fehlende Strukturen und bekannte Fehler; umgesetzte Punkte wandern in das zuständige Dokument. Konkrete Inhalte erst nach Punkt 15 (Vorbereitung der Inhalte).
+Arbeitsliste: [docs/Systemausbau.md](docs/Systemausbau.md), fehlende Strukturen und bekannte Fehler; umgesetzte Punkte wandern in das zuständige Dokument. Konkreter Inhalt erst nach Punkt 11, bis dahin nur Probeinhalt.
 
 ## Dokumentation
 
@@ -80,6 +80,7 @@ Kaskade: CLAUDE.md gibt Prinzipien, Ordner und Wegweiser; jedes Dokument in `doc
 
 + Jede Datei in `src/`, `daten/`, `sprache/`, `grafik/`, `lib/`, `werkzeuge/`, `tests/` und jedes Startskript hat genau ein zuständiges Dokument; neue Dateien bekommen es sofort, neue Dokumente einen Eintrag hier.
 + Wer eine Datei ändert, führt ihr zuständiges Dokument nach und prüft die Dokumente aus dessen "Mitprüfen"; ändern sich Prinzipien, Ordner oder Begriffe, auch CLAUDE.md.
++ Dokumente beschreiben den heutigen Stand; überholte Entscheidungen und Rückblicke gehören in die Git-Historie, nicht in die Dokumente.
 + Jede Aussage steht an genau einer Stelle; andere verweisen darauf, in Markdown als Link auf das Dokument mit dem Abschnitt dahinter, im Code als `siehe docs/<Dokument>.md, <Abschnitt>`.
 + Design-Dokumente (ohne "Zuständig für") sagen was und warum, technische wie (Daten, Schnittstellen, Regeln); Zahlen und Formeln stehen nur im technischen Dokument oder in `daten/regeln.js`. Jeder Design-Abschnitt endet mit "Umsetzung: siehe …", "teilweise, siehe …; offen: …", "offen" oder "keine"; dort Genanntes steht unter "Mitprüfen".
 + Widersprechen sich Doku und Code, wird das gemeldet und nicht still einseitig angepasst.

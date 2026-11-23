@@ -11,7 +11,8 @@ Grobskizze, auszuarbeiten.
 ## Sprachdateien
 
 + Alle Texte im Spiel stehen in Sprachdateien, Code und Daten verweisen nur über Schlüssel darauf
-+ Sprachen: Deutsch zuerst, Englisch vorgesehen
++ Sprachen: Deutsch und Englisch; jeder Text entsteht in beiden, das Englische frei nachgeschrieben statt Satz für Satz übersetzt (Englisch noch offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 9)
++ Anrede: Oberflächentexte sprechen die Spielerin mit "du" an, erzählende Texte (Log, Beschreibungen) sprechen in der dritten Person über Ninkasi; ein Lauf heißt "Lauf"
 + Fehlende Schlüssel werden beim Laden gemeldet (Prüfung wie bei den Daten, siehe Inhalte als Daten in [Architektur.md](Architektur.md))
 + Format: `sprache/de/texte.js` mit `export default { schluessel: text }`; Texte enthalten Platzhalter wie `{menge}`; der Satzanfang wird groß geschrieben
 + Wesen und Gegenstände sind Hauptwörter: Geschlecht (`m`, `f`, `n`), bei Eigennamen `eigenname: true`, und alle vier Fälle der Einzahl ohne Artikel, z.B. `{ geschlecht: "n", einzahl: { nom: "Essigbakterium", gen: "Essigbakteriums", dat: "Essigbakterium", akk: "Essigbakterium" } }`; unregelmäßige Beugung (des Bären) steht so ausgeschrieben in den Fällen
@@ -65,10 +66,10 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 
 ## Offen
 
-+ Korpustexte noch nicht an Spielinhalte gekoppelt (Brauschritte, Fundstücke); seit 0.32.0 liest das Spiel sie zur Laufzeit (`sprache/de/korpus/index.js` als Liste der Dateien, `src/anzeige/korpus.js` zerlegt in Kopf, Strophen und Sätze) und zeigt einen Satz als Spruch im Titel; ein neuer Korpustext braucht seine Zeile in der Liste
-+ Laden von `sprache/literatur.json` im Spiel (`fetch` oder `import … with { type: "json" }`); den Kopf der Korpustexte und ihre Quellenschlüssel prüft seit 0.44.0 das Kompendium (siehe [Entwicklung.md](Entwicklung.md), Kompendium)
++ Korpustexte noch nicht an Spielinhalte gekoppelt (Brauschritte, Fundstücke); das Spiel liest sie zur Laufzeit (`sprache/de/korpus/index.js` als Liste der Dateien, `src/anzeige/korpus.js` zerlegt in Kopf, Strophen und Sätze) und zeigt einen Satz als Spruch im Titel; ein neuer Korpustext braucht seine Zeile in der Liste
++ Laden von `sprache/literatur.json` im Spiel (`fetch` oder `import … with { type: "json" }`); den Kopf der Korpustexte und ihre Quellenschlüssel prüft das Kompendium (siehe [Entwicklung.md](Entwicklung.md), Kompendium)
 + Abdeckung der Texte je Eintrag (welcher Gegner, welches Getränk hat Beschreibung, Fundtext, Zitat), sobald Korpus und Inhalte gekoppelt sind; als Reiter des Kompendiums
 + Wo erzeugte Texte vorkommen: Bücher, Schriftrollen, Inschriften, HACCP-Aushänge, Händlergerede
 + Mehrzahl und Adjektive im Detail
-+ Anrede in Oberflächentexten: die Hilfe zur Charaktererstellung spricht die Spielerin mit "du" an und sagt "Run", die übrigen Texte sprechen über Ninkasi in der dritten Person und sagen "Lauf"; einheitlich festlegen
++ Vorhandene Texte an die Regel der Anrede angleichen (die Hilfe zur Charaktererstellung sagt noch "Run")
 + Platzhalter in Hilfetexten: ein Fenster gibt seiner Hilfe Werte mit (`hilfewerte`, z.B. `{punkte}` in `hilfe.thema.erstellung`), damit Zahlen aus den Regeln nicht fest im Text stehen

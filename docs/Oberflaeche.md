@@ -1,10 +1,10 @@
 # Battle Ninkasi - Oberfläche
 
-Stand: 2026-11-21, Entwurf, Entscheidungen getroffen, teilweise umgesetzt (siehe Stand der Umsetzung)
+Stand: 2026-11-23, teilweise umgesetzt (siehe die Zeilen "Umsetzung")
 
 Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Bedienung.md](Bedienung.md), [Animationen.md](Animationen.md), [Titelbildschirm.md](Titelbildschirm.md)
 
-Schema der Oberfläche: Prinzipien, Layout, Leisten, Log, Fenster, Tastatur, Einstellungen. Alles hier ist Anzeige und Eingabe; die Logik kennt weder Fenster noch Leisten und bekommt nur gewöhnliche Befehle. Was heute umgesetzt ist, beschreibt [Anzeige.md](Anzeige.md) (Anzeige, Oberfläche), [Bedienung.md](Bedienung.md) (Eingabe, Zielmodus, Untersuchen); Bewegung und Effekte stehen in [Animationen.md](Animationen.md), die Arbeitsliste in Punkt 11 von [Systemausbau.md](Systemausbau.md). Entschiedenes und Offenes steht am Ende unter Entscheidungen.
+Schema der Oberfläche: Prinzipien, Layout, Leisten, Log, Fenster, Tastatur, Einstellungen. Alles hier ist Anzeige und Eingabe; die Logik kennt weder Fenster noch Leisten und bekommt nur gewöhnliche Befehle. Was heute umgesetzt ist, beschreibt [Anzeige.md](Anzeige.md) (Anzeige, Oberfläche), [Bedienung.md](Bedienung.md) (Eingabe, Zielmodus, Untersuchen); Bewegung und Effekte stehen in [Animationen.md](Animationen.md), die offene Arbeit in Punkt 12 von [Systemausbau.md](Systemausbau.md).
 
 ## Vorbilder
 
@@ -41,11 +41,11 @@ Nach Fagerholt und Lorentzon ("Beyond the HUD", 2009): diegetisch (in Geschichte
 
 + Nicht-diegetisch: fast alles, Leisten, Seitenleiste, Log, Fenster
 + Räumlich: Markierungen auf der Karte (Ankündigungen, Zielvorschau, Wegvorschau, Randmarker, später schwebende Zahlen und Lebensbalken über Wesen)
-+ Meta: Bildschirmeffekte, die Ninkasis Zustand spürbar machen, ohne etwas anzuzeigen (bei hohem Pegel Verschwimmen, Schwanken, Doppelbilder; bei wenig LP ein roter Rand); reine Anzeige, umgesetzt mit der Darstellung (Punkt 12)
-+ Vorbereitet wird schon mit dem neuen Layout: eine eigene Effektschicht über der Karte und unter der Oberfläche, so dass die Effekte nur die Karte treffen und Texte lesbar bleiben; jeder Effekt hat einen eigenen Schalter in den Einstellungen, "Bewegung reduzieren" schaltet alle bewegten Effekte zugleich ab
++ Meta: Bildschirmeffekte, die Ninkasis Zustand spürbar machen, ohne etwas anzuzeigen (bei hohem Pegel Verschwimmen, Schwanken, Doppelbilder; bei wenig LP ein roter Rand); reine Anzeige, umgesetzt mit der Darstellung (Punkt 13)
++ Vorbereitet ist eine eigene Effektschicht über der Karte und unter der Oberfläche, so dass die Effekte nur die Karte treffen und Texte lesbar bleiben; jeder Effekt hat einen eigenen Schalter in den Einstellungen, "Bewegung reduzieren" schaltet alle bewegten Effekte zugleich ab
 + Diegetisch: zunächst nichts; denkbar sind Rezeptbuch und Etiketten als Gegenstände der Welt
 
-Umsetzung: teilweise, siehe [Anzeige.md](Anzeige.md), Oberfläche (Effektschicht noch leer); offen: Metaeffekte, schwebende Zahlen, siehe [Systemausbau.md](Systemausbau.md), Punkt 12
+Umsetzung: teilweise, siehe [Anzeige.md](Anzeige.md), Oberfläche (Effektschicht noch leer); offen: Metaeffekte, schwebende Zahlen, siehe [Systemausbau.md](Systemausbau.md), Punkt 13
 
 ## Prioritätsstufen
 
@@ -58,29 +58,15 @@ Umsetzung: teilweise, siehe [Anzeige.md](Anzeige.md), Oberfläche (Effektschicht
 
 Umsetzung: siehe [Anzeige.md](Anzeige.md), Oberfläche
 
-## Bestand und Neubeginn
-
-Die Darstellung kann weitgehend neu entstehen, die Systeme darunter bleiben:
-
-+ Bleibt: Logik und Meldungen, die Auswahl des Wahrnehmbaren (`src/systeme/wahrnehmbar.js`), Vorschau und Untersuchen (`vorschau.js`, `untersuchen.js`), die DOM-freien Kerne der Eingabe (Zielmodus, Inventar- und Fähigkeitenfenster, Reise, Rasten, Erkunden), Pegelanzeige, Texte und Sprachdateien, Renderer und Kamera
-+ Umgesetzt in 0.27.0: Aktionskatalog (`src/eingabe/aktionskatalog.js`) mit Belegung Taste zu Aktion, Fensterstapel über der Karte (`src/eingabe/fenster.js`, `src/anzeige/fenster.js`) nach der Grammatik unten, Inventar und Fähigkeiten als Fenster, Charakter und Skills (C), Charaktererstellung vor jedem Lauf, Hilfe (?) aus dem Katalog; die Seitenleiste zeigt freie EP und bis zur Schnellleiste eine Kurzliste der Fähigkeiten, siehe Fenster in [Bedienung.md](Bedienung.md)
-+ Umgesetzt in 0.29.0: Schnellleiste vollständig, Speichern, Minikarte und Übersichtskarte, Hervorheben; siehe Stand der Umsetzung
-+ Umgesetzt in 0.28.0: Aufbau der Seite (`index.html`, `stil.css`) mit Varianten A und B, Seitenleiste neu geordnet, Log in zwei Spalten (`src/anzeige/logzeilen.js`, `src/anzeige/log.js`), Bedienzeile mit Schnellleiste in der Grundform und Knöpfen, Esc-Kette, Spielmenü, Bestätigung, Verlauf, vi-Belegung, Laufen, Rechtsklick; siehe Stand der Umsetzung
-+ Umgesetzt in 0.30.0: Einstellungen samt Tastenbelegung, Layout kompakt, Befehlszeile, Suche im Verlauf
-+ Umgesetzt in 0.31.0: Klicks in Fenstern
-+ Umgesetzt in 0.32.0: Titelbildschirm, drei Speicherplätze, Fenster nach dem Lauf, Chronik, siehe [Titelbildschirm.md](Titelbildschirm.md)
-
-Umsetzung: keine, Rückblick auf die Versionen; Einzelheiten unter Stand der Umsetzung
-
 ## Bildschirme
 
 + Titel: Hauptmenü mit Titelbild ohne "Drücke eine Taste", Fortsetzen mit Vorschau, Neues Spiel, Einstellungen, Hilfe, Beenden; der erste Klick ist die Geste, die der Browser für Ton und Vollbild verlangt; Entwurf, Entscheidungen und Ideen in [Titelbildschirm.md](Titelbildschirm.md)
-+ Idee: Intro-Film mit Lore und Vorgeschichte als Bildfolge in Pixelart (klein, im Stil) statt Video, jede Taste überspringt, eine Einstellung zeigt ihn nur beim ersten Start oder nie; mit Punkt 12 (Darstellung); Bild und Ton unter CC BY-NC-SA 4.0 in `LIZENZEN.md`
-+ Charaktererstellung: Eigenschaften verteilen (Punkt 13, die Logik nimmt die Verteilung als Startoption)
++ Idee: Intro-Film mit Lore und Vorgeschichte als Bildfolge in Pixelart (klein, im Stil) statt Video, jede Taste überspringt, eine Einstellung zeigt ihn nur beim ersten Start oder nie; mit der Darstellung (Punkt 13); Bild und Ton unter CC BY-NC-SA 4.0 in `LIZENZEN.md`
++ Charaktererstellung: Eigenschaften verteilen (die Logik nimmt die Verteilung als Startoption)
 + Spiel: das Layout unten
-+ Nach dem Lauf (Tod oder Sieg): neuer Lauf, Titel, Aufzeichnung sichern oder abspielen, Laufbericht (Morgue, als Todesbericht in [Ausblick.md](Ausblick.md)), Ruhmeshalle; siehe [Titelbildschirm.md](Titelbildschirm.md)
++ Nach dem Lauf (Tod oder Sieg): ein eigener Bildschirm, siehe [Titelbildschirm.md](Titelbildschirm.md)
 
-Umsetzung: teilweise, siehe [Titelbildschirm.md](Titelbildschirm.md), Stand der Umsetzung 0.32.0; siehe [Bedienung.md](Bedienung.md), Fenster; offen: Intro-Film, Laufbericht, Ruhmeshalle
+Umsetzung: teilweise, siehe [Titelbildschirm.md](Titelbildschirm.md), Titel und Plätze; siehe [Bedienung.md](Bedienung.md), Fenster; offen: Intro-Film, Laufbericht, Ruhmeshalle
 
 ## Layout
 
@@ -111,7 +97,7 @@ Bezugsgröße 1920x1080. Zonen als CSS-Grid, Maße als Variablen, Schriftgröße
 ```
 
 + Höhen: Log 8 Zeilen etwa 176 px, Bedienzeile etwa 56 px; für die Karte bleiben etwa 1520x848 px, bei 16 px etwa 95x53 Felder, bei 32 px etwa 47x26
-+ Seitenleiste etwa 400 px; Minikarte mit 4 px je Feld (100x40 Felder ergeben 400x160 px), bei größeren Ebenen 3 px oder ein Ausschnitt
++ Seitenleiste etwa 400 px; die Minikarte zeigt die ganze Ebene in der Breite der Seitenleiste (Maße in [Anzeige.md](Anzeige.md), Oberfläche)
 + Das Log liegt zwischen Karte und Bedienzeile: nah am Geschehen, die Schnellleiste dafür am unteren Rand wie in Diablo, WoW, BG3 und ToME
 
 ### Variante B (umstellbar)
@@ -144,7 +130,7 @@ Umsetzung: teilweise, siehe [Anzeige.md](Anzeige.md), Oberfläche; offen: Log ob
 ## Bedienzeile
 
 + Am unteren Rand in jeder Variante dieselbe Zeile: links die Schnellleiste unter der Karte, rechts die Knöpfe unten in der Seitenleiste; so bleibt die Handbewegung beim Wechsel des Layouts gleich
-+ Knöpfe für die Maus: klickbar, jeder mit Taste und kurzem Wort (z. B. "[i] Gepäck"), in zwei Reihen zu je vier, bei 400 px etwa 96 px je Knopf: Gepäck, Fähigkeiten, Charakter, Karte; Rasten, Erkunden, Hilfe, Menü
++ Knöpfe für die Maus: klickbar, jeder mit Taste und kurzem Wort (z. B. "[i] Gepäck"), für die häufigsten Fenster und Abläufe; welche es sind, steht in [Anzeige.md](Anzeige.md), Oberfläche
 + Die Knöpfe entstehen aus dem Aktionskatalog (siehe Tastatur)
 + Eine Kopfleiste gibt es nicht; Ort und Zeit (Tiefe, Ebene, Zug) stehen im Kopf der Seitenleiste wie bei Brogue, die Karte gewinnt so etwa 28 px Höhe
 
@@ -174,7 +160,7 @@ Umsetzung: teilweise, siehe [Anzeige.md](Anzeige.md), Oberfläche; offen: Ausdau
 + Vorbelegung des Cursors nach der Art der Wirkung: schädlich auf den nächsten Feind in Sicht, nützlich auf den nächsten verletzten Gefährten bzw. Ninkasi selbst; lebt das zuletzt gewählte Ziel und ist in Sicht, gewinnt es; die Art steht als Angabe `zielvorgabe` ("feind", "gefaehrte", "selbst") in den Daten der Fähigkeit bzw. des Gegenstands, ohne Angabe folgt sie aus den Tags der Wirkung
 + Einstellung "sofort auslösen": mit vorbelegtem Ziel ohne Bestätigung wirken (Vorbild Shattered Pixel Dungeon), Vorgabe aus
 
-Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Schnellleiste; offen: Mindestpegel als Kante
+Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Schnellleiste; offen: Mindestpegel als Kante, Ladungen und Abklingzeit unbekannter Arten (bisher zeigt der Platz nur das Etikett)
 
 ## Log
 
@@ -183,7 +169,7 @@ Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Schnellleiste; offen: 
 + Gleiche Zeilen hintereinander werden zusammengefasst ("x3")
 + Neueste Zeile unten, ältere werden blasser
 + Arten mit Farbe und Symbol: Gefahr, Schaden genommen, Schaden ausgeteilt, Heilung, Pegel, Fund, Gespräch, Hinweis
-+ Verlauf als Fenster (Strg+P wie in vielen Roguelikes, oder Tab): ganze Länge, Filter nach Art, Suche mit /
++ Verlauf als Fenster (Tab): ganze Länge, Filter nach Art, Suche mit /
 + Das Log zeigt weiterhin nur, was Ninkasi wahrnimmt
 + Farben im Kampf nach der Seite, die handelt: Ninkasi in Grüntönen, Verbündete in Blautönen, Gegner in Rot, Orange, Gelb und Lila, Neutrale grau; der Ton folgt dem Ausgang (Treffer, Krit hell und fett, abgewehrt gedämpft), bei Gegnern Gelb für angekündigte Angriffe und Lila für Psi und Magie; Symbole bleiben, damit nichts nur an der Farbe hängt
 + Zahlen im Kampf in festen, schmalen Spalten mit kurzer Kopfzeile ("%", "DMG", "×", "–"): Chance, Schaden, Krit (Faktor), Abzug (Rüstung und Widerstand zusammen, die Aufteilung im Tooltip); Reflektieren und Absorbieren bekommen ihren Platz, sobald es sie gibt
@@ -194,11 +180,11 @@ Umsetzung: siehe [Anzeige.md](Anzeige.md), Log
 
 + Ein Stapel über der Karte; das oberste bekommt jede Taste zuerst; Fenster kosten keine Spielzeit
 + Grammatik: Titel mit allen Reitern, links eine Liste mit Buchstaben, rechts die Einzelheiten des Gewählten, unten eine Fußzeile mit den gültigen Tasten; Suche mit / in langen Listen (Qud)
-+ Bewegung in Listen: Pfeiltasten oder Strg+j/k; ein Buchstabe wählt direkt; Enter bestätigt; Esc schließt
-+ Erklärungen stehen nicht im Fenster selbst, sondern in der Hilfe zum Fenster: `?` in einem Fenster zeigt nur den Text zu diesem Fenster und seine Tasten, `?` im Spiel die allgemeine Hilfe mit allen Tasten (seit 0.27.0, Texte zuerst für Charaktererstellung und Charakter); die ganze Belegung steht nie dauerhaft auf dem Schirm, sichtbar ist, was gerade gilt: die Fußzeile des Fensters, der Hinweis "?: Hilfe", ab 0.28.0 die Tasten auf Knöpfen und Plätzen der Bedienzeile
++ Bewegung in Listen: Pfeiltasten oder j/k (in Listen mit Buchstaben nur die Pfeile); ein Buchstabe wählt direkt; Enter bestätigt; Esc schließt
++ Erklärungen stehen nicht im Fenster selbst, sondern in der Hilfe zum Fenster: `?` in einem Fenster zeigt nur den Text zu diesem Fenster und seine Tasten, `?` im Spiel die allgemeine Hilfe mit allen Tasten (Texte zuerst für Charaktererstellung und Charakter); die ganze Belegung steht nie dauerhaft auf dem Schirm, sichtbar ist, was gerade gilt: die Fußzeile des Fensters, der Hinweis "?: Hilfe", die Tasten auf Knöpfen und Plätzen der Bedienzeile
 + Inventar und Ausrüstung
 + Fähigkeiten (mit Belegung der Schnellleiste)
-+ Charakter und Skills (0.27.0)
++ Charakter und Skills
 + Logverlauf
 + Übersichtskarte
 + Hilfe mit Tastenübersicht aus dem Aktionskatalog
@@ -219,10 +205,7 @@ Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Fenster (Bestätigung 
 
 ## Esc als Kette
 
-1. Zielmodus abbrechen
-2. Oberstes Fenster schließen
-3. Reise, Rasten oder Erkunden abbrechen
-4. Ist nichts davon offen: Spielmenü öffnen
++ Esc nimmt immer das Nächstliegende zurück (Zielmodus, Fenster, Ablauf) und öffnet zuletzt das Spielmenü; die Reihenfolge steht in [Bedienung.md](Bedienung.md), Eingabe
 
 Umsetzung: siehe [Bedienung.md](Bedienung.md), Eingabe
 
@@ -235,36 +218,36 @@ Umsetzung: siehe [Bedienung.md](Bedienung.md), Eingabe
 + Aus neovim übernommen: Modi statt Tastenkombinationen (Normalmodus, Zielmodus mit denselben Richtungstasten, Fenster), `:` öffnet eine Befehlszeile mit Vervollständigung über alle Aktionen des Katalogs, `/` sucht in Listen, `?` zeigt die Hilfe, Esc verlässt jeden Modus
 + Nicht übernommen: Zahlen vor einem Befehl (sie gehören der Schnellleiste); das Laufen mit Umschalt deckt den häufigsten Fall ab
 + Aktionskatalog: jede Aktion der Oberfläche hat eine ID, einen Text aus der Sprachdatei, eine Vorgabetaste und optional eine Schaltfläche; daraus entstehen die Knöpfe der Bedienzeile, Hilfe, Befehlszeile, Tooltips und die Seite zur Tastenbelegung
-+ Belegungssätze als Vorgaben zum Wählen: "vi" (Vorgabe) und "Ziffernblock"; eigene Änderungen liegen darüber
++ Eine einzige Vorgabe der Belegung (vi-Tasten, dazu Ziffernblock und Pfeile), eigene Änderungen liegen darüber; Belegungssätze gibt es nicht
 
-Vorschlag für die Vorgabe, Buchstaben nach der deutschen Aufschrift:
+Vorgabe, Buchstaben nach der deutschen Aufschrift:
 
 | Taste | Aktion | Stand |
 |:--|:--|:--|
-| h j k l, z u b n | Bewegen (z ist die Lage von y) | 0.28.0, dazu Ziffernblock und Pfeile |
-| Umschalt + Richtung | Laufen | 0.28.0 |
-| . | Warten | 0.28.0, dazu Ziffernblock 5 |
+| h j k l, z u b n | Bewegen (z ist die Lage von y) | umgesetzt, dazu Ziffernblock und Pfeile |
+| Umschalt + Richtung | Laufen | umgesetzt |
+| . | Warten | umgesetzt, dazu Ziffernblock 5 |
 | g | Aufheben | umgesetzt |
-| d | Fallenlassen | 0.29.0 |
+| d | Fallenlassen | umgesetzt |
 | t | Trinken (wählt im Zweifel) | umgesetzt |
-| w | Werfen (fragt nach dem Gegenstand) | 0.29.0 |
+| w | Werfen (fragt nach dem Gegenstand) | umgesetzt |
 | i | Inventar | umgesetzt |
-| f | Fähigkeiten | 0.28.0 |
-| c | Charakter und Skills | 0.27.0 |
+| f | Fähigkeiten | umgesetzt |
+| c | Charakter und Skills | umgesetzt |
 | x | Untersuchen | umgesetzt |
 | r | Rasten | umgesetzt |
 | o | Erkunden | umgesetzt |
-| a | in der Arena automatisch kämpfen | umgesetzt in 0.43.0 |
-| m | Übersichtskarte | 0.29.0 |
-| Umschalt + 1 bis 5 | Leiste wechseln | 0.29.0 |
-| < > | Treppe | 0.28.0 nach dem Zeichen |
+| a | in der Arena automatisch kämpfen | umgesetzt |
+| m | Übersichtskarte | umgesetzt |
+| Umschalt + 1 bis 5 | Leiste wechseln | umgesetzt |
+| < > | Treppe | umgesetzt, nach dem Zeichen |
 | Leertaste | Fortsetzen | umgesetzt |
-| 1 bis 0 | Schnellleiste | 0.28.0 |
-| Tab | Verlauf | 0.28.0 |
-| : | Befehlszeile | 0.30.0 |
-| / (im Verlauf) | Suche | 0.30.0 |
-| ? | Hilfe | 0.27.0 |
-| Esc | Kette (siehe oben) | 0.28.0 |
+| 1 bis 0 | Schnellleiste | umgesetzt |
+| Tab | Verlauf | umgesetzt |
+| : | Befehlszeile | umgesetzt |
+| / (im Verlauf) | Suche | umgesetzt |
+| ? | Hilfe | umgesetzt |
+| Esc | Kette (siehe oben) | umgesetzt |
 | + - | Zoom | umgesetzt |
 
 + Die Leisten wechselt Umschalt+1 bis 5; Strg+1 bis 5 schied aus, weil es im Browser die Reiter wechselt und sich nicht sicher abfangen lässt
@@ -277,7 +260,7 @@ Umsetzung: siehe [Bedienung.md](Bedienung.md), Eingabe
 + Ziehen belegt die Schnellleiste
 + Rechtsklick auf ein Feld öffnet dessen ausführliche Beschreibung wie Untersuchen mit X, das Kontextmenü des Browsers wird dafür unterdrückt; der linke Klick handelt wie bisher
 + Mausrad zoomt über der Karte und blättert über Listen und Log
-+ In Fenstern (seit 0.31.0): ein Klick wirkt wie die Taste des Eintrags oder Knopfs; der zweite Klick auf die gewählte Zeile wie Enter; Rechtsklick wie Esc; Klick außerhalb des obersten Fensters schließt es, außer Charaktererstellung und Bestätigung; Darüberfahren hebt nur hervor
++ In Fenstern: ein Klick wirkt wie die Taste des Eintrags oder Knopfs; der zweite Klick auf die gewählte Zeile wie Enter; Rechtsklick wie Esc; Klick außerhalb des obersten Fensters schließt es, außer Charaktererstellung und Bestätigung; Darüberfahren hebt nur hervor
 
 Umsetzung: siehe [Bedienung.md](Bedienung.md), Maus, Reise, Laufen, Rasten und Erkunden; siehe [Bedienung.md](Bedienung.md), Fenster
 
@@ -297,12 +280,12 @@ Umsetzung: offen
 
 + Anzeige: Zoom, Größe der Oberfläche, Schriftgröße, Vollbild, Layout (Variante A, B, kompakt), Seitenleiste links oder rechts, Log oben oder unten und seine Zeilen, Minikarte an oder aus, Verzögerung des Tooltips
 + Spiel: Reisetempo, Haltegründe, Bestätigungen, Animationen und Geschossbahn, "sofort auslösen" der Schnellleiste
-+ Tasten: Belegung jeder Aktion mit Erkennung von Konflikten, Vorgabe wiederherstellen (seit 0.30.0; Belegungssätze entfallen, siehe Entscheidungen)
++ Tasten: Belegung jeder Aktion mit Erkennung von Konflikten, Vorgabe wiederherstellen
 + Barrierefreiheit: Kontrast, Palette für Farbenblinde, Bewegung reduzieren (schaltet alle bewegten Effekte ab), jeder Metaeffekt einzeln an oder aus, Stärke der Metaeffekte
 + Später: Ton, Sprache, Gamepad
 + Gespeichert wird wie bisher nur die Abweichung von der Vorgabe (`src/eingabe/einstellungen.js`)
 
-Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Einstellungen; offen: Ton, Sprache, Gamepad, Metaeffekte, Seitenleiste links, Log oben
+Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Einstellungen; offen: Ton, Sprache, Gamepad, Metaeffekte, Seitenleiste links, Log oben, Verzögerung des Tooltips, Schnellleiste an oder aus, Bestätigungen außer beim Neustart
 
 ## Mechaniken, die noch kommen, und ihr Platz
 
@@ -325,7 +308,7 @@ Umsetzung: offen
 Jetzt festzulegen, weil spätere Änderungen teuer wären:
 
 + Aktionskatalog als einzige Quelle für Tasten, Schaltflächen, Hilfe und Befehlszeile
-+ Fensterstapel mit gemeinsamer Grammatik; Inventar und Fähigkeiten ziehen um, das Skillfenster nutzt ihn als Erstes
++ Fensterstapel mit gemeinsamer Grammatik
 + Zonen als CSS-Grid mit Variablen, Größe der Oberfläche über `rem`
 + Ablage der Belegung der Schnellleiste
 + Esc-Kette und Vorrang der Eingabe (Zielmodus, Fenster, Abläufe, Belegung)
@@ -334,7 +317,7 @@ Später festlegbar, ohne dass etwas bricht:
 
 + Farben, Rahmen, Schriften, Stile (eventuell mehrere wie bei ToME)
 + Symbole der Fähigkeiten (Tiles)
-+ Metaeffekte des Pegels, schwebende Zahlen, Lebensbalken über Wesen (Punkt 12)
++ Metaeffekte des Pegels, schwebende Zahlen, Lebensbalken über Wesen (Punkt 13)
 + Ton, Gamepad, Tutorial
 + Zahl der Plätze und Leisten
 
@@ -343,67 +326,6 @@ Als Einstellung umschaltbar:
 + Layout-Variante, Seite der Seitenleiste, Lage und Zeilen des Logs, Minikarte, Schnellleiste an oder aus, Bestätigungen, Tooltip
 
 Umsetzung: keine, Grundsätze der Planung
-
-## Stand der Umsetzung
-
-Aufgeteilt am 2026-11-21 in drei Versionen, damit jede für sich im Browser prüfbar ist:
-
-+ 0.28.0 Layout (umgesetzt): Grid mit Variante A und B (bis zum Einstellungsfenster im Spielmenü umgeschaltet), Effektschicht, Seitenleiste mit Kopf (Tiefe, Zug), Gefährten und Wesen nach Abstand, Log in zwei Spalten mit Zugmarke, Symbolen, Zahlen, Zusammenfassen, Verblassen und Farben nach Seite, Verlauf mit Filter, Bedienzeile mit acht Knöpfen und der Schnellleiste in der Grundform (automatisch nach Lernreihenfolge, danach Getränkearten; nicht umbelegbar, nicht gespeichert), Zielvorgabe und Bestätigen mit derselben Ziffer, Esc-Kette, Spielmenü mit Bestätigung, vi-Belegung samt Pfeilen und Zeichen, Laufen mit Umschalt, Rechtsklick untersucht; Reise, Laufen und Erkunden halten nur bei neuen Feinden
-+ 0.29.0 Schnellleiste und Speichern (umgesetzt): fünf Leisten (Umschalt+1 bis 5), automatisch nachgeführt, Umbelegen mit Ziffer und Entf in Inventar und Fähigkeitenfenster sowie durch Ziehen, Wurfwaffen von Hand, graue Plätze mit Anzahl 0; Fähigkeitenfenster mit Auswahl und Einzelheiten; Speichern im Browser mit Schnappschuss des Zustands samt Teil `oberflaeche`; Minikarte und Übersichtskarte (m) mit Klick zum Reisen; gegenseitiges Hervorheben von Seitenleiste und Karte; d und w als eigene Tasten; Knopf Karte statt Verlauf, der Verlauf über Tab oder einen Klick auf das Log
-+ 0.30.0 Einstellungen (umgesetzt): Einstellungskatalog und Einstellungsfenster mit Reitern, Seite zur Tastenbelegung mit Konflikten und Vorgabe, Layout kompakt, Größe der Oberfläche, Logzeilen, Minikarte an oder aus, Vollbild, Reisetempo, Geschossbahn, sofort auslösen, Nachfrage beim Neustart, Bewegung reduzieren, hoher Kontrast, Palette für Farbenblinde; Befehlszeile (:) mit Register der Quellen; Suche im Verlauf (/)
-+ 0.31.0 Klicks in Fenstern (umgesetzt): "Klick ist Taste" über `data-taste`, direkte Ziele über `data-ziel` und `klick` der Fensterart, Knöpfe in der Fußzeile, × zum Schließen, − und + an Zeilen, Rechtsklick wie Esc, Klick außerhalb schließt, Rad blättert im Verlauf
-+ 0.32.0 Titelbildschirm (umgesetzt): Titel als unterste Ebene mit Bild, Menü, drei Speicherplätzen mit Vorschau und Spruch aus dem Korpus; Läufe, Zum Titel im Spielmenü, Fenster nach dem Tod; Chronik, aufbewahrter letzter Lauf, Spielart als Startoption; siehe [Titelbildschirm.md](Titelbildschirm.md)
-+ Später: Halten an Abzweigungen beim Laufen (wie DCSS), Mindestpegel als Kante an der Schnellleiste, Gamepad
-
-## Entscheidungen
-
-Entschieden am 2026-11-21 für 0.31.0:
-
-+ Grundsatz "Klick ist Taste"; eine eigene klick-Funktion nur für Ziele ohne eigene Taste
-+ Klick auf eine schon gewählte Zeile wirkt wie Enter; das Inventar bekommt Enter als Standardhandlung (trinken, sonst anlegen oder ablegen)
-+ Klick außerhalb des obersten Fensters schließt es, außer Charaktererstellung und Bestätigung
-+ Rechtsklick im Fenster wirkt wie Esc
-+ Darüberfahren hebt nur hervor, gewählt wird mit dem Klick
-
-Entschieden am 2026-11-21 für 0.30.0:
-
-+ Keine Belegungssätze: eine Belegung für die große Tastatur, die auch ohne Ziffernblock spielbar ist (vi-Tasten); Ziffernblock und Pfeile liegen zusätzlich auf der Bewegung; eigene Änderungen liegen darüber
-+ Layout kompakt nur von Hand, nicht nach der Fenstergröße
-+ Palette für Farbenblinde schon jetzt, weil das Kampflog Grün und Rot unterscheidet
-+ Befehlszeile zunächst ohne Zusatzangaben; die Quellen sind ein Register, damit Bierrezepte, Lore-Texte und Bücher später dazukommen
-+ "Sofort auslösen" als Schalter im Reiter Spiel, Vorgabe aus
-+ Klicks in Fenstern als eigene Version 0.31.0, vor dem Titelbildschirm; der Titelbildschirm bekommt einen eigenen Plan
-
-Entschieden am 2026-11-21 für 0.29.0:
-
-+ Fähigkeitenfenster mit Auswahl wie das Inventar: Buchstabe wählt, Enter oder derselbe Buchstabe wirkt, Ziffer belegt
-+ Automatische Belegung auf den ersten freien Platz der Leiste 1, dann der Leisten 2 bis 5
-+ Ein Speicherstand anderer Version wird verworfen, das Log nennt den Grund
-+ Ein gespeicherter Lauf geht vor; `?seed=` gilt nur ohne ihn oder mit `&neu`
-+ Befehlszeile und Suche im Verlauf rücken nach 0.30.0
-+ Laden über einen Schnappschuss des Zustands statt Nachspielen (gemessen knapp 1 s je 2000 Befehle)
-
-Entschieden am 2026-11-21:
-
-+ Aufteilung in 0.28.0, 0.29.0 und 0.30.0 (siehe Stand der Umsetzung)
-+ Schnellleiste bis 0.29.0 automatisch: Fähigkeiten in Lernreihenfolge, danach jede Getränkeart; Wurfwaffen erst mit dem Umbelegen
-+ Kampfspalte: Schaden, Krit samt Faktor, Ausweichen, Blocken, Rüstung, Widerstand, Immunität, Tod anderer, Fähigkeiten, angekündigte Angriffe; Reflektieren und Absorbieren, sobald es sie gibt; Farben nach der Seite (siehe Log)
-+ Laufen mit Umschalt hält wie die Reise; Reise, Laufen und Erkunden beginnen auch mit Feinden in Sicht und halten nur bei einem neuen Feind; wer aus der Sicht gerät und wieder auftaucht, zählt als neu (wie Brogue); auch Rasten (r) beginnt mit bekannten Feinden in Sicht und hält bei einem neuen Feind oder Schaden
-+ Beenden im Spielmenü schließt das Fenster (`window.close()`, im Fenster aus `starten.py` erlaubt), sonst ein Hinweis auf Strg+W
-
-Entschieden am 2026-11-20:
-
-+ Layout: Variante A und B werden beide umgesetzt und sind umstellbar, Vorgabe vorläufig A
-+ vi-Tasten nach Lage (`KeyboardEvent.code`): die Form bleibt, auf der deutschen Tastatur liegt die Diagonale links oben auf Z
-+ Umschalten der Leisten mit Umschalt+1 bis 5
-+ Vorbelegung des Ziels über eine Angabe `zielvorgabe` ("feind", "gefaehrte", "selbst") in den Daten der Fähigkeit bzw. des Gegenstands, ohne Angabe abgeleitet aus den Tags der Wirkung
-+ Ablage der Schnellleiste: ein eigener Teil `oberflaeche` im Spielstand (Belegung der Leisten, später weitere Anzeigedaten des Laufs); der Spielstand besteht sonst aus Version, Startwert, Startoptionen und Befehlsliste und wird beim Laden nachgespielt, der Teil `oberflaeche` wird mitgespeichert und beim Laden wieder eingesetzt, aber nicht nachgespielt; die Logik liest ihn nie
-+ Rechtsklick untersucht (siehe Maus)
-+ Metaeffekte als Idee festgehalten und vorbereitet (Effektschicht, Schalter in den Einstellungen), umgesetzt mit der Darstellung (Punkt 12)
-+ Reihenfolge: 0.27.0 Aktionskatalog, Fensterstapel und Skillfenster; danach das neue Layout, am 2026-11-21 auf 0.28.0 bis 0.30.0 aufgeteilt; die Einordnung neben den übrigen Schwerpunkten (Zustände im Inhalt, Licht, Brausystem) wird bei der weiteren Planung abgestimmt
-+ Knöpfe für die Maus in einer Bedienzeile am unteren Rand mit der Schnellleiste, unten in der Seitenleiste; keine Kopfleiste (siehe Bedienzeile)
-
-Offen ist derzeit nichts; neue Fragen kommen hierher.
 
 ## Quellen
 

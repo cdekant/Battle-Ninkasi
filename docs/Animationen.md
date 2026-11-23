@@ -4,7 +4,7 @@ Stand: 2026-11-20, Entwurf, zurückgestellt
 
 Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Oberflaeche.md](Oberflaeche.md), [Bedienung.md](Bedienung.md)
 
-Konzept für Bewegung und Effekte in der Anzeige: Effektschicht, Kampfanimation, Kamera. Alles hier ist reine Anzeige und berührt weder den Spielzustand noch den Spiel-Zufall; die Logik liefert über ihre Meldungen schon alles Nötige. Grafik (Varianten von Boden und Wand, bewegte Tiles) steht in [Tileset.md](Tileset.md), die Arbeitsliste in Punkt 12 von [Systemausbau.md](Systemausbau.md), Licht in [Welt.md](Welt.md) (Licht), [Wesen.md](Wesen.md) (Wahrnehmung).
+Konzept für Bewegung und Effekte in der Anzeige: Effektschicht, Kampfanimation, Kamera. Alles hier ist reine Anzeige und berührt weder den Spielzustand noch den Spiel-Zufall; die Logik liefert über ihre Meldungen schon alles Nötige. Grafik (Varianten von Boden und Wand, bewegte Tiles) steht in [Tileset.md](Tileset.md), die Arbeitsliste in Punkt 13 von [Systemausbau.md](Systemausbau.md), Licht in [Welt.md](Welt.md) (Licht), [Wesen.md](Wesen.md) (Wahrnehmung).
 
 ## Stand
 
@@ -23,7 +23,7 @@ Umsetzung: siehe [Anzeige.md](Anzeige.md), Anzeige; siehe [Bedienung.md](Bedienu
 2. Varianten von Boden und Wand: siehe [Tileset.md](Tileset.md) (Varianten und Schmuck); der Aufwand liegt vor allem in der Grafik und kann neben Teil 1 in der Tilewerkstatt laufen
 3. Bewegte Tiles (siehe [Tileset.md](Tileset.md)), weiches Scrollen der Kamera; Licht gehört wegen der Wahrnehmung nicht hierher
 
-Umsetzung: offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 12
+Umsetzung: offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 13
 
 ## Entschieden
 
@@ -35,7 +35,7 @@ Der ganze Bereich ist zurückgestellt (Stand 2026-11-20); festgehalten ist, was 
 + Bewegte Tiles und Umgebungseffekte (lodernde Kesselfeuer, blubbernde Bottiche, wogendes Gas) laufen im Bildtakt auch dann, wenn keine Spielzeit vergeht; sie halten die Eingabe nie auf, nur Animationen aus Meldungen tun das; ihr Takt und Flackern kommen aus dem kosmetischen Zufall, die Logik bleibt unberührt
 + Reihenfolge: Gerüst, Kampfanimation, bewegte Tiles (alle drei brauchen den Bildtakt des Gerüsts); Varianten von Boden und Wand hängen nicht daran und sind gesondert zurückgestellt (siehe [Tileset.md](Tileset.md))
 
-Umsetzung: offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 12
+Umsetzung: offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 13
 
 ## Recherche
 

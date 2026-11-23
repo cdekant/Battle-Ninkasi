@@ -1,6 +1,6 @@
 # Battle Ninkasi - Wirkungen
 
-Stand: 2026-11-21
+Stand: 2026-11-23
 
 Zuständig für: `src/kern/effekte.js`, `src/kern/bausteine.js`, `src/kern/ausloeser.js`, `src/kern/vorgang.js`, `src/kern/werte.js`, `src/systeme/modifikatoren.js`, `src/systeme/zustaende.js`, `src/systeme/befehlsveraenderer.js`, `src/systeme/beschwoerung.js`, `src/systeme/zielauswahl.js`, `src/systeme/zielbausteine.js`, `src/systeme/faehigkeiten.js`, `src/systeme/laufendeAktionen.js`, `src/systeme/tod.js`, `src/welt/geometrie.js`, `daten/effekte.js`, `daten/zustaende.js`, `daten/faehigkeiten.js`, `daten/risiken.js`
 
@@ -19,9 +19,9 @@ Skills, Items, Zustände und Fähigkeiten wirken über sechs Arten, die frei kom
 3. Aktionsveränderer ändern, wie eine Aktion abläuft: Zielmuster, Reichweite, Fläche; z.B. "Braupaddel des Rundumschlags trifft alle angrenzenden Felder", "Speer trifft zwei Felder in Linie"; Zielmuster sind Daten (`muster: { art: "angrenzend" }`, `muster: { art: "linie", laenge: 2 }`), siehe Zielauswahl
 4. Zustände sind zeitlich begrenzt, mit Verlauf (gleichbleibend, abklingend, ansteigend) und Stapelregel (erneuern, aufaddieren, nur der stärkste, einzeln); sie bündeln selbst Modifikatoren und Auslöser; z.B. Schaden über Zeit, abklingender Segen, sich steigernde Vergiftung; siehe Zustände
 5. Auren wirken auf andere im Umkreis der Trägerin, z.B. "Gegner in der Nähe langsamer", "Hefen in der Nähe sprossen schneller"; siehe Modifikatoren
-6. Gewährte Aktionen schalten eine neue Aktion frei, z.B. "Braupaddel erlaubt Ansturm"; siehe Fähigkeiten
+6. Gewährte Aktionen schalten eine neue Aktion frei, z.B. "Braupaddel erlaubt Ansturm"; siehe Fähigkeiten (noch offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 5)
 
-Jede Wirkungsart kann zusätzlich Bedingungen tragen (nur ab Pegel X, nur gegen Bakterien, nur unter 30 % LP, nur mit zwei Kupfer-Items: Sets, Synergien) und Nachteile (negative Werte, z.B. für verfluchte Items). Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Pegel); entfällt die Quelle, entfallen genau ihre Modifikatoren.
+Jede Wirkungsart kann zusätzlich Bedingungen tragen (nur ab Pegel X, nur gegen Bakterien, nur unter 30 % LP, nur mit zwei Kupfer-Items: Sets, Synergien) und Nachteile (negative Werte, z.B. für verfluchte Items). Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Aura); Schwellen des Pegels sind Bedingungen; entfällt die Quelle, entfallen genau ihre Modifikatoren.
 
 ## Effektsystem
 
@@ -55,7 +55,7 @@ Schnittstellen:
 Regeln:
 
 + Grundbausteine sind wenige Dutzend kleine, stabile Funktionen; ein neuer ist nur für eine wirklich neue Mechanik nötig
-+ Was sich nicht aus Bausteinen zusammensetzen lässt (KI-Muster wie Zweiteilung, Sprossung, Myzelwachstum, Phagen-Befall, Bossphasen), wird ein benanntes Verhaltensmodul; die Daten verweisen nur darauf, z.B. `ki: "sprossung"` mit Parametern; Bausteine, Verhaltensmodule und Zielmuster stehen in Registern, auch für Mods (siehe [Architektur.md](Architektur.md), Register)
++ Was sich nicht aus Bausteinen zusammensetzen lässt (Muster des Verhaltens), wird ein benanntes Verhaltensmodul; die Daten verweisen nur darauf, z.B. `ki: { modul: "fliehen" }`; ob Zweiteilung, Sprossung und Myzel Verhaltensmodule oder Bausteine werden, ist offen (siehe [Systemausbau.md](Systemausbau.md), Punkt 6), Bossphasen laufen über Auslöser mit Bedingungen; Bausteine, Verhaltensmodule und Zielmuster stehen in Registern, auch für Mods (siehe [Architektur.md](Architektur.md), Register)
 + Bausteine erklären, ob sie ein Wesen brauchen (`brauchtZiel`); ein Schritt ohne Ziel (bei `auf: "quelle"` ohne Quelle) wird übersprungen, der Effekt läuft weiter
 + Bausteine beschreiben ihre Parameter für die Datenprüfung: `text`, `ganzzahl`, `wahrheitswert`, `effekt`, `muster` und weitere, mit `?` freiwillig, eine Liste nennt die erlaubten Werte; benannte Effekte dürfen sich nicht im Kreis aufrufen, auch nicht über Zustände
 + Getötet wird im Effekt nie: fällt der Lebenswert auf 0, stirbt das Wesen in der Zustandsprüfung nach dem Vorgang (siehe Tod und Zustandsprüfung)
@@ -65,7 +65,7 @@ Regeln:
 Daten:
 
 + Modifikator: `{ ziel, art, betrag, quelle, tag?, wenn? }`, z.B. `{ ziel: "kosten.bewegen", art: "prozent", betrag: -5 }`
-+ Ziele sind Namen wie `lp`, `genauigkeit`, `ausweichen`, `ruestung`, `ruestung.<art>`, `widerstand`, `schaden`, `kritfaktor` (siehe [Wesen.md](Wesen.md), Kampfwerte), `reichweiteSicht`, `kosten.<aktion>`, `kosten.alle`, `verbrauch.<wert>`, `verbrauch.alle`, `abklingzeit`, `unterhalt.<wert>` (siehe Fähigkeiten), `regeneration.<wert>`, `schwund.<wert>`, `kurvenverschiebung.<wert>`, `abbau.pegel` (siehe [Wesen.md](Wesen.md), Stoffwechsel), `eigenschaft.<name>` (siehe [Wesen.md](Wesen.md), Skills und Lernen)
++ Ziele sind Namen wie `lp`, `genauigkeit`, `ausweichen`, `ruestung`, `ruestung.<art>`, `widerstand`, `schaden`, `kritfaktor`, `immunitaet` und jeder Kampfwert unter seinem Namen (siehe [Wesen.md](Wesen.md), Kampfwerte), `tragkraft` (siehe [Gegenstaende.md](Gegenstaende.md), Inventar), `reichweiteSicht`, `kosten.<aktion>`, `kosten.alle`, `verbrauch.<wert>`, `verbrauch.alle`, `abklingzeit`, `unterhalt.<wert>` (siehe Fähigkeiten), `regeneration.<wert>`, `schwund.<wert>`, `kurvenverschiebung.<wert>`, `abbau.pegel` (siehe [Wesen.md](Wesen.md), Stoffwechsel), `eigenschaft.<name>` (siehe [Wesen.md](Wesen.md), Skills und Lernen)
 + Arten (`MODIFIKATORARTEN` in `src/kern/werte.js`): `plus`, `prozent`, `mal` (Betrag in Prozent, `150` heißt x1,5), `mindestens`, `hoechstens`, `setzen` (zählt als `mindestens` und `hoechstens` mit demselben Betrag); alle Beträge ganzzahlig
 + Bedingungen: `wenn: [{ bedingung, ...parameter }]`, alle müssen gelten
 + Auren: `auren: [{ reichweite, trifft, selbst?, sichtlinie?, modifikatoren }]` an Wesen und Zuständen
@@ -115,7 +115,7 @@ Regeln:
 + Ketten: Befehle und Welt wirken auf Kettenstufe 0, der Effekt eines Auslösers eine Stufe tiefer als sein Ereignis; die Chance sinkt je Stufe auf `daempfung` Prozent (einheitlich gerundet: 100, 50, 25, 13, 7 ...), ab der höchsten Kettentiefe wird nichts mehr vorgemerkt
 + Sichere Chancen (0 und 100) würfeln nicht, damit die Zahlenfolge des Zufalls ungestört bleibt
 + Kettenreaktionen der Welt (Feuer greift auf Gas über, Fässer explodieren nacheinander) laufen nicht über Auslöser, sondern über die Zeit (Weltuhr, Zeitereignisse); sie sind von der Kettengrenze nicht betroffen und für die Spielerin sichtbar
-+ Ersatzwirkungen aus Daten ("Phönixbier verhindert einmal den Tod") sind ein eigener Typ, da sie sofort wirken müssen; Entwurf in [Systemausbau.md](Systemausbau.md)
++ Ersatzwirkungen aus Daten ("Phönixbier verhindert einmal den Tod") sind ein eigener Typ, da sie sofort wirken müssen; offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 4
 
 ## Zustände
 
@@ -284,6 +284,6 @@ Regeln:
 ## Verweise
 
 + Spieldesign der Fähigkeiten, des Pegels und des Brauens: [Grundlagen.md](Grundlagen.md); Skills, die Fähigkeiten ausbauen: [Charakter.md](Charakter.md)
-+ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkte 1 bis 6, u.a. Ersatzwirkungen, Auslöser am nicht angelegten Inventar, erster Auslöser im Spielinhalt
++ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkte 4 bis 6 (Ersatzwirkungen, gewährte und gelehrte Fähigkeiten, Teilung) und Punkt 8 (u.a. Auslöser am nicht angelegten Inventar, `zug_beginn`); erster Auslöser im Inhalt in Punkt 14
 
 Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).

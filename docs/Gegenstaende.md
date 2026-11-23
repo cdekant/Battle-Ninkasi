@@ -1,10 +1,10 @@
 # Battle Ninkasi - Gegenstände
 
-Stand: 2026-11-22
+Stand: 2026-11-23
 
-Zuständig für: `src/systeme/inventar.js`, `src/systeme/ausruestung.js`, `src/systeme/verschleiss.js`, `src/systeme/kennen.js`, `daten/ausruestung.js`, `daten/getraenke.js`, `daten/etiketten.js`
+Zuständig für: `src/systeme/inventar.js`, `src/systeme/ausruestung.js`, `src/systeme/verschleiss.js`, `src/systeme/kennen.js`, `daten/ausruestung.js`, `daten/getraenke.js`, `daten/wurfgegenstaende.js`, `daten/etiketten.js`
 
-Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Bedienung.md](Bedienung.md), [Grundlagen.md](Grundlagen.md)
+Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Bedienung.md](Bedienung.md), [Grundlagen.md](Grundlagen.md), [Wesen.md](Wesen.md)
 
 ## Zweck
 
@@ -35,7 +35,7 @@ Regeln:
 + Beim Aufheben fließt ein Gegenstand in einen Stapel, der in allen übrigen Komponenten gleich ist, so stapeln sich z.B. Sauerbier und Bier nicht; nur der Zeitpunkt des Verderbens zählt nicht, er wird gemittelt (siehe Verschleiß); auf dem Boden fließt nichts zusammen
 + Trinken, Werfen und Material für Fähigkeiten nehmen ein Stück, Fallenlassen den ganzen Stapel; Trinken nimmt bei Ladungen eine Ladung; ein Gegenstand mit Ladungen stapelt sich nicht
 + Ausstattung geht über `insInventar`, stapelbare fließen also zu einem Stapel zusammen; ein Wesen lässt sie beim Tod fallen wie alles im Gepäck (siehe [Wirkungen.md](Wirkungen.md), Tod und Zustandsprüfung)
-+ Nach dem letzten Gebrauch kommt `wirdZu` ins Gepäck (Bier zu leerer Flasche, Bierfass zu Fass), Grundlage für das Brauen
++ Nach dem letzten Gebrauch kommt `wirdZu` ins Gepäck (Bier zu leerer Flasche, Bierfass zu Fass), Grundlage für das Brauen; der Ballast ist gewollt
 + Gewicht mit Ladungen zuzüglich `gewichtJe` je Ladung; die Last ist die Summe über das Gepäck, Angelegtes eingeschlossen
 + Tragkraft mit Modifikatoren auf `tragkraft` (Skills folgen); verboten ist nichts, Überladung verteuert nur das Bewegen, nach allen Modifikatoren
 + Anzeige: das Inventarfenster zeigt Stapel (x 3), Ladungen (19/20), Angelegtes und die Last (Last 3,2 / 20 kg, rot "überladen"), die Seitenleiste nur die Last
@@ -92,6 +92,7 @@ Regeln:
 + Stapel: fließen zwei zusammen, gilt der nach Anzahl gewichtete Durchschnitt beider Zeitpunkte, abgerundet; die Restzeit aller Stücke bleibt so in Summe gleich, dafür verdirbt der Stapel auf einmal; ein abgespaltenes Stück behält den Zeitpunkt und bekommt sein eigenes Zeitereignis; die Datenprüfung verlangt, dass ein stapelbarer Gegenstand zu einem stapelbaren verdirbt
 + Auf verlassenen Ebenen ruht das Verderben mit (`verdirbtUm` rückt wie die Zeitereignisse nach), was Ninkasi trägt, verdirbt weiter
 + Abgenutzt wird nur über den Baustein `abnutzen`, nicht durch Gebrauch (Zuschlagen, Getroffenwerden)
++ Eine Waffe mit Haltbarkeit geht kaputt wie jede Ausrüstung, angefressen wird sie aber noch nicht schwächer, weil das Ausdünnen nur Modifikatoren trifft, nicht die Angriffsprofile (offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 8)
 + Bei 0 ist der Gegenstand kaputt: er wird zu `wirdZu`, abgelegt und ins Gepäck der Trägerin; er verschwindet also nie ganz
 + Anzeige im Gepäck: unter 75 % "angefressen", unter 50 % "stark angefressen", unter 25 % "zerfressen", jeweils mit dem Prozentwert
 + Im Spielinhalt (Zahlen vorläufig): Bier verdirbt nach 50000 Zeiteinheiten (500 Weltticks) zu Sauerbier (LP +5, Pegel +0,3 ‰ statt +20 und +0,5 ‰); das Bierfass verdirbt nicht; Biss der Essigbakterien und Säurespritzer nutzen 1 ab, Säureschwall und Säuredüse 2
@@ -129,6 +130,6 @@ Regeln:
 ## Verweise
 
 + Spieldesign der Getränke, Biersorten und des Brauens: [Grundlagen.md](Grundlagen.md); Inventarfenster: [Bedienung.md](Bedienung.md), Fenster
-+ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 9
++ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 8 (angefressene Waffen), Punkt 12 (Teilmenge fallen lassen, Restzeit des Verderbens), Punkt 14 (Flüche und Unbekanntes im Inhalt, Reparieren, Verderben weiterer Dinge)
 
 Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).

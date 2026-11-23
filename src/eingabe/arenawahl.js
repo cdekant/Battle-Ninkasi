@@ -1,4 +1,4 @@
-// Wahl der Arena vom Titel aus (siehe docs/Titelbildschirm.md, Stand der Umsetzung 0.43.0): Fensterart "arenawahl",
+// Wahl der Arena vom Titel aus (siehe docs/Titelbildschirm.md, Arena): Fensterart "arenawahl",
 // reine Tastenlogik ohne DOM.
 //   Zustand { gewaehlt, automatisch, taktik }: die Arenen aus daten/arenen.js in ihrer Reihenfolge; Buchstabe oder
 //   Pfeile und Enter starten die Arena (ein freier Platz, sonst die Läufe zum Ersetzen wie beim neuen Spiel);

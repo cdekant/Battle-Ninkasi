@@ -12,7 +12,7 @@ Der Kern, auf dem alle Systeme stehen: wie Befehle in die Logik kommen, wie Zust
 
 ## Grundsätze
 
-+ Modularität und Erweiterbarkeit haben Vorrang, auch auf Kosten höherer Code-Komplexität
++ Modularität, Flexibilität und Erweiterbarkeit haben Vorrang vor einfachem Code; lesbar bleibt der Code durch ausdrückliche Namen und Kommentare
 + Spiellogik und Anzeige strikt getrennt: Die Logik kennt kein DOM, kein Canvas, keine Tasten
 + Die Logik läuft auch ohne Browser (Node), für Tests, Simulationen und Balancing
 + Inhalte sind Daten, Mechanik ist Code; neue Inhalte brauchen im Regelfall keinen neuen Code
@@ -61,7 +61,7 @@ Daten (`src/kern/zustand.js`):
 
 + Zustand: `{ startwert, zeit, naechsteId, naechsteZustandsnummer, einreihungszaehler, warteschlange, entitaeten, spielerinId, vorbei, ebene, tiefe, plan, abgelegteEbenen, sichtbareFelder, zufallszustand, wissen, ruf }`; `tiefe` und `abgelegteEbenen` siehe [Welt.md](Welt.md), Ebenen, `plan` siehe [Welt.md](Welt.md), Plan des Laufs, `wissen` siehe [Gegenstaende.md](Gegenstaende.md), Unbekanntes, `ruf` siehe [Wesen.md](Wesen.md), Fraktionen
 + Spiel: `{ daten, zustand, optionen, befehle, hoerer, zwischenspeicher, anstehendeAusloeser }`; nur `zustand`, `optionen` und `befehle` sind Lauf, der Rest ist abgeleitet oder flüchtig
-+ Eine Entität ist eine ID plus Komponenten, z.B. Position, Werte, Inventar, KI, Fraktion, Handel, Braukessel, Sicht; `entitaetAusDatensatz` übernimmt alle Felder eines Datensatzes außer `vorlage`, `abstrakt` und `werte` als Komponenten, `werte` werden über `werteAusDaten` aufgebaut
++ Eine Entität ist eine ID plus Komponenten, z.B. Position, Werte, Inventar, KI, Fraktion, Handel, Braukessel, Sicht; `entitaetAusDatensatz` übernimmt alle Felder eines Datensatzes außer `vorlage`, `abstrakt`, `werte` und `ausstattung` (`KEINE_KOMPONENTEN`) als Komponenten, `werte` werden über `werteAusDaten` aufgebaut
 + Wesen können in den Daten außerdem `tags`, feste `modifikatoren` und `auren` tragen, siehe [Wirkungen.md](Wirkungen.md), Modifikatoren
 + Werte (LP, MP, PP, Pegel und weitere) sind ein erweiterbarer Satz, keine fest verdrahteten Felder; ein Wert ohne Grundwert ist nach oben offen (z.B. der Pegel), sein Höchstwert wird als `Infinity` berechnet und nie gespeichert; nach unten bleibt jeder Wert bei 0
 + Kurven sind Daten: Stützpunkte `[[stelle, wert], ...]`, aufsteigend nach der Stelle, dazwischen linear und ganzzahlig, außerhalb gleichbleibend (`src/kern/kurven.js`: `wertAufKurve`, `stelleDesHoechstwerts`, `kurvenfehler` für die Datenprüfung); z.B. Regeneration über dem Pegel (siehe [Wesen.md](Wesen.md), Stoffwechsel)
@@ -88,7 +88,7 @@ Daten (`src/kern/zeit.js`):
 
 + Ein einziger Zeitstrahl in ganzzahligen Zeiteinheiten; Dauern werden in Zeiteinheiten angegeben, nicht in Ticks
 + Die Warteschlange enthält drei Arten von Einträgen: Akteure (`art: "akteur"`, Ninkasi, Gegner, Verbündete), die nach dem Handeln mit ihren Aktionskosten wieder eingereiht werden; die Weltuhr (`art: "weltuhr"`) alle `WELTTICK` = 100 Einheiten; Zeitereignisse (`art: "ereignis"`, z.B. "Status endet bei T=4350"), optional an eine Entität gebunden (`gebundenAn`), dann entfallen sie mit ihr
-+ Kosten je Aktionsart in `daten/aktionen.js` (Standard 100; Bewegen, Nahkampf, Fernkampf, Trinken, Psi, Magie, Brauen u.a.); Modifikatoren zielen auf eine Aktionsart oder auf alle
++ Kosten je Aktionsart in `daten/aktionen.js` (Standard 100; Bewegen, Nahkampf, Warten, Aufheben, Trinken, Werfen, Benutzen, Treppe, Anlegen, Ablegen, Fallenlassen und die Vorgabe für Fähigkeiten); Modifikatoren zielen auf eine Aktionsart oder auf alle
 
 Schnittstellen:
 
@@ -104,7 +104,7 @@ Regeln:
 + Zugzähler: Jede ausgeführte Aktion erhöht `zuege` der Akteurin um eins, gleich wie viel Zeit sie kostet; daran misst sich die Abklingzeit der Fähigkeiten, wer schneller handelt, hat sie in Weltzeit früher zurück
 + Prozentuale Änderungen werden einheitlich gerundet; Rundungsfehler liegen bei etwa 1 % und werden hingenommen
 + Bruchteile (z.B. 0,3 LP pro Tick) laufen über ganzzahlige Speicher in Hundertsteln, ein voller Punkt wird gutgeschrieben, der Rest bleibt stehen
-+ Lange Aktionen (z.B. Brauen mit 2000 Einheiten) laufen in Schritten und werden unterbrochen, sobald eine Gefahr auftaucht (Gegner im Sichtfeld, Schaden); nach einer Unterbrechung entscheidet die Spielerin per Befehl: weitermachen oder abbrechen (siehe [Wirkungen.md](Wirkungen.md), Lange Aktionen; Folgen eines Abbruchs sind Spieldesign, siehe [Grundlagen.md](Grundlagen.md))
++ Lange Aktionen laufen in Schritten und lassen sich unterbrechen (siehe [Wirkungen.md](Wirkungen.md), Lange Aktionen)
 + Schleifenschutz: mehr als eine Million Einträge ohne Eingabe der Spielerin werfen einen Fehler
 
 ## Ereignisse
@@ -158,10 +158,10 @@ Regeln:
 Daten:
 
 + Alle Inhalte liegen als JavaScript-Dateien in `daten/` vor, die nur Daten enthalten (`export default { ... }`), mit Kommentaren; `daten/index.js` sammelt sie (neue Datendateien dort eintragen), `daten/regeln.js` hält die Regelwerte, die das Balancing ändern darf, ohne Code anzufassen
-+ Dazu gehören Charakter, Eigenschaften, Makel, Skills, Fähigkeiten, Gegner, Verbündete, Händler, Items, Getränke, Zutaten, Rezepte, Kessel, Effekte, Zustände, Tiles, Levelparameter
++ Dazu gehören Charakter, Eigenschaften, Makel, Skills, Fähigkeiten, Gegner, Verbündete, Händler, Items, Getränke, Zutaten, Rezepte, Kessel, Effekte, Zustände, Levelparameter; Tiles liegen wegen ihrer Lizenz in `grafik/`
 + Vorlagen mit Vererbung für Wesen, Gegenstände und Zustände: Einträge mit `abstrakt: true` sind Vorlagen, `vorlage` erbt von ihnen (z.B. "Bakterium", davon abgeleitet "Essigbakterium" mit Abweichungen)
-+ Namensbuch (`daten/namensbuch.js`, seit 0.45.0): je Art (`wesen`, `gegenstaende`, `eigenschaften`, `skills`, `faehigkeiten`, `zustaende`, `fallen`, ohne Vorlagen) die Listen `fest` und `vorlaeufig`; fest sind bisher `ninkasi` und die sechs Eigenschaften, der übrige Testinhalt ist vorläufig
-+ Umbenennungen (`daten/umbenennungen.js`, seit 0.45.0): `{ <art>: { <alter Name>: <neuer Name> | null } }`, `null` heißt entfernt; Ketten sind erlaubt, Kreise nicht
++ Namensbuch (`daten/namensbuch.js`): je Art (`wesen`, `gegenstaende`, `eigenschaften`, `skills`, `faehigkeiten`, `zustaende`, `fallen`, ohne Vorlagen) die Listen `fest` und `vorlaeufig`; fest sind bisher `ninkasi` und die sechs Eigenschaften, der übrige Testinhalt ist vorläufig
++ Umbenennungen (`daten/umbenennungen.js`): `{ <art>: { <alter Name>: <neuer Name> | null } }`, `null` heißt entfernt; Ketten sind erlaubt, Kreise nicht
 + Namensbuch und Umbenennungen gehören nicht zu den Spieldaten (nicht in `daten/index.js`), ändern also die Prüfsumme nicht
 
 Schnittstellen:
@@ -172,7 +172,7 @@ Regeln:
 
 + Beim Laden werden alle Daten geprüft (Pflichtfelder, Typen, Verweise auf vorhandene Effekte, Zustände, Verhaltensmodule, Gelände, Texte, Kreise in Effekten); Fehler erscheinen beim Start gesammelt mit klarer Meldung
 + Texte stehen nicht in den Daten, sondern als Schlüssel; siehe [Texte.md](Texte.md)
-+ Stabile Namen (seit 0.45.0): ein Name in den Daten ist eine Kennung, kein Anzeigename (der steht in der Sprachdatei); Namen gelangen in Ablagen außerhalb des Laufs (Zähler der Chronik `besiegt.<typ>` und `gesehen.<typ>`, die letzte Verteilung der Eigenschaften, später Vorwissen und Bestiarium)
++ Stabile Namen: ein Name in den Daten ist eine Kennung, kein Anzeigename (der steht in der Sprachdatei); Namen gelangen in Ablagen außerhalb des Laufs (Zähler der Chronik `besiegt.<typ>` und `gesehen.<typ>`, die letzte Verteilung der Eigenschaften, später Vorwissen und Bestiarium)
 + Ein fester Name ändert sich nur mit einem Eintrag in `daten/umbenennungen.js`; vorläufige Namen (Testinhalte) dürfen sich frei ändern und verschwinden, ihre Zähler in der Chronik bleiben dann unbenutzt liegen; fest wird ein Name von Hand, spätestens wenn er als echter Inhalt entsteht
 + Jeder Name der Daten steht im Namensbuch, jeder feste gibt es noch in den Daten oder er steht in den Umbenennungen, deren Ziele es gibt (geprüft von `tests/namensbuch.test.js`); `node werkzeuge/namensbuch.js` führt das Namensbuch nach (siehe [Entwicklung.md](Entwicklung.md), Bot und Werkzeuge)
 + Die Umbenennungen wendet nur die Oberfläche beim Lesen der Ablage an (`src/eingabe/umbenennen.js`: `nameNachUmbenennung`, `schluesselUmbenennen`, `eigenschaftenUmbenennen`; Zähler der Chronik über `zaehlerUmbenennen` in `src/eingabe/chronik.js`, gleichnamige werden zusammengelegt), nie die Logik; Spielstände brauchen sie nicht, weil eine Umbenennung die Prüfsumme ändert
@@ -182,8 +182,8 @@ Regeln:
 
 Daten:
 
-+ Spielstand (`spielstand` in `src/kern/spiel.js`): `{ version, pruefsumme, startwert, optionen, befehle }`; `optionen` sind die Startoptionen (Eigenschaften aus der Charaktererstellung und seit 0.32.0 die Spielart); Laden heißt Nachspielen ohne Anzeige (`nachspielen`)
-+ Prüfsumme der Daten (seit 0.45.0, `src/kern/pruefsumme.js`): `pruefsummeBerechnen(wert)`, 32-Bit-FNV-1a über die JSON-Form als Hex-Text mit acht Stellen; `vorbereiten` legt sie als `daten.pruefsumme` an, über die Rohdaten samt späterer Mods, ohne Sprache (Texte wirken nicht auf die Logik)
++ Spielstand (`spielstand` in `src/kern/spiel.js`): `{ version, pruefsumme, startwert, optionen, befehle }`; `optionen` sind die Startoptionen (Eigenschaften aus der Charaktererstellung und die Spielart); Laden heißt Nachspielen ohne Anzeige (`nachspielen`)
++ Prüfsumme der Daten (`src/kern/pruefsumme.js`): `pruefsummeBerechnen(wert)`, 32-Bit-FNV-1a über die JSON-Form als Hex-Text mit acht Stellen; `vorbereiten` legt sie als `daten.pruefsumme` an, über die Rohdaten samt späterer Mods, ohne Sprache (Texte wirken nicht auf die Logik)
 + Spielart in den Startoptionen: siehe Abschnitt Spielarten
 + Spiel-Zufall: eigener Generator sfc32 (`src/kern/zufall.js`), nur ganze Zahlen, Zustand aus vier 32-Bit-Zahlen im Spielzustand (`zufallszustand`)
 
@@ -192,7 +192,7 @@ Schnittstellen (`src/kern/zufall.js`):
 + `zufallErzeugen`, `naechsteZufallszahl`, `zufallsGanzzahl(z, min, max)`, `mitProzentChance(z, prozent)`, `mitAnteil(z, zaehler, nenner)` (exakter Bruch), `wuerfeln(z, "1W6+2")`, `wuerfelSpanne("1W6+2")` (kleinster und größter Wurf, ohne zu würfeln), `istWuerfelausdruck`, `startwertAbleiten(startwert, kennung)`
 + Abgeleitete Startwerte: Spiel-Zufall (`"spiel"`), Plan des Laufs (`"plan"`), Grundriss (`"ebene.<tiefe>.<name>"`, bei einem neuen Versuch mit `.versuch<n>`), Türen, Objekte und Inhalt einer Ebene (`.tueren`, `.objekte`, `.inhalt` dahinter) haben eigene Quellen, damit die Ebene nicht vom Spielverlauf abhängt; ebenso die Etiketten unbekannter Gegenstände (`"etiketten"`); später z.B. Buchtexte aus Lauf-Startwert und Objekt-ID
 
-Schnittstellen (`src/kern/wurf.js`, seit 0.36.0):
+Schnittstellen (`src/kern/wurf.js`):
 
 + Würfe im Spiel: `wurfGanzzahl(spiel, name, min, max)`, `wurfWuerfel(spiel, name, ausdruck)`, `wurfProzent(spiel, name, prozent)`, `wurfAnteil(spiel, name, zaehler, nenner)`, `wurfAuswahl(spiel, name, liste)`; jeder Wurf trägt einen kurzen Namen (`treffer`, `blocken`, `kritisch`, `schaden`, `heilen`, `menge`, `angriffsprofil`, `risiko`, `ausloeser`, `faehigkeitenwahl`, `bemerken`, `erkennen`, `falle_entdecken`, `abweichen`, `ziel_verfehlen`, `ausbreitung`, `gasabbau`, `entzuenden`, Auswahlen mit `_wohin` wie `kette_wohin`, dazu `zufallsfeld`); ein Wurf ohne Namen wirft
 + Quelle der Würfe: `spiel.wurfquelle`, ein Laufzeitfeld außerhalb des Zustands, nicht gespeichert; ohne Angabe oder mit `{ art: "zufall" }` der Spiel-Zufall, `{ art: "fremd", zufallszustand }` ein eigener Zufallszustand (für viele Simulationen, aus denen Spannen folgen), `{ art: "grenzen", mengen: "kleinste" | "groesste", chancen?: { <name>: true | false }, zufallszustand }` Würfel und Ganzzahlen am kleinsten oder größten Wurf, festgelegte Chancen ohne Wurf, nicht festgelegte Chancen und Auswahlen aus dem eigenen Zufallszustand
@@ -204,13 +204,13 @@ Regeln:
 + Regeln für die Logik: kein `Math.random()`, keine Uhrzeit, keine Winkelfunktionen, nur ganze Zahlen, feste Reihenfolge beim Durchlaufen von Sammlungen
 + Jede Änderung am Verfahren des Zufalls ändert die Zahlenfolge
 + Ein Spielstand passt nur zu derselben Version und derselben Prüfsumme der Daten (`spielstandUnpassend(daten, stand)` gibt `null`, `"version"` oder `"daten"`); `nachspielen` und `ausSchnappschuss` werfen sonst; streng, weil der Zustand per Namen auf die Daten verweist und ein Lauf aus alten und neuen Daten weder nachspielbar noch sicher spielbar wäre
-+ Jeder Wurf während des Spiels läuft über `src/kern/wurf.js`; nur Generator, Schnittstelle und das Anlegen in `src/kern/spiel.js` fassen `zufallszustand` an (geprüft von `tests/wurf.test.js`); die Welterzeugung würfelt mit eigenen abgeleiteten Startwerten; im echten Spiel rufen die Wurffunktionen dieselben Funktionen in derselben Reihenfolge wie zuvor, die Zahlenfolge blieb mit 0.36.0 gleich
++ Jeder Wurf während des Spiels läuft über `src/kern/wurf.js`; nur Generator, Schnittstelle und das Anlegen in `src/kern/spiel.js` fassen `zufallszustand` an (geprüft von `tests/wurf.test.js`); die Welterzeugung würfelt mit eigenen abgeleiteten Startwerten
 + Sichere Fälle (Chance 0 oder 100) würfeln nicht, wo der Aufrufer sie vorher prüft; so bleibt die Zahlenfolge von solchen Fällen ungestört
-+ Startwert eines neuen Laufs: zufällig (`crypto.getRandomValues` in `src/main.js`) oder über `?seed=` in der Adresse (Zahl, sonst aus dem Text abgeleitet), ebenso `?spielart=` (nur eine aus `SPIELARTEN`); beide gelten nur mit einem leeren Platz; eine Abfrage im Titel nach dem Vorbild Brogue ist vorgesehen
++ Startwert eines neuen Laufs: zufällig (`crypto.getRandomValues` in `src/main.js`) oder über `?seed=` in der Adresse (Zahl, sonst aus dem Text abgeleitet), ebenso `?spielart=` (nur eine aus `SPIELARTEN`); beide gelten nur mit einem leeren Platz; eine Abfrage im Titel ist eine Idee (siehe [Titelbildschirm.md](Titelbildschirm.md), Ideen für später)
 + Kosmetischer Zufall (Titelbild, Spruch im Titel, später Animationen, Partikel und Textvarianten) nutzt `Math.random()` nur in der Anzeige und berührt den Spiel-Zufall nie
 + rot.js hat einen eigenen, globalen Zufall; er wird nur für die Dungeon-Erzeugung benutzt und vorher mit einem abgeleiteten Startwert gesetzt (`RNG.setSeed` im Schritt `karte_digger`, `src/welt/ebenenschritte.js`)
 + Fallstrick: Die Kartengeneratoren von rot.js (Digger, Uniform) brechen nach einer Zeitgrenze ab (`timeLimit`, gemessen mit `Date.now()`); sie wird deshalb immer auf `Infinity` gesetzt
-+ Jede Änderung an Code oder Daten macht alte Spielstände ungültig; passt die Version nicht, wirft das Laden mit klarer Meldung
++ Ein geänderter Datenstand fällt über die Prüfsumme immer auf, geänderter Code nur über eine neue Version; verbindlich sind deshalb nur Spielstände getaggter Versionen (siehe Versionen); eine Prüfsumme des Codes ist vorgesehen (siehe [Systemausbau.md](Systemausbau.md), Punkt 11); passt ein Stand nicht, wirft das Laden mit klarer Meldung
 + Nebennutzen: Spielstand als Fehlerbericht, Aufzeichnungen zum Anschauen, "Seed des Tages", automatische Tests
 
 ## Spielarten
@@ -219,10 +219,10 @@ Vorbilder: DCSS (Wizard Mode zum Prüfen, Läufe darin zählen nicht), NetHack (
 
 Daten:
 
-+ `optionen.spielart` (Liste `SPIELARTEN` in `src/kern/spiel.js`: "normal" als Vorgabe, "allmaechtig" seit 0.41.0, "arena" seit 0.43.0; eine unbekannte wirft)
++ `optionen.spielart` (Liste `SPIELARTEN` in `src/kern/spiel.js`: "normal" als Vorgabe, "allmaechtig", "arena"; eine unbekannte wirft)
 + Regelwerte `regeln.allmacht`: `kammer` (Ebene aus `daten/ebenen.js`, "testkammer", ein leerer Raum mit Treppe hinab) und `tiefe` (0, sonst der Hub); geprüft beim Laden
 
-Schnittstellen (`src/systeme/allmacht.js`, seit 0.41.0):
+Schnittstellen (`src/systeme/allmacht.js`):
 
 + `istAllmaechtig(spiel)`, `erzeugbareTypen(daten)` → `{ wesen, gegenstaende }` (nach Namen geordnet, ohne abstrakte Vorlagen und ohne Ninkasi)
 + Planschritt `testkammer` (siehe [Welt.md](Welt.md), Plan des Laufs): setzt im allmächtigen Lauf die Kammer als Vorlage ihrer Tiefe und `plan.starttiefe` auf diese Tiefe
@@ -236,10 +236,10 @@ Regeln:
 + Allmächtig heißt Testkammer: der Lauf beginnt in der Kammer, die übrigen Tiefen sind dieselben wie im normalen Lauf mit demselben Startwert, weil jede Ebene aus eigenen abgeleiteten Startwerten entsteht; man prüft also die echten Ebenen
 + Unverwundbar heißt: Schaden wirkt wie sonst (die Zahlen bleiben prüfbar), nur der Tod fällt aus; die Allmacht läuft als letzte am Haken, damit andere Rettungen zuerst greifen
 + Erzeugen und Tiefe wählen gehen nur an Ninkasi selbst und laufen wie alles über die Eingangstür, sie stehen also in der Aufzeichnung
-+ Getrennte Wertung: die Chronik trägt den Lauf mit seiner Spielart ein, die Zähler zählen nicht mit (siehe [Titelbildschirm.md](Titelbildschirm.md), Stand der Umsetzung 0.41.0)
++ Getrennte Wertung: die Chronik trägt den Lauf mit seiner Spielart ein, die Zähler zählen nicht mit (siehe [Titelbildschirm.md](Titelbildschirm.md), Testkammer)
 + Bedienung: Erzeugen und Tiefen über die Befehlszeile (siehe [Bedienung.md](Bedienung.md), Eingabe)
 
-Arena (seit 0.43.0, `src/systeme/arena.js`; Vorbild DCSS mit `crawl -arena "3 rat v 2 kobold"`):
+Arena (`src/systeme/arena.js`; Vorbild DCSS mit `crawl -arena "3 rat v 2 kobold"`):
 
 + `optionen.spielart: "arena"` mit `optionen.arena`, der Aufstellung: `{ name?, varianten?, karte, taktik?, abstand?, wachzustand?, start?: { x, y }, ninkasi?: { eigenschaften?, skills?: { name: stufe }, ausruestung?: [typ], gepaeck?: [{ typ, anzahl? }], werte?: { name: wert } }, wellen?: [[{ typ, anzahl? }]], population?: { tabelle?, tiefe, wellen?, alle? } }`; geprüft beim Laden der Daten und beim Start (`arenaFehler` in `src/kern/daten.js`), ein Fehler wirft
 + Benannte Aufstellungen in `daten/arenen.js`, dazu `text` und `varianten: { ninkasi?: { name: Teil von ninkasi }, gegner?: { name: { wellen?, population? } } }`; `aufstellungAus(daten, name, { ninkasi?, gegner? })` macht daraus die Startoption (Ninkasis Variante ergänzt ihren Teil, die der Gegner ersetzt Wellen und Population)
@@ -251,7 +251,7 @@ Arena (seit 0.43.0, `src/systeme/arena.js`; Vorbild DCSS mit `crawl -arena "3 ra
 + Zustandsprüfung `arena`: lebt kein Feind Ninkasis mehr, kommt die nächste Welle ohne Rast (Meldung `arena_welle { welle, von }`); nach der letzten endet der Lauf mit `zustand.ergebnis = "sieg"` (Meldung `arena_sieg { wellen }`); der Tod endet ihn wie sonst, ohne Ergebnis
 + `istArena(spiel)`, `feindeInDerArena(spiel)`
 + Wer Ninkasi steuert, weiß die Logik nicht: von Hand, automatisch im Browser (siehe [Bedienung.md](Bedienung.md), Maus, Reise, Laufen, Rasten und Erkunden), im Werkzeug `werkzeuge/arena.js` (siehe [Entwicklung.md](Entwicklung.md), Bot und Werkzeuge); die Taktik liegt in `src/ki/taktik.js` (siehe [Wesen.md](Wesen.md), KI)
-+ Chronik: wie die Testkammer eingetragen, aber nicht gezählt; Ergebnis "sieg" oder "tod" (siehe [Titelbildschirm.md](Titelbildschirm.md), Stand der Umsetzung 0.43.0)
++ Chronik: wie die Testkammer eingetragen, aber nicht gezählt; Ergebnis "sieg" oder "tod" (siehe [Titelbildschirm.md](Titelbildschirm.md), Arena)
 
 ## Speichern
 
@@ -260,26 +260,26 @@ Daten:
 + Speicherstand (`speicherstandText` in `src/eingabe/speicherstand.js`): `{ version, pruefsumme, startwert, optionen, befehle, zustand, vorschau, oberflaeche: { leisten, log, gesehen } }`
 + `vorschau` (`vorschauAusSpiel`): Tiefe, Züge, Startwert, Spielart, `gespeichertAm`; der Titel liest sie über `platzVorschau`, ohne den Zustand einzusetzen
 + `oberflaeche` liest die Logik nie: Stand der Schnellleiste, die letzten `GESPEICHERTE_LOGZEILEN` = 200 Logzeilen (`zeilenEinsetzen` in `src/anzeige/log.js`) und `gesehen`, die Wesenarten, die die Chronik in diesem Lauf schon gezählt hat
-+ Schlüssel im `localStorage`: drei Plätze `battle-ninkasi.lauf.1` bis `.3` (`ANZAHL_PLAETZE`, `speicherschluesselPlatz`), `battle-ninkasi.letzter_lauf`, `battle-ninkasi.chronik`; der eine Platz bis 0.31.0 (`battle-ninkasi.lauf`) wird beim Start gelöscht
++ Schlüssel im `localStorage`: drei Plätze `battle-ninkasi.lauf.1` bis `.3` (`ANZAHL_PLAETZE`, `speicherschluesselPlatz`), `battle-ninkasi.letzter_lauf`, `battle-ninkasi.chronik`; der frühere einzelne Platz `battle-ninkasi.lauf` wird beim Start gelöscht
 
 Schnittstellen:
 
 + `schnappschuss(spiel)` (Spielstand plus Kopie des reinen JSON-Zustands) und `ausSchnappschuss(daten, stand)` in `src/kern/spiel.js`; `speicherstandLesen` (Grund `"kaputt"`, `"version"`, `"daten"` oder `"fehler"`), `platzVorschau(text, pruefsumme)`, `platzSpielbar`, `platzFuerNeuesSpiel`, `zuletztGespielt` in `src/eingabe/speicherstand.js` (ohne DOM und ohne `localStorage`)
 + `src/main.js` schreibt: gesammelt höchstens alle 300 ms nach einem Befehl und sofort beim Verlassen der Seite (`pagehide`), nicht während der Charaktererstellung; der Platz des laufenden Spiels ist `aktuelleStelle`
 + Ende eines Laufs (`laufAbschliessen` in `src/main.js`, einmal je Lauf): nach dem Tod oder beim Aufgeben über "Neuer Lauf" ein Eintrag in die Chronik, der ganze Stand bleibt als `battle-ninkasi.letzter_lauf` für ein späteres Abspielen, der Platz wird frei
-+ Chronik (`src/eingabe/chronik.js`): `{ format, laeufe, zaehler }`, Läufe mit Version, Prüfsumme der Daten, Startwert, Spielart, Datum, Tiefe, Zügen, Befehlen, Ergebnis und Ursache (höchstens 500, die Zähler bleiben); Zähler frei benannt (`besiegt.<typ>` für Siege Ninkasis, `gesehen.<typ>` einmal je Lauf und Art, `tode`, `laeufe`), erhoben in der Oberfläche aus den Meldungen (Tabelle `ZAEHLREGELN`) und dem Sichtfeld nach jedem Befehl, nie in der Logik; Läufe der Spielarten in `SPIELARTEN_OHNE_ZAEHLER` (bisher "allmaechtig", Abfrage `zaehltMit(spiel)`) stehen in `laeufe`, zählen aber in keinem Zähler, auch nicht in `laeufe`; Freischaltungen sind Bedingungen `{ zaehler, mindestens }` (`freigeschaltet`), zuerst für Titelbilder, später für Erfolge, Bestiarium und Kompendium
++ Chronik (`src/eingabe/chronik.js`): `{ format, laeufe, zaehler }`, Läufe mit Version, Prüfsumme der Daten, Startwert, Spielart, Datum, Tiefe, Zügen, Befehlen, Ergebnis und Ursache (höchstens 500, die Zähler bleiben); Zähler frei benannt (`besiegt.<typ>` für Siege Ninkasis, `gesehen.<typ>` einmal je Lauf und Art, `tode`, `laeufe`), erhoben in der Oberfläche aus den Meldungen (Tabelle `ZAEHLREGELN`) und dem Sichtfeld nach jedem Befehl, nie in der Logik; Läufe der Spielarten in `SPIELARTEN_OHNE_ZAEHLER` ("allmaechtig" und "arena", Abfrage `zaehltMit(spiel)`) stehen in `laeufe`, zählen aber in keinem Zähler, auch nicht in `laeufe`; Freischaltungen sind Bedingungen `{ zaehler, mindestens }` (`freigeschaltet`), zuerst für Titelbilder, später für Erfolge, Bestiarium, Glossar und Rezeptbuch
 
 Regeln:
 
 + Die Plätze sind nebeneinander laufende Läufe, keine Sicherungen desselben Laufs
 + Der Spielstand (Startwert, Startoptionen, Befehle) bleibt die verbindliche Aufzeichnung; der Schnappschuss lädt ohne Nachspielen; Index und Zwischenspeicher entstehen aus dem Zustand neu, die vorgemerkten Auslöser sind zwischen zwei Befehlen leer
-+ Gemessen: 2152 Befehle sind 62 kB, Nachspielen dauert knapp 1 s; ein Zustand sind etwa 40 kB, das Umwandeln unter 1 ms; deshalb lädt der Schnappschuss und nicht die Befehlsliste
-+ Beim Start der Seite erscheint der Titel (siehe [Titelbildschirm.md](Titelbildschirm.md)); Fortsetzen lädt einen Platz, die Charaktererstellung entfällt, das Log nennt das Fortsetzen; ein Platz aus einer anderen Version oder unlesbar heißt im Titel veraltet und lässt sich nur ersetzen oder löschen, ebenso einer mit anderer Prüfsumme der Daten ("Daten geändert", seit 0.45.0); lässt sich ein Zustand nicht einsetzen, wird der Platz gelöscht und der Titel sagt es
++ Geladen wird der Schnappschuss und nicht die Befehlsliste, weil das Nachspielen langer Läufe spürbar dauert, das Einsetzen eines Zustands nicht (Messwerte siehe [Entwicklung.md](Entwicklung.md), Messwerte)
++ Beim Start der Seite erscheint der Titel (siehe [Titelbildschirm.md](Titelbildschirm.md)); Fortsetzen lädt einen Platz, die Charaktererstellung entfällt, das Log nennt das Fortsetzen; ein Platz aus einer anderen Version oder unlesbar heißt im Titel veraltet und lässt sich nur ersetzen oder löschen, ebenso einer mit anderer Prüfsumme der Daten ("Daten geändert"); lässt sich ein Zustand nicht einsetzen, wird der Platz gelöscht und der Titel sagt es
 + `?seed=` beginnt gleich einen Lauf mit diesem Startwert auf dem ersten leeren Platz (sonst erscheint der Titel) und verschwindet danach aus der Adresse; der Startwert wird nicht in die Adresse geschrieben
 + Die Chronik ist getrennt von den Plätzen und ohne Aufzeichnungen, damit sie neue Versionen übersteht
-+ Format der Chronik (seit 0.45.0): ein neues Format heißt `CHRONIK_FORMAT` erhöhen und in `CHRONIK_MIGRATIONEN` eine Funktion aus dem vorigen Format eintragen; `chronikGueltig(roh, umbenennungen)` migriert der Reihe nach, statt zu verwerfen (geprüft von `tests/titel.test.js`); eine Chronik aus einem neueren Format (ein älteres Spiel nach einem neueren) bleibt unberührt: das Spiel arbeitet mit einer leeren (`neueresFormat: true`) und speichert sie nicht
++ Format der Chronik: ein neues Format heißt `CHRONIK_FORMAT` erhöhen und in `CHRONIK_MIGRATIONEN` eine Funktion aus dem vorigen Format eintragen; `chronikGueltig(roh, umbenennungen)` migriert der Reihe nach, statt zu verwerfen (geprüft von `tests/titel.test.js`); eine Chronik aus einem neueren Format (ein älteres Spiel nach einem neueren) bleibt unberührt: das Spiel arbeitet mit einer leeren (`neueresFormat: true`) und speichert sie nicht
 + Weitere Ablagen außerhalb des Laufs: die eigene Tastenbelegung verliert beim Lesen Aktionen, die der Katalog nicht mehr kennt (siehe [Bedienung.md](Bedienung.md), Eingabe); die letzte Verteilung der Eigenschaften folgt den Umbenennungen
-+ Wissen über Läufe hinweg (seit 0.40.1 als Regel): die Chronik ist die einzige Ablage außerhalb des Laufs; Wissen nur zum Zeigen (Bestiarium, Glossar) liest die Anzeige direkt aus ihr, ohne Eintrag im Spielstand; Wissen mit Wirkung auf die Logik (ein bekanntes Rezept erlaubt das Brauen, ein Gegenstand ist schon erkannt) übernimmt die Oberfläche beim Start des Laufs als Startoption `optionen.vorwissen`, die Logik liest nur `spiel.optionen` und nie die Ablage (geprüft von `tests/ablage.test.js`)
++ Wissen über Läufe hinweg: die Chronik ist die einzige Ablage außerhalb des Laufs; Wissen nur zum Zeigen (Bestiarium, Glossar) liest die Anzeige direkt aus ihr, ohne Eintrag im Spielstand; Wissen mit Wirkung auf die Logik (ein bekanntes Rezept erlaubt das Brauen, ein Gegenstand ist schon erkannt) übernimmt die Oberfläche beim Start des Laufs als Startoption `optionen.vorwissen`, die Logik liest nur `spiel.optionen` und nie die Ablage (geprüft von `tests/ablage.test.js`)
 + Das Vorwissen gilt, wie es beim Start war: was während des Laufs in die Chronik kommt, wirkt erst im nächsten Lauf; das Feld `vorwissen` und sein Format legt das erste System an, das es braucht
 
 ## Versionen
@@ -307,11 +307,7 @@ Regeln:
 + Obergrenze der Population `regeln.population.hoechstWesen` (500): darüber entsteht nichts mehr, nicht stillschweigend: Beschwören meldet `population_voll`, das Log zeigt den Hinweis hervorgehoben und die Konsole warnt; bestellt eine Ebene mit Ninkasi mehr Wesen, ist das ein Datenfehler
 + Vorbilder: Gitter als räumlicher Index (bei Rasterspielen üblich), Prüfungen nur für Vorgemerktes; Brogue und DCSS simulieren die ganze Ebene, ferne Wesen werden hier ebenso voll simuliert
 
-Messwerte:
-
-+ Stand 0.17.0: 113 Wesen 0,4 ms, 341 Wesen 1,0 ms, 1173 Wesen 7 ms je Befehl (vorher 1,5 ms, 9,2 ms und quadratisches Wachstum)
-+ Stand 0.18.0 mit Türen an der Hälfte der Raumzugänge: 356 Wesen etwa 1,7 bis 2,1 ms, 1176 Wesen etwa 12 bis 13 ms, ohne Türen wie 0.17.0; Bakterien öffnen keine Türen und drängen sich in ihren Räumen, jede Suche im Umkreis findet so mehr Nachbarn
-+ Stand 0.19.0: 339 Wesen etwa 1,6 ms, 1160 Wesen etwa 8,5 ms; mit 30 Brandherden 2,2 ms, Feuer, Rauch und das neu berechnete Sichtfeld kosten etwas
+Messwerte: siehe [Entwicklung.md](Entwicklung.md), Messwerte
 
 ## Mods
 
@@ -326,6 +322,6 @@ Messwerte:
 ## Verweise
 
 + Spieldesign: [Grundlagen.md](Grundlagen.md); Speicherplätze und Chronik aus Sicht der Spielerin: [Titelbildschirm.md](Titelbildschirm.md)
-+ Offen in [Systemausbau.md](Systemausbau.md): reservierter Haken `zug_beginn` (Punkt 1); weitere Schutzmechanismen als Idee (siehe [Ausblick.md](Ausblick.md), Schutz der Ablagen)
++ Offen in [Systemausbau.md](Systemausbau.md): reservierter Haken `zug_beginn` (Punkt 8); Schutz der Ablagen und Prüfsumme des Codes (Punkt 11, Ideen in [Ausblick.md](Ausblick.md), Schutz der Ablagen)
 
 Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).

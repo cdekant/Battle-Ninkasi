@@ -1,6 +1,6 @@
 # Battle Ninkasi - Tileset
 
-Stand: 2026-11-18
+Stand: 2026-11-23
 
 Zuständig für: `grafik/*`, `src/anzeige/tilebilder.js`, `daten/zeichen.js`, `werkzeuge/tiles-ableiten.js`
 
@@ -135,12 +135,9 @@ Entwurf, zurückgestellt (Stand 2026-11-20); entschieden sind nur die zwei Stufe
 
 ## Ablauf
 
-1. Palette: Farbfelder und eine Probe aus Boden und Wand (erledigt, 62 Farben)
-2. Stilprobe in 64 px: Boden, Wand, Ninkasi, Essigbakterium, Bier; Artstyle-Fibel bestätigt (erledigt)
-3. Einbau in den Renderer: Tiles aus Pixeldaten, Ersatz fehlender Tiles durch Zeichen (erledigt, `src/anzeige/tilebilder.js`, Tests in `tests/tilebilder.test.js`)
-4. Kleine Sätze 48, 32 und 16 px für die fünf Tiles der Stilprobe: zunächst von Hand generalisiert, wegen abweichender Formen ersetzt durch Ableiten per Werkzeug mit Nacharbeit (erledigt)
-5. Erstliste in 64 px vervollständigen: Tür, Treppe, zweiter Gegner, Truhe, Falle; kleine Sätze per Werkzeug
-6. Danach Tile für Tile nach Bedarf neuer Inhalte; jede neue Entität kommt direkt als Tile, ohne Zeichen als Platzhalter
++ Keine Zeichen als Platzhalter: jede neue Entität des echten Inhalts kommt direkt als Tile ins Spiel; der Probeinhalt (siehe [Entwicklung.md](Entwicklung.md), Stand des Spielinhalts) darf Zeichen tragen; sonst ist das Zeichen nur Absicherung, falls ein Tile fehlt
++ Als Nächstes das Grundgerüst in 64 px: Tür offen und zu, Treppe hinauf und hinab; kleine Sätze per Werkzeug
++ Danach Tile für Tile mit dem echten Inhalt
 
 ## Offene Fragen
 

@@ -1,16 +1,16 @@
 # Battle Ninkasi - Charakter und Lernen
 
-Stand: 2026-11-20
+Stand: 2026-11-23
 
 Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Bedienung.md](Bedienung.md), [Grundlagen.md](Grundlagen.md), [Entwicklung.md](Entwicklung.md), [Ausblick.md](Ausblick.md)
 
-Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaft, Skillpunkte unabhängig vom späteren Lerntempo), DCSS (EP fließen in die benutzten Skills, Kosten anzeigen statt Formel), Caves of Qud (Eigenschaften dauerhaft und vorübergehend veränderbar), Tales of Maj'Eyal und Path of Exile (Skills wirken über Tags auch auf künftige Fähigkeiten). Die Mechanik ist seit 0.26.0 umgesetzt, mit den hier genannten vorläufigen Zahlen, beschrieben in [Wesen.md](Wesen.md) (Skills und Lernen); offen sind Skillfenster, Charaktererstellung und Skillkatalog (Punkt 13 in [Systemausbau.md](Systemausbau.md)).
+Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaft, Skillpunkte unabhängig vom späteren Lerntempo), DCSS (EP fließen in die benutzten Skills, Kosten anzeigen statt Formel), Caves of Qud (Eigenschaften dauerhaft und vorübergehend veränderbar), Tales of Maj'Eyal und Path of Exile (Skills wirken über Tags auch auf künftige Fähigkeiten). Die Mechanik ist umgesetzt und mit ihren vorläufigen Zahlen in [Wesen.md](Wesen.md) (Skills und Lernen) beschrieben; offen sind Skillkatalog, Makel und Vorzüge (Punkt 14 in [Systemausbau.md](Systemausbau.md)).
 
 ## Charaktererstellung
 
-+ Alle sechs Eigenschaften starten bei 10, die Spielerin verteilt 20 Punkte, höchstens 20 je Eigenschaft (vorläufig, Regelwerte in `regeln.lernen`)
-+ Die Charaktererstellung erscheint vor jedem Lauf als Fenster über der Karte, vorbelegt mit der letzten Verteilung (seit 0.27.0, siehe Fenster in [Bedienung.md](Bedienung.md))
-+ Keine festen Startskills: Ninkasi beginnt mit einem Startguthaben freier EP (vorläufig 300) und verteilt es selbst
++ Alle sechs Eigenschaften starten gleich, die Spielerin verteilt eine feste Zahl von Punkten, mit einer Obergrenze je Eigenschaft (Werte in [Wesen.md](Wesen.md), Skills und Lernen)
++ Die Charaktererstellung erscheint vor jedem Lauf als Fenster über der Karte, vorbelegt mit der letzten Verteilung (siehe Fenster in [Bedienung.md](Bedienung.md))
++ Keine festen Startskills: Ninkasi beginnt mit einem Startguthaben freier EP und verteilt es selbst
 + Makel gehören zur Charaktererstellung: Nachteil gegen zusätzliche Punkte
 + Idee, noch nicht bestätigt: Vorzüge als Gegenstück, Vorteil gegen Punkte
 + Idee, noch nicht bestätigt: Makel und Vorzüge werden vor der Punkteverteilung gewählt, die zu verteilenden Punkte ergeben sich daraus (Grundpunkte + Makel - Vorzüge); die Oberfläche rechnet sie an einer Stelle (`punkteZuVerteilen` in `src/eingabe/erstellung.js`), der Hilfetext nennt sie über Platzhalter statt einer festen Zahl
@@ -23,10 +23,9 @@ Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Fenster; siehe [Wesen.
 
 ## Startwerte
 
-+ Vorläufig, Grundlage fürs Balancing: 100 LP, 100 MP, Pegel 0 ‰
-+ 100 als Grundwert, damit Boni in Prozent vom Grundwert glatte ganze Zahlen ergeben
-+ Mit Pegel 0 startet Ninkasi nüchtern: LP regenerieren langsam, MP am schnellsten, PP schwinden (Verläufe in [Grundlagen.md](Grundlagen.md))
-+ PP (Psi-Punkte) vorläufig 0 von 100, Start- und Höchstwert noch offen
++ LP und MP beginnen voll, mit runden Grundwerten, damit Boni in Prozent vom Grundwert glatte ganze Zahlen ergeben
++ Ninkasi startet nüchtern: LP regenerieren langsam, MP am schnellsten, PP schwinden (Verläufe in [Grundlagen.md](Grundlagen.md))
++ PP beginnen leer, Start- und Höchstwert noch offen
 + Der Pegel ist nach oben offen
 
 Umsetzung: siehe [Entwicklung.md](Entwicklung.md), Stand des Spielinhalts
@@ -98,27 +97,28 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Neuv
 
 ### Kosten
 
-+ Kosten einer Stufe in Lernpunkten: Stufentabelle × Rang, vorläufig 50, 100, 200, 350, 550 für die Stufen 1 bis 5 (1250 je Skill bei Rang 1)
-+ Rang nach Tier: Grund 1, Experte 2, Meister 4, göttlich 8; einzelne Skills dürfen abweichen; ein komplettes Set kostet so rund 19 000 Lernpunkte
-+ EP werden beim Eingang in Lernpunkte umgerechnet: Lernpunkte = EP × (2 × primär + sekundär) / 40, mit den Grundwerten der Eigenschaften in diesem Moment; Bruchteile bleiben stehen wie im Zeitmodell
-+ Bezug ist die durchschnittliche Ninkasi (Summe 80, im Schnitt 13,3): Sie lernt zum Normalpreis; 10 und 10 lernt 25 % langsamer (Preis 133 %), 20 und 20 um die Hälfte schneller (Preis 67 %), die Spreizung zwischen bestem und schlechtestem Fall ist also etwa 2
++ Kosten einer Stufe in Lernpunkten: eine Stufentabelle mal dem Rang des Skills, jede Stufe teurer als die vorige
++ Der Rang wächst mit dem Tier, jeder Tier etwa doppelt so teuer wie der vorige; einzelne Skills dürfen abweichen
++ EP werden beim Eingang in Lernpunkte umgerechnet, nach der primären Eigenschaft doppelt so stark wie nach der sekundären, mit den Grundwerten in diesem Moment; Bruchteile bleiben stehen wie im Zeitmodell
++ Bezug ist die durchschnittliche Ninkasi aus der Charaktererstellung, sie lernt zum Normalpreis; zwischen der schwächsten und der stärksten Paarung liegt etwa der Faktor zwei
++ Zahlen und Formel in [Wesen.md](Wesen.md), Skills und Lernen
 + Weil die Schwellen in Lernpunkten fest stehen, wirkt eine Änderung der Eigenschaften nur auf das, was danach gelernt wird: Stufen gehen nie verloren, auch nicht durch Flüche oder eine Neuverteilung
 + Die Oberfläche zeigt die Kosten in EP ("noch 120 EP bis Stufe 3"), nicht die Formel
 
 ### Anfangsbalance
 
 + Ziel festlegen: was eine ausgewogene Ninkasi am Ende eines Laufs erreicht haben soll, z.B. zwei Sets bis Meister und ein göttliches Niveau
-+ EP-Budget messen: Der Bot zählt die EP je Ebene aus Erkundung und Bewältigtem; erste Messung mit 0.26.0 (zufällige Befehle, vorläufige Zahlen): rund 1200 EP aus Erkundung gegen rund 55 aus Gegnern in Tiefe 1, das Verhältnis ist noch festzulegen; vorgesehen sind zwei bis drei Strategien des Bots für das Erkunden (nächster Rand als Obergrenze, zielstrebig zur Treppe als Untergrenze, später die Dijkstra-Karte), damit die Spanne zwischen gründlichem und eiligem Spiel sichtbar wird
++ EP-Budget messen: Der Bot zählt die EP je Ebene aus Erkundung und Bewältigtem (Messwerte in [Entwicklung.md](Entwicklung.md), Messwerte); das Verhältnis ist noch festzulegen; vorgesehen sind zwei bis drei Strategien des Bots für das Erkunden (nächster Rand als Obergrenze, zielstrebig zur Treppe als Untergrenze, später die Dijkstra-Karte), damit die Spanne zwischen gründlichem und eiligem Spiel sichtbar wird
 + Die Stufentabelle danach ausrichten, dass Budget und Ziel zusammenpassen
-+ Die Spreizung der Eigenschaften (etwa 2) bleibt dabei fest
++ Die Spreizung der Eigenschaften (siehe Kosten) bleibt dabei fest
 + Alle Stellschrauben sind Regelwerte in `regeln.lernen`: Startwert, Punkte, Höchstwert, Bezugswert, Stufentabelle, Ränge, Startguthaben, Topf der Abstammungslinie
 
 ### Wirkung
 
-+ Gleich bleibender Ertrag pro Stufe, Boni in Prozent vom Grundwert; innerhalb eines Skills addieren sich die Stufen (fünfmal 5 % sind 25 %)
-+ Zwischen verschiedenen Skills multiplizieren sich die Prozente (Vorbild EVE Online): Jeder Skill liefert für seine Prozente einen einzigen `mal`-Modifikator, z.B. `mal 125` auf Stufe 5; feste Beträge (`plus`) bleiben Summen
++ Gleich bleibender Ertrag pro Stufe, Boni in Prozent vom Grundwert; innerhalb eines Skills addieren sich die Stufen
++ Zwischen verschiedenen Skills multiplizieren sich die Prozente (Vorbild EVE Online): Jeder Skill liefert für seine Prozente einen einzigen `mal`-Modifikator; feste Beträge (`plus`) bleiben Summen
 + Umstellbar über den Regelwert `regeln.lernen.verrechnung` (`multiplizieren` als Vorgabe, `addieren`), die Daten bleiben gleich; ein später Wechsel verlangt, die bis dahin balancierten Zahlen neu einzustellen
-+ Bei Abzügen ist das Multiplizieren milder (zweimal −25 % Zeit ergibt ×0,56), exponentiell wachsen nur steigende Werte wie Schaden und Vorräte; Kampfwerte bleiben über ihren Halbwert unter 100 %
++ Bei Abzügen ist das Multiplizieren milder als das Addieren, exponentiell wachsen nur steigende Werte wie Schaden und Vorräte; Kampfwerte bleiben über ihren Halbwert unter 100 %
 + Ausrüstung und Zustände addieren sich weiter, `mal` nur, wo ihre Daten es ausdrücklich sagen
 + Tag-System: Fähigkeiten, Angriffe und Effekte tragen Tags, Skills wirken über Modifikatoren mit `tag` auch auf künftige Fähigkeiten, siehe Modifikatoren in [Wirkungen.md](Wirkungen.md)
 + Höhere Tiers und Stufen verändern Fähigkeiten qualitativ (z.B. Psi-Teleport nimmt ab Meister ein Ziel mit); die Fähigkeit nennt das selbst in ihrem Ausbau mit der Bedingung Skillstufe
@@ -133,14 +133,14 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Neuv
 + Fundstück ohne passenden Skill: nutzbar, aber mit hohem Fehlschlagrisiko über eine Risikotabelle nach dem fehlenden Skill (Vorbild DCSS)
 + Vorschlag, noch nicht bestätigt: Ausnahmen nur für körpereigene Fähigkeiten ohne mögliches Fundstück (Kopfstoß, Bierfontäne, Rülpser)
 
-Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skillkatalog, siehe [Systemausbau.md](Systemausbau.md), Punkt 13
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skillkatalog, siehe [Systemausbau.md](Systemausbau.md), Punkt 14
 
 ## Erfahrungspunkte (EP)
 
 ### Freie EP
 
 + Freie EP aus Erkundung und Rätseln, die Spielerin verteilt sie selbst
-+ Erkundung: 1 EP pro Feld, das zum ersten Mal wirklich gesehen wird
++ Erkundung: EP für jedes Feld, das zum ersten Mal wirklich gesehen wird
 + Magisch kartierte Felder gelten als bekannt, bringen EP aber erst beim wirklichen Sehen; vergessene Felder (Filmriss) bringen beim Wiedersehen keine EP mehr
 + Offen, ob EP je Feld die beste Form ist: Ein Ablaufen jeder Ecke wird belohnt; Abwägung in [Ausblick.md](Ausblick.md), EP für Erkundung
 + Jedes Rätsel bringt seine EP nur einmal
@@ -168,8 +168,8 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skil
 + Der Pegel beeinflusst das Lernen nicht
 + EP pro Ebene weitgehend begrenzt, Ausnahme: Gegner, die durch Psi erscheinen, bringen EP
 + Keine verminderten EP für schwache oder wiederholte Gegner: Weil nur Bewältigtes EP bringt, ist Farmen ohnehin eingeschränkt; jeder Gegner bringt seinen festen Wert
-+ Teilende Mikroorganismen: Die Mutterzelle eröffnet einen gemeinsamen Topf für ihre ganze Abstammungslinie (vorläufig dreimal ihre EP); jede getötete Zelle bringt ihre EP, höchstens was noch im Topf ist; ist er leer, lohnt das Farmen des Essigbakterien-Pools nicht mehr
-+ Nachrückende Gegner nicht ausgeschlossen, als eigenes, per Parameter einstellbares System (Rate, Obergrenze, EP-Faktor)
++ Teilende Mikroorganismen: die ganze Abstammungslinie einer Mutterzelle teilt einen begrenzten Topf an EP; ist er leer, lohnt das Farmen nicht mehr (siehe [Wesen.md](Wesen.md), Skills und Lernen; die Teilung selbst ist offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 6)
++ Nachrückende Gegner sind nicht ausgeschlossen, mit eigenem EP-Faktor (Idee in [Ausblick.md](Ausblick.md), Nachrückende Gegner)
 + Vorschlag, noch nicht bestätigt: Varianten durch Affixe vervielfachen die Gegnertypen
 
 Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: nachrückende Gegner, Rätsel
@@ -177,15 +177,12 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: nach
 ## Offen
 
 + Ausnahmen von der Regel "keine Fähigkeiten direkt durch Skills"
-+ Übersicht der Skills in der Oberfläche: Liste nach Set und Tier mit Voraussetzungen und "ermöglicht" seit 0.27.0 (siehe Fenster in [Bedienung.md](Bedienung.md)); offen sind Filter, Suche und ein Graph der Abhängigkeiten, wenn der Katalog groß ist
++ Übersicht der Skills in der Oberfläche: Liste nach Set und Tier mit Voraussetzungen und "ermöglicht" (siehe Fenster in [Bedienung.md](Bedienung.md)); offen sind Filter, Suche und ein Graph der Abhängigkeiten, wenn der Katalog groß ist
 + Idee, noch nicht bestätigt: zufällige besondere Skills mit zufälligen Kombinationen, als Fundstück freigeschaltet
 + Idee, noch nicht bestätigt: Zielstufe je Skill wie in DCSS, eingehende freie EP fließen von selbst dorthin (Mechanik, nicht Oberfläche)
 + Ob Fähigkeitsquellen verbraucht werden oder dauerhaft lehren, flexibel pro Quelle regelbar, später entscheiden
-+ Währung bei Händlern (Gold, Alkohol, Tausch)
-+ Nachrückende Gegner: ob, wie oft, mit welchem EP-Faktor
 + Skillkatalog: alle Skills mit Set, Tier, Rang, primärer und sekundärer Eigenschaft, Wirkung, Lernanlässen und Abhängigkeiten, als eigene Sitzung
-+ Höhe des Abzugs je fehlendem Punkt einer Anforderung (vorläufig je 5 % auf Genauigkeit und Schaden, für die Trägerin insgesamt)
++ Höhe des Abzugs je fehlendem Punkt einer Anforderung (vorläufiger Wert in [Wesen.md](Wesen.md), Skills und Lernen)
 + Katalog der Makel und ihr Punktwert
 + Eingeschränkte Neuverteilung der Eigenschaften im Lauf
 + Affixe im Detail
-+ Bestiarium und Glossar (Bierbrauen, Mikroorganismen), Tonfall enzyklopädisch-ernsthaft-informativ, eigene Sitzung

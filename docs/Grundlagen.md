@@ -1,6 +1,6 @@
 # Battle Ninkasi - Grundlagen
 
-Stand: 2026-11-18
+Stand: 2026-11-23
 
 Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Architektur.md](Architektur.md), [Wesen.md](Wesen.md), [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md), [Tileset.md](Tileset.md), [Entwicklung.md](Entwicklung.md), [Ausblick.md](Ausblick.md)
 
@@ -21,7 +21,7 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Dienste des Hubs,
 + Ninkasi ist die Inkarnation der mesopotamischen Göttin des Bieres, alkoholaffin
 + Alkohol ist Ressource: Bier, Wein und Brand
 + Drei Vorräte: Lebenspunkte (LP), Magiepunkte (MP), Psi-Punkte (PP)
-+ Dazu der Pegel, gemessen in Promille: 100 entsprechen 1 ‰, nach oben offen; in der Oberfläche als ‰, in Text und Doku "Pegel"
++ Dazu der Pegel, gemessen in Promille, nach oben offen; in der Oberfläche als ‰, in Text und Doku "Pegel"
 + Magie und Psi sind getrennte Systeme mit eigenem Vorrat
 + Magie: gebunden an Ritual, Schrift und Alchemie, kostet neben MP auch Zeit und Material; langsamer, wirkt über die Zeit, etwas mehr in Richtung Crowd Control
 + Psi: sofort und rein geistig, hohes Risiko, hoher Ertrag; wirkt auf Einzelziele (Gedanken, Furcht, Kontrolle, Teleport); Wirksamkeit und Risiko steigen mit dem Pegel
@@ -36,7 +36,7 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Dienste des Hubs,
 + Brand hebt den Pegel schneller als Wein und Bier
 + Wein füllt MP sofort, bremst über den Pegel aber die MP-Regeneration
 + Pegel klingt über die Zeit ab
-+ Vorschlag, noch nicht bestätigt: linearer Abbau wie in der Wirklichkeit (etwa 0,1 bis 0,15 ‰ pro Stunde), Trinkfestigkeit beschleunigt ihn; ein hoher Pegel hält so lange an
++ Vorschlag, noch nicht bestätigt: linearer Abbau mit dem Tempo der Wirklichkeit, Trinkfestigkeit beschleunigt ihn; ein hoher Pegel hält so lange an
 + Option, noch nicht entschieden: Ausdauer als vierter Vorrat
   + Kosten nur für körperliche Sonderaktionen (Kopfstoß, Bierfontäne, Sprint, Ringen, Werfen), nie für Bewegen und normales Angreifen
   + Regeneriert schnell und unabhängig vom Pegel, der einzige Vorrat, der auch nüchtern verlässlich zurückkommt
@@ -46,6 +46,7 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Dienste des Hubs,
 + Pegel bringt Risiko
 + Brausystem mit Zutaten und Rezepten
 + Gebraut wird an festen Altären (Braukessel) oder in mobilen Kesseln
++ Ninkasi muss beim Brauen am Kessel bleiben, damit das Bier gut wird; eine Gärung, die ohne sie weiterläuft, gibt es nicht
 + Kessel in Tiers nach Material: Kupfer, Eisen, Edelstahl, Silber, Gold
 + Vorschlag, noch nicht bestätigt: weitere Materialien wie Ton (sumerische Brautradition), Holz (Fass), Bronze
 + Idee, noch nicht bestätigt: häufige Anwendung von Psi lässt Gegner erscheinen (Vorbild: Glimmer in Caves of Qud)
@@ -89,9 +90,9 @@ Umsetzung: teilweise, siehe [Entwicklung.md](Entwicklung.md), Stand des Spielinh
 + rot.js für Dungeon-Erzeugung, Sichtfeld, Wegfindung, Zufall mit Startwert, Zugreihenfolge
 + Keine Spiele-Engine, kein Build-Schritt
 + Spiellogik getrennt von der Anzeige
-+ Ergebnis zählt mehr als Lesbarkeit des Codes für den Autor; bei Namen sticht die Lesbarkeit, sie bleiben ausdrücklich (siehe CLAUDE.md)
++ Modularität, Flexibilität und Erweiterbarkeit gehen vor einfachem Code; lesbar bleibt er durch ausdrückliche Namen und Kommentare (siehe CLAUDE.md)
 + Läufe aus Startwert und Befehlsliste reproduzierbar, Inhalte als Daten, Zeitmodell mit Aktionskosten
-+ Bezugsgröße 1920x1080, Kamera mit Scrollen, Tile-Größe einstellbar
++ Kamera mit Scrollen, Tile-Größe einstellbar
 + Texte zweisprachig über Sprachdateien, Textkorpus für erzeugte Texte
 + Details: [Architektur.md](Architektur.md) und die übrigen technischen Dokumente (Übersicht in CLAUDE.md), [Texte.md](Texte.md)
 
@@ -99,15 +100,9 @@ Umsetzung: siehe [Architektur.md](Architektur.md), Grundsätze
 
 ## Tileset
 
-+ Keine Zeichen als Platzhalter: Neue Entitäten kommen direkt als Tile ins Spiel
-+ Claude zeichnet die Tiles
-+ Pixelart in vier Sätzen (16, 32, 48, 64 px); gezeichnet wird der größte, die kleineren werden per Werkzeug abgeleitet und von Hand nachgearbeitet; Einzelheiten in [Tileset.md](Tileset.md) und [Anzeige.md](Anzeige.md)
-+ Draufsicht, Figuren und Wände leicht von vorn
-+ Licht von links oben, Figuren mit dunklem Rand, Umgebung gedämpft
-+ Zunächst keine Animation der Tiles; ausgenommen ist das Flackern von Licht, siehe Licht in [Welt.md](Welt.md)
-+ Palette mit 62 Farben und verbindliche Artstyle-Fibel in [Tileset.md](Tileset.md)
-+ Erstliste: Boden, Wand, Tür, Treppe, Ninkasi, zwei Gegner, Bier, Truhe, Falle
-+ Arbeitsweise, Pixeldaten, Vorschau und Ablauf: [Tileset.md](Tileset.md)
++ Pixelart in Draufsicht, in mehreren Größen; Claude zeichnet die Tiles
++ Echter Inhalt kommt gleich als Tile ins Spiel, nicht als Zeichen
++ Stil, Palette, Regel für Tiles, Pixeldaten und Ablauf verbindlich in [Tileset.md](Tileset.md)
 
 Umsetzung: siehe [Tileset.md](Tileset.md), Pixeldaten
 
@@ -123,12 +118,12 @@ Umsetzung: teilweise, siehe [Tileset.md](Tileset.md), Artstyle-Fibel; offen: Sig
 ## Offen
 
 + Regeneration im Detail: Raten und Form der Verläufe
-+ Wo das Optimum der LP-Regeneration liegt (etwa 1,5 ‰?) und ob Trinkfestigkeit es nach oben verschiebt
++ Wo das Optimum der LP-Regeneration liegt und ob Trinkfestigkeit es nach oben verschiebt
 + Ob die LP-Regeneration bei sehr hohem Pegel negativ wird (Alkoholvergiftung), als natürliche Grenze des offenen Pegels
 + Ob die MP-Regeneration bei hohem Pegel auf null sinkt oder nur immer langsamer wird
 + Wofür der Brand gut ist: PP direkt füllen oder nur über den Pegel wirken
 + Ab welcher Schwelle "nüchtern" für Meditieren und Schriftrollen gilt
-+ Worin das Risiko von Psi besteht (Fehlschlag, Kontrollverlust, Rückschlag); der Mechanismus (Risikotabellen über den Pegel) steht seit 0.12.0, siehe Fähigkeiten in [Wirkungen.md](Wirkungen.md)
++ Worin das Risiko von Psi besteht (Fehlschlag, Kontrollverlust, Rückschlag); der Mechanismus (Risikotabellen über den Pegel) steht, siehe Fähigkeiten in [Wirkungen.md](Wirkungen.md)
 + Magie im Detail: welche Wirkungen über die Zeit (Schaden, Flächen, Segen und Fluch, Beschwörung)
 + Pegel im Detail: Schwellen, Risiken, Aktionen mit Mindestpegel
 + Ausdauer: ob überhaupt, Zuordnung zu Gewandtheit oder Körperlichkeit, Verhältnis zu einer Nahrungsuhr
@@ -139,7 +134,6 @@ Umsetzung: teilweise, siehe [Tileset.md](Tileset.md), Artstyle-Fibel; offen: Sig
 + Dienste des Hubs im Detail
 + Ziel eines Laufs und was zwei Läufe unterscheidet
 + Welt und Schauplatz
-+ Bestenliste der eigenen Läufe: ja, als Ruhmeshalle (entschieden 2026-11-21, siehe [Titelbildschirm.md](Titelbildschirm.md))
 + Licht und Wahrnehmung (vorläufige Ideen in [Welt.md](Welt.md), Licht, und [Wesen.md](Wesen.md), Wahrnehmung): wie Ninkasi ohne Nachtsicht im Dunkeln sieht (gar nicht, geringe Reichweite, abhängig vom Pegel)
 + Ob Mikroorganismen durch Wände spüren oder nur entlang von Wegen, wie ein Geruch
 + Ob Kontrolleure Taschenlampen tragen (bewegliche Lichtquelle, später vielleicht als Lichtkegel in Blickrichtung)

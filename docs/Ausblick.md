@@ -6,7 +6,7 @@ Mitprüfen bei Änderungen: [Grundlagen.md](Grundlagen.md), [Architektur.md](Arc
 
 Ideen für Mechaniken, über die noch nicht entschieden ist, mit dem, was sie dem Kern abverlangen. Zweck: früh erkennen, wo heutiger Code einer Idee den Weg verbaut, und dort rechtzeitig vorbauen, statt später schwer umzubauen.
 
-Abgrenzung: [Systemausbau.md](Systemausbau.md) ist die Arbeitsliste beschlossener Arbeit, [Grundlagen.md](Grundlagen.md), Offen sammelt Fragen des Spieldesigns (Raten, Schwellen, Inhalte). Hier stehen Ideen samt ihren Folgen für die Struktur. Wird eine Idee beschlossen, wandert ihr Spieldesign in das Design-Dokument und ihre Arbeit als Punkt in die Arbeitsliste; hier bleibt sie gestrichen.
+Abgrenzung: [Systemausbau.md](Systemausbau.md) ist die Arbeitsliste beschlossener Arbeit, [Grundlagen.md](Grundlagen.md), Offen sammelt Fragen des Spieldesigns (Raten, Schwellen, Inhalte). Hier stehen Ideen samt ihren Folgen für die Struktur. Wird eine Idee beschlossen oder verworfen, wandert ihr Spieldesign in das Design-Dokument und ihre Arbeit als Punkt in die Arbeitsliste; hier wird sie gestrichen. Wie es zu einer Entscheidung kam, steht in der Git-Historie.
 
 ## Form eines Eintrags
 
@@ -23,8 +23,7 @@ Umsetzung: keine
 
 | Idee | Wichtigkeit | Umbaurisiko | Vorkehrung nötig |
 |---|---|---|---|
-| Steuerung anderer Wesen | mittel, offen | hoch, mit Lesefunktion gering | ja (Lesefunktion) |
-| Handlungsoptionen der KI | hoch | mittel | erledigt (Handlungen mit Bewertung) |
+| Steuerung anderer Wesen | mittel, offen | gering | erledigt (Lesefunktion) |
 | Schatzräume mit Schlüssel | hoch | gering (Plan des Laufs steht) | erledigt (Plan des Laufs) |
 | Fraktionen: Ruf und Beistand | hoch | gering | erledigt (Ruf und Beistand) |
 | Vorschau durch Simulation | hoch | mittel | erledigt (Würfe über eine Schnittstelle) |
@@ -32,9 +31,10 @@ Umsetzung: keine
 | Zeitumkehr | hoch | mittel | ja |
 | Verwandlung | mittel | mittel | erledigt (Lesefunktionen) |
 | Veränderbares Gelände | hoch | mittel | erledigt (Erinnerung der Karte) |
+| Flüssigkeiten und Gase | ungeklärt | gering, Mischen mittel | ja (über das Mischen entscheiden) |
 | Begleiter und Befehle | hoch | gering bis mittel | teils erledigt (Treppen, Vorrang an der KI), offen: Befehl und Begleiter |
 | Handel, Währung, Gespräch | hoch | gering bis mittel | ja (Befehle) |
-| Bestiarium, Glossar, Rezeptbuch | hoch | gering | ja (Regel wie Fortschritt) |
+| Bestiarium, Glossar, Rezeptbuch | hoch | gering | erledigt (Regel für Wissen über Läufe) |
 | Erfolge | hoch | gering | nein |
 | Ausrüstung und Effekte am Tile | hoch | gering | ja (Daten fürs Aussehen) |
 | Wurfweite nach Skill und Gewicht | ungeklärt | gering | nein |
@@ -42,18 +42,14 @@ Umsetzung: keine
 | Questsystem | hoch | gering bis mittel | teils erledigt (Plan des Laufs), offen: Ziele über Haken |
 | Feste Strukturen | ungeklärt | gering bis mittel | erledigt (Erzeugung in Schritten) |
 | Nachrückende Gegner | ungeklärt | gering | nein |
-| Fortschritt über Läufe | höchstens Wissen | gering, mit einer Regel | erledigt (Regel) |
 | Themenräume und Rätsel | mittel | gering bis mittel | erledigt (Erzeugung in Schritten) |
-| Licht | hoch | gering | nein |
 | Todesbericht | hoch | gering | nein |
-| Prüfsumme der Daten | hoch | gering | erledigt (0.45.0) |
-| Schutz der Ablagen | ungeklärt | gering | teils erledigt (stabile Namen, Format der Chronik), offen: Kandidaten |
+| Schutz der Ablagen | ungeklärt | gering | teils erledigt (stabile Namen, Format der Chronik), Kandidaten in der Arbeitsliste |
 | Druck gegen endloses Rasten | ungeklärt | gering | nein |
 | Gunst der Nebengottheiten | ungeklärt | gering | nein |
 | Filmriss | ungeklärt | gering | erledigt (Erinnerung der Karte) |
 | EP für Erkundung | ungeklärt | gering | erledigt (gesehen getrennt von bekannt) |
 | Mechaniken aus Pen-and-Paper | teils | gering | nein |
-| Wesen auf mehreren Feldern | gering | hoch | keine |
 
 Umsetzung: keine
 
@@ -62,9 +58,9 @@ Umsetzung: keine
 + Wichtigkeit: mittel, "schon interessant" (2026-11-22); mindestens Begleiter mit Befehlen (eigener Abschnitt)
 + Vorbilder: Caves of Qud, Domination: Ninkasi übernimmt den Körper eines Nachbarn, ihr eigener bleibt reglos liegen; ein Treffer kann die Übernahme brechen, Tötungen bringen in dieser Zeit keine EP, ein misslungener Versuch erzürnt Neutrale; im Extremfall bleibt man dauerhaft im fremden Körper
 + Braucht: zwei getrennte Begriffe, wo heute einer steht: wer Befehle über die Eingangstür bekommt, wessen Sicht gilt und wem Kamera und Zielmodus folgen (die gesteuerte Entität), und wessen Tod den Lauf beendet, wer lernt und wer weiß (Ninkasi)
-+ Berührt: `zustand.spielerinId` und `spielerin()`, die heute beides bedeuten, in rund 40 Dateien unter `src/` (Eingangstür, Sicht, Lernen, Kennen, Tod, Ebenen, Fallen, Anzeige, Eingabe); den umgekehrten Fall, dass Ninkasi eine KI bekommt (Furcht, Rausch, Psi-Kontrolle), gibt es schon in `src/kern/spiel.js`
-+ Umbaurisiko: seit 0.34.0 gering; vorher hoch, weil es mit jedem neuen System wuchs, das `spielerin()` fragte
-+ Vorkehrung (leichte Fassung, entschieden 2026-11-22, erledigt in 0.34.0, siehe [Architektur.md](Architektur.md), Entitäten und Komponenten): kein neues Feld im Zustand, keine Änderung am Spielstand; nur eine Lesefunktion `gesteuerteEntitaet(zustand)`, die vorerst Ninkasi liefert; Eingangstür, Sicht, Kamera und Zielmodus fragen sie, Tod, Lernen und Wissen fragen weiter `spielerin()`; kommt Besessenheit, ändert sich nur diese Funktion, kommt sie nicht, kostet es nur einen genauer benannten Aufruf
++ Berührt: `gesteuerteEntitaet` und `spielerin` (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); den umgekehrten Fall, dass Ninkasi eine KI bekommt (Furcht, Rausch, Psi-Kontrolle), gibt es schon in `src/kern/spiel.js`
++ Umbaurisiko: gering
++ Vorkehrung (leichte Fassung, erledigt, siehe [Architektur.md](Architektur.md), Entitäten und Komponenten): nur die Lesefunktion `gesteuerteEntitaet(zustand)`, die vorerst Ninkasi liefert; kommt Besessenheit, ändert sich nur diese Funktion
 + Abgrenzung: [Grundlagen.md](Grundlagen.md), Spiel sagt "Gesteuert wird nur Ninkasi" (Begleiter nehmen nur Vorrangbefehle an); Besessenheit wäre eine ausdrückliche Ausnahme davon und ist noch nicht entschieden
 
 Umsetzung: offen (nur die Vorkehrung steht)
@@ -74,11 +70,11 @@ Umsetzung: offen (nur die Vorkehrung steht)
 + Wichtigkeit: hoch, mindestens Begleiter mit Befehlen (2026-11-22)
 + Vorbilder: Dungeon Crawl Stone Soup (Rufe an Verbündete: folgen, warten, angreifen); Caves of Qud (Begleiter kämpfen auf Anweisung angriffslustig oder nur zur Verteidigung, eigene Taste für Begleiter, Wesen werden durch Überreden zu Begleitern); Brogue (befreite Gefangene werden Verbündete und lernen Fähigkeiten besiegter Gegner); Ancardia (warten, folgen, gehen, angreifen; ein wartender Begleiter versperrt ein Nest)
 + Braucht: Befehlsart `befehlen { zielId, anweisung }`, die nur die Anweisung am Begleiter setzt (die Eingangstür bleibt bei Ninkasi); KI-Modul `begleiten`, das die Anweisung liest; Mitnehmen über Treppen; Begleiter in der Seitenleiste und im Untersuchen
-+ Berührt: Ebenenwechsel (seit 0.38.0 über das Register `mitnehmen`, siehe [Welt.md](Welt.md), Ebenen), Fraktionen (Begleiter gehören zur Fraktion `ninkasi`), Lernen (Zurechnung wie bei Beschworenen mit `beschworenVon`), Tod, Bot
++ Berührt: Ebenenwechsel (über das Register `mitnehmen`, siehe [Welt.md](Welt.md), Ebenen), Fraktionen (Begleiter gehören zur Fraktion `ninkasi`), Lernen (Zurechnung wie bei Beschworenen mit `beschworenVon`), Tod, Bot
 + Umbaurisiko: gering bis mittel, das Mittlere wegen der Treppen
-+ Vorkehrung (erledigt in 0.38.0, siehe [Welt.md](Welt.md), Ebenen): was beim Ebenenwechsel mitkommt, sammelt das Register `mitnehmen`; Begleiter melden dort einen eigenen Eintrag an; damit ist auch der Rest "Wesen folgen Ninkasi über Treppen" aus [Systemausbau.md](Systemausbau.md), Punkt 8 gelöst
-+ Vorkehrung für die Vorrangbefehle (erledigt in 0.39.0, siehe [Wesen.md](Wesen.md), KI): `ki.vorrang` mit `angreifen`, `warten`, `folgen` und `bis`, die KI liest es; offen sind der Befehl `befehlen`, Taste und Anzeige, sie kommen mit den Begleitern
-+ Entschieden 2026-11-22: Begleiter handeln nach ihrer eigenen KI und nehmen Vorrangbefehle an (z.B. greif diesen an, warte hier, folge mir), die für eine Weile oder bis zum Widerruf vor ihrer eigenen Wahl gelten; festgehalten in [Grundlagen.md](Grundlagen.md), Spiel
++ Vorkehrung (erledigt, siehe [Welt.md](Welt.md), Ebenen): was beim Ebenenwechsel mitkommt, sammelt das Register `mitnehmen`; Begleiter melden dort einen eigenen Eintrag an
++ Vorkehrung für die Vorrangbefehle (erledigt, siehe [Wesen.md](Wesen.md), KI): `ki.vorrang` mit `angreifen`, `warten`, `folgen` und `bis`, die KI liest es; offen sind der Befehl `befehlen`, Taste und Anzeige, sie kommen mit den Begleitern
++ Entschieden: Begleiter handeln nach ihrer eigenen KI und nehmen Vorrangbefehle an, siehe [Grundlagen.md](Grundlagen.md), Spiel
 
 Umsetzung: offen
 
@@ -89,7 +85,7 @@ Umsetzung: offen
 + Braucht: einen Zustand "Gestalt", der Komponenten überlagert statt sie zu ersetzen: Angriffe, Plätze, Bewegungsart, Sicht, Türen öffnen, Zeichen und Tile; Zahlenwerte gehen schon über Modifikatoren
 + Berührt: Systeme, die Komponenten ohne Zahl direkt aus der Entität lesen (`angriffe`, `plaetze`, `bewegung`, `tueren`, `sicht`); Ausrüstung (was mit angelegten Dingen auf fehlenden Plätzen geschieht); Anzeige
 + Umbaurisiko: mittel
-+ Vorkehrung (erledigt in 0.40.0, siehe [Architektur.md](Architektur.md), Entitäten und Komponenten): Komponenten ohne Zahl über Lesefunktionen mit Überlagerung durch Zustände, auch das Aussehen für Zeichen und Tile; ein Test wacht über direkte Zugriffe. Offen für die Gestalt selbst: die Felder an Zuständen zulassen, was mit angelegten Dingen auf fehlenden Plätzen geschieht und wie Waffen und Angriffe der Gestalt zusammenspielen (`angriffeVon` ist die einzige Stelle)
++ Vorkehrung (erledigt, siehe [Architektur.md](Architektur.md), Entitäten und Komponenten): Komponenten ohne Zahl über Lesefunktionen mit Überlagerung durch Zustände, auch das Aussehen für Zeichen und Tile; ein Test wacht über direkte Zugriffe. Offen für die Gestalt selbst: die Felder an Zuständen zulassen, was mit angelegten Dingen auf fehlenden Plätzen geschieht und wie Waffen und Angriffe der Gestalt zusammenspielen (`angriffeVon` ist die einzige Stelle)
 
 Umsetzung: offen
 
@@ -100,31 +96,37 @@ Umsetzung: offen
 + Braucht: Wert an Gegenständen; Fensterarten Handel und Gespräch; Befehlsarten `handeln { mitId, geben, nehmen }` und `sprechen { mitId, wahl }`, damit Handel und Gespräch wiederholbar bleiben; Gespräche als Daten (Knoten, Wahl, Bedingung, Wirkung als Effekt; eine Wirkung kann den Ruf ändern, siehe Fraktionen: Ruf und Beistand)
 + Berührt: Fraktionen, Inventar, Texte und Grammatik, Hub (Dienste)
 + Umbaurisiko: gering bis mittel
-+ Vorkehrung: Fenster für Handel und Gespräch nur über Befehle, nie direkt am Zustand (gilt als Prinzip ohnehin); Idee für die Währung: Bier oder Pfandflaschen, die schon Gewicht haben
++ Vorkehrung: Fenster für Handel und Gespräch nur über Befehle, nie direkt am Zustand (gilt als Prinzip ohnehin); offen ist die Währung (Gold, Alkohol, Tausch; Idee: Bier oder Pfandflaschen, die schon Gewicht haben)
+
 Umsetzung: offen
-
-## Fortschritt über Läufe
-
-+ Wichtigkeit: entschieden 2026-11-22: höchstens als Wissen (Rezepte, Bestiarium, Glossar), keine stärkeren Werte; ob der Hub ausgebaut wird, ist damit offen, er könnte nur Wissen zeigen
-+ Vorbilder: Hades (Spiegel der Nacht, bezahlt mit einer Währung aus dem Tod; die meisten Stufen ändern, wie ein Lauf sich spielt, nicht rohe Werte; freiwillige Erschwernisse gegen Belohnung); Rogue Legacy (Erben mit zufälligen Eigenschaften, Gold aus jedem Lauf für dauerhafte Stufen); Darkest Dungeon (Weiler mit Gebäuden, ausgebaut mit Erbstücken aus den Expeditionen); Noita (der einzige Fortschritt ist das Wissen der Spielerin); Dungeon Crawl Stone Soup und Brogue (kein Fortschritt); Kritik: wer weiß, dass er nur dank Fortschritt gewonnen hat, freut sich weniger
-+ Braucht: eine Ablage außerhalb des Laufs (die Chronik gibt es, siehe [Titelbildschirm.md](Titelbildschirm.md)), Freischaltungen als Daten (Rezepte, Hub-Gebäude)
-+ Berührt: Wiederholbarkeit: liest die Logik die Ablage direkt, spielt ein geladener Lauf anders als der aufgezeichnete
-+ Umbaurisiko: gering, wenn die Regel unten gilt; hoch, sobald ein System die Ablage direkt liest
-+ Vorkehrung (erledigt in 0.40.1, siehe [Architektur.md](Architektur.md), Speichern): Regel festhalten: was ein Lauf aus der Ablage nutzt, geht beim Start als Startoption in den Spielstand ein (wie heute Eigenschaften), die Logik liest die Ablage nie
-+ Festgehalten in [Grundlagen.md](Grundlagen.md), Spiel
-+ Verwandt: Dienste des Hubs (offen in [Grundlagen.md](Grundlagen.md), Spiel)
-
-Umsetzung: offen (nur die Vorkehrung steht)
 
 ## Veränderbares Gelände
 
 + Wichtigkeit: hoch, zerstörbar und veränderbar (2026-11-22)
 + Vorbilder: Brogue (Gras brennt, Brücken stürzen ein, Gelände reagiert in Ketten); Cogmind (fast alles ist zerstörbar, man bahnt sich Wege durch Wände); Brigador Killers (ganz zerstörbare Ebenen machen klassische Sperren wie verschlossene Türen wirkungslos); Noita (Stoffe reagieren miteinander)
 + Vorhanden: `gelaendeSetzen`, `zerstoerbar`, Feuer mit `verbrenntZu` (siehe [Welt.md](Welt.md), Gelände)
-+ Braucht: Graben und Bauen (z.B. einen Kessel aufstellen) als Befehle; Wachstum (Schimmel, Hefe) als System am Welttick; Kosten je Gelände in der Wegfindung (dort schon als "später" vermerkt); eine Erinnerung der Karte
-+ Berührt: Rätsel und Themenräume, die auf Sperren bauen; die Anzeige zeigt außer Sicht seit 0.37.0 das Erinnerte, eine außer Sicht eingestürzte Wand verrät sich nicht mehr
++ Braucht: Graben und Bauen (z.B. einen Kessel aufstellen) als Befehle; Wachstum (Schimmel, Hefe) als System am Welttick; Kosten je Gelände in der Wegfindung (dort schon als "später" vermerkt)
++ Berührt: Rätsel und Themenräume, die auf Sperren bauen; die Anzeige zeigt außer Sicht das Erinnerte, eine außer Sicht eingestürzte Wand verrät sich nicht mehr
 + Umbaurisiko: mittel
-+ Vorkehrung (erledigt in 0.37.0, siehe [Welt.md](Welt.md), Sicht und Erinnerung): eine Erinnerung je Feld (zuletzt gesehenes Gelände, dazu Oberfläche, Gegenstände und Fallen als Aussehen) neben `erkundet`, die Anzeige, Untersuchen und die Wege der Abläufe für nicht sichtbare Felder lesen
++ Vorkehrung (erledigt, siehe [Welt.md](Welt.md), Sicht und Erinnerung): eine Erinnerung je Feld (zuletzt gesehenes Gelände, dazu Oberfläche, Gegenstände und Fallen als Aussehen) neben `erkundet`, die Anzeige, Untersuchen und die Wege der Abläufe für nicht sichtbare Felder lesen
+
+Umsetzung: offen
+
+## Flüssigkeiten und Gase
+
++ Wichtigkeit: ungeklärt, Frage gestellt am 2026-11-23: tiefes Wasser, Verteilen und Verdunsten; tiefes Wasser zieht mit einer Chance in eine Richtung, ein Skill Schwimmen hilft
++ Vorbilder (aus der Erinnerung, nicht nachgeprüft): Brogue (tiefes Wasser als Gelände: wer schwimmt, verliert mit einer Chance nicht angelegte Gegenstände, die abtreiben; flaches Wasser dämpft; Gas verteilt sich und verfliegt); Dungeon Crawl Stone Soup (tiefes Wasser nur für Schwimmer und Flieger, schwere Rüstung zieht hinunter); Caves of Qud (Flüssigkeiten mischen sich in Pfützen und Gefäßen, jede Mischung hat eigene Wirkung, Tiefe von Pfütze bis See, Wasser als Währung); Noita (Stoffe fließen, verdampfen und reagieren miteinander)
++ Vorhanden: Flüssigkeiten sind Oberfläche mit Menge und Schwund (Verdunsten ohne Rückstand), je Feld eine Art, die neue verdrängt die alte; Gas mit Ausgleich zu den Nachbarn und Abbau; Gelände mit `passierbarFuer` für Wasser und Abgrund; Last aus dem Gewicht; Stoßen und Versetzen (siehe [Welt.md](Welt.md), Feldschichten und [Wesen.md](Wesen.md), Bewegung); im Inhalt gibt es noch kein Wasser
++ Braucht, je nach Entscheidung:
+  + Tiefe: Stufen der Menge (Pfütze, flach, tief) oder tiefes Wasser als Gelände; tief heißt schwimmen, mit Folgen nach der Last (abtreiben, untergehen, Ertrinken als Zustand)
+  + Strömung: eine Richtung je Feld (am Gelände oder als Schicht), die mit einer Chance versetzt (`versetzen` mit eigener Art); Schwimmen als Skill senkt die Chance über ein Modifikatorziel
+  + Fließen: Oberfläche verteilt sich wie Gas zu den Nachbarn, aber erst über einer Schwelle und langsamer, nach unten (Abgrund, Senke) zuerst
+  + Verdunsten zu Gas: Hochprozentiges wird zu brennbarem Dampf, Gärendes zu CO2 (eine Angabe an der Oberfläche, welches Gas mit welchem Anteil entsteht)
+  + Mischen: mehrere Flüssigkeiten auf einem Feld und in Gefäßen, mit Regeln für Mischungen (Bier und Wasser, Würze und Hefe); berührt das Brausystem unmittelbar
+  + Schwere des Gases: CO2 sinkt und sammelt sich in Senken, ohne echte Höhe über eine Angabe am Gelände
++ Berührt: das Format der Feldschichten (`{ art, menge }` je Feld), Wegfindung (Kosten statt nur Meiden), Ebenenerzeugung (Seen, Bäche), Brausystem, Inventar (Gefäße, Last), Licht (brennender Alkohol), Leistung (Fließen am Welttick)
++ Umbaurisiko: gering für Tiefe, Strömung, Fließen, Verdunsten und Schwere (Register `welttick`, Haken `betritt_feld`, Daten der Schichten); mittel für das Mischen, weil dann ein Feld mehrere Arten trägt und sich das Format der Feldschichten ändert
++ Vorkehrung: vor dem Inhalt entscheiden, ob Flüssigkeiten sich mischen sollen (siehe [Systemausbau.md](Systemausbau.md), Punkt 10); bis dahin keine Daten anlegen, die auf genau einer Art je Feld bestehen
 
 Umsetzung: offen
 
@@ -147,8 +149,7 @@ Umsetzung: offen
 + Braucht: Arten der Wahrnehmung neben dem Sehen: gesehen, gespürt (Ort bekannt, Art vielleicht nicht), kartiert (Gelände bekannt, nie gesehen); Unsichtbarkeit als Gegenstück; Anzeige je Art (z.B. Umriss für Gespürtes)
 + Berührt: `sieht` in `src/systeme/sicht.js` (für Ninkasi heißt Sehen heute "im Sichtfeld"), der Filter des Logs (`src/systeme/wahrnehmbar.js`), der Renderer, die Wegfindung mit `nurBekannt`, EP für Erkundung (ein kartiertes Feld zählt erst beim Sehen, siehe EP für Erkundung)
 + Umbaurisiko: mittel
-+ Vorkehrung: eine Abfrage "wie nimmt Ninkasi dieses Ziel wahr" (Art statt ja oder nein), die neue Systeme statt `istSichtbar` fragen (offen); kartiert neben gesehen ist erledigt in 0.37.0 über die Erinnerung (`kartieren`, auf Wunsch mit Schätzen, siehe [Welt.md](Welt.md), Sicht und Erinnerung); Gegner erinnert die Karte nie, sie brauchen das Spüren
-+ Aus der Arbeitsliste hierher: Telepathie und Unsichtbarkeit (vorher [Systemausbau.md](Systemausbau.md), Punkt 10); magisch kartierte Felder (vorher Punkt 13)
++ Vorkehrung: eine Abfrage "wie nimmt Ninkasi dieses Ziel wahr" (Art statt ja oder nein), die neue Systeme statt `istSichtbar` fragen (beschlossen, siehe [Systemausbau.md](Systemausbau.md), Punkt 3); kartiert neben gesehen ist erledigt über die Erinnerung (`kartieren`, auf Wunsch mit Schätzen, siehe [Welt.md](Welt.md), Sicht und Erinnerung); Gegner erinnert die Karte nie, sie brauchen das Spüren
 
 Umsetzung: offen
 
@@ -160,9 +161,8 @@ Umsetzung: offen
 + Braucht: einen Lauf der Wirkung auf einer Kopie des Zustands
 + Berührt: den Zufall: eine Kopie mit demselben Zufallszustand würfelt genau das, was gleich wirklich geschieht; die Vorschau verriete die Zukunft (eine ungewollte Hellsicht)
 + Umbaurisiko: mittel
-+ Vorkehrung (erledigt in 0.36.0, siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit): alle Würfe im Spiel laufen über eine Schnittstelle mit benannten Würfen, die eine Simulation gegen "kleinster Wurf", "größter Wurf" mit festgelegten Chancen oder einen fremden Zufall tauschen kann; die Vorschau zeigt dann Spannen statt eines Ergebnisses
++ Vorkehrung (erledigt, siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit): alle Würfe im Spiel laufen über eine Schnittstelle mit benannten Würfen, die eine Simulation gegen "kleinster Wurf", "größter Wurf" mit festgelegten Chancen oder einen fremden Zufall tauschen kann; die Vorschau zeigt dann Spannen statt eines Ergebnisses
 + Offen: die Simulation selbst, eine Kopie des Spiels samt Laufzeitdaten (Raumindex, Vormerkungen, Zwischenspeicher), auf der eine Wirkung läuft, ohne zu melden
-+ Aus der Arbeitsliste hierher: vorher [Systemausbau.md](Systemausbau.md), Punkt 10 und Punkt 11 (Später)
 
 Umsetzung: offen
 
@@ -171,10 +171,9 @@ Umsetzung: offen
 + Wichtigkeit: mittel (Struktur für Rätsel, die EP bringen)
 + Vorbilder: Brogue (Machines: Räume aus Bausteinen mit Hebeln, Schlüsseln, Käfigen, Fallen; ein Schlüssel öffnet einen Altarraum anderswo auf der Ebene)
 + Braucht: Ebenenerzeugung in Schritten aus Daten (Räume einsetzen, Bezüge zwischen Feldern wie Hebel und Tor); Hebel mit Wirkung in der Ferne, verschlossene Türen mit Schlüssel; Lernanlass "Rätsel gelöst"
-+ Berührt: die Ebenenerzeugung (seit 0.33.0 in Schritten mit Register, siehe [Welt.md](Welt.md), Ebenen), veränderbares Gelände (zerstörbare Wände umgehen Sperren)
++ Berührt: die Ebenenerzeugung (in Schritten mit Register, siehe [Welt.md](Welt.md), Ebenen), veränderbares Gelände (zerstörbare Wände umgehen Sperren)
 + Umbaurisiko: gering bis mittel; ein Themenraum ist ein neuer Ebenenschritt, Bezüge zwischen Feldern wie Hebel und Tor fehlen noch
-+ Vorkehrung: erledigt in 0.33.0 (Erzeugung in Schritten mit Register)
-+ Aus der Arbeitsliste hierher: vorher [Systemausbau.md](Systemausbau.md), Punkt 10
++ Vorkehrung: erledigt (Erzeugung in Schritten mit Register)
 
 Umsetzung: offen
 
@@ -182,21 +181,11 @@ Umsetzung: offen
 
 + Wichtigkeit: ungeklärt, gewünscht (2026-11-22): feste Bauwerke mit Grundmuster in den zufälligen Ebenen, z.B. Sudhäuser
 + Vorbilder: Minecraft (Bauwerke aus Vorlagen: ein Startstück aus einem gewichteten Pool, Anschlusspunkte im Stück nennen den Pool für das nächste Stück, so wächst ein Dorf aus Häusern und Wegen; ein Ersatzpool schließt eine Kette sauber ab); Dungeon Crawl Stone Soup (Vaults als Text in `.des`-Dateien: Karte aus Zeichen, Zeichen als Platzhalter für Gegner, Gegenstände und Gelände aus Tabellen, Ersetzungen mit Zufall, Tiefe als Bedingung, frei platziert oder als ganze Ebene, Rand als Pflicht); Brogue (Machines, siehe Themenräume)
-+ Vorhanden: feste Karten als Zeilen aus Kennungen, bisher nur für eine ganze Ebene (der Hub in `daten/ebenen.js`, Schritt `karte_fest`); seit 0.33.0 entsteht jede Ebene in Schritten aus einem Register samt Prüfung der Erreichbarkeit und neuem Versuch (siehe [Welt.md](Welt.md), Ebenen)
++ Vorhanden: feste Karten als Zeilen aus Kennungen, bisher nur für eine ganze Ebene (der Hub in `daten/ebenen.js`, Schritt `karte_fest`); jede Ebene entsteht in Schritten aus einem Register samt Prüfung der Erreichbarkeit und neuem Versuch (siehe [Welt.md](Welt.md), Ebenen)
 + Braucht: Strukturen als Daten im selben Format wie der Hub, dazu eine Legende für Platzhalter (Gegner aus einer Tabelle, Gegenstand, Falle, Gelände mit Zufall); Bedingungen (Tiefe, Ebenenart, höchstens einmal je Lauf) und Gewichte; einen Schritt der Erzeugung, der eine Struktur in die fertige Karte stempelt (Platz suchen, drehen oder spiegeln, Eingänge an Gänge anbinden), danach eine Prüfung, dass alles Begehbare erreichbar bleibt, sonst ein neuer Versuch mit abgeleitetem Zufall; später zusammengesetzte Strukturen aus Teilen nach Minecraft (Sudhalle, Lager, Gärkeller)
 + Berührt: `src/welt/ebene.js`, Themenräume (eine Struktur kann einen Themenraum enthalten), Schatzräume und Questsystem (der Plan des Laufs legt fest, welche Tiefe welche Struktur bekommt), Population (in Strukturen eigene Regeln), Nachrückende Gegner (nicht in Strukturen), veränderbares Gelände (geschützte Wände)
 + Umbaurisiko: gering bis mittel, auf die Ebenenerzeugung beschränkt; eine Struktur ist ein neuer Ebenenschritt zwischen Karte und `erreichbarkeit`
-+ Vorkehrung: erledigt in 0.33.0 (Erzeugung in Schritten mit Register, Erreichbarkeit mit neuem Versuch); weiter gilt: das Kartenformat des Hubs als gemeinsames Format für Strukturen behalten
-
-Umsetzung: offen
-
-## Licht
-
-+ Wichtigkeit: hoch, "auf jeden Fall" (2026-11-22)
-+ Vorbilder: Brogue (im Dunkeln halbiert sich die Heimlichkeitsweite, im Licht verdoppelt sie sich); Torchbearer (Licht als Verbrauchsgut: Kerze, Fackel, Laterne leuchten unterschiedlich vielen Gefährten unterschiedlich lange; im Dämmer wird jede Probe schwerer)
-+ Stand: vorläufige Ideen in [Welt.md](Welt.md), Licht; der offene Rest steht in [Systemausbau.md](Systemausbau.md), Punkt 7
-+ Umbaurisiko: gering: ohne Angabe gilt jedes Feld als hell, das Spiel verhält sich dann wie bisher
-+ Vorkehrung: keine; vor Inhalt und Balancing einplanen, weil Licht Heimlichkeit und Gefahr verschiebt
++ Vorkehrung: erledigt (Erzeugung in Schritten mit Register, Erreichbarkeit mit neuem Versuch); weiter gilt: das Kartenformat des Hubs als gemeinsames Format für Strukturen behalten
 
 Umsetzung: offen
 
@@ -209,25 +198,13 @@ Umsetzung: offen
 + Berührt: Chronik und Fenster nach dem Tod ([Titelbildschirm.md](Titelbildschirm.md))
 + Umbaurisiko: gering
 + Vorkehrung: keine, solange Meldungen Urheber und Ort tragen
-+ Aus der Arbeitsliste hierher: vorher [Systemausbau.md](Systemausbau.md), Punkt 10
 
 Umsetzung: offen
 
-## Prüfsumme der Daten
-
-+ Wichtigkeit: hoch, "auf jeden Fall" (2026-11-22)
-+ Inhalt: eine Prüfsumme der Daten im Spielstand, samt Mods; das Laden prüft bisher nur die Version, geänderte Daten ohne neue Version fallen nicht auf (siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit)
-+ Umbaurisiko: gering
-+ Vorkehrung: keine; die Daten sind Objekte mit fester Reihenfolge der Schlüssel, eine Prüfsumme über ihre JSON-Form ist stabil
-+ Aus der Arbeitsliste hierher: vorher [Systemausbau.md](Systemausbau.md), Punkt 10
-+ Umgesetzt in 0.45.0, streng: eine andere Prüfsumme macht den Platz veraltet
-
-Umsetzung: siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit
-
 ## Schutz der Ablagen
 
-+ Wichtigkeit: ungeklärt; gesammelt 2026-11-23 aus [Systemausbau.md](Systemausbau.md), Punkt 15
-+ Inhalt: was außerhalb eines Laufs liegt (Chronik, Einstellungen, Belegung, später Vorwissen und Mods), soll Änderungen an Code und Daten überstehen; erledigt in 0.45.0: stabile Namen mit Namensbuch und Umbenennungen, Migrationen der Chronik, Belegung ohne unbekannte Aktionen
++ Wichtigkeit: ungeklärt; die Arbeit steht in [Systemausbau.md](Systemausbau.md), Punkt 11
++ Inhalt: was außerhalb eines Laufs liegt (Chronik, Einstellungen, Belegung, später Vorwissen und Mods), soll Änderungen an Code und Daten überstehen; erledigt: stabile Namen mit Namensbuch und Umbenennungen, Migrationen der Chronik, Belegung ohne unbekannte Aktionen
 + Kandidaten: Namensräume für Mods in den Registern (Vorsatz `<mod>.`, Fehler bei doppelter Anmeldung), erst mit dem ersten Mod; ein Katalog der Wächtertests (Ablage, Komponenten, gesteuerte Entität, Würfe, Namensbuch) an einer Stelle; Migrationen auch für Einstellungen und Belegung, sobald sich ihr Format zum ersten Mal ändert; Fix-Versionen mit gleicher Prüfsumme der Daten behalten ihre Plätze (dann ist die Prüfsumme der eigentliche Schutz); eine Prüfsumme des Codes (bisher leistet das die Version); Freischaltungen gegen das Namensbuch prüfen (ein Zähler `besiegt.<typ>` mit unbekanntem Typ)
 + Umbaurisiko: gering
 + Vorkehrung: keine
@@ -238,11 +215,10 @@ Umsetzung: teilweise, siehe [Architektur.md](Architektur.md), Speichern; offen: 
 
 + Wichtigkeit: ungeklärt
 + Vorbilder: Dungeon Crawl Stone Soup (Nahrung galt als schlecht gemachte Uhr und wurde durch die Zot-Uhr ersetzt: sehr locker, sie trifft nur grobes Trödeln, dann schnell); Cogmind (Alarmstufe ruft Trupps, Vernichtungstrupps kommen nach Zeit); Torchbearer (alle vier Runden ein Zustand in fester Folge: hungrig, erschöpft, wütend, krank, verletzt, verängstigt); Blades in the Dark (sichtbare Uhren mit Segmenten für drohendes Unheil)
-+ Vorhanden: Bier verdirbt (seit 0.23.0); LP regenerieren immer, Pegelabbau und Psi-Schwund allein sind kein Druck
-+ Braucht: Zeit je Ebene im Zustand; Nachrücken der Population verlassener Ebenen (logistisch auf eine Tragfähigkeit, siehe [Systemausbau.md](Systemausbau.md), Punkt 8); sichtbare Uhr in der Anzeige (passt zu "durchschaubar statt geheim")
++ Vorhanden: Bier verdirbt; LP regenerieren immer, Pegelabbau und Psi-Schwund allein sind kein Druck
++ Braucht: Zeit je Ebene im Zustand; Nachrücken der Population verlassener Ebenen (logistisch auf eine Tragfähigkeit, siehe [Systemausbau.md](Systemausbau.md), Punkt 14); sichtbare Uhr in der Anzeige (passt zu "durchschaubar statt geheim")
 + Umbaurisiko: gering, Zeitereignisse und Weltuhr reichen
-+ Vorkehrung: keine
-+ Aus der Arbeitsliste hierher: vorher [Systemausbau.md](Systemausbau.md), Punkt 10
++ Vorkehrung: keine; das Spieldesign gehört zur Ökonomie der Vorräte in [Systemausbau.md](Systemausbau.md), Punkt 10
 
 Umsetzung: offen
 
@@ -253,7 +229,6 @@ Umsetzung: offen
 + Braucht: Gunst als Wert, Gebote und Tabus als Auslöser auf Taten, Kräfte als Fähigkeiten nach Schwellen der Gunst
 + Umbaurisiko: gering, Haken und Register reichen
 + Vorkehrung: keine
-+ Aus der Arbeitsliste hierher: vorher [Systemausbau.md](Systemausbau.md), Punkt 10
 
 Umsetzung: offen
 
@@ -263,8 +238,7 @@ Umsetzung: offen
 + Inhalt: Zeitsprung und verlorene Erinnerung an erkundete Felder bei sehr hohem Pegel
 + Braucht: die Erinnerung der Karte aus "Veränderbares Gelände"; eine Weise, Zeit vergehen zu lassen, in der Ninkasi von der KI geführt wird
 + Umbaurisiko: gering
-+ Vorkehrung (erledigt in 0.37.0): `vergessen` löscht die Erinnerung an Felder, nicht `erkundet`; ein Wiedersehen bringt keine EP (siehe [Welt.md](Welt.md), Sicht und Erinnerung)
-+ Aus der Arbeitsliste hierher: vorher [Systemausbau.md](Systemausbau.md), Punkt 10
++ Vorkehrung (erledigt): `vergessen` löscht die Erinnerung an Felder, nicht `erkundet`; ein Wiedersehen bringt keine EP (siehe [Welt.md](Welt.md), Sicht und Erinnerung)
 
 Umsetzung: offen
 
@@ -286,18 +260,6 @@ Ideen aus Rollenspielen am Tisch; jede passt nach heutigem Stand in Daten, Regis
 
 Umsetzung: offen
 
-## Handlungsoptionen der KI
-
-+ Wichtigkeit: hoch, "ausgefeiltere KI" (2026-11-22): Gegner wählen situationsbedingt oder zufällig aus einer Liste von Handlungen, z.B. wegspringen, Zauber wirken, Nahkampf
-+ Vorhanden bis 0.38.0: `faehigkeiten` an der KI als Liste, der erste passende Eintrag (Abstand, `wenn`, benutzbar, keine Verbündeten getroffen) wird mit `chance` gewürfelt, sonst Nahkampf und Bewegung; `abstandHalten`; Module `abwarten`, `jagen`, `fliehen` (siehe [Wesen.md](Wesen.md), KI)
-+ Vorbilder: Utility-KI nach Dave Mark (Infinite Axis Utility System: jede Handlung bekommt eine Bewertung aus mehreren Gesichtspunkten wie eigene LP, Abstand, Zahl der Gegner, jeder über eine Kurve auf 0 bis 1 gebracht und multipliziert; gewählt wird die beste, gewichtet zufällig unter allen oder unter den besten n); Dungeon Crawl Stone Soup (Häufigkeit je Monsterzauber); Brogue (Monster blinken zur Flucht, fliehen nahe dem Tod, Affen stehlen und laufen weg); Old-School-Regelwerke (Moral als Wurf, wann ein Wesen aufgibt)
-+ Braucht: Handlungen als Liste an der KI, jede mit Bedingungen, Gewicht und Bewertungen (Eingabe und Kurve); Grundhandlungen neben Fähigkeiten (angreifen, nähern, zurückweichen, fliehen, warten, rufen); eine Wahlregel (`beste`, `gewichtet`, `gewichtetUnterBesten`); Eingaben als Register (`ki_eingaben`), damit neue Gesichtspunkte Daten bleiben
-+ Berührt: `src/ki/faehigkeitenwahl.js` und `src/ki/jagen.js`; Kurven (`src/kern/kurven.js`, ganzzahlig, passt zur Wiederholbarkeit); die Datenprüfung; Wegspringen geht schon mit den Bausteinen `teleportieren` und `stossen` als Fähigkeit
-+ Umbaurisiko: mittel, aber auf `src/ki/` beschränkt
-+ Vorkehrung (erledigt in 0.39.0, siehe [Wesen.md](Wesen.md), KI): `handlungen` mit Gewicht, `chance` und Bewertungen über Eingaben und Kurven in Promille, Wahl `erste`, `beste`, `gewichtet`, `gewichtetUnterBesten`; das alte Format ist `wahl: "erste"`, die beiden vorhandenen Gegner sind umgebaut, ihr Verhalten blieb gleich; neue Gegner entstehen im neuen Format
-
-Umsetzung: offen
-
 ## Schatzräume mit Schlüssel
 
 + Wichtigkeit: hoch (2026-11-22): ein Schatzraum hat garantiert einen Schlüssel auf derselben Ebene oder höchstens zwei Ebenen entfernt
@@ -306,22 +268,21 @@ Umsetzung: offen
 + Berührt: `src/welt/ebene.js` (erzeugt jede Ebene für sich mit eigenem abgeleitetem Zufall), Themenräume, veränderbares Gelände (Schutz der Wände), Verschleiß (ein Schlüssel darf nicht zerfressen werden), Fallenlassen und Sturz in den Abgrund (verlorener Schlüssel)
 + Regelfrage: was mit einem verlorenen Schlüssel geschieht (kehrt zurück, ist unzerstörbar, oder Pech)
 + Umbaurisiko: gering, seit es den Plan des Laufs gibt
-+ Vorkehrung: erledigt in 0.33.0 (Plan des Laufs im Zustand, siehe [Welt.md](Welt.md), Plan des Laufs); weiter gilt: Ebenen nie aus dem Spielverlauf würfeln, nur aus Startwert und Plan
++ Vorkehrung: erledigt (Plan des Laufs im Zustand, siehe [Welt.md](Welt.md), Plan des Laufs); weiter gilt: Ebenen nie aus dem Spielverlauf würfeln, nur aus Startwert und Plan
 
 Umsetzung: offen
 
 ## Fraktionen: Ruf und Beistand
 
 + Wichtigkeit: hoch, zumindest das System vorbereiten (2026-11-22)
-+ Vorhanden seit 0.14.0: Beziehungen als Tabelle der Fraktionen; Zorn: greift Ninkasi ein neutrales Wesen an, werden es und alle Wesen seiner Fraktion, die sie sehen, ihr gegenüber feindlich (jedes einzeln, `zornAuf`), siehe [Wesen.md](Wesen.md), Fraktionen; damit ist der Wunsch "Neutrale in Sicht werden aggressiv, wenn man ein Wesen ihrer Fraktion angreift" schon erfüllt
-+ Neu, Beistand (entschieden 2026-11-22): Wesen helfen Ninkasi, wenn sie in ihrer Sicht einen Feind ihrer eigenen Fraktion bekämpft (der Feind meines Feindes)
++ Vorhanden: Beziehungen als Tabelle der Fraktionen; Zorn: greift Ninkasi ein neutrales Wesen an, werden es und alle Wesen seiner Fraktion, die sie sehen, ihr gegenüber feindlich (jedes einzeln, `zornAuf`), siehe [Wesen.md](Wesen.md), Fraktionen; damit ist der Wunsch "Neutrale in Sicht werden aggressiv, wenn man ein Wesen ihrer Fraktion angreift" schon erfüllt
++ Beistand (entschieden): Wesen helfen Ninkasi, wenn sie in ihrer Sicht einen Feind ihrer eigenen Fraktion bekämpft (der Feind meines Feindes)
 + Vorbilder: Caves of Qud (Ruf je Fraktion als Zahl, Schwellen machen eine Fraktion freundlich oder feindlich, Wasserritual und Taten verschieben ihn; Mitglieder kommen einander zu Hilfe)
 + Braucht: Ruf je Fraktion als Zahl im Zustand (Vorgabe 0); Schwellen in `daten/regeln.js`, ab denen die Beziehung kippt; Taten, die den Ruf verschieben (Angriff, Tötung, Hilfe, Gespräch), als Auslöser an der Fraktion; für den Beistand eine Regel in der Zielwahl (`src/ki/ziele.js`): wer ein Mitglied einer verfeindeten Fraktion angreift, wird für Zuschauer zum Verbündeten auf Zeit
 + Berührt: `beziehung` in `src/systeme/fraktionen.js` (liest heute nur Daten und Zorn), die KI, Handel und Gespräch, Anzeige (Ruf im Charakterfenster)
 + Umbaurisiko: gering bis mittel
-+ Vorkehrung (erledigt in 0.35.0, siehe [Wesen.md](Wesen.md), Fraktionen): `zustand.ruf` mit Vorgabe 0, `beziehung` liest Grundwert plus Ruf über die Schwellen; Beistand gegen Feinde der eigenen Fraktion mit Ende über den Kampfzustand; als erste Tat verschiebt eine Tötung den Ruf, nur mit Zeugen; Baustein `ruf_aendern` für Gespräch und Quests
-+ Entschieden 2026-11-22: Ruf als Grundwert aus der Tabelle plus Ruf; er gehört der Fraktion `ninkasi`, unter Verkleidung oder Besessenheit gelten die Beziehungen der fremden Fraktion, und Taten ändern Ninkasis Ruf dann nicht; Beistand leisten nur Neutrale; Tötungen zählen nur mit Zeugen
-+ Aus der Arbeitsliste hierher: Ruf bei ganzen Fraktionen (vorher [Systemausbau.md](Systemausbau.md), Punkt 7)
++ Vorkehrung (erledigt, siehe [Wesen.md](Wesen.md), Fraktionen): `zustand.ruf` mit Vorgabe 0, `beziehung` liest Grundwert plus Ruf über die Schwellen; Beistand gegen Feinde der eigenen Fraktion mit Ende über den Kampfzustand; als erste Tat verschiebt eine Tötung den Ruf, nur mit Zeugen; Baustein `ruf_aendern` für Gespräch und Quests
++ Entschieden: Ruf als Grundwert aus der Tabelle plus Ruf; er gehört der Fraktion `ninkasi`, unter Verkleidung oder Besessenheit gelten die Beziehungen der fremden Fraktion, und Taten ändern Ninkasis Ruf dann nicht; Beistand leisten nur Neutrale; Tötungen zählen nur mit Zeugen
 
 Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Fraktionen; offen: weitere Taten (Hilfe, Gespräch, Handel), Ruf im Charakterfenster, ob eine Tat in Verkleidung etwas anderes verschiebt
 
@@ -329,11 +290,11 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Fraktionen; offen: weitere Tat
 
 + Wichtigkeit: hoch (2026-11-22); zugleich der dauerhafte Fortschritt als Wissen
 + Vorbilder: Hades (Kodex: Einträge wachsen, je öfter man einem Wesen begegnet, es besiegt oder mit ihm spricht); Hades II (Bestiarium mit allen begegneten Gegnern und der Zahl der Siege); Caves of Qud (Journal mit Orten, Geheimnissen und Kochrezepten, aus der Erinnerung, nicht nachgeprüft)
-+ Inhalt: Bestiarium mit Wesen, deren Eintrag mit Begegnungen und Siegen wächst (erst Name und Bild, dann Werte, dann Schwächen); Glossar mit den Begriffen des Spiels (Pegel, Brand, Zorn, Heimlichkeit), auch aus der Hilfe und dem Untersuchen erreichbar; Rezeptbuch mit gefundenen oder erbrauten Rezepten
-+ Braucht: Fensterarten; Quellen für die Befehlszeile (das Register der Quellen ist dafür vorbereitet, siehe [Bedienung.md](Bedienung.md), Einstellungen); Zähler je Wesensart aus den Meldungen (wie die Chronik); Texte in `sprache/`
-+ Berührt: Wiederholbarkeit: liest nur die Anzeige das Wissen, ist nichts zu beachten; ermöglicht ein bekanntes Rezept das Brauen, gilt die Regel aus "Fortschritt über Läufe" (Startoption)
++ Inhalt: Bestiarium mit Wesen, deren Eintrag mit Begegnungen und Siegen wächst (erst Name und Bild, dann Werte, dann Schwächen); Glossar mit den Begriffen des Spiels (Pegel, Brand, Zorn, Heimlichkeit), auch aus der Hilfe und dem Untersuchen erreichbar; Rezeptbuch mit gefundenen oder erbrauten Rezepten; Tonfall von Bestiarium und Glossar enzyklopädisch, ernsthaft und informativ; das Glossar der Fachbegriffe des Brauens entsteht zweisprachig mit dem Englischen ([Systemausbau.md](Systemausbau.md), Punkt 9)
++ Braucht: Fensterarten; Quellen für die Befehlszeile (das Register der Quellen ist dafür vorbereitet, siehe [Bedienung.md](Bedienung.md), Eingabe); Zähler je Wesensart aus den Meldungen (wie die Chronik); Texte in `sprache/`
++ Berührt: Wiederholbarkeit: liest nur die Anzeige das Wissen, ist nichts zu beachten; ermöglicht ein bekanntes Rezept das Brauen, gilt die Regel für Wissen über Läufe hinweg (Startoption, siehe [Architektur.md](Architektur.md), Speichern)
 + Umbaurisiko: gering
-+ Vorkehrung: die Regel aus "Fortschritt über Läufe"; Meldungen nennen die Art des Wesens
++ Vorkehrung: erledigt mit der Regel für Wissen über Läufe hinweg; Meldungen nennen die Art des Wesens
 
 Umsetzung: offen
 
@@ -377,7 +338,7 @@ Umsetzung: offen
 + Vorhanden: Zustände mit Dauer, Verlauf über die Zeit, Stapelregel, Tags und Auslösern (siehe [Wirkungen.md](Wirkungen.md), Zustände); Baustein `zustand_entfernen { zustand | tag }`; Heilung durch einen Gegenstand über `trinkbar` oder Benutzen, an einem Ort über Gelände mit `beimBenutzen` (Altar, Quelle), durch ein Ritual als lange Aktion (siehe [Wirkungen.md](Wirkungen.md), Lange Aktionen); zufällige Rezepte je Lauf gehen über Etiketten wie bei Unbekanntem
 + Braucht: Krankheit als Zustand mit Stufen (Vorstufe, Ausbruch), der von selbst weiterschreitet oder ausheilt (ein Wurf je Welttick oder Tag); Ansteckung über Auslöser (Treffer, Trinken) oder Aura; Schutz gegen das falsche Heilmittel: ein Tag am Zustand, den nur das richtige Mittel entfernt (z.B. `krankheit.glotrot`), während allgemeine Heilung nur `krankheit` ohne Unterart trifft
 + Umbaurisiko: gering, fast alles sind Daten
-+ Vorkehrung: keine; vor dem ersten Inhalt prüfen, ob das Weiterschreiten zu einer nächsten Stufe (Zustand A wird zu Zustand B) als `beimEnde` mit `zustand_setzen` reicht
++ Vorkehrung: keine; ob das Weiterschreiten zu einer nächsten Stufe (Zustand A wird zu Zustand B) als `beimEnde` mit `zustand_setzen` reicht, prüft der Probedurchstich ([Systemausbau.md](Systemausbau.md), Punkt 2)
 
 Umsetzung: offen
 
@@ -388,7 +349,7 @@ Umsetzung: offen
 + Braucht: Quests als Daten (Vorlage mit Rollen wie Auftraggeber, Ziel, Gegenstand, Ort; Bedingungen für das Erscheinen nach Tiefe); erzeugte Quests aus Vorlagen mit Platzhaltern, die die Erzeugung aus dem Inhalt füllt; Ziele als Auslöser auf vorhandene Haken und Meldungen (töten, bringen, erreichen, brauen, sprechen, beschützen); Stand der Quests im Zustand; Belohnungen als Effekte (Gegenstände, EP als Lernanlass, Ruf, Wissen); Fensterart Journal; Annehmen und Abgeben über Gespräch
 + Berührt: Ebenenerzeugung (das Ziel einer Quest kann auf einer noch nicht erzeugten Ebene liegen: derselbe Plan des Laufs wie bei den Schatzräumen), Gespräch, Ruf, Lernen (gebundene EP nur für Bewältigtes, eine Quest ist Bewältigtes), Texte und Grammatik (Platzhalter in Aufträgen), Bestiarium und Rezeptbuch (Wissen als Belohnung)
 + Regelfragen: was geschieht, wenn ein Questziel ohne Ninkasi verschwindet (ein anderer tötet den Gesuchten, Säure zerfrisst den Gegenstand); ob Quests scheitern können oder eine Frist haben (passt zum Druck gegen endloses Rasten)
-+ Umbaurisiko: gering bis mittel; der Plan des Laufs steht seit 0.33.0 und nimmt Quests in `inhalte` auf
++ Umbaurisiko: gering bis mittel; der Plan des Laufs steht und nimmt Quests in `inhalte` auf
 + Vorkehrung: der Plan des Laufs ist erledigt (siehe [Welt.md](Welt.md), Plan des Laufs); weiter gilt: Meldungen und Haken tragen weiter Urheber, Art und Ort, damit Questziele nur Auslöser sind; Questgegenstände als Gegenstände mit einem Kennzeichen, das Verschleiß und Zerstören verhindert
 
 Umsetzung: offen
@@ -396,7 +357,7 @@ Umsetzung: offen
 ## Nachrückende Gegner
 
 + Wichtigkeit: ungeklärt; angedacht ist ein fester Pool von Gegnern je Ebene, nachdenken erwünscht (2026-11-22)
-+ Stand: [Charakter.md](Charakter.md), Erfahrungspunkte (EP) schließt nachrückende Gegner nicht aus, als eigenes System mit Rate, Obergrenze und EP-Faktor; verlassene Ebenen ruhen bisher, das logistische Nachholen steht in [Systemausbau.md](Systemausbau.md), Punkt 8
++ Stand: [Charakter.md](Charakter.md), Erfahrungspunkte (EP) schließt nachrückende Gegner nicht aus, als eigenes System mit Rate, Obergrenze und EP-Faktor; verlassene Ebenen ruhen bisher, das logistische Nachholen steht in [Systemausbau.md](Systemausbau.md), Punkt 14
 + Vorbilder: Brogue (Horden erscheinen von Zeit zu Zeit, nie in Sicht, nie näher als 15 Felder, nie in Themenräumen, nie unbewegliche Wesen); Cogmind (Trupps nach Alarmstufe und nach Zeit); Dungeon Crawl Stone Soup (langsames Nachrücken, später die Zot-Uhr)
 + Abwägung: ein fester Pool macht jede Ebene berechenbar und das Rasten sicher; Nachrücken ist zugleich der einfachste Druck gegen endloses Rasten; Farmen verhindern schon der EP-Faktor und der Topf je Abstammungslinie
 + Braucht: ein System am Welttick oder als Zeitereignis je Ebene; Regeln für den Ort (außer Sicht, Mindestabstand, nicht in Themenräumen); Werte in `daten/regeln.js` und an der Ebene (Rate, Obergrenze, EP-Faktor, Tabelle der Population); die Obergrenze der Population (500) gilt weiter
@@ -406,39 +367,16 @@ Umsetzung: offen
 
 Umsetzung: offen
 
-## Wesen auf mehreren Feldern
-
-+ Wichtigkeit: gering, höchstens für Bosskämpfe und auch dort verzichtbar (2026-11-22)
-+ Stand: verworfen in [Systemausbau.md](Systemausbau.md), Punkt 7 (keine Mehrfeld-Wesen, Bossphasen über Auslöser mit Bedingungen)
-+ Umbaurisiko: hoch (Position, räumlicher Index, Wegfindung und Sicht gehen von einem Feld aus)
-+ Vorkehrung: keine
-
-Umsetzung: offen
-
 ## EP für Erkundung
 
 + Wichtigkeit: ungeklärt, Frage gestellt am 2026-11-22
-+ Inhalt: heute 1 EP je Feld, das Ninkasi zum ersten Mal wirklich sieht (siehe [Charakter.md](Charakter.md), Freie EP); laut Bot rund 1100 EP aus Erkundung gegen rund 25 aus Gegnern in Tiefe 1
++ Inhalt: heute EP je Feld, das Ninkasi zum ersten Mal wirklich sieht (siehe [Charakter.md](Charakter.md), Freie EP); laut Bot kommt fast alles aus der Erkundung (Messwerte in [Entwicklung.md](Entwicklung.md), Messwerte)
 + Wege: a) nur Gesehenes zählt, Kartierung zeigt den Weg und die EP kommen beim Hingehen (gilt); b) jede Erkundung zählt, ein mächtiger Trank der Kartierung brächte alle EP der Ebene auf einmal und wäre die größte EP-Quelle; c) EP je Ort (Raum, Fundort) statt je Feld, das Ablaufen jeder Ecke lohnt dann nicht mehr
 + Berührt: `epFuerErkundung` (`src/systeme/lernen.js`) und das Balancing der EP
 + Umbaurisiko: gering
-+ Vorkehrung (erledigt in 0.37.0): `erkundet` (einmal gesehen, EP) ist von der Erinnerung (bekannt) getrennt; jeder der drei Wege ist damit eine kleine Änderung, ein Filmriss bringt unter keinem doppelte EP
++ Vorkehrung (erledigt): `erkundet` (einmal gesehen, EP) ist von der Erinnerung (bekannt) getrennt; jeder der drei Wege ist damit eine kleine Änderung, ein Filmriss bringt unter keinem doppelte EP
 
 Umsetzung: teilweise, siehe [Welt.md](Welt.md), Sicht und Erinnerung; offen: ob c) die bessere Form ist
-
-## Entscheidungen
-
-+ 2026-11-22: Gärung über Zeit ohne Ninkasi verworfen; Ninkasi muss am Kessel bleiben, damit das Bier gut wird (Brauen als lange Aktion, siehe [Wirkungen.md](Wirkungen.md), Lange Aktionen)
-+ 2026-11-22: Ideen mit möglichen Folgen für den Kern stehen hier, nicht mehr in der Arbeitsliste
-+ 2026-11-22: dauerhafter Fortschritt zwischen den Läufen höchstens als Wissen ([Grundlagen.md](Grundlagen.md), Spiel)
-+ 2026-11-22: Stabilität und Wahnsinn nach Call of Cthulhu nur als Vorbild für die Schwellen des Pegels
-+ 2026-11-22: Beistand heißt, Wesen helfen Ninkasi gegen einen Feind ihrer eigenen Fraktion
-+ 2026-11-22: Begleiter nehmen Vorrangbefehle an ([Grundlagen.md](Grundlagen.md), Spiel)
-+ 2026-11-22: die Vorkehrungen stehen nach Dringlichkeit als Punkt 14 in [Systemausbau.md](Systemausbau.md)
-+ 2026-11-22: für Besessenheit nur die leichte Vorkehrung (Lesefunktion statt zweitem Feld); ob sie kommt, bleibt offen
-+ 2026-11-22: Kartierung zeigt Gelände, auf Wunsch auch Schätze, bringt aber keine EP; die EP kommen erst beim Sehen (Weg a unter EP für Erkundung)
-+ 2026-11-23: Prüfsumme der Daten streng (anderer Stand heißt veraltet), Nachspielen ebenso; Namensbuch mit den Stufen fest und vorläufig, fest zuerst Ninkasi und die Eigenschaften; Migrationen der Chronik; umgesetzt in 0.45.0
-+ 2026-11-22: Plan des Laufs im Zustand, Folge der Ebenenschritte in den Daten (mit Vorgabe in `daten/regeln.js` und Prüfung von `braucht`), Erreichbarkeit mit neuem Versuch; umgesetzt in 0.33.0
 
 ## Recherche
 

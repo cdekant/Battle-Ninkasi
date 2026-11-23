@@ -1,10 +1,10 @@
 # Battle Ninkasi - Wesen
 
-Stand: 2026-11-22
+Stand: 2026-11-23
 
-Zuständig für: `src/systeme/kampf.js`, `src/systeme/kampfzustand.js`, `src/systeme/fraktionen.js`, `src/systeme/wahrnehmung.js`, `src/systeme/bewegung.js`, `src/systeme/verschieben.js`, `src/systeme/werfen.js`, `src/systeme/skills.js`, `src/systeme/lernen.js`, `src/systeme/stoffwechsel.js`, `src/ki/*`, `daten/gegner.js`, `daten/ninkasi.js`, `daten/fraktionen.js`, `daten/schadensarten.js`, `daten/eigenschaften.js`, `daten/skills.js`, `daten/wurfgegenstaende.js`, `daten/taktiken.js`
+Zuständig für: `src/systeme/kampf.js`, `src/systeme/kampfzustand.js`, `src/systeme/fraktionen.js`, `src/systeme/wahrnehmung.js`, `src/systeme/bewegung.js`, `src/systeme/verschieben.js`, `src/systeme/werfen.js`, `src/systeme/skills.js`, `src/systeme/lernen.js`, `src/systeme/stoffwechsel.js`, `src/ki/*`, `daten/gegner.js`, `daten/ninkasi.js`, `daten/fraktionen.js`, `daten/schadensarten.js`, `daten/eigenschaften.js`, `daten/skills.js`, `daten/taktiken.js`
 
-Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Charakter.md](Charakter.md), [Grundlagen.md](Grundlagen.md), [Ausblick.md](Ausblick.md)
+Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Charakter.md](Charakter.md), [Grundlagen.md](Grundlagen.md), [Ausblick.md](Ausblick.md), [Gegenstaende.md](Gegenstaende.md)
 
 ## Zweck
 
@@ -51,6 +51,7 @@ Regeln:
 + Widerstand R in Punkten aus `widerstaende` und Modifikatoren auf `widerstand` mit der Art als Tag (ohne Tag gegen alles): Schaden × H / (H + R); mit dem Halbwert H 100 halbieren 100 Punkte, 300 Punkte lassen ein Viertel; negative Punkte machen verwundbar, Schaden × (H − 2R) / (H − R), das nähert sich dem Doppelten (−100 Punkte: x1,5); einmal gerundet
 + Immunität als Sonderfall: `immun` am Wesen oder ein Modifikator auf `immunitaet` mit der Art als Tag (Betrag über 0), Schaden genau 0
 + Hinterhalt: Ein Angriff mit Quelle auf ein ahnungsloses Ziel (siehe Wahrnehmung) trifft sicher, wird nicht geblockt und ist kritisch; mehr Schaden im Hinterhalt geben Modifikatoren mit der Bedingung `gegenueber_ahnungslos`, z.B. auf `kritfaktor` für einen Dolch-Skill
++ Keine Gelegenheitsangriffe: wer sich von einem Gegner wegbewegt, wird dafür nicht angegriffen
 
 ## Kampfzustand
 
@@ -65,7 +66,7 @@ Vorbild Caves of Qud: Feindliche greifen an, Neutrale tun nichts, werden aber fe
 
 Daten:
 
-+ Fraktion (`daten/fraktionen.js`): `{ text, beziehungen?: { andereFraktion: "feind" | "neutral" | "verbuendet" }, rufFest? }` (`BEZIEHUNGEN`); die Tabelle nennt nur Abweichungen von `regeln.fraktionen.beziehungVorgabe` (Vorgabe `feind`, wie vor 0.14.0); `rufFest: true` lässt sich durch keinen Ruf umstimmen (im Spielinhalt vorläufig die Verderber)
++ Fraktion (`daten/fraktionen.js`): `{ text, beziehungen?: { andereFraktion: "feind" | "neutral" | "verbuendet" }, rufFest? }` (`BEZIEHUNGEN`); die Tabelle nennt nur Abweichungen von `regeln.fraktionen.beziehungVorgabe` (Vorgabe `feind`); `rufFest: true` lässt sich durch keinen Ruf umstimmen (im Spielinhalt vorläufig die Verderber)
 + Am Wesen `fraktion`, überlagerbar durch Zustände (siehe [Wirkungen.md](Wirkungen.md), Zustände); `zornAuf: [IDs]` für einzelnen Zorn; `beistandFuer: { angreiferinId: [Gegner-IDs] }` für Beistand
 + Im Zustand `ruf: { fraktion: Zahl }`, ein fehlender Eintrag heißt 0
 + Regeln in `regeln.fraktionen`: `rufTraeger` (`ninkasi`), `rufGrundwert` (feind -100, neutral 0, verbündet 100), `rufSchwellen` (feind -50, verbündet 50), `rufToetungFeind` (10), `rufToetungEigene` (-25), `rufNurMitZeugen` (true); die Datenprüfung verlangt, dass jeder Grundwert in der Zone seiner Beziehung liegt
@@ -92,7 +93,7 @@ Vorbild Brogue (Heimlichkeitsweite, Chance je Zug, Spur verlieren, Angriffe auf 
 
 Daten:
 
-+ Wachzustand in der KI-Komponente (`WACHZUSTAENDE`): `ki.wachzustand` `schlaeft`, `wach` oder `jagt` (Vorgabe `jagt`, das Verhalten vor 0.14.0); in den Daten z.B. `ki: { modul: "jagen", wachzustand: "schlaeft" }`; dazu `letzteBekanntePosition`
++ Wachzustand in der KI-Komponente (`WACHZUSTAENDE`): `ki.wachzustand` `schlaeft`, `wach` oder `jagt` (Vorgabe `jagt`); in den Daten z.B. `ki: { modul: "jagen", wachzustand: "schlaeft" }`; dazu `letzteBekanntePosition`
 + Am Akteur `letzteAktion` (gesetzt in `befehlAusfuehren`, siehe [Architektur.md](Architektur.md), Befehle)
 + Regelwerte `regeln.wahrnehmung`: `heimlichkeitVorgabe` 7, `heimlichkeitMindestens` 2, `heimlichkeitNachAktion` (Nahkampf und Fähigkeit 200 %, Warten 50 %), `bemerkenChance` 25, `spurFaktor` 3, `laermNahkampf` 6, `laermWurf` 4; Lärmdämpfung des Geländes `laermdaempfung` (Wand 8) in `daten/gelaende.js`
 
@@ -112,7 +113,7 @@ Regeln:
 + Lärm breitet sich aus wie eine Wegsuche mit Kosten: ein passierbares Feld kostet 1, anderes Gelände seine `laermdaempfung`, ohne Angabe dringt nichts durch; wer innerhalb der Lautstärke liegt, hört ihn: Schlafende werden wach, Wache gehen der Quelle nach, wer jagt, bleibt dabei; jeder Nahkampf macht Lärm
 + Dichter Rauch versperrt Ninkasis Sichtfeld und die Sichtlinie aller anderen (siehe [Welt.md](Welt.md), Feldschichten)
 
-Vorläufige Ideen, noch nicht umgesetzt:
+Vorläufige Ideen, noch nicht umgesetzt (Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 3):
 
 + Sehen braucht Licht: Ein Wesen sieht ein Ziel nur, wenn das Feld des Ziels hell genug ist; Brogue verdoppelt die Heimlichkeitsweite im Licht und halbiert sie im Dunkeln; z. B. Lebensmittelkontrolleure
 + Spüren braucht kein Licht: Wahrnehmung im Umkreis, unabhängig von der Helligkeit; z. B. Mikroorganismen
@@ -126,8 +127,8 @@ Vorbilder: Brogue (Monster mit Abstand, `MONST_MAINTAINS_DISTANCE`; kein Bolt du
 
 Daten:
 
-+ KI-Komponente: `ki: { modul, trifft?, wachzustand?, handlungen?, wahl?, vorrang?, ...Parameter des Moduls }` (seit 0.39.0; `faehigkeiten` und `abstandHalten` an der KI gibt es nicht mehr, die Datenprüfung nennt den Ersatz)
-+ Handlungen: `handlungen: [{ handlung, gewicht? (Vorgabe 100), chance? (Prozent), abstandAb?, abstandBis?, wenn?, bewertung?: [{ eingabe, kurve }], ...Parameter der Handlung }]`; Grundhandlungen `faehigkeit { name }` (das Wesen muss die Fähigkeit kennen, `faehigkeiten` am Wesen), `nutzen { zweck }` (seit 0.42.0, eine eigene Fähigkeit oder einen Gegenstand im Gepäck, der dem Zweck dient), `abstand_halten { abstand }`, `fliehen`, `warten`, `verfolgen`
++ KI-Komponente: `ki: { modul, trifft?, wachzustand?, handlungen?, wahl?, vorrang?, ...Parameter des Moduls }` (die alten Felder `faehigkeiten` und `abstandHalten` an der KI weist die Datenprüfung mit ihrem Ersatz ab)
++ Handlungen: `handlungen: [{ handlung, gewicht? (Vorgabe 100), chance? (Prozent), abstandAb?, abstandBis?, wenn?, bewertung?: [{ eingabe, kurve }], ...Parameter der Handlung }]`; Grundhandlungen `faehigkeit { name }` (das Wesen muss die Fähigkeit kennen, `faehigkeiten` am Wesen), `nutzen { zweck }` (eine eigene Fähigkeit oder einen Gegenstand im Gepäck, der dem Zweck dient), `abstand_halten { abstand }`, `fliehen`, `warten`, `verfolgen`
 + Wahl: `wahl: "erste"` (Vorgabe) | `"beste"` | `"gewichtet"` | `{ gewichtetUnterBesten: n }`
 + Eingaben der Bewertung: `abstand` (Schachbrett zur Beute), `eigeneLpProzent`, `beuteLpProzent`, `feindeInSicht`, `verbuendeteInSicht`; Kurven wie überall (`src/kern/kurven.js`), Werte in Promille von 0 bis 1000; statt der Stützpunkte kann `kurve` den Namen einer Kurve aus `regeln.ki.kurven` tragen, die alle Wesen teilen (vorläufig `heilenNachLp`: dringend bis 20 % LP, ab 80 % gar nicht)
 + Zwecke: `regeln.ki.zwecke` (vorläufig `heilen`, `angriff`); `zweck: [name]` an einer Fähigkeit und an den Nutzungen eines Gegenstands (`trinkbar.zweck`, `wurf.zweck`) sagt, wozu die KI sie mit `nutzen` wählt; die Datenprüfung kennt nur Zwecke aus der Liste
@@ -143,7 +144,7 @@ Schnittstellen:
 + Zielwahl `naechstesSichtbaresZiel`, `istZielFuer` (`src/ki/ziele.js`); Schrittwahl `schrittWeg` (`src/ki/schritte.js`) für Flucht und Abstand
 + `src/ki/handlungen.js`: `handlungWaehlen(spiel, wesen, ki, beute)` (Befehl, `VERFOLGEN` oder `null`), `wertung`; Register `kihandlungen` (`{ parameter, befehl(spiel, wesen, beute, eintrag) }`, ohne Nebenwirkungen, weil die Wahl alle Einträge fragt) und `kieingaben` (`(spiel, wesen, beute) => ganze Zahl`)
 + `faehigkeitsbefehl` (`src/ki/faehigkeitenwahl.js`): der Befehl einer Fähigkeit gegen die Beute oder `null`
-+ `taktikbefehl(spiel, taktik)` (`src/ki/taktik.js`, seit 0.43.0): der Befehl, mit dem die gesteuerte Entität nach einer Taktik aus `daten/taktiken.js` kämpft (`{ text, handlungen, wahl? }` im Format der Handlungen, geprüft wie die KI eines jagenden Wesens); Beute ist der nächste sichtbare Feind, die Wahl läuft über `handlungWaehlen`, kommt keine Handlung in Frage oder heißt sie `verfolgen`, setzt sie nach und greift an (`verfolgungsbefehl` mit einer Wegwerf-KI, der Zustand bleibt unberührt); sieht sie keinen Feind, geht sie zum nächsten, den es gibt, sonst wartet sie; genutzt vom automatischen Kampf in der Arena, vom Werkzeug `werkzeuge/arena.js` und vom Bot (siehe [Architektur.md](Architektur.md), Spielarten); Taktiken vorläufig `nahkampf` (trinkt unter 40 % LP, sonst Nahkampf) und `fernkampf` (dazu ab Abstand 2 `nutzen` mit Zweck `angriff`: Fähigkeiten, dann Würfe; dafür trägt die `testfaehigkeit` den Zweck `angriff`)
++ `taktikbefehl(spiel, taktik)` (`src/ki/taktik.js`): der Befehl, mit dem die gesteuerte Entität nach einer Taktik aus `daten/taktiken.js` kämpft (`{ text, handlungen, wahl? }` im Format der Handlungen, geprüft wie die KI eines jagenden Wesens); Beute ist der nächste sichtbare Feind, die Wahl läuft über `handlungWaehlen`, kommt keine Handlung in Frage oder heißt sie `verfolgen`, setzt sie nach und greift an (`verfolgungsbefehl` mit einer Wegwerf-KI, der Zustand bleibt unberührt); sieht sie keinen Feind, geht sie zum nächsten, den es gibt, sonst wartet sie; genutzt vom automatischen Kampf in der Arena, vom Werkzeug `werkzeuge/arena.js` und vom Bot (siehe [Architektur.md](Architektur.md), Spielarten); Taktiken vorläufig `nahkampf` (trinkt unter 40 % LP, sonst Nahkampf) und `fernkampf` (dazu ab Abstand 2 `nutzen` mit Zweck `angriff`: Fähigkeiten, dann Würfe; dafür trägt die `testfaehigkeit` den Zweck `angriff`)
 + `nutzbefehl(spiel, wesen, zweck, beute)` (`src/ki/nutzen.js`): der Befehl für `nutzen` oder `null`; Register `nutzungen` (`{ feld, befehl(spiel, wesen, beute, gegenstand) }`, ohne Nebenwirkungen): ein Gegenstand dient einem Zweck über eine Nutzung, wenn `gegenstand[feld].zweck` ihn enthält; angemeldet von den Systemen, die den Befehl kennen: `trinken` (Feld `trinkbar`, `src/systeme/inventar.js`), `werfen` (Feld `wurf`, `src/systeme/werfen.js`)
 + `verfolgungsbefehl`, `angriffDaneben` (`src/ki/verfolgen.js`); `geltenderVorrang`, `vorrangBefehl` (`src/ki/vorrang.js`)
 + `kiVon` (`src/kern/zustand.js`) liefert die wirksame KI, auch eine überlagerte
@@ -152,14 +153,14 @@ Regeln:
 
 + Sieht das jagende Wesen seine Beute, wählt es eine Handlung, vor Nahkampf und Bewegung; ein Eintrag kommt in Frage, wenn `gewicht` und `chance` nicht 0 sind, der Abstand (Schachbrett) im Bereich liegt, `wenn` am Wesen gilt (Gegenüber ist die Beute), die Handlung einen Befehl liefert (bei `faehigkeit`: `faehigkeitPruefen` wendet nichts ein und kein Verbündeter wäre betroffen) und die Wertung über 0 liegt; erst dann wird `chance` gewürfelt (sichere Fälle würfeln nicht)
 + Wertung: `gewicht` mal je Bewertung den Wert der Kurve an der Stelle der Eingabe in Promille (abgeschnitten auf 0 bis 1000), nach jedem Faktor abgerundet; ohne Ausgleichsfaktor für viele Bewertungen (er bräuchte eine Potenz), das Gewicht gleicht aus
-+ Wahl: `erste` nimmt den ersten Eintrag, der in Frage kommt (die Reihenfolge ist der Vorrang, so verhielt sich die KI vor 0.39.0); `beste` den mit der höchsten Wertung, bei Gleichstand den früheren; `gewichtet` würfelt nach Wertung (`wurfGanzzahl`, Wurf `ki_wahl`), `gewichtetUnterBesten` nur unter den n besten; ein einziger Kandidat würfelt nicht
++ Wahl: `erste` nimmt den ersten Eintrag, der in Frage kommt (die Reihenfolge ist der Vorrang); `beste` den mit der höchsten Wertung, bei Gleichstand den früheren; `gewichtet` würfelt nach Wertung (`wurfGanzzahl`, Wurf `ki_wahl`), `gewichtetUnterBesten` nur unter den n besten; ein einziger Kandidat würfelt nicht
 + Kommt keine Handlung in Frage oder fällt die Wahl auf `verfolgen`, setzt das Wesen der Beute nach (Weg zur letzten bekannten Position, Angriff auf ein Ziel im Weg)
 + Vorrang: gilt vor der eigenen Wahl, außer im Schlaf; `angreifen` macht `zielId` zur Beute (die Position ist bekannt, gesehen wird es nur in Sicht), auch wenn es nach `trifft` keins wäre, und endet, wenn das Ziel fort oder tot ist; `warten` bleibt stehen und wehrt sich nur gegen ein Ziel daneben; `folgen` geht zu `zielId` (Vorgabe Ninkasi), bis es daneben steht, dort wie `warten`; ab `bis` gilt der Vorrang nicht mehr und wird gelöscht
 + Verbündete schonen: zählt unter den Betroffenen aus `zielAufloesen` ein anderes Wesen als verbündet, unterbleibt die Fähigkeit, außer die Zielart trifft ausdrücklich `verbuendete`; mit `ueberVerbuendete` an der Zielart fliegen Geschosse darüber
 + Zielangabe nach Zielart: `wesen` und `geschoss` die Beute, `feld` ihr Feld (angekündigte Angriffe zielen so auf das Feld beim Beginn), `selbst` keine, `richtung` zur Beute, nur wenn sie daneben steht
 + Umweg: steht auf dem nächsten Feld des Weges ein Wesen, das kein Ziel ist (ein Verbündeter im Gang), sucht der Jäger einen Weg um alle Wesen herum (`wesenMeiden`) und nimmt ihn, wenn er höchstens `umwegHoechstens` Felder länger ist; sonst wartet er (Vorbild Brogue); so gehen Rudel um den Vordermann herum, ohne sich in langen Gängen zu verlaufen
 + `nutzen { zweck }`: erst die eigenen Fähigkeiten mit dem Zweck in der Reihenfolge von `faehigkeiten` (wie die Handlung `faehigkeit`, also mit derselben Zielangabe gegen die Beute), dann die Gegenstände im Gepäck in dessen Reihenfolge; das erste, das einen Befehl liefert, gilt; trinken geht immer, geworfen wird auf die Beute nur, wenn die Bahn sie als erstes Wesen trifft (kein Verbündeter davor, kein Fluch); ob sich das Nutzen lohnt, sagt die Bewertung, nicht die Handlung
-+ Grenze: eine Fähigkeit zielt immer nach der Beute; eine Heilfähigkeit taugt für `nutzen` nur mit der Zielart `selbst`, eine mit Zielart `wesen` käme nie in Frage
++ Grenze: eine Fähigkeit zielt immer nach der Beute; eine Heilfähigkeit taugt für `nutzen` nur mit der Zielart `selbst`, eine mit Zielart `wesen` käme nie in Frage (offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 7)
 + `abstand_halten { abstand: n }`: steht die Beute näher als n, weicht das Wesen zurück (in die Ecke gedrängt kein Befehl, dann greift es normal an), auf genau n Feldern wartet es, bei mehr kommt die Handlung nicht in Frage
 + Ungültige Befehle der KI werden zu `warten`; handlungsunfähige Wesen warten (siehe [Architektur.md](Architektur.md), Zeitmodell)
 
@@ -190,6 +191,7 @@ Schnittstellen:
 Regeln:
 
 + `bewegen` greift durch Hineinlaufen Feinde an, mit `angreifen: true` jedes Wesen (gezielter Angriff, Rausch, Verwirrung); `warten` wartet eine Aktion
++ Jedes Wesen belegt genau ein Feld, auch ein Boss; Bossphasen laufen über Auslöser mit Bedingungen (siehe [Wirkungen.md](Wirkungen.md), Auslöser)
 + Was eine Bewegungsart kann, sagen die Daten des Geländes; `phasend` betritt jedes Gelände außer `undurchdringlich`; `unbeweglich` steht, wo `laufend` steht; Sicht und Lärm hängen weiter am Gelände selbst
 + Unbeweglich: der Schritt auf ein freies Feld wird mit `unbeweglich` abgelehnt, Angreifen durch Hineinlaufen geht; `jagen` setzt Fähigkeiten ein, greift an, was daneben steht, und wartet sonst; Stoßen, Ziehen, Tauschen und Teleportieren wirken nicht
 + Stoßen geht Feld für Feld, bis ein Hindernis aufhält: festes Gelände, das das Ziel nicht betreten kann, ein Wesen, der Kartenrand; dann Aufprall mit der Menge je verbliebenem Feld als Schaden (`art` Vorgabe `stumpf`, Tag `aufprall`), ein Wesen als Hindernis bekommt denselben Schaden; die Menge läuft durch die gewöhnliche Schadensrechnung, so skaliert sie über die Daten, Modifikatoren der Urheberin und Rüstung des Ziels
@@ -202,6 +204,7 @@ Regeln:
 
 Daten:
 
++ Der Pegel ist ein Wert in Hundertsteln Promille (100 entsprechen 1 ‰), ohne Grundwert und damit nach oben offen
 + Komponente `stoffwechsel` (`src/systeme/stoffwechsel.js`, Werte für Ninkasi in `daten/ninkasi.js`): Abbau des Pegels, Schwellen und je Wert eine Kurve der Regeneration über dem Pegel (Hundertstel je Welttick, Kurven siehe [Architektur.md](Architektur.md), Entitäten und Komponenten)
 
 Schnittstellen:
@@ -262,6 +265,6 @@ Regeln:
 ## Verweise
 
 + Spieldesign: Gegner und Pegel in [Grundlagen.md](Grundlagen.md), Eigenschaften, Skills und EP in [Charakter.md](Charakter.md)
-+ Offene Reste in [Systemausbau.md](Systemausbau.md): Punkt 5 (Kampfwerte), Punkt 7 (Licht in der Wahrnehmung, Spüren, Umherziehen, Spur als Geruch), Punkt 13 (Skillkatalog, Makel und Vorzüge, Anfangsbalance)
++ Offene Reste in [Systemausbau.md](Systemausbau.md): Punkt 3 (Licht in der Wahrnehmung, Spüren, Spur als Geruch), Punkt 7 (Unterstützung unter Verbündeten, Umherziehen), Punkt 10 (Zeitskala, Machtkurve, Anfangsbalance), Punkt 14 (Skillkatalog, Makel und Vorzüge, Kampfwerte aus Skills)
 
 Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).

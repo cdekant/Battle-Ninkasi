@@ -1,6 +1,6 @@
 # Battle Ninkasi - Welt
 
-Stand: 2026-11-22
+Stand: 2026-11-23
 
 Zuständig für: `src/welt/ebene.js`, `src/welt/ebenenschritte.js`, `src/welt/plan.js`, `src/welt/population.js`, `src/welt/karte.js`, `src/welt/schichten.js`, `src/welt/wege.js`, `src/systeme/gelaende.js`, `src/systeme/fallen.js`, `src/systeme/schichten.js`, `src/systeme/ebenen.js`, `src/systeme/sicht.js`, `src/systeme/erinnerung.js`, `src/systeme/gefahr.js`, `daten/gelaende.js`, `daten/fallen.js`, `daten/schichten.js`, `daten/ebenen.js`, `daten/populationen.js`
 
@@ -67,6 +67,7 @@ Regeln:
 + Wirkung: je Welttick die höchste erreichte Stufe, deren `wenn` am Wesen gilt, z.B. CO2 ab 30 benommen, ab 70 Ersticken, beides nur ohne den Tag `anaerob`; ab `undurchsichtigAb` versperrt dichtes Gas die Sicht (Ninkasis Sichtfeld wird dann je Welttick neu berechnet), Geschosse fliegen hindurch
 + Feuer je Welttick und brennendem Feld: `brennen` auf Wesen darin (auch beim Betreten), Rauch, Übergreifen auf jedes nicht brennende Nachbarfeld mit der Chance seiner Brennbarkeit (die höchste aus Gelände, Oberfläche und Gas); dann sinkt die Menge um 1, erlischt das Feuer, verbrennen Oberfläche und Gelände zu `verbrenntZu` (eine Holztür zu Boden), neu entzündete Felder brennen ab dem nächsten Tick
 + Brennbares Gas fängt auf einmal Feuer, verschwindet und wirkt `explodiert` am Feld (Verpuffung)
++ Bewusst ohne: Schwerkraft, Druck und Temperatur beim Gas, Fließen von Flüssigkeiten (sie sind Oberfläche mit Menge)
 + Wiederholbar: alle Würfe über den Spiel-Zufall, immer nach Feldindex aufsteigend; die Weltuhr bearbeitet nur belegte Felder; die Liste der Gasquellen hält der `zwischenspeicher`, `gelaendeSetzen` verwirft sie
 + Wege: die KI meidet Feuer und Gefährliches, Reise und Erkunden ebenso
 + Anzeige: farbige Überlagerung auf sichtbaren Feldern, Oberfläche und Feuer unter den Entitäten, Gas darüber mit der Menge zunehmend deckend; Farben in `zeichen.schichten`; Tiles folgen
@@ -99,7 +100,7 @@ Daten:
 
 + Abfolge der Tiefen in `daten/index.js`: `abfolge: ["hub", "keller", "keller", "keller"]` (Tiefe 0 ist der Hub), `starttiefe: 1`; mehrere Tiefen dürfen dieselbe Vorlage aus `daten/ebenen.js` nutzen; der Plan des Laufs übernimmt sie
 + Ebene (`daten/ebenen.js`): feste `karte` (Zeilen aus Geländekennungen, z.B. der Hub) oder `breite`, `hoehe` und Parameter für den Digger von rot.js (`digger`), dazu `gelaende` (Rollen `wand`, `boden`, `tuer`, `treppeAuf`, `treppeAb`; Vorgaben `wand`, `boden`, `tuer_zu`, `treppe_auf`, `treppe_ab`), `gelaendeObjekte` (z.B. Gärbottiche), `tuerChance`, `fallen`, `gegenstaende` und `population: { tabelle, anzahl: [min, max] }` oder eine feste Liste `gegner`; wahlweise `schritte`, die Folge der Ebenenschritte
-+ Vorgaben der Schritte in `regeln.ebenen`: `schritteErzeugt` (`karte_digger`, `tueren`, `treppen`, `gelaende_objekte`, `erreichbarkeit`, `ebene_anlegen`, `freie_felder`, `population`, `gegenstaende`, `fallen`), `schritteFest` für Ebenen mit `karte` (`karte_fest`, `erreichbarkeit`, `ebene_anlegen`), `versuche` 10
++ Vorgaben der Schritte in `regeln.ebenen`: `schritteErzeugt` (`karte_digger`, `tueren`, `treppen`, `gelaende_objekte`, `erreichbarkeit`, `ebene_anlegen`, `freie_felder`, `population`, `gegenstaende`, `fallen`), `schritteFest` für Ebenen mit `karte` (`karte_fest`, `erreichbarkeit`, `ebene_anlegen`), `versuche` 10, `folgen.abstand` 1 (siehe Verfolger unter Regeln)
 + Population (`daten/populationen.js`): Einträge `{ typ, gewicht, tiefe: [von, bis], rudel?: [min, max], affixe?: [{ zustand, chance }] }`; Regelwerte `regeln.population` (`tieferChance` 10, `tieferBis` 2, `hoechstWesen` 500)
 + Im Zustand: `ebene` (die aktuelle), `tiefe`, `abgelegteEbenen[tiefe]` (verlassene Ebenen mit ihren Entitäten und Einträgen der Warteschlange samt Zeitpunkt)
 + Baukontext (`src/welt/ebene.js`), den die Schritte nacheinander füllen: `{ tiefe, name, ebenendaten, planEintrag, versuch, schluessel, zufall(name), zeilen, raeume, tuerFelder, treppen, freieFelder }`; er lebt nur während der Erzeugung und gehört nicht zum Zustand
@@ -111,7 +112,7 @@ Schnittstellen:
 + `eintraegeFuerTiefe`, `populationSetzen`, `freiesFeldZiehen` (`src/welt/population.js`)
 + Befehl `{ art: "treppe" }` (Taste `<` oder `>`), nur für Ninkasi, Ablehnung `keine_treppe`, Zeitkosten `aktionen.treppe`; Meldung `ebene_gewechselt` mit `tiefe` und `richtung`
 + `ebeneWechseln` (`src/systeme/ebenen.js`)
-+ Register `mitnehmen` (seit 0.38.0): `(spiel, ninkasi, wechsel) => [id]` mit `wechsel = { von, nach, richtung }`; angemeldet sind `getragenes` (Ninkasi) und `verfolger` (`verfolgt(spiel, wesen, ninkasi)`); was ein Mitgenommener trägt, kommt immer mit; Begleiter melden später einen eigenen Eintrag an
++ Register `mitnehmen`: `(spiel, ninkasi, wechsel) => [id]` mit `wechsel = { von, nach, richtung }`; angemeldet sind `getragenes` (Ninkasi) und `verfolger` (`verfolgt(spiel, wesen, ninkasi)`); was ein Mitgenommener trägt, kommt immer mit; Begleiter melden später einen eigenen Eintrag an
 + Meldung `gefolgt` mit `wer` und `wem` je angekommenem Verfolger
 
 Regeln:
@@ -119,7 +120,7 @@ Regeln:
 + Jede Tiefe bekommt ihren eigenen abgeleiteten Zufall (`ebene.<tiefe>.<name>` für den Digger, `bau.zufall(name)` dahinter, z.B. `.tueren`, `.objekte`, `.inhalt`, siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit), ist je Startwert also wiederholbar und doch verschieden; nie aus dem Spielverlauf
 + Erzeugung in Schritten: die Folge aus `schritte` der Ebene, sonst die Vorgabe; die Datenprüfung verlangt, dass jeder Schritt angemeldet ist, ein früherer liefert, was er braucht, ein verwerfender Schritt vor `ebene_anlegen` steht (dann steht noch nichts im Zustand) und am Ende eine Ebene angelegt ist
 + Schritte: `karte_digger` gräbt mit dem Digger; `karte_fest` übernimmt die feste Karte samt Treppen; `tueren` setzt an Raumzugängen mit `tuerChance` Prozent Türen; `treppen` setzt die Treppe hinauf in die Mitte des ersten Raums und die Treppe hinab in die Mitte des Raums, der davon am weitesten entfernt ist, jeweils nur, wenn es die Tiefe im Plan gibt; `gelaende_objekte` setzt Objekte nur ins Innere der Räume außer dem ersten, so sperren sie keinen Durchgang; `erreichbarkeit` verlangt, dass jedes Feld, das ein laufendes Wesen betreten kann (Türen zählen als offen), von der Treppe hinauf (sonst hinab, sonst der Mitte des ersten Raums) in acht Richtungen erreichbar ist; `ebene_anlegen` setzt `zustand.ebene`; `freie_felder` sammelt Bodenfelder außerhalb des ersten Raums und seines Rands ohne Zugänge; `population`, `gegenstaende` und `fallen` setzen darauf mit dem gemeinsamen Zufall `.inhalt`
-+ Verwirft ein Schritt den Versuch, beginnt der Bau neu mit dem Schlüssel `ebene.<tiefe>.<name>.versuch<n>`, höchstens `regeln.ebenen.versuche` Mal, danach wirft die Erzeugung; der erste Versuch behält den Schlüssel ohne Zusatz, so blieben alle Ebenen beim Umbau in Schritte gleich (0.33.0)
++ Verwirft ein Schritt den Versuch, beginnt der Bau neu mit dem Schlüssel `ebene.<tiefe>.<name>.versuch<n>`, höchstens `regeln.ebenen.versuche` Mal, danach wirft die Erzeugung; der erste Versuch behält den Schlüssel ohne Zusatz
 + Ninkasi legt die Erzeugung nicht an; zu Beginn steht Ninkasi auf der Treppe hinauf der Starttiefe (oder in der Mitte des ersten Raums)
 + Wechsel: die alte Ebene kommt mit allen Entitäten außer den Mitgenommenen und deren Einträgen der Warteschlange (Akteure, gebundene Zeitereignisse) samt Zeitpunkt nach `abgelegteEbenen`; die Weltuhr gehört keiner Ebene und läuft weiter
 + Verlassene Ebenen ruhen: bei der Rückkehr rücken alle Zeitangaben dort (Einträge, Beginn und Ende der Zustände) um die vergangene Zeit nach; noch nie besuchte Tiefen werden erzeugt und ihre Wesen eingereiht; Ninkasi kommt an der Gegentreppe an (wer hinabsteigt, an der Treppe hinauf), ist sie besetzt, am nächsten freien Feld
@@ -144,11 +145,11 @@ Regeln:
 ## Sichtweite
 
 + Die Sichtweite (`reichweiteSicht` in `src/systeme/sicht.js`, Modifikatoren auf `reichweiteSicht`) ergibt sich aus Grundwert (`sicht.reichweite` über `sichtVon`), Skills und Zuständen; Hindernisse begrenzt der Schattenwurf des Sichtfelds
-+ Ist sie größer als der Ausschnitt, wird nicht herausgezoomt; die Liste "In Sicht" der Seitenleiste nennt alle sichtbaren Wesen; Markierungen am Kartenrand für Gegner außerhalb des Ausschnitts sind vorgesehen, noch nicht umgesetzt
++ Ist sie größer als der Ausschnitt, wird nicht herausgezoomt; die Liste "In Sicht" der Seitenleiste nennt alle sichtbaren Wesen; Markierungen am Kartenrand siehe [Anzeige.md](Anzeige.md), Kamera
 
 ## Sicht und Erinnerung
 
-Daten (an der Ebene, seit 0.37.0):
+Daten (an der Ebene):
 
 + `erkundet`: je Feld 1, wenn Ninkasi es einmal wirklich gesehen hat; bringt die EP für Erkundung (siehe [Wesen.md](Wesen.md), Skills und Lernen) und wird nie zurückgesetzt
 + `erinnerung`: je Feld die Kennung des zuletzt gesehenen oder kartierten Geländes, `null` für unbekannt; ein Feld ist bekannt, wenn hier etwas steht
@@ -164,7 +165,7 @@ Schnittstellen:
 
 ## Licht
 
-Vorläufige Ideen, noch nicht umgesetzt. Licht ist hauptsächlich Spielmechanik, Stimmung ein Nebeneffekt.
+Vorläufige Ideen, noch nicht umgesetzt (Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 3). Licht ist hauptsächlich Spielmechanik, Stimmung ein Nebeneffekt. Vorbilder: Brogue (im Dunkeln halbiert sich die Heimlichkeitsweite, im Licht verdoppelt sie sich), Torchbearer (Licht als Verbrauchsgut: Kerze, Fackel und Laterne leuchten unterschiedlich weit und lange; im Dämmer wird jede Probe schwerer).
 
 + Die Logik rechnet je Feld eine Helligkeit als ganze Zahl (z. B. 0 bis 100); sie ist Teil des Zustands oder wird daraus deterministisch berechnet
 + Lichtquellen sind eine Komponente mit Reichweite und Stärke, die Farbe ist nur für die Anzeige; Beispiele: Fackel an der Wand mit Reichweite 10, glühender Kessel, getragene Laterne
@@ -193,6 +194,6 @@ Regeln:
 ## Verweise
 
 + Spieldesign der Welt und des Hubs: [Grundlagen.md](Grundlagen.md); Darstellung von Karte und Schichten: [Anzeige.md](Anzeige.md); Tiles: [Tileset.md](Tileset.md)
-+ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 8 (u.a. Nachholen der Zeit verlassener Ebenen, Dienste des Hubs, Tiles); Themenräume, Schatzräume, Quests und feste Strukturen als Ideen in [Ausblick.md](Ausblick.md), sie bauen auf den Plan des Laufs und die Schritte
++ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 3 (Licht), Punkt 8 (Sturz in den Abgrund, Suchen nach Fallen), Punkt 14 (Nachholen verlassener Ebenen, Dienste des Hubs, Ebenenarten); Themenräume, Schatzräume, Quests und feste Strukturen als Ideen in [Ausblick.md](Ausblick.md), sie bauen auf den Plan des Laufs und die Schritte
 
 Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).

@@ -8,7 +8,7 @@ Mitprüfen bei Änderungen: [Architektur.md](Architektur.md), [Grundlagen.md](Gr
 
 ## Zweck
 
-Arbeitsweise am Code: Starten, Tests und Balancing, Bot und Werkzeuge, Kompendium, Ablauf einer Version, Stolpersteine und der Stand des Spielinhalts. Jeder Abschnitt nennt, soweit vorhanden, Daten, Schnittstellen und Regeln.
+Arbeitsweise am Code: Starten, Tests und Balancing, Bot und Werkzeuge, Kompendium, Messwerte, Ablauf einer Version, Stolpersteine und der Stand des Spielinhalts. Jeder Abschnitt nennt, soweit vorhanden, Daten, Schnittstellen und Regeln.
 
 ## Starten
 
@@ -35,7 +35,7 @@ Daten:
 Schnittstellen:
 
 + `node --test` im Hauptverzeichnis
-+ Arena-Simulation seit 0.43.0 (siehe Bot und Werkzeuge); vorgesehen: Statistiken über erzeugte Dungeons je Startwert (Items, Getränke, Gegner pro Ebene, Weglängen), Ausgabe als Tabellen, Auswertung und Diagramme mit Python
++ Arena-Simulation (siehe Bot und Werkzeuge); vorgesehen: Statistiken über erzeugte Dungeons je Startwert (Items, Getränke, Gegner pro Ebene, Weglängen), Ausgabe als Tabellen, Auswertung und Diagramme mit Python
 
 Regeln:
 
@@ -54,7 +54,7 @@ Schnittstellen:
 + `node werkzeuge/messung.js [Gegner] [Befehle] [Startwert] [Türen in Prozent] [Brandherde]`: Leistung bei vielen Gegnern (siehe [Architektur.md](Architektur.md), Leistung)
 + `node werkzeuge/arena.js <Arena | Kurzform> [Kämpfe=1000] [erster Startwert=1] [--taktik name] [--karte name] [--ninkasi variante] [--gegner variante] [--json datei]`: Arena-Simulation; ohne Argument nennt es Arenen und Taktiken; eine Arena aus `daten/arenen.js` läuft mit allen Paaren ihrer Varianten (eine Zeile je Paar), `--ninkasi` und `--gegner` beschränken; die Kurzform nach DCSS ("3 essigbakterium, fernkaempfer_test" ist eine Welle, "/" trennt Wellen) kämpft in `arena_offen` mit der Taktik `nahkampf`; Spielart und Aufstellung siehe [Architektur.md](Architektur.md), Spielarten
 + Exportiert für Tests und spätere Werkzeuge (Machtkurve): `kampfAusfuehren(daten, aufstellung, startwert, taktik?)`, `auswerten(kaempfe)`, `wilson(erfolge, anzahl)`, `quantil(werte, anteil)`, `kurzformLesen(daten, text)`, `variantenpaare(daten, name, wahl)`
-+ `node werkzeuge/namensbuch.js` (seit 0.45.0): führt `daten/namensbuch.js` nach, neue Namen kommen nach `vorlaeufig`, vorläufige, die es nicht mehr gibt, fallen weg, feste bleiben immer stehen; danach nennt es die übrigen Fehler (Rückgabewert 1); exportiert `NAMENSBUCH_ARTEN`, `namenDerDaten`, `namensbuchFehler`, `namensbuchNachgefuehrt`, `namensbuchText` für `tests/namensbuch.test.js` (Regel siehe [Architektur.md](Architektur.md), Inhalte als Daten)
++ `node werkzeuge/namensbuch.js`: führt `daten/namensbuch.js` nach, neue Namen kommen nach `vorlaeufig`, vorläufige, die es nicht mehr gibt, fallen weg, feste bleiben immer stehen; danach nennt es die übrigen Fehler (Rückgabewert 1); exportiert `NAMENSBUCH_ARTEN`, `namenDerDaten`, `namensbuchFehler`, `namensbuchNachgefuehrt`, `namensbuchText` für `tests/namensbuch.test.js` (Regel siehe [Architektur.md](Architektur.md), Inhalte als Daten)
 + `node werkzeuge/tiles-ableiten.js`: leitet die kleinen Tile-Sätze ab und schreibt `grafik/tileset.js` (siehe [Tileset.md](Tileset.md))
 
 Regeln:
@@ -81,8 +81,17 @@ Schnittstellen:
 Regeln:
 
 + Gruppen: `daten` (jede Meldung der Datenprüfung, Stufe Fehler), `tiles` (Eintrag aus `daten/zeichen.js` ohne Tile in einem oder allen Sätzen, Tile ohne Eintrag), `verweise` (Wesen, Gegenstand, Effekt, Zustand, Fähigkeit, Falle, Oberfläche oder Gas, dessen Name sonst nirgends in den Daten steht, weder als Wert noch als Schlüssel; Vorlagen und vom Code verwendete Einträge in `VOM_CODE_VERWENDET` ausgenommen), `texte` (Textschlüssel mit dem Vorsatz eines Datenbereichs wie `wesen.`, den kein Eintrag nennt), `korpus` (Kopf unvollständig, `art` unbekannt, Quelle fehlt in `sprache/literatur.json`, Stufe Fehler)
-+ Stufe Warnung für alles, was Testinhalte bis zum Abschluss von [Systemausbau.md](Systemausbau.md), Punkt 15 sein dürfen; der Spielinhalt hat keine Lücke der Stufe Fehler (geprüft von `tests/kompendium.test.js`)
++ Stufe Warnung für alles, was Probeinhalt haben darf; nach dem Auslagern des Probeinhalts gilt für echten Inhalt die Stufe Fehler (siehe [Systemausbau.md](Systemausbau.md), Punkt 1); der Spielinhalt hat keine Lücke der Stufe Fehler (geprüft von `tests/kompendium.test.js`)
 + Die Verweisprüfung ist eine Näherung: ein Name, der zufällig wie ein anderer Text in den Daten lautet, gilt als verwendet
+
+## Messwerte
+
+Gemessene Zahlen an einer Stelle, je mit Stand; neue Messungen ersetzen alte.
+
++ Leistung (Ziel siehe [Architektur.md](Architektur.md), Leistung), gemessen mit `werkzeuge/messung.js`: Stand 0.17.0 113 Wesen 0,4 ms, 341 Wesen 1,0 ms, 1173 Wesen 7 ms je Befehl; Stand 0.18.0 mit Türen an der Hälfte der Raumzugänge 356 Wesen etwa 1,7 bis 2,1 ms, 1176 Wesen etwa 12 bis 13 ms (Bakterien öffnen keine Türen und drängen sich in ihren Räumen, jede Suche im Umkreis findet so mehr Nachbarn); Stand 0.19.0 339 Wesen etwa 1,6 ms, 1160 Wesen etwa 8,5 ms, mit 30 Brandherden 2,2 ms
++ Speichern: 2152 Befehle sind 62 kB, Nachspielen dauert knapp 1 s; ein Zustand sind etwa 40 kB, das Einsetzen unter 1 ms; `localStorage` fasst je Ursprung etwa 5 MB, also reichen auch fünf lange Läufe
++ EP je Lauf des Bots (3000 Befehle, zufällige Befehle, Tiefe 1): Stand 0.26.0 rund 1200 EP aus Erkundung gegen rund 55 aus Gegnern; Stand 2026-11-22 rund 1100 gegen rund 25
++ Arena, erster Befund mit 200 Kämpfen (Stand 0.43.0): drei Essigbakterien besiegt Ninkasi immer, fünf zu etwa 60 %, Ausrüstung und Skills ändern daran wenig; acht Essigbakterien und drei Fernkämpfer nie
 
 ## Ablauf einer Version
 
@@ -111,18 +120,17 @@ Regeln:
 
 ## Stand des Spielinhalts
 
-Der Inhalt ist vorläufig und dient dem Ausprobieren der Systeme; alle Zahlen stehen in `daten/`. Geschichte: begonnen als 0.0.0; 0.1.0 Maus und Reise, 0.2.0 Tiles im Spiel, 0.3.0 Pegel in Promille, Psi-Punkte und Stoffwechsel, 0.4.0 Tod als Zustandsprüfung, danach der Systemausbau nach [Systemausbau.md](Systemausbau.md).
+Der Inhalt ist vorläufig und dient dem Ausprobieren der Systeme; alle Zahlen stehen in `daten/`.
 
 + Ebenen: Hub (Tiefe 0) als feste Karte, im allmächtigen Lauf an seiner Stelle die Testkammer (21x11 Felder, leer), drei Kellertiefen zu 120x40 Feldern mit 16 bis 20 Wesen aus der Population (Essigbakterien in Rudeln, Fernkämpfer-Tests), 10 Bieren, einem Bierfass, 3 Brandflaschen, 3 Gärbottichen, je 6 Säuredüsen und Klappergeschirren, je einem Stück Ausrüstung (zwei Kupferringe), Türen an der Hälfte der Raumzugänge, Treppen hinauf und hinab (siehe [Welt.md](Welt.md), Ebenen)
 + Ninkasi: 100 LP, 100 MP, 0 von 100 PP, Pegel 0 (nach oben offen), Sichtweite 8, Faust 1W6+2 stumpf mit Genauigkeit 80 (80 % gegen ein Wesen ohne Ausweichen), die vorläufige `testfaehigkeit`
 + Stoffwechsel je Welttick (`daten/ninkasi.js`): LP 0,3 nüchtern, 0,8 bei 1,5 ‰, darüber abnehmend; MP 0,8 nüchtern, 0 ab 3 ‰; PP Schwund 0,3 nüchtern, Stillstand von 0,5 bis 1,5 ‰, dann steigend bis 1,0 bei 4 ‰; danach Abbau des Pegels um 0,01 ‰; Schwellen 0,5, 1, 2 und 3 ‰ werden angezeigt und gemeldet, haben aber noch keine Wirkung; die Leiste zeigt zusätzlich das Optimum der LP
 + Essigbakterium: 15 LP, Biss 1W4 mit Genauigkeit 70, 10 gebundene EP, Verhaltensmodul `jagen`
-+ Fernkämpfer-Test (ab 0.15.0, Zeichen F, noch ohne Tile): Testgegner für die KI mit Fähigkeiten, 10 LP, hält 3 Felder Abstand, Säurespucke (Geschoss über Verbündete, Abklingzeit 3) und angekündigter Säureschwall (Kreis mit Radius 1 auf das Feld beim Beginn, 3 Schritte, durch Schaden unterbrechbar, 30 %); trägt ein Bier und trinkt es ab 0.42.0 unter 80 % LP mit 50 % Chance (Handlung `nutzen`, siehe [Wesen.md](Wesen.md), KI)
-+ Arenen (ab 0.43.0, `daten/arenen.js`): Essigbakterien (drei, mit Varianten Ninkasi nackt, gerüstet, geübt und Gegner drei oder fünf), Fernkämpfer in zwei Wellen (mit zwei Bier), Rudel im Engpass (sechs Essigbakterien vor dem Gang), Reihe aus dem Keller (sechs Rudel aus Tiefe 1, mit Bier und Brandflaschen, Taktik `fernkampf`), alle Gegner des Kellers; Taktiken `nahkampf` und `fernkampf` (`daten/taktiken.js`); erster Befund mit 200 Kämpfen: drei Essigbakterien besiegt Ninkasi immer, fünf zu etwa 60 %, Ausrüstung und Skills ändern daran wenig; acht Essigbakterien und drei Fernkämpfer nie
++ Fernkämpfer-Test (Zeichen F, ohne Tile): Testgegner für die KI mit Fähigkeiten, 10 LP, hält 3 Felder Abstand, Säurespucke (Geschoss über Verbündete, Abklingzeit 3) und angekündigter Säureschwall (Kreis mit Radius 1 auf das Feld beim Beginn, 3 Schritte, durch Schaden unterbrechbar, 30 %); trägt ein Bier und trinkt es unter 80 % LP mit 50 % Chance (Handlung `nutzen`, siehe [Wesen.md](Wesen.md), KI)
++ Arenen (`daten/arenen.js`): Essigbakterien (drei, mit Varianten Ninkasi nackt, gerüstet, geübt und Gegner drei oder fünf), Fernkämpfer in zwei Wellen (mit zwei Bier), Rudel im Engpass (sechs Essigbakterien vor dem Gang), Reihe aus dem Keller (sechs Rudel aus Tiefe 1, mit Bier und Brandflaschen, Taktik `fernkampf`), alle Gegner des Kellers; Taktiken `nahkampf` und `fernkampf` (`daten/taktiken.js`); Befund siehe Messwerte
 + Bier: +20 LP, Pegel +0,5 ‰, wird zur leeren Flasche; Getränke, Ausrüstung und Verderben siehe [Gegenstaende.md](Gegenstaende.md)
 + Alle Aktionen kosten bisher 100 (`daten/aktionen.js`), abweichend nur Angriffsprofile der Waffen
 + Auslöser sind im System vorhanden, im Spielinhalt aber noch nicht benutzt
-+ Noch nicht enthalten: ganzzahlige Skalierung mit Rand, Umschauen, Markierungen für Gegner außerhalb des Ausschnitts, Englisch
 
 ## Verweise
 
