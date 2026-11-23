@@ -407,7 +407,7 @@ function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
   if (gegenstand.verflucht && !gegenstand.ausruestung) fehler.push(`${ort}: verflucht wirkt nur an Ausrüstung`);
   if (gegenstand.unbekannt !== undefined) {
     const unbekannt = gegenstand.unbekannt;
-    if (!istObjekt(unbekannt) || !daten.etiketten?.[unbekannt.gruppe]) fehler.push(`${ort}: unbekannt muss { gruppe, schwierigkeit } mit einer Gruppe aus daten/etiketten.js sein`);
+    if (!istObjekt(unbekannt) || !daten.etiketten?.[unbekannt.gruppe]) fehler.push(`${ort}: unbekannt muss { gruppe, schwierigkeit } mit einer Gruppe aus datenproben/etiketten.js sein`);
     else if (!istZahlAbNull(unbekannt.schwierigkeit)) fehler.push(`${ort}.unbekannt: schwierigkeit muss eine ganze Zahl >= 0 sein`);
   }
   if (!daten.zeichen.gegenstaende[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js`);
@@ -1132,7 +1132,7 @@ function pruefeArenaPopulation(daten, population, ort, fehler) {
   if (!tabelle || !daten.populationen?.[tabelle]) fehler.push(`${ort}: keine Populationstabelle ${population.tabelle ? `"${population.tabelle}"` : "für diese Tiefe"}`);
 }
 
-// Arenen (daten/arenen.js): Aufstellung mit text und varianten { ninkasi?: { name: Teil von ninkasi }, gegner?: { name: { wellen?, population? } } }
+// Arenen (datenproben/arenen.js): Aufstellung mit text und varianten { ninkasi?: { name: Teil von ninkasi }, gegner?: { name: { wellen?, population? } } }
 function pruefeArenen(daten, sprache, fehler) {
   for (const [name, arena] of Object.entries(daten.arenen || {})) {
     const ort = `arenen.${name}`;

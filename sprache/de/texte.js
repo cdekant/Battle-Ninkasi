@@ -7,50 +7,6 @@ export default {
     geschlecht: "f", eigenname: true,
     einzahl: { nom: "Ninkasi", gen: "Ninkasis", dat: "Ninkasi", akk: "Ninkasi" },
   },
-  "wesen.essigbakterium": {
-    geschlecht: "n",
-    einzahl: { nom: "Essigbakterium", gen: "Essigbakteriums", dat: "Essigbakterium", akk: "Essigbakterium" },
-  },
-  "wesen.fernkaempfer_test": {
-    geschlecht: "m",
-    einzahl: { nom: "Fernkämpfer-Test", gen: "Fernkämpfer-Tests", dat: "Fernkämpfer-Test", akk: "Fernkämpfer-Test" },
-  },
-  "falle.saeureduese": {
-    geschlecht: "f",
-    einzahl: { nom: "Säuredüse", gen: "Säuredüse", dat: "Säuredüse", akk: "Säuredüse" },
-  },
-  "falle.klappergeschirr": {
-    geschlecht: "n",
-    einzahl: { nom: "Klappergeschirr", gen: "Klappergeschirrs", dat: "Klappergeschirr", akk: "Klappergeschirr" },
-  },
-  "gegenstand.brandflasche": {
-    geschlecht: "f",
-    einzahl: { nom: "Brandflasche", gen: "Brandflasche", dat: "Brandflasche", akk: "Brandflasche" },
-  },
-  "gegenstand.schoepfkelle": { geschlecht: "f", einzahl: { nom: "Schöpfkelle", gen: "Schöpfkelle", dat: "Schöpfkelle", akk: "Schöpfkelle" } },
-  "gegenstand.fasshammer": { geschlecht: "m", einzahl: { nom: "Fasshammer", gen: "Fasshammers", dat: "Fasshammer", akk: "Fasshammer" } },
-  "gegenstand.lederschuerze": { geschlecht: "f", einzahl: { nom: "Lederschürze", gen: "Lederschürze", dat: "Lederschürze", akk: "Lederschürze" } },
-  "gegenstand.kupferhelm": { geschlecht: "m", einzahl: { nom: "Kupferhelm", gen: "Kupferhelms", dat: "Kupferhelm", akk: "Kupferhelm" } },
-  "gegenstand.lederhose": { geschlecht: "f", einzahl: { nom: "Lederhose", gen: "Lederhose", dat: "Lederhose", akk: "Lederhose" } },
-  "gegenstand.hopfenkette": { geschlecht: "f", einzahl: { nom: "Hopfenkette", gen: "Hopfenkette", dat: "Hopfenkette", akk: "Hopfenkette" } },
-  "gegenstand.kupferring": { geschlecht: "m", einzahl: { nom: "Kupferring", gen: "Kupferrings", dat: "Kupferring", akk: "Kupferring" } },
-  "gegenstand.bierfass": { geschlecht: "n", einzahl: { nom: "Bierfass", gen: "Bierfasses", dat: "Bierfass", akk: "Bierfass" } },
-  "gegenstand.leere_flasche": { geschlecht: "f", einzahl: { nom: "leere Flasche", gen: "leeren Flasche", dat: "leeren Flasche", akk: "leere Flasche" } },
-  "gegenstand.sauerbier": { geschlecht: "n", einzahl: { nom: "Sauerbier", gen: "Sauerbiers", dat: "Sauerbier", akk: "Sauerbier" } },
-  "gegenstand.lederfetzen": { geschlecht: "m", einzahl: { nom: "Lederfetzen", gen: "Lederfetzens", dat: "Lederfetzen", akk: "Lederfetzen" } },
-  "gegenstand.kupferschrott": { geschlecht: "m", einzahl: { nom: "Kupferschrott", gen: "Kupferschrotts", dat: "Kupferschrott", akk: "Kupferschrott" } },
-  // Etiketten unbekannter Gegenstände (daten/etiketten.js)
-  "etikett.tonkrug": { geschlecht: "m", einzahl: { nom: "Tonkrug", gen: "Tonkrugs", dat: "Tonkrug", akk: "Tonkrug" } },
-  "etikett.steinkrug": { geschlecht: "m", einzahl: { nom: "Steinkrug", gen: "Steinkrugs", dat: "Steinkrug", akk: "Steinkrug" } },
-  "etikett.buegelflasche": { geschlecht: "f", einzahl: { nom: "Bügelflasche", gen: "Bügelflasche", dat: "Bügelflasche", akk: "Bügelflasche" } },
-  "etikett.henkelflasche": { geschlecht: "f", einzahl: { nom: "Henkelflasche", gen: "Henkelflasche", dat: "Henkelflasche", akk: "Henkelflasche" } },
-  "etikett.bocksbeutel": { geschlecht: "m", einzahl: { nom: "Bocksbeutel", gen: "Bocksbeutels", dat: "Bocksbeutel", akk: "Bocksbeutel" } },
-  "gegenstand.leeres_fass": { geschlecht: "n", einzahl: { nom: "Fass", gen: "Fasses", dat: "Fass", akk: "Fass" } },
-  "gegenstand.bier": {
-    geschlecht: "n",
-    einzahl: { nom: "Bier", gen: "Biers", dat: "Bier", akk: "Bier" },
-  },
-
   // Log
   "log.willkommen": "Ninkasi erwacht in einem feuchten Keller. Nüchtern. Das muss sich ändern.",
   "log.schaden": "{quelle.nom} trifft {ziel.akk}: {menge} Schaden ({art}).",
@@ -171,17 +127,13 @@ export default {
   "log.abgelehnt.zu_wenig_ep": "Zu wenig freie EP.",
   "log.abgelehnt.punkte_uebrig": "Erst alle Punkte verteilen.",
 
-  // Eigenschaften und Skills (daten/eigenschaften.js, daten/skills.js; Skills vorläufig)
+  // Eigenschaften und Skills (daten/eigenschaften.js; Skills bringt der Inhalt mit)
   "eigenschaft.koerperlichkeit": "Körperlichkeit",
   "eigenschaft.trinkfestigkeit": "Trinkfestigkeit",
   "eigenschaft.gewandtheit": "Gewandtheit",
   "eigenschaft.sinnlichkeit": "Sinnlichkeit",
   "eigenschaft.klugheit": "Klugheit",
   "eigenschaft.braukunde": "Braukunde",
-  "skill.zaehigkeit_grund": "Zähigkeit",
-  "skill.zaehigkeit_experte": "Zähigkeit (Expertin)",
-  "skill.nahkampf_grund": "Nahkampf",
-  "skill.ausweichen_grund": "Ausweichen",
   "log.skillstufe": "{skill}: Stufe {stufe}.",
   "log.gelernt": "{wer.nom} übt sich in {skill} ({ep} EP).",
   "log.ep_erhalten": "+{ep} EP.",
@@ -190,30 +142,19 @@ export default {
   "log.risiko.ungeschickt": "{wer.nom} weiß damit nicht recht umzugehen.",
   "log.risiko.ueberfordert": "Das übersteigt {wer.akk}, es misslingt.",
 
-  // Fähigkeiten (Testgegner, vorläufig)
-  "faehigkeit.testfaehigkeit": "Testfähigkeit",
-  "zustand.testzustand": "Testzustand",
+  // Gelände
   "gelaende.wand": "Wand",
   "gelaende.boden": "Boden",
   "gelaende.tuer_zu": "geschlossene Tür",
   "gelaende.tuer_offen": "offene Tür",
   "gelaende.treppe_ab": "Treppe hinab",
   "gelaende.treppe_auf": "Treppe hinauf",
-  "gelaende.gaerbottich": "Gärbottich",
-  "faehigkeit.saeurespucke": "Säurespucke",
-  "faehigkeit.saeureschwall": "Säureschwall",
-  "faehigkeit.saeureschwall.ankuendigung": "{wer.nom} bläht sich auf und zielt. Gleich kommt ein Schwall.",
 
   // Feldschichten
-  "oberflaeche.saeure": "Säure",
-  "oberflaeche.brand": "Brandlache",
-  "oberflaeche.asche": "Asche",
-  "gas.co2": "CO2",
   "gas.rauch": "Rauch",
 
   // Fraktionen
   "fraktion.ninkasi": "Ninkasi",
-  "fraktion.verderber": "Verderber",
 
   // Schadensarten (Platzhalter {art} im Log)
   "schaden.stumpf": "stumpf",
@@ -516,11 +457,6 @@ export default {
   "arenawahl.knopf_hand": "von Hand",
   "arenawahl.knopf_taktik": "Taktik",
   "arenawahl.fuss": "Buchstabe oder Pfeile und Enter starten; Leertaste: von Hand oder automatisch, Tab: Taktik; Esc schließt.",
-  "arena.essigbakterien": "Essigbakterien",
-  "arena.fernkaempfer": "Fernkämpfer in zwei Wellen",
-  "arena.engpass": "Rudel im Engpass",
-  "arena.keller_reihe": "Reihe aus dem Keller, Tiefe 1",
-  "arena.keller_alle": "Alle Gegner des Kellers, Tiefe 1",
   "taktik.nahkampf": "Nahkampf",
   "taktik.fernkampf": "Fernkampf",
   "titel.laeufe": "Läufe",
@@ -620,9 +556,6 @@ export default {
   "taste.Enter": "Enter",
   "taste.NumpadAdd": "Num +",
   "taste.NumpadSubtract": "Num -",
-  "skillset.zaehigkeit": "Zähigkeit",
-  "skillset.nahkampf": "Nahkampf",
-  "skillset.ausweichen": "Ausweichen",
   "lernanlass.wirkung": "eigener Wirkung am Gegner",
   "lernanlass.ausgewichen": "Angriffen, denen sie ausweicht",
   "lernanlass.geblockt": "Angriffen, die sie blockt",

@@ -1,5 +1,5 @@
 // Fähigkeiten (siehe docs/Wirkungen.md, Fähigkeiten): Magie, Psi, Fernkampf und körpereigene Aktionen als Daten.
-// Daten (daten/faehigkeiten.js):
+// Daten (datenproben/faehigkeiten.js):
 //   name: { text, art?, tags?, verbrauch?, material?, zeit?, abklingzeit?, voraussetzungen?, ziel?, wirkung?, zustand?, risiko?,
 //           skill?, anforderung?, ausbau? }
 //   art:             "aktiv" (Vorgabe) wirkt einmal; "aufrecht" setzt den Zustand an der Wirkenden, erneutes Benutzen beendet ihn
@@ -12,7 +12,7 @@
 //   wirkung:         benannter Effekt; mit muster im Ziel auf jede betroffene Entität, bei durchdringendem
 //                    Geschoss auf jedes Wesen der Bahn, sonst einmal auf das Ziel (oder das Feld)
 //   zustand:         bei "aufrecht" der Zustand, meist mit unterhalt (MP je Welttick, siehe systeme/zustaende.js)
-//   risiko:          Name einer Risikotabelle (daten/risiken.js), gewürfelt vor der Wirkung über den Pegel
+//   risiko:          Name einer Risikotabelle (datenproben/risiken.js), gewürfelt vor der Wirkung über den Pegel
 //   skill:           { name, stufe, risiko } der Skill, den die Fähigkeit verlangt; die Tabelle risiko wird über die
 //                    fehlenden Stufen gewürfelt (Fundstück ohne passenden Skill, systeme/skills.js)
 //   anforderung:     { eigenschaften: { koerperlichkeit: 15 }, risiko } weiche Anforderung; die Tabelle wird über die

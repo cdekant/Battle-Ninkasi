@@ -7,8 +7,7 @@
 
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
-import rohdaten from "../daten/index.js";
-import texte from "../sprache/de/texte.js";
+import { rohdaten, texteDe as texte, probenamen, probentexte } from "../src/inhalt.js";
 import grammatik from "../sprache/de/grammatik.js";
 import korpusliste from "../sprache/de/korpus/index.js";
 import tileset from "../grafik/tileset.js";
@@ -26,7 +25,7 @@ export function quellenLaden() {
   const korpus = korpusliste.map((datei) => korpustextZerlegen(datei, readFileSync(new URL(`sprache/de/korpus/${datei}`, hauptverzeichnis), "utf8")));
   const literatur = JSON.parse(readFileSync(new URL("sprache/literatur.json", hauptverzeichnis), "utf8"));
   const sprache = { texte, nomenPruefen: erstelleGrammatik(grammatik).pruefen };
-  return { rohdaten, sprache, tileset, korpus, literatur };
+  return { rohdaten, sprache, tileset, korpus, literatur, probenamen, probentexte };
 }
 
 // Lücken als Textzeilen, nach Gruppe geordnet

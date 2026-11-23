@@ -1,7 +1,7 @@
 // Hilfen für Unittests: kleine Spiele aus Testkarten, ohne Dungeon-Erzeugung.
 // Keine Testdatei (Endung nicht .test.js), wird von node --test nicht ausgeführt.
 
-import rohdaten from "../daten/index.js";
+import { rohdaten } from "../src/inhalt.js";
 import gelaende from "../daten/gelaende.js";
 import regeln from "../daten/regeln.js";
 import aktionen from "../daten/aktionen.js";

@@ -135,8 +135,8 @@ Entwurf, zurückgestellt (Stand 2026-11-20); entschieden sind nur die zwei Stufe
 
 ## Ablauf
 
-+ Keine Zeichen als Platzhalter: jede neue Entität des echten Inhalts kommt direkt als Tile ins Spiel; der Probeinhalt (siehe [Entwicklung.md](Entwicklung.md), Stand des Spielinhalts) darf Zeichen tragen; sonst ist das Zeichen nur Absicherung, falls ein Tile fehlt
-+ Als Nächstes das Grundgerüst in 64 px: Tür offen und zu, Treppe hinauf und hinab; kleine Sätze per Werkzeug
++ Keine Zeichen als Platzhalter: jede neue Entität des echten Inhalts kommt direkt als Tile ins Spiel; der Probeinhalt (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt) darf Zeichen tragen; sonst ist das Zeichen nur Absicherung, falls ein Tile fehlt
++ Als Nächstes das Grundgerüst in 64 px: Tür offen und zu, Treppe hinauf und hinab, Feuer; kleine Sätze per Werkzeug; bis dahin stehen sie in `TILES_AUSSTEHEND` (siehe [Entwicklung.md](Entwicklung.md), Kompendium)
 + Danach Tile für Tile mit dem echten Inhalt
 
 ## Offene Fragen

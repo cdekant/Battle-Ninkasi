@@ -1,4 +1,4 @@
-// Prüfung der Dokumentation (siehe docs/Entwicklung.md, Tests und Balancing, und CLAUDE.md, Dokumentation):
+// Prüfung der Dokumentation (siehe docs/Dokumentation.md, Prüfung, und docs/Entwicklung.md, Tests und Balancing):
 // Verweise zeigen auf vorhandene Dateien und Abschnitte, jede Datei hat genau ein zuständiges Dokument, jedes
 // Dokument steht in CLAUDE.md, CLAUDE.md bleibt unter dem Limit, "Mitprüfen" gilt in beide Richtungen, Design-Dokumente
 // nennen je Abschnitt ihre Umsetzung. Ob etwas doppelt beschrieben ist oder inhaltlich übereinstimmt, prüft das nicht.
@@ -14,8 +14,8 @@ const doku = join(hauptverzeichnis, "docs");
 const HOECHSTE_LAENGE_CLAUDE = 12000;
 
 // Ordner und Dateien, die ein zuständiges Dokument brauchen; nicht im Repo liegende Teile bleiben außen vor
-const ZUGEORDNETE_ORDNER = ["src", "daten", "sprache", "grafik", "lib", "werkzeuge", "tests"];
-const ZUGEORDNETE_DATEIEN = ["index.html", "package.json", "starten.py", "starten.bat"];
+const ZUGEORDNETE_ORDNER = ["src", "daten", "datenproben", "sprache", "grafik", "lib", "werkzeuge", "tests"];
+const ZUGEORDNETE_DATEIEN = ["index.html", "package.json", "starten.py", "starten.bat", "CLAUDE.md"];
 const AUSGENOMMEN = ["sprache/Literatur/", "__pycache__/"];
 
 const lesen = (pfad) => readFileSync(pfad, "utf8");
@@ -53,7 +53,7 @@ function abschnittVorhanden(datei, textDahinter) {
 function quellenMitVerweisen() {
   const quellen = [{ pfad: join(hauptverzeichnis, "CLAUDE.md"), text: claudeText }];
   for (const name of dokumente) quellen.push({ pfad: join(doku, name), text: dokumenttexte[name] });
-  for (const ordner of ["src", "daten", "werkzeuge", "tests"]) {
+  for (const ordner of ["src", "daten", "datenproben", "werkzeuge", "tests"]) {
     for (const pfad of dateienUnter(join(hauptverzeichnis, ordner))) {
       if (pfad.endsWith(".js") || pfad.endsWith(".css")) quellen.push({ pfad, text: lesen(pfad) });
     }
@@ -146,7 +146,7 @@ test("Doku: Mitprüfen gilt in beide Richtungen", () => {
 });
 
 // Design-Dokumente beschreiben keine Dateien (kein "Zuständig für:"); jeder Abschnitt nennt in einer Zeile
-// "Umsetzung:", wo das Entschiedene technisch beschrieben ist (siehe CLAUDE.md, Dokumentation)
+// "Umsetzung:", wo das Entschiedene technisch beschrieben ist (siehe docs/Dokumentation.md, Arten der Dokumente)
 const ABSCHNITTE_OHNE_UMSETZUNG = ["Offen", "Offene Fragen", "Quellen", "Recherche", "Vorbilder", "Entscheidungen", "Stand der Umsetzung"];
 const UMSETZUNGSZEILE = /^Umsetzung: (siehe |teilweise, siehe |offen|keine)/;
 

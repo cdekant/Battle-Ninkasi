@@ -4,44 +4,30 @@ Stand: 2026-11-23
 
 Mitprüfen bei Änderungen: alle Dokumente, deren Punkte hier umgesetzt werden
 
-Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und während der Inhalt entsteht. Was umgesetzt ist, steht im zuständigen Dokument (Übersicht in CLAUDE.md, Dokumentation), wie es dazu kam, in der Git-Historie. Ideen ohne Entscheidung stehen in [Ausblick.md](Ausblick.md), offene Fragen des Spieldesigns in [Grundlagen.md](Grundlagen.md), Offen und [Charakter.md](Charakter.md), Offen.
+Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und während der Inhalt entsteht. Was umgesetzt ist, steht im zuständigen Dokument, wie es dazu kam, in der Git-Historie; wie Punkte entstehen und gestrichen werden, regelt [Dokumentation.md](Dokumentation.md), Lebenslauf einer Aussage. Ideen ohne Entscheidung stehen in [Ausblick.md](Ausblick.md), offene Fragen des Spieldesigns in [Grundlagen.md](Grundlagen.md), Offen und [Charakter.md](Charakter.md), Offen.
 
 ## Arbeitsweise
 
 + Jeder Punkt wird vor der Umsetzung als Vorschlag ausgearbeitet und freigegeben
-+ Ist ein Punkt umgesetzt, steht seine Beschreibung im zuständigen Dokument und er wird hier gestrichen; bleibt ein Rest, steht hier nur der Rest
-+ Status je Punkt: offen oder in Arbeit; Erledigtes steht nicht hier, sondern in der Git-Historie
-+ Wird eine Idee aus [Ausblick.md](Ausblick.md) beschlossen, kommt ihre Arbeit als Punkt hierher, auch eine neue Vorkehrung
-+ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 1 bis 11 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Stand des Spielinhalts)
++ Status je Punkt: offen oder in Arbeit
++ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 2 bis 11 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
 
 ## Reihenfolge
 
 Stand 2026-11-23, vor dem Inhalt in dieser Folge:
 
-1. Doku bereinigen: Handprüfung auf Widersprüche und Doppeltes, diese Liste neu fassen (in Arbeit)
-2. Probeinhalt auslagern (Punkt 1)
-3. Probedurchstich (Punkt 2), seine Funde ordnen die Punkte 3 bis 8 neu
-4. Systemlücken schließen (Punkte 3 bis 8), nach ihrer Wirkung auf den Inhalt
-5. Englisch, Mehrzahl und Glossar (Punkt 9)
-6. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
-7. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
-8. Danach der Inhalt (Punkt 14)
+1. Probedurchstich (Punkt 2), seine Funde ordnen die Punkte 3 bis 8 neu
+2. Systemlücken schließen (Punkte 3 bis 8), nach ihrer Wirkung auf den Inhalt
+3. Englisch, Mehrzahl und Glossar (Punkt 9)
+4. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
+5. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
+6. Danach der Inhalt (Punkt 14)
 
-Daneben, ohne festen Platz: Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13).
+Daneben, ohne festen Platz: Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Punkt 1 (Probeinhalt auslagern) ist erledigt, die Nummern der übrigen bleiben.
 
 ## Bekannte Fehler
 
 + Derzeit keine
-
-## 1. Probeinhalt auslagern
-
-Status: offen
-
-+ Der bisherige Spielinhalt zieht nach `datenproben/` mit eigener `index.js`, die auf das Grundgerüst in `daten/` aufsetzt; das Grundgerüst behält Regeln, Aktionen, Schadensarten, Eigenschaften, Ninkasi, Grundgelände (Boden, Wand, Tür, Treppe) und die Ebenenarten (Hub, Keller, Testkammer, Arenakarten)
-+ Probeinhalt sind Gegner, Getränke, Ausrüstung, Wurfgegenstände, Fähigkeiten, Zustände, Skills, Risiken, Fallen, Schichten, Populationen, Arenen, Taktiken und Etiketten; die Namen bleiben, der Ordner kennzeichnet sie
-+ Tests, Bot, Werkzeuge und vorerst der Browser laden Grundgerüst und Probeinhalt; so bricht das Einstellen echten Inhalts keinen Test
-+ Texte des Probeinhalts in einer eigenen Sprachdatei, ohne englische Fassung
-+ Folgen: Namensbuch nur für echte Namen; Lücken im Kompendium für `datenproben/` als Warnung, für `daten/` als Fehler; die Regel "keine Zeichen als Platzhalter" gilt nur für `daten/` (siehe [Tileset.md](Tileset.md), Ablauf); ein Abschnitt für den Probeinhalt in [Entwicklung.md](Entwicklung.md), Stand des Spielinhalts statt der Beschreibungen in den Fachdokumenten
 
 ## 2. Probedurchstich
 
@@ -145,7 +131,7 @@ Status: offen; jeweils zuerst in [Grundlagen.md](Grundlagen.md) oder [Charakter.
 Status: offen
 
 + Anleitungen zum Anlegen von Inhalten, je Art eine (Gegner, Gegenstand, Effekt, Skill, Fähigkeit, Ritual, Quest, Raumstruktur): Datenformat, Einordnung in die Machtkurve, Tile nach der Fibel, Texte in beiden Sprachen, Tests; Form: Claude-Code-Skills unter `.claude/skills/`; Beispiel Gegner: Tiefe und Rolle geben das Budget, daraus Werte, Angriffe, Fähigkeiten und EP, dann Thema, Verhalten, Tile, Texte; braucht die Machtkurve (Punkt 10)
-+ Tiles für das Grundgerüst vor dem ersten echten Inhalt: Tür offen und zu, Treppe hinauf und hinab (siehe [Tileset.md](Tileset.md), Ablauf)
++ Tiles für das Grundgerüst vor dem ersten echten Inhalt: Tür offen und zu, Treppe hinauf und hinab, Feuer; danach `TILES_AUSSTEHEND` in `werkzeuge/luecken.js` leeren (siehe [Tileset.md](Tileset.md), Ablauf)
 + Testkammer: ein Feld zum Erzeugen über den Zielmodus wählen, Wesen und Gegenstände entfernen (siehe [Architektur.md](Architektur.md), Spielarten)
 + Arena: eigene Aufstellungen im Browser (siehe [Titelbildschirm.md](Titelbildschirm.md), Ideen für später), bessere Taktiken (Abstand halten, Engpass suchen), Statistiken über erzeugte Dungeons (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing)
 + Kompendium: Abdeckung der Texte je Eintrag (siehe [Texte.md](Texte.md), Offen)

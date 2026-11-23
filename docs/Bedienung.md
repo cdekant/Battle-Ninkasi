@@ -225,4 +225,4 @@ Regeln:
 + Schema der Oberfläche: [Oberflaeche.md](Oberflaeche.md); Titel, Läufe und Chronik: [Titelbildschirm.md](Titelbildschirm.md); Darstellung von Karte, Seitenleiste und Log: [Anzeige.md](Anzeige.md)
 + Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 12, u.a. Halten an Abzweigungen, Vorschau verschachtelter Wirkungen, Blocken in der angezeigten Chance
 
-Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).
+Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

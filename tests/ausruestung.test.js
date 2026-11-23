@@ -2,7 +2,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import "../src/kern/spiel.js"; // meldet Bausteine, Systeme und Verhaltensmodule an
-import rohdaten from "../daten/index.js";
+import { rohdaten } from "../src/inhalt.js";
 import { miniSpiel, wesen, spielerinSetzen, gegenstandTragen, meldungenMitschneiden, allesSichtbar, hakenFuerTest } from "./hilfen.js";
 import { befehlGeben, zeitkosten } from "../src/kern/spiel.js";
 import { akteurEinreihen } from "../src/kern/zeit.js";
@@ -145,7 +145,7 @@ test("Inventarfenster: wählen, handeln, zurück und schließen", () => {
   assert.deepEqual(inventarTaste({ gewaehlt: bier.id }, "KeyT", spiel).befehl, { art: "trinken", gegenstandId: bier.id });
 });
 
-// Ein eigener Testgegenstand für die Datenprüfung, damit der Spielinhalt (daten/ausruestung.js) frei änderbar bleibt
+// Ein eigener Testgegenstand für die Datenprüfung, damit der Spielinhalt (datenproben/ausruestung.js) frei änderbar bleibt
 const TESTAUSRUESTUNG = {
   text: "gegenstand.testausruestung", aufhebbar: true, tags: ["test"],
   ausruestung: {

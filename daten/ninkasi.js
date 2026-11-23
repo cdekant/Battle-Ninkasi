@@ -14,7 +14,7 @@ export default {
     sicht: { reichweite: 8 },
     angriffe: [{ name: "faust", genauigkeit: 80, effekt: "faustschlag", tags: ["nahkampf"] }], // gegen Ausweichen 0 und Grundverteidigung 20: 80 %; Tag für den Skill nahkampf_grund
     inventar: [],
-    faehigkeiten: ["testfaehigkeit"], // vorläufig, für den Zielmodus (daten/faehigkeiten.js)
+    faehigkeiten: [], // eigene Fähigkeiten folgen mit dem Inhalt; der Probeinhalt ergänzt die testfaehigkeit (datenproben/index.js)
     // Plätze für Ausrüstung (src/systeme/ausruestung.js): Waffen in den Händen, Rüstung und Schmuck am Körper
     plaetze: { hand: 2, kopf: 1, brust: 1, beine: 1, hals: 1, finger: 2 },
     // Stoffwechsel, siehe src/systeme/stoffwechsel.js; alle Zahlen vorläufig.

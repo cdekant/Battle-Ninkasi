@@ -6,8 +6,7 @@ import { createHash } from "node:crypto";
 import { anmelden, abmelden } from "../src/kern/register.js";
 import { unerreichbareFelder } from "../src/welt/ebenenschritte.js";
 import "../src/kern/spiel.js"; // meldet Bausteine, Systeme und Verhaltensmodule an
-import rohdaten from "../daten/index.js";
-import texte from "../sprache/de/texte.js";
+import { rohdaten, texteDe as texte } from "../src/inhalt.js";
 import { meldungenMitschneiden } from "./hilfen.js";
 import { datenLaden, neuesSpiel, befehlGeben, spielstand, nachspielen } from "../src/kern/spiel.js";
 import { spielerin, alleEntitaeten, istWesen } from "../src/kern/zustand.js";

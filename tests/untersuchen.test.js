@@ -18,8 +18,7 @@ import { zielmodusBeginnen, zielmodusTaste, zielmodusVorschau, zielmodusBestaeti
 import { buchstabeDerTaste, inventarTaste } from "../src/eingabe/inventar.js";
 import { faehigkeitenTaste } from "../src/eingabe/faehigkeiten.js";
 import belegung from "../src/eingabe/belegung.js";
-import texte from "../sprache/de/texte.js";
-import rohdaten from "../daten/index.js";
+import { texteDe as texte, rohdaten } from "../src/inhalt.js";
 
 const KARTE = [
   "############",

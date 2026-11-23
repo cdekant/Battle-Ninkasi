@@ -2,8 +2,7 @@
 // unverwundbar, Wiederholbarkeit, getrennte Wertung in der Chronik, Einträge der Befehlszeile
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import rohdaten from "../daten/index.js";
-import texteDe from "../sprache/de/texte.js";
+import { rohdaten, texteDe } from "../src/inhalt.js";
 import grammatikDe from "../sprache/de/grammatik.js";
 import { datenLaden, neuesSpiel, befehlGeben, spielstand, nachspielen } from "../src/kern/spiel.js";
 import { spielerin, entitaetMitId } from "../src/kern/zustand.js";

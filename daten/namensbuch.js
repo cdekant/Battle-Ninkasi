@@ -6,11 +6,11 @@
 export default {
   wesen: {
     fest: ["ninkasi"],
-    vorlaeufig: ["essigbakterium", "fernkaempfer_test"],
+    vorlaeufig: [],
   },
   gegenstaende: {
     fest: [],
-    vorlaeufig: ["bier", "sauerbier", "bierfass", "leere_flasche", "leeres_fass", "brandflasche", "schoepfkelle", "fasshammer", "lederschuerze", "kupferhelm", "lederhose", "hopfenkette", "kupferring", "lederfetzen", "kupferschrott"],
+    vorlaeufig: [],
   },
   eigenschaften: {
     fest: ["koerperlichkeit", "trinkfestigkeit", "gewandtheit", "sinnlichkeit", "klugheit", "braukunde"],
@@ -18,18 +18,18 @@ export default {
   },
   skills: {
     fest: [],
-    vorlaeufig: ["zaehigkeit_grund", "zaehigkeit_experte", "nahkampf_grund", "ausweichen_grund"],
+    vorlaeufig: [],
   },
   faehigkeiten: {
     fest: [],
-    vorlaeufig: ["testfaehigkeit", "saeurespucke", "saeureschwall"],
+    vorlaeufig: [],
   },
   zustaende: {
     fest: [],
-    vorlaeufig: ["testzustand"],
+    vorlaeufig: [],
   },
   fallen: {
     fest: [],
-    vorlaeufig: ["saeureduese", "klappergeschirr"],
+    vorlaeufig: [],
   },
 };

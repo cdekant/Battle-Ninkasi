@@ -2,7 +2,7 @@
 
 Stand: 2026-11-23
 
-Zuständig für: `src/systeme/kampf.js`, `src/systeme/kampfzustand.js`, `src/systeme/fraktionen.js`, `src/systeme/wahrnehmung.js`, `src/systeme/bewegung.js`, `src/systeme/verschieben.js`, `src/systeme/werfen.js`, `src/systeme/skills.js`, `src/systeme/lernen.js`, `src/systeme/stoffwechsel.js`, `src/ki/*`, `daten/gegner.js`, `daten/ninkasi.js`, `daten/fraktionen.js`, `daten/schadensarten.js`, `daten/eigenschaften.js`, `daten/skills.js`, `daten/taktiken.js`
+Zuständig für: `src/systeme/kampf.js`, `src/systeme/kampfzustand.js`, `src/systeme/fraktionen.js`, `src/systeme/wahrnehmung.js`, `src/systeme/bewegung.js`, `src/systeme/verschieben.js`, `src/systeme/werfen.js`, `src/systeme/skills.js`, `src/systeme/lernen.js`, `src/systeme/stoffwechsel.js`, `src/ki/*`, `daten/ninkasi.js`, `daten/fraktionen.js`, `daten/schadensarten.js`, `daten/eigenschaften.js`, `daten/taktiken.js`
 
 Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Charakter.md](Charakter.md), [Grundlagen.md](Grundlagen.md), [Ausblick.md](Ausblick.md), [Gegenstaende.md](Gegenstaende.md)
 
@@ -66,7 +66,7 @@ Vorbild Caves of Qud: Feindliche greifen an, Neutrale tun nichts, werden aber fe
 
 Daten:
 
-+ Fraktion (`daten/fraktionen.js`): `{ text, beziehungen?: { andereFraktion: "feind" | "neutral" | "verbuendet" }, rufFest? }` (`BEZIEHUNGEN`); die Tabelle nennt nur Abweichungen von `regeln.fraktionen.beziehungVorgabe` (Vorgabe `feind`); `rufFest: true` lässt sich durch keinen Ruf umstimmen (im Spielinhalt vorläufig die Verderber)
++ Fraktion (`daten/fraktionen.js`): `{ text, beziehungen?: { andereFraktion: "feind" | "neutral" | "verbuendet" }, rufFest? }` (`BEZIEHUNGEN`); die Tabelle nennt nur Abweichungen von `regeln.fraktionen.beziehungVorgabe` (Vorgabe `feind`); `rufFest: true` lässt sich durch keinen Ruf umstimmen
 + Am Wesen `fraktion`, überlagerbar durch Zustände (siehe [Wirkungen.md](Wirkungen.md), Zustände); `zornAuf: [IDs]` für einzelnen Zorn; `beistandFuer: { angreiferinId: [Gegner-IDs] }` für Beistand
 + Im Zustand `ruf: { fraktion: Zahl }`, ein fehlender Eintrag heißt 0
 + Regeln in `regeln.fraktionen`: `rufTraeger` (`ninkasi`), `rufGrundwert` (feind -100, neutral 0, verbündet 100), `rufSchwellen` (feind -50, verbündet 50), `rufToetungFeind` (10), `rufToetungEigene` (-25), `rufNurMitZeugen` (true); die Datenprüfung verlangt, dass jeder Grundwert in der Zone seiner Beziehung liegt
@@ -134,7 +134,7 @@ Daten:
 + Zwecke: `regeln.ki.zwecke` (vorläufig `heilen`, `angriff`); `zweck: [name]` an einer Fähigkeit und an den Nutzungen eines Gegenstands (`trinkbar.zweck`, `wurf.zweck`) sagt, wozu die KI sie mit `nutzen` wählt; die Datenprüfung kennt nur Zwecke aus der Liste
 + Ausstattung: `ausstattung: [{ typ, anzahl? }]` am Wesen legt beim Erzeugen Gegenstände ins Gepäck (siehe [Gegenstaende.md](Gegenstaende.md), Inventar)
 + Beispiel: `{ handlung: "fliehen", bewertung: [{ eingabe: "eigeneLpProzent", kurve: [[0, 1000], [30, 1000], [31, 0]] }] }` vor den Angriffen: unter 31 % LP flieht das Wesen
-+ Beispiel: `{ handlung: "nutzen", zweck: "heilen", chance: 50, bewertung: [{ eingabe: "eigeneLpProzent", kurve: "heilenNachLp" }] }` (Fernkämpfer-Test mit einem Bier in der Ausstattung): unter 80 % LP trinkt es in der Hälfte der Fälle
++ Beispiel: `{ handlung: "nutzen", zweck: "heilen", chance: 50, bewertung: [{ eingabe: "eigeneLpProzent", kurve: "heilenNachLp" }] }` (mit einem Bier in der Ausstattung): unter 80 % LP trinkt es in der Hälfte der Fälle
 + Vorrangbefehl (Laufzeit, für Begleiter): `vorrang: { anweisung: "angreifen" | "warten" | "folgen", zielId?, bis? }`; gesetzt wird er später über einen Befehl Ninkasis, die KI liest ihn schon
 + Regelwert `regeln.bewegung.umwegHoechstens` (4)
 
@@ -224,8 +224,8 @@ Spieldesign in [Charakter.md](Charakter.md); hier die Umsetzung. Alle Zahlen vor
 Daten:
 
 + Eigenschaften (`daten/eigenschaften.js`): Körperlichkeit, Trinkfestigkeit, Gewandtheit, Sinnlichkeit, Klugheit, Braukunde; Grundwerte an Ninkasi als `eigenschaften: { koerperlichkeit: 14, ... }`, vorläufig 14, 14, 13, 13, 13, 13 als ausgewogene Vorgabe der Charaktererstellung
-+ Skills (`daten/skills.js`): `{ text, set, tier, rang?, primaer, sekundaer, voraussetzungen?, freischaltung?, jeStufe?, abStufe?, lernt?, verwandt? }`; Tier 1 bis 4 (Grund, Experte, Meister, göttlich), je Set jeder Tier einmal; `rang` ohne Angabe aus `raengeNachTier`; `voraussetzungen: [{ skill, stufe }]`; `jeStufe` (nur `plus` und `prozent`); `abStufe: { 3: { modifikatoren?, ausloeser? } }`; `lernt: [{ anlass, tags? }]`; `verwandt: [{ skill, anteil }]`; im Spielinhalt vorläufig Zähigkeit (Grund und Expertin, LP), Nahkampf (Genauigkeit mit Tag `nahkampf`) und Ausweichen, der Katalog folgt in einer eigenen Sitzung
-+ Lernstand an Ninkasi: `skills: { name: { lernpunkte, rest } }`, `freieEp`, `freigeschaltet: [name]`, `erkundet`; gebundene EP an Wesen: `ep` in den Daten (vorläufig Essigbakterium 10, `fernkaempfer_test` 15), Beitragsbuch `beitraege: [{ anlass, tags }]`, `topfId`; Töpfe in `zustand.toepfe`
++ Skills (`datenproben/skills.js`): `{ text, set, tier, rang?, primaer, sekundaer, voraussetzungen?, freischaltung?, jeStufe?, abStufe?, lernt?, verwandt? }`; Tier 1 bis 4 (Grund, Experte, Meister, göttlich), je Set jeder Tier einmal; `rang` ohne Angabe aus `raengeNachTier`; `voraussetzungen: [{ skill, stufe }]`; `jeStufe` (nur `plus` und `prozent`); `abStufe: { 3: { modifikatoren?, ausloeser? } }`; `lernt: [{ anlass, tags? }]`; `verwandt: [{ skill, anteil }]`
++ Lernstand an Ninkasi: `skills: { name: { lernpunkte, rest } }`, `freieEp`, `freigeschaltet: [name]`, `erkundet`; gebundene EP an Wesen: `ep` in den Daten, Beitragsbuch `beitraege: [{ anlass, tags }]`, `topfId`; Töpfe in `zustand.toepfe`
 + Anforderungen an Ausrüstung: `ausruestung.anforderung: { koerperlichkeit: 15 }`, wahlweise `abzugJePunkt`
 + Regelwerte `regeln.lernen`: `eigenschaftStart` 10, `eigenschaftPunkte` 20, `eigenschaftHoechstens` 20, `bezugswert` 40, `stufen` (50, 100, 200, 350, 550), `raengeNachTier` (1, 2, 4, 8), `tierVoraussetzungen` (Experte: Grund 3; Meister: 4, 3; göttlich: 5, 4, 3), `startEp` 300, `epJeFeld` 1, `verrechnung` ("multiplizieren" oder "addieren"), `gewichtung` ("erste"), `topfFaktor` 3, `ort` ("jederzeit"), `anforderungAbzug` (Genauigkeit und Schaden je -5 %)
 
@@ -254,7 +254,7 @@ Regeln:
   + `ruestung`: Ninkasis Rüstung fängt Schaden des Wesens ab (Haken `vor_schaden` nach dem Rang der Rüstung)
   + `schaden_erlitten`: das Wesen fügt Ninkasi Schaden zu
 + Verteilung beim Tod (Haken `nach_tod`), gleich wer tötet, sobald das Buch einen Eintrag hat: die EP zu gleichen Teilen je Bucheintrag, je Eintrag zu gleichen Teilen auf die Skills, deren `lernt` passt (gleicher Anlass, Tags des Skills im Eintrag enthalten); `verwandt` gibt zusätzlich Anteile an verwandte Skills (Querlernen); Rundungsreste, Einträge ohne passenden Skill und was ein Skill nicht aufnimmt, werden freie EP
-+ Topf je Abstammungslinie: `beschwoeren` mit `abstammung: true` (Zellteilung) gibt dem neuen Wesen die `topfId` der Quelle; hat sie keine, eröffnet sie einen Topf mit ep x `topfFaktor`; wer zu einem Topf gehört, bringt höchstens den Rest darin; im Spielinhalt teilt sich bisher nichts
++ Topf je Abstammungslinie: `beschwoeren` mit `abstammung: true` (Zellteilung) gibt dem neuen Wesen die `topfId` der Quelle; hat sie keine, eröffnet sie einen Topf mit ep x `topfFaktor`; wer zu einem Topf gehört, bringt höchstens den Rest darin
 + Anforderungen an Ausrüstung: je fehlendem Punkt (wirksamer Wert) gilt der Abzug einmal, für die Trägerin insgesamt (Quelle `anforderungen`), ein Prozentabzug sinkt nicht unter -100; feiner über Tags der Angriffsprofile später
 + Der Bot gibt zufällige Lernbefehle, verteilt jede zweite Partie die Eigenschaften neu, prüft den Lernstand (ganzzahlig, höchstens Stufe 5, keine freien EP verloren, jede Verteilung geht auf) und gibt das EP-Budget je Tiefe aus (Erkundung, gebunden, frei aus Beute)
 
@@ -267,4 +267,4 @@ Regeln:
 + Spieldesign: Gegner und Pegel in [Grundlagen.md](Grundlagen.md), Eigenschaften, Skills und EP in [Charakter.md](Charakter.md)
 + Offene Reste in [Systemausbau.md](Systemausbau.md): Punkt 3 (Licht in der Wahrnehmung, Spüren, Spur als Geruch), Punkt 7 (Unterstützung unter Verbündeten, Umherziehen), Punkt 10 (Zeitskala, Machtkurve, Anfangsbalance), Punkt 14 (Skillkatalog, Makel und Vorzüge, Kampfwerte aus Skills)
 
-Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).
+Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

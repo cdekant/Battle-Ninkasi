@@ -3,8 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import "../src/kern/spiel.js"; // meldet Bausteine, Systeme und Verhaltensmodule an
-import rohdaten from "../daten/index.js";
-import texte from "../sprache/de/texte.js";
+import { rohdaten, texteDe as texte } from "../src/inhalt.js";
 import { miniSpiel, wesen, lernendeSpielerin, gegenstandTragen, meldungenMitschneiden, rohdatenMitTesteintraegen } from "./hilfen.js";
 import { datenLaden, neuesSpiel, befehlGeben, befehlAusfuehren, spielstand, nachspielen } from "../src/kern/spiel.js";
 import { akteurEinreihen } from "../src/kern/zeit.js";

@@ -5,8 +5,7 @@
 // jeder fünfte (Startwert % 5 === 4) in einer Arena (Spielart "arena"), abwechselnd mit Taktik (eingabe/arenakampf.js)
 // und mit zufälligen Befehlen.
 
-import rohdaten from "../daten/index.js";
-import texte from "../sprache/de/texte.js";
+import { rohdaten, texteDe as texte } from "../src/inhalt.js";
 import grammatikDe from "../sprache/de/grammatik.js";
 import { erstelleGrammatik } from "../src/anzeige/grammatik.js";
 import { datenLaden, neuesSpiel, befehlGeben, spielstand, nachspielen } from "../src/kern/spiel.js";

@@ -3,7 +3,7 @@
 // alle Einzelkämpfe als JSON für die Auswertung mit Python.
 // Aufruf: node werkzeuge/arena.js <Arena | Kurzform> [Kämpfe=1000] [erster Startwert=1]
 //           [--taktik name] [--karte name] [--ninkasi variante] [--gegner variante] [--json datei]
-//   Arena: Name aus daten/arenen.js; hat sie Varianten, läuft jede Kombination (eine Zeile je Paar), --ninkasi und
+//   Arena: Name aus datenproben/arenen.js; hat sie Varianten, läuft jede Kombination (eine Zeile je Paar), --ninkasi und
 //   --gegner beschränken auf eine. Kurzform wie in DCSS: "3 essigbakterium, fernkaempfer_test" ist eine Welle,
 //   "/" trennt Wellen ("3 essigbakterium / 2 fernkaempfer_test"), Karte arena_offen, Taktik nahkampf.
 // Jeder Kampf folgt aus seinem Startwert und lässt sich mit demselben Aufruf wiederholen; Patt nach
@@ -11,8 +11,7 @@
 
 import { writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
-import rohdaten from "../daten/index.js";
-import texte from "../sprache/de/texte.js";
+import { rohdaten, texteDe as texte } from "../src/inhalt.js";
 import VERSION from "../src/version.js";
 import { datenLaden, neuesSpiel, befehlGeben } from "../src/kern/spiel.js";
 import { hoererAnmelden } from "../src/kern/ereignisse.js";

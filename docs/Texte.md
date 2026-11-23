@@ -14,11 +14,12 @@ Grobskizze, auszuarbeiten.
 + Sprachen: Deutsch und Englisch; jeder Text entsteht in beiden, das Englische frei nachgeschrieben statt Satz für Satz übersetzt (Englisch noch offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 9)
 + Anrede: Oberflächentexte sprechen die Spielerin mit "du" an, erzählende Texte (Log, Beschreibungen) sprechen in der dritten Person über Ninkasi; ein Lauf heißt "Lauf"
 + Fehlende Schlüssel werden beim Laden gemeldet (Prüfung wie bei den Daten, siehe Inhalte als Daten in [Architektur.md](Architektur.md))
++ Texte des Probeinhalts in `sprache/de/proben.js`, ohne englische Fassung; `src/inhalt.js` legt sie zu denen des Grundgerüsts, doppelte Schlüssel sind ein Fehler (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
 + Format: `sprache/de/texte.js` mit `export default { schluessel: text }`; Texte enthalten Platzhalter wie `{menge}`; der Satzanfang wird groß geschrieben
 + Wesen und Gegenstände sind Hauptwörter: Geschlecht (`m`, `f`, `n`), bei Eigennamen `eigenname: true`, und alle vier Fälle der Einzahl ohne Artikel, z.B. `{ geschlecht: "n", einzahl: { nom: "Essigbakterium", gen: "Essigbakteriums", dat: "Essigbakterium", akk: "Essigbakterium" } }`; unregelmäßige Beugung (des Bären) steht so ausgeschrieben in den Fällen
 + Die Artikel kommen als Tabelle nach Art, Geschlecht und Fall aus `sprache/de/grammatik.js`; den Code dazu liefert `src/anzeige/grammatik.js`; Eigennamen stehen ohne Artikel, ihr Geschlecht dient später den Fürwörtern
 + Platzhalter für Hauptwörter: `{ziel.akk}` mit bestimmtem Artikel (Standard: Nominativ, bestimmt), `{was.nom.ein}` mit unbestimmtem, `{wer.gen.ohne}` ohne Artikel
-+ Etiketten unbekannter Gegenstände (`daten/etiketten.js`, siehe Unbekanntes in [Gegenstaende.md](Gegenstaende.md)) sind Hauptwörter unter `etikett.<name>`; ein unbekannter Gegenstand nennt sein Etikett statt seines Namens (Bezug mit `etikett`); solange es keine Adjektivendungen gibt, sind Namen und Etiketten Hauptwörter ohne Adjektiv (Sauerbier, Bügelflasche)
++ Etiketten unbekannter Gegenstände (`datenproben/etiketten.js`, siehe Unbekanntes in [Gegenstaende.md](Gegenstaende.md)) sind Hauptwörter unter `etikett.<name>`; ein unbekannter Gegenstand nennt sein Etikett statt seines Namens (Bezug mit `etikett`); solange es keine Adjektivendungen gibt, sind Namen und Etiketten Hauptwörter ohne Adjektiv (Sauerbier, Bügelflasche)
 + Schadensarten stehen als einfache Wörter unter `schaden.<art>` (z.B. `schaden.saeure`: "Säure"); das Log setzt sie als `{art}` ein
 + Jede Sprache bekommt ihre eigene Regeltabelle; Sprachen mit Sonderregeln (englisch a/an) bekommen zusätzlich eigenen Code
 + Später: Mehrzahl (`mehrzahl` mit den vier Fällen, Artikel für `p`), Adjektivendungen für Affixe (ein verfluchtes Braupaddel)

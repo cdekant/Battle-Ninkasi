@@ -3,8 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync, existsSync } from "node:fs";
-import rohdaten from "../daten/index.js";
-import texteDe from "../sprache/de/texte.js";
+import { rohdaten, texteDe } from "../src/inhalt.js";
 import grammatikDe from "../sprache/de/grammatik.js";
 import korpusliste from "../sprache/de/korpus/index.js";
 import { datenLaden, neuesSpiel, befehlGeben, spielstand, nachspielen, SPIELARTEN } from "../src/kern/spiel.js";

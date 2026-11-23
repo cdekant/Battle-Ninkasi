@@ -46,7 +46,7 @@ export default {
     // höchstens so viele Felder länger ist; sonst wartet er (src/ki/jagen.js, Vorbild Brogue)
     umwegHoechstens: 4,
   },
-  // Population, siehe src/systeme/beschwoerung.js und src/welt/population.js (Tabellen in daten/populationen.js)
+  // Population, siehe src/systeme/beschwoerung.js und src/welt/population.js (Tabellen in datenproben/populationen.js)
   population: {
     hoechstWesen: 500, // mehr Wesen entstehen nicht (Beschwören, Erzeugen der Ebene), Meldung population_voll
     tieferChance: 10, // Prozent je Wurf der Population: ein Gegner aus einer tieferen Tiefe

@@ -2,13 +2,13 @@
 
 Stand: 2026-11-23
 
-Zuständig für: `starten.py`, `starten.bat`, `tests/*`, `werkzeuge/bot.js`, `werkzeuge/messung.js`, `werkzeuge/arena.js`, `werkzeuge/kompendium.js`, `werkzeuge/kompendium.html`, `werkzeuge/luecken.js`, `werkzeuge/namensbuch.js`
+Zuständig für: `starten.py`, `starten.bat`, `tests/*`, `werkzeuge/bot.js`, `werkzeuge/messung.js`, `werkzeuge/arena.js`, `werkzeuge/kompendium.js`, `werkzeuge/kompendium.html`, `werkzeuge/luecken.js`, `werkzeuge/namensbuch.js`, `datenproben/*`
 
-Mitprüfen bei Änderungen: [Architektur.md](Architektur.md), [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md), [Anzeige.md](Anzeige.md), [Texte.md](Texte.md)
+Mitprüfen bei Änderungen: [Architektur.md](Architektur.md), [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md), [Anzeige.md](Anzeige.md), [Texte.md](Texte.md), [Dokumentation.md](Dokumentation.md)
 
 ## Zweck
 
-Arbeitsweise am Code: Starten, Tests und Balancing, Bot und Werkzeuge, Kompendium, Messwerte, Ablauf einer Version, Stolpersteine und der Stand des Spielinhalts. Jeder Abschnitt nennt, soweit vorhanden, Daten, Schnittstellen und Regeln.
+Arbeitsweise am Code: Starten, Tests und Balancing, Bot und Werkzeuge, Kompendium, Messwerte, Ablauf einer Version, Stolpersteine, Grundgerüst und Probeinhalt. Jeder Abschnitt nennt, soweit vorhanden, Daten, Schnittstellen und Regeln.
 
 ## Starten
 
@@ -29,7 +29,7 @@ Regeln:
 Daten:
 
 + Unittests mit dem in Node eingebauten `node:test` und `node:assert`, ohne Abhängigkeiten; Dateien in `tests/`, benannt nach dem geprüften Modul mit Endung `.test.js` (z. B. `tests/wege.test.js`); welche Tests zu welchem System gehören, nennt jedes technische Dokument unter "Tests"
-+ `tests/doku.test.js` prüft die Dokumentation: Markdown-Links auf vorhandene Dokumente, Verweise mit Abschnitt (im Code `docs/<Datei>.md, <Abschnitt>`, in Markdown "siehe" mit Link auf das Dokument, danach Komma und Abschnitt, für die Arbeitsliste auch `Punkt N`) auf vorhandene Überschriften, genau ein zuständiges Dokument je Datei in `src/`, `daten/`, `sprache/`, `grafik/`, `lib/`, `werkzeuge/`, `tests/` und je Startskript (`sprache/Literatur/` ausgenommen), jedes Dokument in CLAUDE.md, CLAUDE.md unter 12000 Zeichen, "Mitprüfen" in jedem Kopf und gegenseitig (die Arbeitsliste ausgenommen), in Design-Dokumenten (ohne "Zuständig für") je Abschnitt genau eine Zeile "Umsetzung:", deren Dokumente unter "Mitprüfen" stehen (ausgenommen Abschnitte wie Offen, Quellen, Vorbilder, Entscheidungen, Stand der Umsetzung); Text klein hinter einem Verweis (z.B. ein Pfad) gilt nicht als Abschnitt
++ `tests/doku.test.js` prüft die Dokumentation: Markdown-Links auf vorhandene Dokumente, Verweise mit Abschnitt (im Code `docs/<Datei>.md, <Abschnitt>`, in Markdown "siehe" mit Link auf das Dokument, danach Komma und Abschnitt, für die Arbeitsliste auch `Punkt N`) auf vorhandene Überschriften, genau ein zuständiges Dokument je Datei in `src/`, `daten/`, `datenproben/`, `sprache/`, `grafik/`, `lib/`, `werkzeuge/`, `tests/`, je Startskript und für CLAUDE.md (`sprache/Literatur/` ausgenommen), jedes Dokument in CLAUDE.md, CLAUDE.md unter 12000 Zeichen, "Mitprüfen" in jedem Kopf und gegenseitig (die Arbeitsliste ausgenommen), in Design-Dokumenten (ohne "Zuständig für") je Abschnitt genau eine Zeile "Umsetzung:", deren Dokumente unter "Mitprüfen" stehen (ausgenommen Abschnitte wie Offen, Quellen, Vorbilder, Entscheidungen, Stand der Umsetzung); Text klein hinter einem Verweis (z.B. ein Pfad) gilt nicht als Abschnitt
 + `tests/hilfen.js` baut kleine Spiele aus Testkarten (ohne Dungeon-Erzeugung) mit Testeffekten, Schadensarten und Regelwerten (Grundverteidigung dort 0, damit Genauigkeit 100 ohne Ausweichen sicher trifft), samt Wesen, Spielerin und getragenen Gegenständen, macht auf Wunsch die ganze Karte sichtbar, lässt die Welt (Weltuhr, Zeitereignisse) bis zu einem Zeitpunkt laufen, schneidet Meldungen mit und meldet Haken nur für die Dauer eines Tests an; `rohdatenMitTesteintraegen` liefert die Spieldaten samt Testeinträgen (alle mit "test" im Namen)
 
 Schnittstellen:
@@ -52,7 +52,7 @@ Schnittstellen:
 
 + `node werkzeuge/bot.js [Läufe=20] [Befehle=3000] [erster Startwert=1]`: der dumme Bot spielt mit zufälligen Befehlen, auch über Reise, Laufen, Rasten, Erkunden, Treppen, Fähigkeiten, Werfen, Lernen, Untersuchen und die Klicks aller Fenster
 + `node werkzeuge/messung.js [Gegner] [Befehle] [Startwert] [Türen in Prozent] [Brandherde]`: Leistung bei vielen Gegnern (siehe [Architektur.md](Architektur.md), Leistung)
-+ `node werkzeuge/arena.js <Arena | Kurzform> [Kämpfe=1000] [erster Startwert=1] [--taktik name] [--karte name] [--ninkasi variante] [--gegner variante] [--json datei]`: Arena-Simulation; ohne Argument nennt es Arenen und Taktiken; eine Arena aus `daten/arenen.js` läuft mit allen Paaren ihrer Varianten (eine Zeile je Paar), `--ninkasi` und `--gegner` beschränken; die Kurzform nach DCSS ("3 essigbakterium, fernkaempfer_test" ist eine Welle, "/" trennt Wellen) kämpft in `arena_offen` mit der Taktik `nahkampf`; Spielart und Aufstellung siehe [Architektur.md](Architektur.md), Spielarten
++ `node werkzeuge/arena.js <Arena | Kurzform> [Kämpfe=1000] [erster Startwert=1] [--taktik name] [--karte name] [--ninkasi variante] [--gegner variante] [--json datei]`: Arena-Simulation; ohne Argument nennt es Arenen und Taktiken; eine Arena aus `datenproben/arenen.js` läuft mit allen Paaren ihrer Varianten (eine Zeile je Paar), `--ninkasi` und `--gegner` beschränken; die Kurzform nach DCSS ("3 essigbakterium, fernkaempfer_test" ist eine Welle, "/" trennt Wellen) kämpft in `arena_offen` mit der Taktik `nahkampf`; Spielart und Aufstellung siehe [Architektur.md](Architektur.md), Spielarten
 + Exportiert für Tests und spätere Werkzeuge (Machtkurve): `kampfAusfuehren(daten, aufstellung, startwert, taktik?)`, `auswerten(kaempfe)`, `wilson(erfolge, anzahl)`, `quantil(werte, anteil)`, `kurzformLesen(daten, text)`, `variantenpaare(daten, name, wahl)`
 + `node werkzeuge/namensbuch.js`: führt `daten/namensbuch.js` nach, neue Namen kommen nach `vorlaeufig`, vorläufige, die es nicht mehr gibt, fallen weg, feste bleiben immer stehen; danach nennt es die übrigen Fehler (Rückgabewert 1); exportiert `NAMENSBUCH_ARTEN`, `namenDerDaten`, `namensbuchFehler`, `namensbuchNachgefuehrt`, `namensbuchText` für `tests/namensbuch.test.js` (Regel siehe [Architektur.md](Architektur.md), Inhalte als Daten)
 + `node werkzeuge/tiles-ableiten.js`: leitet die kleinen Tile-Sätze ab und schreibt `grafik/tileset.js` (siehe [Tileset.md](Tileset.md))
@@ -60,7 +60,7 @@ Schnittstellen:
 Regeln:
 
 + Der Bot prüft nach jedem Befehl Invarianten (u.a. kein Wesen mit Lebenswert 0, nichts Getragenes ohne Trägerin, keine verwaisten Zeitereignisse, keine liegengebliebenen Auslöser, räumlicher Index und Heap stimmen, Lernstand ganzzahlig und vollständig verteilt), spielt jeden Lauf aus Startwert und Befehlsliste nach und vergleicht die Zustände; jeden vierten Lauf speichert er mitten im Lauf, lädt ihn und verlangt nach den übrigen Befehlen denselben Zustand; jeder fünfte Lauf (Startwert % 5 = 3) spielt in der Testkammer (siehe [Architektur.md](Architektur.md), Spielarten) mit zufälligem Erzeugen und Tiefenwahl, auch in Tiefen, die es nicht gibt, und verlangt, dass Ninkasi nie stirbt und die Chronik nichts zählt
-+ Jeder fünfte Lauf (Startwert % 5 = 4) spielt eine Arena aus `daten/arenen.js` der Reihe nach; jede zweite davon kämpft wie der automatische Kampf im Browser nach der Taktik (eingabe/arenakampf.js) mit gelegentlichen Zufallsbefehlen, die übrigen zufällig; nach dem Lauf zeichnet er das Endfenster und die Wahl der Arena mit allen Schaltern und verlangt nach einem Sieg, dass kein Feind mehr steht
++ Jeder fünfte Lauf (Startwert % 5 = 4) spielt eine Arena aus `datenproben/arenen.js` der Reihe nach; jede zweite davon kämpft wie der automatische Kampf im Browser nach der Taktik (eingabe/arenakampf.js) mit gelegentlichen Zufallsbefehlen, die übrigen zufällig; nach dem Lauf zeichnet er das Endfenster und die Wahl der Arena mit allen Schaltern und verlangt nach einem Sieg, dass kein Feind mehr steht
 + Arena-Simulation: Ninkasi kämpft nach einer Taktik (`taktikbefehl`, siehe [Wesen.md](Wesen.md), KI); lehnt die Logik einen Befehl ab, wartet sie (Spalte "abgel."); nach `regeln.arena.grenzeBefehle` Befehlen gilt der Kampf als Patt; jeder Kampf folgt aus seinem Startwert und lässt sich wiederholen
 + Gemessen je Kampf aus den Meldungen: Ausgang (Sieg, Tod, Patt), geschaffte Wellen, Befehle, Zeit in Zeiteinheiten, eigene Züge, LP-Verlust (Anfang minus Ende), Schaden erlitten und ausgeteilt, geheilte LP, MP-Verbrauch, Getränke, Würfe, Fähigkeiten, Treffer (Schadensmeldungen Ninkasis) und Fehlschläge
 + Ausgabe je Zeile: Siegquote mit Wilson-Intervall 95 % (verlässlich auch nahe 0 und 100 %; bei 1000 Kämpfen etwa plus minus 3 Prozentpunkte), Tode, Patt, Zeit und LP-Verlust als Median, P10 und P90 über die Siege, Getränke, Würfe, Fähigkeiten und Ablehnungen im Mittel, Trefferquote; mit `--json` dazu alle Einzelkämpfe samt Startwert für Python
@@ -70,18 +70,18 @@ Regeln:
 
 ## Kompendium
 
-Werkzeug der Entwicklung: alle Inhalte aus `daten/` als Tabellen und was ihnen noch fehlt. Bestiarium, Lore, Bierrezepte und Bierwissen für die Spielerin gehören nicht hierher, sondern ins Spiel; sie nutzen dieselben Steckbriefe (siehe [Anzeige.md](Anzeige.md), Beschreibung).
+Werkzeug der Entwicklung: alle geladenen Inhalte (Grundgerüst und Probeinhalt, siehe `src/inhalt.js`) als Tabellen mit ihrer Herkunft und was ihnen noch fehlt. Bestiarium, Lore, Bierrezepte und Bierwissen für die Spielerin gehören nicht hierher, sondern ins Spiel; sie nutzen dieselben Steckbriefe (siehe [Anzeige.md](Anzeige.md), Beschreibung).
 
 Schnittstellen:
 
 + `werkzeuge/kompendium.html` über den lokalen Server (`http://localhost:8000/werkzeuge/kompendium.html`): ein Reiter für die Lücken, je Art aus `ARTEN` (Wesen, Gegenstände, Gelände, Fallen, Oberflächen, Gase, Zustände, Fähigkeiten, Effekte, Skills, Eigenschaften, Fraktionen, Schadensarten, Etiketten, Populationen, Ebenen, Arenen, Taktiken) einer und einer für den Korpus; Tabellen mit Bild (Tile aus dem Satz 32, sonst das Zeichen), Name aus der Sprachdatei, den Merkmalen des Steckbriefs und den Lücken des Eintrags; sortierbar über die Kopfzeile, filterbar über alle Spalten; der gewählte Reiter steht im Anker der Adresse; die Zahl am Reiter ist gelb, wenn ein Eintrag Lücken hat
 + `node werkzeuge/kompendium.js [Art]`: ohne Art alle Lücken nach Gruppe, Rückgabewert 1 bei einer Lücke der Stufe Fehler; mit Art die Steckbriefe als Liste; exportiert `quellenLaden()` und `lueckenText(luecken)`
-+ `lueckenFinden({ rohdaten, sprache, tileset?, korpus?, literatur? })` in `werkzeuge/luecken.js`: reine Funktion, Lücken als `{ gruppe, stufe, ort, meldung }`; Browser und Node laden die Quellen selbst (Korpus und Literatur dort per `fetch`, hier aus den Dateien)
++ `lueckenFinden({ rohdaten, sprache, tileset?, korpus?, literatur?, probenamen?, probentexte? })` in `werkzeuge/luecken.js`: reine Funktion, Lücken als `{ gruppe, stufe, ort, meldung }`; Browser und Node laden die Quellen selbst (Korpus und Literatur dort per `fetch`, hier aus den Dateien), Namen und Texte des Probeinhalts kommen aus `src/inhalt.js`; `TILES_AUSSTEHEND` nennt Tiles des Grundgerüsts, die noch gezeichnet werden
 
 Regeln:
 
 + Gruppen: `daten` (jede Meldung der Datenprüfung, Stufe Fehler), `tiles` (Eintrag aus `daten/zeichen.js` ohne Tile in einem oder allen Sätzen, Tile ohne Eintrag), `verweise` (Wesen, Gegenstand, Effekt, Zustand, Fähigkeit, Falle, Oberfläche oder Gas, dessen Name sonst nirgends in den Daten steht, weder als Wert noch als Schlüssel; Vorlagen und vom Code verwendete Einträge in `VOM_CODE_VERWENDET` ausgenommen), `texte` (Textschlüssel mit dem Vorsatz eines Datenbereichs wie `wesen.`, den kein Eintrag nennt), `korpus` (Kopf unvollständig, `art` unbekannt, Quelle fehlt in `sprache/literatur.json`, Stufe Fehler)
-+ Stufe Warnung für alles, was Probeinhalt haben darf; nach dem Auslagern des Probeinhalts gilt für echten Inhalt die Stufe Fehler (siehe [Systemausbau.md](Systemausbau.md), Punkt 1); der Spielinhalt hat keine Lücke der Stufe Fehler (geprüft von `tests/kompendium.test.js`)
++ Stufen: Fehler für jede Meldung der Datenprüfung und des Korpus und für Tiles, Verweise und Texte des echten Inhalts; Warnung für den Probeinhalt, für Tiles in `TILES_AUSSTEHEND` und für alles, wenn die Quellen keine Namen des Probeinhalts nennen (Tests mit eigenen Daten); der geladene Inhalt hat keine Lücke der Stufe Fehler (geprüft von `tests/kompendium.test.js`); die Tabellen haben eine Spalte Herkunft (Probe oder echt)
 + Die Verweisprüfung ist eine Näherung: ein Name, der zufällig wie ein anderer Text in den Daten lautet, gilt als verwendet
 
 ## Messwerte
@@ -97,7 +97,7 @@ Gemessene Zahlen an einer Stelle, je mit Stand; neue Messungen ersetzen alte.
 
 1. Plan mit Empfehlungen vorlegen, Freigabe abwarten
 2. Umsetzen mit Tests; neue Dateien bekommen ein zuständiges Dokument; neue oder entfernte Namen in den Daten mit `node werkzeuge/namensbuch.js` ins Namensbuch, ein umbenannter oder entfernter fester Name mit Eintrag in `daten/umbenennungen.js`
-3. Doku nach den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md) nachführen, umgesetzte Punkte aus [Systemausbau.md](Systemausbau.md) streichen
+3. Doku nach [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung nachführen, umgesetzte Punkte aus [Systemausbau.md](Systemausbau.md) streichen
 4. Nummer in `src/version.js` erhöhen (Schema siehe [Architektur.md](Architektur.md), Versionen)
 5. `node --test` und `node werkzeuge/bot.js` fehlerfrei
 6. Commit (`Version X.Y.Z: Thema`), annotierter Tag `vX.Y.Z`, Push, alles erst auf ausdrücklichen Zuruf; reine Doku-Commits heißen `Doku: Thema` und bekommen keine Version
@@ -118,22 +118,47 @@ Gemessene Zahlen an einer Stelle, je mit Stand; neue Messungen ersetzen alte.
 + Neue Würfe im Spiel nie mit `spiel.zustand.zufallszustand`, sondern über `src/kern/wurf.js` mit einem Namen, sonst schlägt `tests/wurf.test.js` fehl (siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit)
 + Die Kartengeneratoren von rot.js brechen ohne `timeLimit: Infinity` nach Uhrzeit ab (siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit)
 
-## Stand des Spielinhalts
+## Grundgerüst
 
-Der Inhalt ist vorläufig und dient dem Ausprobieren der Systeme; alle Zahlen stehen in `daten/`.
+Was `daten/` heute hält: nur, was die Regeln selbst brauchen, dazu Ninkasi; echter Inhalt kommt hier hinzu (siehe [Architektur.md](Architektur.md), Inhalte als Daten). Alle Zahlen vorläufig.
 
-+ Ebenen: Hub (Tiefe 0) als feste Karte, im allmächtigen Lauf an seiner Stelle die Testkammer (21x11 Felder, leer), drei Kellertiefen zu 120x40 Feldern mit 16 bis 20 Wesen aus der Population (Essigbakterien in Rudeln, Fernkämpfer-Tests), 10 Bieren, einem Bierfass, 3 Brandflaschen, 3 Gärbottichen, je 6 Säuredüsen und Klappergeschirren, je einem Stück Ausrüstung (zwei Kupferringe), Türen an der Hälfte der Raumzugänge, Treppen hinauf und hinab (siehe [Welt.md](Welt.md), Ebenen)
-+ Ninkasi: 100 LP, 100 MP, 0 von 100 PP, Pegel 0 (nach oben offen), Sichtweite 8, Faust 1W6+2 stumpf mit Genauigkeit 80 (80 % gegen ein Wesen ohne Ausweichen), die vorläufige `testfaehigkeit`
++ Regeln, Aktionen, Schadensarten, Eigenschaften, Taktiken (`nahkampf`, `fernkampf`), die Fraktion `ninkasi`; Gelände Wand, Boden, Tür offen und zu, Treppe hinauf und hinab; Effekte `faustschlag`, `eingeklemmt`, `brennen`, `rauch_husten`; das Gas `rauch`; Ebenen Hub (Tiefe 0, ein leerer Raum mit Treppe hinab), Testkammer (21x11 Felder, leer) und die Arenakarten; die Abfolge allein ist nur der Hub
++ Ninkasi: 100 LP, 100 MP, 0 von 100 PP, Pegel 0 (nach oben offen), Sichtweite 8, Faust 1W6+2 stumpf mit Genauigkeit 80 (80 % gegen ein Wesen ohne Ausweichen), ohne Fähigkeiten
 + Stoffwechsel je Welttick (`daten/ninkasi.js`): LP 0,3 nüchtern, 0,8 bei 1,5 ‰, darüber abnehmend; MP 0,8 nüchtern, 0 ab 3 ‰; PP Schwund 0,3 nüchtern, Stillstand von 0,5 bis 1,5 ‰, dann steigend bis 1,0 bei 4 ‰; danach Abbau des Pegels um 0,01 ‰; Schwellen 0,5, 1, 2 und 3 ‰ werden angezeigt und gemeldet, haben aber noch keine Wirkung; die Leiste zeigt zusätzlich das Optimum der LP
-+ Essigbakterium: 15 LP, Biss 1W4 mit Genauigkeit 70, 10 gebundene EP, Verhaltensmodul `jagen`
-+ Fernkämpfer-Test (Zeichen F, ohne Tile): Testgegner für die KI mit Fähigkeiten, 10 LP, hält 3 Felder Abstand, Säurespucke (Geschoss über Verbündete, Abklingzeit 3) und angekündigter Säureschwall (Kreis mit Radius 1 auf das Feld beim Beginn, 3 Schritte, durch Schaden unterbrechbar, 30 %); trägt ein Bier und trinkt es unter 80 % LP mit 50 % Chance (Handlung `nutzen`, siehe [Wesen.md](Wesen.md), KI)
-+ Arenen (`daten/arenen.js`): Essigbakterien (drei, mit Varianten Ninkasi nackt, gerüstet, geübt und Gegner drei oder fünf), Fernkämpfer in zwei Wellen (mit zwei Bier), Rudel im Engpass (sechs Essigbakterien vor dem Gang), Reihe aus dem Keller (sechs Rudel aus Tiefe 1, mit Bier und Brandflaschen, Taktik `fernkampf`), alle Gegner des Kellers; Taktiken `nahkampf` und `fernkampf` (`daten/taktiken.js`); Befund siehe Messwerte
-+ Bier: +20 LP, Pegel +0,5 ‰, wird zur leeren Flasche; Getränke, Ausrüstung und Verderben siehe [Gegenstaende.md](Gegenstaende.md)
-+ Alle Aktionen kosten bisher 100 (`daten/aktionen.js`), abweichend nur Angriffsprofile der Waffen
-+ Auslöser sind im System vorhanden, im Spielinhalt aber noch nicht benutzt
++ Alle Aktionen kosten 100 (`daten/aktionen.js`), abweichend nur Angriffsprofile der Waffen
++ Tiles fehlen noch für Tür, Treppe und Feuer (`TILES_AUSSTEHEND` in `werkzeuge/luecken.js`, siehe [Systemausbau.md](Systemausbau.md), Punkt 11)
+
+## Probeinhalt
+
+Vorläufiger Inhalt in `datenproben/`, nur zum Ausprobieren der Systeme; er verschwindet, wenn echter Inhalt entsteht. Alle Zahlen vorläufig.
+
+Daten:
+
++ `datenproben/index.js`: `{ eintraege, ergaenzen, abfolge, starttiefe }` für `datenZusammenfuegen` (siehe [Architektur.md](Architektur.md), Inhalte als Daten); die übrigen Dateien in `datenproben/` sind Sammlungen wie in `daten/`, Texte in `sprache/de/proben.js`
+
+Regeln:
+
++ Kein Name des Probeinhalts steht im Grundgerüst, keiner im Namensbuch; Zähler der Chronik für Proben bleiben später unbenutzt liegen
++ Probeinhalt darf unvollständig sein: Lücken im Kompendium sind dort Warnungen, Zeichen statt Tiles erlaubt (siehe Kompendium und [Tileset.md](Tileset.md), Ablauf)
++ Tests, Bot und Werkzeuge spielen mit Grundgerüst und Probeinhalt (`src/inhalt.js`); Tests leiten Erwartungen aus den Daten ab, damit der Probeinhalt sich ändern darf
+
+Inhalt:
+
++ Ebenen: unter dem Hub drei Kellertiefen zu 120x40 Feldern mit 16 bis 20 Wesen aus der Population (Essigbakterien in Rudeln von 1 bis 3, Fernkämpfer-Tests ab Tiefe 2 häufiger), 10 Bieren, einem Bierfass, 3 Brandflaschen, 3 Gärbottichen im Inneren der Räume, je 6 Säuredüsen und Klappergeschirren, je einem Stück Ausrüstung (zwei Kupferringe), Türen an der Hälfte der Raumzugänge (siehe [Welt.md](Welt.md), Ebenen); der Lauf beginnt in Tiefe 1
++ Ninkasi bekommt die `testfaehigkeit` (Kreis mit Radius 1 auf ein Feld bis 6 weit, 10 MP, Trefferwurf je Wesen, sie selbst bleibt verschont), damit sich der Zielmodus ausprobieren lässt; sie setzt bei einem Treffer den `testzustand` (Ausweichen -2 für 5 Züge), damit die Anzeige der Zustände etwas zeigt
++ Essigbakterium: 15 LP, Biss 1W4 Säure mit Genauigkeit 70 (nutzt 1 ab), 10 gebundene EP, Verhaltensmodul `jagen`, Fraktion `verderber` (lässt sich durch keinen Ruf umstimmen); im Probeinhalt teilt sich nichts
++ Fernkämpfer-Test (Zeichen F, ohne Tile): Testgegner für die KI mit Fähigkeiten, 10 LP, 15 gebundene EP, hält 3 Felder Abstand, Säurespucke (Geschoss über Verbündete, Abklingzeit 3, nutzt 1 ab) und angekündigter Säureschwall (Kreis mit Radius 1 auf das Feld beim Beginn, 3 Schritte, durch Schaden unterbrechbar, 30 %, nutzt 2 ab); trägt ein Bier und trinkt es unter 80 % LP mit 50 % Chance (Handlung `nutzen`, siehe [Wesen.md](Wesen.md), KI)
++ Fallen: Säuredüse (Tarnung 40, 2W4 Säure, nutzt 2 ab, hinterlässt Säure, die 1W3 je Tick verätzt und trocknet) und Klappergeschirr (Tarnung 20, Lärm 14, weckt die Nachbarschaft)
++ Feldschichten: Gärbottiche geben CO2 ab, das sich hinter geschlossenen Türen sammelt (ab 30 benommen, ab 70 Ersticken, vorläufig Giftschaden statt Zuständen); Brandflaschen zerspringen beim Wurf zu Hochprozentigem und entzünden es; Feuer 1W6, Rauch ab 40 undurchsichtig, ab 60 Husten
++ Getränke: Bier (+20 LP, Pegel +0,5 ‰, 900 g, stapelbar) wird zur leeren Flasche (400 g) und verdirbt nach 50000 Zeiteinheiten zu Sauerbier (LP +5, Pegel +0,3 ‰); Bierfass mit 20 Schlucken zu einer Halben (2 kg Holz und 500 g je Schluck, voll 12 kg), wird zum Fass und verdirbt nicht; Bier und Bierfass dienen dem Zweck `heilen`; Brandflasche (900 g, stapelbar) dem Zweck `angriff`
++ Ausrüstung von 20 g bis 6 kg: Schöpfkelle (Hand, flink), Fasshammer (beide Hände, langsam, Ausweichen -5), Lederschürze (Brust, Rüstung 2, Ausweichen -5), Kupferhelm (Kopf), Lederhose (Beine), Hopfenkette (Hals, LP-Regeneration +20 %), Kupferring (Finger); Kupferhelm und Kupferringe bilden ein Set (Willenskraft); Lederschürze und Lederhose (Haltbarkeit 20, werden zu Lederfetzen) und Kupferhelm (30, wird zu Kupferschrott) nutzen sich unter Säure ab
++ Unbekanntes: noch kein unbekannter Gegenstand; die Gruppe `biere` (Tonkrug, Steinkrug, Bügelflasche, Henkelflasche, Bocksbeutel) wartet auf die Biersorten
++ Skills: Zähigkeit (Grund und Expertin, LP), Nahkampf (Genauigkeit mit Tag `nahkampf`), Ausweichen
++ Arenen (`datenproben/arenen.js`): Essigbakterien (drei, mit Varianten Ninkasi nackt, gerüstet, geübt und Gegner drei oder fünf), Fernkämpfer in zwei Wellen (mit zwei Bier), Rudel im Engpass (sechs Essigbakterien vor dem Gang), Reihe aus dem Keller (sechs Rudel aus Tiefe 1, mit Bier und Brandflaschen, Taktik `fernkampf`), alle Gegner des Kellers; Befund siehe Messwerte
++ Auslöser sind im System vorhanden, im Probeinhalt aber nicht benutzt
 
 ## Verweise
 
 + Gesamte Arbeitsliste: [Systemausbau.md](Systemausbau.md); Lizenzen neuer Bibliotheken und Inhalte: `LIZENZEN.md`
 
-Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).
+Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

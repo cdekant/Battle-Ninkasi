@@ -2,22 +2,11 @@
 
 Stand: 2026-11-23
 
-Mitprüfen bei Änderungen: [Grundlagen.md](Grundlagen.md), [Architektur.md](Architektur.md), [Systemausbau.md](Systemausbau.md), [Wesen.md](Wesen.md), [Welt.md](Welt.md), [Charakter.md](Charakter.md)
+Mitprüfen bei Änderungen: [Dokumentation.md](Dokumentation.md), [Grundlagen.md](Grundlagen.md), [Architektur.md](Architektur.md), [Systemausbau.md](Systemausbau.md), [Wesen.md](Wesen.md), [Welt.md](Welt.md), [Charakter.md](Charakter.md)
 
 Ideen für Mechaniken, über die noch nicht entschieden ist, mit dem, was sie dem Kern abverlangen. Zweck: früh erkennen, wo heutiger Code einer Idee den Weg verbaut, und dort rechtzeitig vorbauen, statt später schwer umzubauen.
 
-Abgrenzung: [Systemausbau.md](Systemausbau.md) ist die Arbeitsliste beschlossener Arbeit, [Grundlagen.md](Grundlagen.md), Offen sammelt Fragen des Spieldesigns (Raten, Schwellen, Inhalte). Hier stehen Ideen samt ihren Folgen für die Struktur. Wird eine Idee beschlossen oder verworfen, wandert ihr Spieldesign in das Design-Dokument und ihre Arbeit als Punkt in die Arbeitsliste; hier wird sie gestrichen. Wie es zu einer Entscheidung kam, steht in der Git-Historie.
-
-## Form eines Eintrags
-
-+ Wichtigkeit: Einschätzung der Nutzerin bzw. des Nutzers mit Datum (hoch, mittel, gering, ungeklärt)
-+ Vorbilder: wie andere Spiele, auch Pen-and-Paper-Systeme, es lösen; Quellen unter Recherche
-+ Braucht: neue Strukturen (Register, Haken, Felder im Zustand, Befehlsarten, Fensterarten)
-+ Berührt: vorhandene Systeme und Annahmen
-+ Umbaurisiko: hoch (Annahme, die viele Dateien teilen), mittel (ein System muss umgebaut werden), gering (passt in Register und Daten)
-+ Vorkehrung: was heute schon frei zu halten oder anzulegen ist, damit das Risiko nicht wächst
-
-Umsetzung: keine
+Abgrenzung: [Systemausbau.md](Systemausbau.md) ist die Arbeitsliste beschlossener Arbeit, [Grundlagen.md](Grundlagen.md), Offen sammelt Fragen des Spieldesigns (Raten, Schwellen, Inhalte). Hier stehen Ideen samt ihren Folgen für die Struktur. Wird eine Idee beschlossen oder verworfen, wandert ihr Spieldesign in das Design-Dokument und ihre Arbeit als Punkt in die Arbeitsliste; hier wird sie gestrichen. Wie es zu einer Entscheidung kam, steht in der Git-Historie. Die Form eines Eintrags regelt [Dokumentation.md](Dokumentation.md), Arten der Dokumente.
 
 ## Übersicht
 

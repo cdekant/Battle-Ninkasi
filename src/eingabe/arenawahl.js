@@ -1,6 +1,6 @@
 // Wahl der Arena vom Titel aus (siehe docs/Titelbildschirm.md, Arena): Fensterart "arenawahl",
 // reine Tastenlogik ohne DOM.
-//   Zustand { gewaehlt, automatisch, taktik }: die Arenen aus daten/arenen.js in ihrer Reihenfolge; Buchstabe oder
+//   Zustand { gewaehlt, automatisch, taktik }: die Arenen aus datenproben/arenen.js in ihrer Reihenfolge; Buchstabe oder
 //   Pfeile und Enter starten die Arena (ein freier Platz, sonst die Läufe zum Ersetzen wie beim neuen Spiel);
 //   Leertaste schaltet zwischen von Hand und automatisch, Tab wechselt die Taktik (null: die der Arena); Esc schließt.
 //   Ein Klick auf eine Zeile wählt sie, der zweite startet.

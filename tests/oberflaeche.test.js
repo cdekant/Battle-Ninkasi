@@ -4,8 +4,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import "../src/kern/spiel.js";
-import rohdaten from "../daten/index.js";
-import texteDe from "../sprache/de/texte.js";
+import { rohdaten, texteDe } from "../src/inhalt.js";
 import grammatikDe from "../sprache/de/grammatik.js";
 import belegung from "../src/eingabe/belegung.js";
 import vorgaben from "../src/eingabe/einstellungen.js";

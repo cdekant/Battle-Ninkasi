@@ -2,7 +2,7 @@
 
 Stand: 2026-11-23
 
-Zuständig für: `src/systeme/inventar.js`, `src/systeme/ausruestung.js`, `src/systeme/verschleiss.js`, `src/systeme/kennen.js`, `daten/ausruestung.js`, `daten/getraenke.js`, `daten/wurfgegenstaende.js`, `daten/etiketten.js`
+Zuständig für: `src/systeme/inventar.js`, `src/systeme/ausruestung.js`, `src/systeme/verschleiss.js`, `src/systeme/kennen.js`
 
 Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Bedienung.md](Bedienung.md), [Grundlagen.md](Grundlagen.md), [Wesen.md](Wesen.md)
 
@@ -21,7 +21,7 @@ Daten:
 + Ausstattung in den Daten eines Wesens: `ausstattung: [{ typ, anzahl? }]` (Vorgabe `anzahl` 1), keine Komponente; beim Erzeugen aus Daten liegt sie im Gepäck
 + Zweck für die KI: `zweck: [name]` an `trinkbar` (und an `wurf`, siehe [Wesen.md](Wesen.md), KI)
 + Regelwert `regeln.tragen.stufen`: ab 100 % der Tragkraft kostet Bewegen 25 % mehr, ab 150 % 100 % mehr
-+ Getränke in `daten/getraenke.js`, Wurfgegenstände in `daten/wurfgegenstaende.js`
++ Getränke in `datenproben/getraenke.js`, Wurfgegenstände in `datenproben/wurfgegenstaende.js`
 
 Schnittstellen (`src/systeme/inventar.js`):
 
@@ -39,7 +39,6 @@ Regeln:
 + Gewicht mit Ladungen zuzüglich `gewichtJe` je Ladung; die Last ist die Summe über das Gepäck, Angelegtes eingeschlossen
 + Tragkraft mit Modifikatoren auf `tragkraft` (Skills folgen); verboten ist nichts, Überladung verteuert nur das Bewegen, nach allen Modifikatoren
 + Anzeige: das Inventarfenster zeigt Stapel (x 3), Ladungen (19/20), Angelegtes und die Last (Last 3,2 / 20 kg, rot "überladen"), die Seitenleiste nur die Last
-+ Im Spielinhalt (Zahlen vorläufig): Bier 900 g, stapelbar, wird zur leeren Flasche (400 g, stapelbar) und verdirbt zu Sauerbier; Bierfass mit 20 Schlucken zu einer Halben, 2 kg Holz und 500 g je Schluck, voll 12 kg, wird zum Fass; Brandflasche 900 g, stapelbar; Bier und Bierfass dienen dem Zweck `heilen`, die Brandflasche `angriff`; der Fernkämpfer-Test trägt ein Bier; Ausrüstung von 20 g (Kupferring) bis 6 kg (Fasshammer)
 
 ## Ausrüstung
 
@@ -48,7 +47,7 @@ Vorbilder: Brogue (wenige Plätze), DCSS (Tauschen in einem Befehl), NetHack (Fl
 Daten:
 
 + Plätze am Wesen: `plaetze: { hand: 2, kopf: 1, brust: 1, beine: 1, hals: 1, finger: 2 }` (Ninkasi); die Namen stehen in `regeln.ausruestung.plaetze`
-+ Gegenstand (`daten/ausruestung.js`): `ausruestung: { platz, belegt?, angriffe?, modifikatoren?, ausloeser?, anforderung?, abzugJePunkt? }` und `tags`; `belegt` (Vorgabe 1) zählt die Stellen, ein Zweihänder belegt beide Hände; Anforderungen siehe [Wesen.md](Wesen.md), Skills und Lernen
++ Gegenstand (`datenproben/ausruestung.js`): `ausruestung: { platz, belegt?, angriffe?, modifikatoren?, ausloeser?, anforderung?, abzugJePunkt? }` und `tags`; `belegt` (Vorgabe 1) zählt die Stellen, ein Zweihänder belegt beide Hände; Anforderungen siehe [Wesen.md](Wesen.md), Skills und Lernen
 + `verflucht: true` am Gegenstand, `fluchBekannt` nach dem Anlegen
 + Angelegt ist, was in `ausgeruestet: [IDs]` am Wesen steht; der Gegenstand bleibt im Inventar
 
@@ -69,7 +68,6 @@ Regeln:
 + Auslöser an der Ausrüstung gelten für die Trägerin, nach ihren eigenen und denen ihrer Zustände
 + Fluch: angelegt lässt sich ein verfluchter Gegenstand weder ablegen noch fallen lassen, werfen oder beim Anlegen eines anderen wegtauschen; bekannt wird der Fluch erst beim Anlegen (im Gepäck dann "verflucht"); beim Tod fällt er mit allem anderen; `fluch_aufheben` nimmt die Flüche aller angelegten Gegenstände des Ziels, einen Gegenstand dafür gibt es noch nicht
 + Angefressene Ausrüstung wirkt schwächer: die Vorteile ihrer Modifikatoren (`plus` und `prozent` über 0, `mal` über 100) sinken im Verhältnis der Haltbarkeit (`haltbarkeitProzent`, skaliert wie bei den Zuständen), Nachteile bleiben voll; eine zerfressene Platte schützt kaum noch und bleibt doch schwer
-+ Im Spielinhalt (Zahlen vorläufig): Schöpfkelle (Hand, flink), Fasshammer (beide Hände, langsam, Ausweichen -5), Lederschürze (Brust, Rüstung 2, Ausweichen -5), Kupferhelm (Kopf), Lederhose (Beine), Hopfenkette (Hals, LP-Regeneration +20 %), zwei Kupferringe (Finger); Kupferhelm und Kupferringe bilden ein Set (Willenskraft); Lederschürze und Lederhose (Haltbarkeit 20, werden zu Lederfetzen) und Kupferhelm (30, wird zu Kupferschrott) nutzen sich unter Säure ab
 
 ## Verschleiß
 
@@ -95,7 +93,6 @@ Regeln:
 + Eine Waffe mit Haltbarkeit geht kaputt wie jede Ausrüstung, angefressen wird sie aber noch nicht schwächer, weil das Ausdünnen nur Modifikatoren trifft, nicht die Angriffsprofile (offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 8)
 + Bei 0 ist der Gegenstand kaputt: er wird zu `wirdZu`, abgelegt und ins Gepäck der Trägerin; er verschwindet also nie ganz
 + Anzeige im Gepäck: unter 75 % "angefressen", unter 50 % "stark angefressen", unter 25 % "zerfressen", jeweils mit dem Prozentwert
-+ Im Spielinhalt (Zahlen vorläufig): Bier verdirbt nach 50000 Zeiteinheiten (500 Weltticks) zu Sauerbier (LP +5, Pegel +0,3 ‰ statt +20 und +0,5 ‰); das Bierfass verdirbt nicht; Biss der Essigbakterien und Säurespritzer nutzen 1 ab, Säureschwall und Säuredüse 2
 
 ## Unbekanntes
 
@@ -103,7 +100,7 @@ Vorbild Brogue: je Lauf zufällig zugeordnete Etiketten, erkannt wird immer die 
 
 Daten:
 
-+ Am Typ: `unbekannt: { gruppe, schwierigkeit }`; Etiketten je Gruppe in `daten/etiketten.js` (Textschlüssel mit Hauptwort, je Gruppe mindestens so viele wie Typen)
++ Am Typ: `unbekannt: { gruppe, schwierigkeit }`; Etiketten je Gruppe in `datenproben/etiketten.js` (Textschlüssel mit Hauptwort, je Gruppe mindestens so viele wie Typen)
 + Wissen im Zustand: `wissen: { etiketten: { typ: etikett }, erkannt: [typ], vertrautheit: { typ: Zahl } }`; am Gegenstand eines noch nicht erkannten Typs `etikett`
 + `kennerschaft` ist ein Kampfwert (Vorgabe 0, Modifikatoren mit gleichnamigem Ziel, siehe [Wesen.md](Wesen.md), Kampfwerte)
 
@@ -121,7 +118,6 @@ Regeln:
 + Aufheben: ein Wurf `kennerschaft / (kennerschaft + schwierigkeit)`, ohne Kennerschaft keiner
 + Später hebt ein Skill mit Sinnlichkeit und Braukunde die Kennerschaft ([Charakter.md](Charakter.md))
 + Fluch und Art sind getrennt: der Fluch zeigt sich beim Anlegen, die Art erst durch Vertrautheit
-+ Im Spielinhalt noch ohne unbekannte Gegenstände; die Gruppe `biere` (Tonkrug, Steinkrug, Bügelflasche, Henkelflasche, Bocksbeutel) wartet auf die Biersorten
 
 ## Tests
 
@@ -132,4 +128,4 @@ Regeln:
 + Spieldesign der Getränke, Biersorten und des Brauens: [Grundlagen.md](Grundlagen.md); Inventarfenster: [Bedienung.md](Bedienung.md), Fenster
 + Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 8 (angefressene Waffen), Punkt 12 (Teilmenge fallen lassen, Restzeit des Verderbens), Punkt 14 (Flüche und Unbekanntes im Inhalt, Reparieren, Verderben weiterer Dinge)
 
-Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).
+Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

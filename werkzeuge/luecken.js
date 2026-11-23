@@ -4,8 +4,10 @@
 //
 // Eine Lücke: { gruppe, stufe, ort, meldung }
 //   gruppe: "daten" (Fehler der Datenprüfung), "tiles", "verweise", "texte", "korpus"
-//   stufe:  "fehler" (das Spiel startet so nicht oder zeigt falsch) oder "warnung" (vorläufig erlaubt, siehe
-//           docs/Systemausbau.md, Punkt 15: Testinhalte dürfen unvollständig sein)
+//   stufe:  "fehler" (das Spiel startet so nicht oder zeigt falsch, oder echter Inhalt ist unvollständig) oder
+//           "warnung" (erlaubt: Probeinhalt darf unvollständig sein, siehe docs/Entwicklung.md, Probeinhalt)
+// Tiles, Verweise und Texte sind Fehler für echten Inhalt, sobald die Quellen sagen, was Probeinhalt ist
+// (probenamen, probentexte); ohne diese Angabe gilt alles als Probe (Tests mit eigenen Daten).
 
 import "../src/kern/spiel.js"; // meldet Bausteine, Systeme und KI-Module an, die die Datenprüfung kennen muss
 import { vorbereiten } from "../src/kern/daten.js";
@@ -29,10 +31,21 @@ export const VERWEISBEREICHE = {
 // Einträge, die der Code selbst verwendet und die deshalb in den Daten niemand nennen muss
 export const VOM_CODE_VERWENDET = { wesen: ["ninkasi"] };
 
-// quellen: { rohdaten, sprache: { texte, nomenPruefen? }, tileset?, korpus?: [{ name, kopf }], literatur?: [{ id }] }
+// Tiles des Grundgerüsts, die noch gezeichnet werden (docs/Systemausbau.md, Punkt 11); bis dahin nur eine Warnung
+export const TILES_AUSSTEHEND = ["gelaende.tuer_zu", "gelaende.tuer_offen", "gelaende.treppe_ab", "gelaende.treppe_auf", "schichten.feuer"];
+
+// Sammlung der Namen in probenamen (src/inhalt.js) je Bereich der Tiles und Verweise
+const PROBENSAMMLUNG = { oberflaechen: "schichten.oberflaechen", gase: "schichten.gase" };
+
+// quellen: { rohdaten, sprache: { texte, nomenPruefen? }, tileset?, korpus?: [{ name, kopf }], literatur?: [{ id }],
+//            probenamen?: { <sammlung>: [name] }, probentexte?: [schluessel] }
 export function lueckenFinden(quellen) {
   const luecken = [];
   const melden = (gruppe, stufe, ort, meldung) => luecken.push({ gruppe, stufe, ort, meldung });
+  const streng = Boolean(quellen.probenamen);
+  // Stufe einer Lücke an einem Eintrag: Probe oder ausstehend heißt Warnung, echter Inhalt Fehler
+  const stufeAm = (sammlung, name, ausstehend = false) =>
+    !streng || ausstehend || (quellen.probenamen[sammlung] ?? []).includes(name) ? "warnung" : "fehler";
 
   const { fehler } = vorbereiten(quellen.rohdaten, quellen.sprache);
   for (const meldung of fehler) {
@@ -40,22 +53,26 @@ export function lueckenFinden(quellen) {
     melden("daten", "fehler", rest.length ? ort : "daten", rest.length ? rest.join(": ") : meldung);
   }
 
-  if (quellen.tileset) tileLuecken(quellen.rohdaten, quellen.tileset, melden);
-  verweisLuecken(quellen.rohdaten, melden);
-  if (quellen.sprache?.texte) textLuecken(quellen.rohdaten, quellen.sprache.texte, melden);
+  if (quellen.tileset) tileLuecken(quellen.rohdaten, quellen.tileset, melden, stufeAm);
+  verweisLuecken(quellen.rohdaten, melden, stufeAm);
+  if (quellen.sprache?.texte) {
+    const probentexte = new Set(quellen.probentexte ?? []);
+    textLuecken(quellen.rohdaten, quellen.sprache.texte, melden, (schluessel) => (!streng || probentexte.has(schluessel) ? "warnung" : "fehler"));
+  }
   if (quellen.korpus) korpusLuecken(quellen.korpus, quellen.literatur ?? [], melden);
   return luecken;
 }
 
 // Tiles fehlen je Satz; ein Eintrag ohne jedes Tile wird einmal gemeldet, nicht viermal
-function tileLuecken(rohdaten, tileset, melden) {
+function tileLuecken(rohdaten, tileset, melden, stufeAm) {
   const satzGroessen = Object.keys(tileset.saetze).map(Number).sort((a, b) => b - a);
   for (const bereich of TILEBEREICHE) {
     for (const [name, eintrag] of Object.entries(rohdaten.zeichen[bereich] ?? {})) {
       if (bereich === "schichten" && !eintrag.zeichen) continue; // Überlagerung ohne eigenes Bild
       const fehlend = satzGroessen.filter((groesse) => !tileset.saetze[groesse][name]);
-      if (fehlend.length === satzGroessen.length) melden("tiles", "warnung", `${bereich}.${name}`, "kein Tile, nur Zeichen");
-      else if (fehlend.length) melden("tiles", "warnung", `${bereich}.${name}`, `Tile fehlt in Satz ${fehlend.join(", ")}`);
+      const stufe = stufeAm(`zeichen.${bereich}`, name, TILES_AUSSTEHEND.includes(`${bereich}.${name}`));
+      if (fehlend.length === satzGroessen.length) melden("tiles", stufe, `${bereich}.${name}`, "kein Tile, nur Zeichen");
+      else if (fehlend.length) melden("tiles", stufe, `${bereich}.${name}`, `Tile fehlt in Satz ${fehlend.join(", ")}`);
     }
   }
   for (const [groesse, satz] of Object.entries(tileset.saetze)) {
@@ -86,25 +103,25 @@ const gleich = (pfad, anderer) => pfad.length === anderer.length && beginntMit(p
 
 // Ein Eintrag ohne Verweis aus den übrigen Daten kommt im Spiel nie vor; sein eigener Eintrag, die Namen seiner
 // Sammlung und die Zeichen zählen nicht
-function verweisLuecken(rohdaten, melden) {
+function verweisLuecken(rohdaten, melden, stufeAm) {
   for (const [bereich, sammlungspfad] of Object.entries(VERWEISBEREICHE)) {
     const sammlung = sammlungspfad.reduce((teil, schluessel) => teil?.[schluessel], rohdaten) ?? {};
     for (const [name, eintrag] of Object.entries(sammlung)) {
       if (eintrag?.abstrakt || VOM_CODE_VERWENDET[bereich]?.includes(name)) continue;
       const eigener = [...sammlungspfad, name];
       const genannt = texteSammeln(rohdaten, [], (pfad) => pfad[0] === "zeichen" || gleich(pfad, eigener), (pfad) => !gleich(pfad, sammlungspfad), new Set());
-      if (!genannt.has(name)) melden("verweise", "warnung", `${bereich}.${name}`, "nirgends verwendet");
+      if (!genannt.has(name)) melden("verweise", stufeAm(PROBENSAMMLUNG[bereich] ?? bereich, name), `${bereich}.${name}`, "nirgends verwendet");
     }
   }
 }
 
 // Textschlüssel mit dem Vorsatz eines Datenbereichs (wesen., gegenstand. usw.), die kein Eintrag nennt
-function textLuecken(rohdaten, texte, melden) {
+function textLuecken(rohdaten, texte, melden, stufeFuer) {
   const genannt = texteSammeln(rohdaten, [], () => false, () => true, new Set());
   const vorsaetze = new Set([...genannt].filter((text) => text in texte && text.includes(".")).map((text) => text.split(".")[0]));
   for (const schluessel of Object.keys(texte)) {
     const vorsatz = schluessel.split(".")[0];
-    if (vorsaetze.has(vorsatz) && !genannt.has(schluessel)) melden("texte", "warnung", schluessel, "Text ohne Eintrag in den Daten");
+    if (vorsaetze.has(vorsatz) && !genannt.has(schluessel)) melden("texte", stufeFuer(schluessel), schluessel, "Text ohne Eintrag in den Daten");
   }
 }
 

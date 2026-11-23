@@ -7,8 +7,7 @@
 // Brandherde: so viele Kreise aus Hochprozentigem (Radius 2) auf zufälligen Bodenfeldern, zu Beginn entzündet,
 // für einen Fall mit Feuer und Rauch (Feldschichten, src/systeme/schichten.js).
 
-import rohdaten from "../daten/index.js";
-import texte from "../sprache/de/texte.js";
+import { rohdaten, texteDe as texte } from "../src/inhalt.js";
 import { datenLaden, neuesSpiel, befehlGeben } from "../src/kern/spiel.js";
 import { zufallErzeugen, zufallsGanzzahl } from "../src/kern/zufall.js";
 import { alleEntitaeten, istWesen, spielerin } from "../src/kern/zustand.js";

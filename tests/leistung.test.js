@@ -2,8 +2,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import "../src/kern/spiel.js"; // meldet Bausteine, Systeme und Verhaltensmodule an
-import rohdaten from "../daten/index.js";
-import texte from "../sprache/de/texte.js";
+import { rohdaten, texteDe as texte } from "../src/inhalt.js";
 import { miniSpiel, wesen, spielerinSetzen, gegenstandTragen, meldungenMitschneiden, allesSichtbar } from "./hilfen.js";
 import { datenLaden, neuesSpiel, befehlGeben, spielstand, nachspielen } from "../src/kern/spiel.js";
 import { effektAnwenden, wertAendern } from "../src/kern/effekte.js";

@@ -2,7 +2,7 @@
 // Eigenschaften (daten/eigenschaften.js): Grundwerte an Ninkasi als eigenschaften: { koerperlichkeit: 14, ... };
 //   vorübergehende Änderungen sind Modifikatoren auf eigenschaft.<name>. Das Lerntempo rechnet mit dem Grundwert,
 //   Anforderungen und Bedingungen mit dem wirksamen Wert (eigenschaftWirksam).
-// Skills (daten/skills.js):
+// Skills (datenproben/skills.js):
 //   name: { text, set, tier, rang?, primaer, sekundaer, voraussetzungen?, freischaltung?, jeStufe?, abStufe?, lernt?, verwandt? }
 //   tier:            1 Grund, 2 Experte, 3 Meister, 4 göttlich; rang ohne Angabe aus regeln.lernen.raengeNachTier
 //   voraussetzungen: [{ skill, stufe }] zusätzlich zu denen der Tiers (regeln.lernen.tierVoraussetzungen im selben Set)

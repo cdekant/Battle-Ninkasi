@@ -6,7 +6,7 @@ Roguelike um Ninkasi, die sumerische Göttin des Biers, im Browser ohne Engine u
 
 + Niemals Code schreiben, immer Freigabe abwarten.
 + CLAUDE.md unter 12000 Zeichen Länge halten, Ziel 10500; wird sie länger: Dokumentation auslagern und darauf verweisen.
-+ Keine Änderung ist vollständig, bevor die Dokumentation nach den Pflichten unter "Dokumentation" geprüft und nachgeführt ist.
++ Keine Änderung ist vollständig, bevor die Dokumentation nach [docs/Dokumentation.md](docs/Dokumentation.md) geprüft und nachgeführt ist.
 + Code grundsätzlich einfach halten aber immer prüfen, ob Wartbarkeit, Modularität und Erweiterbarkeit gegeben ist.
 + Kommunikation im Chat auf Deutsch.
 + Namen von Funktionen, Variablen, Parametern und Datenfeldern sind ausdrücklich und menschenlesbar statt knapp: deutsch, camelCase, der Name sagt, was drinsteht (z. B. `reichweiteSicht` statt `weite`, `entitaet` statt `e`, `spielerin` statt `p`). Ausnahmen nur für Koordinaten (`x`, `y`, `dx`, `dy`), reine Schleifenzähler (`i`) und nachgebaute Fremdverfahren, die die Namen ihrer Referenz behalten (z. B. sfc32 in `src/kern/zufall.js`).
@@ -35,7 +35,8 @@ Taste → `eingabe/eingabe.js` (Belegung → Aktion aus dem Aktionskatalog) → 
 + `src/welt/`: Plan des Laufs, Erzeugung der Ebenen in Schritten, Population, Karte, Feldschichten, Wegfindung, Geometrie
 + `src/eingabe/`: Aktionskatalog, Belegung, Fensterstapel und Fensterarten, Maus, Abläufe (Reise, Laufen, Rasten, Erkunden), Zielmodus, Einstellungen, Speicherstand; reine Tastenlogik ohne DOM
 + `src/anzeige/`: Renderer, Tilebilder, Kamera, Seitenleiste, Log, Fensterinhalte, Titel, Texte und Grammatik, `stil.css`
-+ `daten/`: Inhalte als JS-Daten, gesammelt in `daten/index.js`; Regelwerte für das Balancing in `daten/regeln.js`
++ `daten/`: Grundgerüst und echter Inhalt als JS-Daten, gesammelt in `daten/index.js`; Regelwerte für das Balancing in `daten/regeln.js`
++ `datenproben/`: Probeinhalt zum Ausprobieren der Systeme, bis echter Inhalt entsteht; was geladen wird, entscheidet `src/inhalt.js`
 + `sprache/`: Texte, Grammatik und Korpus je Sprache; `grafik/`: Palette und Tiles als Pixeldaten; `lib/`: rot.js mit Lizenz
 + `tests/`: Unittests, `tests/hilfen.js` baut kleine Testspiele; `werkzeuge/`: Bot, Messung, Arena-Simulation, Kompendium mit Lücken, Ableiten der Tiles
 + `Artwork/`: Konzeptbilder (siehe unten)
@@ -63,6 +64,7 @@ Spieldesign:
 
 Technik:
 
++ [docs/Dokumentation.md](docs/Dokumentation.md): Regeln der Doku (Kaskade, Arten der Dokumente, wohin eine Aussage gehört, Lebenslauf, Form, Pflichten, Prüfung)
 + [docs/Architektur.md](docs/Architektur.md): Kern (Grundsätze, Datenfluss, Befehle, Entitäten, Zeit, Ereignisse, Register, Daten, Wiederholbarkeit, Spielarten, Speichern, Versionen, Leistung)
 + [docs/Wirkungen.md](docs/Wirkungen.md): Wirkungsarten, Effekte, Modifikatoren, Auslöser, Zustände, Zielauswahl, Fähigkeiten, lange Aktionen, Tod
 + [docs/Wesen.md](docs/Wesen.md): Kampfwerte, Fraktionen, Wahrnehmung, KI, Bewegung, Stoffwechsel, Skills und Lernen
@@ -70,21 +72,20 @@ Technik:
 + [docs/Gegenstaende.md](docs/Gegenstaende.md): Inventar, Ausrüstung, Verschleiß, Unbekanntes
 + [docs/Anzeige.md](docs/Anzeige.md): Renderer, Seitenleiste, Kamera, Log
 + [docs/Bedienung.md](docs/Bedienung.md): Eingabe, Maus und Abläufe, Fenster, Schnellleiste, Zielmodus, Untersuchen, Einstellungen
-+ [docs/Entwicklung.md](docs/Entwicklung.md): Starten, Tests, Bot, Werkzeuge, Ablauf einer Version, Stolpersteine, Stand des Spielinhalts
++ [docs/Entwicklung.md](docs/Entwicklung.md): Starten, Tests, Bot, Werkzeuge, Messwerte, Ablauf einer Version, Stolpersteine, Grundgerüst und Probeinhalt
 
 Arbeitsliste: [docs/Systemausbau.md](docs/Systemausbau.md), fehlende Strukturen und bekannte Fehler; umgesetzte Punkte wandern in das zuständige Dokument. Konkreter Inhalt erst nach Punkt 11, bis dahin nur Probeinhalt.
 
 ## Dokumentation
 
-Kaskade: CLAUDE.md gibt Prinzipien, Ordner und Wegweiser; jedes Dokument in `docs/` beschreibt sein Thema im Einzelnen. Jedes Dokument nennt im Kopf "Mitprüfen bei Änderungen" (Nachbardokumente, gegenseitig); technische Dokumente zusätzlich "Zuständig für" (Dateien und Ordner, die sie beschreiben).
+Die Regeln im Einzelnen stehen in [docs/Dokumentation.md](docs/Dokumentation.md); hier die Grundsätze:
 
-+ Jede Datei in `src/`, `daten/`, `sprache/`, `grafik/`, `lib/`, `werkzeuge/`, `tests/` und jedes Startskript hat genau ein zuständiges Dokument; neue Dateien bekommen es sofort, neue Dokumente einen Eintrag hier.
-+ Wer eine Datei ändert, führt ihr zuständiges Dokument nach und prüft die Dokumente aus dessen "Mitprüfen"; ändern sich Prinzipien, Ordner oder Begriffe, auch CLAUDE.md.
-+ Dokumente beschreiben den heutigen Stand; überholte Entscheidungen und Rückblicke gehören in die Git-Historie, nicht in die Dokumente.
-+ Jede Aussage steht an genau einer Stelle; andere verweisen darauf, in Markdown als Link auf das Dokument mit dem Abschnitt dahinter, im Code als `siehe docs/<Dokument>.md, <Abschnitt>`.
-+ Design-Dokumente (ohne "Zuständig für") sagen was und warum, technische wie (Daten, Schnittstellen, Regeln); Zahlen und Formeln stehen nur im technischen Dokument oder in `daten/regeln.js`. Jeder Design-Abschnitt endet mit "Umsetzung: siehe …", "teilweise, siehe …; offen: …", "offen" oder "keine"; dort Genanntes steht unter "Mitprüfen".
++ Kaskade von allgemein nach speziell: CLAUDE.md, Dokumentation.md, Grundlagen.md, Design-Dokumente, technische Dokumente, Kommentare im Code; Spezielles verweist hinauf und widerspricht nie.
++ Design-Dokumente sagen was und warum, ohne Zahlen; technische sagen wie (Daten, Schnittstellen, Regeln, Zahlen); jede Aussage steht an genau einer Stelle.
++ Dokumente beschreiben den heutigen Stand; überholte Entscheidungen und Rückblicke gehören in die Git-Historie.
++ Jede Datei hat genau ein zuständiges Dokument; wer eine Datei ändert, führt es nach und prüft sein "Mitprüfen".
 + Widersprechen sich Doku und Code, wird das gemeldet und nicht still einseitig angepasst.
-+ Vor jedem Commit: Verweise, Zuordnung, Köpfe, Umsetzungszeilen und Limit stimmen (geprüft von `tests/doku.test.js` bei `node --test`); Tests und Bot laufen fehlerfrei. Doppeltes und inhaltliche Widersprüche findet kein Test, das bleibt Handarbeit.
++ Vor jedem Commit laufen `node --test` (prüft auch die Doku) und `node werkzeuge/bot.js` fehlerfrei; Doppeltes und Widersprüche findet kein Test, das bleibt Handarbeit.
 
 ## Repository und Umgebung
 

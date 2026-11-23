@@ -78,8 +78,7 @@
 </main>
 
 <script type="module">
-  import rohdaten from "../daten/index.js";
-  import texte from "../sprache/de/texte.js";
+  import { rohdaten, texteDe as texte, probenamen, probentexte } from "../src/inhalt.js";
   import grammatik from "../sprache/de/grammatik.js";
   import korpusliste from "../sprache/de/korpus/index.js";
   import tileset from "../grafik/tileset.js";
@@ -98,7 +97,7 @@
   const korpus = await Promise.all(korpusliste.map(async (datei) => korpustextZerlegen(datei, await (await fetch(`../sprache/de/korpus/${datei}`)).text())));
   const literatur = await (await fetch("../sprache/literatur.json")).json();
   const { daten, fehler } = vorbereiten(rohdaten, sprache);
-  const luecken = lueckenFinden({ rohdaten, sprache, tileset, korpus, literatur });
+  const luecken = lueckenFinden({ rohdaten, sprache, tileset, korpus, literatur, probenamen, probentexte });
   if (fehler.length) {
     const anzeige = document.getElementById("fehler");
     anzeige.textContent = `Die Datenprüfung meldet ${fehler.length} Fehler, siehe Reiter Lücken.`;
@@ -180,6 +179,9 @@
 
   const listenwert = (wert) => (Array.isArray(wert) ? wert.join(" ") : wert);
 
+  // Herkunft eines Eintrags: Probeinhalt (datenproben/) oder echter Inhalt (daten/)
+  const herkunftVon = (art, name) => ((probenamen[art === "oberflaechen" || art === "gase" ? `schichten.${art}` : art] ?? []).includes(name) ? "Probe" : "echt");
+
   function artAnzeigen(art) {
     const briefe = eintragsnamen(daten, art).map((name) => ({ ...steckbrief(daten, art, name), luecken: lueckenVon(art, name) }));
     const felder = [...new Set(briefe.flatMap((brief) => Object.keys(brief.merkmale)))];
@@ -187,6 +189,7 @@
       { titel: "Name", wert: (brief) => brief.name, zelle: (brief) => element("td", { className: "name" },
         brief.name, brief.abstrakt ? element("span", { className: "vorlage", textContent: " Vorlage" }) : null,
         element("span", { className: "anzeigename", textContent: anzeigenameVon(brief) })) },
+      { titel: "Herkunft", wert: (brief) => herkunftVon(art, brief.name), zelle: (brief) => element("td", { textContent: herkunftVon(art, brief.name) }) },
       ...(ARTEN[art].zeichen ? [{ titel: "Bild", wert: (brief) => brief.zeichen?.zeichen ?? "", zelle: (brief) => element("td", {}, bildVon(brief.name, brief.zeichen)) }] : []),
       ...felder.map((feld) => ({ titel: feld, wert: (brief) => listenwert(brief.merkmale[feld]), zelle: (brief) => zelle(brief.merkmale[feld]) })),
       { titel: "Lücken", wert: (brief) => brief.luecken.length, zelle: (brief) => element("td", { className: "luecken-im-eintrag" },

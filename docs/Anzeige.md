@@ -123,4 +123,4 @@ Schnittstellen:
 + Schema der Oberfläche: [Oberflaeche.md](Oberflaeche.md); Effektschicht, Kampfanimation und weiches Scrollen: [Animationen.md](Animationen.md)
 + Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 12 (Oberfläche) und Punkt 13 (Darstellung)
 
-Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).
+Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

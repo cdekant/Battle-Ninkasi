@@ -2,7 +2,7 @@
 
 Stand: 2026-11-23
 
-Zuständig für: `index.html`, `package.json`, `lib/*`, `src/main.js`, `src/version.js`, `src/kern/spiel.js`, `src/kern/zustand.js`, `src/kern/zeit.js`, `src/kern/zufall.js`, `src/kern/wurf.js`, `src/kern/ereignisse.js`, `src/kern/hakenkatalog.js`, `src/kern/register.js`, `src/kern/daten.js`, `src/kern/raumindex.js`, `src/kern/kurven.js`, `src/kern/pruefsumme.js`, `src/systeme/index.js`, `src/systeme/allmacht.js`, `src/systeme/arena.js`, `src/eingabe/speicherstand.js`, `src/eingabe/umbenennen.js`, `daten/index.js`, `daten/arenen.js`, `daten/regeln.js`, `daten/aktionen.js`, `daten/namensbuch.js`, `daten/umbenennungen.js`
+Zuständig für: `index.html`, `package.json`, `lib/*`, `src/main.js`, `src/version.js`, `src/kern/spiel.js`, `src/kern/zustand.js`, `src/kern/zeit.js`, `src/kern/zufall.js`, `src/kern/wurf.js`, `src/kern/ereignisse.js`, `src/kern/hakenkatalog.js`, `src/kern/register.js`, `src/kern/daten.js`, `src/kern/raumindex.js`, `src/kern/kurven.js`, `src/kern/pruefsumme.js`, `src/kern/zusammenfuegen.js`, `src/inhalt.js`, `src/systeme/index.js`, `src/systeme/allmacht.js`, `src/systeme/arena.js`, `src/eingabe/speicherstand.js`, `src/eingabe/umbenennen.js`, `daten/index.js`, `daten/regeln.js`, `daten/aktionen.js`, `daten/namensbuch.js`, `daten/umbenennungen.js`
 
 Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Entwicklung.md](Entwicklung.md), [Titelbildschirm.md](Titelbildschirm.md), [Grundlagen.md](Grundlagen.md), [Texte.md](Texte.md), [Ausblick.md](Ausblick.md), [Welt.md](Welt.md), [Bedienung.md](Bedienung.md)
 
@@ -157,15 +157,17 @@ Regeln:
 
 Daten:
 
-+ Alle Inhalte liegen als JavaScript-Dateien in `daten/` vor, die nur Daten enthalten (`export default { ... }`), mit Kommentaren; `daten/index.js` sammelt sie (neue Datendateien dort eintragen), `daten/regeln.js` hält die Regelwerte, die das Balancing ändern darf, ohne Code anzufassen
++ Alle Inhalte liegen als JavaScript-Dateien vor, die nur Daten enthalten (`export default { ... }`), mit Kommentaren: das Grundgerüst und der echte Inhalt in `daten/` (gesammelt in `daten/index.js`, neue Datendateien dort eintragen), der Probeinhalt in `datenproben/` (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt); `daten/regeln.js` hält die Regelwerte, die das Balancing ändern darf, ohne Code anzufassen
++ Geladen wird über `src/inhalt.js`: `rohdaten` (Grundgerüst plus Probeinhalt), `texte` je Sprache, `texteDe`, `probenamen` und `probentexte` für das Kompendium; Browser, Werkzeuge und Tests laden Inhalte nur hierüber, entsteht echter Inhalt, ändert sich nur diese Datei
 + Dazu gehören Charakter, Eigenschaften, Makel, Skills, Fähigkeiten, Gegner, Verbündete, Händler, Items, Getränke, Zutaten, Rezepte, Kessel, Effekte, Zustände, Levelparameter; Tiles liegen wegen ihrer Lizenz in `grafik/`
 + Vorlagen mit Vererbung für Wesen, Gegenstände und Zustände: Einträge mit `abstrakt: true` sind Vorlagen, `vorlage` erbt von ihnen (z.B. "Bakterium", davon abgeleitet "Essigbakterium" mit Abweichungen)
-+ Namensbuch (`daten/namensbuch.js`): je Art (`wesen`, `gegenstaende`, `eigenschaften`, `skills`, `faehigkeiten`, `zustaende`, `fallen`, ohne Vorlagen) die Listen `fest` und `vorlaeufig`; fest sind bisher `ninkasi` und die sechs Eigenschaften, der übrige Testinhalt ist vorläufig
++ Namensbuch (`daten/namensbuch.js`): je Art (`wesen`, `gegenstaende`, `eigenschaften`, `skills`, `faehigkeiten`, `zustaende`, `fallen`, ohne Vorlagen) die Listen `fest` und `vorlaeufig`, nur für Namen aus `daten/`; fest sind bisher `ninkasi` und die sechs Eigenschaften; vorläufig ist ein Name echten Inhalts, solange er sich noch ändern darf; der Probeinhalt steht nicht darin
 + Umbenennungen (`daten/umbenennungen.js`): `{ <art>: { <alter Name>: <neuer Name> | null } }`, `null` heißt entfernt; Ketten sind erlaubt, Kreise nicht
 + Namensbuch und Umbenennungen gehören nicht zu den Spieldaten (nicht in `daten/index.js`), ändern also die Prüfsumme nicht
 
 Schnittstellen:
 
++ `datenZusammenfuegen(grundstock, zusatz)` (`src/kern/zusammenfuegen.js`, rein und ohne Importe, damit das Laden keine Systeme anmeldet): `zusatz = { eintraege?, ergaenzen?, abfolge?, starttiefe? }`; `eintraege` bringt neue Einträge je Sammlung (`schichten` und `zeichen` eine Ebene tiefer), ein Name, den der Grundstock schon hat, ist ein Fehler; `ergaenzen` setzt Felder an vorhandenen Einträgen (so bekommt Ninkasi die Fähigkeit des Probeinhalts); `abfolge` und `starttiefe` ersetzen die des Grundstocks; jeder Fehler wirft mit allen Meldungen; `namenDesZusatzes(zusatz)` nennt die Namen je Sammlung
 + `datenLaden(rohdaten, sprache)` in `src/kern/spiel.js` → geprüfte Daten oder `Datenfehler` mit allen Meldungen; darunter `vorbereiten` in `src/kern/daten.js` (`{ daten, fehler }`, Vorlagen aufgelöst)
 
 Regeln:
@@ -242,7 +244,7 @@ Regeln:
 Arena (`src/systeme/arena.js`; Vorbild DCSS mit `crawl -arena "3 rat v 2 kobold"`):
 
 + `optionen.spielart: "arena"` mit `optionen.arena`, der Aufstellung: `{ name?, varianten?, karte, taktik?, abstand?, wachzustand?, start?: { x, y }, ninkasi?: { eigenschaften?, skills?: { name: stufe }, ausruestung?: [typ], gepaeck?: [{ typ, anzahl? }], werte?: { name: wert } }, wellen?: [[{ typ, anzahl? }]], population?: { tabelle?, tiefe, wellen?, alle? } }`; geprüft beim Laden der Daten und beim Start (`arenaFehler` in `src/kern/daten.js`), ein Fehler wirft
-+ Benannte Aufstellungen in `daten/arenen.js`, dazu `text` und `varianten: { ninkasi?: { name: Teil von ninkasi }, gegner?: { name: { wellen?, population? } } }`; `aufstellungAus(daten, name, { ninkasi?, gegner? })` macht daraus die Startoption (Ninkasis Variante ergänzt ihren Teil, die der Gegner ersetzt Wellen und Population)
++ Benannte Aufstellungen in `datenproben/arenen.js`, dazu `text` und `varianten: { ninkasi?: { name: Teil von ninkasi }, gegner?: { name: { wellen?, population? } } }`; `aufstellungAus(daten, name, { ninkasi?, gegner? })` macht daraus die Startoption (Ninkasis Variante ergänzt ihren Teil, die der Gegner ersetzt Wellen und Population)
 + Karten in `daten/ebenen.js`: `arena_offen` (offener Raum) und `arena_gang` (Gang vor einem Raum), feste Karten ohne Treppen und ohne Erreichbarkeitsprüfung (`schritte: ["karte_fest", "ebene_anlegen"]`)
 + Regelwerte `regeln.arena`: `abstand` (5, Felder der ersten Welle rechts von Ninkasi), `wachzustand` ("jagt"), `grenzeBefehle` (500, Patt für Werkzeug und Bot)
 + Planschritt `arena`: der Plan hat nur die Tiefe 0 mit der Karte der Aufstellung
@@ -311,12 +313,12 @@ Messwerte: siehe [Entwicklung.md](Entwicklung.md), Messwerte
 
 ## Mods
 
-+ Mods bringen Daten mit und, wenn nötig, eigene Grundbausteine, Verhaltensmodule und Zielmuster als Code, die sich in den Registern anmelden, und ergänzen den Katalog der Haken
++ Mods bringen Daten mit, als Zusatz für `datenZusammenfuegen` wie der Probeinhalt, und, wenn nötig, eigene Grundbausteine, Verhaltensmodule und Zielmuster als Code, die sich in den Registern anmelden, und ergänzen den Katalog der Haken
 + Beispiel: "Ninkasi wird sauer - das Kombucha-Mod"
 
 ## Tests
 
-+ `tests/zeit.test.js` (Warteschlange, Gleichstand, Heap), `tests/zufall.test.js` (sfc32, Würfel, Anteile), `tests/register.test.js` (Ränge, Vorrat), `tests/kurven.test.js`, `tests/daten.test.js` (Datenprüfung), `tests/speichern.test.js` (Schnappschuss, Speicherstand, Plätze), `tests/leistung.test.js` (räumlicher Index), `tests/ausloeser.test.js` und `tests/tod.test.js` (Vorgang), `tests/gesteuert.test.js` (gesteuerte Entität; Dateien für Eingabe, Sicht, Kamera und Zielmodus fragen nicht `spielerin()`), `tests/komponenten.test.js` (Lesefunktionen der Komponenten ohne Zahl mit Überlagerung; Wächter gegen direkte Zugriffe in `src/` mit einer Liste begründeter Ausnahmen), `tests/ablage.test.js` (die Logik in `src/kern/`, `src/systeme/`, `src/ki/` und `src/welt/` nennt weder Chronik noch Browserspeicher), `tests/namensbuch.test.js` (Namensbuch, Umbenennungen, Zähler der Chronik); die Prüfsumme prüft `tests/speichern.test.js`
++ `tests/zeit.test.js` (Warteschlange, Gleichstand, Heap), `tests/zufall.test.js` (sfc32, Würfel, Anteile), `tests/register.test.js` (Ränge, Vorrat), `tests/kurven.test.js`, `tests/daten.test.js` (Datenprüfung), `tests/speichern.test.js` (Schnappschuss, Speicherstand, Plätze), `tests/leistung.test.js` (räumlicher Index), `tests/ausloeser.test.js` und `tests/tod.test.js` (Vorgang), `tests/gesteuert.test.js` (gesteuerte Entität; Dateien für Eingabe, Sicht, Kamera und Zielmodus fragen nicht `spielerin()`), `tests/komponenten.test.js` (Lesefunktionen der Komponenten ohne Zahl mit Überlagerung; Wächter gegen direkte Zugriffe in `src/` mit einer Liste begründeter Ausnahmen), `tests/ablage.test.js` (die Logik in `src/kern/`, `src/systeme/`, `src/ki/` und `src/welt/` nennt weder Chronik noch Browserspeicher), `tests/namensbuch.test.js` (Namensbuch, Umbenennungen, Zähler der Chronik), `tests/inhalt.test.js` (Zusammenführen, Grundgerüst allein, Grundgerüst plus Probeinhalt, Stufen der Lücken); die Prüfsumme prüft `tests/speichern.test.js`
 + Der Bot prüft Wiederholbarkeit (Nachspielen), Index und Heap nach jedem Befehl und das Laden mitten im Lauf (siehe [Entwicklung.md](Entwicklung.md), Bot und Werkzeuge)
 
 ## Verweise
@@ -324,4 +326,4 @@ Messwerte: siehe [Entwicklung.md](Entwicklung.md), Messwerte
 + Spieldesign: [Grundlagen.md](Grundlagen.md); Speicherplätze und Chronik aus Sicht der Spielerin: [Titelbildschirm.md](Titelbildschirm.md)
 + Offen in [Systemausbau.md](Systemausbau.md): reservierter Haken `zug_beginn` (Punkt 8); Schutz der Ablagen und Prüfsumme des Codes (Punkt 11, Ideen in [Ausblick.md](Ausblick.md), Schutz der Ablagen)
 
-Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).
+Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

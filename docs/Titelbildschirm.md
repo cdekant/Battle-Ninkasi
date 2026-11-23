@@ -113,7 +113,7 @@ Damit die Ideen später ohne Umbau dazukommen:
 
 ## Arena
 
-+ Menü: nach Testkammer der Eintrag Arena; er öffnet die Fensterart `arenawahl` (`src/eingabe/arenawahl.js`, Anzeige in `src/anzeige/titel.js`) mit den Arenen aus `daten/arenen.js` (Name, Zahl der Wellen oder die Population), darunter von Hand oder automatisch und bei automatisch die Taktik (Spielart und Aufstellung siehe [Architektur.md](Architektur.md), Spielarten)
++ Menü: nach Testkammer der Eintrag Arena; er öffnet die Fensterart `arenawahl` (`src/eingabe/arenawahl.js`, Anzeige in `src/anzeige/titel.js`) mit den Arenen aus `datenproben/arenen.js` (Name, Zahl der Wellen oder die Population), darunter von Hand oder automatisch und bei automatisch die Taktik (Spielart und Aufstellung siehe [Architektur.md](Architektur.md), Spielarten)
 + Bedienung: Buchstabe oder Pfeile und Enter starten, Leertaste schaltet zwischen von Hand und automatisch, Tab wechselt die Taktik (Vorgabe die der Arena), Esc schließt; Klick wählt, der zweite startet; Knöpfe für Leertaste und Tab
 + Start wie Testkammer: ein Platz, sind alle belegt, `laeufe` zum Ersetzen (Zustand mit `spielart` und `zusatz`); die Aktion ist `{ art: "neuesSpiel", stelle, spielart: "arena", arena, automatisch, taktik }`; die gewählte Taktik geht in die Aufstellung (`taktik`), bleibt also im Spielstand
 + Adresse: `?spielart=arena`, dazu `?arena=<name>` (Vorgabe die erste) und `?auto=1`

@@ -79,7 +79,7 @@ Umsetzung: siehe [Wesen.md](Wesen.md), Skills und Lernen
 + Endosporen: ruhende Bakterien, erwachen später (Wärme, Feuer)
 + Protozoen und Amöben: einzelne Jäger, die andere Mikroorganismen fressen
 
-Umsetzung: teilweise, siehe [Entwicklung.md](Entwicklung.md), Stand des Spielinhalts; siehe [Wesen.md](Wesen.md), KI; offen: Mikroorganismen mit eigener Mechanik, Bosse
+Umsetzung: teilweise, siehe [Entwicklung.md](Entwicklung.md), Probeinhalt; siehe [Wesen.md](Wesen.md), KI; offen: Mikroorganismen mit eigener Mechanik, Bosse
 
 ## Technik
 

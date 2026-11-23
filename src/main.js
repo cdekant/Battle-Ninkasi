@@ -4,9 +4,8 @@
 // Adresse, damit Neuladen wieder zum Titel führt.
 
 import VERSION from "./version.js";
-import rohdaten from "../daten/index.js";
+import { rohdaten, texteDe } from "./inhalt.js";
 import tileset from "../grafik/tileset.js";
-import texteDe from "../sprache/de/texte.js";
 import grammatikDe from "../sprache/de/grammatik.js";
 import belegungsVorgabe from "./eingabe/belegung.js";
 import { abweichungenAnwenden, abweichungenGueltig } from "./eingabe/belegunganpassen.js";
@@ -159,7 +158,7 @@ function platzLoeschen(stelle) {
 try { localStorage.removeItem(SPEICHERSCHLUESSEL_ALTER_LAUF); } catch { /* ohne Speicher weiter */ }
 
 // ?seed= und ?spielart= aus der Adresse lesen und entfernen (auch das frühere &neu); eine unbekannte Spielart zählt nicht;
-// für die Arena dazu ?arena= (Name aus daten/arenen.js, Vorgabe die erste) und ?auto=1 (automatisch kämpfen)
+// für die Arena dazu ?arena= (Name aus datenproben/arenen.js, Vorgabe die erste) und ?auto=1 (automatisch kämpfen)
 function startAusUrl() {
   const parameter = new URLSearchParams(location.search);
   const startwertText = parameter.get("seed"), spielartText = parameter.get("spielart");

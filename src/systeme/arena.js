@@ -4,7 +4,7 @@
 //   Aufstellung: { name?, varianten?, karte, taktik?, abstand?, wachzustand?, start?: { x, y },
 //     ninkasi?: { eigenschaften?, skills?: { name: stufe }, ausruestung?: [typ], gepaeck?: [{ typ, anzahl? }], werte? },
 //     wellen?: [[{ typ, anzahl? }]], population?: { tabelle?, tiefe, wellen?, alle? } }; geprüft in kern/daten.js
-//     (arenaFehler); benannte Aufstellungen in daten/arenen.js, aufstellungAus löst Name und Varianten auf
+//     (arenaFehler); benannte Aufstellungen in datenproben/arenen.js, aufstellungAus löst Name und Varianten auf
 //   Planschritt "arena": der Plan hat nur die Tiefe 0 mit der Karte der Aufstellung, ohne Treppen
 //   Laufbeginn: Ninkasi steht auf start (Vorgabe: das erste begehbare Feld der mittleren Zeile von links), bekommt
 //     Eigenschaften, Skills bis zur Stufe (über die EP, Voraussetzungen gelten), Gepäck, angelegte Ausrüstung und
@@ -37,7 +37,7 @@ export function istArena(spiel) {
   return spiel.optionen?.spielart === "arena";
 }
 
-// Startoption einer benannten Arena aus daten/arenen.js; varianten: { ninkasi?, gegner? } (Namen aus ihren varianten).
+// Startoption einer benannten Arena aus datenproben/arenen.js; varianten: { ninkasi?, gegner? } (Namen aus ihren varianten).
 // Ninkasis Variante ergänzt und ersetzt Felder ihres Teils, die der Gegner ersetzt wellen und population.
 export function aufstellungAus(daten, name, varianten = {}) {
   const arena = daten.arenen?.[name];

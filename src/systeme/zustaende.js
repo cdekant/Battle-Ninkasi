@@ -1,5 +1,5 @@
 // Zustände (siehe docs/Wirkungen.md, Zustände): zeitlich begrenzte Wirkungen an einer Entität.
-// Daten (daten/zustaende.js):
+// Daten (datenproben/zustaende.js):
 //   name: { text, tags?, dauer?, stapel?, hoechstStapel?, verlauf?, modifikatoren?, jeTick?, beimBeginn?, beimEnde?,
 //           ausloeser?, gebundenAnQuelle? }
 //   dauer:        Zeiteinheiten; ohne Angabe unbegrenzt, bis der Zustand entfernt wird

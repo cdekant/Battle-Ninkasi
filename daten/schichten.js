@@ -1,22 +1,9 @@
 // Arten der Feldschichten (Aufbau siehe src/systeme/schichten.js); Feuer in daten/regeln.js (feuer). Zahlen vorläufig.
+// Grundgerüst: nur, was die Regeln selbst brauchen; weitere Arten bringt der Inhalt mit (Probeinhalt in datenproben/schichten.js).
 export default {
-  oberflaechen: {
-    // aus der Säuredüse; verätzt, wer darin steht, und trocknet langsam ab
-    saeure: { text: "oberflaeche.saeure", schwund: 1, hoechstens: 6, jeTick: "saeure_veraetzt", gefaehrlich: true },
-    // Hochprozentiges aus der Brandflasche: brennt lichterloh, verdunstet sonst
-    brand: { text: "oberflaeche.brand", schwund: 1, hoechstens: 6, brennbar: 100, brenndauer: 4, verbrenntZu: "asche" },
-    asche: { text: "oberflaeche.asche", hoechstens: 1 },
-  },
+  oberflaechen: {},
   gase: {
-    // aus den Gärbottichen; sammelt sich hinter geschlossenen Türen, wer nicht anaerob lebt, wird benommen, dann erstickt er
-    co2: {
-      text: "gas.co2", abbau: 1, gefaehrlich: true,
-      stufen: [
-        { ab: 30, effekt: "co2_benommen", wenn: [{ bedingung: "ohne_tag", tag: "anaerob" }] },
-        { ab: 70, effekt: "co2_ersticken", wenn: [{ bedingung: "ohne_tag", tag: "anaerob" }] },
-      ],
-    },
-    // aus Feuer; dicht versperrt er die Sicht
+    // aus Feuer (regeln.feuer.rauch); dicht versperrt er die Sicht
     rauch: { text: "gas.rauch", abbau: 15, undurchsichtigAb: 40, stufen: [{ ab: 60, effekt: "rauch_husten" }] },
   },
 };

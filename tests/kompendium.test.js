@@ -1,8 +1,7 @@
 // Kompendium: Beschreibung der Inhalte (src/anzeige/beschreibung.js) und Lücken (werkzeuge/luecken.js)
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import rohdaten from "../daten/index.js";
-import texte from "../sprache/de/texte.js";
+import { rohdaten, texteDe as texte } from "../src/inhalt.js";
 import { vorbereiten } from "../src/kern/daten.js";
 import { ARTEN, eintragsnamen, steckbrief, vorkommenVon, angriffKurz, modifikatorKurz, schrittKurz } from "../src/anzeige/beschreibung.js";
 import { lueckenFinden } from "../werkzeuge/luecken.js";

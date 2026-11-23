@@ -1,5 +1,5 @@
 // Unbekannte Gegenstände (siehe docs/Gegenstaende.md, Unbekanntes); Vorbild Brogue: je Lauf zufällige Etiketten.
-// Daten am Typ: unbekannt: { gruppe, schwierigkeit }; die Etiketten je Gruppe in daten/etiketten.js (Textschlüssel).
+// Daten am Typ: unbekannt: { gruppe, schwierigkeit }; die Etiketten je Gruppe in datenproben/etiketten.js (Textschlüssel).
 // Beim Spielstart ordnet etikettenZuordnen jedem unbekannten Typ ein Etikett seiner Gruppe zu, über einen eigenen
 // abgeleiteten Zufall ("etiketten"), wiederholbar je Startwert. Das Wissen des Laufs steht im Zustand:
 //   zustand.wissen = { etiketten: { typ: etikett }, erkannt: [typ], vertrautheit: { typ: Zahl } }

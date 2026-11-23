@@ -2,7 +2,7 @@
 
 Stand: 2026-11-23
 
-Zuständig für: `src/kern/effekte.js`, `src/kern/bausteine.js`, `src/kern/ausloeser.js`, `src/kern/vorgang.js`, `src/kern/werte.js`, `src/systeme/modifikatoren.js`, `src/systeme/zustaende.js`, `src/systeme/befehlsveraenderer.js`, `src/systeme/beschwoerung.js`, `src/systeme/zielauswahl.js`, `src/systeme/zielbausteine.js`, `src/systeme/faehigkeiten.js`, `src/systeme/laufendeAktionen.js`, `src/systeme/tod.js`, `src/welt/geometrie.js`, `daten/effekte.js`, `daten/zustaende.js`, `daten/faehigkeiten.js`, `daten/risiken.js`
+Zuständig für: `src/kern/effekte.js`, `src/kern/bausteine.js`, `src/kern/ausloeser.js`, `src/kern/vorgang.js`, `src/kern/werte.js`, `src/systeme/modifikatoren.js`, `src/systeme/zustaende.js`, `src/systeme/befehlsveraenderer.js`, `src/systeme/beschwoerung.js`, `src/systeme/zielauswahl.js`, `src/systeme/zielbausteine.js`, `src/systeme/faehigkeiten.js`, `src/systeme/laufendeAktionen.js`, `src/systeme/tod.js`, `src/welt/geometrie.js`, `daten/effekte.js`
 
 Mitprüfen bei Änderungen: [Architektur.md](Architektur.md), [Wesen.md](Wesen.md), [Gegenstaende.md](Gegenstaende.md), [Grundlagen.md](Grundlagen.md)
 
@@ -121,7 +121,7 @@ Regeln:
 
 Daten:
 
-+ Zustand (`daten/zustaende.js`, mit Vorlagen): `{ text, tags, dauer, stapel, hoechstStapel, verlauf, modifikatoren, auren, jeTick, beimBeginn, beimEnde, ausloeser, gebundenAnQuelle, unterhalt, handlungsunfaehig, befehl, ki, fraktion }`
++ Zustand (`datenproben/zustaende.js`, mit Vorlagen): `{ text, tags, dauer, stapel, hoechstStapel, verlauf, modifikatoren, auren, jeTick, beimBeginn, beimEnde, ausloeser, gebundenAnQuelle, unterhalt, handlungsunfaehig, befehl, ki, fraktion }`
   + `dauer` in Zeiteinheiten, ohne Angabe unbegrenzt bis zum Entfernen
   + `stapel`: `erneuern` (Vorgabe: eine Instanz, höhere Stärke, längere Dauer), `aufaddieren` (Stärken addiert bis `hoechstStapel` Anwendungen, Dauer erneuert), `staerkster` (nur eine mindestens gleich starke Anwendung ersetzt, sonst nichts), `einzeln` (eigene Instanzen mit eigenem Ende, höchstens `hoechstStapel`)
   + `verlauf`: `gleichbleibend` (Vorgabe), `abklingend`, `ansteigend` oder eine eigene Kurve `[[anteilProzent, staerkeProzent], ...]` über den Anteil der verstrichenen Dauer
@@ -151,7 +151,6 @@ Regeln:
 + `ki` überlagert die KI (Furcht mit `fliehen`, Rausch mit `jagen` und `trifft: "wesen"`); bei Ninkasi übernimmt die KI für die Dauer, das Spiel wartet dann nicht auf Eingaben; nach dem Ende gilt von selbst wieder der ursprüngliche Stand, die eigene KI behält ihr Gedächtnis
 + Beispiel ganz als Daten: `beschworen: { gebundenAnQuelle: true, beimEnde: "verschwinden" }`, mit `dauer` auch eine Beschwörung auf Zeit (Vorbild Brogue: Geisterklingen verschwinden mit dem Goblin-Beschwörer)
 + Die Datenprüfung verfolgt Kreise auch über Zustände: ein Effekt, der einen Zustand setzt, dessen `beimBeginn` ihn wieder aufruft, ist ein Fehler
-+ Im Spielinhalt bisher nur der vorläufige `testzustand` (Ausweichen -2 für 5 Züge), den Ninkasis `testfaehigkeit` bei einem Treffer setzt, damit die Anzeige der Zustände etwas zeigt
 
 ## Zielauswahl
 
@@ -193,7 +192,7 @@ Vorbilder: Tales of Maj'Eyal (aktive Talente mit Kosten und Abklingzeit, aufrech
 
 Daten:
 
-+ Fähigkeit (`daten/faehigkeiten.js`, umgesetzt in `src/systeme/faehigkeiten.js`): `{ text, art?, tags?, zweck?, verbrauch?, material?, zeit?, abklingzeit?, voraussetzungen?, ziel?, zielvorgabe?, wirkung?, zustand?, risiko?, skill?, anforderung?, ausbau?, dauer?, beimAbbruch?, ankuendigung?, unterbrechbar? }`; Wesen kennen sie als Liste `faehigkeiten: ["name"]`
++ Fähigkeit (`datenproben/faehigkeiten.js`, umgesetzt in `src/systeme/faehigkeiten.js`): `{ text, art?, tags?, zweck?, verbrauch?, material?, zeit?, abklingzeit?, voraussetzungen?, ziel?, zielvorgabe?, wirkung?, zustand?, risiko?, skill?, anforderung?, ausbau?, dauer?, beimAbbruch?, ankuendigung?, unterbrechbar? }`; Wesen kennen sie als Liste `faehigkeiten: ["name"]`
   + `art`: `aktiv` (Vorgabe) wirkt einmal; `aufrecht` setzt `zustand` an der Wirkenden, erneutes Benutzen beendet ihn ohne Kosten; den laufenden Preis trägt der Zustand als `unterhalt` (siehe Zustände)
   + `verbrauch: { mp, pp, pegel, ... }` aus den Vorräten; `material: [{ typ, anzahl }]` aus dem Inventar, wird verbraucht
   + `zeit`: Grundkosten, Vorgabe `aktionen.faehigkeit`
@@ -206,7 +205,7 @@ Daten:
   + `anforderung: { eigenschaften: { klugheit: 12 }, risiko }`: weiche Anforderung, die Tabelle wird über die Summe der fehlenden Punkte (wirksame Werte) gewürfelt
   + `ausbau: [{ wenn, aendert }]`: Ausbau durch Skills; zutreffende Einträge (Bedingungen an der Wirkenden, meist `skill_ab`) legen `aendert` in Datenreihenfolge flach über die Definition; `ausbau` und `art` lassen sich nicht ändern
   + `dauer: { schritte }`: lange Aktion (Ritual, Kanalisieren); `beimAbbruch`: Effekt auf die Wirkende beim Abbruch; `ankuendigung`: Textschlüssel für das Log; `unterbrechbar`: Liste aus `schaden` und `versetzt`, `true` heißt `["schaden"]` (siehe Lange Aktionen)
-+ Risikotabellen (`daten/risiken.js`): `[{ name, chance, wirkt, effekt? }]`, die Chance jedes Ausgangs ist eine Kurve über x: bei `risiko` der Pegel der Wirkenden, bei `skill.risiko` die fehlenden Stufen, bei `anforderung.risiko` die fehlenden Punkte
++ Risikotabellen (`datenproben/risiken.js`): `[{ name, chance, wirkt, effekt? }]`, die Chance jedes Ausgangs ist eine Kurve über x: bei `risiko` der Pegel der Wirkenden, bei `skill.risiko` die fehlenden Stufen, bei `anforderung.risiko` die fehlenden Punkte
 + Befehl `{ art: "faehigkeit", faehigkeit, ziel?: { x, y } | { id } | { dx, dy } }`
 
 Schnittstellen:
@@ -225,7 +224,6 @@ Regeln:
 + Angekündigte Angriffe sind lange Aktionen mit `ankuendigung` und meist der Zielart `feld`: das Ziel ist das Feld beim Beginn, wer bis zum letzten Schritt das Muster verlässt, weicht aus; die Anzeige markiert die Felder, solange die Aktion läuft; der erste Schritt läuft sofort, `schritte: 3` lässt dem Ziel also zwei Züge
 + Vorläufige Tabelle `psi`: Fehlschlag nüchtern 30 %, bei 1,5 ‰ am seltensten (5 %), darüber wieder steigend; Rückschlag ab 3 ‰ bis 20 % bei 8 ‰ (Effekt `psi_rueckschlag`); dass Psi mit dem Pegel stärker wirkt, geht über Modifikatoren mit `pegel_ab` und dem Tag `psi`; dazu `ohne_skill` (1 fehlende Stufe 25 %, 3: 60 %, 5: 85 %) und `anforderung` (1 fehlender Punkt 5 %, 10: 50 %), beide vorläufig
 + Glimmer (Psi lockt Gegner an) wäre ein Wert `glimmer`, den Psi-Fähigkeiten über `wert_aendern` erhöhen; seine Folgen sind Spieldesign ([Grundlagen.md](Grundlagen.md))
-+ Im Spielinhalt bisher die beiden Fähigkeiten des Testgegners `fernkaempfer_test` (Säurespucke, Säureschwall) und die vorläufige `testfaehigkeit` Ninkasis (Kreis mit Radius 1 auf ein Feld bis 6 weit, 10 MP, Trefferwurf je Wesen, sie selbst bleibt verschont), damit sich der Zielmodus ausprobieren lässt; eigentliche Fähigkeiten für Ninkasi folgen nach dem Systemausbau
 
 ## Lange Aktionen
 
@@ -286,4 +284,4 @@ Regeln:
 + Spieldesign der Fähigkeiten, des Pegels und des Brauens: [Grundlagen.md](Grundlagen.md); Skills, die Fähigkeiten ausbauen: [Charakter.md](Charakter.md)
 + Offene Reste in [Systemausbau.md](Systemausbau.md), Punkte 4 bis 6 (Ersatzwirkungen, gewährte und gelehrte Fähigkeiten, Teilung) und Punkt 8 (u.a. Auslöser am nicht angelegten Inventar, `zug_beginn`); erster Auslöser im Inhalt in Punkt 14
 
-Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).
+Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

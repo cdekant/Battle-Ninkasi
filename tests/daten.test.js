@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import "../src/kern/spiel.js"; // meldet Bausteine, Systeme und Verhaltensmodule an
-import rohdaten from "../daten/index.js";
+import { rohdaten } from "../src/inhalt.js";
 import { vorbereiten } from "../src/kern/daten.js";
 import { rohdatenMitTesteintraegen } from "./hilfen.js";
 

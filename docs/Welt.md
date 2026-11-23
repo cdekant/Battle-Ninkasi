@@ -2,7 +2,7 @@
 
 Stand: 2026-11-23
 
-Zuständig für: `src/welt/ebene.js`, `src/welt/ebenenschritte.js`, `src/welt/plan.js`, `src/welt/population.js`, `src/welt/karte.js`, `src/welt/schichten.js`, `src/welt/wege.js`, `src/systeme/gelaende.js`, `src/systeme/fallen.js`, `src/systeme/schichten.js`, `src/systeme/ebenen.js`, `src/systeme/sicht.js`, `src/systeme/erinnerung.js`, `src/systeme/gefahr.js`, `daten/gelaende.js`, `daten/fallen.js`, `daten/schichten.js`, `daten/ebenen.js`, `daten/populationen.js`
+Zuständig für: `src/welt/ebene.js`, `src/welt/ebenenschritte.js`, `src/welt/plan.js`, `src/welt/population.js`, `src/welt/karte.js`, `src/welt/schichten.js`, `src/welt/wege.js`, `src/systeme/gelaende.js`, `src/systeme/fallen.js`, `src/systeme/schichten.js`, `src/systeme/ebenen.js`, `src/systeme/sicht.js`, `src/systeme/erinnerung.js`, `src/systeme/gefahr.js`, `daten/gelaende.js`, `daten/schichten.js`, `daten/ebenen.js`
 
 Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Anzeige.md](Anzeige.md), [Grundlagen.md](Grundlagen.md), [Bedienung.md](Bedienung.md), [Ausblick.md](Ausblick.md), [Architektur.md](Architektur.md)
 
@@ -18,7 +18,7 @@ Daten:
 
 + Gelände (`daten/gelaende.js`): `kennung` (ein Zeichen, so steht das Feld in `zustand.ebene.felder`, einer Liste von Zeichenketten), `text` (Name für Untersuchen und Tooltip, Pflicht), `passierbar`, `passierbarFuer`, `undurchdringlich`, `durchsichtig`, `geschossdurchlaessig` (Vorgabe wie `durchsichtig`), `gasdurchlaessig` (Vorgabe wie passierbar), `laermdaempfung`, `treppe` ("ab" oder "auf"), `tuer` (`{ offen }` an der geschlossenen, `{ zu }` an der offenen Tür), `zerstoerbar: { wird }`, `beimBenutzen` (Effekt), `beimFestsitzen` (Effekt), `brennbar`, `brenndauer`, `verbrenntZu`, `quelle: { gas, menge }`; jede Art braucht ein Zeichen in `daten/zeichen.js`
 + Am Wesen `tueren`: `"oeffnen"` (Vorgabe) oder `"nicht"`
-+ Fallen (`daten/fallen.js`): Entitäten auf einem Feld mit `falle: { tarnung, effekt, ausloesenFuer? }` und `verborgen` (Vorgabe ja), nach dem Auslösen oder Entdecken `entdeckt`; die Ebene legt sie nach `fallen: [{ typ, anzahl }]`
++ Fallen (`datenproben/fallen.js`): Entitäten auf einem Feld mit `falle: { tarnung, effekt, ausloesenFuer? }` und `verborgen` (Vorgabe ja), nach dem Auslösen oder Entdecken `entdeckt`; die Ebene legt sie nach `fallen: [{ typ, anzahl }]`
 + Regelwerte `regeln.fallen`: `entdeckenVorgabe` 30, `reichweite` 5; an der Ebene `tuerChance`
 
 Schnittstellen:
@@ -39,7 +39,6 @@ Regeln:
 + Entdecken am Haken `zug_ende`, nur für Ninkasi: für jede verborgene Falle, die sie sieht und die höchstens `reichweite` entfernt ist, ein Wurf mit E / (E + Tarnung), E = Entdecken × 2 / (1 + Abstand); Entdecken ist ein Kampfwert (Vorgabe `entdeckenVorgabe`), Skills ändern ihn über Modifikatoren; Beispiel Entdecken 30 gegen Tarnung 30: daneben 50 %, auf 3 Felder 33 % je Zug
 + Die Anzeige zeigt Fallen erst, wenn sie bekannt sind; Wesen mit KI meiden alle Fallen, Reise und Erkunden die entdeckten (Option `meiden` der Wegfindung); liegt eine entdeckte Falle in einem Gang ohne Umweg, hält die Reise mit `kein_weg`
 + Hebel mit Wirkung in der Ferne brauchen Themenräume (Idee in [Ausblick.md](Ausblick.md))
-+ Im Spielinhalt (Zahlen vorläufig): Säuredüse (Tarnung 40, 2W4 Säure) und Klappergeschirr (Tarnung 20, Lärm 14, weckt die Nachbarschaft); Türen und Fallen haben noch keine Tiles, nur Zeichen
 
 ## Feldschichten
 
@@ -71,7 +70,6 @@ Regeln:
 + Wiederholbar: alle Würfe über den Spiel-Zufall, immer nach Feldindex aufsteigend; die Weltuhr bearbeitet nur belegte Felder; die Liste der Gasquellen hält der `zwischenspeicher`, `gelaendeSetzen` verwirft sie
 + Wege: die KI meidet Feuer und Gefährliches, Reise und Erkunden ebenso
 + Anzeige: farbige Überlagerung auf sichtbaren Feldern, Oberfläche und Feuer unter den Entitäten, Gas darüber mit der Menge zunehmend deckend; Farben in `zeichen.schichten`; Tiles folgen
-+ Im Spielinhalt (Zahlen vorläufig): die Säuredüse hinterlässt Säure (verätzt 1W3 je Tick, trocknet); drei Gärbottiche je Ebene im Inneren der Räume (Gelände-Objekte, sperren keinen Durchgang) geben CO2 ab, das sich hinter geschlossenen Türen sammelt; drei Brandflaschen je Ebene zerspringen beim Wurf zu Hochprozentigem und entzünden es; Feuer 1W6, Rauch ab 40 undurchsichtig, ab 60 Husten; Benommenheit und Ersticken sind vorläufig Giftschaden, bis es Zustände im Spielinhalt gibt
 
 ## Plan des Laufs
 
@@ -101,7 +99,7 @@ Daten:
 + Abfolge der Tiefen in `daten/index.js`: `abfolge: ["hub", "keller", "keller", "keller"]` (Tiefe 0 ist der Hub), `starttiefe: 1`; mehrere Tiefen dürfen dieselbe Vorlage aus `daten/ebenen.js` nutzen; der Plan des Laufs übernimmt sie
 + Ebene (`daten/ebenen.js`): feste `karte` (Zeilen aus Geländekennungen, z.B. der Hub) oder `breite`, `hoehe` und Parameter für den Digger von rot.js (`digger`), dazu `gelaende` (Rollen `wand`, `boden`, `tuer`, `treppeAuf`, `treppeAb`; Vorgaben `wand`, `boden`, `tuer_zu`, `treppe_auf`, `treppe_ab`), `gelaendeObjekte` (z.B. Gärbottiche), `tuerChance`, `fallen`, `gegenstaende` und `population: { tabelle, anzahl: [min, max] }` oder eine feste Liste `gegner`; wahlweise `schritte`, die Folge der Ebenenschritte
 + Vorgaben der Schritte in `regeln.ebenen`: `schritteErzeugt` (`karte_digger`, `tueren`, `treppen`, `gelaende_objekte`, `erreichbarkeit`, `ebene_anlegen`, `freie_felder`, `population`, `gegenstaende`, `fallen`), `schritteFest` für Ebenen mit `karte` (`karte_fest`, `erreichbarkeit`, `ebene_anlegen`), `versuche` 10, `folgen.abstand` 1 (siehe Verfolger unter Regeln)
-+ Population (`daten/populationen.js`): Einträge `{ typ, gewicht, tiefe: [von, bis], rudel?: [min, max], affixe?: [{ zustand, chance }] }`; Regelwerte `regeln.population` (`tieferChance` 10, `tieferBis` 2, `hoechstWesen` 500)
++ Population (`datenproben/populationen.js`): Einträge `{ typ, gewicht, tiefe: [von, bis], rudel?: [min, max], affixe?: [{ zustand, chance }] }`; Regelwerte `regeln.population` (`tieferChance` 10, `tieferBis` 2, `hoechstWesen` 500)
 + Im Zustand: `ebene` (die aktuelle), `tiefe`, `abgelegteEbenen[tiefe]` (verlassene Ebenen mit ihren Entitäten und Einträgen der Warteschlange samt Zeitpunkt)
 + Baukontext (`src/welt/ebene.js`), den die Schritte nacheinander füllen: `{ tiefe, name, ebenendaten, planEintrag, versuch, schluessel, zufall(name), zeilen, raeume, tuerFelder, treppen, freieFelder }`; er lebt nur während der Erzeugung und gehört nicht zum Zustand
 
@@ -128,7 +126,6 @@ Regeln:
 + Verfolger (Vorbilder Brogue und NetHack): ein Wesen folgt, wenn es höchstens `regeln.ebenen.folgen.abstand` (1) Felder entfernt steht, handeln und sich bewegen kann, nicht `folgt: false` trägt (Daten des Wesens) und Ninkasi jagt (KI `jagen` im Wachzustand `jagt`, sie ist sein Ziel nach `trifft`; ein Fliehender hat eine andere KI) oder von ihr beschworen ist; Helfer aus dem Beistand folgen nicht, ihr Beistand endet mit dem Kampf
 + Mitgenommene Wesen verlassen ihr Feld bis zur Ankunft, behalten ihren Platz in der Warteschlange (kein Freizug, ihr nächster Zug kommt wie geplant) und stehen nach ID geordnet auf dem nächsten freien, für sie betretbaren Feld bei Ninkasi; die KI kennt danach Ninkasis neue Position; ohne freies Feld bleiben sie samt Gepäck und Einträgen auf der alten Ebene an ihrem Platz
 + Population: je Wurf gewichtet unter den Einträgen der Tiefe, mit `tieferChance` aus einer bis zu `tieferBis` Tiefen tieferen; ein Rudel steht beieinander (jedes weitere Mitglied auf dem freien Feld, das dem ersten am nächsten liegt), Affixe sind Zustände beim Erzeugen; findet ein Wurf nichts, fällt er aus; bestellt eine Ebene mit Ninkasi mehr als `hoechstWesen`, ist das ein Datenfehler
-+ Im Spielinhalt (Zahlen vorläufig): der Hub ist ein leerer Raum mit Treppe hinab (Dienste folgen), die Testkammer des allmächtigen Laufs ein größerer, der ihn in Tiefe 0 ersetzt, drei Kellertiefen mit 16 bis 20 Wesen, Essigbakterien in Rudeln von 1 bis 3, Fernkämpfer ab Tiefe 2 häufiger; Treppen haben noch keine Tiles
 
 ## Wegfindung
 
@@ -196,4 +193,4 @@ Regeln:
 + Spieldesign der Welt und des Hubs: [Grundlagen.md](Grundlagen.md); Darstellung von Karte und Schichten: [Anzeige.md](Anzeige.md); Tiles: [Tileset.md](Tileset.md)
 + Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 3 (Licht), Punkt 8 (Sturz in den Abgrund, Suchen nach Fallen), Punkt 14 (Nachholen verlassener Ebenen, Dienste des Hubs, Ebenenarten); Themenräume, Schatzräume, Quests und feste Strukturen als Ideen in [Ausblick.md](Ausblick.md), sie bauen auf den Plan des Laufs und die Schritte
 
-Pflege: Dieses Dokument folgt den Pflichten unter "Dokumentation" in [CLAUDE.md](../CLAUDE.md).
+Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

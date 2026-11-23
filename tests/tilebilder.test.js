@@ -2,7 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { passendeSaetze, pixelZuRgba, tilesetPruefen } from "../src/anzeige/tilebilder.js";
 import tileset from "../grafik/tileset.js";
-import zeichensatz from "../daten/zeichen.js";
+import { rohdaten } from "../src/inhalt.js";
+const zeichensatz = rohdaten.zeichen; // Grundgerüst und Probeinhalt
 
 const palette = {
   durchsichtig: ".",
@@ -46,11 +47,11 @@ test("das Tileset in grafik/ ist fehlerfrei", () => {
   assert.deepEqual(tilesetPruefen(tileset), []);
 });
 
-test("jedes Tile hat einen Eintrag in daten/zeichen.js als Ersatz", () => {
+test("jedes Tile hat einen Eintrag in den Zeichen als Ersatz", () => {
   const zeichenNamen = new Set([
     ...Object.keys(zeichensatz.gelaende), ...Object.keys(zeichensatz.wesen), ...Object.keys(zeichensatz.gegenstaende),
   ]);
   for (const satz of Object.values(tileset.saetze)) {
-    for (const name of Object.keys(satz)) assert.ok(zeichenNamen.has(name), `${name} fehlt in daten/zeichen.js`);
+    for (const name of Object.keys(satz)) assert.ok(zeichenNamen.has(name), `${name} fehlt in den Zeichen`);
   }
 });

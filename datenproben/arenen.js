@@ -1,6 +1,6 @@
 // Arenen der Spielart "arena" (Aufbau und Regeln siehe src/systeme/arena.js): benannte Aufstellungen für Kämpfe von
 // Hand, automatisch im Browser und im Werkzeug werkzeuge/arena.js. Vorläufig, zum Ausprobieren der Systeme; die
-// Machtkurve (docs/Systemausbau.md, Punkt 15) braucht später eigene.
+// Machtkurve (docs/Systemausbau.md, Punkt 10) braucht später eigene.
 export default {
   essigbakterien: {
     text: "arena.essigbakterien", karte: "arena_offen", taktik: "nahkampf",

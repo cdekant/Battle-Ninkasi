@@ -2,7 +2,7 @@
 // (eingabe/eingabe.js), Hilfe aus dem Katalog (eingabe/hilfe.js, anzeige/fenster.js tastenname)
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import texteDe from "../sprache/de/texte.js";
+import { texteDe } from "../src/inhalt.js";
 import belegung from "../src/eingabe/belegung.js";
 import { AKTIONEN, GRUPPEN, KNOEPFE, PLAETZE_DER_LEISTE, aktionDerTaste, befehlDerAktion, tastenDerAktion } from "../src/eingabe/aktionskatalog.js";
 import { uebersetzen } from "../src/eingabe/eingabe.js";

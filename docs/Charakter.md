@@ -28,7 +28,7 @@ Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Fenster; siehe [Wesen.
 + PP beginnen leer, Start- und Höchstwert noch offen
 + Der Pegel ist nach oben offen
 
-Umsetzung: siehe [Entwicklung.md](Entwicklung.md), Stand des Spielinhalts
+Umsetzung: siehe [Entwicklung.md](Entwicklung.md), Grundgerüst
 
 ## Eigenschaften
 

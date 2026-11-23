@@ -1,5 +1,5 @@
 // Fallen (siehe docs/Welt.md, Gelände): Entitäten auf einem Feld mit der Komponente falle.
-// Daten (daten/fallen.js): { text, falle: { tarnung, effekt, ausloesenFuer? }, verborgen? }
+// Daten (datenproben/fallen.js): { text, falle: { tarnung, effekt, ausloesenFuer? }, verborgen? }
 //   tarnung:       Punkte gegen das Entdecken, die Qualität der Falle (z.B. 20 plump, 80 meisterhaft)
 //   effekt:        wirkt auf das Wesen, das hineintritt (Quelle die Falle, Ursache "falle"), eine Kettenstufe tiefer
 //   ausloesenFuer: Bewegungsarten, die sie auslösen (Vorgabe ["laufend"]; Fliegende und Schwebende gehen darüber)

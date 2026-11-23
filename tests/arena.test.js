@@ -3,8 +3,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import rohdaten from "../daten/index.js";
-import texteDe from "../sprache/de/texte.js";
+import { rohdaten, texteDe } from "../src/inhalt.js";
 import { datenLaden, neuesSpiel, befehlGeben, spielstand, nachspielen } from "../src/kern/spiel.js";
 import { vorbereiten } from "../src/kern/daten.js";
 import { spielerin, alleEntitaeten, istWesen } from "../src/kern/zustand.js";
