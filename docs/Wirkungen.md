@@ -223,6 +223,7 @@ Regeln:
 + Mit `dauer` wird am Anfang bezahlt, jeder Schritt kostet `zeit`, Risiko und Wirkung kommen nach dem letzten Schritt; das Ziel wird dann neu aufgelöst, passt es nicht mehr, verpufft die Wirkung
 + Angekündigte Angriffe sind lange Aktionen mit `ankuendigung` und meist der Zielart `feld`: das Ziel ist das Feld beim Beginn, wer bis zum letzten Schritt das Muster verlässt, weicht aus; die Anzeige markiert die Felder, solange die Aktion läuft; der erste Schritt läuft sofort, `schritte: 3` lässt dem Ziel also zwei Züge
 + Vorläufige Tabelle `psi`: Fehlschlag nüchtern 30 %, bei 1,5 ‰ am seltensten (5 %), darüber wieder steigend; Rückschlag ab 3 ‰ bis 20 % bei 8 ‰ (Effekt `psi_rueckschlag`); dass Psi mit dem Pegel stärker wirkt, geht über Modifikatoren mit `pegel_ab` und dem Tag `psi`; dazu `ohne_skill` (1 fehlende Stufe 25 %, 3: 60 %, 5: 85 %) und `anforderung` (1 fehlender Punkt 5 %, 10: 50 %), beide vorläufig
++ Der Rückschlag ist Psi-Schaden: Modifikatoren auf Schaden mit dem Tag `psi` (z.B. mit `pegel_ab`) verstärken auch ihn, gewollt; ein Skill kann ihn gezielt dämpfen
 + Glimmer (Psi lockt Gegner an) wäre ein Wert `glimmer`, den Psi-Fähigkeiten über `wert_aendern` erhöhen; seine Folgen sind Spieldesign ([Grundlagen.md](Grundlagen.md))
 
 ## Lange Aktionen
@@ -282,6 +283,6 @@ Regeln:
 ## Verweise
 
 + Spieldesign der Fähigkeiten, des Pegels und des Brauens: [Grundlagen.md](Grundlagen.md); Skills, die Fähigkeiten ausbauen: [Charakter.md](Charakter.md)
-+ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkte 4 bis 6 (Ersatzwirkungen, gewährte und gelehrte Fähigkeiten, Teilung) und Punkt 8 (u.a. Auslöser am nicht angelegten Inventar, `zug_beginn`); erster Auslöser im Inhalt in Punkt 14
++ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkte 4 bis 6 (Ersatzwirkungen, gewährte und gelehrte Fähigkeiten, Teilung), Punkt 8 (u.a. Auslöser am nicht angelegten Inventar, `zug_beginn`) und Punkt 15 (Urheberin der Feldschichten, Ende eines Zustands nach Grund, Zufallsverzweigung); erster Auslöser im Inhalt in Punkt 14
 
 Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

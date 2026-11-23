@@ -24,8 +24,9 @@ import { entitaetMitId, plaetzeVon } from "../kern/zustand.js";
 import { modifikatorSkaliert } from "../kern/werte.js";
 import { bausteinAnmelden } from "../kern/bausteine.js";
 
+// Angelegte Gegenstände; einer ohne Komponente ausruestung (nur in einem kaputten Zustand möglich) zählt nicht
 export function ausgeruestete(spiel, wesen) {
-  return (wesen.ausgeruestet || []).map((id) => entitaetMitId(spiel.zustand, id)).filter(Boolean);
+  return (wesen.ausgeruestet || []).map((id) => entitaetMitId(spiel.zustand, id)).filter((gegenstand) => gegenstand?.ausruestung);
 }
 
 export function istAngelegt(wesen, gegenstandId) {

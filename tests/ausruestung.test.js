@@ -175,3 +175,12 @@ test("Datenprüfung: Plätze an Wesen und Gegenständen, Waffenprofile, Modifika
   ];
   for (const [aendern, teilDerMeldung] of erwartet) assert.ok(pruefen(aendern).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
 });
+
+test("Ein Gegenstand ohne ausruestung in ausgeruestet (kaputter Zustand) zählt nicht als angelegt und bringt nichts zum Absturz", () => {
+  const { spiel, ninkasi } = aufstellen();
+  const schuerze = gegenstandTragen(spiel, ninkasi, SCHUERZE);
+  const fremdkoerper = gegenstandTragen(spiel, ninkasi, { typ: "stein" });
+  ninkasi.ausgeruestet = [fremdkoerper.id, schuerze.id];
+  assert.equal(kampfwert(spiel, ninkasi, "ruestung"), 2, "nur die Schürze zählt");
+  assert.deepEqual(angriffeVon(spiel, ninkasi).map((profil) => profil.name), ["faust"]);
+});

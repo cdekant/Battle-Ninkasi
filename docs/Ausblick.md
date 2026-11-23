@@ -327,7 +327,7 @@ Umsetzung: offen
 + Vorhanden: Zustände mit Dauer, Verlauf über die Zeit, Stapelregel, Tags und Auslösern (siehe [Wirkungen.md](Wirkungen.md), Zustände); Baustein `zustand_entfernen { zustand | tag }`; Heilung durch einen Gegenstand über `trinkbar` oder Benutzen, an einem Ort über Gelände mit `beimBenutzen` (Altar, Quelle), durch ein Ritual als lange Aktion (siehe [Wirkungen.md](Wirkungen.md), Lange Aktionen); zufällige Rezepte je Lauf gehen über Etiketten wie bei Unbekanntem
 + Braucht: Krankheit als Zustand mit Stufen (Vorstufe, Ausbruch), der von selbst weiterschreitet oder ausheilt (ein Wurf je Welttick oder Tag); Ansteckung über Auslöser (Treffer, Trinken) oder Aura; Schutz gegen das falsche Heilmittel: ein Tag am Zustand, den nur das richtige Mittel entfernt (z.B. `krankheit.glotrot`), während allgemeine Heilung nur `krankheit` ohne Unterart trifft
 + Umbaurisiko: gering, fast alles sind Daten
-+ Vorkehrung: keine; ob das Weiterschreiten zu einer nächsten Stufe (Zustand A wird zu Zustand B) als `beimEnde` mit `zustand_setzen` reicht, prüft der Probedurchstich ([Systemausbau.md](Systemausbau.md), Punkt 2)
++ Vorkehrung: keine; das Weiterschreiten zu einer nächsten Stufe geht als `beimEnde` mit `zustand_setzen`, Ansteckung über einen Auslöser, Heilung nur mit dem richtigen Mittel über einen Tag wie `krankheit.glotrot` (Proben in `tests/probedurchstich.test.js`); es fehlen ein Ende nur nach Ablauf, damit die geheilte Vorstufe nicht ausbricht, und vielleicht eine Zufallsverzweigung für das Ausheilen von selbst (siehe [Systemausbau.md](Systemausbau.md), Punkt 15)
 
 Umsetzung: offen
 

@@ -10,43 +10,36 @@ Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und wäh
 
 + Jeder Punkt wird vor der Umsetzung als Vorschlag ausgearbeitet und freigegeben
 + Status je Punkt: offen oder in Arbeit
-+ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 2 bis 11 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
++ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 3 bis 11 und 15 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
 
 ## Reihenfolge
 
-Stand 2026-11-23, vor dem Inhalt in dieser Folge:
+Stand 2026-11-23, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer Wirkung auf den Inhalt, das Kleine und Breite zuerst:
 
-1. Probedurchstich (Punkt 2), seine Funde ordnen die Punkte 3 bis 8 neu
-2. Systemlücken schließen (Punkte 3 bis 8), nach ihrer Wirkung auf den Inhalt
-3. Englisch, Mehrzahl und Glossar (Punkt 9)
-4. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
-5. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
-6. Danach der Inhalt (Punkt 14)
+1. Reste des Effektsystems (Punkt 15)
+2. Gewährte und gelehrte Fähigkeiten (Punkt 5)
+3. Ersatzwirkungen (Punkt 4)
+4. KI: Unterstützung und Umherziehen (Punkt 7)
+5. Teilung und Wachstum (Punkt 6), braucht Punkt 7
+6. Licht und Wahrnehmung (Punkt 3)
+7. Englisch, Mehrzahl und Glossar (Punkt 9)
+8. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
+9. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
+10. Danach der Inhalt (Punkt 14)
 
-Daneben, ohne festen Platz: Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Punkt 1 (Probeinhalt auslagern) ist erledigt, die Nummern der übrigen bleiben.
+Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern) und Punkt 2 (Probedurchstich), die Nummern der übrigen bleiben.
+
+Die Proben des Probedurchstichs stehen in `tests/probedurchstich.test.js`; jede Lücke dort ist ein Test mit `todo` und dem Punkt, der sie schließt, mit einem Entwurf der Daten (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing). Wer einen Punkt umsetzt, nimmt dort das `todo` weg.
 
 ## Bekannte Fehler
 
 + Derzeit keine
 
-## 2. Probedurchstich
-
-Status: offen
-
-Typische Inhalte als Probe anlegen, nur aus Daten; jede Stelle, die Code verlangt, ist eine Lücke für die Punkte 3 bis 8. Die Proben bleiben als Tests stehen.
-
-+ Ein Bakterium, das sich teilt (Punkt 6)
-+ Ein Kontrolleur mit Taschenlampe im Dunkeln (Punkt 3)
-+ Ein Zauber, der über die Zeit wirkt (Fläche mit Zustand, Ritual)
-+ Ein Psi-Zauber mit Rückschlag
-+ Ein Gegenstand mit Ersatzwirkung (Punkt 4)
-+ Ein Gegenstand, der eine Fähigkeit gewährt, und eine Schriftrolle, die eine lehrt (Punkt 5)
-+ Ein Heiler unter den Gegnern (Punkt 7)
-+ Eine Krankheit in Stufen: reicht "Zustand A wird zu Zustand B" über `beimEnde` mit `zustand_setzen` (siehe [Ausblick.md](Ausblick.md), Krankheiten)
-
 ## 3. Licht und Wahrnehmung
 
-Status: offen, erst Recherche und Spieldesign
+Status: offen, erst Recherche, dann neu designen und überarbeiten
+
++ Probe: der Kontrolleur mit Taschenlampe bemerkt Ninkasi im Dunkeln nur im Schein seiner Lampe
 
 + Helligkeit je Feld, Lichtquellen, Licht im Renderer (Ideen in [Welt.md](Welt.md), Licht); ohne Angabe gilt jedes Feld als hell, das Spiel verhält sich dann wie bisher
 + Licht in der Wahrnehmung (Brogue: Heimlichkeitsweite im Licht doppelt, im Dunkeln halb), Spüren ohne Licht, Spur als Geruch (Duftkarte nach Brogue, passend zu Mikroorganismen, die entlang von Wegen spüren); Ideen in [Wesen.md](Wesen.md), Wahrnehmung
@@ -57,17 +50,22 @@ Status: offen, erst Recherche und Spieldesign
 
 ## 4. Ersatzwirkungen
 
-Status: offen
+Status: offen, erst Recherche
+
++ Probe: das Phönixbier im Gepäck verhindert einmal den Tod und ist dann verbraucht
 
 + Wirkungen aus Daten, die sofort an einem Haken "davor" eingreifen und sich verbrauchen können, z.B. "Phönixbier verhindert einmal den Tod", "Schild fängt einen Treffer ab"; heute gibt es dafür nur Code-Handler am Haken `vor_tod` (siehe [Wirkungen.md](Wirkungen.md), Auslöser)
 + Sie achten den Marker `unblockbar` (siehe [Wesen.md](Wesen.md), Kampfwerte)
 
 ## 5. Gewährte und gelehrte Fähigkeiten
 
-Status: offen
+Status: offen, erst Recherche
+
++ Proben: das angelegte Braupaddel gewährt den Ansturm; eine Schriftrolle lehrt ihn beim Lesen dauerhaft und ist dann verbraucht
++ Gegenstände aus dem Gepäck lesen oder benutzen: einen Befehl dafür gibt es noch nicht, `benutzen` kennt nur Gelände; Entwurf `lesbar: { effekt }` am Gegenstand
 
 + Gewährt: eine Fähigkeit, solange ein Gegenstand angelegt oder getragen ist oder ein Zustand wirkt ("Braupaddel erlaubt Ansturm", siehe [Wirkungen.md](Wirkungen.md), Wirkungsarten); heute kennt ein Wesen Fähigkeiten nur aus seiner Liste `faehigkeiten`
-+ Gelehrt: eine Fähigkeit dauerhaft, z.B. durch eine Schriftrolle oder einen HACCP-Aushang, als Baustein neben `skill_freischalten`
++ Gelehrt: eine Fähigkeit dauerhaft, z.B. durch eine Schriftrolle oder einen HACCP-Aushang, als Baustein neben `skill_freischalten` (Entwurf `faehigkeit_lehren { faehigkeit }`)
 + Spieldesign dazu: ob eine Quelle verbraucht wird oder dauerhaft lehrt (offen in [Charakter.md](Charakter.md), Offen); Quellen der Fähigkeiten in [Charakter.md](Charakter.md), Skills
 
 ## 6. Teilung und Wachstum
@@ -75,13 +73,16 @@ Status: offen
 Status: offen, erst Recherche und Spieldesign
 
 + Mechanismen der Mikroorganismen (siehe [Grundlagen.md](Grundlagen.md), Gegner): Zweiteilung (aus einer Zelle werden zwei), Sprossung (die Mutterzelle bleibt und bekommt eine Tochter), Myzel (Feld für Feld), Phagen (Befall macht ein Wesen zu einem anderen)
-+ Entscheiden, ob Teilung ein Verhaltensmodul ist (so [Wirkungen.md](Wirkungen.md), Effektsystem) oder der Baustein `beschwoeren` mit `abstammung` (so [Wesen.md](Wesen.md), Skills und Lernen); danach eine der beiden Stellen anpassen
++ Entscheiden, ob Teilung ein Verhaltensmodul ist (so [Wirkungen.md](Wirkungen.md), Effektsystem) oder der Baustein `beschwoeren` mit `abstammung` (so [Wesen.md](Wesen.md), Skills und Lernen); danach eine der beiden Stellen anpassen; der Probedurchstich zeigt: Zweiteilung und Sprossung gehen schon als Fähigkeit mit `beschwoeren` und `abstammung`, die die KI wählt, solange sie ihre Beute sieht; offen bleiben Myzel und Phagen
++ Entschieden im Probedurchstich: eine Teilung ergibt zwei Wesen mit vollen Werten (LP, MP, PP); geteilt wird nur, solange die KI ihre Beute sieht, ohne Sicht führt sie keine Handlungen aus
++ Obergrenze je Wesen: sieht eine Zelle Ninkasi, ohne sie zu erreichen, teilt sie sich bis zur Obergrenze aller Wesen (`regeln.population.hoechstWesen`); Probe: eine Art hört bei ihrer eigenen Obergrenze auf, Entwurf als Bedingung `anzahl_unter { wesen, anzahl }` an der Fähigkeit
 + EP über den Topf je Abstammungslinie, Verhalten an der Obergrenze der Population, Leistung bei vielen Zellen
 
 ## 7. KI: Unterstützung und Umherziehen
 
 Status: offen
 
++ Probe: ein Heiler heilt einen verwundeten Verbündeten; was schon geht, ist eine Aura für Verbündete
 + Heilen und Stärken von Verbündeten mit `nutzen`: eine Fähigkeit zielt bisher immer nach der Beute, also heilt nur eine mit Zielart `selbst` (siehe [Wesen.md](Wesen.md), KI); die Handlung braucht ein Ziel unter den Verbündeten; Grundlage für Heiler, Kulturhefe als Verbündete und Begleiter
 + Umherziehen wacher Wesen (Brogue "wandering"), damit Ebenen nicht stillstehen, bis Ninkasi kommt
 
@@ -169,7 +170,7 @@ Status: zurückgestellt, Entwurf in [Animationen.md](Animationen.md) und [Tilese
 
 Status: offen; was der Inhalt abdecken muss, damit keine Mechanik ungenutzt bleibt; jeweils mit dem Spieldesign in den Design-Dokumenten
 
-+ Skillkatalog als eigene Sitzung, darin Kennerschaft, Nachtsicht und Fernsicht als Skills, Kampfwerte aus Skills (Ausweichen aus Gewandtheit, Widerstand gegen Gift aus Trinkfestigkeit), Tragkraft; Makel und Vorzüge in der Charaktererstellung mit ihrem Katalog (siehe [Charakter.md](Charakter.md), Charaktererstellung)
++ Skillkatalog als eigene Sitzung, darin Kennerschaft, Nachtsicht und Fernsicht als Skills, ein Skill gegen den Psi-Rückschlag (Modifikatoren auf Psi-Schaden verstärken auch den Rückschlag, siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten), Kampfwerte aus Skills (Ausweichen aus Gewandtheit, Widerstand gegen Gift aus Trinkfestigkeit), Tragkraft; Makel und Vorzüge in der Charaktererstellung mit ihrem Katalog (siehe [Charakter.md](Charakter.md), Charaktererstellung)
 + Ninkasis eigene Fähigkeiten statt der `testfaehigkeit`
 + Zustände im Inhalt, darunter Benommenheit und Ersticken statt Giftschaden
 + Erster Auslöser im Inhalt (z.B. Säurespritzer des Essigbakteriums beim Tod)
@@ -180,3 +181,11 @@ Status: offen; was der Inhalt abdecken muss, damit keine Mechanik ungenutzt blei
 + Mehr Ebenenarten, Themenräume, Hebel mit Wirkung in der Ferne, verschlossene Türen mit Schlüssel (Ideen in [Ausblick.md](Ausblick.md), Themenräume und Rätsel)
 + Abstraktes Nachholen verlassener Ebenen, falls die Machtkurve es verlangt (siehe [Ausblick.md](Ausblick.md), Nachrückende Gegner)
 + Ruf bei ganzen Fraktionen: weitere Taten (siehe [Ausblick.md](Ausblick.md), Fraktionen: Ruf und Beistand)
+
+## 15. Reste des Effektsystems
+
+Status: offen; gefunden im Probedurchstich
+
++ Urheberin der Feldschichten: eine Oberfläche oder ein Gas aus einer Fähigkeit wirkt heute ohne Quelle (`quelleId: null`), so gehen gebundene EP, Zorn und Todesursache verloren; Probe: der Hopfensud rechnet seinen Zustand der Wirkenden zu; erst erkunden, dann einrichten
++ Ende eines Zustands nach Grund: `beimEnde` wirkt bei jedem Grund (`abgelaufen`, `entfernt`, `quelle_tot`, `unterhalt`), wer die Vorstufe einer Krankheit heilt, löst so den Ausbruch aus; Probe: die geheilte Vorstufe bricht nicht aus; Entwurf `beimAblauf` (nur `abgelaufen`) neben `beimEnde` oder eine Bedingung auf den Grund; erst erkunden, dann einrichten
++ Zufallsverzweigung in einem Effekt, z.B. Baustein `zufall { chance, effekt, sonst? }`; offen, ob nötig: Auslöser und Risikotabellen haben schon eine Chance; Probe als `todo`: die Vorstufe einer Krankheit heilt mit einer Chance von selbst aus (siehe [Ausblick.md](Ausblick.md), Krankheiten)
