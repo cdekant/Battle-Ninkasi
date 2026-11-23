@@ -12,6 +12,7 @@ export default {
     bier: { zeichen: "!", farbe: "#e0952b" },
     bierfass: { zeichen: "&", farbe: "#a07a4a" },
     sauerbier: { zeichen: "!", farbe: "#a8a04a" },
+    riechwasser: { zeichen: "!", farbe: "#9fc7c0" },
     lederfetzen: { zeichen: ",", farbe: "#8c5a33" },
     kupferschrott: { zeichen: ",", farbe: "#5f8f7a" },
     leere_flasche: { zeichen: "!", farbe: "#8c7a63" },

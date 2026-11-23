@@ -2,13 +2,16 @@
 // angreifen, wer im Weg steht und ein Ziel ist; ein unbewegliches Wesen greift nur an, wer daneben steht.
 // Steht auf dem nächsten Feld ein Wesen, das kein Ziel ist (z.B. ein Verbündeter im Gang), sucht es einen Weg um alle
 // Wesen herum und nimmt ihn, wenn er höchstens regeln.bewegung.umwegHoechstens Felder länger ist; sonst wartet es.
+// Ohne wahrgenommene Beute folgt ein jagendes Wesen zuerst dem Duft der gesteuerten Entität (duftfolgebefehl).
 // Verändert ki (letzteBekanntePosition, Wachzustand), darum nur für den gewählten Befehl aufrufen.
 
 import { weg } from "../welt/wege.js";
 import { wesenAufFeld, gleichesFeld } from "../welt/geometrie.js";
 import { abstand, oeffnetTueren } from "../welt/karte.js";
-import { bewegungVon } from "../kern/zustand.js";
+import { bewegungVon, gesteuerteEntitaet } from "../kern/zustand.js";
 import { fallenMeiden } from "../systeme/fallen.js";
+import { duftfeld } from "../systeme/duft.js";
+import { spurweite } from "../systeme/wahrnehmung.js";
 import { gefahrenMeiden, meidenZusammen } from "../systeme/schichten.js";
 import { istUnbeweglich } from "../systeme/bewegung.js";
 import { abwarten } from "./abwarten.js";
@@ -60,4 +63,21 @@ export function verfolgungsbefehl(spiel, jaeger, ki, beute, trifft, befohlenId =
   if (!wesenImWeg) return schritt(naechstesFeld);
   if (istAngriffsziel(spiel, jaeger, wesenImWeg, trifft, befohlenId)) return { ...schritt(naechstesFeld), angreifen: true };
   return umwegSchritt(spiel, position, ziel, wegOptionen, direkterWeg.length) ?? abwarten();
+}
+
+// Dem Duft der gesteuerten Entität folgen (systeme/duft.js), für ein jagendes Wesen ohne wahrgenommene Beute: nur mit
+// ki.duftFolgen (Vorgabe true), wenn sie für das Wesen ein Ziel ist und innerhalb ihrer Spurweite steht; Schritt auf
+// das Nachbarfeld mit dem stärksten frischen Duft, steht dort ein Ziel, greift es an. Merkt sich das Feld als letzte
+// bekannte Position, damit es dort wach wird, wenn die Spur endet. Sonst null (dann gilt verfolgungsbefehl).
+export function duftfolgebefehl(spiel, jaeger, ki, trifft) {
+  if (ki.duftFolgen === false || istUnbeweglich(jaeger)) return null;
+  const gesteuerte = gesteuerteEntitaet(spiel.zustand);
+  if (!gesteuerte?.position || gesteuerte.id === jaeger.id || !istZielFuer(spiel, jaeger, gesteuerte, trifft)) return null;
+  if (abstand(jaeger.position, gesteuerte.position) > spurweite(spiel, gesteuerte)) return null;
+  const feld = duftfeld(spiel, jaeger, wegOptionenFuer(spiel, jaeger).meiden);
+  if (!feld) return null;
+  const wesenDort = wesenAufFeld(spiel, feld)[0];
+  if (wesenDort && !istZielFuer(spiel, jaeger, wesenDort, trifft)) return null;
+  ki.letzteBekanntePosition = { x: feld.x, y: feld.y };
+  return { art: "bewegen", dx: feld.x - jaeger.position.x, dy: feld.y - jaeger.position.y, ...(wesenDort ? { angreifen: true } : {}) };
 }

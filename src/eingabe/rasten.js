@@ -4,7 +4,7 @@
 
 import { gesteuerteEntitaet } from "../kern/zustand.js";
 import { hoechstwert, hatWert } from "../kern/werte.js";
-import { lageErfassen, sichtbareFeinde } from "../systeme/gefahr.js";
+import { lageErfassen, wahrgenommeneFeinde } from "../systeme/gefahr.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 import { unterwegsPruefen } from "./reise.js";
 
@@ -17,7 +17,7 @@ function vollGerastet(spiel, einstellungen) {
 // Mit Feinden in Sicht hält es wie die Reise erst bei einem neuen Feind oder bei Schaden (rastenHalt)
 export function rastenBeginnen(spiel, einstellungen) {
   if (spiel.zustand.vorbei) return { grund: "vorbei" };
-  if (!einstellungen.rastenTrotzFeinden && sichtbareFeinde(spiel).length) return { grund: "feinde_in_sicht" };
+  if (!einstellungen.rastenTrotzFeinden && wahrgenommeneFeinde(spiel).length) return { grund: "feinde_in_sicht" };
   if (vollGerastet(spiel, einstellungen)) return { grund: "schon_voll" };
   return { ablauf: { lage: lageErfassen(spiel), schrittzahl: 0 } };
 }

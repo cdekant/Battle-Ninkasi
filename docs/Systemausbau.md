@@ -16,28 +16,18 @@ Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und wäh
 
 Stand 2026-11-23, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer Wirkung auf den Inhalt, das Kleine und Breite zuerst:
 
-1. Wahrnehmungsarten, Spüren und Duft (Punkt 3; das Licht ist umgesetzt)
-2. Englisch, Mehrzahl und Glossar (Punkt 9)
-3. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
-4. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
-5. Danach der Inhalt (Punkt 14)
+1. Englisch, Mehrzahl und Glossar (Punkt 9)
+2. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
+3. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
+4. Danach der Inhalt (Punkt 14)
 
-Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind das Licht aus Punkt 3, Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
+Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 3 (Licht, Wahrnehmungsarten, Spüren und Duft), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
 
 Die Proben des Probedurchstichs stehen in `tests/probedurchstich.test.js`; jede Lücke dort ist ein Test mit `todo` und dem Punkt, der sie schließt, mit einem Entwurf der Daten (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing). Wer einen Punkt umsetzt, nimmt dort das `todo` weg.
 
 ## Bekannte Fehler
 
 + Derzeit keine
-
-## 3. Wahrnehmungsarten, Spüren und Duft
-
-Status: offen; das Licht (Teil 3a) ist umgesetzt, siehe [Welt.md](Welt.md), Licht
-
-+ Art der Wahrnehmung statt ja oder nein: eine Abfrage `wahrnehmung(spiel, betrachter, ziel)` mit `gesehen`, `gespuert` oder nichts, Sinne in einem Register, damit Hellsicht und Telepathie sich später einhängen; `sieht` bleibt die Kurzform für "gesehen", die KI jagt, was sie auf irgendeine Art wahrnimmt (siehe [Ausblick.md](Ausblick.md), Hellsicht, Spüren, Unsichtbarkeit)
-+ Spüren ohne Licht im Umkreis (z. B. Mikroorganismen); Anzeige von Gespürtem für Ninkasi
-+ Spur als Duft nach Brogue: die gesteuerte Entität hinterlässt je Zug Duft auf ihrem Sichtfeld, mit der Entfernung schwächer, ein globaler Zähler statt Abklingen je Feld; Jagende, die ihre Beute aus den Augen verloren haben, folgen dem Duft entlang der Wege
-+ Offene Frage des Spieldesigns in [Grundlagen.md](Grundlagen.md), Offen: ob Mikroorganismen durch Wände spüren oder nur entlang von Wegen
 
 ## 8. Kleinere Reste der Systeme
 

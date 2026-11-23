@@ -66,6 +66,7 @@ Regeln:
 + Ein Rechtsklick untersucht das Feld wie x (Zielmodus mit `{ zweck: "untersuchen" }`, Cursor auf dem Feld); das Kontextmenü des Browsers bleibt über der Karte zu; das Mausrad zoomt
 + Gereist wird nur über bekannte Felder und nach dem bekannten Gelände (siehe [Welt.md](Welt.md), Sicht und Erinnerung), der Weg wird bei jedem Schritt neu berechnet; beim Darüberfahren zeigt die Anzeige den Weg als Vorschau
 + Reise, Laufen und Erkunden beginnen auch mit Feinden in Sicht und halten nur bei einem neuen Feind (`reiseTrotzFeinden`, Vorgabe an; aus, beginnt mit Feinden in Sicht nichts); neu heißt: im Schritt davor nicht zu sehen, wer aus der Sicht gerät und wieder auftaucht, hält also erneut (Prüfung `gegner_in_sicht`, Vorbild Brogue)
++ Als Feind in Sicht zählt hier jeder, den Ninkasi wahrnimmt, auch nur gespürt (siehe [Welt.md](Welt.md), Gefahrenprüfung)
 + Eine Reise hält bei den Gründen aus `reiseHalt`, außerdem bei Ankunft, fehlendem Weg, versperrtem Feld, Tod und jeder Taste oder jedem Klick; jede Taste und jeder Klick bricht jeden Ablauf ab
 + Laufen (Umschalt plus Richtung) geht geradeaus; beginnt nicht vor einem Hindernis (`versperrt`); hält wie die Reise, vor einem Hindernis (`hindernis`) oder Wesen (`versperrt`), vor einer bekannten Falle oder Gefahr (`gefahr_voraus`) und wenn neben Ninkasi eine Tür, eine Treppe oder ein Gegenstand neu in Reichweite kommt (`bemerkenswert`; schon Bemerktes hält nicht noch einmal); das Halten an Abzweigungen in Gängen fehlt noch
 + Rasten wartet, bis die Vorräte aus `rastenBis` voll sind; beginnt auch mit bekannten Feinden in Sicht (`rastenTrotzFeinden`), nicht aber, wenn schon alles voll ist; hält bei `rastenHalt` und nach höchstens `rastenHoechstens` Schritten, falls sich nichts mehr füllt (z.B. MP bei hohem Pegel)
@@ -178,15 +179,16 @@ Daten:
 
 Schnittstellen (`src/systeme/untersuchen.js`, reine Lesefunktionen):
 
-+ `feldBeschreiben(spiel, feld)`: nichts für ein unbekanntes Feld, für ein bekanntes, das Ninkasi gerade nicht sieht, das Erinnerte (Gelände, Oberfläche ohne Menge, unter `erinnert` Gegenstände und Fallen als Aussehen ohne ID), für ein sichtbares Gelände, Feldschichten mit Menge, Gegenstände, bekannte Fallen und Wesen
++ `feldBeschreiben(spiel, feld)`: nichts für ein unbekanntes Feld, für ein bekanntes, das Ninkasi gerade nicht sieht, das Erinnerte (Gelände, Oberfläche ohne Menge, unter `erinnert` Gegenstände und Fallen als Aussehen ohne ID), für ein sichtbares Gelände, Feldschichten mit Menge, Gegenstände, bekannte Fallen und Wesen; Wesen, die Ninkasi nur spürt, zählt `gespuert` ohne ihre Art, auch auf einem unbekannten Feld (dann ist `gelaende` null; `gespuerteWesenAuf`)
 + `wesenBeschreiben`: LP, Zustände mit Restdauer (`zustaendeVon`: angefangene Züge zu 100 Zeiteinheiten, unbegrenzt ohne), Wachzustand, laufende Aktion (`laufendeAktionVon`), Trefferchance des ersten Angriffsprofils in beide Richtungen (`nahkampfchanceVorschau`)
-+ `werteAufschluesseln`: Höchstwerte, Genauigkeit des ersten Profils, Kampfwerte und Sichtweite Ninkasis, je mit Grundwert, Wert und jedem Modifikator samt Herkunft (`herkunftVon`: angeboren, Gegenstand, Zustand, Aura)
++ `werteAufschluesseln`: Höchstwerte, Genauigkeit des ersten Profils, Kampfwerte, Sichtweite, Sicht im Dunkeln und Spüren Ninkasis, je mit Grundwert, Wert und jedem Modifikator samt Herkunft (`herkunftVon`: angeboren, Gegenstand, Zustand, Aura)
 + Tooltip: `tooltipHtml` in `src/anzeige/oberflaeche.js`, Element `#tooltip` über der Karte (siehe [Anzeige.md](Anzeige.md), Oberfläche)
 
 Regeln:
 
 + Taste x oder ein Rechtsklick öffnet den Zielmodus mit der Auswahl `{ zweck: "untersuchen" }`: derselbe Cursor (Bewegungstasten, Maus, Tab), keine Vorschau, kein Befehl, keine Spielzeit; Enter und Klick tun nichts, Esc oder x schließt
 + Gegen Ahnungslose zeigt die Trefferchance 100 % als Hinterhalt, Blocken ist nicht eingerechnet
++ Gespürte Wesen nennt Untersuchen nur als "Du spürst etwas Lebendiges." mit ihrer Anzahl
 + Die Aufschlüsselung zeigt nur Werte, die nicht 0 sind oder Modifikatoren haben; Modifikatoren mit Bedingungen an ein Gegenüber zählen dort nicht
 + Der Tooltip zeigt die Kurzfassung des Feldes unter dem Zeiger, beim Untersuchen unter dem Cursor, also auch per Tastatur; rechts neben dem Feld, am rechten Rand links davon; nicht während eines Ablaufs
 + Der Bot untersucht alle zehn Befehle Ninkasis Feld samt Werten, per Tab das nächste Wesen und ein Feld daneben, und zählt, welche Meldungen das Log zeigen, verbergen oder hören würde

@@ -9,8 +9,12 @@ const DECKKRAFT_ERINNERT = 0.35; // bekannte, aber gerade nicht sichtbare Felder
 import { istBekannt } from "../systeme/fallen.js";
 import { erinnerteDingeAuf } from "../systeme/erinnerung.js";
 import { schichtenVon, feldVonIndex } from "../welt/schichten.js";
-import { aussehenVon } from "../kern/zustand.js";
+import { aussehenVon, gesteuerteEntitaet } from "../kern/zustand.js";
 import { lichtWirkt, lichtAufFeld, stufeVonHelligkeit } from "../systeme/licht.js";
+import { wesenMitWahrnehmungsart } from "../systeme/sinne.js";
+
+// Zeichen für ein Wesen, das Ninkasi nur spürt; ein eigenes Tile kommt mit der Darstellung (docs/Systemausbau.md, Punkt 13)
+const GESPUERT = { zeichen: "?", farbe: "#c9a0dc" };
 
 // Deckkraft der Feldschichten: Oberfläche und Feuer fest, Gas mit der Menge zunehmend bis höchstens GAS_DECKKRAFT
 const OBERFLAECHE_DECKKRAFT = 0.4, FEUER_DECKKRAFT = 0.6, GAS_DECKKRAFT = 0.6, GAS_VOLL = 100;
@@ -133,7 +137,20 @@ export class Renderer {
     // Gas schwebt über allem, das Licht liegt über dem Bild
     this.schichtZeichnen(spiel, kamera, ansicht, zoom, sichtbareFelder, "gas");
     if (lichtWirkt(spiel)) this.lichtZeichnen(spiel, kamera, ansicht, zoom, sichtbareFelder);
+    this.gespuertesZeichnen(spiel, kamera, ansicht, zoom);
     this.markierungenZeichnen(kamera, ansicht, zoom, markierungen);
+  }
+
+  // Wesen, die Ninkasi nur spürt (systeme/sinne.js): ein neutrales Zeichen ohne ihre Art, über dem Licht, damit es auch
+  // im Finstern zu sehen ist
+  gespuertesZeichnen(spiel, kamera, ansicht, zoom) {
+    const gesteuerte = gesteuerteEntitaet(spiel.zustand);
+    if (!gesteuerte?.position) return;
+    for (const wesen of wesenMitWahrnehmungsart(spiel, gesteuerte, "gespuert")) {
+      const bildX = wesen.position.x - kamera.x, bildY = wesen.position.y - kamera.y;
+      if (bildX < 0 || bildY < 0 || bildX >= ansicht.breite || bildY >= ansicht.hoehe) continue;
+      this.feldZeichnen(bildX, bildY, zoom, "gespuert", GESPUERT, 1);
+    }
   }
 
   // Farbe eines Felds in der Lichtkarte: Grau nach der Stufe, getönt nach den Farben der Quellen (gewichtet nach Beitrag)

@@ -10,7 +10,7 @@ import { gesteuerteEntitaet, entitaetenAuf, istWesen } from "../kern/zustand.js"
 import { feldBekannt, feldIndex, betretbar, bekanntesGelaendeAuf } from "../welt/karte.js";
 import { istSichtbar } from "../systeme/sicht.js";
 import { erinnerteDingeAuf } from "../systeme/erinnerung.js";
-import { sichtbareFeinde, lageErfassen } from "../systeme/gefahr.js";
+import { wahrgenommeneFeinde, lageErfassen } from "../systeme/gefahr.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 import { fallenMeiden } from "../systeme/fallen.js";
 import { gefahrenMeiden, meidenZusammen } from "../systeme/schichten.js";
@@ -40,7 +40,7 @@ export function bemerkenswerteNachbarn(spiel) {
 export function laufenBeginnen(spiel, richtung, einstellungen) {
   const zustand = spiel.zustand;
   if (zustand.vorbei) return { grund: "vorbei" };
-  if (!einstellungen.reiseTrotzFeinden && sichtbareFeinde(spiel).length) return { grund: "feinde_in_sicht" };
+  if (!einstellungen.reiseTrotzFeinden && wahrgenommeneFeinde(spiel).length) return { grund: "feinde_in_sicht" };
   const gesteuerte = gesteuerteEntitaet(zustand);
   const erstesFeld = { x: gesteuerte.position.x + richtung.dx, y: gesteuerte.position.y + richtung.dy };
   if (!betretbar(spiel, gesteuerte, erstesFeld)) return { grund: "versperrt" };

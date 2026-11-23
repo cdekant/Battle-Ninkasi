@@ -167,6 +167,10 @@ export class Oberflaeche {
     if (!beschreibung) return [`<li class="leise">${text("ui.unerkundet")}</li>`];
     const zustand = spiel.zustand;
     const zeilen = beschreibung.wesen.flatMap((wesen) => this.wesenZeilen(spiel, wesen, ausfuehrlich));
+    // gespürte Wesen nur als Hinweis, ohne Art (systeme/sinne.js)
+    if (beschreibung.gespuert) zeilen.push(`<li>${text("ui.gespuert")}${beschreibung.gespuert > 1 ? ` x ${beschreibung.gespuert}` : ""}</li>`);
+    // ein unbekanntes Feld mit gespürten Wesen: kein Gelände
+    if (beschreibung.gelaende === null) return [...zeilen, `<li class="leise">${text("ui.unerkundet")}</li>`];
     for (const id of beschreibung.gegenstaende) {
       const gegenstand = entitaetMitId(zustand, id);
       const anzahl = anzahlVon(gegenstand) > 1 ? ` x ${anzahlVon(gegenstand)}` : "";

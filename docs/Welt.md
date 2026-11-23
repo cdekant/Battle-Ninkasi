@@ -2,7 +2,7 @@
 
 Stand: 2026-11-23
 
-Zuständig für: `src/welt/ebene.js`, `src/welt/ebenenschritte.js`, `src/welt/plan.js`, `src/welt/population.js`, `src/welt/karte.js`, `src/welt/schichten.js`, `src/welt/wege.js`, `src/systeme/gelaende.js`, `src/systeme/fallen.js`, `src/systeme/schichten.js`, `src/systeme/ebenen.js`, `src/systeme/sicht.js`, `src/systeme/licht.js`, `src/systeme/erinnerung.js`, `src/systeme/gefahr.js`, `daten/gelaende.js`, `daten/schichten.js`, `daten/ebenen.js`
+Zuständig für: `src/welt/ebene.js`, `src/welt/ebenenschritte.js`, `src/welt/plan.js`, `src/welt/population.js`, `src/welt/karte.js`, `src/welt/schichten.js`, `src/welt/wege.js`, `src/systeme/gelaende.js`, `src/systeme/fallen.js`, `src/systeme/schichten.js`, `src/systeme/ebenen.js`, `src/systeme/sicht.js`, `src/systeme/licht.js`, `src/systeme/duft.js`, `src/systeme/erinnerung.js`, `src/systeme/gefahr.js`, `daten/gelaende.js`, `daten/schichten.js`, `daten/ebenen.js`
 
 Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Anzeige.md](Anzeige.md), [Grundlagen.md](Grundlagen.md), [Bedienung.md](Bedienung.md), [Ausblick.md](Ausblick.md), [Architektur.md](Architektur.md)
 
@@ -192,11 +192,33 @@ Regeln:
 + Wiederholbar: die Abfrage liest nur den Zustand und rechnet ganzzahlig; die Summe hängt nicht von der Reihenfolge der Quellen ab
 + Anzeige: Lichtkarte über der Karte nach den Stufen, getönt nach den Farben der Quellen (siehe [Anzeige.md](Anzeige.md), Anzeige)
 
+## Duft
+
+Vorbild Brogue (Duft auf dem Sichtfeld, ein globaler Zähler statt Abklingen je Feld, Jäger gehen zum stärksten Duft daneben).
+
+Daten:
+
++ `zustand.duftZaehler` (über den ganzen Lauf) und `ebene.duft`: je Feld eine ganze Zahl, angelegt beim ersten Zug auf der Ebene, 0 heißt nie Duft; verlassene Ebenen tragen ihren Duft mit
++ Regelwerte `regeln.duft`: `jeZug` 3, `reichweite` 8, `haltbarkeitZuege` 20
+
+Schnittstellen (`src/systeme/duft.js`):
+
++ `duftLegen(spiel)` am Haken `zug_ende` der gesteuerten Entität, also auch bei jedem Schritt einer langen Aktion; `duftAuf`, `duftFrisch`, `duftabstand`, `duftfeld(spiel, wesen, meiden?)`
++ `duftfolgebefehl` in `src/ki/verfolgen.js` (siehe [Wesen.md](Wesen.md), KI)
+
+Regeln:
+
++ Nach jedem Zug der gesteuerten Entität steigt der Zähler um `jeZug`; jedes Feld in ihrer Sichtlinie bis `reichweite` (Schattenwurf nur nach dem Gelände, ohne Licht und Rauch) bekommt den Zähler minus den Duftabstand (die längere Achse doppelt, die kürzere einfach: gerade 2, schräg 3), wenn das mehr ist als sein bisheriger Duft
++ Frisch ist Duft, der höchstens `haltbarkeitZuege * jeZug` unter dem Zähler liegt
++ Jedes Feld ihres Weges hat einen Nachbarn mit mindestens `jeZug` mehr Duft (ihren nächsten Schritt), darum führt der Duft bis zu ihr; Teleport und Ebenenwechsel reißen die Spur ab
++ Folgen: ein jagendes Wesen ohne Vorrang, das keine Beute wahrnimmt, mit `ki.duftFolgen` (Vorgabe true), für das die gesteuerte Entität ein Ziel ist und das innerhalb ihrer Spurweite steht (siehe [Wesen.md](Wesen.md), Wahrnehmung), geht auf das Nachbarfeld mit dem stärksten frischen Duft, der stärker ist als auf seinem eigenen, das es betreten kann und das weder gefährlich noch eine Falle ist (bei Gleichstand in fester Richtungsfolge); steht dort ein Ziel, greift es an, ein anderes Wesen versperrt den Duft; das Feld wird seine letzte bekannte Position, so wird es dort wach, wenn die Spur endet
++ Wiederholbar: nur ganze Zahlen im Zustand, kein Zufall
+
 ## Gefahrenprüfung
 
 Schnittstellen (`src/systeme/gefahr.js`, reine Lesefunktionen, verändern nichts und benutzen keinen Zufall):
 
-+ `lageErfassen`: eine Lage ist ein Schnappschuss (sichtbare Feinde, LP); `sichtbareFeinde`; `gefahrPruefen` vergleicht zwei Lagen
++ `lageErfassen`: eine Lage ist ein Schnappschuss (wahrgenommene Feinde, LP); `wahrgenommeneFeinde` (gesehen oder gespürt, siehe [Wesen.md](Wesen.md), Wahrnehmung); `gefahrPruefen` vergleicht zwei Lagen
 + Register `gefahren` (`(vorher, nachher) => true` bei neuer Gefahr): `gegner_in_sicht`, `schaden`
 
 Regeln:
@@ -205,11 +227,11 @@ Regeln:
 
 ## Tests
 
-+ `tests/gelaende.test.js` (Türen, Benutzen, Fallen, Entdecken), `tests/schichten.test.js` (Oberfläche, Gas, Feuer), `tests/licht.test.js` (Quellen, Stufen, Sehen im Dunkeln, Heimlichkeit, dunkler Keller), `tests/ebenen.test.js` (Plan des Laufs, Erzeugung in Schritten samt Vergleich mit den Ebenen vor dem Umbau, Erreichbarkeit, Treppen, Ruhen, Population), `tests/wege.test.js`, `tests/gefahr.test.js`, `tests/geometrie.test.js`
++ `tests/gelaende.test.js` (Türen, Benutzen, Fallen, Entdecken), `tests/schichten.test.js` (Oberfläche, Gas, Feuer), `tests/licht.test.js` (Quellen, Stufen, Sehen im Dunkeln, Heimlichkeit, dunkler Keller), `tests/duft.test.js` (Legen, Abstand, Folgen um die Ecke, Haltbarkeit, Spurweite), `tests/ebenen.test.js` (Plan des Laufs, Erzeugung in Schritten samt Vergleich mit den Ebenen vor dem Umbau, Erreichbarkeit, Treppen, Ruhen, Population), `tests/wege.test.js`, `tests/gefahr.test.js`, `tests/geometrie.test.js`
 
 ## Verweise
 
 + Spieldesign der Welt und des Hubs: [Grundlagen.md](Grundlagen.md); Darstellung von Karte und Schichten: [Anzeige.md](Anzeige.md); Tiles: [Tileset.md](Tileset.md)
-+ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 3 (Wahrnehmungsarten, Spüren, Duft), Punkt 8 (Licht schalten, Sturz in den Abgrund, Suchen nach Fallen), Punkt 14 (Nachholen verlassener Ebenen, Dienste des Hubs, Ebenenarten); Themenräume, Schatzräume, Quests und feste Strukturen als Ideen in [Ausblick.md](Ausblick.md), sie bauen auf den Plan des Laufs und die Schritte
++ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 8 (Licht schalten, Sturz in den Abgrund, Suchen nach Fallen), Punkt 14 (Nachholen verlassener Ebenen, Dienste des Hubs, Ebenenarten); Themenräume, Schatzräume, Quests und feste Strukturen als Ideen in [Ausblick.md](Ausblick.md), sie bauen auf den Plan des Laufs und die Schritte
 
 Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

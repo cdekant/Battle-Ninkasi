@@ -92,8 +92,10 @@ Umsetzung: teilweise, siehe [Entwicklung.md](Entwicklung.md), Probeinhalt; siehe
 + Helligkeit in fünf Stufen, so fein, dass mehr als hell, mittel und dunkel entsteht, und so grob, dass man jeden Unterschied bemerkt; nur die finsterste verbirgt ganz, die übrigen machen das Schleichen stufenweise leichter
 + Im Finstern sieht man nur aus nächster Nähe, Ninkasi als Göttin etwas weiter als Sterbliche; Nachtsicht und Fernsicht kommen als Skills
 + Wer Licht trägt, sieht weiter und wird selbst von weitem gesehen
++ Manche Wesen spüren ihre Beute ohne Licht aus der Nähe, wie einen Geruch: entlang von allem, was offen ist, nie durch Wände oder geschlossene Türen; durch Wände reichen erst eigene Sinne wie Telepathie
++ Wer Ninkasi aus den Augen verliert, folgt ihrer Spur, bis sie zu alt oder Ninkasi zu weit fort ist; Heimlichkeit hilft auch dagegen
 
-Umsetzung: teilweise, siehe [Welt.md](Welt.md), Licht; offen: Spüren ohne Licht, Arten der Wahrnehmung, Spur als Duft, Licht ein- und ausschalten
+Umsetzung: teilweise, siehe [Welt.md](Welt.md), Licht, [Welt.md](Welt.md), Duft und [Wesen.md](Wesen.md), Wahrnehmung; offen: Licht ein- und ausschalten, Telepathie und andere Sinne
 
 ## Technik
 
@@ -148,5 +150,4 @@ Umsetzung: teilweise, siehe [Tileset.md](Tileset.md), Artstyle-Fibel; offen: Sig
 + Dienste des Hubs im Detail
 + Ziel eines Laufs und was zwei Läufe unterscheidet
 + Welt und Schauplatz
-+ Ob Mikroorganismen durch Wände spüren oder nur entlang von Wegen, wie ein Geruch
 + Ob der Pegel beeinflusst, wie weit Ninkasi im Dunkeln sieht

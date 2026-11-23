@@ -28,6 +28,7 @@ export function neuerZustand(startwert) {
     plan: null, // Plan des Laufs: was jede Tiefe bekommt, beim Start festgelegt (welt/plan.js)
     abgelegteEbenen: {}, // verlassene Ebenen nach Tiefe, sie ruhen bis zur Rückkehr (systeme/ebenen.js)
     sichtbareFelder: [], // Feldindizes, die Ninkasi gerade sieht (aufsteigend)
+    duftZaehler: 0, // steigt mit jedem Zug der gesteuerten Entität; der Duft je Feld steht in ebene.duft (systeme/duft.js)
     zufallszustand: null, // Zustand des Spiel-Zufalls
     wissen: null, // was Ninkasi in diesem Lauf über unbekannte Gegenstände weiß (systeme/kennen.js)
     ruf: {}, // Ruf der Fraktion regeln.fraktionen.rufTraeger bei anderen Fraktionen, fehlt heißt 0 (systeme/fraktionen.js)
@@ -164,6 +165,10 @@ export function tuerenVon(entitaet) {
 
 export function sichtVon(entitaet) {
   return juengsteUeberlagerung(entitaet, "sicht") ?? null;
+}
+
+export function spuerenVon(entitaet) {
+  return juengsteUeberlagerung(entitaet, "spueren") ?? null;
 }
 
 // Die eigenen Angriffsprofile ohne Waffen; alle Profile liefert angriffeVon in systeme/kampf.js

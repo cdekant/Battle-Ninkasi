@@ -59,6 +59,9 @@ export default {
   psi_rueckschlag: {
     schritte: [{ baustein: "schaden", art: "psi", wuerfel: "1W6" }],
   },
+  riechwasser_trinken: {
+    schritte: [{ baustein: "zustand_setzen", zustand: "witterung" }],
+  },
   sauerbier_trinken: {
     schritte: [
       { baustein: "heilen", wertName: "lp", menge: 5 },

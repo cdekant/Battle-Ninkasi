@@ -6,6 +6,7 @@ export default {
     tueren: "nicht", // Mikroorganismen öffnen keine Türen
     ki: { modul: "jagen", letzteBekanntePosition: null },
     sicht: { reichweite: 7 },
+    spueren: { reichweite: 3 }, // spüren Beute ohne Licht entlang offener Felder (src/systeme/sinne.js), vorläufig
   },
 
   essigbakterium: {

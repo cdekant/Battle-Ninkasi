@@ -17,6 +17,11 @@ export default {
     text: "gegenstand.bierfass", aufhebbar: true, gewicht: 2000, ladungen: { hoechstens: 20, gewichtJe: 500 },
     trinkbar: { effekt: "bier_trinken", zweck: ["heilen"] }, wirdZu: "leeres_fass",
   },
+  // schärft eine Weile die Witterung: Ninkasi spürt Wesen ohne Licht (src/systeme/sinne.js); vorläufig
+  riechwasser: {
+    text: "gegenstand.riechwasser", aufhebbar: true, stapelbar: true, gewicht: 300,
+    trinkbar: { effekt: "riechwasser_trinken" }, wirdZu: "leere_flasche",
+  },
   // Behälter, später für das Brauen; bis dahin Ballast oder etwas zum Werfen
   leere_flasche: { text: "gegenstand.leere_flasche", aufhebbar: true, stapelbar: true, gewicht: 400 },
   leeres_fass: { text: "gegenstand.leeres_fass", aufhebbar: true, gewicht: 2000 },

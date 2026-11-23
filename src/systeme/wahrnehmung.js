@@ -2,9 +2,11 @@
 // Wachzustand in der KI-Komponente: ki.wachzustand = "schlaeft" | "wach" | "jagt" (Vorgabe "jagt", wie bisher)
 //   schlaeft: tut nichts, bis es etwas bemerkt (dann jagt) oder Lärm hört (dann wach)
 //   wach:     hat noch niemanden bemerkt; geht Lärm nach (letzteBekanntePosition), sonst wartet es
-//   jagt:     verfolgt sichtbare Ziele innerhalb der Spurweite; verliert es die Spur, wird es wieder wach
-// Bemerken: vor seinem Zug würfelt ein Wesen, das nicht jagt, für jedes sichtbare feindliche Ziel innerhalb von dessen
-//   Heimlichkeitsweite mit regeln.wahrnehmung.bemerkenChance; Treffer oder Fehlschlag gegen es wecken es sofort.
+//   jagt:     verfolgt wahrgenommene Ziele innerhalb der Spurweite, sonst den Duft der gesteuerten Entität
+//             (systeme/duft.js); verliert es die Spur, wird es wieder wach
+// Bemerken: vor seinem Zug würfelt ein Wesen, das nicht jagt, für jedes wahrgenommene (gesehene oder gespürte,
+//   systeme/sinne.js) feindliche Ziel innerhalb von dessen Heimlichkeitsweite mit regeln.wahrnehmung.bemerkenChance;
+//   Treffer oder Fehlschlag gegen es wecken es sofort.
 // Heimlichkeitsweite: Kampfwert heimlichkeit (Vorgabe aus den Regeln) mit Modifikatoren, dann nach der letzten eigenen
 //   Aktion skaliert (Kämpfen verdoppelt, Warten halbiert) und nach der Lichtstufe des eigenen Felds
 //   (regeln.licht.stufen, systeme/licht.js), nie unter heimlichkeitMindestens.
@@ -21,7 +23,7 @@ import { bausteinAnmelden } from "../kern/bausteine.js";
 import { abstand, aufDerKarte, feldIndex, passierbar, gelaendeAuf } from "../welt/karte.js";
 import { ACHT_RICHTUNGEN } from "../welt/geometrie.js";
 import { trifftZu } from "./zielauswahl.js";
-import { sieht, kandidatenInSicht } from "./sicht.js";
+import { nimmtWahr, kandidatenWahrnehmbar } from "./sinne.js";
 import { heimlichkeitImLicht } from "./licht.js";
 
 export const WACHZUSTAENDE = ["schlaeft", "wach", "jagt"];
@@ -51,12 +53,12 @@ export function spurweite(spiel, ziel) {
 
 const lebt = (entitaet) => (entitaet.werte?.[lebenswertName(entitaet)]?.aktuell ?? 1) > 0;
 
-// Sichtbare feindliche Ziele nach Abstand, bei Gleichstand nach ID
-function sichtbareFeinde(spiel, wesen) {
+// Wahrgenommene feindliche Ziele (gesehen oder gespürt, systeme/sinne.js) nach Abstand, bei Gleichstand nach ID
+function wahrgenommeneFeinde(spiel, wesen) {
   const urheber = { id: wesen.id, fraktion: fraktionVon(wesen) ?? null };
-  return kandidatenInSicht(spiel, wesen)
+  return kandidatenWahrnehmbar(spiel, wesen)
     .filter((kandidat) => kandidat.id !== wesen.id && kandidat.position && lebt(kandidat)
-      && trifftZu(spiel, "feinde", urheber, kandidat) && sieht(spiel, wesen, kandidat))
+      && trifftZu(spiel, "feinde", urheber, kandidat) && nimmtWahr(spiel, wesen, kandidat))
     .sort((erstes, zweites) => abstand(wesen.position, erstes.position) - abstand(wesen.position, zweites.position) || erstes.id - zweites.id);
 }
 
@@ -69,7 +71,7 @@ export function wahrnehmen(spiel, wesen) {
   const ki = wesen.ki;
   if (!ki || !wesen.position || wachzustandVon(wesen) === "jagt") return;
   const chance = regelnVon(spiel).bemerkenChance;
-  for (const ziel of sichtbareFeinde(spiel, wesen)) {
+  for (const ziel of wahrgenommeneFeinde(spiel, wesen)) {
     if (abstand(wesen.position, ziel.position) > heimlichkeitsweite(spiel, ziel)) continue;
     const bemerkt = chance >= 100 || (chance > 0 && wurfProzent(spiel, "bemerken", chance));
     if (!bemerkt) continue;

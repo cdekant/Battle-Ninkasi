@@ -2,7 +2,9 @@
 // Die Reihenfolge hier ist die Anmeldereihenfolge und damit fest.
 import "./kampfzustand.js";
 import "./fraktionen.js";
+import "./sinne.js";
 import "./wahrnehmung.js";
+import "./duft.js";
 import "./kampf.js";
 import "./bewegung.js";
 import "./inventar.js";

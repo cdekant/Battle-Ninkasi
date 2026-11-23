@@ -41,6 +41,12 @@ export default {
     laermNahkampf: 6, // Lautstärke eines Nahkampfs (Kosten der Ausbreitung, freies Feld 1)
     laermWurf: 4, // Lautstärke am Aufschlag eines geworfenen Gegenstands
   },
+  // Spur als Duft, siehe src/systeme/duft.js; Vorbild Brogue, alle Zahlen vorläufig
+  duft: {
+    jeZug: 3, // so viel steigt der Zähler mit jedem Zug der gesteuerten Entität (ein Schritt gerade kostet 2, schräg 3)
+    reichweite: 8, // so weit legt sich ihr Duft in ihrer Sichtlinie, ohne Rücksicht auf Licht
+    haltbarkeitZuege: 20, // älterem Duft folgt niemand mehr
+  },
   // Licht, siehe src/systeme/licht.js; alle Zahlen vorläufig
   licht: {
     // Stufen der Helligkeit (0 bis 100) aufsteigend, die erste ab 0: auf einem Feld einer Stufe mit verbirgt sieht man

@@ -50,6 +50,8 @@ export default {
   "skill.ausweichen_grund": "Ausweichen",
   "faehigkeit.testfaehigkeit": "Testfähigkeit",
   "zustand.testzustand": "Testzustand",
+  "zustand.witterung": "Witterung",
+  "gegenstand.riechwasser": { geschlecht: "n", einzahl: { nom: "Riechwasser", gen: "Riechwassers", dat: "Riechwasser", akk: "Riechwasser" } },
   "gelaende.gaerbottich": "Gärbottich",
   "gelaende.wandfackel": "Wandfackel",
   "faehigkeit.saeurespucke": "Säurespucke",

@@ -33,6 +33,7 @@ const ARTEN = [
   "kihandlungen",       // Handlungen der KI (ki/handlungen.js): { parameter, zielwahl?, befehl(spiel, wesen, beute, eintrag, ziel) }
   "kieingaben",         // Eingaben der Bewertung (ki/handlungen.js): (spiel, wesen, beute, ziel) => ganze Zahl
   "nutzungen",          // wie die KI einen Gegenstand nutzt (ki/nutzen.js): { feld, ziel, befehl(spiel, wesen, ziel, gegenstand) }
+  "sinne",              // Arten der Wahrnehmung (systeme/sinne.js): { art, reichweite(spiel, betrachter), nimmtWahr(spiel, betrachter, ziel) }; die Anmeldereihenfolge ist der Vorrang
 ];
 
 export const RANG_VORGABE = 100;

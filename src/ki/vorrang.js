@@ -10,7 +10,7 @@ import { abstand } from "../welt/karte.js";
 import { naechstesWegfeld } from "../welt/wege.js";
 import { lebenswertName } from "../kern/werte.js";
 import { abwarten } from "./abwarten.js";
-import { naechstesSichtbaresZiel } from "./ziele.js";
+import { naechstesWahrgenommenesZiel } from "./ziele.js";
 import { angriffDaneben, wegOptionenFuer } from "./verfolgen.js";
 
 export const ANWEISUNGEN = ["angreifen", "warten", "folgen"];
@@ -33,7 +33,7 @@ export function geltenderVorrang(spiel, ki) {
 
 // Befehl für warten und folgen (angreifen setzt nur die Beute, das übernimmt ki/jagen.js), sonst null
 export function vorrangBefehl(spiel, wesen, ki, vorrang, trifft) {
-  const daneben = () => angriffDaneben(spiel, wesen, naechstesSichtbaresZiel(spiel, wesen, trifft), trifft);
+  const daneben = () => angriffDaneben(spiel, wesen, naechstesWahrgenommenesZiel(spiel, wesen, trifft), trifft);
   if (vorrang.anweisung === "warten") return daneben();
   if (vorrang.anweisung === "folgen") {
     const ziel = spiel.zustand.entitaeten[vorrang.zielId ?? spiel.zustand.spielerinId];

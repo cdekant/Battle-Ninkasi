@@ -5,7 +5,7 @@
 
 import { gesteuerteEntitaet, entitaetenAuf, istWesen, bewegungVon } from "../kern/zustand.js";
 import { naechstesWegfeld, naechstesFeldMit, amRandDesErkundeten } from "../welt/wege.js";
-import { lageErfassen, sichtbareFeinde } from "../systeme/gefahr.js";
+import { lageErfassen, wahrgenommeneFeinde } from "../systeme/gefahr.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 import { unterwegsPruefen } from "./reise.js";
 import { fallenMeiden } from "../systeme/fallen.js";
@@ -22,7 +22,7 @@ function naechstesRandfeld(spiel) {
 // Gibt { ablauf } oder { grund } zurück; grund: "vorbei" | "feinde_in_sicht" | "alles_erkundet"
 export function erkundenBeginnen(spiel, einstellungen) {
   if (spiel.zustand.vorbei) return { grund: "vorbei" };
-  if (!einstellungen.reiseTrotzFeinden && sichtbareFeinde(spiel).length) return { grund: "feinde_in_sicht" };
+  if (!einstellungen.reiseTrotzFeinden && wahrgenommeneFeinde(spiel).length) return { grund: "feinde_in_sicht" };
   if (!naechstesRandfeld(spiel)) return { grund: "alles_erkundet" };
   return { ablauf: { lage: lageErfassen(spiel), schrittzahl: 0 } };
 }

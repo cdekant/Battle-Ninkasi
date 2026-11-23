@@ -45,6 +45,7 @@ export function miniSpiel(kartenzeilen, { gelaende: testgelaende = {}, schichten
     feuer: { ...regeln.feuer, ...regelAbweichungen.feuer },
     lernen: { ...regeln.lernen, ...regelAbweichungen.lernen },
     licht: { ...regeln.licht, ...regelAbweichungen.licht },
+    duft: { ...regeln.duft, ...regelAbweichungen.duft },
   };
   return { zustand, daten: { gelaende: { ...gelaende, ...testgelaende }, schichten, aktionen, fraktionen: fraktionsdaten, effekte, schadensarten, zustaende, wesen: wesensdaten, faehigkeiten, risiken, gegenstaende, etiketten, eigenschaften: eigenschaftsdaten, skills, regeln: testregeln }, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
 }

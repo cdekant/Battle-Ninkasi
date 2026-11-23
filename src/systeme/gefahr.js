@@ -6,23 +6,23 @@
 import { anmelden, hat, holen } from "../kern/register.js";
 import { entitaetenMitPosition, gesteuerteEntitaet } from "../kern/zustand.js";
 import { feindlich } from "./kampf.js";
-import { istSichtbar } from "./sicht.js";
+import { nimmtWahr } from "./sinne.js";
 
-// Feinde, die Ninkasi gerade sieht (IDs aufsteigend)
-export function sichtbareFeinde(spiel) {
+// Feinde, die Ninkasi gerade wahrnimmt, gesehen oder gespürt (systeme/sinne.js), IDs aufsteigend
+export function wahrgenommeneFeinde(spiel) {
   const zustand = spiel.zustand;
   const gesteuerte = gesteuerteEntitaet(zustand);
   return entitaetenMitPosition(zustand)
-    .filter((entitaet) => entitaet.position && feindlich(spiel, gesteuerte, entitaet) && istSichtbar(zustand, entitaet.position.x, entitaet.position.y))
+    .filter((entitaet) => entitaet.position && feindlich(spiel, gesteuerte, entitaet) && nimmtWahr(spiel, gesteuerte, entitaet))
     .map((entitaet) => entitaet.id);
 }
 
 export function lageErfassen(spiel) {
   const gesteuerte = gesteuerteEntitaet(spiel.zustand);
-  return { feinde: sichtbareFeinde(spiel), lp: gesteuerte.werte.lp.aktuell };
+  return { feinde: wahrgenommeneFeinde(spiel), lp: gesteuerte.werte.lp.aktuell };
 }
 
-// Ein Feind ist in Sicht gekommen, der vorher nicht sichtbar war
+// Ein Feind ist wahrgenommen worden, der es vorher nicht war
 anmelden("gefahren", "gegner_in_sicht", (vorher, nachher) => nachher.feinde.some((feindId) => !vorher.feinde.includes(feindId)));
 
 // Ninkasi hat LP verloren

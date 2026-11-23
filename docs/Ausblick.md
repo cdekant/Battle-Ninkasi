@@ -16,7 +16,7 @@ Abgrenzung: [Systemausbau.md](Systemausbau.md) ist die Arbeitsliste beschlossene
 | Schatzräume mit Schlüssel | hoch | gering (Plan des Laufs steht) | erledigt (Plan des Laufs) |
 | Fraktionen: Ruf und Beistand | hoch | gering | erledigt (Ruf und Beistand) |
 | Vorschau durch Simulation | hoch | mittel | erledigt (Würfe über eine Schnittstelle) |
-| Hellsicht, Spüren, Unsichtbarkeit | hoch | mittel | teils erledigt (Erinnerung, Kartieren), offen: Art der Wahrnehmung |
+| Hellsicht, Spüren, Unsichtbarkeit | hoch | mittel | teils erledigt (Erinnerung, Kartieren, Arten der Wahrnehmung, Spüren), offen: Telepathie, Orten, Unsichtbarkeit |
 | Zeitumkehr | hoch | mittel | ja |
 | Verwandlung | mittel | mittel | erledigt (Lesefunktionen) |
 | Veränderbares Gelände | hoch | mittel | erledigt (Erinnerung der Karte) |
@@ -139,9 +139,10 @@ Umsetzung: offen
 + Braucht: Arten der Wahrnehmung neben dem Sehen: gesehen, gespürt (Ort bekannt, Art vielleicht nicht), kartiert (Gelände bekannt, nie gesehen); Unsichtbarkeit als Gegenstück; Anzeige je Art (z.B. Umriss für Gespürtes)
 + Berührt: `sieht` in `src/systeme/sicht.js` (für Ninkasi heißt Sehen heute "im Sichtfeld"), der Filter des Logs (`src/systeme/wahrnehmbar.js`), der Renderer, die Wegfindung mit `nurBekannt`, EP für Erkundung (ein kartiertes Feld zählt erst beim Sehen, siehe EP für Erkundung)
 + Umbaurisiko: mittel
-+ Vorkehrung: eine Abfrage "wie nimmt Ninkasi dieses Ziel wahr" (Art statt ja oder nein), die neue Systeme statt `istSichtbar` fragen (beschlossen, siehe [Systemausbau.md](Systemausbau.md), Punkt 3); kartiert neben gesehen ist erledigt über die Erinnerung (`kartieren`, auf Wunsch mit Schätzen, siehe [Welt.md](Welt.md), Sicht und Erinnerung); Gegner erinnert die Karte nie, sie brauchen das Spüren
++ Ideen (2026-11-23): Telepathie als Skill (Wesen durch Wände, ein Sinn mit eigener Reichweite), Schätze orten (Gegenstände statt Wesen), Magie orten (Gegenstände und Wesen mit magischen Wirkungen)
++ Vorkehrung (erledigt): Sinne im Register `sinne` mit der Abfrage `wahrnehmungsart` (gesehen, gespürt, siehe [Wesen.md](Wesen.md), Wahrnehmung), neue Sinne hängen sich dort ein; Orten von Dingen geht über die Erinnerung (`kartieren`, auf Wunsch mit Schätzen, siehe [Welt.md](Welt.md), Sicht und Erinnerung); Gegner erinnert die Karte nie, sie spüren oder folgen dem Duft
 
-Umsetzung: offen
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Wahrnehmung; offen: Telepathie, Orten, Unsichtbarkeit, Anzeige je Art über das neutrale Zeichen hinaus
 
 ## Vorschau durch Simulation
 
@@ -392,7 +393,7 @@ Stand 2026-11-22; die Quellen sind teils Wikis und Foren, die Einzelheiten könn
 + Fortschritt über Läufe: Hades (https://saschb2b.github.io/game-mechanics/games/hades/meta-progression), Game Maker's Toolkit zu Rogue Legacy (https://amara.org/subtitles/7doGHxwrhRpX/en/1/download/Roguelikes%20Persistency%20and%20Progression%20%20Game%20Makers%20Toolkit.en.dfxp), Darkest Dungeon (https://darkestdungeon.wiki.gg/wiki/Expedition)
 + Zerstörbares Gelände: Brigador Killers (https://80.lv/articles/how-brigador-killers-makes-blowing-up-buildings-part-of-the-strategy), Game Maker's Toolkit (https://gmtk.substack.com/p/how-games-do-destruction)
 + Begleiter allgemein: Ancardia (https://ancardia.fandom.com/wiki/Companion)
-+ Licht und Spur (2026-11-23): Brogue, Heimlichkeit im Licht (https://brogue.fandom.com/wiki/Stealth?oldid=9248); Sil, Licht mit Radius und Abfall (https://angband.live/forums/forum/angband/sil/5368-adapting-mechanics-from-sil-to-other-longer-games?p=110424); NetHack (https://nethackwiki.com/wiki/Light); ToME (https://te4.org/wiki/Vision); Duftkarten (https://groups.google.com/g/rec.games.roguelike.development/c/qNu94zobNt4, https://drwjf.github.io/roc/notes/scent.html)
++ Licht und Spur (2026-11-23): Brogue, Heimlichkeit im Licht (https://brogue.fandom.com/wiki/Stealth?oldid=9248); Sil, Licht mit Radius und Abfall (https://angband.live/forums/forum/angband/sil/5368-adapting-mechanics-from-sil-to-other-longer-games?p=110424); NetHack (https://nethackwiki.com/wiki/Light); ToME (https://te4.org/wiki/Vision); Duftkarten (https://groups.google.com/g/rec.games.roguelike.development/c/qNu94zobNt4, https://drwjf.github.io/roc/notes/scent.html, Brogue mit Zähler 3 je Zug und Duftabstand https://angband.live/forums/forum/angband/vanilla/7924-monster-path-finding-in-4-0-5?p=171575, RogueBasin https://chizaruu.github.io/roguebasin/tracking_by_scent_and_sound); Spüren: Pathfinder, Scent (https://www.aonprd.com/Rules.aspx?ID=434)
 + Utility-KI: Infinite Axis Utility System (https://carloslab-ai.github.io/UtilityIntelligence/UtilityIntelligence/considerations/), Folien von Dave Mark und Kevin Dill (https://api.sambuz.com/doc/improving-improving-ai-decision-modeling-ai-decision-ppt-presentation-788939)
 + Brogue, Schatzräume: Schlüsselhalter (https://brogue.fandom.com/wiki/Key_Holder), Altar (https://brogue.fandom.com/wiki/Altar), Schatzraum (https://brogue.fandom.com/wiki/Reward_room)
 + Hades: Kodex (https://breezewiki.discard.no/hades/wiki/Codex), Bestiarium in Hades II (https://vandal.elespanol.com/en/hades-2/hades-2-how-to-unlock-the-book-of-shadows-and-what-it-does.html)

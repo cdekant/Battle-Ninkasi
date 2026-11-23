@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import { plaetzeVon, tuerenVon, sichtVon, eigeneAngriffeVon, aussehenVon, bewegungVon } from "../src/kern/zustand.js";
+import { plaetzeVon, tuerenVon, sichtVon, spuerenVon, eigeneAngriffeVon, aussehenVon, bewegungVon } from "../src/kern/zustand.js";
 import { angriffeVon } from "../src/systeme/kampf.js";
 import { oeffnetTueren } from "../src/welt/karte.js";
 import { miniSpiel, wesen } from "./hilfen.js";
@@ -35,7 +35,7 @@ test("der jüngste Zustand mit dem Feld überlagert die eigene Komponente", () =
   const entitaet = {
     typ: "ninkasi", plaetze: { hand: 2 }, tueren: "oeffnen", sicht: { reichweite: 8 }, angriffe: [{ name: "faust" }],
     zustaende: [
-      gestalt(1, { plaetze: { kopf: 1 }, tueren: "nicht", sicht: { reichweite: 3 }, angriffe: [{ name: "klaue" }], aussehen: "drache" }),
+      gestalt(1, { plaetze: { kopf: 1 }, tueren: "nicht", sicht: { reichweite: 3 }, spueren: { reichweite: 2 }, angriffe: [{ name: "klaue" }], aussehen: "drache" }),
       gestalt(2, { aussehen: "statue", plaetze: { finger: 2 } }),
       gestalt(3, {}),
     ],
@@ -45,6 +45,8 @@ test("der jüngste Zustand mit dem Feld überlagert die eigene Komponente", () =
   assert.equal(tuerenVon(entitaet), "nicht");
   assert.equal(oeffnetTueren(entitaet), false);
   assert.deepEqual(sichtVon(entitaet), { reichweite: 3 });
+  assert.deepEqual(spuerenVon(entitaet), { reichweite: 2 });
+  assert.equal(spuerenVon({ typ: "stein" }), null);
   assert.deepEqual(eigeneAngriffeVon(entitaet), [{ name: "klaue" }]);
   assert.equal(bewegungVon(entitaet), "laufend");
 });
@@ -60,7 +62,7 @@ test("angriffeVon nimmt ohne Waffe die eigenen Profile über die Lesefunktion", 
 });
 
 // Direkte Zugriffe auf Komponenten ohne Zahl; erlaubt sind nur die Stellen unten, die keine Entität lesen
-const ZUGRIFF = /(?:\.|\?\.)(plaetze|tueren|sicht|angriffe|bewegung|aussehen)\b/g;
+const ZUGRIFF = /(?:\.|\?\.)(plaetze|tueren|sicht|spueren|angriffe|bewegung|aussehen)\b/g;
 const ERLAUBT = [
   /^src\/kern\/daten\.js$/, // Datenprüfung liest die Datensätze, nicht Entitäten
   /^src\/anzeige\/beschreibung\.js$/, // Steckbriefe lesen die Datensätze, nicht Entitäten
@@ -94,5 +96,5 @@ test("Systeme lesen Komponenten ohne Zahl nur über Lesefunktionen", () => {
       }
     });
   }
-  assert.deepEqual(verstoesse, [], "direkter Zugriff statt plaetzeVon, tuerenVon, sichtVon, eigeneAngriffeVon, aussehenVon oder bewegungVon");
+  assert.deepEqual(verstoesse, [], "direkter Zugriff statt plaetzeVon, tuerenVon, sichtVon, spuerenVon, eigeneAngriffeVon, aussehenVon oder bewegungVon");
 });

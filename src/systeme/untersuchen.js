@@ -2,12 +2,13 @@
 // Wesen darauf weiß; ändern nichts und würfeln nicht. Grundlage für Tooltip und Seitenleiste (anzeige/oberflaeche.js).
 // Ein unbekanntes Feld gibt nichts preis, ein bekanntes, das sie gerade nicht sieht, nur, woran sie sich erinnert
 // (Gelände, Oberfläche, Gegenstände und Fallen als Aussehen, systeme/erinnerung.js), ein sichtbares alles: Gelände,
-// Feldschichten, Gegenstände, bekannte Fallen und Wesen.
+// Feldschichten, Gegenstände, bekannte Fallen und Wesen. Gespürte Wesen (systeme/sinne.js) zählt es nur, ohne ihre Art.
 // Wesen: LP, Zustände mit Restdauer in Zügen, Wachzustand, laufende Aktion, Trefferchance in beide Richtungen
 // (erstes Angriffsprofil, systeme/vorschau.js). Ninkasi selbst dazu mit der Aufschlüsselung ihrer Werte.
 
-import { gesteuerteEntitaet, entitaetenAuf, istWesen, sichtVon } from "../kern/zustand.js";
-import { feldBekannt, feldIndex, gelaendeName, bekannterGelaendeName } from "../welt/karte.js";
+import { gesteuerteEntitaet, entitaetenAuf, istWesen, sichtVon, spuerenVon } from "../kern/zustand.js";
+import { aufDerKarte, feldBekannt, feldIndex, gelaendeName, bekannterGelaendeName } from "../welt/karte.js";
+import { wahrnehmungsart } from "./sinne.js";
 import { schichtAuf } from "../welt/schichten.js";
 import { hatHoechstwert, hoechstwert, modifikatorenAufgeschluesselt, verrechnet, lebenswertName } from "../kern/werte.js";
 import { istSichtbar } from "./sicht.js";
@@ -65,17 +66,30 @@ function erinnerterBezug(zustand, eintrag) {
   return bezug;
 }
 
-// Was Ninkasi über ein Feld weiß, oder null (außerhalb der Karte oder unbekannt):
+// Wie viele Wesen auf einem Feld, das sie nicht sieht, Ninkasi nur spürt (systeme/sinne.js): Ort ja, Art nein
+export function gespuerteWesenAuf(spiel, feld) {
+  const zustand = spiel.zustand;
+  const gesteuerte = gesteuerteEntitaet(zustand);
+  if (!gesteuerte || istSichtbar(zustand, feld.x, feld.y)) return 0;
+  return entitaetenAuf(zustand, feld.x, feld.y).filter((entitaet) => istWesen(entitaet) && wahrnehmungsart(spiel, gesteuerte, entitaet) === "gespuert").length;
+}
+
+// Was Ninkasi über ein Feld weiß, oder null (außerhalb der Karte oder unbekannt und nichts gespürt):
 // { x, y, sichtbar, gelaende, schichten: [{ schicht, art, menge }], gegenstaende: [id], fallen: [id], wesen: [Beschreibung],
-//   erinnert: { gegenstaende: [{ typ, text, etikett?, anzahl }], fallen: [{ typ, text }] } }
-// Außer Sicht kommen Gelände und Oberfläche (menge null) aus der Erinnerung, Gegenstände und Fallen stehen unter erinnert
+//   gespuert: Anzahl, erinnert: { gegenstaende: [{ typ, text, etikett?, anzahl }], fallen: [{ typ, text }] } }
+// Außer Sicht kommen Gelände und Oberfläche (menge null) aus der Erinnerung, Gegenstände und Fallen stehen unter erinnert;
+// gespürte Wesen zählt gespuert, auch auf einem unbekannten Feld (dann ist gelaende null)
 export function feldBeschreiben(spiel, feld) {
   const zustand = spiel.zustand;
   const ebene = zustand.ebene;
-  if (!feld || !feldBekannt(ebene, feld.x, feld.y)) return null;
+  if (!feld || !aufDerKarte(ebene, feld.x, feld.y)) return null;
+  const gespuert = gespuerteWesenAuf(spiel, feld);
+  const bekannt = feldBekannt(ebene, feld.x, feld.y);
+  if (!bekannt && !gespuert) return null;
   const sichtbar = istSichtbar(zustand, feld.x, feld.y);
   const gelaende = sichtbar ? gelaendeName(spiel, feld.x, feld.y) : bekannterGelaendeName(spiel, feld.x, feld.y);
-  const beschreibung = { x: feld.x, y: feld.y, sichtbar, gelaende, schichten: [], gegenstaende: [], fallen: [], wesen: [], erinnert: { gegenstaende: [], fallen: [] } };
+  const beschreibung = { x: feld.x, y: feld.y, sichtbar, gelaende, schichten: [], gegenstaende: [], fallen: [], wesen: [], gespuert, erinnert: { gegenstaende: [], fallen: [] } };
+  if (!bekannt) return beschreibung;
   if (!sichtbar) {
     const dinge = erinnerteDingeAuf(ebene, feldIndex(ebene, feld.x, feld.y));
     if (dinge.oberflaeche) beschreibung.schichten.push({ schicht: "oberflaeche", art: dinge.oberflaeche, menge: null });
@@ -117,6 +131,7 @@ function grundwertVon(spiel, wesen, name) {
   if (name === "reichweiteSicht") return sichtVon(wesen)?.reichweite ?? 0;
   // ohne Sicht auch keine Sicht im Dunkeln
   if (name === "sichtImDunkeln") return sichtVon(wesen) ? sichtVon(wesen).imDunkeln ?? spiel.daten.regeln.licht.imDunkeln : 0;
+  if (name === "reichweiteSpueren") return spuerenVon(wesen)?.reichweite ?? 0;
   if (name === "genauigkeit") return angriffeVon(spiel, wesen)[0]?.genauigkeit ?? 0;
   if (name === "heimlichkeit") return wesen.kampfwerte?.heimlichkeit ?? spiel.daten.regeln.wahrnehmung.heimlichkeitVorgabe;
   return wesen.kampfwerte?.[name] ?? 0;
@@ -126,7 +141,7 @@ function grundwertVon(spiel, wesen, name) {
 // nicht 0 sind oder Modifikatoren haben; Modifikatoren mit Bedingungen an ein Gegenüber zählen hier nicht
 // (ohne Umstände); Kampfwerte nie unter 0 wie in systeme/kampf.js
 export function werteAufschluesseln(spiel, wesen) {
-  const namen = [...HOECHSTWERTE.filter((name) => wesen.werte?.[name] && hatHoechstwert(wesen, name)), "genauigkeit", ...KAMPFWERTE, "reichweiteSicht", "sichtImDunkeln"];
+  const namen = [...HOECHSTWERTE.filter((name) => wesen.werte?.[name] && hatHoechstwert(wesen, name)), "genauigkeit", ...KAMPFWERTE, "reichweiteSicht", "sichtImDunkeln", "reichweiteSpueren"];
   const ergebnis = [];
   for (const name of namen) {
     const grundwert = grundwertVon(spiel, wesen, name);

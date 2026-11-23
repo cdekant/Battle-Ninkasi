@@ -7,7 +7,7 @@
 import { gesteuerteEntitaet, entitaetenAuf, istWesen, bewegungVon } from "../kern/zustand.js";
 import { feldBekannt, gelaendeBetretbarFuer, bekanntesGelaendeAuf, oeffnetTueren } from "../welt/karte.js";
 import { naechstesWegfeld } from "../welt/wege.js";
-import { lageErfassen, sichtbareFeinde, gefahrPruefen } from "../systeme/gefahr.js";
+import { lageErfassen, wahrgenommeneFeinde, gefahrPruefen } from "../systeme/gefahr.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 import { fallenMeiden } from "../systeme/fallen.js";
 import { gefahrenMeiden, meidenZusammen } from "../systeme/schichten.js";
@@ -23,7 +23,7 @@ export function reiseBeginnen(spiel, ziel, einstellungen) {
   // das Ziel muss bekannt und nach dem bekannten Gelände betretbar sein (systeme/erinnerung.js)
   const zielBetretbar = gelaendeBetretbarFuer(spiel, bekanntesGelaendeAuf(spiel, ziel.x, ziel.y), bewegungVon(gesteuerte), oeffnetTueren(gesteuerte));
   if (!feldBekannt(zustand.ebene, ziel.x, ziel.y) || !zielBetretbar) return { grund: "kein_weg" };
-  if (!einstellungen.reiseTrotzFeinden && sichtbareFeinde(spiel).length) return { grund: "feinde_in_sicht" };
+  if (!einstellungen.reiseTrotzFeinden && wahrgenommeneFeinde(spiel).length) return { grund: "feinde_in_sicht" };
   if (!naechstesWegfeld(spiel, gesteuerteEntitaet(zustand).position, ziel, wegOptionen(spiel))) return { grund: "kein_weg" };
   return { reise: { ziel: { x: ziel.x, y: ziel.y }, lage: lageErfassen(spiel), schrittzahl: 0 } };
 }

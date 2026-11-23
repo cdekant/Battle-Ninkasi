@@ -151,13 +151,14 @@ test("Datenprüfung: Abfolge, Starttiefe, feste Karte, Population und Tabellen",
 // den dunklen Keller in Tiefe 2, die Laterne und sicht.imDunkeln an Ninkasi (mit der alten Abfolge, ohne Laterne und
 // ohne imDunkeln blieben die Werte gleich).
 test("Erzeugung in Schritten: dieselben Ebenen wie vorher", () => {
-  const erwartet = { 1: "19529a21c859ea4c", 2: "953feaf1c37735ff", 3: "1f13fcc0886803ef", 42: "5302ffc81cb916b0", 4711: "ce6a5f0e7f2ea304" };
+  const erwartet = { 1: "5a9e288d8433cbb6", 2: "a67da0e260ab5e47", 3: "a67aa2c0b8704a96", 42: "cf3621f3e1d82c11", 4711: "3955eb456b94b8ac" };
   for (const [startwert, fingerabdruck] of Object.entries(erwartet)) {
     const spiel = neuesSpiel(DATEN, Number(startwert));
     for (const tiefe of [2, 3, 0]) ebeneWechseln(spiel, tiefe);
     const { ebene, abgelegteEbenen, entitaeten } = spiel.zustand;
-    // die Erinnerung der Karte (seit 0.37.0) ist Wissen Ninkasis, nicht Teil der Erzeugung, und zählt nicht mit
-    const ohneErinnerung = (karte) => { const { erinnerung, erinnerteDinge, ...rest } = karte; return rest; };
+    // die Erinnerung der Karte (seit 0.37.0) ist Wissen Ninkasis und der Duft (seit 0.53.0) ihre Spur, beides nicht
+    // Teil der Erzeugung, sie zählen nicht mit
+    const ohneErinnerung = (karte) => { const { erinnerung, erinnerteDinge, duft, ...rest } = karte; return rest; };
     const abgelegt = Object.fromEntries(Object.entries(abgelegteEbenen).map(([tiefe, eintrag]) => [tiefe, { ...eintrag, ebene: ohneErinnerung(eintrag.ebene) }]));
     const ergebnis = createHash("sha256").update(JSON.stringify({ ebene: ohneErinnerung(ebene), abgelegt, entitaeten })).digest("hex").slice(0, 16);
     assert.equal(ergebnis, fingerabdruck, `Startwert ${startwert}`);

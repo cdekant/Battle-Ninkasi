@@ -71,7 +71,7 @@ test("Untersuchen: sichtbar alles, außer Sicht das Erinnerte, unbekannt nichts"
   spiel.zustand.sichtbareFelder = [feldIndex(ebene, 1, 1)];
   assert.deepEqual(feldBeschreiben(spiel, { x: 4, y: 1 }), {
     x: 4, y: 1, sichtbar: false, gelaende: "boden", schichten: [{ schicht: "oberflaeche", art: "saeure", menge: null }],
-    gegenstaende: [], fallen: [], wesen: [], erinnert: { gegenstaende: [{ typ: "flasche", text: "x", anzahl: 1 }], fallen: [] },
+    gegenstaende: [], fallen: [], wesen: [], gespuert: 0, erinnert: { gegenstaende: [{ typ: "flasche", text: "x", anzahl: 1 }], fallen: [] },
   });
   // unbekannt oder außerhalb der Karte: nichts
   ebene.erinnerung[feldIndex(ebene, 4, 1)] = null;
@@ -206,7 +206,8 @@ test("Texte für Untersuchen, Zustände, Geräusche und Gelände sind vorhanden"
     ...["n", "no", "o", "so", "s", "sw", "w", "nw", "nah"].map((richtung) => `richtung.${richtung}`),
     ...["schlaeft", "wach", "jagt"].map((wachzustand) => `ui.wachzustand.${wachzustand}`),
     ...["eigen", "aura", "sonstige"].map((herkunft) => `ui.herkunft.${herkunft}`),
-    ...["lp", "mp", "pp", "genauigkeit", ...KAMPFWERTE, "reichweiteSicht", "sichtImDunkeln"].map((wert) => `ui.wert.${wert}`),
+    ...["lp", "mp", "pp", "genauigkeit", ...KAMPFWERTE, "reichweiteSicht", "sichtImDunkeln", "reichweiteSpueren"].map((wert) => `ui.wert.${wert}`),
+    "ui.gespuert",
     ...Object.values(rohdaten.gelaende).map((gelaende) => gelaende.text),
   ];
   assert.deepEqual(schluessel.filter((eintrag) => !(eintrag in texte)), []);
