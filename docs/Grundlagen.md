@@ -1,8 +1,8 @@
 # Battle Ninkasi - Grundlagen
 
-Stand: 2026-11-23
+Stand: 2026-11-24
 
-Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Architektur.md](Architektur.md), [Wesen.md](Wesen.md), [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md), [Tileset.md](Tileset.md), [Entwicklung.md](Entwicklung.md), [Ausblick.md](Ausblick.md)
+Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Architektur.md](Architektur.md), [Wesen.md](Wesen.md), [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md), [Tileset.md](Tileset.md), [Entwicklung.md](Entwicklung.md), [Ausblick.md](Ausblick.md), [Spielverlauf.md](Spielverlauf.md)
 
 ## Spiel
 
@@ -10,11 +10,12 @@ Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Architektur.md](Archi
 + Permadeath; dauerhafter Fortschritt zwischen den Läufen höchstens als Wissen (Rezepte, Bestiarium, Glossar), nie als stärkere Werte (entschieden 2026-11-22, Ideen in [Ausblick.md](Ausblick.md))
 + Gesteuert wird nur Ninkasi; Begleiter handeln selbst und nehmen von ihr Vorrangbefehle an (entschieden 2026-11-22, siehe Begleiter und Befehle in [Ausblick.md](Ausblick.md))
 + Zufällig erzeugte Dungeons
-+ Hub: fester Ort zwischen den Ebenen mit Diensten (Händler u.a.), ähnliche Dienste unterwegs durch wandernde Händler und Nebengottheiten
++ Offene Tiefe in Kapiteln, jedes mit eigenen Ebenenbildern, Gegnern und einem Boss; zwei Läufe unterscheiden sich vor allem durch den klassenlosen Build und die Fundstücke (siehe [Spielverlauf.md](Spielverlauf.md))
++ Hub: fester Ort zwischen den Kapiteln mit Diensten (Händler u.a.), der im Lauf mit jedem Kapitel reicher wird (siehe [Spielverlauf.md](Spielverlauf.md), Hub); ähnliche Dienste unterwegs durch wandernde Händler und Nebengottheiten
 + Zielgruppe: zunächst nur privat, Steam als spätere Option, Steam Deck kein Ziel
 + Open Source: Code unter GPL-3.0-or-later, Texte und Grafik unter CC BY-NC-SA 4.0, siehe [LIZENZEN.md](../LIZENZEN.md)
 
-Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Dienste des Hubs, wandernde Händler und Nebengottheiten
+Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Kapitel, Dienste des Hubs, wandernde Händler und Nebengottheiten
 
 ## Spielkern
 
@@ -68,9 +69,7 @@ Umsetzung: siehe [Wesen.md](Wesen.md), Skills und Lernen
 + Mikroorganismen verschiedener Art
 + Betriebskontrolleure
 + Abstinenzler
-+ Endboss: Gott der Nüchternheit
-+ Vorschlag, noch nicht bestätigt: Sobrietas als Endboss (römische Personifikation der Nüchternheit, erschlägt in der "Psychomachia" des Prudentius die Luxuria)
-+ Vorschlag, noch nicht bestätigt: Lykurg von Thrakien, Pentheus von Theben und eine Figur nach Carrie Nation als Bosse davor
++ Bosse am Ende jedes Kapitels, Sobrietas am Ende größerer Bögen: siehe [Spielverlauf.md](Spielverlauf.md), Bosse
 + Vorschlag, noch nicht bestätigt: Hefen ambivalent, Milchsäurebakterien, Essigbakterien und Schimmel als Verderber
 + Idee, noch nicht bestätigt: Mikroorganismen teilen sich, ausgehend von einer Mutterzelle
 + Ideen, auszuarbeiten: jede Gruppe der Mikroorganismen mit eigener Mechanik
@@ -87,7 +86,7 @@ Umsetzung: teilweise, siehe [Entwicklung.md](Entwicklung.md), Probeinhalt; siehe
 ## Licht und Wahrnehmung
 
 + Licht ist Spielmechanik, Stimmung ein Nebeneffekt
-+ Ebenen sind je nach Plan des Laufs hell oder dunkel; kein Wechsel von Tag und Nacht, weil Warten auf Dunkelheit das Rasten belohnte und der Schauplatz meist unter der Erde liegt; später vielleicht helle Räume und dunkle Gänge auf derselben Ebene
++ Ebenen sind je nach Plan des Laufs hell oder dunkel; kein Wechsel von Tag und Nacht, weil Warten auf Dunkelheit das Rasten belohnte; später vielleicht helle Räume und dunkle Gänge auf derselben Ebene
 + Lichtquellen leuchten in einem Umkreis und werden zum Rand hin schwächer: Wandfackeln, Feuer, getragene Laternen; Kontrolleure tragen Taschenlampen
 + Helligkeit in fünf Stufen, so fein, dass mehr als hell, mittel und dunkel entsteht, und so grob, dass man jeden Unterschied bemerkt; nur die finsterste verbirgt ganz, die übrigen machen das Schleichen stufenweise leichter
 + Im Finstern sieht man nur aus nächster Nähe, Ninkasi als Göttin etwas weiter als Sterbliche; Nachtsicht und Fernsicht kommen als Skills
@@ -143,11 +142,8 @@ Umsetzung: teilweise, siehe [Tileset.md](Tileset.md), Artstyle-Fibel; offen: Sig
 + Magie im Detail: welche Wirkungen über die Zeit (Schaden, Flächen, Segen und Fluch, Beschwörung)
 + Pegel im Detail: Schwellen, Risiken, Aktionen mit Mindestpegel
 + Ausdauer: ob überhaupt, Zuordnung zu Gewandtheit oder Körperlichkeit, Verhältnis zu einer Nahrungsuhr
-+ Endboss: Sobrietas oder erfundener Gott der Nüchternheit
 + Unterschiede der Mikroorganismen ausarbeiten (Hefen, Bakterien, Schimmel, weitere Gruppen)
 + Brausystem im Detail: Zutaten, Rezepte, Wirkung der Kessel-Tiers, Reihenfolge der Materialien
 + Folgen eines abgebrochenen Brauvorgangs: verdorben, minderwertig oder wieder aufnehmbar (Unterbrechung und Entscheidung per Befehl regelt [Wirkungen.md](Wirkungen.md), Lange Aktionen)
 + Dienste des Hubs im Detail
-+ Ziel eines Laufs und was zwei Läufe unterscheidet
-+ Welt und Schauplatz
 + Ob der Pegel beeinflusst, wie weit Ninkasi im Dunkeln sieht

@@ -1,8 +1,8 @@
 # Battle Ninkasi - Ausblick
 
-Stand: 2026-11-23
+Stand: 2026-11-24
 
-Mitprüfen bei Änderungen: [Dokumentation.md](Dokumentation.md), [Grundlagen.md](Grundlagen.md), [Architektur.md](Architektur.md), [Systemausbau.md](Systemausbau.md), [Wesen.md](Wesen.md), [Welt.md](Welt.md), [Charakter.md](Charakter.md)
+Mitprüfen bei Änderungen: [Dokumentation.md](Dokumentation.md), [Grundlagen.md](Grundlagen.md), [Architektur.md](Architektur.md), [Systemausbau.md](Systemausbau.md), [Wesen.md](Wesen.md), [Welt.md](Welt.md), [Charakter.md](Charakter.md), [Spielverlauf.md](Spielverlauf.md)
 
 Ideen für Mechaniken, über die noch nicht entschieden ist, mit dem, was sie dem Kern abverlangen. Zweck: früh erkennen, wo heutiger Code einer Idee den Weg verbaut, und dort rechtzeitig vorbauen, statt später schwer umzubauen.
 
@@ -40,6 +40,10 @@ Abgrenzung: [Systemausbau.md](Systemausbau.md) ist die Arbeitsliste beschlossene
 | EP für Erkundung | ungeklärt | gering | erledigt (gesehen getrennt von bekannt) |
 | Mechaniken aus Pen-and-Paper | teils | gering | nein |
 | Licht im Wandel | ungeklärt | gering | erledigt (Licht als Abfrage) |
+| Mutationen | ungeklärt | gering | nein |
+| Erzeugte Geschichte | ungeklärt | gering | nein |
+| Speichern im Hub | ungeklärt | gering | nein |
+| Geister früherer Läufe | hoch | gering | nein |
 
 Umsetzung: keine
 
@@ -379,6 +383,58 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Sicht und Erinnerung; offen: ob 
 + Vorkehrung (erledigt): Licht ist eine Abfrage aus dem Zustand ohne gespeicherte Karte, jede dieser Ideen ändert nur, woraus sie rechnet
 
 Umsetzung: offen
+
+## Mutationen
+
++ Wichtigkeit: ungeklärt, angeregt durch Caves of Qud (2026-11-24)
++ Vorbilder: Caves of Qud (körperliche und geistige Mutationen mit Stufen als eigene Achse neben den Skills, dazu Defekte als Nachteil); Dungeon Crawl Classics (Korruption: Magie verändert den Körper dauerhaft)
++ Idee: Hefen, Bakterien und Schimmel verändern Ninkasi dauerhaft, zum Guten oder zum Schlechten; als eigene Achse der Builds neben Skills und Brauschule oder nur als seltene Ereignisse
++ Braucht: dauerhafte Zustände mit Modifikatoren, Fähigkeiten und Auslösern (vorhanden, siehe [Wirkungen.md](Wirkungen.md), Zustände); eine Quelle (Infektion, Trank, Ort); Anzeige im Charakterfenster; für sichtbare Veränderungen die Gestalt aus Verwandlung
++ Berührt: Verwandlung, Krankheiten, Skills und Machtkurve (ob Mutationen EP kosten oder Skills ersetzen)
++ Umbaurisiko: gering
++ Vorkehrung: keine; Zustände ohne Ende und Komponenten über Lesefunktionen genügen
+
+Umsetzung: offen
+
+## Erzeugte Geschichte
+
++ Wichtigkeit: ungeklärt; die volle Fassung nach Caves of Qud ist groß, eine kleine ist erreichbar (2026-11-24)
++ Vorbilder: Caves of Qud (je Spielwelt erzeugte Geschichte der Sultane aus Ereignissen, gefunden als Inschriften an Schreinen und als Artefakte, Orte und Fraktionen beziehen sich darauf)
++ Idee: je Startwert ein paar Legenden früherer Brauerinnen, gefallener Götter und verlorener Rezepte, gefunden als Fundtexte, Inschriften und Orte; einzelne werden zu Artefakten oder festen Strukturen; die Legenden handeln von Fraktionen, und was Ninkasi aus ihnen weiß oder findet, hilft, eine Fraktion zu befreunden
++ Braucht: einen Schritt im Plan des Laufs, der die Legenden aus seinem Zufall erzeugt und auf Tiefen verteilt; Vorlagen und Grammatik für die Texte (vorhanden: Korpus, Markow-Ketten und Grammatik, siehe [Texte.md](Texte.md), Erzeugte Texte); Artefakte mit erzeugtem Namen; Taten an Artefakten, die den Ruf verschieben (siehe Fraktionen: Ruf und Beistand)
++ Berührt: Plan des Laufs, Texte, Fraktionen, Questsystem, Feste Strukturen
++ Umbaurisiko: gering, der Plan des Laufs ist für Festlegungen vor der ersten Ebene gedacht
++ Vorkehrung: keine; der Plan gehört zum Zustand und folgt allein aus Startwert und Daten (siehe [Welt.md](Welt.md), Plan des Laufs)
+
+Umsetzung: offen
+
+## Speichern im Hub
+
++ Wichtigkeit: ungeklärt, "ein weicher Spielmodus" (2026-11-24)
++ Vorbilder: Tales of Maj'Eyal (Spielarten neben dem Roguelike: Abenteuer mit wenigen zusätzlichen Leben, Erkunden ohne Permadeath)
++ Idee: In einer eigenen weichen Spielart sichert das Betreten des Hubs den Stand; stirbt Ninkasi, geht es dort weiter (siehe [Spielverlauf.md](Spielverlauf.md), Hub)
++ Braucht: die Spielart (vorgesehen, siehe [Architektur.md](Architektur.md), Spielarten); beim Betreten des Hubs eine Kopie des Zustands im Spielstand; nach dem Tod die Rückkehr dorthin statt des Endes; die Chronik vermerkt die Spielart
++ Berührt: Speichern, Tod, Chronik, Todesbericht, Erfolge (ob sie in der weichen Spielart zählen)
++ Umbaurisiko: gering, der ganze Zustand ist JSON
++ Vorkehrung: keine
+
+Umsetzung: offen
+
+## Geister früherer Läufe
+
++ Wichtigkeit: hoch, "eine bisher in Spielen noch wenig aufgetauchte Mechanik" (2026-11-24)
++ Vorbilder: NetHack (Bones: die Ebene, auf der eine Figur starb, kann in einem späteren Spiel mit ihrem Geist und ihrer verfluchten Habe wieder auftauchen); Dungeon Crawl Stone Soup (Geister toter Figuren mit Name, Stufe und Zaubern aus Bones-Dateien); Middle-earth: Shadow of Mordor (Nemesis-System: Gegner erinnern sich an frühere Begegnungen); neu gegenüber diesen: die Geister jagen Psi und Rausch
++ Idee: Jeder Tod legt eine Geist-Ninkasi in eine wachsende Bibliothek, mit ihren Skills, Fähigkeiten und Gegenständen; in späteren Läufen erscheinen Geister als Psi-Jägerinnen, angelockt von hohem Pegel und vom Einsatz von Psi; die Bibliothek erzählt so die Geschichte der eigenen Läufe ("Ninkasi die Dritte, ertrunken im Gärbottich auf Level 7"); ein gleicher Startwert ist nicht nötig, weil nur der Geist mitkommt, nicht die Ebene
++ Zusammenhang: die Geister wären der Inhalt der Idee, dass häufiges Psi Gegner erscheinen lässt (Glimmer, siehe [Grundlagen.md](Grundlagen.md), Spielkern), und der Folgen des Pegels (siehe [Systemausbau.md](Systemausbau.md), Punkt 10)
++ Braucht: beim Tod einen Eintrag in der Bibliothek außerhalb des Laufs (Name, Todestiefe und Ursache, Skillstufen, Fähigkeiten, Ausrüstung), nur aus Spielarten, die zählen; beim Start übernimmt die Oberfläche eine Auswahl als Startoption wie das Vorwissen (siehe [Architektur.md](Architektur.md), Speichern), so bleibt der Lauf wiederholbar; ein Auslöser über Pegel und Psi ruft einen Geist herbei; die KI des Geists handelt mit ihren Fähigkeiten nach der Taktik der gesteuerten Entität (siehe [Wesen.md](Wesen.md), KI)
++ Machtkurve: Es erscheinen nur Geister aus ähnlicher Tiefe oder mit ähnlichen EP wie Ninkasi; bis die Bibliothek gefüllt ist, wird ein Geist auf die heutige Tiefe skaliert
++ Beute: Der Geist hinterlässt keine Ausrüstung, höchstens einen Gegenstand, der für Psi nützlich ist und den Pegel hebt (Arbeitsnamen "reiner Alkohol", "Ninkasis Essenz"); so bleibt die Regel gewahrt, dass zwischen Läufen nur Wissen bleibt ([Grundlagen.md](Grundlagen.md), Spiel)
++ Taktik: Ausgangspunkt ist die Bewertung der Handlungen, nach der schon die Taktik der gesteuerten Entität den Bot führt; als Ausbau kann der Geist die Spielweise der toten Ninkasi nachahmen, aus der Häufigkeit ihrer Fähigkeiten und Befehle im Lauf
++ Berührt: Chronik und Todesbericht (Quelle der Einträge), Schutz der Ablagen, Arena und Bot (füllen die Bibliothek nicht)
++ Umbaurisiko: gering
++ Vorkehrung: keine; der Weg über die Startoptionen steht
+
+Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 10
 
 ## Recherche
 

@@ -55,6 +55,7 @@ Spieldesign:
 
 + [docs/Grundlagen.md](docs/Grundlagen.md): Spiel, Spielkern, Charakter, Gegner, Licht, Technik, Design, offene Fragen
 + [docs/Charakter.md](docs/Charakter.md): Eigenschaften, Skills, EP und Charaktererstellung
++ [docs/Spielverlauf.md](docs/Spielverlauf.md): Kapitel, Epochen, Ebenenbilder, Bosse, was Läufe unterscheidet
 + [docs/Oberflaeche.md](docs/Oberflaeche.md): Schema der Oberfläche (Layout, Log, Fenster, Tastatur nach vi)
 + [docs/Titelbildschirm.md](docs/Titelbildschirm.md): Titel, Speicherplätze, Chronik, Ideen für später
 + [docs/Animationen.md](docs/Animationen.md): Effektschicht, Kampfanimation, Kamera (zurückgestellt)

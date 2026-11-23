@@ -17,7 +17,7 @@ Die Dokumente bilden eine Kaskade von allgemein nach speziell; jede Stufe verwei
 1. CLAUDE.md: Axiome, Designprinzipien, Ordner, Grundbegriffe als Wegweiser, Liste der Dokumente
 2. Dokumentation.md: Regeln für alle Dokumente (dieses Dokument)
 3. Grundlagen.md: das Spiel im Ganzen, Spielkern, offene Fragen des Spieldesigns
-4. Design-Dokumente je Thema: Charakter, Oberflaeche, Titelbildschirm, Animationen, Ausblick (Ideen)
+4. Design-Dokumente je Thema: Charakter, Spielverlauf, Oberflaeche, Titelbildschirm, Animationen, Ausblick (Ideen)
 5. Technische Dokumente je System: Architektur (Kern), dann Wirkungen, Wesen, Welt, Gegenstaende, Anzeige, Bedienung, Texte, Tileset, Entwicklung
 6. Kommentare im Code: was die Datei tut, mit Verweis auf ihren Abschnitt im technischen Dokument
 
@@ -42,7 +42,7 @@ Regeln:
 | Axiom, Prinzip, Ordner, neuer Begriff | CLAUDE.md |
 | Regel für die Doku | dieses Dokument |
 | Idee ohne Entscheidung | Ausblick |
-| Offene Frage des Spieldesigns | Abschnitt Offen in Grundlagen oder Charakter |
+| Offene Frage des Spieldesigns | Abschnitt Offen in Grundlagen, Charakter oder Spielverlauf |
 | Entscheidung des Spieldesigns, auch ein Verwerfen | Design-Dokument des Themas, als heute geltende Regel ("keine Gelegenheitsangriffe") |
 | Beschlossene, noch offene Arbeit | Arbeitsliste |
 | Umsetzung: Daten, Schnittstellen, Regeln, Zahlen | technisches Dokument des Systems |

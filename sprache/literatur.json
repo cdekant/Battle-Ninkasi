@@ -59,5 +59,71 @@
     "URL": "https://etcsl.orinst.ox.ac.uk/cgi-bin/etcsl.cgi?text=t.4.23.1",
     "keyword": "sumerisch, Bier, Hymne",
     "note": "Nur Fachquelle: englische Übersetzung urheberrechtlich geschützt (© The ETCSL project, University of Oxford), nicht zitieren. Grundlage der Lesart in sprache/de/korpus/ninkasi-hymne-b.md."
+  },
+  {
+    "id": "ungnad1911gilgamesch",
+    "type": "book",
+    "author": [
+      { "family": "Ungnad", "given": "Arthur" },
+      { "family": "Gressmann", "given": "Hugo" }
+    ],
+    "title": "Das Gilgamesch-Epos: Neu übersetzt von Arthur Ungnad und gemeinverständlich erklärt von Hugo Gressmann",
+    "collection-title": "Forschungen zur Religion und Literatur des Alten und Neuen Testaments",
+    "collection-number": "14",
+    "publisher": "Vandenhoeck & Ruprecht",
+    "publisher-place": "Göttingen",
+    "issued": { "date-parts": [[1911]] },
+    "keyword": "akkadisch, Gilgamesch, Epos",
+    "note": "Gemeinfrei (Ungnad gest. 1945, Gressmann gest. 1927). Kandidat für den Korpus, siehe docs/Texte.md, Korpus."
+  },
+  {
+    "id": "bjcp2021styleguidelines",
+    "type": "report",
+    "author": [
+      { "family": "Strong", "given": "Gordon" },
+      { "family": "England", "given": "Kristen" }
+    ],
+    "title": "BJCP 2021 Style Guidelines: Beer Style Guidelines",
+    "publisher": "Beer Judge Certification Program",
+    "issued": { "date-parts": [[2021]] },
+    "URL": "https://www.bjcp.org/bjcp-style-guidelines/",
+    "language": "en",
+    "keyword": "Bier, Bierstile, Richtlinien für Bierrichter",
+    "note": "Nur Fachquelle: © 2023 BJCP, Inc., Kopien nur für Wettbewerbe des BJCP und zur Ausbildung, sonst alle Rechte vorbehalten; nicht zitieren, Merkmale und Kennzahlen eigenständig zusammenfassen."
+  },
+  {
+    "id": "ba2025styleguidelines",
+    "type": "report",
+    "author": [{ "literal": "Brewers Association" }],
+    "title": "Brewers Association 2025 Beer Style Guidelines",
+    "publisher": "Brewers Association",
+    "issued": { "date-parts": [[2025, 5, 30]] },
+    "URL": "https://www.brewersassociation.org/edu/brewers-association-beer-style-guidelines/",
+    "language": "en",
+    "keyword": "Bier, Bierstile, Great American Beer Festival, World Beer Cup",
+    "note": "Nur Fachquelle: © Brewers Association 1993 bis 2025; nicht zitieren, Merkmale und Kennzahlen eigenständig zusammenfassen. Grundlage der Kategorien von Great American Beer Festival und World Beer Cup."
+  },
+  {
+    "id": "ba2016worldbeercup",
+    "type": "report",
+    "author": [{ "literal": "Brewers Association" }],
+    "title": "World Beer Cup 2016 Style Guidelines",
+    "publisher": "Brewers Association",
+    "issued": { "date-parts": [[2016]] },
+    "language": "en",
+    "keyword": "Bier, Bierstile, World Beer Cup",
+    "note": "Nur Fachquelle: ältere Ausgabe der Richtlinien der Brewers Association, ohne Titelblatt, Titel nach dem Dateinamen; nicht zitieren."
+  },
+  {
+    "id": "ebs2025kategorien",
+    "type": "report",
+    "author": [{ "literal": "Private Brauereien Deutschland" }, { "literal": "Private Brauereien Bayern" }],
+    "title": "European Beer Star 2025: Kategoriebeschreibungen",
+    "publisher": "Private Brauereien Deutschland; Private Brauereien Bayern",
+    "issued": { "date-parts": [[2025]] },
+    "URL": "https://european-beer-star.com/ebs-de-wAssets/docs/kategorien-de/DE-Kategoriebeschreibung-2025.pdf",
+    "language": "de",
+    "keyword": "Bier, Bierstile, European Beer Star",
+    "note": "Nur Fachquelle: keine freie Lizenz angegeben; nicht zitieren, Merkmale und Kennzahlen eigenständig zusammenfassen."
   }
 ]

@@ -1,8 +1,8 @@
 # Battle Ninkasi - Charakter und Lernen
 
-Stand: 2026-11-23
+Stand: 2026-11-24
 
-Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Bedienung.md](Bedienung.md), [Grundlagen.md](Grundlagen.md), [Entwicklung.md](Entwicklung.md), [Ausblick.md](Ausblick.md)
+Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Bedienung.md](Bedienung.md), [Grundlagen.md](Grundlagen.md), [Entwicklung.md](Entwicklung.md), [Ausblick.md](Ausblick.md), [Spielverlauf.md](Spielverlauf.md)
 
 Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaft, Skillpunkte unabhängig vom späteren Lerntempo), DCSS (EP fließen in die benutzten Skills, Kosten anzeigen statt Formel), Caves of Qud (Eigenschaften dauerhaft und vorübergehend veränderbar), Tales of Maj'Eyal und Path of Exile (Skills wirken über Tags auch auf künftige Fähigkeiten). Die Mechanik ist umgesetzt und mit ihren vorläufigen Zahlen in [Wesen.md](Wesen.md) (Skills und Lernen) beschrieben; offen sind Skillkatalog, Makel und Vorzüge (Punkt 14 in [Systemausbau.md](Systemausbau.md)).
 
@@ -93,7 +93,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Neuv
 + Die Skills bilden so einen Graphen; die Datenprüfung erkennt Kreise und unbekannte Namen, das Skillfenster zeigt die Abhängigkeiten
 + Optional `freischaltung`: Ein besonderer Skill, den man unterwegs findet, wird erst durch das Fundstück lernbar; bis dahin zeigt ihn das Skillfenster nicht. Braubücher und Rezepturen lehren eher Rezepte und Fähigkeiten als Skills
 + Alle gewöhnlichen Skills sind im Skillfenster immer sichtbar, solche mit fehlenden Voraussetzungen ausgegraut: Der Katalog ist die Grundlage zum Planen von Builds
-+ Keine künstliche Begrenzung göttlicher Niveaus: Das Balancing sorgt dafür, dass pro komplettem Lauf implizit nur eine gewisse Anzahl erreichbar ist
++ Keine künstliche Begrenzung göttlicher Niveaus: Weil die Tiefe offen ist (siehe [Spielverlauf.md](Spielverlauf.md), Kapitel), begrenzt das Balancing nicht, was ein Lauf erreicht, sondern was je Kapitel zu erwarten ist (siehe Anfangsbalance)
 
 ### Kosten
 
@@ -105,9 +105,18 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Neuv
 + Weil die Schwellen in Lernpunkten fest stehen, wirkt eine Änderung der Eigenschaften nur auf das, was danach gelernt wird: Stufen gehen nie verloren, auch nicht durch Flüche oder eine Neuverteilung
 + Die Oberfläche zeigt die Kosten in EP ("noch 120 EP bis Stufe 3"), nicht die Formel
 
+### Breite und Spezialisierung
+
++ Spezialisierung ist merklich stärker als Breite (Vorbild EVE Online): In ihrem Feld schlägt eine spezialisierte Ninkasi eine breit gelernte klar
++ Breite heißt mehrere Spezialisierungen nebeneinander, nicht Alleskönnerin: Wer viele Skills hat, ist vielseitiger und kann zwischen seinen Spezialisierungen wählen
++ Spezialisierung lohnt am Anfang: Erst ein paar günstige Grundskills, dann früh eine Richtung, oft angestoßen durch ein Fundstück
++ Mit der Tiefe wird eine zweite Spezialisierung nebenbei leichter, weil die unteren Tiers im Verhältnis zu den EP der Tiefe billig werden: Das gute Schwert, das auf einer frühen Ebene neben dem Dolch nicht lohnte, ist später schnell gelernt, und es muss dann sofort nützlich sein
++ Eine Spezialisierung bis ins göttliche Niveau ist die stärkste in ihrem Feld, engt aber Flexibilität ein
++ Zeigen Simulation und Arena, dass es stärker ist, die EP immer in den gerade billigsten Skill zu stecken, als sich zu spezialisieren, wird zugunsten der Spezialisierung nachgeregelt
+
 ### Anfangsbalance
 
-+ Ziel festlegen: was eine ausgewogene Ninkasi am Ende eines Laufs erreicht haben soll, z.B. zwei Sets bis Meister und ein göttliches Niveau
++ Ziel festlegen: was eine ausgewogene und eine spezialisierte Ninkasi am Ende des ersten Kapitels erreicht haben sollen (siehe [Spielverlauf.md](Spielverlauf.md), Erstes Kapitel), z.B. zwei Sets bis Meister und ein göttliches Niveau; danach je weiteres Kapitel
 + EP-Budget messen: Der Bot zählt die EP je Ebene aus Erkundung und Bewältigtem (Messwerte in [Entwicklung.md](Entwicklung.md), Messwerte); das Verhältnis ist noch festzulegen; vorgesehen sind zwei bis drei Strategien des Bots für das Erkunden (nächster Rand als Obergrenze, zielstrebig zur Treppe als Untergrenze, später die Dijkstra-Karte), damit die Spanne zwischen gründlichem und eiligem Spiel sichtbar wird
 + Die Stufentabelle danach ausrichten, dass Budget und Ziel zusammenpassen
 + Die Spreizung der Eigenschaften (siehe Kosten) bleibt dabei fest

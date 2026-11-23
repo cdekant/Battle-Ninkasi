@@ -606,7 +606,7 @@ export default {
   "glossar.emmer": "Emmer",
   "glossar.emmer.erklaerung": "Alte Weizenart mit fest sitzenden Spelzen; im alten Mesopotamien neben der Gerste ein Braugetreide.",
   "glossar.hopfen": "Hopfen",
-  "glossar.hopfen.erklaerung": "Kletterpflanze, deren Dolden dem Bier Bitterkeit und Aroma geben und es länger haltbar machen.",
+  "glossar.hopfen.erklaerung": "Die Dolden der Kletterpflanze **Hopfen** verleihen dem Bier Bitterkeit und Aroma und machen es länger haltbar.",
   "glossar.hefe": "Hefe",
   "glossar.hefe.erklaerung": "Einzellige Pilze, die Zucker zu Alkohol und Kohlendioxid vergären.",
   "glossar.brauwasser": "Brauwasser",

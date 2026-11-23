@@ -1,26 +1,27 @@
 # Battle Ninkasi - Systemausbau
 
-Stand: 2026-11-23
+Stand: 2026-11-24
 
 Mitprüfen bei Änderungen: alle Dokumente, deren Punkte hier umgesetzt werden
 
-Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und während der Inhalt entsteht. Was umgesetzt ist, steht im zuständigen Dokument, wie es dazu kam, in der Git-Historie; wie Punkte entstehen und gestrichen werden, regelt [Dokumentation.md](Dokumentation.md), Lebenslauf einer Aussage. Ideen ohne Entscheidung stehen in [Ausblick.md](Ausblick.md), offene Fragen des Spieldesigns in [Grundlagen.md](Grundlagen.md), Offen und [Charakter.md](Charakter.md), Offen.
+Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und während der Inhalt entsteht. Was umgesetzt ist, steht im zuständigen Dokument, wie es dazu kam, in der Git-Historie; wie Punkte entstehen und gestrichen werden, regelt [Dokumentation.md](Dokumentation.md), Lebenslauf einer Aussage. Ideen ohne Entscheidung stehen in [Ausblick.md](Ausblick.md), offene Fragen des Spieldesigns in [Grundlagen.md](Grundlagen.md), Offen, [Charakter.md](Charakter.md), Offen und [Spielverlauf.md](Spielverlauf.md), Offen.
 
 ## Arbeitsweise
 
 + Jeder Punkt wird vor der Umsetzung als Vorschlag ausgearbeitet und freigegeben
 + Status je Punkt: offen oder in Arbeit
-+ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 3 bis 11 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
++ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 3 bis 11, 16 und 17 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
 
 ## Reihenfolge
 
 Stand 2026-11-23, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer Wirkung auf den Inhalt, das Kleine und Breite zuerst:
 
-1. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
-2. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
-3. Danach der Inhalt (Punkt 14)
+1. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10), darin die Bierstile vor dem Brausystem (Punkt 17)
+2. Ebenenbau: Ebenenbilder, Übergänge und feste Strukturen (Punkt 16)
+3. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
+4. Danach der Inhalt (Punkt 14)
 
-Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 3 (Licht, Wahrnehmungsarten, Spüren und Duft), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen), Punkt 9 (Englisch, Mehrzahl und Glossar) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
+Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12), Korpustexte aus dem Gilgamesch-Epos (Punkt 18), Auszeichnung in Texten (Punkt 19, spätestens mit dem Fenster des Glossars); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 3 (Licht, Wahrnehmungsarten, Spüren und Duft), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen), Punkt 9 (Englisch, Mehrzahl und Glossar) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
 
 Die Proben des Probedurchstichs stehen in `tests/probedurchstich.test.js`; jede Lücke dort ist ein Test mit `todo` und dem Punkt, der sie schließt, mit einem Entwurf der Daten (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing). Wer einen Punkt umsetzt, nimmt dort das `todo` weg.
 
@@ -50,19 +51,22 @@ Status: offen, jeweils mit dem ersten Bedarf
 
 ## 10. Spieldesign vor dem Inhalt
 
-Status: offen; jeweils zuerst in [Grundlagen.md](Grundlagen.md) oder [Charakter.md](Charakter.md) entscheiden, mit Recherche bei anderen Spielen
+Status: in Arbeit; jeweils zuerst in [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md) oder [Spielverlauf.md](Spielverlauf.md) entscheiden, mit Recherche bei anderen Spielen; der Rahmen (offene Tiefe in Kapiteln, erstes Kapitel, Epochen, Bosse, was Läufe unterscheidet) steht in [Spielverlauf.md](Spielverlauf.md), Breite und Spezialisierung in [Charakter.md](Charakter.md), Skills
 
 + Zeitskala: Maßstab für schnell und langsam bei Wesen, Waffen und Aktionen; Idee: Ninkasi ist von Haus aus etwas langsamer als der Standard, erst Bewegungsskills machen sie schneller, Alternative: Skills senken die Kosten nur für Nahkampf oder nur für Zauber; die Anzeige der Restdauer in Zügen hängt daran (siehe [Bedienung.md](Bedienung.md), Untersuchen)
-+ Pegelschwellen mit Wirkung, darin Torkeln aus dem Pegel und die Folgen von Rückschlag und Glimmer (offen in [Grundlagen.md](Grundlagen.md), Spielkern)
++ Pegelschwellen mit Wirkung, darin Torkeln aus dem Pegel und die Folgen von Rückschlag und Glimmer (offen in [Grundlagen.md](Grundlagen.md), Spielkern); darin die Geister früherer Läufe als Psi-Jägerinnen, angelockt von Pegel und Psi (siehe [Ausblick.md](Ausblick.md), Geister früherer Läufe)
 + Brausystem: Kern des Spiels, bestimmt Zutaten, Gegenstände, Beute, Orte und Rezepte; Brauen danach als eigene Art langer Aktion (offen in [Grundlagen.md](Grundlagen.md), Spielkern)
 + Machtkurve: Budget je Tiefe für alle Arten von Inhalt als Regelwerte, ein Werkzeug warnt bei Ausreißern; braucht Zeitskala, Pegel und Brausystem; darin:
-  + Länge und Ziel eines Laufs (offen in [Grundlagen.md](Grundlagen.md), Offen)
+  + Ziel der Anfangsbalance am Ende des ersten Kapitels für eine ausgewogene und eine spezialisierte Ninkasi (siehe [Charakter.md](Charakter.md), Skills)
+  + Kernskills der Archetypen als Prüfsteine für Arena und Simulation (siehe [Spielverlauf.md](Spielverlauf.md), Was zwei Läufe unterscheidet)
+  + Fundstücke, die mit der Tiefe wachsen, und einfache Waffen jeder Art, die verlässlich zu bekommen sind
   + Ninkasis Grundausstattung als Bezug: was sie ohne Skills auf der ersten Tiefe kann
   + Ökonomie der Vorräte als ein Kreislauf mit Skill- und Brausystem: Rasten und Regeneration, Bier als Heilung, Brauen als Quelle, Skills als Hebel, Druck gegen endloses Rasten, Ausdauer und Nahrung (siehe [Ausblick.md](Ausblick.md), Druck gegen endloses Rasten)
   + EP aus Erkundung gegen EP aus Gegnern, bezogen auf die zu erwartenden Skillstufen je Ebene und die Builds, die daraus folgen (Messwerte in [Entwicklung.md](Entwicklung.md), Messwerte)
   + der Befund der Arena, dass Ausrüstung und Skills bisher wenig ändern
 + Flüssigkeiten und Gase: tiefes Wasser, Strömung und Schwimmen, Fließen, Verdunsten zu Gas, Schwere des Gases und vor allem, ob Flüssigkeiten sich mischen, weil das Mischen das Format der Feldschichten ändert und am Brausystem hängt (siehe [Ausblick.md](Ausblick.md), Flüssigkeiten und Gase)
-+ Inhaltsplan grob: Thema je Tiefe, Gegnerfamilien (Mikroorganismen mit eigener Mechanik, Bosse, offen in [Grundlagen.md](Grundlagen.md), Gegner), Rolle des Hubs; im Einzelnen zuletzt
++ Noch in [Spielverlauf.md](Spielverlauf.md) zu klären (dort unter Offen): welche Systeme tieferen Kapiteln vorbehalten bleiben; welche Figuren in den Hub ziehen, wodurch, und was eine Stufe des Hubs ausmacht; wann der Hopfen kommt (Freischaltung durch den ersten Fund oder hoch im Skillbaum); wie die Erzählung drinnen und draußen und die Reise durch die Zeit begründet; die Rohstoffe Sumers mit Quellen; die Kernskills der Archetypen (mit der Machtkurve); der Boss des ersten Kapitels (mit dem Inhaltsplan)
++ Inhaltsplan grob für das erste Kapitel: Systeme, die tieferen Kapiteln vorbehalten bleiben, Gegnerfamilien (Mikroorganismen mit eigener Mechanik, offen in [Grundlagen.md](Grundlagen.md), Gegner), der erste Boss, Rolle des Hubs, Rohstoffe Sumers (offen in [Spielverlauf.md](Spielverlauf.md), Offen); im Einzelnen zuletzt
 
 ## 11. Anleitungen, Werkzeuge und Grundgerüst
 
@@ -121,3 +125,36 @@ Status: offen; was der Inhalt abdecken muss, damit keine Mechanik ungenutzt blei
 + Mehr Ebenenarten, Themenräume, Hebel mit Wirkung in der Ferne, verschlossene Türen mit Schlüssel (Ideen in [Ausblick.md](Ausblick.md), Themenräume und Rätsel)
 + Abstraktes Nachholen verlassener Ebenen, falls die Machtkurve es verlangt (siehe [Ausblick.md](Ausblick.md), Nachrückende Gegner)
 + Ruf bei ganzen Fraktionen: weitere Taten (siehe [Ausblick.md](Ausblick.md), Fraktionen: Ruf und Beistand)
+
+## 16. Ebenenbau
+
+Status: offen, in eigenen Sitzungen; das Spieldesign steht in [Spielverlauf.md](Spielverlauf.md), Ebenenbilder und Übergänge
+
++ Ebenenbilder als Daten: Bauweise, Wand- und Bodentiles, Ausstattung, Gegner
++ Übergänge über mehrere Level: der Plan des Laufs gibt jeder Tiefe einen Anteil je Bild, die Ebenenschritte lesen ihn; die Merkmale dürfen versetzt überblenden (siehe [Welt.md](Welt.md), Plan des Laufs)
++ Feste Strukturen und Raumstrukturen in den zufälligen Ebenen (siehe [Ausblick.md](Ausblick.md), Feste Strukturen)
++ Ebenen unter freiem Himmel
++ Hub zwischen den Kapiteln im Plan des Laufs: der Lauf beginnt im leeren Hub, nach dem Boss führt der Weg in den Hub der nächsten Stufe, Figuren aus den Leveln seit dem letzten Boss ziehen ein (siehe [Spielverlauf.md](Spielverlauf.md), Hub); heute steht der Hub im Probeinhalt als Tiefe 0 vor dem ersten Level
+
+## 17. Bierstile
+
+Status: offen, als eigene Sitzung vor dem Brausystem (Punkt 10)
+
++ Die allgemein anerkannten Merkmale der Bierstile aus den vier Richtlinien zusammenfassen: `bjcp2021styleguidelines`, `ba2025styleguidelines`, `ba2016worldbeercup`, `ebs2025kategorien` in `sprache/literatur.json`; nur eigene Texte, kein Wortlaut (siehe [Texte.md](Texte.md), Korpus)
++ Bierstile als Glossareinträge, jeder mit diesen Quellen; das Glossar braucht dafür ein Feld für Quellen, heute sind andere Felder als `gebiet` und `text` ein Fehler (siehe [Texte.md](Texte.md), Glossar)
++ Kennzahlen der Stile (Stammwürze, Bittere, Farbe, Alkohol) als Ziele für die Rezepte des Brausystems
+
+## 18. Korpustexte aus dem Gilgamesch-Epos
+
+Status: offen, als eigene Sitzung
+
++ `ungnad1911gilgamesch` (gemeinfrei) aus `sprache/Literatur/` einlesen und daraus neue Korpustexte gewinnen, in beiden Sprachen (siehe [Texte.md](Texte.md), Korpus)
+
+## 19. Auszeichnung in Texten
+
+Status: offen
+
++ Eine kleine Auszeichnung nach Markdown in den Sprachdateien: `**fett**`, `*kursiv*`, `\n` als Zeilenumbruch, eine Leerzeile als neuer Absatz; heute sind Texte schlichte Zeichenketten mit Platzhaltern (siehe [Texte.md](Texte.md), Sprachdateien), ein `\n` wird zum Leerzeichen und Sternchen erscheinen wörtlich (so in `glossar.hopfen.erklaerung`)
++ Eine Funktion in `src/anzeige/texte.js` maskiert den Text und setzt danach die Auszeichnung in HTML um; wo kein HTML entsteht (Log, Tooltips), entfernt sie nur die Zeichen
++ Alle Fenster zeigen Texte über diese Funktion; heute maskieren Log, Titel und Systemfenster, während Hilfe und Einstellungen Texte roh als HTML einsetzen (z.B. `src/anzeige/einstellungsanzeige.js`)
++ `tests/sprachen.test.js` prüft, dass jede Auszeichnung geschlossen ist; das Kompendium zeigt die Auszeichnung ebenso

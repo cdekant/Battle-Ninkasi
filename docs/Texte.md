@@ -84,7 +84,8 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 + Bei Übersetzungen zählt der Übersetzer: gemeinfrei erst 70 Jahre nach seinem Tod; Keilschrift-Originale sind gemeinfrei, viele moderne Übersetzungen nicht (z.B. ETCSL)
 + Herkunft und Rechtsgrundlage jedes Korpustextes werden festgehalten
 + Geschützte moderne Übersetzungen dienen nur als Fachquelle: Wir dichten aus dem gemeinfreien Original eigenständig nach und übernehmen keinen Wortlaut; das Zitatrecht deckt Zitate als Spielausstattung nicht
-+ Kandidaten, zu prüfen: Gilgamesch-Epos in alten Übersetzungen, mittelalterliche Brauanleitungen, Brauordnungen, Bibelstellen und antike Autoren zu Bier und Wein
++ Gilgamesch-Epos in der gemeinfreien Übersetzung `ungnad1911gilgamesch`, einzulesen mit [Systemausbau.md](Systemausbau.md), Punkt 18
++ Kandidaten, zu prüfen: weitere alte Übersetzungen des Gilgamesch-Epos, mittelalterliche Brauanleitungen, Brauordnungen, Bibelstellen und antike Autoren zu Bier und Wein
 
 ### Ablage und Format
 
@@ -110,7 +111,7 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 
 + Varianten desselben Originals tragen die Endung `-b`, `-c` usw.; sie folgen einer anderen Lesart oder anderen Bildern und erweitern so den Wortschatz der Markow-Ketten
 + Die englischen Korpustexte sind aus unseren deutschen Nachdichtungen übertragen, im selben altertümlichen Ton (thou, hath) und mit denselben Dateinamen; aus den modernen Übersetzungen der Fachquellen stammt kein Wortlaut
-+ Weitere Fachquellen ohne eigene Nachdichtung: `sallaberger2012bierbrauen` (auf ZORA nicht gefunden, keine freie Lizenz bekannt, daher keine wörtlichen Zitate)
++ Weitere Fachquellen ohne eigene Nachdichtung: `sallaberger2012bierbrauen` (auf ZORA nicht gefunden, keine freie Lizenz bekannt, daher keine wörtlichen Zitate); für die Bierstile `bjcp2021styleguidelines`, `ba2025styleguidelines`, `ba2016worldbeercup` und `ebs2025kategorien` (keine freie Lizenz, Merkmale und Kennzahlen nur eigenständig zusammengefasst)
 
 ## Offen
 
