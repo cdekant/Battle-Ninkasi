@@ -10,6 +10,7 @@ import { zufallErzeugen, zufallsGanzzahl, mitProzentChance, mitAnteil, wuerfeln 
 import { wurfGanzzahl, wurfWuerfel, wurfProzent, wurfAnteil, wurfAuswahl, mitWurfquelle } from "../src/kern/wurf.js";
 import { nahkampf } from "../src/systeme/kampf.js";
 import { miniSpiel, wesen } from "./hilfen.js";
+import { effektAnwenden } from "../src/kern/effekte.js";
 
 const hauptverzeichnis = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -81,6 +82,25 @@ test("Grenzen: Mengen am kleinsten oder größten Wurf, festgelegte Chancen wür
   });
   assert.deepEqual(fremd, vergleich);
   assert.deepEqual(spiel.zustand.zufallszustand, vorher);
+});
+
+test("Baustein zufall: wirkt effekt mit der Chance, sonst sonst; die Ablage bleibt geteilt", () => {
+  const effekte = {
+    vielleicht: { schritte: [{ baustein: "zufall", chance: 30, effekt: "treffen", sonst: "heilen" }, { baustein: "schaden", menge: { aus: "summeSchaden" } }] },
+    ohneSonst: { schritte: [{ baustein: "zufall", chance: 30, effekt: "treffen" }] },
+    treffen: { schritte: [{ baustein: "schaden", menge: 2 }] },
+    heilen: { schritte: [{ baustein: "heilen", menge: 1 }] },
+  };
+  const spiel = miniSpiel(["....."], { effekte, startwert: 5 });
+  const ziel = wesen(spiel, 1, 0, "feinde", 20);
+  ziel.werte.lp.aktuell = 10;
+  const wirken = (name, chance) => mitWurfquelle(spiel, { art: "grenzen", mengen: "kleinste", chancen: { zufall: chance }, zufallszustand: zufallErzeugen(1) }, () => effektAnwenden(spiel, name, { zielId: ziel.id }));
+  wirken("vielleicht", true);
+  assert.equal(ziel.werte.lp.aktuell, 6, "getroffen mit 2, der zweite Schritt liest summeSchaden aus der geteilten Ablage");
+  wirken("vielleicht", false);
+  assert.equal(ziel.werte.lp.aktuell, 7, "sonst geheilt");
+  wirken("ohneSonst", false);
+  assert.equal(ziel.werte.lp.aktuell, 7, "ohne sonst geschieht nichts");
 });
 
 test("mitWurfquelle stellt die vorige Quelle auch nach einem Fehler wieder her", () => {

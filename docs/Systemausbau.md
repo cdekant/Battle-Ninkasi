@@ -10,24 +10,23 @@ Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und wäh
 
 + Jeder Punkt wird vor der Umsetzung als Vorschlag ausgearbeitet und freigegeben
 + Status je Punkt: offen oder in Arbeit
-+ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 3 bis 11 und 15 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
++ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 3 bis 11 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
 
 ## Reihenfolge
 
 Stand 2026-11-23, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer Wirkung auf den Inhalt, das Kleine und Breite zuerst:
 
-1. Reste des Effektsystems (Punkt 15)
-2. Gewährte und gelehrte Fähigkeiten (Punkt 5)
-3. Ersatzwirkungen (Punkt 4)
-4. KI: Unterstützung und Umherziehen (Punkt 7)
-5. Teilung und Wachstum (Punkt 6), braucht Punkt 7
-6. Licht und Wahrnehmung (Punkt 3)
-7. Englisch, Mehrzahl und Glossar (Punkt 9)
-8. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
-9. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
-10. Danach der Inhalt (Punkt 14)
+1. Gewährte und gelehrte Fähigkeiten (Punkt 5)
+2. Ersatzwirkungen (Punkt 4)
+3. KI: Unterstützung und Umherziehen (Punkt 7)
+4. Teilung und Wachstum (Punkt 6), braucht Punkt 7
+5. Licht und Wahrnehmung (Punkt 3)
+6. Englisch, Mehrzahl und Glossar (Punkt 9)
+7. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
+8. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
+9. Danach der Inhalt (Punkt 14)
 
-Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern) und Punkt 2 (Probedurchstich), die Nummern der übrigen bleiben.
+Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
 
 Die Proben des Probedurchstichs stehen in `tests/probedurchstich.test.js`; jede Lücke dort ist ein Test mit `todo` und dem Punkt, der sie schließt, mit einem Entwurf der Daten (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing). Wer einen Punkt umsetzt, nimmt dort das `todo` weg.
 
@@ -182,11 +181,3 @@ Status: offen; was der Inhalt abdecken muss, damit keine Mechanik ungenutzt blei
 + Mehr Ebenenarten, Themenräume, Hebel mit Wirkung in der Ferne, verschlossene Türen mit Schlüssel (Ideen in [Ausblick.md](Ausblick.md), Themenräume und Rätsel)
 + Abstraktes Nachholen verlassener Ebenen, falls die Machtkurve es verlangt (siehe [Ausblick.md](Ausblick.md), Nachrückende Gegner)
 + Ruf bei ganzen Fraktionen: weitere Taten (siehe [Ausblick.md](Ausblick.md), Fraktionen: Ruf und Beistand)
-
-## 15. Reste des Effektsystems
-
-Status: offen; gefunden im Probedurchstich
-
-+ Urheberin der Feldschichten: eine Oberfläche oder ein Gas aus einer Fähigkeit wirkt heute ohne Quelle (`quelleId: null`), so gehen gebundene EP, Zorn und Todesursache verloren; Probe: der Hopfensud rechnet seinen Zustand der Wirkenden zu; erst erkunden, dann einrichten
-+ Ende eines Zustands nach Grund: `beimEnde` wirkt bei jedem Grund (`abgelaufen`, `entfernt`, `quelle_tot`, `unterhalt`), wer die Vorstufe einer Krankheit heilt, löst so den Ausbruch aus; Probe: die geheilte Vorstufe bricht nicht aus; Entwurf `beimAblauf` (nur `abgelaufen`) neben `beimEnde` oder eine Bedingung auf den Grund; erst erkunden, dann einrichten
-+ Zufallsverzweigung in einem Effekt, z.B. Baustein `zufall { chance, effekt, sonst? }`; offen, ob nötig: Auslöser und Risikotabellen haben schon eine Chance; Probe als `todo`: die Vorstufe einer Krankheit heilt mit einer Chance von selbst aus (siehe [Ausblick.md](Ausblick.md), Krankheiten)

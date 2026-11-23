@@ -46,15 +46,15 @@ Vorbild Brogue: je Feld höchstens eine Gasart, die sich auf die Nachbarn vertei
 
 Daten:
 
-+ Drei Schichten (`SCHICHTEN`) neben der Karte in `zustand.ebene.schichten`, nur belegte Felder: `oberflaeche` und `gas` mit `{ art, menge }`, `feuer` mit `{ menge }` (Brenndauer in Weltticks)
++ Drei Schichten (`SCHICHTEN`) neben der Karte in `zustand.ebene.schichten`, nur belegte Felder: `oberflaeche` und `gas` mit `{ art, menge }`, `feuer` mit `{ menge }` (Brenndauer in Weltticks); dazu `urheberId` und `urheberFraktion`, wenn der Eintrag eine Urheberin hat
 + Arten (`daten/schichten.js`): `oberflaechen` mit `hoechstens?`, `schwund`, `beimBetreten`, `jeTick`, `ausloesenFuer` (Vorgabe `laufend`, `unbeweglich`), `brennbar`, `brenndauer`, `verbrenntZu`, `ausbreitung: { chance }`, `gefaehrlich`; `gase` mit `hoechstens?`, `abbau` (Prozent je Tick), `stufen: [{ ab, effekt, wenn? }]`, `undurchsichtigAb`, `brennbar`
 + Regelwerte: `regeln.feuer` (`brennen`, `rauch`, `rauchMenge`), `regeln.schichten` (`hoechstOberflaeche` 10, `hoechstGas` 1000)
 
 Schnittstellen:
 
 + Datenzugriff (`src/welt/schichten.js`, ändert nichts): `schichtenVon`, `schichtAuf`, `belegteFelder`, `feldVonIndex`, `gasdurchlaessig`, `sichtdurchlaessig`
-+ `src/systeme/schichten.js`: `oberflaecheSetzen`, `gasSetzen`, `entzuenden`, `brennbarkeit`, `gefahrenMeiden` (für die Wegfindung, zusammen mit den Fallen über `meidenZusammen`); Handler der Weltuhr für Quellen, Ausgleich, Abbau, Wirkung und Feuer
-+ Bausteine `oberflaeche_setzen { art, menge, muster? }`, `gas_setzen { art, menge, muster? }`, `entzuenden { muster? }` (nur wo etwas brennt); Parameterarten `oberflaeche` und `gas` in der Datenprüfung
++ `src/systeme/schichten.js`: `oberflaecheSetzen`, `gasSetzen`, `entzuenden` (je mit einer freiwilligen Urheberin `{ id, fraktion }` als letztem Parameter), `brennbarkeit`, `gefahrenMeiden` (für die Wegfindung, zusammen mit den Fallen über `meidenZusammen`); Handler der Weltuhr für Quellen, Ausgleich, Abbau, Wirkung und Feuer
++ Bausteine `oberflaeche_setzen { art, menge, muster? }`, `gas_setzen { art, menge, muster? }`, `entzuenden { muster? }` (nur wo etwas brennt), mit der Urheberin des Effekts; Parameterarten `oberflaeche` und `gas` in der Datenprüfung
 
 Regeln:
 
@@ -66,6 +66,7 @@ Regeln:
 + Wirkung: je Welttick die höchste erreichte Stufe, deren `wenn` am Wesen gilt, z.B. CO2 ab 30 benommen, ab 70 Ersticken, beides nur ohne den Tag `anaerob`; ab `undurchsichtigAb` versperrt dichtes Gas die Sicht (Ninkasis Sichtfeld wird dann je Welttick neu berechnet), Geschosse fliegen hindurch
 + Feuer je Welttick und brennendem Feld: `brennen` auf Wesen darin (auch beim Betreten), Rauch, Übergreifen auf jedes nicht brennende Nachbarfeld mit der Chance seiner Brennbarkeit (die höchste aus Gelände, Oberfläche und Gas); dann sinkt die Menge um 1, erlischt das Feuer, verbrennen Oberfläche und Gelände zu `verbrenntZu` (eine Holztür zu Boden), neu entzündete Felder brennen ab dem nächsten Tick
 + Brennbares Gas fängt auf einmal Feuer, verschwindet und wirkt `explodiert` am Feld (Verpuffung)
++ Urheberin (Vorbild DCSS, Wolken tragen ihre Verursacherin): eine Schicht wirkt ohne Quelle (`quelleId: null`), aber zugerechnet ihrer Urheberin, so zählen gebundene EP, Zorn, Ruf und Todesursache wie bei einem unmittelbaren Treffer; eine Zugabe mit Urheberin übernimmt das Feld, eine ohne (Gasquelle am Gelände) lässt die vorhandene stehen; Ausbreitung, Ausgleich in ein leeres Feld, Übergreifen des Feuers (vom ersten brennenden Nachbarn nach Feldindex), Rauch und `verbrenntZu` erben sie; ein Feuer ohne Urheberin übernimmt beim Verpuffen die des Gases
 + Bewusst ohne: Schwerkraft, Druck und Temperatur beim Gas, Fließen von Flüssigkeiten (sie sind Oberfläche mit Menge)
 + Wiederholbar: alle Würfe über den Spiel-Zufall, immer nach Feldindex aufsteigend; die Weltuhr bearbeitet nur belegte Felder; die Liste der Gasquellen hält der `zwischenspeicher`, `gelaendeSetzen` verwirft sie
 + Wege: die KI meidet Feuer und Gefährliches, Reise und Erkunden ebenso

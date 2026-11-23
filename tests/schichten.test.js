@@ -44,6 +44,8 @@ const EFFEKTE = {
   ersticken: { schritte: [{ baustein: "schaden", art: "gift", menge: 5 }] },
   brennen: { schritte: [{ baustein: "schaden", art: "feuer", menge: 2 }] },
   verpuffung: { schritte: [{ baustein: "fuer_jedes_ziel", muster: { art: "kreis", radius: 1 }, trifft: "wesen", effekt: "brennen" }] },
+  schleim_giessen: { schritte: [{ baustein: "oberflaeche_setzen", art: "schleim", menge: 2 }] },
+  anzuenden: { schritte: [{ baustein: "entzuenden" }] },
 };
 
 const RAUM = ["#########", "#.......#", "#.......#", "#.......#", "#########"];
@@ -157,6 +159,67 @@ test("Brennbares Gas verpufft auf einmal; Feuer erzeugt Rauch", () => {
   assert.equal(schichtAuf(spiel, "gas", 3, 2), null);
   tick(spiel);
   assert.equal(schichtAuf(spiel, "gas", 3, 2)?.art, "rauch");
+});
+
+const urheberVon = (entitaet) => ({ urheberId: entitaet.id, urheberFraktion: entitaet.fraktion });
+const ohneMenge = (eintrag) => eintrag && { urheberId: eintrag.urheberId, urheberFraktion: eintrag.urheberFraktion };
+
+test("Urheberin: der Baustein trägt sie ein, die Fläche wirkt in ihrem Namen; eine Zugabe ohne lässt sie stehen, eine mit übernimmt", () => {
+  const { spiel } = spielBauen();
+  const erste = wesen(spiel, 1, 1, "feinde", 20), zweite = wesen(spiel, 1, 3, "feinde", 20);
+  const opfer = wesen(spiel, 4, 2, "ninkasi", 20);
+  effektAnwenden(spiel, "schleim_giessen", { quelleId: erste.id, zielfeld: { x: 4, y: 2 } });
+  assert.deepEqual(schichtAuf(spiel, "oberflaeche", 4, 2), { art: "schleim", menge: 2, ...urheberVon(erste) });
+  oberflaecheSetzen(spiel, { x: 4, y: 2 }, "schleim", 1);
+  assert.deepEqual(ohneMenge(schichtAuf(spiel, "oberflaeche", 4, 2)), urheberVon(erste), "ohne Urheberin bleibt die alte");
+  tick(spiel);
+  assert.equal(opfer.letzterVerlust.urheberId, erste.id, "jeTick wirkt im Namen der Urheberin");
+  assert.equal(opfer.letzterVerlust.ursache, "oberflaeche");
+  effektAnwenden(spiel, "schleim_giessen", { quelleId: zweite.id, zielfeld: { x: 4, y: 2 } });
+  assert.deepEqual(ohneMenge(schichtAuf(spiel, "oberflaeche", 4, 2)), urheberVon(zweite), "die neue übernimmt");
+  oberflaecheSetzen(spiel, { x: 5, y: 2 }, "pfuetze", 2);
+  assert.deepEqual(schichtAuf(spiel, "oberflaeche", 5, 2), { art: "pfuetze", menge: 2 }, "ohne Urheberin keine Felder dafür");
+});
+
+test("Urheberin erbt: Ausbreitung, Gas in leere Felder, Übergreifen des Feuers, Rauch und Asche", () => {
+  const { spiel } = spielBauen(["#######", "#.....#", "#######"], { feuer: { brennen: "brennen", dauer: 2, rauch: "rauch", rauchMenge: 30 } });
+  const wirkende = wesen(spiel, 5, 1, "feinde", 20);
+  const urheber = { id: wirkende.id, fraktion: wirkende.fraktion };
+  oberflaecheSetzen(spiel, { x: 1, y: 1 }, "brand", 3);
+  oberflaecheSetzen(spiel, { x: 2, y: 1 }, "brand", 3);
+  oberflaecheSetzen(spiel, { x: 4, y: 1 }, "myzel", 1, urheber);
+  entzuenden(spiel, { x: 1, y: 1 }, urheber);
+  tick(spiel);
+  assert.deepEqual(ohneMenge(schichtAuf(spiel, "oberflaeche", 3, 1) ?? schichtAuf(spiel, "oberflaeche", 5, 1)), urheberVon(wirkende), "Myzel breitet sich aus");
+  assert.deepEqual(ohneMenge(schichtAuf(spiel, "feuer", 2, 1)), urheberVon(wirkende), "das Feuer greift über");
+  assert.deepEqual(ohneMenge(schichtAuf(spiel, "gas", 1, 1)), urheberVon(wirkende), "Rauch");
+  tick(spiel, 4);
+  assert.deepEqual(ohneMenge(schichtAuf(spiel, "oberflaeche", 1, 1)), urheberVon(wirkende), "Asche");
+  const { spiel: gasspiel } = spielBauen();
+  const andere = wesen(gasspiel, 5, 3, "feinde", 20);
+  gasSetzen(gasspiel, { x: 1, y: 1 }, "nebel", 90, { id: andere.id, fraktion: andere.fraktion });
+  gasSetzen(gasspiel, { x: 3, y: 1 }, "nebel", 5);
+  tick(gasspiel);
+  assert.deepEqual(ohneMenge(schichtAuf(gasspiel, "gas", 2, 1)), urheberVon(andere), "das Gas strömt in ein leeres Feld");
+  assert.deepEqual(ohneMenge(schichtAuf(gasspiel, "gas", 3, 1)), { urheberId: undefined, urheberFraktion: undefined }, "in ein volles Feld gleicher Art bleibt dessen Urheberin");
+});
+
+test("Urheberin beim Feuer: der Baustein entzündet in ihrem Namen, die Todesursache nennt sie; Verpuffung ohne Urheberin des Feuers zählt die des Gases", () => {
+  const { spiel, meldungen } = spielBauen();
+  const wirkende = wesen(spiel, 1, 1, "feinde", 20);
+  const opfer = wesen(spiel, 4, 2, "ninkasi", 2);
+  oberflaecheSetzen(spiel, { x: 4, y: 2 }, "brand", 3);
+  effektAnwenden(spiel, "anzuenden", { quelleId: wirkende.id, zielfeld: { x: 4, y: 2 } });
+  tick(spiel);
+  vorgangAbschliessen(spiel);
+  const tod = meldungen.find((meldung) => meldung.art === "tod");
+  assert.equal(tod.quelle.id, wirkende.id);
+  assert.equal(tod.ursache, "feuer");
+  gasSetzen(spiel, { x: 2, y: 2 }, "dampf", 20, { id: wirkende.id, fraktion: wirkende.fraktion });
+  const nah = wesen(spiel, 2, 3, "ninkasi", 20);
+  entzuenden(spiel, { x: 2, y: 2 });
+  assert.equal(nah.letzterVerlust.urheberId, wirkende.id);
+  assert.deepEqual(ohneMenge(schichtAuf(spiel, "feuer", 2, 2)), urheberVon(wirkende));
 });
 
 test("Wege meiden Feuer und Gefährliches; die Ebene stellt Gärbottiche ins Rauminnere", () => {

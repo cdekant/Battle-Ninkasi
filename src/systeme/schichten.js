@@ -19,6 +19,10 @@
 //   (die höchste aus Gelände, Oberfläche, Gas), Menge minus 1; erlischt es, verbrennen Oberfläche und Gelände zu
 //   verbrenntZu (oder verschwinden). Brennbares Gas fängt auf einmal Feuer und wirkt explodiert am Feld.
 // Bausteine: oberflaeche_setzen { art, menge, muster? }, gas_setzen { art, menge, muster? }, entzuenden { muster? }
+// Urheberin: ein Eintrag trägt urheberId und urheberFraktion, wenn er eine hat (aus dem Kontext des Bausteins);
+//   eine Zugabe mit Urheberin übernimmt das Feld, eine ohne (Gasquelle am Gelände) lässt die vorhandene stehen;
+//   Ausbreitung, Ausgleich in ein leeres Feld, Übergreifen, Rauch und verbrenntZu erben sie; ein Feuer ohne Urheberin
+//   übernimmt beim Verpuffen die des Gases. Gewirkt wird ohne Quelle (quelleId null), zugerechnet der Urheberin.
 // Würfe über den Spiel-Zufall, immer nach Feldindex aufsteigend, damit Spielstände wiederholbar bleiben.
 
 import { anmelden } from "../kern/register.js";
@@ -52,25 +56,38 @@ const wesenAufIndex = (spiel, index) => {
   return entitaetenAuf(spiel.zustand, x, y).filter(istWesen);
 };
 
-function aufWesenWirken(spiel, effekt, wesen, index, ursache, mittel) {
+// Urheberin eines Eintrags oder Kontexts als { id, fraktion } oder null, dieselbe Form wie urheberVon (systeme/fraktionen.js)
+const urheberDes = (eintrag) => (eintrag?.urheberId != null ? { id: eintrag.urheberId, fraktion: eintrag.urheberFraktion ?? null } : null);
+
+// Eintrag mit der Urheberin; ohne Urheberin bleiben die Felder weg
+const eintragMit = (werte, urheber) => (urheber ? { ...werte, urheberId: urheber.id, urheberFraktion: urheber.fraktion } : werte);
+
+// Die neue Urheberin übernimmt, ohne neue bleibt die des vorhandenen Eintrags gleicher Art
+const urheberNach = (gleicherEintrag, neu) => neu ?? urheberDes(gleicherEintrag);
+
+function aufWesenWirken(spiel, effekt, wesen, index, ursache, mittel, urheber = null) {
   if (!spiel.zustand.entitaeten[wesen.id]) return;
   const feld = feldVonIndex(spiel.zustand.ebene, index);
-  effektAnwenden(spiel, effekt, { quelleId: null, zielId: wesen.id, ursprung: feld, zielfeld: feld, ursache, mittel });
+  effektAnwenden(spiel, effekt, {
+    quelleId: null, urheberId: urheber?.id ?? null, urheberFraktion: urheber?.fraktion ?? null,
+    zielId: wesen.id, ursprung: feld, zielfeld: feld, ursache, mittel,
+  });
 }
 
 const betroffenVonOberflaeche = (daten, wesen) => (daten.ausloesenFuer ?? ["laufend", "unbeweglich"]).includes(bewegungVon(wesen));
 
 // Oberfläche
 
-export function oberflaecheSetzen(spiel, feld, art, menge) {
+export function oberflaecheSetzen(spiel, feld, art, menge, urheber = null) {
   const ebene = spiel.zustand.ebene;
   if (!aufDerKarte(ebene, feld.x, feld.y) || !passierbar(spiel, feld.x, feld.y) || menge <= 0) return;
   const tabelle = schichtenVon(ebene, true).oberflaeche;
   const index = feldIndex(ebene, feld.x, feld.y);
   const vorher = tabelle[index];
   const hoechstens = oberflaecheDaten(spiel, art).hoechstens ?? regelnSchichten(spiel).hoechstOberflaeche;
-  const neu = vorher?.art === art ? vorher.menge + menge : menge;
-  tabelle[index] = { art, menge: Math.min(hoechstens, neu) };
+  const gleich = vorher?.art === art ? vorher : null;
+  const neu = gleich ? gleich.menge + menge : menge;
+  tabelle[index] = eintragMit({ art, menge: Math.min(hoechstens, neu) }, urheberNach(gleich, urheber));
 }
 
 function oberflaecheEntfernen(spiel, index) {
@@ -79,19 +96,20 @@ function oberflaecheEntfernen(spiel, index) {
 
 // Gas
 
-export function gasSetzen(spiel, feld, art, menge) {
+export function gasSetzen(spiel, feld, art, menge, urheber = null) {
   const ebene = spiel.zustand.ebene;
   if (!aufDerKarte(ebene, feld.x, feld.y) || !gasdurchlaessig(spiel, feld.x, feld.y) || menge <= 0) return;
-  gasAufIndexSetzen(spiel, feldIndex(ebene, feld.x, feld.y), art, menge);
+  gasAufIndexSetzen(spiel, feldIndex(ebene, feld.x, feld.y), art, menge, urheber);
 }
 
-function gasAufIndexSetzen(spiel, index, art, menge) {
+function gasAufIndexSetzen(spiel, index, art, menge, urheber = null) {
   const tabelle = schichtenVon(spiel.zustand.ebene, true).gas;
   const vorher = tabelle[index];
   const hoechstens = gasDaten(spiel, art).hoechstens ?? regelnSchichten(spiel).hoechstGas;
   if (vorher && vorher.art !== art && vorher.menge >= menge) return; // die größere Menge behauptet sich
-  const neu = vorher?.art === art ? vorher.menge + menge : menge;
-  tabelle[index] = { art, menge: Math.min(hoechstens, neu) };
+  const gleich = vorher?.art === art ? vorher : null;
+  const neu = gleich ? gleich.menge + menge : menge;
+  tabelle[index] = eintragMit({ art, menge: Math.min(hoechstens, neu) }, urheberNach(gleich, urheber));
 }
 
 // Feuer
@@ -108,7 +126,8 @@ export function brennbarkeit(spiel, x, y) {
 }
 
 // Entzündet ein Feld, wenn etwas darauf brennt; brennbares Gas verpufft dabei auf einmal. Gibt true zurück, wenn es brennt.
-export function entzuenden(spiel, feld) {
+// Brennt das Feld schon, behält es seine Urheberin.
+export function entzuenden(spiel, feld, urheber = null) {
   const ebene = spiel.zustand.ebene;
   if (!aufDerKarte(ebene, feld.x, feld.y) || brennbarkeit(spiel, feld.x, feld.y) <= 0) return false;
   const schichten = schichtenVon(ebene, true);
@@ -121,12 +140,19 @@ export function entzuenden(spiel, feld) {
     gelaendeAuf(spiel, feld.x, feld.y)?.brenndauer ?? 0,
     oberflaeche ? oberflaecheDaten(spiel, oberflaeche.art).brenndauer ?? 0 : 0,
   );
-  schichten.feuer[index] = { menge: dauer };
+  const brennbaresGas = gas && gasDaten(spiel, gas.art).brennbar ? gas : null;
+  const urheberDesFeuers = urheber ?? urheberDes(brennbaresGas);
+  schichten.feuer[index] = eintragMit({ menge: dauer }, urheberDesFeuers);
   melden(spiel, "entzuendet", { feld: { x: feld.x, y: feld.y } });
-  if (gas && gasDaten(spiel, gas.art).brennbar) {
+  if (brennbaresGas) {
     delete schichten.gas[index];
     const explodiert = gasDaten(spiel, gas.art).explodiert;
-    if (explodiert) effektAnwenden(spiel, explodiert, { quelleId: null, zielId: null, ursprung: { ...feld }, zielfeld: { ...feld }, ursache: "feuer", mittel: { art: "gas", name: gas.art } });
+    if (explodiert) {
+      effektAnwenden(spiel, explodiert, {
+        quelleId: null, urheberId: urheberDesFeuers?.id ?? null, urheberFraktion: urheberDesFeuers?.fraktion ?? null,
+        zielId: null, ursprung: { x: feld.x, y: feld.y }, zielfeld: { x: feld.x, y: feld.y }, ursache: "feuer", mittel: { art: "gas", name: gas.art },
+      });
+    }
   }
   return true;
 }
@@ -143,15 +169,15 @@ function felderDesEffekts(spiel, kontext, muster) {
 }
 
 bausteinAnmelden("oberflaeche_setzen", { art: "oberflaeche", menge: "ganzzahl", muster: "muster?" }, (spiel, kontext, parameter) => {
-  for (const feld of felderDesEffekts(spiel, kontext, parameter.muster)) oberflaecheSetzen(spiel, feld, parameter.art, parameter.menge);
+  for (const feld of felderDesEffekts(spiel, kontext, parameter.muster)) oberflaecheSetzen(spiel, feld, parameter.art, parameter.menge, urheberDes(kontext));
 });
 
 bausteinAnmelden("gas_setzen", { art: "gas", menge: "ganzzahl", muster: "muster?" }, (spiel, kontext, parameter) => {
-  for (const feld of felderDesEffekts(spiel, kontext, parameter.muster)) gasSetzen(spiel, feld, parameter.art, parameter.menge);
+  for (const feld of felderDesEffekts(spiel, kontext, parameter.muster)) gasSetzen(spiel, feld, parameter.art, parameter.menge, urheberDes(kontext));
 });
 
 bausteinAnmelden("entzuenden", { muster: "muster?" }, (spiel, kontext, parameter) => {
-  for (const feld of felderDesEffekts(spiel, kontext, parameter.muster)) entzuenden(spiel, feld);
+  for (const feld of felderDesEffekts(spiel, kontext, parameter.muster)) entzuenden(spiel, feld, urheberDes(kontext));
 });
 
 // Beim Betreten: Oberfläche und Feuer
@@ -162,8 +188,9 @@ anmelden("haken", "betritt_feld", (spiel, kontext) => {
   const index = feldIndex(spiel.zustand.ebene, x, y);
   const oberflaeche = schichtAuf(spiel, "oberflaeche", x, y);
   const daten = oberflaeche && oberflaecheDaten(spiel, oberflaeche.art);
-  if (daten?.beimBetreten && betroffenVonOberflaeche(daten, wesen)) aufWesenWirken(spiel, daten.beimBetreten, wesen, index, "oberflaeche", { art: "oberflaeche", name: oberflaeche.art });
-  if (schichtAuf(spiel, "feuer", x, y)) aufWesenWirken(spiel, regelnFeuer(spiel).brennen, wesen, index, "feuer", { art: "feuer", name: "feuer" });
+  if (daten?.beimBetreten && betroffenVonOberflaeche(daten, wesen)) aufWesenWirken(spiel, daten.beimBetreten, wesen, index, "oberflaeche", { art: "oberflaeche", name: oberflaeche.art }, urheberDes(oberflaeche));
+  const feuer = schichtAuf(spiel, "feuer", x, y);
+  if (feuer) aufWesenWirken(spiel, regelnFeuer(spiel).brennen, wesen, index, "feuer", { art: "feuer", name: "feuer" }, urheberDes(feuer));
 });
 
 // Weltuhr: Oberfläche
@@ -177,11 +204,11 @@ anmelden("welttick", "oberflaeche", (spiel) => {
     if (!eintrag) continue;
     const daten = oberflaecheDaten(spiel, eintrag.art);
     if (daten.jeTick) {
-      for (const wesen of wesenAufIndex(spiel, index)) if (betroffenVonOberflaeche(daten, wesen)) aufWesenWirken(spiel, daten.jeTick, wesen, index, "oberflaeche", { art: "oberflaeche", name: eintrag.art });
+      for (const wesen of wesenAufIndex(spiel, index)) if (betroffenVonOberflaeche(daten, wesen)) aufWesenWirken(spiel, daten.jeTick, wesen, index, "oberflaeche", { art: "oberflaeche", name: eintrag.art }, urheberDes(eintrag));
     }
     if (daten.ausbreitung && wurfProzent(spiel, "ausbreitung", daten.ausbreitung.chance)) {
       const freie = nachbarIndizes(ebene, index).filter((nachbar) => !tabelle[nachbar] && passierbar(spiel, nachbar % ebene.breite, Math.floor(nachbar / ebene.breite)));
-      if (freie.length) tabelle[wurfAuswahl(spiel, "ausbreitung_wohin", freie)] = { art: eintrag.art, menge: 1 };
+      if (freie.length) tabelle[wurfAuswahl(spiel, "ausbreitung_wohin", freie)] = eintragMit({ art: eintrag.art, menge: 1 }, urheberDes(eintrag));
     }
     if (daten.schwund && tabelle[index] && !ebene.schichten.feuer[index]) {
       tabelle[index].menge -= daten.schwund;
@@ -224,17 +251,19 @@ function quelleAusstroemen(spiel, { x, y, quelle }) {
   });
 }
 
-// Ausgleich aus dem alten Stand: je Paar fließt ein Neuntel des Unterschieds vom volleren ins leerere Feld
+// Ausgleich aus dem alten Stand: je Paar fließt ein Neuntel des Unterschieds vom volleren ins leerere Feld;
+// ein bisher leeres Feld erbt die Urheberin des ersten Zuflusses nach Feldindex
 function gasAusgleichen(spiel) {
   const ebene = spiel.zustand.ebene;
   const tabelle = schichtenVon(ebene, true).gas;
   const aenderungen = new Map();
-  const aendern = (index, art, menge) => {
+  const aendern = (index, art, menge, urheber = null) => {
     const bisher = aenderungen.get(index);
-    aenderungen.set(index, { art: bisher?.art ?? art, menge: (bisher?.menge ?? 0) + menge });
+    aenderungen.set(index, { art: bisher?.art ?? art, menge: (bisher?.menge ?? 0) + menge, urheber: bisher ? bisher.urheber : urheber });
   };
   for (const index of belegteFelder(ebene, "gas")) {
     const { art, menge } = tabelle[index];
+    const urheber = urheberDes(tabelle[index]);
     for (const nachbar of nachbarIndizes(ebene, index)) {
       if (!gasdurchlaessig(spiel, nachbar % ebene.breite, Math.floor(nachbar / ebene.breite))) continue;
       const dort = tabelle[nachbar];
@@ -242,12 +271,13 @@ function gasAusgleichen(spiel) {
       const fluss = Math.floor((menge - (dort?.menge ?? 0)) / 9);
       if (fluss <= 0) continue;
       aendern(index, art, -fluss);
-      aendern(nachbar, art, fluss);
+      aendern(nachbar, art, fluss, urheber);
     }
   }
-  for (const [index, { art, menge }] of [...aenderungen].sort(([erster], [zweiter]) => erster - zweiter)) {
-    const neu = (tabelle[index]?.menge ?? 0) + menge;
-    if (neu > 0) tabelle[index] = { art: tabelle[index]?.art ?? art, menge: neu };
+  for (const [index, { art, menge, urheber }] of [...aenderungen].sort(([erster], [zweiter]) => erster - zweiter)) {
+    const vorher = tabelle[index];
+    const neu = (vorher?.menge ?? 0) + menge;
+    if (neu > 0) tabelle[index] = vorher ? { ...vorher, menge: neu } : eintragMit({ art, menge: neu }, urheber);
     else delete tabelle[index];
   }
 }
@@ -276,7 +306,7 @@ anmelden("welttick", "gas", (spiel) => {
     if (daten.undurchsichtigAb !== undefined) sichtBetroffen = true;
     for (const wesen of wesenAufIndex(spiel, index)) {
       const stufe = [...(daten.stufen || [])].reverse().find((kandidat) => eintrag.menge >= kandidat.ab && bedingungenErfuellt(spiel, wesen, kandidat.wenn));
-      if (stufe) aufWesenWirken(spiel, stufe.effekt, wesen, index, "gas", { art: "gas", name: eintrag.art });
+      if (stufe) aufWesenWirken(spiel, stufe.effekt, wesen, index, "gas", { art: "gas", name: eintrag.art }, urheberDes(eintrag));
     }
   }
   // dichter Rauch kommt und geht: Ninkasis Sichtfeld neu berechnen
@@ -292,15 +322,17 @@ anmelden("welttick", "feuer", (spiel) => {
   const brennend = belegteFelder(ebene, "feuer");
   if (!brennend.length) return;
   const regeln = regelnFeuer(spiel);
-  const zuEntzuenden = new Set();
+  // Feldindex -> Urheberin des Feuers, von dem es übergreift (das erste nach Feldindex)
+  const zuEntzuenden = new Map();
   for (const index of brennend) {
-    for (const wesen of wesenAufIndex(spiel, index)) aufWesenWirken(spiel, regeln.brennen, wesen, index, "feuer", { art: "feuer", name: "feuer" });
+    const urheber = urheberDes(schichten.feuer[index]);
+    for (const wesen of wesenAufIndex(spiel, index)) aufWesenWirken(spiel, regeln.brennen, wesen, index, "feuer", { art: "feuer", name: "feuer" }, urheber);
     const feld = feldVonIndex(ebene, index);
-    if (regeln.rauch) gasSetzen(spiel, feld, regeln.rauch, regeln.rauchMenge);
+    if (regeln.rauch) gasSetzen(spiel, feld, regeln.rauch, regeln.rauchMenge, urheber);
     for (const nachbar of nachbarIndizes(ebene, index)) {
       if (schichten.feuer[nachbar] || zuEntzuenden.has(nachbar)) continue;
       const chance = brennbarkeit(spiel, nachbar % ebene.breite, Math.floor(nachbar / ebene.breite));
-      if (chance > 0 && wurfProzent(spiel, "entzuenden", chance)) zuEntzuenden.add(nachbar);
+      if (chance > 0 && wurfProzent(spiel, "entzuenden", chance)) zuEntzuenden.set(nachbar, urheber);
     }
   }
   // erst abbrennen lassen, dann die neuen Felder entzünden (sie brennen ab dem nächsten Welttick)
@@ -309,19 +341,20 @@ anmelden("welttick", "feuer", (spiel) => {
     if (!eintrag) continue;
     eintrag.menge -= 1;
     if (eintrag.menge > 0) continue;
+    const urheber = urheberDes(eintrag);
     delete schichten.feuer[index];
     const feld = feldVonIndex(ebene, index);
     const oberflaeche = schichten.oberflaeche[index];
     const datenOberflaeche = oberflaeche && oberflaecheDaten(spiel, oberflaeche.art);
     if (datenOberflaeche?.brennbar) {
       delete schichten.oberflaeche[index];
-      if (datenOberflaeche.verbrenntZu) oberflaecheSetzen(spiel, feld, datenOberflaeche.verbrenntZu, 1);
+      if (datenOberflaeche.verbrenntZu) oberflaecheSetzen(spiel, feld, datenOberflaeche.verbrenntZu, 1, urheber);
     }
     const gelaende = gelaendeAuf(spiel, feld.x, feld.y);
     if (gelaende?.brennbar && gelaende.verbrenntZu) gelaendeSetzen(spiel, feld, gelaende.verbrenntZu);
     melden(spiel, "erloschen", { feld });
   }
-  for (const index of [...zuEntzuenden].sort((erster, zweiter) => erster - zweiter)) entzuenden(spiel, feldVonIndex(ebene, index));
+  for (const [index, urheber] of [...zuEntzuenden].sort(([erster], [zweiter]) => erster - zweiter)) entzuenden(spiel, feldVonIndex(ebene, index), urheber);
 });
 
 // Für die Wegfindung (welt/wege.js meiden): Felder mit Feuer oder mit gefährlicher Oberfläche oder Gas; null, wenn keine

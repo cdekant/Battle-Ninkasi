@@ -8,9 +8,9 @@
 // zustand_setzen und zustand_entfernen in systeme/zustaende.js.
 
 import { anmelden } from "./register.js";
-import { wurfWuerfel } from "./wurf.js";
+import { wurfWuerfel, wurfProzent } from "./wurf.js";
 import { hakenAusloesen, melden, bezugAuf } from "./ereignisse.js";
-import { wertAendern, ursprungAus, beteiligteAus } from "./effekte.js";
+import { effektAnwenden, wertAendern, ursprungAus, beteiligteAus } from "./effekte.js";
 import { prozentVon, prozentWiederholt, geteiltGerundet } from "./werte.js";
 
 // Menge eines Schritts:
@@ -86,3 +86,10 @@ bausteinAnmelden("wert_aendern", { wertName: "text", ...MENGE }, (spiel, kontext
   const geaendert = wertAendern(spiel, ziel, parameter.wertName, mengeBestimmen(spiel, kontext, parameter), ursprungAus(kontext));
   melden(spiel, "wert_geaendert", { ziel: bezugAuf(ziel), wertName: parameter.wertName, menge: geaendert });
 }, { brauchtZiel: true });
+
+// Zufallsverzweigung: mit chance Prozent wirkt effekt, sonst (freiwillig) sonst; beide mit demselben Kontext,
+// die Ablage kontext.werte bleibt geteilt. Wurf "zufall", es wird immer gewürfelt, auch bei 0 und 100.
+bausteinAnmelden("zufall", { chance: "ganzzahl", effekt: "effekt", sonst: "effekt?" }, (spiel, kontext, parameter) => {
+  const gewaehlt = wurfProzent(spiel, "zufall", parameter.chance) ? parameter.effekt : parameter.sonst;
+  if (gewaehlt) effektAnwenden(spiel, gewaehlt, kontext);
+});

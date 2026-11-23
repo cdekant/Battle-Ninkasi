@@ -829,7 +829,7 @@ function pruefeEffekt(daten, name, effekt, fehler) {
 }
 
 // Namen der Effekte, die ein Effekt sofort aufruft: Parameter vom Typ "effekt" und, über Parameter vom
-// Typ "zustand", die Effekte beim Beginn und Ende dieses Zustands (jeTick wirkt erst später)
+// Typ "zustand", die Effekte beim Beginn und Ende dieses Zustands (jeTick und beimAblauf wirken erst später)
 function aufgerufeneEffekte(daten, effekt) {
   const namen = [];
   for (const schritt of effekt.schritte || []) {
@@ -937,7 +937,7 @@ function pruefeZustand(daten, sprache, name, zustand, fehler) {
   pruefeText(sprache.texte, zustand.text, ort, fehler);
   if (zustand.dauer !== undefined && !(istGanzzahl(zustand.dauer) && zustand.dauer > 0)) fehler.push(`${ort}: dauer muss eine ganze Zahl > 0 sein`);
   if (zustand.hoechstStapel !== undefined && !(istGanzzahl(zustand.hoechstStapel) && zustand.hoechstStapel > 0)) fehler.push(`${ort}: hoechstStapel muss eine ganze Zahl > 0 sein`);
-  const felder = { stapel: STAPELREGELN, jeTick: "effekt?", beimBeginn: "effekt?", beimEnde: "effekt?", gebundenAnQuelle: "wahrheitswert?", handlungsunfaehig: "wahrheitswert?", fraktion: "text?", bewegung: BEWEGUNGSARTEN };
+  const felder = { stapel: STAPELREGELN, jeTick: "effekt?", beimBeginn: "effekt?", beimEnde: "effekt?", beimAblauf: "effekt?", gebundenAnQuelle: "wahrheitswert?", handlungsunfaehig: "wahrheitswert?", fraktion: "text?", bewegung: BEWEGUNGSARTEN };
   pruefeParameter(daten, felder, zustand, ort, fehler);
   if (zustand.ki !== undefined) pruefeKi(daten, zustand.ki, `${ort}.ki`, fehler);
   if (zustand.befehl !== undefined) {

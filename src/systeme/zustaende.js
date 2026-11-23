@@ -1,7 +1,7 @@
 // Zustände (siehe docs/Wirkungen.md, Zustände): zeitlich begrenzte Wirkungen an einer Entität.
 // Daten (datenproben/zustaende.js):
 //   name: { text, tags?, dauer?, stapel?, hoechstStapel?, verlauf?, modifikatoren?, jeTick?, beimBeginn?, beimEnde?,
-//           ausloeser?, gebundenAnQuelle? }
+//           beimAblauf?, ausloeser?, gebundenAnQuelle? }
 //   dauer:        Zeiteinheiten; ohne Angabe unbegrenzt, bis der Zustand entfernt wird
 //   stapel:       was beim erneuten Anwenden desselben Zustands geschieht (Vorgabe "erneuern"):
 //                 "erneuern"    eine Instanz, die höhere Stärke, die längere Dauer
@@ -11,7 +11,10 @@
 //   verlauf:      "gleichbleibend" (Vorgabe) | "abklingend" | "ansteigend" | eigene Kurve
 //                 [[anteilProzent, staerkeProzent], ...] über den Anteil der verstrichenen Dauer
 //   modifikatoren: [{ ziel, art, betrag }], betrag je Stärke 1, mit dem Verlauf skaliert (siehe modifikatorSkaliert)
-//   jeTick, beimBeginn, beimEnde: Effekte auf die Trägerin; Mengen mit mitStaerke skalieren mit der Stärke
+//   jeTick, beimBeginn, beimEnde, beimAblauf: Effekte auf die Trägerin; Mengen mit mitStaerke skalieren mit der Stärke
+//   beimEnde:     bei jedem Grund des Endes (aufräumen, z.B. verschwinden)
+//   beimAblauf:   nur wenn die Dauer abgelaufen ist, nach beimEnde (die nächste Stufe einer Krankheit, die geheilte
+//                 Vorstufe bricht so nicht aus)
 //   gebundenAnQuelle: endet mit dem Tod oder Verschwinden der Quelle (aufrechterhaltener Zauber, Beschworene)
 //   unterhalt: { mp: 2 } kostet die Trägerin je Welttick, vor jeTick; Modifikatoren auf unterhalt.<wert> mit den Tags;
 //              reicht ein Vorrat nicht, endet der Zustand mit dem Grund "unterhalt" (aufrechterhaltene Zauber)
@@ -178,7 +181,9 @@ export function zustandBeenden(spiel, traegerin, instanz, grund, kettentiefe = 0
   if (traegerin.zustaende.length === 0) delete traegerin.zustaende;
   melden(spiel, "zustand_endet", { wer: bezugAuf(traegerin), zustand: instanz.name, grund });
   hakenAusloesen(spiel, "zustand_endet", hakenKontext(traegerin, instanz, kettentiefe, { grund }));
-  zustandsEffekt(spiel, traegerin, instanz, definitionVon(spiel, instanz.name).beimEnde, kettentiefe);
+  const definition = definitionVon(spiel, instanz.name);
+  zustandsEffekt(spiel, traegerin, instanz, definition.beimEnde, kettentiefe);
+  if (grund === "abgelaufen" && spiel.zustand.entitaeten[traegerin.id]) zustandsEffekt(spiel, traegerin, instanz, definition.beimAblauf, kettentiefe);
 }
 
 anmelden("zeitereignisse", "zustand_ende", (spiel, { traegerinId, nummer }) => {

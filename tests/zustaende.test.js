@@ -17,6 +17,7 @@ const EFFEKTE = {
   dornen: { schritte: [{ baustein: "schaden", menge: 1 }] },
   stoss: { schritte: [{ baustein: "schaden", menge: 5 }] },
   toedlich: { schritte: [{ baustein: "schaden", menge: 100 }] },
+  panzern: { schritte: [{ baustein: "zustand_setzen", zustand: "panzer" }] },
 };
 
 const ZUSTAENDE = {
@@ -26,6 +27,7 @@ const ZUSTAENDE = {
   blutung: { text: "zustand.blutung", dauer: 300, stapel: "einzeln", hoechstStapel: 2 },
   abklingender_segen: { text: "zustand.segen", dauer: 1000, verlauf: "abklingend", modifikatoren: [{ ziel: "trefferchance", art: "plus", betrag: 10 }] },
   verflucht: { text: "zustand.verflucht", tags: ["gift"], beimBeginn: "erfrischen", beimEnde: "erfrischen" },
+  vorstufe: { text: "zustand.vorstufe", tags: ["gift"], dauer: 300, beimEnde: "erfrischen", beimAblauf: "panzern" },
   dornenhaut: { text: "zustand.dornenhaut", dauer: 500, ausloeser: [{ bei: "nach_schaden", rolle: "ziel", ziel: "quelle", effekt: "dornen" }] },
   gebannt: { text: "zustand.gebannt", gebundenAnQuelle: true },
 };
@@ -125,6 +127,20 @@ test("Unbegrenzt bis zum Entfernen per Tag; beimBeginn und beimEnde wirken auf d
   assert.ok(!hatZustand(traegerin, "verflucht"));
   assert.deepEqual(meldungen.filter((meldung) => meldung.art === "zustand_endet").map((meldung) => meldung.grund), ["entfernt"]);
   assert.equal(traegerin.werte.lp.aktuell, 15, "10, heilt 3 vorab und 3 beim Beginn, Gift 2 · 2, 3 beim Ende");
+});
+
+test("beimAblauf wirkt nur, wenn die Dauer abläuft, nach beimEnde; beimEnde bei jedem Grund", () => {
+  const spiel = spielBauen();
+  const abgelaufen = wesen(spiel, 2, 1, "feinde", 20), entfernt = wesen(spiel, 4, 1, "feinde", 20);
+  for (const traegerin of [abgelaufen, entfernt]) traegerin.werte.lp.aktuell = 10;
+  zustandSetzen(spiel, abgelaufen, "vorstufe");
+  zustandSetzen(spiel, entfernt, "vorstufe");
+  effektAnwenden(spiel, "entgiften", { zielId: entfernt.id });
+  weltLaufenLassen(spiel, 300);
+  assert.ok(hatZustand(abgelaufen, "panzer"), "abgelaufen: die nächste Stufe beginnt");
+  assert.ok(!hatZustand(entfernt, "panzer"), "entfernt: kein beimAblauf");
+  assert.equal(abgelaufen.werte.lp.aktuell, 13, "beimEnde heilt auch beim Ablauf");
+  assert.equal(entfernt.werte.lp.aktuell, 13, "beimEnde heilt beim Entfernen");
 });
 
 test("Auslöser an Zuständen: Dornenhaut schlägt zurück, solange sie besteht", () => {

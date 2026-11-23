@@ -60,7 +60,7 @@ const ZUSTAENDE = {
     auren: [{ reichweite: 2, trifft: "feinde", modifikatoren: [{ ziel: "genauigkeit", art: "plus", betrag: -20 }] }],
   },
   // Krankheit in Stufen: die Vorstufe geht nach Ablauf in den Ausbruch über
-  halsweh: { text: "zustand.halsweh", tags: ["krankheit", "krankheit.glotrot"], dauer: 300, beimEnde: "glotrot_ausbruch" },
+  halsweh: { text: "zustand.halsweh", tags: ["krankheit", "krankheit.glotrot"], dauer: 300, beimAblauf: "glotrot_ausbruch" },
   glotrot: { text: "zustand.glotrot", tags: ["krankheit", "krankheit.glotrot"], jeTick: "glotrot_zehrt" },
 };
 
@@ -196,7 +196,7 @@ test("Fläche über die Zeit: Hopfensud beruhigt, wer darin steht, und trocknet 
   assert.equal(schichtAuf(spiel, "oberflaeche", 6, 2), null, "abgetrocknet");
 });
 
-test("Fläche über die Zeit: die Wirkung wird der Wirkenden zugerechnet", { todo: "Punkt 15: Feldschichten tragen keine Urheberin, EP, Zorn und Todesursache gehen verloren" }, () => {
+test("Fläche über die Zeit: die Wirkung wird der Wirkenden zugerechnet", () => {
   const { spiel, ninkasi } = aufstellen();
   const feind = wesen(spiel, 6, 2, "verderber", 20);
   befehlAusfuehren(spiel, ninkasi, { art: "faehigkeit", faehigkeit: "hopfensud", ziel: { x: 6, y: 2 } });
@@ -325,8 +325,7 @@ test("Krankheit: nur das passende Heilmittel nimmt sie", () => {
   assert.ok(!hatZustand(ninkasi, "glotrot"));
 });
 
-test("Krankheit: wer die Vorstufe heilt, löst den Ausbruch nicht aus", { todo: "Punkt 15: beimEnde wirkt bei jedem Grund des Endes, auch beim Entfernen" }, () => {
-  // Entwurf: beimAblauf (nur Grund "abgelaufen") neben beimEnde, oder eine Bedingung auf den Grund
+test("Krankheit: wer die Vorstufe heilt, löst den Ausbruch nicht aus", () => {
   const { spiel, ninkasi } = aufstellen({ effekte: { vorstufe_heilen: { schritte: [{ baustein: "zustand_entfernen", zustand: "halsweh" }] } } });
   zustandSetzen(spiel, ninkasi, "halsweh");
   effektAnwenden(spiel, "vorstufe_heilen", { quelleId: ninkasi.id, zielId: ninkasi.id });
@@ -334,11 +333,11 @@ test("Krankheit: wer die Vorstufe heilt, löst den Ausbruch nicht aus", { todo: 
   assert.ok(!hatZustand(ninkasi, "glotrot"));
 });
 
-test("Krankheit: die Vorstufe heilt mit einer Chance von selbst aus", { todo: "Punkt 15, ob nötig: keine Zufallsverzweigung in einem Effekt" }, () => {
-  // Entwurf: Baustein zufall { chance, effekt, sonst? }; hier sicher ausgeheilt (chance 0)
+test("Krankheit: die Vorstufe heilt mit einer Chance von selbst aus", () => {
+  // chance 0: sicher ausgeheilt
   const { spiel, ninkasi } = aufstellen({
     effekte: { vielleicht_ausbruch: { schritte: [{ baustein: "zufall", chance: 0, effekt: "glotrot_ausbruch" }] } },
-    zustaende: { halsweh: { ...ZUSTAENDE.halsweh, beimEnde: "vielleicht_ausbruch" } },
+    zustaende: { halsweh: { ...ZUSTAENDE.halsweh, beimAblauf: "vielleicht_ausbruch" } },
   });
   zustandSetzen(spiel, ninkasi, "halsweh");
   weltLaufenLassen(spiel, 300);

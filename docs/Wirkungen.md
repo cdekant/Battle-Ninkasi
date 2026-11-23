@@ -44,12 +44,13 @@ Schnittstellen:
 + `effektAnwenden(spiel, effektName, kontext)`; `wertAendern` und `wertAendernInHundertsteln` für jede Änderung eines Werts (siehe [Architektur.md](Architektur.md), Ereignisse); `beteiligteAus`, `ursprungAus`
 + `bausteinAnmelden(name, parameterBeschreibung, funktion, { brauchtZiel })`: Funktion `(spiel, kontext, parameter) => void` im Register `bausteine`
 + Grundbausteine, nach Datei (beschrieben im jeweiligen Dokument):
-  + `src/kern/bausteine.js`: `schaden`, `heilen`, `wert_aendern`
+  + `src/kern/bausteine.js`: `schaden`, `heilen`, `wert_aendern`, `zufall`
   + `src/systeme/zielbausteine.js`: `fuer_jedes_ziel`, `auf_feld`, `geschoss`, `springen` (siehe Zielauswahl)
   + `src/systeme/zustaende.js`: `zustand_setzen`, `zustand_entfernen`; `src/systeme/beschwoerung.js`: `beschwoeren`, `verschwinden` (siehe Zustände)
   + `src/systeme/kampf.js`: `trefferwurf`, `angreifen` (siehe [Wesen.md](Wesen.md), Kampfwerte); `src/systeme/verschieben.js`: `stossen`, `ziehen`, `tauschen`, `teleportieren` (siehe [Wesen.md](Wesen.md), Bewegung); `src/systeme/wahrnehmung.js`: `laerm`; `src/systeme/fraktionen.js`: `ruf_aendern` (siehe [Wesen.md](Wesen.md), Fraktionen); `src/systeme/skills.js`: `eigenschaft_aendern`, `skill_freischalten`
   + `src/systeme/gelaende.js`: `gelaende_setzen`, `gelaende_zerstoeren`; `src/systeme/schichten.js`: `oberflaeche_setzen`, `gas_setzen`, `entzuenden` (siehe [Welt.md](Welt.md))
   + `src/systeme/verschleiss.js`: `abnutzen`; `src/systeme/ausruestung.js`: `fluch_aufheben` (siehe [Gegenstaende.md](Gegenstaende.md))
++ Baustein `zufall { chance, effekt, sonst? }`: mit `chance` Prozent wirkt `effekt`, sonst `sonst` (oder nichts), mit demselben Kontext und derselben Ablage; Wurf `zufall`, für eine Chance innerhalb eines Effekts (die Vorstufe einer Krankheit heilt von selbst aus, ein Treffer betäubt manchmal); Chancen an Ereignissen haben schon die Auslöser, Chancen über den Pegel die Risikotabellen
 + Baustein `angreifen { profil? }`: die Quelle greift das Ziel mit ihren Angriffsprofilen an wie bei einer Angriffsaktion, ohne Zeitkosten, mit `profil` nur dieses eine; nur gegen ein Ziel daneben; für Konter aus Auslösern, z.B. `{ bei: "verfehlt", rolle: "ziel", ziel: "quelle", effekt: "konter" }`; die Angriffe laufen auf der Kettentiefe des Effekts, gegenseitige Konter enden so an der Kettengrenze
 
 Regeln:
@@ -121,7 +122,7 @@ Regeln:
 
 Daten:
 
-+ Zustand (`datenproben/zustaende.js`, mit Vorlagen): `{ text, tags, dauer, stapel, hoechstStapel, verlauf, modifikatoren, auren, jeTick, beimBeginn, beimEnde, ausloeser, gebundenAnQuelle, unterhalt, handlungsunfaehig, befehl, ki, fraktion }`
++ Zustand (`datenproben/zustaende.js`, mit Vorlagen): `{ text, tags, dauer, stapel, hoechstStapel, verlauf, modifikatoren, auren, jeTick, beimBeginn, beimEnde, beimAblauf, ausloeser, gebundenAnQuelle, unterhalt, handlungsunfaehig, befehl, ki, fraktion }`
   + `dauer` in Zeiteinheiten, ohne Angabe unbegrenzt bis zum Entfernen
   + `stapel`: `erneuern` (Vorgabe: eine Instanz, höhere Stärke, längere Dauer), `aufaddieren` (Stärken addiert bis `hoechstStapel` Anwendungen, Dauer erneuert), `staerkster` (nur eine mindestens gleich starke Anwendung ersetzt, sonst nichts), `einzeln` (eigene Instanzen mit eigenem Ende, höchstens `hoechstStapel`)
   + `verlauf`: `gleichbleibend` (Vorgabe), `abklingend`, `ansteigend` oder eine eigene Kurve `[[anteilProzent, staerkeProzent], ...]` über den Anteil der verstrichenen Dauer
@@ -144,13 +145,14 @@ Regeln:
 + Wurde der Zustand verlängert, reiht sich das Zeitereignis zum neuen Ende wieder ein, und der Verlauf beginnt neu
 + Verschiedene Zustände bestehen immer nebeneinander; die Stapelregel gilt nur für Anwendungen desselben Zustands
 + Modifikatoren gelten je Stärke 1 und skalieren mit Stärke und Verlauf zur Zeit der Abfrage: `plus` und `prozent` im Betrag, `mal` im Anteil über 100 (`mal 150` bei Stärke 50 % wird `mal 125`), Grenzen gar nicht; endet der Zustand, entfallen sie ohne Nachführen
-+ `jeTick`, `beimBeginn`, `beimEnde` wirken auf die Trägerin mit Ursprung an ihrer Position, zugerechnet der Urheberin, Ursache `zustand`, Mittel `{ art: "zustand", name }`, Tags des Zustands; Mengen mit `mitStaerke: true` skalieren mit der Stärke (`werte.staerkeProzent`, 100 = Stärke 1)
++ `beimEnde` wirkt bei jedem Grund des Endes (aufräumen, z.B. `verschwinden`), `beimAblauf` nur beim Grund `abgelaufen`, nach `beimEnde`: die nächste Stufe einer Krankheit beginnt so nur nach Ablauf, wer die Vorstufe heilt, verhindert den Ausbruch
++ `jeTick`, `beimBeginn`, `beimEnde`, `beimAblauf` wirken auf die Trägerin mit Ursprung an ihrer Position, zugerechnet der Urheberin, Ursache `zustand`, Mittel `{ art: "zustand", name }`, Tags des Zustands; Mengen mit `mitStaerke: true` skalieren mit der Stärke (`werte.staerkeProzent`, 100 = Stärke 1)
 + `unterhalt` wird vor `jeTick` bezahlt, mit Modifikatoren auf `unterhalt.<wert>` und den Tags des Zustands; reicht ein Vorrat nicht, endet der Zustand mit dem Grund `unterhalt`
 + Handlungsunfähig: die Trägerin muss warten; bei Ninkasi wird jede Eingabe angenommen, aufgezeichnet, mit der Meldung `handlungsunfaehig` ("Leider nicht möglich") beantwortet und als warten ausgeführt, je Eingabe vergeht eine Aktion; eine Reise hält an
 + Befehlsveränderer wirken auf jeden Befehl der Trägerin, von Ninkasi wie von der KI; ein abgebrochener oder ungültig gewordener Befehl wird zu warten; aufgezeichnet wird der ursprüngliche Befehl
 + `ki` überlagert die KI (Furcht mit `fliehen`, Rausch mit `jagen` und `trifft: "wesen"`); bei Ninkasi übernimmt die KI für die Dauer, das Spiel wartet dann nicht auf Eingaben; nach dem Ende gilt von selbst wieder der ursprüngliche Stand, die eigene KI behält ihr Gedächtnis
 + Beispiel ganz als Daten: `beschworen: { gebundenAnQuelle: true, beimEnde: "verschwinden" }`, mit `dauer` auch eine Beschwörung auf Zeit (Vorbild Brogue: Geisterklingen verschwinden mit dem Goblin-Beschwörer)
-+ Die Datenprüfung verfolgt Kreise auch über Zustände: ein Effekt, der einen Zustand setzt, dessen `beimBeginn` ihn wieder aufruft, ist ein Fehler
++ Die Datenprüfung verfolgt Kreise auch über Zustände: ein Effekt, der einen Zustand setzt, dessen `beimBeginn` ihn wieder aufruft, ist ein Fehler; `jeTick` und `beimAblauf` wirken erst später und zählen nicht
 
 ## Zielauswahl
 
@@ -283,6 +285,6 @@ Regeln:
 ## Verweise
 
 + Spieldesign der Fähigkeiten, des Pegels und des Brauens: [Grundlagen.md](Grundlagen.md); Skills, die Fähigkeiten ausbauen: [Charakter.md](Charakter.md)
-+ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkte 4 bis 6 (Ersatzwirkungen, gewährte und gelehrte Fähigkeiten, Teilung), Punkt 8 (u.a. Auslöser am nicht angelegten Inventar, `zug_beginn`) und Punkt 15 (Urheberin der Feldschichten, Ende eines Zustands nach Grund, Zufallsverzweigung); erster Auslöser im Inhalt in Punkt 14
++ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkte 4 bis 6 (Ersatzwirkungen, gewährte und gelehrte Fähigkeiten, Teilung) und Punkt 8 (u.a. Auslöser am nicht angelegten Inventar, `zug_beginn`); erster Auslöser im Inhalt in Punkt 14
 
 Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.
