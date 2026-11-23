@@ -153,6 +153,7 @@ Status: offen, ohne festen Platz in der Reihenfolge
 + Gefahreneinschätzung beim Untersuchen
 + Blocken in der angezeigten Chance; Vorschau von Wirkungen innerhalb eines Effekts (siehe [Ausblick.md](Ausblick.md), Vorschau durch Simulation)
 + Mindestpegel als Kante an der Schnellleiste; Restzeit des Verderbens im Gepäck ("frisch", "bald sauer")
++ Farbpalette des Spiels festlegen: die Farben der Oberfläche (heute verstreute Variablen in `stil.css`, Farben von Gelände und Schichten in `daten/zeichen.js`, Minikarte, Effekte des Titels in `src/anzeige/titeleffekte.js`) als eine benannte Liste mit Bedeutung, abgestimmt auf die Pixel-Palette (`grafik/palette.js`, [Tileset.md](Tileset.md)) und die Signalfarben, dazu die Palette für Farbenblinde; dokumentiert an einer Stelle in [Anzeige.md](Anzeige.md)
 + Offenes aus dem Schema in [Oberflaeche.md](Oberflaeche.md) und [Titelbildschirm.md](Titelbildschirm.md), Ideen für später
 
 ## 13. Darstellung

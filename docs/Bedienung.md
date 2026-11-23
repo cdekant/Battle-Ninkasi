@@ -208,7 +208,7 @@ Schnittstellen:
 
 Regeln:
 
-+ Reiter Anzeige: Layout (A, B, kompakt), Größe der Oberfläche (Schriftgröße von `:root` in px, 12 bis 22, alle Maße in `rem` folgen), Zoom, Logzeilen (Layout A), Minikarte, Vollbild; Spiel: Reisetempo (auch für Laufen, Rasten, Erkunden), Geschossbahn (0 aus), Reisen und Rasten trotz Feinden, Halt bei Gegenständen, Schnellleiste sofort auslösen, Neustart nachfragen; Barrierefreiheit: Bewegung reduzieren (bisher die Geschossbahn), hoher Kontrast, Palette für Farbenblinde (Blau und Orange statt Grün und Rot)
++ Reiter Anzeige: Layout (A, B, kompakt), Größe der Oberfläche (Schriftgröße von `:root` in px, 12 bis 22, alle Maße in `rem` folgen), Zoom, Logzeilen (Layout A), Minikarte, Vollbild; Spiel: Reisetempo (auch für Laufen, Rasten, Erkunden), Geschossbahn (0 aus), Reisen und Rasten trotz Feinden, Halt bei Gegenständen, Schnellleiste sofort auslösen, Neustart nachfragen; Barrierefreiheit: Bewegung reduzieren (Geschossbahn, Effekte des Titelbilds), hoher Kontrast, Palette für Farbenblinde (Blau und Orange statt Grün und Rot)
 + Layout kompakt ist A mit 3 Logzeilen, Seitenleiste 20rem und kleineren Knöpfen, nur von Hand einstellbar
 + Sofort auslösen: ein Platz der Schnellleiste mit vorbelegtem, gültigem Ziel wirkt ohne zweiten Tastendruck; sonst bleibt der Zielmodus offen
 + Einstellungsfenster: die Kopfzeile nennt alle Reiter, Tab und Umschalt+Tab wechseln; Buchstabe oder Pfeile wählen, links und rechts oder - und + ändern, Enter schaltet um bzw. löst aus, Entf stellt die Vorgabe her; die Einzelheiten nennen Erklärung und Vorgabe; jede Änderung wirkt sofort und wird gespeichert

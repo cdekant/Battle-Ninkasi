@@ -46,6 +46,7 @@ import { menueOeffnen, endeOeffnen } from "./eingabe/menue.js";
 import { titelOeffnen } from "./eingabe/titel.js";
 import { titelHtml } from "./anzeige/titel.js";
 import { titelbildWaehlen } from "./anzeige/titelbilder.js";
+import { titeleffekteAnlegen } from "./anzeige/titeleffekte.js";
 import { korpustextZerlegen, spruchWaehlen } from "./anzeige/korpus.js";
 import korpusliste from "../sprache/de/korpus/index.js";
 import { verlaufOeffnen } from "./eingabe/verlauf.js";
@@ -276,6 +277,11 @@ let aktuelleStelle = null;
 let plaetze = plaetzeLesen();
 const titelbild = titelbildWaehlen(chronik, Math.random());
 let spruch = null;
+// Bewegte Effekte über dem Titelbild (anzeige/titeleffekte.js); Bewegung reduzieren gilt aus den Einstellungen oder vom System
+const titeleffekte = titeleffekteAnlegen({
+  zufall: Math.random,
+  bewegungReduziert: () => einstellungen.bewegungReduzieren || window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+});
 // Chronik im laufenden Lauf: schon gezählte Wesenarten, die Todesmeldung Ninkasis, abgeschlossene Läufe
 let gesehenImLauf = new Set();
 let todesmeldung = null;
@@ -288,6 +294,7 @@ function zeichnen() {
   document.documentElement.dataset.bildschirm = titelOffen ? "titel" : "spiel";
   titelElement.hidden = !titelOffen;
   titelElement.innerHTML = titelOffen ? titelHtml(fensterumgebung(), fensterStapel) : "";
+  if (titelOffen) titeleffekte.einhaengen(titelElement.querySelector(".titel-hintergrund"), titelbild);
   if (spiel && !titelOffen) spielZeichnen();
   const fensterInhalt = fensterHtml(fensterumgebung(), fensterStapel);
   fensterElement.hidden = !fensterInhalt;

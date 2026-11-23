@@ -21,7 +21,7 @@ export default {
   rastenHoechstens: 1000,     // höchstens so viele Schritte warten
   sofortAusloesen: false,     // Schnellleiste: mit vorbelegtem Ziel ohne zweiten Tastendruck wirken
   neustartNachfragen: true,   // Neuer Lauf im Spielmenü fragt nach
-  bewegungReduzieren: false,  // schaltet alle bewegten Effekte ab (bisher die Geschossbahn)
+  bewegungReduzieren: false,  // schaltet alle bewegten Effekte ab (Geschossbahn, Effekte des Titelbilds)
   hoherKontrast: false,
   farbenblind: false,         // Blau und Orange statt Grün und Rot (Kampflog, Gut und Schlimm, LP)
 };

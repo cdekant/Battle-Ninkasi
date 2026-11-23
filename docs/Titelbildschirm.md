@@ -2,7 +2,7 @@
 
 Stand: 2026-11-23
 
-Zuständig für: `src/eingabe/titel.js`, `src/eingabe/arenawahl.js`, `src/eingabe/chronik.js`, `src/anzeige/titel.js`, `src/anzeige/titelbilder.js`
+Zuständig für: `src/eingabe/titel.js`, `src/eingabe/arenawahl.js`, `src/eingabe/chronik.js`, `src/anzeige/titel.js`, `src/anzeige/titelbilder.js`, `src/anzeige/titeleffekte.js`
 
 Mitprüfen bei Änderungen: [Oberflaeche.md](Oberflaeche.md), [Bedienung.md](Bedienung.md), [Architektur.md](Architektur.md)
 
@@ -29,8 +29,8 @@ Was ein Titel in anderen Spielen leistet (aus Kenntnis der Spiele, nicht im Einz
 + Kein "Drücke eine Taste": die Seite öffnet direkt das Hauptmenü mit Titelbild; der erste Klick oder Tastendruck im Menü ist die Geste, die der Browser später für Ton verlangt
 + Weiche mit Vorwahl: Fortsetzen ist vorgewählt, wenn ein Lauf gespeichert ist, sonst Neues Spiel; Bedienung wie das Spielmenü (Buchstaben, Pfeile, Enter, Klick, "Klick ist Taste")
 + Drei Spalten: links das Menü, in der Mitte das Bild, rechts Vorschau des Laufs, später Ruhmeshalle und Statistik
-+ Titelbild quadratisch `Artwork/titel/cover-ninkasi-bierschlaechterin-02.jpg` (1408x1408, ohne eingemalte Schrift, CC0, öffentliches Konzeptbild); auf großen Bildschirmen wird es etwas pixelig, das passt; das Querformat `-01` bleibt als zweites Titelbild
-+ Das Bild füllt das Fenster und darf seitlich und in der Höhe beschnitten werden; ein Fokuspunkt je Bild hält Ninkasi im Blick
++ Titelbild quadratisch `Artwork/titel/cover-ninkasi-bierschlaechterin-03.jpg` (2000x2000, ohne eingemalte Schrift, CC0, öffentliches Konzeptbild), gemalt ohne Dampf und Blitze, die als Animation darüberliegen; einziges Titelbild, bis freischaltbare hinzukommen
++ Der Ausschnitt folgt der Fenstergröße: so viel vom Bild wie möglich, beschnitten nur, was über die Höhe des Fensters und die freie Mitte zwischen den Spalten hinausgeht; ein Schutzbereich je Bild hält Ninkasi vom Weizen bis zu den Stiefeln im Blick und in der freien Mitte
 + "Battle Ninkasi – Die Rückkehr der Bierschlächterin" steht in der linken Spalte
 + Drei Speicherplätze für nebeneinander laufende Läufe
 + Freischaltbare Titelbilder: Ninkasi im Kampf mit einem Wesen, sichtbar erst, wenn es einmal besiegt oder, bei freundlichen Wesen, getroffen wurde
@@ -45,13 +45,14 @@ Was ein Titel in anderen Spielen leistet (aus Kenntnis der Spiele, nicht im Einz
 
 ## Aufbau
 
-+ Das Bild füllt den ganzen Bildschirm (`object-fit: cover`, Fokuspunkt als `object-position`); die Spalten links und rechts sind keine Kästen, sondern ein weicher Verlauf ins Dunkle über dem Bildrand, so dass man sie nur an der Anordnung der Elemente erkennt; die Mitte bleibt frei
++ Das Bild füllt die Höhe des Fensters und die freie Mitte; ist es schmaler als das Fenster, läuft es unter den Spalten weich ins Dunkle aus; die Spalten links und rechts sind keine Kästen, sondern ein weicher Verlauf ins Dunkle über dem Bildrand, so dass man sie nur an der Anordnung der Elemente erkennt; die Mitte bleibt frei
 + Links: Spielname mit Untertitel, darunter das Menü senkrecht
 + Rechts: Vorschau des gewählten Laufs, der Spruch aus dem Korpus; später Ruhmeshalle und Statistik
 + Bei schmalen Fenstern rückt alles über das Bild, der Verlauf wird dichter
 + Das Bild trägt keine eigene Schrift, der Spielname steht nur links
 + Stil: das gemalte Bild bleibt Titelbild; Herunterskalieren macht keine Pixelart (bei 320x180 wird der Untertitel unlesbar, mit 32 Farben verlieren die Schleime ihr Grün); echte Pixelart müsste eigens gezeichnet werden und passt eher zum Intro-Film oder als freischaltbares Titelbild
-+ Lebendigkeit ohne neues Bild: Dampf und Funken als leichte Animation über dem Bild, abschaltbar über Bewegung reduzieren
++ Lebendigkeit durch Animation über dem Bild: gemalte Dampfschwaden steigen von den Kesseln auf und liegen hinter den Figuren, vorn steigen sie aus den Pfützen, ab und zu zischt ein Dampfstoß aus einem Ventil, Nebelbänder treiben am Boden; Ninkasi steht im Mittelpunkt der Blitze, die von den Anlagen auf Kolben, Krug und Diadem überspringen und manchmal weiter auf einen Gegner, umgeben von einer pulsierenden Aura entlang ihrer Silhouette; nach jedem Einschlag zerplatzen kleine Feuerwerke auf ihrem Umriss; die Augen der Schleime leuchten gelb, die des Lebensmittelkontrolleurs rot, jedes Wesen schwillt im eigenen Takt an und ab
++ Rücksicht auf Lichtempfindliche: nur die dünnen Blitze flackern, Aura und Lichthöfe schwellen weich, kein Aufblitzen des ganzen Bildes, höchstens etwa ein Einschlag alle zwei Sekunden; Bewegung reduzieren (Einstellung oder System) lässt nur die ruhende Aura
 + Mehrere Titelbilder: je Start eines aus den freigeschalteten, keine Bildfolge während des Menüs
 
 Menü der ersten Version: Fortsetzen, Neues Spiel, Läufe (ab zwei belegten Plätzen), Einstellungen, Hilfe, Beenden; keine ausgegrauten Platzhalter für Kommendes.
@@ -97,7 +98,13 @@ Damit die Ideen später ohne Umbau dazukommen:
 + Rechte Spalte: die drei Plätze ("Platz 1: Tiefe 2, Zug 340, 21.11.2026", frei, veraltet), ein Klick setzt fort oder beginnt auf einem freien Platz; darunter der Spruch
 + Neues Spiel nimmt den ersten leeren Platz, sonst einen veralteten; sind alle spielbar belegt, öffnet sich `laeufe` zum Ersetzen mit Nachfrage; `laeufe` setzt fort, beginnt auf freien Plätzen neu, fragt bei veralteten nach und löscht mit Entf nach Nachfrage
 + Spielmenü mit Zum Titel; nach dem Tod öffnet sich `ende` (Neuer Lauf auf demselben Platz, Zum Titel, Verlauf)
-+ Titelbilder in `src/anzeige/titelbilder.js` (Datei, Fokus, Freischaltung), geladen direkt aus `Artwork/titel/` ohne Kopie; je Start eines aus den freigeschalteten; ein Test prüft die Dateien
++ Titelbilder in `src/anzeige/titelbilder.js` (Datei, Schutzbereich, Freischaltung, wahlweise Effekte), geladen direkt aus `Artwork/titel/` ohne Kopie; je Start eines aus den freigeschalteten; ein Test prüft die Dateien
++ Effekte gehören zu genau einem Titelbild: weitere Bilder bekommen eigene Effekte, Masken und Sprites (benannt nach ihrem Bild) oder keine; das Modul liefert nur die Arten (Dampf, Stoß, Nebel, Blitze, Aura, Feuerwerk, Augen)
++ Effekte eines Titelbilds (`src/anzeige/titeleffekte.js`) als Daten: Masken als Schwarzweiß-PNG in Bildgröße neben dem Bild (`-maske-frau`, `-maske-gegner`, `-maske-anlagen`; weiß ist die Figur), Sprites des Dampfs (`-dampf-schwade-*`, `-dampf-stoss-*`, `-dampf-nebel-*`: weiß auf Schwarz, die Helligkeit wird Deckkraft, eingefärbt im Code), Quellen des Dampfs (hinten oder vorn), Ventile der Dampfstöße mit Richtung, Band des Bodennebels, Quellen, Ziele und Überschläge der Blitze, Augen je Wesen (Farbe, Größe, Punkte), alle Punkte in Prozent des Bildes; ein Test prüft Masken und Punkte
++ Ausschnitt (`ausschnittWaehlen` in `src/anzeige/titeleffekte.js`): Maßstab so, dass das Bild die Höhe des Fensters und die freie Mitte zwischen den Spalten füllt; je Achse steht ein Bild, das hineinpasst, mittig in der freien Mitte, sonst rückt der Schutzbereich in die Mitte, nur so weit, dass keine Lücke entsteht, und ist er höher als das Fenster, bleibt sein oberer Rand sichtbar; Lage und Größe stehen als Stil am Bild, neu bei jeder Größenänderung und jedem Neuzeichnen des Titels (mit der einmal bekannten Bildgröße, damit ein frisch gebautes Bild nicht kurz verrutscht)
++ Ein eigenes Canvas über dem Bild, das nach jedem Neuzeichnen des Titels wieder eingehängt wird; gezeichnet in Bildpixeln mit derselben Abbildung wie das Bild; Ebenen von hinten nach vorn: Widerschein auf den Anlagen, Dampf hinten (von den Masken im Vordergrund ausgestanzt), Aura, Augen, Lichthöfe, Blitze, Feuerwerk, Dampf vorn, Bodennebel; eine Schwade steht mit dem Fuß an ihrer Quelle, steigt, wächst, dreht sich leicht und verblasst, ein Nebelband treibt seitwärts, ein Stoß wird von der Düse aus aufgedeckt; der Dampf läuft beim Laden acht Sekunden vor; das Canvas blendet an denselben Rändern aus wie das Bild
++ Blitze durch fortgesetztes Halbieren mit seitlichem Versatz, Äste an den Knicken (kürzer, schwächer, eine Stufe weniger, bis Tiefe 2); drei Lagen (weicher Schein, Strang, weißer Kern), additiv überblendet; ein Einschlag mit einem Nachschlag auf demselben Pfad, dann eine Pause von 1,8 bis 5,2 s; danach kriechen zwölf Feuerwerke vom Einschlag aus über den Umriss, jedes leuchtet kurz auf und zerplatzt in Funken, die geradeaus nach außen fliegen und in einer Drittelsekunde verglühen
++ Kosmetischer Zufall aus `Math.random()` von `src/main.js`, ohne Bezug zum Spielzustand; die Schleife hält an, wenn der Titel geschlossen oder der Tab verborgen ist; die Farben der Effekte sind eigene Werte im Modul, nicht aus der Pixel-Palette
 + Spruch: `sprache/de/korpus/index.js` listet die Korpusdateien (ein Test vergleicht mit dem Ordner), `src/anzeige/korpus.js` zerlegt sie (Kopf, Strophen, Verse ohne Sprecher und Anführungszeichen) in Sätze von höchstens drei Versen; längere gehen als Ausschnitt ihrer ersten zwei Verse ein, Sätze mit Lücken ("...") fallen weg; unter dem Spruch steht der Titel des Korpustexts
 + Chronik, letzter Lauf und Spielart wie unter "Was schon jetzt zu beachten ist", Einzelheiten unter Speichern in [Architektur.md](Architektur.md)
 + Vollbild ist ein Knopf, keine Einstellung; `?seed=` gilt nur mit einem leeren Platz

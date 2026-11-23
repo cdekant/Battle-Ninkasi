@@ -1,6 +1,7 @@
 // Titelbildschirm, Wahl der Läufe und der Arena (eingabe/titel.js, eingabe/arenawahl.js, docs/Titelbildschirm.md). Liest nur.
 // Der Titel ist eine eigene Ebene (#titel in index.html) über der ganzen Seite: das Bild füllt das Fenster und darf
-// seitlich und in der Höhe beschnitten werden (object-fit: cover, Fokuspunkt je Bild aus anzeige/titelbilder.js);
+// seitlich und in der Höhe beschnitten werden (object-fit: cover, den Ausschnitt setzt anzeige/titeleffekte.js nach dem
+// Schutzbereich je Bild aus anzeige/titelbilder.js);
 // links Name und Menü, rechts die Speicherplätze und ein Spruch aus dem Korpus, beide Spalten nur als weicher Verlauf
 // ins Dunkle. Der Hintergrund ist ein eigenes Element, das später statt des Bildes auch eine laufende Karte zeigen kann
 // (Vorführmodus). Fenster wie Einstellungen und Hilfe legen sich darüber (#fenster).
@@ -56,7 +57,7 @@ export function titelHtml(umgebung, stapel) {
   if (unten?.art !== "titel") return "";
   const { texte, plaetze = [], titelbild, spruch, version } = umgebung;
   const { text } = texte;
-  const bild = titelbild ? `<img class="titel-bild" src="${escapeHtml(titelbild.datei)}" alt="" style="object-position: ${titelbild.fokus.x}% ${titelbild.fokus.y}%">` : "";
+  const bild = titelbild ? `<img class="titel-bild" src="${escapeHtml(titelbild.datei)}" alt="">` : "";
   const hinweis = unten.zustand.hinweis ? `<p class="titel-hinweis">${text(unten.zustand.hinweis)}</p>` : "";
   return `<div class="titel-hintergrund">${bild}</div>
     <div class="titel-spalte titel-links">

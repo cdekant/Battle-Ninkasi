@@ -1,5 +1,5 @@
 // Titelbildschirm 0.32.0: Speicherplätze mit Vorschau, Titel und Läufe, Fenster nach dem Lauf, Chronik, Spielart,
-// Korpus und Titelbilder
+// Korpus, Titelbilder und ihre Effekte
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync, existsSync } from "node:fs";
@@ -18,6 +18,7 @@ import "../src/eingabe/verlauf.js";
 import { neueChronik, chronikGueltig, meldungZaehlen, sichtungenZaehlen, laufEintragen, zaehlerstand, freigeschaltet, HOECHSTENS_LAEUFE, CHRONIK_FORMAT, CHRONIK_MIGRATIONEN } from "../src/eingabe/chronik.js";
 import { korpustextZerlegen, saetzeAus, spruchWaehlen } from "../src/anzeige/korpus.js";
 import { TITELBILDER, titelbildWaehlen } from "../src/anzeige/titelbilder.js";
+import { ausschnittWaehlen, augenLeuchten, funkenBahn, blitzErzeugen, blitzHelligkeit, weichesLeuchten } from "../src/anzeige/titeleffekte.js";
 import { titelHtml, speicherplatzText } from "../src/anzeige/titel.js";
 import { fensterHtml } from "../src/anzeige/fenster.js";
 import "../src/anzeige/systemfenster.js";
@@ -197,12 +198,115 @@ test("Korpus: Liste passt zum Ordner, Kopf und Verse ohne Sprecher, Sätze höch
   assert.equal(spruchWaehlen([], 0.5), null);
 });
 
-test("Titelbilder: jede Datei existiert, Fokus in Prozent, Wahl nur unter freigeschalteten", () => {
+test("Titelbilder: jede Datei existiert, Schutzbereich in Prozent, Wahl nur unter freigeschalteten", () => {
   for (const bild of TITELBILDER) {
     assert.ok(existsSync(bild.datei), bild.datei);
-    assert.ok(bild.fokus.x >= 0 && bild.fokus.x <= 100 && bild.fokus.y >= 0 && bild.fokus.y <= 100);
+    const { links, oben, rechts, unten } = bild.schutzbereich;
+    assert.ok(links >= 0 && links < rechts && rechts <= 100 && oben >= 0 && oben < unten && unten <= 100, bild.datei);
   }
   const chronik = neueChronik();
   assert.ok(TITELBILDER.includes(titelbildWaehlen(chronik, 0.99)));
   assert.equal(titelbildWaehlen(chronik, 0), TITELBILDER[0]);
+});
+
+test("Titeleffekte: Masken und Sprites existieren, Punkte in Prozent, nur bekannte Masken", () => {
+  const imBild = (punkt) => punkt.x >= 0 && punkt.x <= 100 && punkt.y >= 0 && punkt.y <= 100;
+  for (const { datei, effekte } of TITELBILDER) {
+    if (!effekte) continue;
+    const masken = effekte.masken ?? {};
+    for (const maske of Object.values(masken)) assert.ok(existsSync(maske), maske);
+    for (const datei of Object.values(effekte.sprites ?? {}).flat()) assert.ok(existsSync(datei), datei);
+    for (const ventil of effekte.dampfstoesse ?? []) assert.ok(["links", "rechts"].includes(ventil.richtung), `${datei}: Ventil ${JSON.stringify(ventil)}`);
+    const genannt = [...(effekte.vordergrund ?? []), effekte.aura, effekte.blitze?.widerschein, effekte.blitze?.ueberschlagMaske, effekte.blitze?.kontur].filter(Boolean);
+    for (const name of genannt) assert.ok(name in masken, `${datei}: Maske ${name}`);
+    for (const wesen of effekte.augen ?? []) assert.ok(["gelb", "rot"].includes(wesen.farbe) && wesen.groesse > 0 && wesen.punkte.length, `${datei}: Augen`);
+    const punkte = [...(effekte.dampf ?? []), ...(effekte.dampfstoesse ?? []), ...(effekte.augen ?? []).flatMap((wesen) => wesen.punkte), ...(effekte.blitze?.quellen ?? []), ...(effekte.blitze?.ziele ?? []), ...(effekte.blitze?.ueberschlaege ?? [])];
+    for (const punkt of punkte) assert.ok(imBild(punkt), `${datei}: ${JSON.stringify(punkt)}`);
+    if (effekte.blitze) assert.ok(effekte.blitze.quellen.length && effekte.blitze.ziele.length, `${datei}: Blitze brauchen Quellen und Ziele`);
+  }
+});
+
+test("Titeleffekte: Blitz verästelt, trifft sein Ziel und folgt dem Zufall", () => {
+  const zufallAus = (startwert) => {
+    let wert = startwert;
+    return () => ((wert = (wert * 1103515245 + 12345) % 2147483648) / 2147483648);
+  };
+  const von = { x: 100, y: 50 };
+  const nach = { x: 900, y: 700 };
+  const straenge = blitzErzeugen(von, nach, zufallAus(7));
+  const [haupt, ...aeste] = straenge;
+  assert.deepEqual(haupt.punkte[0], von);
+  assert.deepEqual(haupt.punkte.at(-1), nach);
+  assert.equal(haupt.punkte.length, 2 ** 6 + 1, "sechs Stufen Halbierung");
+  assert.equal(haupt.staerke, 1);
+  for (const ast of aeste) {
+    assert.ok(ast.staerke < 1 && ast.tiefe >= 1 && ast.tiefe <= 2);
+    assert.ok(ast.punkte.length < haupt.punkte.length);
+  }
+  for (const strang of straenge) for (const punkt of strang.punkte) assert.ok(Number.isFinite(punkt.x) && Number.isFinite(punkt.y));
+  assert.deepEqual(blitzErzeugen(von, nach, zufallAus(7)), straenge, "gleicher Zufall, gleicher Blitz");
+  // über viele Blitze gibt es Äste
+  const astZahl = Array.from({ length: 20 }, (_, i) => blitzErzeugen(von, nach, zufallAus(i + 1)).length - 1).reduce((summe, zahl) => summe + zahl, 0);
+  assert.ok(astZahl >= 20, `Äste: ${astZahl}`);
+  assert.equal(blitzErzeugen(von, nach, zufallAus(3), { astTiefe: 0 }).length, 1, "ohne Äste nur der Hauptpfad");
+});
+
+test("Titeleffekte: Blitz flackert kurz, Lichthöfe schwellen weich", () => {
+  assert.equal(blitzHelligkeit(-1), 0);
+  assert.equal(blitzHelligkeit(0), 1);
+  assert.ok(blitzHelligkeit(70) < blitzHelligkeit(100), "Nachschlag nach kurzem Dunkel");
+  assert.equal(blitzHelligkeit(10000), 0);
+  // weich: nach dem Anstieg nur noch fallend, ohne zweiten Gipfel
+  let vorher = weichesLeuchten(60, 600);
+  assert.equal(vorher, 1);
+  for (let alter = 80; alter < 600; alter += 20) {
+    const jetzt = weichesLeuchten(alter, 600);
+    assert.ok(jetzt <= vorher);
+    vorher = jetzt;
+  }
+  assert.equal(weichesLeuchten(600, 600), 0);
+});
+
+test("Titelbild: Ausschnitt füllt Höhe und freie Mitte, der Schutzbereich rückt in die Mitte", () => {
+  const ninkasi = { links: 27, oben: 31, rechts: 72, unten: 85 };
+  const nahe = (wert, soll) => Math.abs(wert - soll) < 0.01;
+  // 16:9 mit Spalten von 384 px: das Bild füllt genau die freie Mitte (1152 px), seitlich unter den Spalten Rand,
+  // oben und unten steht es 72 px über; der Schutzbereich rückt so weit nach oben, wie es ohne Lücke geht
+  const breitbild = ausschnittWaehlen(1920, 1080, 2000, 2000, ninkasi, { links: 384, rechts: 1536 });
+  assert.ok(nahe(breitbild.massstab, 0.576) && nahe(breitbild.versatzX, 384) && nahe(breitbild.versatzY, -72), JSON.stringify(breitbild));
+  // ohne Spalten füllt es die ganze Breite und wird oben und unten beschnitten
+  const ohneSpalten = ausschnittWaehlen(1920, 1080, 2000, 2000, ninkasi);
+  assert.ok(nahe(ohneSpalten.massstab, 0.96) && ohneSpalten.versatzX === 0, JSON.stringify(ohneSpalten));
+  // sehr breit: die freie Mitte ist breiter als das Bild hoch, es wird größer und oben und unten beschnitten,
+  // der Schutzbereich steht senkrecht mittig, ohne Lücke
+  const sehrBreit = ausschnittWaehlen(2560, 1080, 2000, 2000, ninkasi, { links: 384, rechts: 2176 });
+  assert.ok(nahe(sehrBreit.massstab, 0.896));
+  const bildhoehe = 2000 * sehrBreit.massstab;
+  assert.ok(nahe(sehrBreit.versatzY + ((ninkasi.oben + ninkasi.unten) / 200) * bildhoehe, 540), "Schutzbereich senkrecht mittig");
+  assert.ok(sehrBreit.versatzY <= 0 && sehrBreit.versatzY >= 1080 - bildhoehe, "keine Lücke");
+  // hoch und schmal: Höhe füllt, waagerecht rückt der Schutzbereich in die freie Mitte
+  const hoch = ausschnittWaehlen(1000, 1500, 2000, 2000, ninkasi, { links: 400, rechts: 1000 });
+  assert.ok(nahe(hoch.massstab, 0.75) && hoch.versatzY === 0);
+  assert.ok(nahe(hoch.versatzX + ((ninkasi.links + ninkasi.rechts) / 200) * 1500, 700), `Mitte bei 700 px: ${hoch.versatzX}`);
+  // nicht weiter verschieben, als das Bild Rand hat
+  assert.equal(ausschnittWaehlen(1000, 1500, 2000, 2000, ninkasi, { links: 900, rechts: 1000 }).versatzX, 0);
+  assert.equal(ausschnittWaehlen(1000, 1500, 2000, 2000, ninkasi, { links: 0, rechts: 100 }).versatzX, -500);
+  // Schutzbereich höher als das Fenster: sein oberer Rand bleibt sichtbar
+  const flach = ausschnittWaehlen(3000, 600, 2000, 2000, ninkasi);
+  assert.ok(nahe(flach.versatzY, -0.31 * 2000 * flach.massstab), `oberer Rand bei ${flach.versatzY}`);
+});
+
+test("Titeleffekte: Augen schwellen zwischen schwach und hell", () => {
+  const werte = Array.from({ length: 100 }, (_, i) => augenLeuchten(i * 40, 4000, 0));
+  assert.ok(Math.min(...werte) > 0.1 && Math.max(...werte) < 0.9);
+  assert.ok(Math.max(...werte) - Math.min(...werte) > 0.6, "deutliches An- und Abschwellen");
+});
+
+test("Titeleffekte: Feuerwerksfunken fliegen geradeaus nach außen", () => {
+  const start = { x: 100, y: 100 };
+  assert.deepEqual(funkenBahn(start, 0, 120, 0), start);
+  const waagerecht = funkenBahn(start, 0, 120, 500);
+  assert.ok(Math.abs(waagerecht.x - 160) < 1e-9 && Math.abs(waagerecht.y - 100) < 1e-9, "eine halbe Sekunde mit 120 px/s, ohne Absinken");
+  const schraeg = funkenBahn(start, Math.PI / 4, 100, 1000);
+  assert.ok(Math.abs(schraeg.x - schraeg.y) < 1e-9, "auf der Geraden im Winkel");
 });
