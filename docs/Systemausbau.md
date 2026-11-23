@@ -16,15 +16,14 @@ Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und wäh
 
 Stand 2026-11-23, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer Wirkung auf den Inhalt, das Kleine und Breite zuerst:
 
-1. KI: Unterstützung und Umherziehen (Punkt 7)
-2. Teilung und Wachstum (Punkt 6), braucht Punkt 7
-3. Licht und Wahrnehmung (Punkt 3)
-4. Englisch, Mehrzahl und Glossar (Punkt 9)
-5. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
-6. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
-7. Danach der Inhalt (Punkt 14)
+1. Teilung und Wachstum (Punkt 6)
+2. Licht und Wahrnehmung (Punkt 3)
+3. Englisch, Mehrzahl und Glossar (Punkt 9)
+4. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
+5. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
+6. Danach der Inhalt (Punkt 14)
 
-Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
+Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 7 (KI: Unterstützung und Umherziehen) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
 
 Die Proben des Probedurchstichs stehen in `tests/probedurchstich.test.js`; jede Lücke dort ist ein Test mit `todo` und dem Punkt, der sie schließt, mit einem Entwurf der Daten (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing). Wer einen Punkt umsetzt, nimmt dort das `todo` weg.
 
@@ -55,13 +54,6 @@ Status: offen, erst Recherche und Spieldesign
 + Obergrenze je Wesen: sieht eine Zelle Ninkasi, ohne sie zu erreichen, teilt sie sich bis zur Obergrenze aller Wesen (`regeln.population.hoechstWesen`); Probe: eine Art hört bei ihrer eigenen Obergrenze auf, Entwurf als Bedingung `anzahl_unter { wesen, anzahl }` an der Fähigkeit
 + EP über den Topf je Abstammungslinie, Verhalten an der Obergrenze der Population, Leistung bei vielen Zellen
 
-## 7. KI: Unterstützung und Umherziehen
-
-Status: offen
-
-+ Probe: ein Heiler heilt einen verwundeten Verbündeten; was schon geht, ist eine Aura für Verbündete
-+ Heilen und Stärken von Verbündeten mit `nutzen`: eine Fähigkeit zielt bisher immer nach der Beute, also heilt nur eine mit Zielart `selbst` (siehe [Wesen.md](Wesen.md), KI); die Handlung braucht ein Ziel unter den Verbündeten; Grundlage für Heiler, Kulturhefe als Verbündete und Begleiter
-+ Umherziehen wacher Wesen (Brogue "wandering"), damit Ebenen nicht stillstehen, bis Ninkasi kommt
 
 ## 8. Kleinere Reste der Systeme
 

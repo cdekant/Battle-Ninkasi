@@ -16,16 +16,20 @@
 //   erreichbarkeit: jedes Feld, das ein laufendes Wesen betreten kann (Türen zählen als offen), muss von der Treppe
 //     hinauf (sonst hinab, sonst der Mitte des ersten Raums) in acht Richtungen erreichbar sein, sonst neuer Versuch
 //   ebene_anlegen: setzt zustand.ebene
+//   wegpunkte: Ziele für umherziehende Wesen (ki/umherziehen.js) in zustand.ebene.wegpunkte [{ x, y }], Vorbild Brogue: die
+//     begehbaren Felder (Türen zählen als offen) in einer Reihenfolge aus dem Zufall "wegpunkte"; ein Feld wird Wegpunkt,
+//     wenn es noch kein Wegpunkt innerhalb von regeln.ki.wegpunktSicht sieht (Sicht durch das Gelände, rot.js)
 //   freie_felder: Bodenfelder (gelaende.boden) außerhalb des ersten Raums und seines Rands, ohne Zugänge, in fester
 //     Reihenfolge; ohne Räume (feste Karte) alle Bodenfelder
 //   population, gegenstaende, fallen: auf freien Feldern (welt/population.js), mit dem gemeinsamen Zufall "inhalt"
 
 import RNG from "../../lib/rot/rng.js";
 import Digger from "../../lib/rot/map/digger.js";
+import PreciseShadowcasting from "../../lib/rot/fov/precise-shadowcasting.js";
 import { anmelden } from "../kern/register.js";
 import { startwertAbleiten, zufallsGanzzahl } from "../kern/zufall.js";
 import { ausDatenErzeugen } from "../kern/zustand.js";
-import { gelaendeBetretbarFuer } from "./karte.js";
+import { gelaendeBetretbarFuer, betretbarFuer, durchsichtig, aufDerKarte, feldIndex } from "./karte.js";
 import { abstandQuadrat } from "./geometrie.js";
 import { ebenennameFuer } from "./plan.js";
 import { populationSetzen, freiesFeldZiehen } from "./population.js";
@@ -176,6 +180,31 @@ anmelden("ebenenschritte", "ebene_anlegen", {
       erinnerteDinge: {},
       schichten: { oberflaeche: {}, gas: {}, feuer: {} },
     };
+  },
+});
+
+anmelden("ebenenschritte", "wegpunkte", {
+  braucht: ["ebene"], liefert: [],
+  ausfuehren(spiel, bau) {
+    const ebene = spiel.zustand.ebene;
+    const zufall = bau.zufall("wegpunkte");
+    const felder = [];
+    for (let y = 0; y < ebene.hoehe; y++) for (let x = 0; x < ebene.breite; x++) if (betretbarFuer(spiel, x, y)) felder.push({ x, y });
+    // Fisher-Yates mit dem Zufall der Ebene
+    for (let i = felder.length - 1; i > 0; i--) {
+      const j = zufallsGanzzahl(zufall, 0, i);
+      [felder[i], felder[j]] = [felder[j], felder[i]];
+    }
+    const abgedeckt = new Uint8Array(ebene.breite * ebene.hoehe);
+    const schattenwurf = new PreciseShadowcasting((x, y) => aufDerKarte(ebene, x, y) && durchsichtig(spiel, x, y), { topology: 8 });
+    ebene.wegpunkte = [];
+    for (const feld of felder) {
+      if (abgedeckt[feldIndex(ebene, feld.x, feld.y)]) continue;
+      ebene.wegpunkte.push(feld);
+      schattenwurf.compute(feld.x, feld.y, spiel.daten.regeln.ki.wegpunktSicht, (x, y) => {
+        if (aufDerKarte(ebene, x, y)) abgedeckt[feldIndex(ebene, x, y)] = 1;
+      });
+    }
   },
 });
 

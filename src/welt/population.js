@@ -4,6 +4,10 @@
 //   mit regeln.population.tieferChance Prozent aus einer Tiefe bis tieferBis tiefer gezogen (Gegner aus der Tiefe),
 //   gewichtet unter den Einträgen der Tiefe; ein Rudel steht beieinander; Affixe sind Zustände beim Erzeugen.
 // Alle Gegner höchstens bis zur Obergrenze der Population (regeln.population.hoechstWesen).
+// Wachzustand: ein Rudel (ein fester Gegner ist ein Rudel für sich) schläft mit regeln.population.schlafChance Prozent,
+//   sonst ist es wach und zieht umher (ki/umherziehen.js); einmal je Rudel gewürfelt mit dem eigenen Zufall "schlaf", so
+//   bleibt der Zufall "inhalt" unberührt. Nur Wesen mit KI ohne eigenen wachzustand in den Daten.
+// Rudel: jedes weitere Mitglied trägt ki.anfuehrerinId, die ID des ersten.
 
 import { zufallsGanzzahl, mitProzentChance } from "../kern/zufall.js";
 import { ausDatenErzeugen, anzahlWesen } from "../kern/zustand.js";
@@ -42,6 +46,16 @@ function freiesFeldNahe(bau, feld) {
 }
 
 // Setzt die festen Gegner (ebenendaten.gegner) und die Population (ebenendaten.population) auf freie Felder
+// Wachzustand eines neuen Rudels: "schlaeft" oder "wach"
+const rudelschlaf = (spiel, bau) => (mitProzentChance(bau.zufall("schlaf"), spiel.daten.regeln.population.schlafChance) ? "schlaeft" : "wach");
+
+// Wachzustand und Anführerin an ein neues Mitglied eines Rudels
+function insRudel(wesen, wachzustand, anfuehrerin) {
+  if (!wesen.ki) return;
+  if (wesen.ki.wachzustand === undefined) wesen.ki.wachzustand = wachzustand;
+  if (anfuehrerin && anfuehrerin !== wesen) wesen.ki.anfuehrerinId = anfuehrerin.id;
+}
+
 export function populationSetzen(spiel, bau, zufall) {
   const zustand = spiel.zustand;
   const hoechstWesen = spiel.daten.regeln.population.hoechstWesen;
@@ -56,7 +70,10 @@ export function populationSetzen(spiel, bau, zufall) {
     return ausDatenErzeugen(spiel, "wesen", typ, feld);
   };
   for (const gegnerEintrag of bau.ebenendaten.gegner || []) {
-    for (let i = 0; i < gegnerEintrag.anzahl; i++) gegnerSetzen(gegnerEintrag.typ, platzierung.wesen < hoechstWesen ? freiesFeldZiehen(bau, zufall) : null);
+    for (let i = 0; i < gegnerEintrag.anzahl; i++) {
+      const wesen = gegnerSetzen(gegnerEintrag.typ, platzierung.wesen < hoechstWesen ? freiesFeldZiehen(bau, zufall) : null);
+      if (wesen) insRudel(wesen, rudelschlaf(spiel, bau), null);
+    }
   }
   if (bau.ebenendaten.population) tabelleSetzen(spiel, bau, zufall, gegnerSetzen);
   if (platzierung.ausgefallen) melden(spiel, "population_voll", { wesen: null, hoechstWesen, ausgefallen: platzierung.ausgefallen });
@@ -87,12 +104,14 @@ function tabelleSetzen(spiel, bau, zufall, gegnerSetzen) {
     // nichts für diese Tiefe: der Wurf fällt aus, der nächste versucht es wieder (höchstens 1000 Versuche)
     if (!gezogen) continue;
     const { eintrag, rudel } = gezogen;
-    let anfuehrerin = null;
+    let anfuehrerin = null, wachzustand = null;
     for (let mitglied = 0; mitglied < Math.min(rudel, offen); mitglied++) {
       const feld = anfuehrerin ? freiesFeldNahe(bau, anfuehrerin.position) : freiesFeldZiehen(bau, zufall);
       const wesen = gegnerSetzen(eintrag.typ, feld);
       if (!wesen) return;
       anfuehrerin ??= wesen;
+      wachzustand ??= rudelschlaf(spiel, bau);
+      insRudel(wesen, wachzustand, anfuehrerin);
       for (const affix of eintrag.affixe || []) {
         if (mitProzentChance(zufall, affix.chance)) zustandSetzen(spiel, wesen, affix.zustand, { quelleId: wesen.id, urheberId: wesen.id });
       }

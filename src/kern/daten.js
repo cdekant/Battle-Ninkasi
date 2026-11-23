@@ -258,6 +258,7 @@ function pruefeRegeln(daten, regeln, fehler) {
   if (!istGanzzahl(regeln.population?.hoechstWesen) || regeln.population.hoechstWesen < 1) fehler.push("regeln.population.hoechstWesen muss eine ganze Zahl >= 1 sein");
   if (!istProzent(regeln.population?.tieferChance)) fehler.push("regeln.population.tieferChance muss eine ganze Zahl von 0 bis 100 sein");
   if (!istZahlAbNull(regeln.population?.tieferBis)) fehler.push("regeln.population.tieferBis muss eine ganze Zahl >= 0 sein");
+  if (!istProzent(regeln.population?.schlafChance)) fehler.push("regeln.population.schlafChance muss eine ganze Zahl von 0 bis 100 sein");
   if (!daten.ebenen?.[regeln.allmacht?.kammer]) fehler.push("regeln.allmacht.kammer muss eine Ebene aus daten/ebenen.js sein");
   if (!istZahlAbNull(regeln.allmacht?.tiefe) || regeln.allmacht.tiefe >= (daten.abfolge?.length ?? 0)) fehler.push("regeln.allmacht.tiefe muss eine Tiefe der abfolge sein");
   if (!istGanzzahl(regeln.ebenen?.versuche) || regeln.ebenen.versuche < 1) fehler.push("regeln.ebenen.versuche muss eine ganze Zahl >= 1 sein");
@@ -276,6 +277,8 @@ function pruefeRegeln(daten, regeln, fehler) {
   else pruefeParameter(daten, { entdeckenVorgabe: "ganzzahl", reichweite: "ganzzahl" }, regeln.fallen, "regeln.fallen", fehler);
   pruefeLernregeln(daten, regeln.lernen, fehler);
   if (!istTextliste(regeln.ki?.zwecke)) fehler.push("regeln.ki.zwecke muss eine Liste von Namen sein");
+  if (!istGanzzahl(regeln.ki?.wegpunktSicht) || regeln.ki.wegpunktSicht < 1) fehler.push("regeln.ki.wegpunktSicht muss eine ganze Zahl >= 1 sein");
+  if (!istZahlAbNull(regeln.ki?.rudelAbstand)) fehler.push("regeln.ki.rudelAbstand muss eine ganze Zahl >= 0 sein");
   // Spielart "arena", siehe systeme/arena.js
   if (!istObjekt(regeln.arena)) fehler.push("regeln.arena fehlt");
   else {
@@ -895,11 +898,12 @@ function pruefeEffektKreise(daten, fehler) {
   for (const name of Object.keys(effekte)) besuchen(name, [name]);
 }
 
-// KI-Komponente: { modul, trifft?, wachzustand?, handlungen?, wahl? }, siehe ki/jagen.js und ki/handlungen.js
+// KI-Komponente: { modul, trifft?, wachzustand?, umherziehen?, handlungen?, wahl? }, siehe ki/jagen.js, ki/umherziehen.js
+// und ki/handlungen.js
 // bekannte: die Fähigkeiten des Wesens (bei einer KI aus einem Zustand null, dann zählt nur, dass es sie gibt)
 function pruefeKi(daten, ki, ort, fehler, bekannte = null) {
   if (!istObjekt(ki) || !hat("ki", ki.modul)) return fehler.push(`${ort}: Verhaltensmodul "${ki?.modul}" ist nicht angemeldet`);
-  pruefeParameter(daten, { trifft: TRIFFT_ARTEN, wachzustand: WACHZUSTAENDE }, ki, ort, fehler);
+  pruefeParameter(daten, { trifft: TRIFFT_ARTEN, wachzustand: WACHZUSTAENDE, umherziehen: "wahrheitswert?" }, ki, ort, fehler);
   // das Format vor 0.39.0
   if (ki.faehigkeiten !== undefined) fehler.push(`${ort}: faehigkeiten an der KI gibt es nicht mehr, Fähigkeiten stehen als { handlung: "faehigkeit", name } in handlungen`);
   if (ki.abstandHalten !== undefined) fehler.push(`${ort}: abstandHalten gibt es nicht mehr, dafür { handlung: "abstand_halten", abstand } in handlungen`);

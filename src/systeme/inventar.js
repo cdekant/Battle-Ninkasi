@@ -15,7 +15,7 @@
 //                     Zeitpunkt steht in verdirbtUm, fließen Stapel zusammen, gilt ihr nach Anzahl gewichteter Durchschnitt
 // Ausstattung am Wesen: ausstattung: [{ typ, anzahl? }]  was es beim Erzeugen aus Daten im Gepäck hat (Vorgabe anzahl 1),
 //   z.B. Bier zum Heilen für einen Gegner; stapelbare fließen zu einem Stapel zusammen
-// Nutzung für die KI (Register "nutzungen", ki/nutzen.js): trinkbar.zweck sagt, wozu ein Wesen den Gegenstand trinkt
+// Nutzung für die KI (Register "nutzungen", ki/nutzen.js): trinkbar.zweck sagt, wozu ein Wesen den Gegenstand selbst trinkt
 // Tragkraft: wesen.tragkraft, sonst regeln.tragen.tragkraft, mit Modifikatoren auf "tragkraft"; Überladung verteuert das
 //   Bewegen in Stufen (regeln.tragen.stufen: [{ ab: Prozent der Tragkraft, kosten: Prozent mehr }]), verboten ist nichts.
 
@@ -47,7 +47,7 @@ anmelden("ausDaten", "ausstattung", (spiel, wesen, datensatz) => {
   }
 });
 
-anmelden("nutzungen", "trinken", { feld: "trinkbar", befehl: (spiel, wesen, beute, gegenstand) => ({ art: "trinken", gegenstandId: gegenstand.id }) });
+anmelden("nutzungen", "trinken", { feld: "trinkbar", ziel: "selbst", befehl: (spiel, wesen, ziel, gegenstand) => ({ art: "trinken", gegenstandId: gegenstand.id }) });
 
 export const anzahlVon = (gegenstand) => gegenstand.anzahl ?? 1;
 export const ladungenVon = (gegenstand) => (gegenstand.ladungen ? gegenstand.ladungen.aktuell ?? gegenstand.ladungen.hoechstens : null);

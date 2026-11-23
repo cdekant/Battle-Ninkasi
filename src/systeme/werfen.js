@@ -66,6 +66,7 @@ anmelden("befehle", "werfen", {
 
 anmelden("nutzungen", "werfen", {
   feld: "wurf",
+  ziel: "beute",
   befehl(spiel, wesen, beute, gegenstand) {
     if (fluchHindert(spiel, wesen, gegenstand.id)) return null;
     const aufloesung = wurfbahn(spiel, wesen, gegenstand, { id: beute.id });

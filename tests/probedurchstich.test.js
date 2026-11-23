@@ -280,9 +280,10 @@ test("Schriftrolle: Lesen lehrt den Ansturm dauerhaft, die Rolle ist verbraucht"
 
 // 7. Ein Heiler unter den Gegnern (Punkt 7)
 
-test("Heiler: heilt einen verwundeten Verbündeten", { todo: "Punkt 7: eine Fähigkeit zielt immer nach der Beute, nie nach einem Verbündeten" }, () => {
+test("Heiler: heilt einen verwundeten Verbündeten", () => {
   const { spiel } = aufstellen();
-  const heiler = wesen(spiel, 7, 2, "verderber", 10, { sicht: { reichweite: 9 }, faehigkeiten: ["heilspruch"], ki: { modul: "jagen", letzteBekanntePosition: null, handlungen: [{ handlung: "nutzen", zweck: "heilen" }] } });
+  const heilen = { handlung: "nutzen", zweck: "heilen", bewertung: [{ eingabe: "zielLpProzent", kurve: "heilenNachLp" }] };
+  const heiler = wesen(spiel, 7, 2, "verderber", 10, { sicht: { reichweite: 9 }, faehigkeiten: ["heilspruch"], ki: { modul: "jagen", letzteBekanntePosition: null, handlungen: [heilen] } });
   const verwundeter = wesen(spiel, 5, 2, "verderber", 10);
   verwundeter.werte.lp.aktuell = 3;
   const befehl = entscheiden(spiel, heiler);

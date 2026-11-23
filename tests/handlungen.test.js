@@ -4,7 +4,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import "../src/kern/spiel.js"; // meldet Bausteine, Systeme und Verhaltensmodule an
-import { miniSpiel, wesen, spielerinSetzen, allesSichtbar } from "./hilfen.js";
+import { miniSpiel, wesen, spielerinSetzen, allesSichtbar, gegenstandTragen } from "./hilfen.js";
 import { holen } from "../src/kern/register.js";
 import { positionSetzen } from "../src/kern/zustand.js";
 import { zufallErzeugen } from "../src/kern/zufall.js";
@@ -19,8 +19,15 @@ const RAUM = [
   "#.........#",
   "###########",
 ];
-const EFFEKTE = { spritzer: { schritte: [{ baustein: "schaden", art: "saeure", menge: 2 }] }, stoss: { schritte: [{ baustein: "schaden", art: "stumpf", menge: 3 }] } };
-const FAEHIGKEITEN = { spucke: { text: "f.spucke", ziel: { art: "geschoss", reichweite: 6, trifft: "wesen" }, wirkung: "spritzer" } };
+const EFFEKTE = {
+  spritzer: { schritte: [{ baustein: "schaden", art: "saeure", menge: 2 }] }, stoss: { schritte: [{ baustein: "schaden", art: "stumpf", menge: 3 }] },
+  heilung: { schritte: [{ baustein: "heilen", menge: 5 }] },
+};
+const FAEHIGKEITEN = {
+  spucke: { text: "f.spucke", zweck: ["angriff"], ziel: { art: "geschoss", reichweite: 6, trifft: "wesen" }, wirkung: "spritzer" },
+  heilspruch: { text: "f.heilspruch", zweck: ["heilen"], ziel: { art: "wesen", reichweite: 6, trifft: "verbuendete" }, wirkung: "heilung" },
+  selbstheilung: { text: "f.selbstheilung", zweck: ["heilen"], ziel: { art: "selbst" }, wirkung: "heilung" },
+};
 const ANGRIFFE = [{ name: "stoss", genauigkeit: 100, effekt: "stoss" }];
 
 function aufstellen() {
@@ -136,4 +143,57 @@ test("Vorrang warten und folgen; bis lässt ihn ablaufen", () => {
   begleiter.ki.vorrang.bis = spiel.zustand.zeit;
   assert.equal(geltenderVorrang(spiel, begleiter.ki), null, "abgelaufen");
   assert.ok(ninkasi);
+});
+
+// Unterstützung: Ziele unter den Verbündeten
+
+const HEILEN = { handlung: "nutzen", zweck: "heilen", bewertung: [{ eingabe: "zielLpProzent", kurve: "heilenNachLp" }] };
+const heiler = (spiel, x, y, faehigkeiten = ["heilspruch"], handlungen = [HEILEN]) =>
+  wesen(spiel, x, y, "verderber", 10, { ki: { modul: "jagen", letzteBekanntePosition: null, handlungen }, sicht: { reichweite: 9 }, angriffe: ANGRIFFE, faehigkeiten });
+
+test("Unterstützung: heilt den bedürftigsten Verbündeten, keinen mit vollen LP", () => {
+  const { spiel, ninkasi } = aufstellen();
+  const helfer = heiler(spiel, 6, 2);
+  const leicht = jaeger(spiel, 7, 2);
+  const schwer = jaeger(spiel, 8, 3);
+  jaeger(spiel, 5, 1);
+  leicht.werte.lp.aktuell = 6;
+  schwer.werte.lp.aktuell = 2;
+  assert.deepEqual(entscheiden(spiel, helfer), { art: "faehigkeit", faehigkeit: "heilspruch", ziel: { id: schwer.id } });
+  assert.equal(holen("kieingaben", "zielLpProzent")(spiel, helfer, ninkasi, schwer), 20);
+  assert.equal(holen("kieingaben", "zielLpProzent")(spiel, helfer, ninkasi), 100, "ohne Ziel die Beute");
+  schwer.werte.lp.aktuell = 10;
+  leicht.werte.lp.aktuell = 10;
+  assert.equal(entscheiden(spiel, helfer).art, "bewegen", "alle gesund: es setzt der Beute nach");
+  helfer.werte.lp.aktuell = 1;
+  assert.deepEqual(entscheiden(spiel, helfer), { art: "faehigkeit", faehigkeit: "heilspruch", ziel: { id: helfer.id } }, "auch sich selbst");
+});
+
+test("Unterstützung: wenn gilt mit dem Ziel als Gegenüber", () => {
+  const { spiel } = aufstellen();
+  const verwundeter = jaeger(spiel, 7, 2);
+  verwundeter.werte.lp.aktuell = 2;
+  const helfer = heiler(spiel, 6, 2, ["heilspruch"], [{ ...HEILEN, wenn: [{ bedingung: "gegenueber_tag", tag: "zelle" }] }]);
+  assert.equal(entscheiden(spiel, helfer).art, "bewegen", "kein Ziel trägt den Tag");
+  verwundeter.tags = ["zelle"];
+  assert.deepEqual(entscheiden(spiel, helfer), { art: "faehigkeit", faehigkeit: "heilspruch", ziel: { id: verwundeter.id } });
+});
+
+test("Unterstützung: Zielart selbst nur für sich; ohne trifft verbuendete nur die Beute; Bier nur selbst", () => {
+  const { spiel, ninkasi } = aufstellen();
+  const verwundeter = jaeger(spiel, 7, 2);
+  verwundeter.werte.lp.aktuell = 2;
+  const selbstheiler = heiler(spiel, 6, 2, ["selbstheilung"]);
+  assert.equal(entscheiden(spiel, selbstheiler).art, "bewegen", "heilt den Verbündeten nicht");
+  selbstheiler.werte.lp.aktuell = 2;
+  assert.deepEqual(entscheiden(spiel, selbstheiler), { art: "faehigkeit", faehigkeit: "selbstheilung" });
+  // Spucke trifft "wesen": nach der Bewertung wäre der Verbündete das beste Ziel, sie trifft trotzdem nur die Beute
+  const spucker = heiler(spiel, 6, 3, ["spucke"], [{ handlung: "nutzen", zweck: "angriff", bewertung: [{ eingabe: "zielLpProzent", kurve: [[0, 1000], [100, 100]] }] }]);
+  positionSetzen(spiel.zustand, verwundeter, { x: 8, y: 1 });
+  assert.deepEqual(entscheiden(spiel, spucker), { art: "faehigkeit", faehigkeit: "spucke", ziel: { id: ninkasi.id } });
+  const trinker = heiler(spiel, 9, 2, [], [HEILEN]);
+  const bier = gegenstandTragen(spiel, trinker, { typ: "bier", trinkbar: { effekt: "heilung", zweck: ["heilen"] } });
+  assert.equal(entscheiden(spiel, trinker).art, "bewegen", "trinkt nicht für den Verbündeten");
+  trinker.werte.lp.aktuell = 2;
+  assert.deepEqual(entscheiden(spiel, trinker), { art: "trinken", gegenstandId: bier.id });
 });

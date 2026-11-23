@@ -18,15 +18,17 @@ export default {
     rufNurMitZeugen: true, // eine Tötung zählt für eine Fraktion nur, wenn eines ihrer Wesen Täterin oder Opfer sieht
   },
   // KI, siehe src/ki/handlungen.js und src/ki/nutzen.js: Zwecke der Handlung nutzen; benannte Kurven für die Bewertung
-  // (Promille), die alle Wesen teilen; Zahlen vorläufig
+  // (Promille), die alle Wesen teilen; Umherziehen siehe src/ki/umherziehen.js; Zahlen vorläufig
   // Spielart "arena", siehe src/systeme/arena.js: Abstand der ersten Welle (Felder nach rechts), Wachzustand der Gegner,
   // Grenze für Werkzeug und Bot (Befehle bis zum Patt)
   arena: { abstand: 5, wachzustand: "jagt", grenzeBefehle: 500 },
   ki: {
     zwecke: ["heilen", "angriff"],
     kurven: {
-      heilenNachLp: [[0, 1000], [20, 1000], [80, 0]], // eigene LP in Prozent: dringend bis 20 %, ab 80 % gar nicht
+      heilenNachLp: [[0, 1000], [20, 1000], [80, 0]], // LP in Prozent: dringend bis 20 %, ab 80 % gar nicht
     },
+    wegpunktSicht: 7, // jedes begehbare Feld liegt in dieser Sichtweite eines Wegpunkts (Ebenenschritt wegpunkte)
+    rudelAbstand: 5, // weiter entfernt geht ein Mitglied des Rudels zur Anführerin, sonst wartet es
   },
   // Wahrnehmung, siehe src/systeme/wahrnehmung.js; Vorbild Brogue, alle Zahlen vorläufig
   wahrnehmung: {
@@ -51,6 +53,7 @@ export default {
     hoechstWesen: 500, // mehr Wesen entstehen nicht (Beschwören, Erzeugen der Ebene), Meldung population_voll
     tieferChance: 10, // Prozent je Wurf der Population: ein Gegner aus einer tieferen Tiefe
     tieferBis: 2, // höchstens so viele Tiefen tiefer
+    schlafChance: 50, // Prozent je Rudel: es schläft beim Erzeugen der Ebene, sonst ist es wach und zieht umher
   },
   // Spielart "allmaechtig", siehe src/systeme/allmacht.js: diese Ebene aus daten/ebenen.js ersetzt die Vorlage dieser
   // Tiefe im Plan des Laufs, dort beginnt der Lauf
@@ -58,7 +61,7 @@ export default {
   // Erzeugung der Ebenen in Schritten, siehe src/welt/ebene.js und src/welt/ebenenschritte.js; eine Ebene in
   // daten/ebenen.js kann mit schritte eine eigene Folge nennen
   ebenen: {
-    schritteErzeugt: ["karte_digger", "tueren", "treppen", "gelaende_objekte", "erreichbarkeit", "ebene_anlegen", "freie_felder", "population", "gegenstaende", "fallen"],
+    schritteErzeugt: ["karte_digger", "tueren", "treppen", "gelaende_objekte", "erreichbarkeit", "ebene_anlegen", "wegpunkte", "freie_felder", "population", "gegenstaende", "fallen"],
     schritteFest: ["karte_fest", "erreichbarkeit", "ebene_anlegen"], // Ebenen mit fester karte, z.B. der Hub
     versuche: 10, // so viele Versuche mit neuem Zufall, wenn ein Schritt die Karte verwirft (z.B. Erreichbarkeit)
     folgen: { abstand: 1 }, // so nah muss ein Verfolger bei Ninkasi stehen, um über die Treppe mitzukommen (src/systeme/ebenen.js)

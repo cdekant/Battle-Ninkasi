@@ -30,9 +30,9 @@ const ARTEN = [
   "laufbeginn",         // beim Start nach dem Einrichten Ninkasis (kern/spiel.js neuesSpiel): (spiel, ninkasi) => void, z.B. Arena
   "ebenenschritte",     // Schritte der Ebenenerzeugung (welt/ebene.js): { braucht, liefert, verwirft?, ausfuehren(spiel, bau) }
   "mitnehmen",          // wer beim Ebenenwechsel mitkommt (systeme/ebenen.js): (spiel, ninkasi, wechsel) => [id]
-  "kihandlungen",       // Handlungen der KI (ki/handlungen.js): { parameter, befehl(spiel, wesen, beute, eintrag) }
-  "kieingaben",         // Eingaben der Bewertung (ki/handlungen.js): (spiel, wesen, beute) => ganze Zahl
-  "nutzungen",          // wie die KI einen Gegenstand nutzt (ki/nutzen.js): { feld, befehl(spiel, wesen, beute, gegenstand) }
+  "kihandlungen",       // Handlungen der KI (ki/handlungen.js): { parameter, zielwahl?, befehl(spiel, wesen, beute, eintrag, ziel) }
+  "kieingaben",         // Eingaben der Bewertung (ki/handlungen.js): (spiel, wesen, beute, ziel) => ganze Zahl
+  "nutzungen",          // wie die KI einen Gegenstand nutzt (ki/nutzen.js): { feld, ziel, befehl(spiel, wesen, ziel, gegenstand) }
 ];
 
 export const RANG_VORGABE = 100;

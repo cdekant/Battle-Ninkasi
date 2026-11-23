@@ -5,8 +5,9 @@
 //   handlungen?, wahl?, vorrang? }
 // Sieht es seine Beute, wählt es zuerst eine Handlung (ki/handlungen.js: Fähigkeit, Abstand halten, Fliehen, Warten,
 // Verfolgen); kommt keine in Frage oder heißt die Wahl "verfolgen", setzt es der Beute nach (ki/verfolgen.js).
-// Wachzustand (systeme/wahrnehmung.js): schlaeft wartet; wach geht nur Lärm nach; jagt verfolgt Ziele innerhalb der
-// Spurweite und wird wieder wach, wenn es an der letzten bekannten Position niemanden mehr findet.
+// Wachzustand (systeme/wahrnehmung.js): schlaeft wartet; wach geht nur Lärm nach, sonst zieht es umher
+// (ki/umherziehen.js); jagt verfolgt Ziele innerhalb der Spurweite und wird wieder wach, wenn es an der letzten
+// bekannten Position niemanden mehr findet.
 // Ein Vorrangbefehl (ki/vorrang.js) gilt vor alledem, außer im Schlaf.
 
 import { anmelden } from "../kern/register.js";
@@ -18,6 +19,7 @@ import { sieht } from "../systeme/sicht.js";
 import { handlungWaehlen, VERFOLGEN } from "./handlungen.js";
 import { verfolgungsbefehl } from "./verfolgen.js";
 import { geltenderVorrang, vorrangBefehl } from "./vorrang.js";
+import { umherziehbefehl } from "./umherziehen.js";
 
 anmelden("ki", "jagen", (spiel, jaeger, ki) => {
   if (spiel.zustand.vorbei) return abwarten();
@@ -45,5 +47,6 @@ anmelden("ki", "jagen", (spiel, jaeger, ki) => {
     const befehl = handlungWaehlen(spiel, jaeger, ki, beute);
     if (befehl && befehl !== VERFOLGEN) return befehl;
   }
+  if (wachzustand === "wach" && !vorrang && !ki.letzteBekanntePosition) return umherziehbefehl(spiel, jaeger, ki);
   return verfolgungsbefehl(spiel, jaeger, ki, beute, trifft, befohlenId);
 });

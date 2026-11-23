@@ -7,6 +7,8 @@
 //   oeffnetTueren: geschlossene Türen zählen als begehbar (Vorgabe true)
 //   meiden: (x, y) => true für Felder, die der Weg meidet (außer Start und Ziel), z.B. bekannte Fallen
 // Später: Kosten je Gelände (Fallen meiden) gelten dann für KI und Spielerin zugleich.
+// Abstandskarte (Dijkstra-Karte, Vorbild Brogue) für Ziele, zu denen viele Wesen oft gehen (Wegpunkte beim Umherziehen):
+//   einmal berechnet, im zwischenspeicher je Ebene gehalten; gelaendeSetzen verwirft sie (systeme/gelaende.js).
 
 import AStar from "../../lib/rot/path/astar.js";
 import { betretbarFuer, gelaendeBetretbarFuer, bekanntesGelaendeAuf, feldIndex, aufDerKarte } from "./karte.js";
@@ -42,6 +44,34 @@ export function naechstesWegfeld(spiel, start, ziel, optionen) {
 }
 
 const NACHBARN = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
+
+// Abstandskarte zum Feld ziel: je Feldindex die Zahl der Schritte in acht Richtungen bis zum Ziel, -1, wenn es von dort
+// nicht erreichbar ist; über Felder, die für bewegung (und oeffnetTueren) betretbar sind, Wesen zählen nicht
+export function abstandskarte(spiel, ziel, { bewegung = "laufend", oeffnetTueren = true } = {}) {
+  const ebene = spiel.zustand.ebene;
+  let speicher = spiel.zwischenspeicher.abstandskarten;
+  if (speicher?.ebene !== ebene) speicher = spiel.zwischenspeicher.abstandskarten = { ebene, karten: new Map() };
+  const schluessel = `${ziel.x},${ziel.y},${bewegung},${oeffnetTueren}`;
+  const gespeichert = speicher.karten.get(schluessel);
+  if (gespeichert) return gespeichert;
+  const karte = new Int32Array(ebene.breite * ebene.hoehe).fill(-1);
+  if (aufDerKarte(ebene, ziel.x, ziel.y) && betretbarFuer(spiel, ziel.x, ziel.y, bewegung, oeffnetTueren)) {
+    karte[feldIndex(ebene, ziel.x, ziel.y)] = 0;
+    const warteliste = [ziel];
+    for (let kopf = 0; kopf < warteliste.length; kopf++) {
+      const feld = warteliste[kopf];
+      const weiter = karte[feldIndex(ebene, feld.x, feld.y)] + 1;
+      for (const [dx, dy] of NACHBARN) {
+        const x = feld.x + dx, y = feld.y + dy;
+        if (!aufDerKarte(ebene, x, y) || karte[feldIndex(ebene, x, y)] >= 0 || !betretbarFuer(spiel, x, y, bewegung, oeffnetTueren)) continue;
+        karte[feldIndex(ebene, x, y)] = weiter;
+        warteliste.push({ x, y });
+      }
+    }
+  }
+  speicher.karten.set(schluessel, karte);
+  return karte;
+}
 
 // Nächstes begehbares Feld (Breitensuche in Schritten, ohne den Start), für das passt(x, y) gilt; null, wenn keins.
 // Nachbarn in fester Reihenfolge, bei gleichem Abstand gewinnt das zuerst gefundene. nurBekannt und bewegung wie bei weg.
