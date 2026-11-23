@@ -22,6 +22,12 @@ export default {
     text: "gegenstand.lederschuerze", aufhebbar: true, gewicht: 2000, haltbarkeit: { hoechstens: 20, wirdZu: "lederfetzen" },
     ausruestung: { platz: "brust", modifikatoren: [{ ziel: "ruestung", art: "plus", betrag: 2 }, { ziel: "ausweichen", art: "plus", betrag: -5 }] },
   },
+  // leuchtet angelegt vom Feld der Trägerin aus, am Boden auch, im Gepäck nicht (src/systeme/licht.js)
+  laterne: {
+    text: "gegenstand.laterne", aufhebbar: true, gewicht: 800,
+    licht: { reichweite: 4, staerke: 80, farbe: "#ffd27a" },
+    ausruestung: { platz: "hand" },
+  },
   kupferhelm: {
     text: "gegenstand.kupferhelm", aufhebbar: true, gewicht: 1500, tags: ["kupfer"], haltbarkeit: { hoechstens: 30, wirdZu: "kupferschrott" },
     ausruestung: { platz: "kopf", modifikatoren: [{ ziel: "ruestung", art: "plus", betrag: 1 }, KUPFERSET] },

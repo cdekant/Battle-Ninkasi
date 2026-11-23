@@ -2,6 +2,7 @@
 export default {
   gelaende: {
     gaerbottich: { zeichen: "O", farbe: "#c87533", hintergrund: "#2a221b" },
+    wandfackel: { zeichen: "*", farbe: "#ffb347", hintergrund: "#2a221b" },
   },
   wesen: {
     essigbakterium: { zeichen: "e", farbe: "#b4bd62" },
@@ -20,6 +21,7 @@ export default {
     fasshammer: { zeichen: ")", farbe: "#8c7a63" },
     lederschuerze: { zeichen: "[", farbe: "#8c5a33" },
     kupferhelm: { zeichen: "[", farbe: "#c87533" },
+    laterne: { zeichen: "(", farbe: "#ffd27a" },
     lederhose: { zeichen: "[", farbe: "#a07a4a" },
     hopfenkette: { zeichen: "\"", farbe: "#8fbf4a" },
     kupferring: { zeichen: "=", farbe: "#c87533" },

@@ -41,6 +41,20 @@ export default {
     laermNahkampf: 6, // Lautstärke eines Nahkampfs (Kosten der Ausbreitung, freies Feld 1)
     laermWurf: 4, // Lautstärke am Aufschlag eines geworfenen Gegenstands
   },
+  // Licht, siehe src/systeme/licht.js; alle Zahlen vorläufig
+  licht: {
+    // Stufen der Helligkeit (0 bis 100) aufsteigend, die erste ab 0: auf einem Feld einer Stufe mit verbirgt sieht man
+    // ein Ziel nur aus nächster Nähe (sicht.imDunkeln); heimlichkeit skaliert die Heimlichkeitsweite in Prozent;
+    // Text unter licht.<name>; die oberste Stufe ist der Stand ohne Licht in den Daten (Grundhelligkeit 100)
+    stufen: [
+      { name: "finster", ab: 0, heimlichkeit: 50, verbirgt: true },
+      { name: "dunkel", ab: 20, heimlichkeit: 50 },
+      { name: "daemmrig", ab: 40, heimlichkeit: 70 },
+      { name: "hell", ab: 60, heimlichkeit: 85 },
+      { name: "taghell", ab: 80, heimlichkeit: 100 },
+    ],
+    imDunkeln: 1, // so weit sieht ein Wesen ohne eigene Angabe sicht.imDunkeln auf finstere Felder
+  },
   // Bewegung, siehe src/systeme/verschieben.js
   bewegung: {
     beimFestsitzen: "eingeklemmt", // Effekt auf ein Wesen in Gelände, das es nicht betreten kann, ohne eigenes beimFestsitzen
@@ -61,7 +75,7 @@ export default {
   // Erzeugung der Ebenen in Schritten, siehe src/welt/ebene.js und src/welt/ebenenschritte.js; eine Ebene in
   // daten/ebenen.js kann mit schritte eine eigene Folge nennen
   ebenen: {
-    schritteErzeugt: ["karte_digger", "tueren", "treppen", "gelaende_objekte", "erreichbarkeit", "ebene_anlegen", "wegpunkte", "freie_felder", "population", "gegenstaende", "fallen"],
+    schritteErzeugt: ["karte_digger", "tueren", "treppen", "gelaende_objekte", "wand_objekte", "erreichbarkeit", "ebene_anlegen", "wegpunkte", "freie_felder", "population", "gegenstaende", "fallen"],
     schritteFest: ["karte_fest", "erreichbarkeit", "ebene_anlegen"], // Ebenen mit fester karte, z.B. der Hub
     versuche: 10, // so viele Versuche mit neuem Zufall, wenn ein Schritt die Karte verwirft (z.B. Erreichbarkeit)
     folgen: { abstand: 1 }, // so nah muss ein Verfolger bei Ninkasi stehen, um über die Treppe mitzukommen (src/systeme/ebenen.js)
@@ -81,6 +95,7 @@ export default {
     dauer: 3, // Brenndauer in Weltticks ohne eigene brenndauer
     rauch: "rauch", // Gas, das ein Feuer je Welttick erzeugt
     rauchMenge: 20,
+    licht: { reichweite: 4, staerke: 70, farbe: "#ff9a3c" }, // jedes brennende Feld leuchtet (src/systeme/licht.js)
   },
   // Ausrüstung, siehe src/systeme/ausruestung.js: die Namen der Plätze, die Wesen und Gegenstände nennen dürfen
   ausruestung: {

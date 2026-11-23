@@ -84,6 +84,17 @@ Umsetzung: siehe [Wesen.md](Wesen.md), Skills und Lernen
 
 Umsetzung: teilweise, siehe [Entwicklung.md](Entwicklung.md), Probeinhalt; siehe [Wesen.md](Wesen.md), KI; Teilung, Sprossung, Myzel, Zerfall und Bossphasen gehen aus Daten, siehe [Wirkungen.md](Wirkungen.md), Effektsystem; offen: die Mikroorganismen und Bosse als Inhalt
 
+## Licht und Wahrnehmung
+
++ Licht ist Spielmechanik, Stimmung ein Nebeneffekt
++ Ebenen sind je nach Plan des Laufs hell oder dunkel; kein Wechsel von Tag und Nacht, weil Warten auf Dunkelheit das Rasten belohnte und der Schauplatz meist unter der Erde liegt; später vielleicht helle Räume und dunkle Gänge auf derselben Ebene
++ Lichtquellen leuchten in einem Umkreis und werden zum Rand hin schwächer: Wandfackeln, Feuer, getragene Laternen; Kontrolleure tragen Taschenlampen
++ Helligkeit in fünf Stufen, so fein, dass mehr als hell, mittel und dunkel entsteht, und so grob, dass man jeden Unterschied bemerkt; nur die finsterste verbirgt ganz, die übrigen machen das Schleichen stufenweise leichter
++ Im Finstern sieht man nur aus nächster Nähe, Ninkasi als Göttin etwas weiter als Sterbliche; Nachtsicht und Fernsicht kommen als Skills
++ Wer Licht trägt, sieht weiter und wird selbst von weitem gesehen
+
+Umsetzung: teilweise, siehe [Welt.md](Welt.md), Licht; offen: Spüren ohne Licht, Arten der Wahrnehmung, Spur als Duft, Licht ein- und ausschalten
+
 ## Technik
 
 + Läuft im Browser (HTML, CSS, JavaScript)
@@ -137,8 +148,5 @@ Umsetzung: teilweise, siehe [Tileset.md](Tileset.md), Artstyle-Fibel; offen: Sig
 + Dienste des Hubs im Detail
 + Ziel eines Laufs und was zwei Läufe unterscheidet
 + Welt und Schauplatz
-+ Licht und Wahrnehmung (vorläufige Ideen in [Welt.md](Welt.md), Licht, und [Wesen.md](Wesen.md), Wahrnehmung): wie Ninkasi ohne Nachtsicht im Dunkeln sieht (gar nicht, geringe Reichweite, abhängig vom Pegel)
 + Ob Mikroorganismen durch Wände spüren oder nur entlang von Wegen, wie ein Geruch
-+ Ob Kontrolleure Taschenlampen tragen (bewegliche Lichtquelle, später vielleicht als Lichtkegel in Blickrichtung)
-+ Wertebereich und Stufenzahl der Helligkeit in der Logik, Reichweiten und Stärken der Lichtquellen
-+ Ob getragenes Licht für Ninkasi vorgesehen ist (Laterne, Fackel) und wie es ihre Sichtbarkeit für Gegner beeinflusst
++ Ob der Pegel beeinflusst, wie weit Ninkasi im Dunkeln sieht

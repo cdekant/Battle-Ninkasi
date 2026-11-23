@@ -10,9 +10,16 @@ import { istBekannt } from "../systeme/fallen.js";
 import { erinnerteDingeAuf } from "../systeme/erinnerung.js";
 import { schichtenVon, feldVonIndex } from "../welt/schichten.js";
 import { aussehenVon } from "../kern/zustand.js";
+import { lichtWirkt, lichtAufFeld, stufeVonHelligkeit } from "../systeme/licht.js";
 
 // Deckkraft der Feldschichten: Oberfläche und Feuer fest, Gas mit der Menge zunehmend bis höchstens GAS_DECKKRAFT
 const OBERFLAECHE_DECKKRAFT = 0.4, FEUER_DECKKRAFT = 0.6, GAS_DECKKRAFT = 0.6, GAS_VOLL = 100;
+// Lichtkarte (systeme/licht.js): Helligkeit der untersten Stufe, die oberste lässt das Bild unverändert; dazwischen
+// gleichmäßig nach der Nummer der Stufe, so sieht man genau die Stufen, die auch für die Regeln gelten.
+// FARBANTEIL: wie stark die Farbe der Quellen tönt (0 gar nicht, 1 voll)
+const LICHT_UNTERSTE = 0.3, FARBANTEIL = 0.5;
+
+const farbeAlsZahlen = (farbe) => [1, 3, 5].map((stelle) => parseInt(farbe.slice(stelle, stelle + 2), 16));
 
 export class Renderer {
   // zeichensatz: daten/zeichen.js; tilebilder: aus tilebilderErstellen oder null (nur Zeichen)
@@ -123,9 +130,60 @@ export class Renderer {
       this.feldZeichnen(bildX, bildY, zoom, aussehen, { ...zeichenEintrag, hintergrund }, 1);
     }
 
-    // Gas schwebt über allem
+    // Gas schwebt über allem, das Licht liegt über dem Bild
     this.schichtZeichnen(spiel, kamera, ansicht, zoom, sichtbareFelder, "gas");
+    if (lichtWirkt(spiel)) this.lichtZeichnen(spiel, kamera, ansicht, zoom, sichtbareFelder);
     this.markierungenZeichnen(kamera, ansicht, zoom, markierungen);
+  }
+
+  // Farbe eines Felds in der Lichtkarte: Grau nach der Stufe, getönt nach den Farben der Quellen (gewichtet nach Beitrag)
+  lichtfarbe(spiel, x, y) {
+    const { helligkeit, grund, beitraege } = lichtAufFeld(spiel, x, y);
+    const stufen = spiel.daten.regeln.licht.stufen;
+    const nummer = stufen.indexOf(stufeVonHelligkeit(spiel, helligkeit));
+    const hell = LICHT_UNTERSTE + ((1 - LICHT_UNTERSTE) * nummer) / Math.max(1, stufen.length - 1);
+    let gewicht = grund;
+    const summe = [255 * grund, 255 * grund, 255 * grund];
+    for (const { licht, beitrag } of beitraege) {
+      const farbe = licht.farbe ? farbeAlsZahlen(licht.farbe) : [255, 255, 255];
+      for (let kanal = 0; kanal < 3; kanal++) summe[kanal] += farbe[kanal] * beitrag;
+      gewicht += beitrag;
+    }
+    return summe.map((kanalSumme) => {
+      const getoent = gewicht > 0 ? kanalSumme / gewicht : 255;
+      return Math.round((255 * (1 - FARBANTEIL) + getoent * FARBANTEIL) * hell);
+    });
+  }
+
+  // Lichtkarte: ein Pixel je sichtbarem Feld (mit einem Rand von einem Feld), geglättet auf Kartengröße skaliert und
+  // multipliziert; Weiß lässt das Bild, wie es ist (auch die erinnerten Felder, die schon gedämpft sind)
+  lichtZeichnen(spiel, kamera, ansicht, zoom, sichtbareFelder) {
+    const ebene = spiel.zustand.ebene;
+    const breite = ansicht.breite + 2, hoehe = ansicht.hoehe + 2;
+    this.lichtCanvas ??= document.createElement("canvas");
+    const karte = this.lichtCanvas;
+    if (karte.width !== breite || karte.height !== hoehe) { karte.width = breite; karte.height = hoehe; }
+    const lichtPinsel = karte.getContext("2d");
+    const bild = lichtPinsel.createImageData(breite, hoehe);
+    bild.data.fill(255);
+    for (let bildY = -1; bildY <= ansicht.hoehe; bildY++) {
+      const y = kamera.y + bildY;
+      if (y < 0 || y >= ebene.hoehe) continue;
+      for (let bildX = -1; bildX <= ansicht.breite; bildX++) {
+        const x = kamera.x + bildX;
+        if (x < 0 || x >= ebene.breite || !sichtbareFelder.has(y * ebene.breite + x)) continue;
+        const [rot, gruen, blau] = this.lichtfarbe(spiel, x, y);
+        const stelle = ((bildY + 1) * breite + (bildX + 1)) * 4;
+        bild.data[stelle] = rot; bild.data[stelle + 1] = gruen; bild.data[stelle + 2] = blau;
+      }
+    }
+    lichtPinsel.putImageData(bild, 0, 0);
+    const pinsel = this.pinsel;
+    pinsel.save();
+    pinsel.globalCompositeOperation = "multiply";
+    pinsel.imageSmoothingEnabled = true;
+    pinsel.drawImage(karte, -zoom, -zoom, breite * zoom, hoehe * zoom);
+    pinsel.restore();
   }
 
   // Was Ninkasi auf einem Feld außer Sicht erinnert, gedämpft: Oberfläche, bekannte Fallen, Gegenstände

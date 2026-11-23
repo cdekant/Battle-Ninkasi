@@ -11,7 +11,7 @@ export default {
     },
     // Grundwerte der Eigenschaften (src/systeme/skills.js); vorläufige Verteilung, bis die Charaktererstellung sie wählt
     eigenschaften: { koerperlichkeit: 14, trinkfestigkeit: 14, gewandtheit: 13, sinnlichkeit: 13, klugheit: 13, braukunde: 13 },
-    sicht: { reichweite: 8 },
+    sicht: { reichweite: 8, imDunkeln: 2 }, // auf finstere Felder sieht sie zwei Felder weit (src/systeme/sicht.js)
     angriffe: [{ name: "faust", genauigkeit: 80, effekt: "faustschlag", tags: ["nahkampf"] }], // gegen Ausweichen 0 und Grundverteidigung 20: 80 %; Tag für den Skill nahkampf_grund
     inventar: [],
     faehigkeiten: [], // eigene Fähigkeiten folgen mit dem Inhalt; der Probeinhalt ergänzt die testfaehigkeit (datenproben/index.js)

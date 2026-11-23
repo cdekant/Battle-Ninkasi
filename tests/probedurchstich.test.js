@@ -5,6 +5,7 @@
 // Alle Daten stehen hier und nicht in datenproben/, damit sie weder im Spiel noch im Kompendium erscheinen.
 
 import { test } from "node:test";
+import { positionSetzen } from "../src/kern/raumindex.js";
 import assert from "node:assert/strict";
 import "../src/kern/spiel.js"; // meldet Bausteine, Systeme und Verhaltensmodule an
 import { miniSpiel, wesen, spielerinSetzen, allesSichtbar, gegenstandTragen, weltLaufenLassen, meldungenMitschneiden } from "./hilfen.js";
@@ -270,11 +271,11 @@ test("Bossphase: unter der Hälfte der LP einmal Raserei und ein Begleiter, beim
   assert.equal(begleiter[0].beschworenVon, boss.id);
 });
 
-// 2. Ein Kontrolleur mit Taschenlampe im Dunkeln (Punkt 3)
+// 2. Ein Kontrolleur mit Taschenlampe im Dunkeln (Licht, siehe docs/Welt.md)
 
-test("Kontrolleur: im Dunkeln bemerkt er Ninkasi nur im Schein seiner Lampe", { todo: "Punkt 3: es gibt weder Helligkeit noch Lichtquellen" }, () => {
-  // Entwurf: Ebene mit Grundhelligkeit 0, Lampe als angelegter Gegenstand mit licht: { reichweite: 3, staerke: 80 };
-  // im Dunkeln halbiert sich die Heimlichkeitsweite (7 wird 4), Abstand 6 liegt außerhalb
+test("Kontrolleur: im Dunkeln bemerkt er Ninkasi nur im Schein seiner Lampe", () => {
+  // Ebene in Finsternis, Lampe als angelegter Gegenstand mit licht: { reichweite: 3, staerke: 80 }; im Abstand 6
+  // steht Ninkasi im Finstern, er sieht sie nicht; drei Felder vor ihm ist es dämmrig (40), er sieht und bemerkt sie
   const { spiel, ninkasi } = aufstellen({ regeln: { wahrnehmung: { bemerkenChance: 100 } } });
   spiel.zustand.ebene.licht = { grundhelligkeit: 0 };
   const kontrolleur = wesen(spiel, 7, 2, "kontrolle", 20, { sicht: { reichweite: 9 }, ki: { modul: "jagen", wachzustand: "wach", letzteBekanntePosition: null } });
@@ -282,7 +283,9 @@ test("Kontrolleur: im Dunkeln bemerkt er Ninkasi nur im Schein seiner Lampe", { 
   kontrolleur.ausgeruestet = [lampe.id];
   wahrnehmen(spiel, kontrolleur);
   assert.equal(kontrolleur.ki.wachzustand, "wach", "Ninkasi steht im Dunkeln");
-  assert.ok(ninkasi);
+  positionSetzen(spiel.zustand, ninkasi, { x: 4, y: 2 });
+  wahrnehmen(spiel, kontrolleur);
+  assert.equal(kontrolleur.ki.wachzustand, "jagt", "im Schein der Lampe");
 });
 
 // 3. Ein Zauber, der über die Zeit wirkt

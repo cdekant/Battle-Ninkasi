@@ -6,7 +6,8 @@
 // Bemerken: vor seinem Zug würfelt ein Wesen, das nicht jagt, für jedes sichtbare feindliche Ziel innerhalb von dessen
 //   Heimlichkeitsweite mit regeln.wahrnehmung.bemerkenChance; Treffer oder Fehlschlag gegen es wecken es sofort.
 // Heimlichkeitsweite: Kampfwert heimlichkeit (Vorgabe aus den Regeln) mit Modifikatoren, dann nach der letzten eigenen
-//   Aktion skaliert (Kämpfen verdoppelt, Warten halbiert), nie unter heimlichkeitMindestens.
+//   Aktion skaliert (Kämpfen verdoppelt, Warten halbiert) und nach der Lichtstufe des eigenen Felds
+//   (regeln.licht.stufen, systeme/licht.js), nie unter heimlichkeitMindestens.
 // Ahnungslos ist ein Wesen mit KI, das nicht jagt: Angriffe darauf sind ein Hinterhalt (systeme/kampf.js).
 // Lärm: breitet sich wie eine Wegsuche mit Kosten aus, ein passierbares Feld kostet 1, anderes Gelände seine
 //   laermdaempfung (ohne Angabe undurchlässig); wer innerhalb der Lautstärke liegt, hört ihn.
@@ -21,6 +22,7 @@ import { abstand, aufDerKarte, feldIndex, passierbar, gelaendeAuf } from "../wel
 import { ACHT_RICHTUNGEN } from "../welt/geometrie.js";
 import { trifftZu } from "./zielauswahl.js";
 import { sieht, kandidatenInSicht } from "./sicht.js";
+import { heimlichkeitImLicht } from "./licht.js";
 
 export const WACHZUSTAENDE = ["schlaeft", "wach", "jagt"];
 
@@ -38,7 +40,8 @@ export function heimlichkeitsweite(spiel, wesen) {
   const regeln = regelnVon(spiel);
   const grundweite = modifiziert(spiel, wesen, "heimlichkeit", wesen.kampfwerte?.heimlichkeit ?? regeln.heimlichkeitVorgabe);
   const nachAktion = regeln.heimlichkeitNachAktion[wesen.letzteAktion] ?? 100;
-  return Math.max(regeln.heimlichkeitMindestens, Math.round((grundweite * nachAktion) / 100));
+  const imLicht = wesen.position ? heimlichkeitImLicht(spiel, wesen.position) : 100;
+  return Math.max(regeln.heimlichkeitMindestens, Math.round((grundweite * nachAktion * imLicht) / 10000));
 }
 
 // Ein jagendes Wesen behält ein Ziel nur innerhalb dieser Weite im Blick

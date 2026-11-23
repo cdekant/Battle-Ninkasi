@@ -39,6 +39,7 @@ Abgrenzung: [Systemausbau.md](Systemausbau.md) ist die Arbeitsliste beschlossene
 | Filmriss | ungeklärt | gering | erledigt (Erinnerung der Karte) |
 | EP für Erkundung | ungeklärt | gering | erledigt (gesehen getrennt von bekannt) |
 | Mechaniken aus Pen-and-Paper | teils | gering | nein |
+| Licht im Wandel | ungeklärt | gering | erledigt (Licht als Abfrage) |
 
 Umsetzung: keine
 
@@ -367,6 +368,17 @@ Umsetzung: offen
 
 Umsetzung: teilweise, siehe [Welt.md](Welt.md), Sicht und Erinnerung; offen: ob c) die bessere Form ist
 
+## Licht im Wandel
+
++ Wichtigkeit: ungeklärt; gegen einen Lichtzyklus entschieden am 2026-11-23, die Ebenen sind fest hell oder dunkel (siehe [Grundlagen.md](Grundlagen.md), Licht und Wahrnehmung)
++ Ideen: helle Räume und dunkle Gänge auf derselben Ebene (NetHack, Angband); ein Wechsel von Tag und Nacht für Ebenen an der Oberfläche oder den Hub; die Taschenlampe als Lichtkegel in Blickrichtung statt als runder Schein
++ Braucht: einen Ebenenschritt, der Räume erhellt (Helligkeit je Raum statt je Ebene); für den Zyklus eine Grundhelligkeit aus der Weltuhr; für den Kegel eine Blickrichtung am Wesen
++ Berührt: `grundhelligkeit` und `lichtquellenNahe` (`src/systeme/licht.js`), Erzeugung der Ebenen, Druck gegen endloses Rasten (ein Zyklus lädt zum Warten ein)
++ Umbaurisiko: gering
++ Vorkehrung (erledigt): Licht ist eine Abfrage aus dem Zustand ohne gespeicherte Karte, jede dieser Ideen ändert nur, woraus sie rechnet
+
+Umsetzung: offen
+
 ## Recherche
 
 Stand 2026-11-22; die Quellen sind teils Wikis und Foren, die Einzelheiten können sich mit neueren Versionen der Spiele geändert haben.
@@ -380,6 +392,7 @@ Stand 2026-11-22; die Quellen sind teils Wikis und Foren, die Einzelheiten könn
 + Fortschritt über Läufe: Hades (https://saschb2b.github.io/game-mechanics/games/hades/meta-progression), Game Maker's Toolkit zu Rogue Legacy (https://amara.org/subtitles/7doGHxwrhRpX/en/1/download/Roguelikes%20Persistency%20and%20Progression%20%20Game%20Makers%20Toolkit.en.dfxp), Darkest Dungeon (https://darkestdungeon.wiki.gg/wiki/Expedition)
 + Zerstörbares Gelände: Brigador Killers (https://80.lv/articles/how-brigador-killers-makes-blowing-up-buildings-part-of-the-strategy), Game Maker's Toolkit (https://gmtk.substack.com/p/how-games-do-destruction)
 + Begleiter allgemein: Ancardia (https://ancardia.fandom.com/wiki/Companion)
++ Licht und Spur (2026-11-23): Brogue, Heimlichkeit im Licht (https://brogue.fandom.com/wiki/Stealth?oldid=9248); Sil, Licht mit Radius und Abfall (https://angband.live/forums/forum/angband/sil/5368-adapting-mechanics-from-sil-to-other-longer-games?p=110424); NetHack (https://nethackwiki.com/wiki/Light); ToME (https://te4.org/wiki/Vision); Duftkarten (https://groups.google.com/g/rec.games.roguelike.development/c/qNu94zobNt4, https://drwjf.github.io/roc/notes/scent.html)
 + Utility-KI: Infinite Axis Utility System (https://carloslab-ai.github.io/UtilityIntelligence/UtilityIntelligence/considerations/), Folien von Dave Mark und Kevin Dill (https://api.sambuz.com/doc/improving-improving-ai-decision-modeling-ai-decision-ppt-presentation-788939)
 + Brogue, Schatzräume: Schlüsselhalter (https://brogue.fandom.com/wiki/Key_Holder), Altar (https://brogue.fandom.com/wiki/Altar), Schatzraum (https://brogue.fandom.com/wiki/Reward_room)
 + Hades: Kodex (https://breezewiki.discard.no/hades/wiki/Codex), Bestiarium in Hades II (https://vandal.elespanol.com/en/hades-2/hades-2-how-to-unlock-the-book-of-shadows-and-what-it-does.html)

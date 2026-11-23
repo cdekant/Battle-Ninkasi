@@ -51,6 +51,7 @@ Daten:
 + Gegenstand (`datenproben/ausruestung.js`): `ausruestung: { platz, belegt?, angriffe?, modifikatoren?, ausloeser?, faehigkeiten?, anforderung?, abzugJePunkt? }` und `tags`; `faehigkeiten: [name]` gewährt diese Fähigkeiten, solange der Gegenstand angelegt ist (z.B. ein Zauberstab in der Hand); `belegt` (Vorgabe 1) zählt die Stellen, ein Zweihänder belegt beide Hände; Anforderungen siehe [Wesen.md](Wesen.md), Skills und Lernen
 + `verflucht: true` am Gegenstand, `fluchBekannt` nach dem Anlegen
 + Angelegt ist, was in `ausgeruestet: [IDs]` am Wesen steht; der Gegenstand bleibt im Inventar
++ `licht` am Gegenstand (etwa eine Laterne): leuchtet angelegt vom Feld der Trägerin aus und am Boden, im Gepäck nicht (siehe [Welt.md](Welt.md), Licht)
 
 Schnittstellen (`src/systeme/ausruestung.js`):
 

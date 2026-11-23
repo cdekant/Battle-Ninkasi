@@ -38,6 +38,7 @@ import { schichtenVon, schichtAuf, belegteFelder, feldVonIndex, gasdurchlaessig 
 import { musterFelder } from "./zielauswahl.js";
 import { gelaendeSetzen } from "./gelaende.js";
 import { sichtfeldAktualisieren } from "./sicht.js";
+import { lichtWirkt } from "./licht.js";
 
 const oberflaecheDaten = (spiel, art) => spiel.daten.schichten.oberflaechen[art];
 const gasDaten = (spiel, art) => spiel.daten.schichten.gase[art];
@@ -355,6 +356,13 @@ anmelden("welttick", "feuer", (spiel) => {
     melden(spiel, "erloschen", { feld });
   }
   for (const [index, urheber] of [...zuEntzuenden].sort(([erster], [zweiter]) => erster - zweiter)) entzuenden(spiel, feldVonIndex(ebene, index), urheber);
+});
+
+// Weltuhr: Licht. Es ändert sich auch ohne Ninkasis Bewegung (eine Lampe zieht vorbei, Feuer greift über, eine Laterne
+// wird angelegt): wo Licht wirkt (systeme/licht.js), wird ihr Sichtfeld je Welttick nach dem Feuer neu berechnet;
+// bewegte Lichter zusätzlich gleich beim Versetzen (systeme/bewegung.js)
+anmelden("welttick", "licht", (spiel) => {
+  if (lichtWirkt(spiel) && gesteuerteEntitaet(spiel.zustand)?.position) sichtfeldAktualisieren(spiel);
 });
 
 // Für die Wegfindung (welt/wege.js meiden): Felder mit Feuer oder mit gefährlicher Oberfläche oder Gas; null, wenn keine

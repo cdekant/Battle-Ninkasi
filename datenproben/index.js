@@ -47,6 +47,6 @@ export default {
     wesen: { ninkasi: { faehigkeiten: ["testfaehigkeit"] } },
   },
   // Hub, darunter drei Kellertiefen; der Lauf beginnt im ersten Keller
-  abfolge: ["hub", "keller", "keller", "keller"],
+  abfolge: ["hub", "keller", "keller_dunkel", "keller"],
   starttiefe: 1,
 };

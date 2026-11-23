@@ -115,6 +115,8 @@ export function herkunftVon(wesen, quelle) {
 function grundwertVon(spiel, wesen, name) {
   if (HOECHSTWERTE.includes(name)) return wesen.werte[name].grundwert;
   if (name === "reichweiteSicht") return sichtVon(wesen)?.reichweite ?? 0;
+  // ohne Sicht auch keine Sicht im Dunkeln
+  if (name === "sichtImDunkeln") return sichtVon(wesen) ? sichtVon(wesen).imDunkeln ?? spiel.daten.regeln.licht.imDunkeln : 0;
   if (name === "genauigkeit") return angriffeVon(spiel, wesen)[0]?.genauigkeit ?? 0;
   if (name === "heimlichkeit") return wesen.kampfwerte?.heimlichkeit ?? spiel.daten.regeln.wahrnehmung.heimlichkeitVorgabe;
   return wesen.kampfwerte?.[name] ?? 0;
@@ -124,7 +126,7 @@ function grundwertVon(spiel, wesen, name) {
 // nicht 0 sind oder Modifikatoren haben; Modifikatoren mit Bedingungen an ein Gegenüber zählen hier nicht
 // (ohne Umstände); Kampfwerte nie unter 0 wie in systeme/kampf.js
 export function werteAufschluesseln(spiel, wesen) {
-  const namen = [...HOECHSTWERTE.filter((name) => wesen.werte?.[name] && hatHoechstwert(wesen, name)), "genauigkeit", ...KAMPFWERTE, "reichweiteSicht"];
+  const namen = [...HOECHSTWERTE.filter((name) => wesen.werte?.[name] && hatHoechstwert(wesen, name)), "genauigkeit", ...KAMPFWERTE, "reichweiteSicht", "sichtImDunkeln"];
   const ergebnis = [];
   for (const name of namen) {
     const grundwert = grundwertVon(spiel, wesen, name);

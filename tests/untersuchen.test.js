@@ -206,7 +206,7 @@ test("Texte für Untersuchen, Zustände, Geräusche und Gelände sind vorhanden"
     ...["n", "no", "o", "so", "s", "sw", "w", "nw", "nah"].map((richtung) => `richtung.${richtung}`),
     ...["schlaeft", "wach", "jagt"].map((wachzustand) => `ui.wachzustand.${wachzustand}`),
     ...["eigen", "aura", "sonstige"].map((herkunft) => `ui.herkunft.${herkunft}`),
-    ...["lp", "mp", "pp", "genauigkeit", ...KAMPFWERTE, "reichweiteSicht"].map((wert) => `ui.wert.${wert}`),
+    ...["lp", "mp", "pp", "genauigkeit", ...KAMPFWERTE, "reichweiteSicht", "sichtImDunkeln"].map((wert) => `ui.wert.${wert}`),
     ...Object.values(rohdaten.gelaende).map((gelaende) => gelaende.text),
   ];
   assert.deepEqual(schluessel.filter((eintrag) => !(eintrag in texte)), []);

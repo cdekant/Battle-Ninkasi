@@ -21,6 +21,7 @@ import { faehigkeitVon } from "../systeme/faehigkeiten.js";
 import { lastText } from "./fenster.js";
 import { feldBeschreiben, zustaendeVon, laufendeAktionVon, werteAufschluesseln, wesenBeschreiben } from "../systeme/untersuchen.js";
 import { heimlichkeitsweite } from "../systeme/wahrnehmung.js";
+import { lichtWirkt, lichtstufeAuf } from "../systeme/licht.js";
 
 // Anzeige eines Modifikators nach Art (kern/werte.js)
 const MODIFIKATOR_FORMEN = {
@@ -197,12 +198,15 @@ export class Oberflaeche {
     return beschreibung ? `<ul>${this.feldZeilen(spiel, beschreibung, false).join("")}</ul>` : "";
   }
 
-  // Heimlichkeitsweite, laufende Aktion und Zustände Ninkasis unter den Balken
+  // Heimlichkeitsweite, Licht auf ihrem Feld (nur, wo Licht wirkt), laufende Aktion und Zustände Ninkasis unter den Balken
   lageHtml(spiel, gesteuerte) {
     const { text } = this.texte;
     const zustaende = zustaendeVon(spiel, gesteuerte);
     const aktion = laufendeAktionVon(gesteuerte);
-    const heimlichkeit = `<div class="leise">${text("ui.heimlichkeit", { felder: heimlichkeitsweite(spiel, gesteuerte) })}</div>`;
+    const licht = lichtWirkt(spiel) && gesteuerte.position
+      ? `<div class="leise">${text("ui.licht", { stufe: text(`licht.${lichtstufeAuf(spiel, gesteuerte.position.x, gesteuerte.position.y).name}`) })}</div>`
+      : "";
+    const heimlichkeit = `<div class="leise">${text("ui.heimlichkeit", { felder: heimlichkeitsweite(spiel, gesteuerte) })}</div>${licht}`;
     const aktionHtml = aktion ? `<div>${this.aktionText(spiel, aktion)}</div>` : "";
     const zustaendeHtml = zustaende.length
       ? `<h2>${text("ui.zustaende")}</h2><ul class="zustaende">${zustaende.map((eintrag) => `<li>${this.zustandText(spiel, eintrag)}</li>`).join("")}</ul>`

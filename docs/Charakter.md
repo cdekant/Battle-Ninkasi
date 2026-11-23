@@ -123,7 +123,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Neuv
 + Tag-System: Fähigkeiten, Angriffe und Effekte tragen Tags, Skills wirken über Modifikatoren mit `tag` auch auf künftige Fähigkeiten, siehe Modifikatoren in [Wirkungen.md](Wirkungen.md)
 + Höhere Tiers und Stufen verändern Fähigkeiten qualitativ (z.B. Psi-Teleport nimmt ab Meister ein Ziel mit); die Fähigkeit nennt das selbst in ihrem Ausbau mit der Bedingung Skillstufe
 + Skills können auch Auslöser tragen (z.B. "bei Hinterhalt Blutung")
-+ Vorläufige Idee: Nachtsicht (Sehen bei weniger Licht) und Fernsicht (größere Sichtweite) als Skills; siehe Licht in [Welt.md](Welt.md) und Wahrnehmung in [Wesen.md](Wesen.md)
++ Nachtsicht (weiter sehen im Finstern) und Fernsicht (größere Sichtweite) als Skills; die Mechanik dafür steht, siehe Licht in [Welt.md](Welt.md) und Wahrnehmung in [Wesen.md](Wesen.md)
 
 ### Fähigkeiten
 

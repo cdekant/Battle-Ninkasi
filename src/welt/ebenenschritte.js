@@ -13,6 +13,8 @@
 //     (gelaende.treppeAuf und gelaende.treppeAb, Vorgabe "treppe_auf" und "treppe_ab")
 //   gelaende_objekte: gelaendeObjekte [{ gelaende, anzahl }] nur im Inneren von Räumen (nicht am Rand, nicht im ersten
 //     Raum), so sperren sie keinen Durchgang
+//   wand_objekte: wandObjekte [{ gelaende, anzahl }] auf Wandfeldern (gelaende.wand), die waagrecht oder senkrecht an
+//     den Boden eines Raums grenzen, etwa Wandfackeln (systeme/licht.js); Zufall "wandobjekte"
 //   erreichbarkeit: jedes Feld, das ein laufendes Wesen betreten kann (Türen zählen als offen), muss von der Treppe
 //     hinauf (sonst hinab, sonst der Mitte des ersten Raums) in acht Richtungen erreichbar sein, sonst neuer Versuch
 //   ebene_anlegen: setzt zustand.ebene
@@ -134,6 +136,36 @@ anmelden("ebenenschritte", "gelaende_objekte", {
   },
 });
 
+anmelden("ebenenschritte", "wand_objekte", {
+  braucht: ["karte", "raeume"], liefert: [],
+  ausfuehren(spiel, bau) {
+    const objekte = bau.ebenendaten.wandObjekte || [];
+    if (!objekte.length) return;
+    const kennungWand = kennungFuer(spiel, bau, "wand");
+    const hoehe = bau.zeilen.length, breite = bau.zeilen[0].length;
+    const istWand = (x, y) => x >= 0 && y >= 0 && x < breite && y < hoehe && bau.zeilen[y][x] === kennungWand;
+    const gesehen = new Set();
+    const wandFelder = [];
+    const dazu = (x, y) => {
+      if (!istWand(x, y) || gesehen.has(`${x},${y}`)) return;
+      gesehen.add(`${x},${y}`);
+      wandFelder.push({ x, y });
+    };
+    // der Rand jedes Raums ohne Ecken, in fester Reihenfolge
+    for (const raum of bau.raeume) {
+      for (let x = raum.getLeft(); x <= raum.getRight(); x++) { dazu(x, raum.getTop() - 1); dazu(x, raum.getBottom() + 1); }
+      for (let y = raum.getTop(); y <= raum.getBottom(); y++) { dazu(raum.getLeft() - 1, y); dazu(raum.getRight() + 1, y); }
+    }
+    const zufall = bau.zufall("wandobjekte");
+    for (const { gelaende, anzahl } of objekte) {
+      for (let i = 0; i < anzahl && wandFelder.length; i++) {
+        const { x, y } = wandFelder.splice(zufallsGanzzahl(zufall, 0, wandFelder.length - 1), 1)[0];
+        bau.zeilen[y][x] = spiel.daten.gelaende[gelaende].kennung;
+      }
+    }
+  },
+});
+
 // Begehbare Felder, die vom Start aus nicht erreichbar sind, als [{ x, y }] in fester Reihenfolge
 export function unerreichbareFelder(spiel, zeilen, start) {
   const gelaendeNachKennung = {};
@@ -180,6 +212,8 @@ anmelden("ebenenschritte", "ebene_anlegen", {
       erinnerteDinge: {},
       schichten: { oberflaeche: {}, gas: {}, feuer: {} },
     };
+    // Grundhelligkeit aus der Vorlage (systeme/licht.js); ohne Angabe ist jedes Feld taghell
+    if (bau.ebenendaten.licht) spiel.zustand.ebene.licht = structuredClone(bau.ebenendaten.licht);
   },
 });
 

@@ -16,13 +16,13 @@ Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und wäh
 
 Stand 2026-11-23, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer Wirkung auf den Inhalt, das Kleine und Breite zuerst:
 
-1. Licht und Wahrnehmung (Punkt 3)
+1. Wahrnehmungsarten, Spüren und Duft (Punkt 3; das Licht ist umgesetzt)
 2. Englisch, Mehrzahl und Glossar (Punkt 9)
 3. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
 4. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
 5. Danach der Inhalt (Punkt 14)
 
-Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
+Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind das Licht aus Punkt 3, Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
 
 Die Proben des Probedurchstichs stehen in `tests/probedurchstich.test.js`; jede Lücke dort ist ein Test mit `todo` und dem Punkt, der sie schließt, mit einem Entwurf der Daten (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing). Wer einen Punkt umsetzt, nimmt dort das `todo` weg.
 
@@ -30,18 +30,14 @@ Die Proben des Probedurchstichs stehen in `tests/probedurchstich.test.js`; jede 
 
 + Derzeit keine
 
-## 3. Licht und Wahrnehmung
+## 3. Wahrnehmungsarten, Spüren und Duft
 
-Status: offen, erst Recherche, dann neu designen und überarbeiten
+Status: offen; das Licht (Teil 3a) ist umgesetzt, siehe [Welt.md](Welt.md), Licht
 
-+ Probe: der Kontrolleur mit Taschenlampe bemerkt Ninkasi im Dunkeln nur im Schein seiner Lampe
-
-+ Helligkeit je Feld, Lichtquellen, Licht im Renderer (Ideen in [Welt.md](Welt.md), Licht); ohne Angabe gilt jedes Feld als hell, das Spiel verhält sich dann wie bisher
-+ Licht in der Wahrnehmung (Brogue: Heimlichkeitsweite im Licht doppelt, im Dunkeln halb), Spüren ohne Licht, Spur als Geruch (Duftkarte nach Brogue, passend zu Mikroorganismen, die entlang von Wegen spüren); Ideen in [Wesen.md](Wesen.md), Wahrnehmung
-+ Art der Wahrnehmung statt ja oder nein (gesehen, gespürt, kartiert), die neue Systeme statt `istSichtbar` fragen (siehe [Ausblick.md](Ausblick.md), Hellsicht, Spüren, Unsichtbarkeit)
-+ Licht durch Feuer; Nachtsicht und Fernsicht als Modifikatorziele für spätere Skills
-+ Offene Fragen des Spieldesigns in [Grundlagen.md](Grundlagen.md), Offen
-+ Die Ideen an den genannten Stellen werden dabei an einer Stelle zusammengeführt
++ Art der Wahrnehmung statt ja oder nein: eine Abfrage `wahrnehmung(spiel, betrachter, ziel)` mit `gesehen`, `gespuert` oder nichts, Sinne in einem Register, damit Hellsicht und Telepathie sich später einhängen; `sieht` bleibt die Kurzform für "gesehen", die KI jagt, was sie auf irgendeine Art wahrnimmt (siehe [Ausblick.md](Ausblick.md), Hellsicht, Spüren, Unsichtbarkeit)
++ Spüren ohne Licht im Umkreis (z. B. Mikroorganismen); Anzeige von Gespürtem für Ninkasi
++ Spur als Duft nach Brogue: die gesteuerte Entität hinterlässt je Zug Duft auf ihrem Sichtfeld, mit der Entfernung schwächer, ein globaler Zähler statt Abklingen je Feld; Jagende, die ihre Beute aus den Augen verloren haben, folgen dem Duft entlang der Wege
++ Offene Frage des Spieldesigns in [Grundlagen.md](Grundlagen.md), Offen: ob Mikroorganismen durch Wände spüren oder nur entlang von Wegen
 
 ## 8. Kleinere Reste der Systeme
 
@@ -50,6 +46,7 @@ Status: offen, jeweils mit dem ersten Bedarf
 + Ladungen als Verbrauch einer gewährten Fähigkeit (Zauberstab, Regel in [Grundlagen.md](Grundlagen.md), Spielkern): Entwurf `verbrauch: { ladungen: 1 }`, bezahlt vom zuerst angelegten Gegenstand der Quelle, der noch Ladungen hat; jede gewährte Fähigkeit kennt ihre Quelle (`gegenstandId`, siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten); das Fähigkeitenfenster zeigt die Summe der Ladungen
 + Lesen mit Ziel: eine Rolle wirkt eine Fähigkeit einmal, ohne sie zu lehren (Entwurf `lesbar: { faehigkeit }`, Befehl `lesen { gegenstandId, ziel? }` über den Zielmodus); heute wirkt ein lesbarer Gegenstand nur auf die Leserin
 + Haken `zug_beginn` in Betrieb nehmen
++ Licht ein- und ausschalten: ein Zustand an der Quelle (Entwurf `licht.an`) und ein Befehl dafür (Lampe, Laterne, Fackel löschen), mit dem ersten Inhalt, der es braucht (siehe [Welt.md](Welt.md), Licht)
 + Ersatzwirkungen an weiteren Haken "davor" (z.B. `vor_angriff` für ein Ausweichen aus Daten) und eine Barriere als Puffer mit Fassungsvermögen statt ganzer Treffer (Entwurf `fasst`, Vorbild ToME), siehe [Wirkungen.md](Wirkungen.md), Ersatzwirkungen
 + Auslöser mit Filter auf den Grund des Ereignisses (`verfehlt` mit `grund: "geblockt"`), etwa für Verschleiß eines Schilds beim Blocken; Verschleiß durch Gebrauch bleibt bis dahin ausgeschlossen (siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß)
 + Angefressene Waffen: wie sie schwächer werden, braucht einen Eingriff in die Schadensrechnung (siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß)
@@ -127,6 +124,7 @@ Status: zurückgestellt, Entwurf in [Animationen.md](Animationen.md) und [Tilese
 + Bewegte Tiles
 + Metaeffekte des Pegels und der LP (siehe [Oberflaeche.md](Oberflaeche.md), Klassen der Elemente)
 + Weiches Scrollen der Kamera (siehe [Anzeige.md](Anzeige.md), Kamera)
++ Licht: leuchtende Pixel (Augen, Glut) nach der Abdunklung neu zeichnen, mit einer Maske je Tile; Flackern über den kosmetischen Zufall; dieselbe Abdunklung auch für erinnerte Felder (siehe [Anzeige.md](Anzeige.md), Anzeige und [Tileset.md](Tileset.md))
 
 ## 14. Mit dem Inhalt
 

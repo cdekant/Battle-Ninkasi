@@ -1,11 +1,12 @@
 // Messung der Leistung bei vielen Gegnern (siehe docs/Architektur.md, Leistung).
-// Aufruf: node werkzeuge/messung.js [Gegner=300] [Befehle=400] [Startwert=7] [Türen in Prozent=aus den Daten] [Brandherde=0]
+// Aufruf: node werkzeuge/messung.js [Gegner=300] [Befehle=400] [Startwert=7] [Türen in Prozent=aus den Daten] [Brandherde=0] [Licht=0]
 // Erzeugt die Ebene "keller" mit der angegebenen Zahl Essigbakterien und einem Fünftel so vielen Fernkämpfern,
 // macht Ninkasi unverwundbar und lässt sie zufällig laufen; ein Befehl heißt: Ninkasi handelt, danach alle anderen.
 // Gemessen wird die Zeit je Befehl ohne Anzeige; die Obergrenze der Population wird für die Messung angehoben.
 // Türen kosten Zeit, weil Wesen, die keine Türen öffnen, sich in ihren Räumen drängen (mehr Nachbarn je Suche).
 // Brandherde: so viele Kreise aus Hochprozentigem (Radius 2) auf zufälligen Bodenfeldern, zu Beginn entzündet,
 // für einen Fall mit Feuer und Rauch (Feldschichten, src/systeme/schichten.js).
+// Licht 1: die Ebene ist finster wie der dunkle Keller (Wandfackeln), jeder Fernkämpfer trägt eine Lampe (src/systeme/licht.js).
 
 import { rohdaten, texteDe as texte } from "../src/inhalt.js";
 import { datenLaden, neuesSpiel, befehlGeben } from "../src/kern/spiel.js";
@@ -15,14 +16,19 @@ import { passierbar } from "../src/welt/karte.js";
 import { kreis } from "../src/welt/geometrie.js";
 import { oberflaecheSetzen, entzuenden } from "../src/systeme/schichten.js";
 
-const [anzahlGegner = 300, anzahlBefehle = 400, startwert = 7, tuerChance, brandherde = 0] = process.argv.slice(2).map(Number);
+const [anzahlGegner = 300, anzahlBefehle = 400, startwert = 7, tuerChance, brandherde = 0, mitLicht = 0] = process.argv.slice(2).map(Number);
 
 const daten = structuredClone(rohdaten);
 daten.ebenen.keller.gegner = [
   { typ: "essigbakterium", anzahl: anzahlGegner },
   { typ: "fernkaempfer_test", anzahl: Math.round(anzahlGegner / 5) },
 ];
-if (tuerChance !== undefined) daten.ebenen.keller.tuerChance = tuerChance;
+if (tuerChance !== undefined && !Number.isNaN(tuerChance)) daten.ebenen.keller.tuerChance = tuerChance;
+if (mitLicht) {
+  daten.ebenen.keller.licht = daten.ebenen.keller_dunkel.licht;
+  daten.ebenen.keller.wandObjekte = daten.ebenen.keller_dunkel.wandObjekte;
+  daten.wesen.fernkaempfer_test.licht = { reichweite: 3, staerke: 80 };
+}
 delete daten.ebenen.keller.population; // die feste Zahl oben statt der Population nach Tiefe
 daten.regeln.population.hoechstWesen = Math.max(daten.regeln.population.hoechstWesen, 2 * anzahlGegner);
 const spiel = neuesSpiel(datenLaden(daten, { texte }), startwert);

@@ -99,26 +99,22 @@ Daten:
 
 Schnittstellen:
 
-+ `src/systeme/sicht.js`: `sieht` (Ninkasi sieht, was in ihrem Sichtfeld liegt; alle anderen sehen ein Ziel mit freier Sichtlinie innerhalb ihrer Sichtweite, auch Ninkasi), `reichweiteSicht`, `sichtfeldAktualisieren` (PreciseShadowcasting aus rot.js), `istSichtbar`, `kandidatenInSicht`
++ `src/systeme/sicht.js`: `sieht` (Ninkasi sieht, was in ihrem Sichtfeld liegt; alle anderen sehen ein Ziel mit freier Sichtlinie innerhalb ihrer Sichtweite, auch Ninkasi, wenn genug Licht auf seinem Feld liegt, siehe [Welt.md](Welt.md), Licht), `reichweiteSicht`, `sichtImDunkeln`, `hellGenug`, `sichtfeldAktualisieren` (PreciseShadowcasting aus rot.js), `istSichtbar`, `kandidatenInSicht`
 + `src/systeme/wahrnehmung.js`: `wahrnehmen` (vor dem Zug eines Wesens mit KI, aus `warteschlangeAbarbeiten`), `wachzustandVon`, `istAhnungslos`, `heimlichkeitsweite`, `spurweite`, `laermMachen`, `laermFelder`; Baustein `laerm { lautstaerke }`
 + Meldungen `bemerkt`, `aufgewacht`, `laerm` (mit `geraeusch` aus `GERAEUSCHE`: `nahkampf`, `aufschlag`, `sonstiges`, und `gesteuerteHoert`, nicht bei eigenem Lärm; siehe [Anzeige.md](Anzeige.md), Anzeige)
 
 Regeln:
 
 + `schlaeft`: tut nichts, bis es jemanden bemerkt (dann `jagt`) oder Lärm hört (dann `wach`); `wach`: hat noch niemanden bemerkt, geht Lärm nach, sonst zieht es umher (siehe KI); `jagt`: verfolgt das nächste sichtbare Ziel innerhalb der Spurweite (`spurFaktor` mal die Heimlichkeitsweite des Ziels); findet es an der letzten bekannten Position niemanden mehr, wird die eigene KI wieder `wach` (eine überlagerte KI wie Rausch bleibt, wie sie ist)
-+ Heimlichkeitsweite eines Ziels: Kampfwert `heimlichkeit` (Vorgabe `heimlichkeitVorgabe`) mit Modifikatoren auf `heimlichkeit` (Skills), dann nach der letzten eigenen Aktion skaliert, nie unter `heimlichkeitMindestens`
++ Heimlichkeitsweite eines Ziels: Kampfwert `heimlichkeit` (Vorgabe `heimlichkeitVorgabe`) mit Modifikatoren auf `heimlichkeit` (Skills), dann nach der letzten eigenen Aktion und nach der Lichtstufe des eigenen Felds skaliert (siehe [Welt.md](Welt.md), Licht), gerundet, nie unter `heimlichkeitMindestens`
 + Bemerken: Vor dem Zug eines Wesens mit eigener KI, das nicht jagt, würfelt es für jedes sichtbare feindliche Ziel innerhalb von dessen Heimlichkeitsweite mit `bemerkenChance`, nach Abstand und ID
 + Wer getroffen, verfehlt oder geschädigt wird, jagt sofort und kennt die Position der Urheberin
 + Ahnungslos ist ein Wesen mit KI, das nicht jagt; Angriffe darauf sind ein Hinterhalt (siehe Kampfwerte)
 + Lärm breitet sich aus wie eine Wegsuche mit Kosten: ein passierbares Feld kostet 1, anderes Gelände seine `laermdaempfung`, ohne Angabe dringt nichts durch; wer innerhalb der Lautstärke liegt, hört ihn: Schlafende werden wach, Wache gehen der Quelle nach, wer jagt, bleibt dabei; jeder Nahkampf macht Lärm
 + Dichter Rauch versperrt Ninkasis Sichtfeld und die Sichtlinie aller anderen (siehe [Welt.md](Welt.md), Feldschichten)
++ Sehen braucht Licht: auf einem finsteren Feld sieht ein Wesen ein Ziel nur bis `sichtImDunkeln`; Nachtsicht und Fernsicht wirken als Modifikatoren auf `sichtImDunkeln` und `reichweiteSicht` (siehe [Welt.md](Welt.md), Licht und Sichtweite)
 
-Vorläufige Ideen, noch nicht umgesetzt (Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 3):
-
-+ Sehen braucht Licht: Ein Wesen sieht ein Ziel nur, wenn das Feld des Ziels hell genug ist; Brogue verdoppelt die Heimlichkeitsweite im Licht und halbiert sie im Dunkeln; z. B. Lebensmittelkontrolleure
-+ Spüren braucht kein Licht: Wahrnehmung im Umkreis, unabhängig von der Helligkeit; z. B. Mikroorganismen
-+ Nachtsicht und Fernsicht werden Skills: Nachtsicht senkt die nötige Helligkeit zum Sehen, Fernsicht erhöht die Sichtweite; siehe [Charakter.md](Charakter.md)
-+ Wer Licht trägt, sieht mehr und wird selbst gesehen
+Noch nicht umgesetzt (Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 3): Spüren ohne Licht im Umkreis (z. B. Mikroorganismen), Arten der Wahrnehmung statt ja oder nein, die Spur als Duft
 
 ## KI
 
@@ -270,6 +266,6 @@ Regeln:
 ## Verweise
 
 + Spieldesign: Gegner und Pegel in [Grundlagen.md](Grundlagen.md), Eigenschaften, Skills und EP in [Charakter.md](Charakter.md)
-+ Offene Reste in [Systemausbau.md](Systemausbau.md): Punkt 3 (Licht in der Wahrnehmung, Spüren, Spur als Geruch), Punkt 10 (Zeitskala, Machtkurve, Anfangsbalance), Punkt 14 (Skillkatalog, Makel und Vorzüge, Kampfwerte aus Skills)
++ Offene Reste in [Systemausbau.md](Systemausbau.md): Punkt 3 (Wahrnehmungsarten, Spüren, Spur als Duft), Punkt 10 (Zeitskala, Machtkurve, Anfangsbalance), Punkt 14 (Skillkatalog, Makel und Vorzüge, Kampfwerte aus Skills)
 
 Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

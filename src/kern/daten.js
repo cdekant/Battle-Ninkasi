@@ -133,6 +133,8 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
   if (wesen.ki) pruefeKi(daten, wesen.ki, `${ort}.ki`, fehler, istTextliste(wesen.faehigkeiten) ? wesen.faehigkeiten : []);
   if (wesen.stoffwechsel) pruefeStoffwechsel(wesen, ort, fehler);
   if (wesen.sicht && !istGanzzahl(wesen.sicht.reichweite)) fehler.push(`${ort}: sicht.reichweite muss eine ganze Zahl sein`);
+  if (wesen.sicht?.imDunkeln !== undefined && !istZahlAbNull(wesen.sicht.imDunkeln)) fehler.push(`${ort}: sicht.imDunkeln muss eine ganze Zahl >= 0 sein`);
+  pruefeLicht(wesen.licht, ort, fehler);
   if (wesen.lebenswert !== undefined && !wesen.werte?.[wesen.lebenswert]) fehler.push(`${ort}: lebenswert "${wesen.lebenswert}" ist kein Wert des Wesens`);
   if (wesen.beimTod?.inventar !== undefined && !HINTERLASSENSCHAFT_REGELN.includes(wesen.beimTod.inventar)) {
     fehler.push(`${ort}: beimTod.inventar muss eines von ${HINTERLASSENSCHAFT_REGELN.join(", ")} sein`);
@@ -322,6 +324,34 @@ function pruefeStoffwechsel(wesen, ort, fehler) {
 }
 
 // Feldschichten: { oberflaechen, gase }, siehe systeme/schichten.js; Zeichen in zeichen.schichten
+// Lichtquelle, siehe systeme/licht.js: licht: { reichweite, staerke, farbe? }
+function pruefeLicht(licht, ort, fehler) {
+  if (licht === undefined) return;
+  const gueltig = istObjekt(licht) && istZahlAbNull(licht.reichweite) && istProzent(licht.staerke) && (licht.farbe === undefined || typeof licht.farbe === "string");
+  if (!gueltig) fehler.push(`${ort}: licht muss { reichweite >= 0, staerke 0 bis 100, farbe? } sein`);
+}
+
+// Stufen des Lichts, siehe systeme/licht.js
+function pruefeLichtregeln(licht, sprache, fehler) {
+  if (!istObjekt(licht)) return fehler.push("regeln.licht fehlt");
+  if (!istZahlAbNull(licht.imDunkeln)) fehler.push("regeln.licht.imDunkeln muss eine ganze Zahl >= 0 sein");
+  const stufen = licht.stufen;
+  if (!Array.isArray(stufen) || !stufen.length) return fehler.push("regeln.licht.stufen muss eine Liste sein");
+  stufen.forEach((stufe, nummer) => {
+    const stelle = `regeln.licht.stufen[${nummer}]`;
+    if (typeof stufe?.name !== "string") return fehler.push(`${stelle}: name fehlt`);
+    pruefeText(sprache.texte, `licht.${stufe.name}`, stelle, fehler);
+    if (!istProzent(stufe.ab)) fehler.push(`${stelle}: ab muss eine ganze Zahl von 0 bis 100 sein`);
+    else if (nummer === 0 && stufe.ab !== 0) fehler.push(`${stelle}: die erste Stufe beginnt bei 0`);
+    else if (nummer > 0 && stufe.ab <= stufen[nummer - 1].ab) fehler.push(`${stelle}: ab muss aufsteigen`);
+    if (!istZahlAbNull(stufe.heimlichkeit)) fehler.push(`${stelle}: heimlichkeit muss eine ganze Zahl >= 0 sein`);
+    if (stufe.verbirgt !== undefined && typeof stufe.verbirgt !== "boolean") fehler.push(`${stelle}: verbirgt muss ein Wahrheitswert sein`);
+  });
+  // die oberste Stufe ist der Stand ohne Licht in den Daten: dort verhält sich das Spiel wie ohne Licht
+  const oberste = stufen.at(-1);
+  if (oberste?.verbirgt || oberste?.heimlichkeit !== 100) fehler.push("regeln.licht.stufen: die oberste Stufe hat heimlichkeit 100 und verbirgt nicht");
+}
+
 function pruefeSchichten(daten, sprache, fehler) {
   const schichten = daten.schichten;
   if (!istObjekt(schichten) || !istObjekt(schichten.oberflaechen) || !istObjekt(schichten.gase)) return fehler.push("schichten { oberflaechen, gase } fehlen");
@@ -339,6 +369,7 @@ function pruefeSchichten(daten, sprache, fehler) {
     }
     const arten = art.ausloesenFuer;
     if (arten !== undefined && !(istTextliste(arten) && arten.every((bewegung) => BEWEGUNGSARTEN.includes(bewegung)))) fehler.push(`${ort}: ausloesenFuer muss eine Liste aus ${BEWEGUNGSARTEN.join(", ")} sein`);
+    pruefeLicht(art.licht, ort, fehler);
     if (!daten.zeichen.schichten?.[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js (schichten)`);
   }
   for (const [name, art] of Object.entries(schichten.gase)) {
@@ -359,6 +390,7 @@ function pruefeSchichten(daten, sprache, fehler) {
         }
       });
     }
+    pruefeLicht(art.licht, ort, fehler);
     if (!daten.zeichen.schichten?.[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js (schichten)`);
   }
   if (!daten.zeichen.schichten?.feuer) fehler.push("zeichen.schichten.feuer fehlt");
@@ -439,6 +471,8 @@ function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
     }
   }
   pruefeVerschleiss(daten, gegenstand, ort, fehler);
+  // Licht: leuchtet am Boden und angelegt, siehe systeme/licht.js
+  pruefeLicht(gegenstand.licht, ort, fehler);
   // Fluch und Unbekanntes, siehe systeme/ausruestung.js und systeme/kennen.js
   pruefeParameter(daten, { verflucht: "wahrheitswert?" }, gegenstand, ort, fehler);
   if (gegenstand.verflucht && !gegenstand.ausruestung) fehler.push(`${ort}: verflucht wirkt nur an Ausrüstung`);
@@ -1053,6 +1087,8 @@ function pruefeEbene(daten, name, ebene, fehler) {
     if (!daten.fallen?.[falle.typ]) fehler.push(`${ort}: Falle "${falle.typ}" gibt es nicht`);
   }
   for (const objekt of ebene.gelaendeObjekte || []) pruefeParameter(daten, { gelaende: "gelaende", anzahl: "ganzzahl" }, objekt, `${ort}.gelaendeObjekte`, fehler);
+  if (ebene.licht !== undefined && !(istObjekt(ebene.licht) && istProzent(ebene.licht.grundhelligkeit))) fehler.push(`${ort}: licht muss { grundhelligkeit 0 bis 100 } sein`);
+  for (const objekt of ebene.wandObjekte || []) pruefeParameter(daten, { gelaende: "gelaende", anzahl: "ganzzahl" }, objekt, `${ort}.wandObjekte`, fehler);
   if (ebene.tuerChance !== undefined && !istProzent(ebene.tuerChance)) fehler.push(`${ort}: tuerChance muss eine ganze Zahl von 0 bis 100 sein`);
   for (const gegenstand of ebene.gegenstaende || []) {
     if (!daten.gegenstaende[gegenstand.typ]) fehler.push(`${ort}: Gegenstand "${gegenstand.typ}" gibt es nicht`);
@@ -1242,12 +1278,15 @@ export function vorbereiten(rohdaten, sprache = {}) {
     if (passierbarFuer !== undefined && !(istTextliste(passierbarFuer) && passierbarFuer.every((art) => BEWEGUNGSARTEN.includes(art)))) {
       fehler.push(`gelaende.${name}: passierbarFuer muss eine Liste aus ${BEWEGUNGSARTEN.join(", ")} sein`);
     }
+    pruefeLicht(gelaende.licht, `gelaende.${name}`, fehler);
     if (!daten.zeichen.gelaende[name]) fehler.push(`gelaende.${name}: kein Zeichen in daten/zeichen.js`);
   }
   for (const [aktion, kosten] of Object.entries(daten.aktionen)) {
     if (!istGanzzahl(kosten) || kosten <= 0) fehler.push(`aktionen.${aktion}: Kosten müssen eine ganze Zahl > 0 sein`);
   }
   pruefeRegeln(daten, daten.regeln, fehler);
+  pruefeLichtregeln(daten.regeln?.licht, sprache, fehler);
+  pruefeLicht(daten.regeln?.feuer?.licht, "regeln.feuer", fehler);
   if (!daten.wesen.ninkasi) fehler.push("wesen.ninkasi fehlt");
   return { daten, fehler };
 }

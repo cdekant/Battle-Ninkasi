@@ -140,7 +140,7 @@ Umsetzung: siehe [Anzeige.md](Anzeige.md), Oberfläche
 
 + Kopf: Ort und Zeit (Tiefe, Ebene, Zug)
 + Minikarte (Variante A, in B oben in der linken Spalte): bekannte Felder, Ninkasi, Treppen, bekannte Wesen; Klick reist dorthin; die große Übersichtskarte (Taste m) zeichnet derselbe Renderer
-+ Ninkasi: LP, MP, PP als Balken, Platz für einen vierten Vorrat (Ausdauer, falls sie kommt), Pegel logarithmisch mit Schwellen, Zustände mit Stärke und Restdauer, laufende Aktion, Heimlichkeit, später Helligkeit des eigenen Feldes (Licht)
++ Ninkasi: LP, MP, PP als Balken, Platz für einen vierten Vorrat (Ausdauer, falls sie kommt), Pegel logarithmisch mit Schwellen, Zustände mit Stärke und Restdauer, laufende Aktion, Heimlichkeit, Helligkeit des eigenen Feldes (Licht, nur wo es wirkt)
 + Zielen und Untersuchen: nur sichtbar, solange der Zielmodus offen ist
 + In Sicht: Wesen nach Abstand mit Wachzustand und Zuständen, "wirkt etwas" bei laufender Aktion; darüber Gefährten (Beschworene, Verbündete) mit LP
 + Seitenleiste und Karte heben sich beim Darüberfahren und beim Untersuchen gegenseitig hervor (Brogue)
@@ -294,7 +294,7 @@ Die Oberfläche lässt sich jetzt durchplanen; was noch fehlt, bekommt einen vor
 + Brausystem: Fenster Brauen mit Rezeptbuch, laufende Aktion in der Seitenleiste (vorhanden)
 + Hub, Händler, Nebengottheiten: Fenster Handel und Gespräch, Klickregeln für Händler und Kessel
 + Magie mit Ritual, Schrift und Material: Fähigkeitenfenster und laufende Aktion, Fenster für Schriftrollen
-+ Licht: Abdunklung der Karte (Renderer), Helligkeit des eigenen Feldes in der Seitenleiste
++ Licht: Abdunklung der Karte (Renderer) und Helligkeit des eigenen Feldes in der Seitenleiste (vorhanden)
 + Ausdauer, falls sie kommt: vierter Balken
 + Schwellen des Pegels: in der Pegelanzeige eingezeichnet (vorhanden), Mindestpegel an der Schnellleiste
 + Beschworene und Verbündete: Abschnitt Gefährten

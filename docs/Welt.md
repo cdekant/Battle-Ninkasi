@@ -2,7 +2,7 @@
 
 Stand: 2026-11-23
 
-Zuständig für: `src/welt/ebene.js`, `src/welt/ebenenschritte.js`, `src/welt/plan.js`, `src/welt/population.js`, `src/welt/karte.js`, `src/welt/schichten.js`, `src/welt/wege.js`, `src/systeme/gelaende.js`, `src/systeme/fallen.js`, `src/systeme/schichten.js`, `src/systeme/ebenen.js`, `src/systeme/sicht.js`, `src/systeme/erinnerung.js`, `src/systeme/gefahr.js`, `daten/gelaende.js`, `daten/schichten.js`, `daten/ebenen.js`
+Zuständig für: `src/welt/ebene.js`, `src/welt/ebenenschritte.js`, `src/welt/plan.js`, `src/welt/population.js`, `src/welt/karte.js`, `src/welt/schichten.js`, `src/welt/wege.js`, `src/systeme/gelaende.js`, `src/systeme/fallen.js`, `src/systeme/schichten.js`, `src/systeme/ebenen.js`, `src/systeme/sicht.js`, `src/systeme/licht.js`, `src/systeme/erinnerung.js`, `src/systeme/gefahr.js`, `daten/gelaende.js`, `daten/schichten.js`, `daten/ebenen.js`
 
 Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Anzeige.md](Anzeige.md), [Grundlagen.md](Grundlagen.md), [Bedienung.md](Bedienung.md), [Ausblick.md](Ausblick.md), [Architektur.md](Architektur.md)
 
@@ -47,8 +47,8 @@ Vorbild Brogue: je Feld höchstens eine Gasart, die sich auf die Nachbarn vertei
 Daten:
 
 + Drei Schichten (`SCHICHTEN`) neben der Karte in `zustand.ebene.schichten`, nur belegte Felder: `oberflaeche` und `gas` mit `{ art, menge }`, `feuer` mit `{ menge }` (Brenndauer in Weltticks); dazu `urheberId` und `urheberFraktion`, wenn der Eintrag eine Urheberin hat
-+ Arten (`daten/schichten.js`): `oberflaechen` mit `hoechstens?`, `schwund`, `beimBetreten`, `jeTick`, `ausloesenFuer` (Vorgabe `laufend`, `unbeweglich`), `brennbar`, `brenndauer`, `verbrenntZu`, `ausbreitung: { chance }`, `gefaehrlich`; `gase` mit `hoechstens?`, `abbau` (Prozent je Tick), `stufen: [{ ab, effekt, wenn? }]`, `undurchsichtigAb`, `brennbar`
-+ Regelwerte: `regeln.feuer` (`brennen`, `rauch`, `rauchMenge`), `regeln.schichten` (`hoechstOberflaeche` 10, `hoechstGas` 1000)
++ Arten (`daten/schichten.js`): `oberflaechen` mit `hoechstens?`, `schwund`, `beimBetreten`, `jeTick`, `ausloesenFuer` (Vorgabe `laufend`, `unbeweglich`), `brennbar`, `brenndauer`, `verbrenntZu`, `ausbreitung: { chance }`, `gefaehrlich`; `gase` mit `hoechstens?`, `abbau` (Prozent je Tick), `stufen: [{ ab, effekt, wenn? }]`, `undurchsichtigAb`, `brennbar`; beide Arten wahlweise mit `licht` (siehe Licht)
++ Regelwerte: `regeln.feuer` (`brennen`, `rauch`, `rauchMenge`, `licht`, siehe Licht), `regeln.schichten` (`hoechstOberflaeche` 10, `hoechstGas` 1000)
 
 Schnittstellen:
 
@@ -97,9 +97,9 @@ Vorbilder: Brogue und DCSS (Ebenen bleiben erhalten, Treppen verbinden sie), Gru
 
 Daten:
 
-+ Abfolge der Tiefen in `daten/index.js`: `abfolge: ["hub", "keller", "keller", "keller"]` (Tiefe 0 ist der Hub), `starttiefe: 1`; mehrere Tiefen dürfen dieselbe Vorlage aus `daten/ebenen.js` nutzen; der Plan des Laufs übernimmt sie
-+ Ebene (`daten/ebenen.js`): feste `karte` (Zeilen aus Geländekennungen, z.B. der Hub) oder `breite`, `hoehe` und Parameter für den Digger von rot.js (`digger`), dazu `gelaende` (Rollen `wand`, `boden`, `tuer`, `treppeAuf`, `treppeAb`; Vorgaben `wand`, `boden`, `tuer_zu`, `treppe_auf`, `treppe_ab`), `gelaendeObjekte` (z.B. Gärbottiche), `tuerChance`, `fallen`, `gegenstaende` und `population: { tabelle, anzahl: [min, max] }` oder eine feste Liste `gegner`; wahlweise `schritte`, die Folge der Ebenenschritte
-+ Vorgaben der Schritte in `regeln.ebenen`: `schritteErzeugt` (`karte_digger`, `tueren`, `treppen`, `gelaende_objekte`, `erreichbarkeit`, `ebene_anlegen`, `wegpunkte`, `freie_felder`, `population`, `gegenstaende`, `fallen`), `schritteFest` für Ebenen mit `karte` (`karte_fest`, `erreichbarkeit`, `ebene_anlegen`), `versuche` 10, `folgen.abstand` 1 (siehe Verfolger unter Regeln)
++ Abfolge der Tiefen in `daten/index.js`: `abfolge`, im Probeinhalt `["hub", "keller", "keller_dunkel", "keller"]` (Tiefe 0 ist der Hub), `starttiefe: 1`; mehrere Tiefen dürfen dieselbe Vorlage aus `daten/ebenen.js` nutzen; der Plan des Laufs übernimmt sie
++ Ebene (`daten/ebenen.js`): feste `karte` (Zeilen aus Geländekennungen, z.B. der Hub) oder `breite`, `hoehe` und Parameter für den Digger von rot.js (`digger`), dazu `gelaende` (Rollen `wand`, `boden`, `tuer`, `treppeAuf`, `treppeAb`; Vorgaben `wand`, `boden`, `tuer_zu`, `treppe_auf`, `treppe_ab`), `gelaendeObjekte` (z.B. Gärbottiche), `wandObjekte` (z.B. Wandfackeln), `licht: { grundhelligkeit }` (siehe Licht), `tuerChance`, `fallen`, `gegenstaende` und `population: { tabelle, anzahl: [min, max] }` oder eine feste Liste `gegner`; wahlweise `schritte`, die Folge der Ebenenschritte
++ Vorgaben der Schritte in `regeln.ebenen`: `schritteErzeugt` (`karte_digger`, `tueren`, `treppen`, `gelaende_objekte`, `wand_objekte`, `erreichbarkeit`, `ebene_anlegen`, `wegpunkte`, `freie_felder`, `population`, `gegenstaende`, `fallen`), `schritteFest` für Ebenen mit `karte` (`karte_fest`, `erreichbarkeit`, `ebene_anlegen`), `versuche` 10, `folgen.abstand` 1 (siehe Verfolger unter Regeln)
 + Population (`datenproben/populationen.js`): Einträge `{ typ, gewicht, tiefe: [von, bis], rudel?: [min, max], affixe?: [{ zustand, chance }] }`; Regelwerte `regeln.population` (`tieferChance` 10, `tieferBis` 2, `hoechstWesen` 500, `schlafChance` 50)
 + Wegpunkte: `ebene.wegpunkte: [{ x, y }]`, Ziele umherziehender Wesen (siehe [Wesen.md](Wesen.md), KI); Regelwert `regeln.ki.wegpunktSicht` (7)
 + Im Zustand: `ebene` (die aktuelle), `tiefe`, `abgelegteEbenen[tiefe]` (verlassene Ebenen mit ihren Entitäten und Einträgen der Warteschlange samt Zeitpunkt)
@@ -119,7 +119,7 @@ Regeln:
 
 + Jede Tiefe bekommt ihren eigenen abgeleiteten Zufall (`ebene.<tiefe>.<name>` für den Digger, `bau.zufall(name)` dahinter, z.B. `.tueren`, `.objekte`, `.inhalt`, siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit), ist je Startwert also wiederholbar und doch verschieden; nie aus dem Spielverlauf
 + Erzeugung in Schritten: die Folge aus `schritte` der Ebene, sonst die Vorgabe; die Datenprüfung verlangt, dass jeder Schritt angemeldet ist, ein früherer liefert, was er braucht, ein verwerfender Schritt vor `ebene_anlegen` steht (dann steht noch nichts im Zustand) und am Ende eine Ebene angelegt ist
-+ Schritte: `karte_digger` gräbt mit dem Digger; `karte_fest` übernimmt die feste Karte samt Treppen; `tueren` setzt an Raumzugängen mit `tuerChance` Prozent Türen; `treppen` setzt die Treppe hinauf in die Mitte des ersten Raums und die Treppe hinab in die Mitte des Raums, der davon am weitesten entfernt ist, jeweils nur, wenn es die Tiefe im Plan gibt; `gelaende_objekte` setzt Objekte nur ins Innere der Räume außer dem ersten, so sperren sie keinen Durchgang; `erreichbarkeit` verlangt, dass jedes Feld, das ein laufendes Wesen betreten kann (Türen zählen als offen), von der Treppe hinauf (sonst hinab, sonst der Mitte des ersten Raums) in acht Richtungen erreichbar ist; `ebene_anlegen` setzt `zustand.ebene`; `wegpunkte` legt die Wegpunkte (Vorbild Brogue): die begehbaren Felder (Türen zählen als offen) in einer Reihenfolge aus dem Zufall `.wegpunkte`, ein Feld wird Wegpunkt, wenn es noch kein Wegpunkt innerhalb von `wegpunktSicht` sieht (Schattenwurf durch das Gelände), so liegt jedes begehbare Feld in Sicht eines Wegpunkts; `freie_felder` sammelt Bodenfelder außerhalb des ersten Raums und seines Rands ohne Zugänge; `population`, `gegenstaende` und `fallen` setzen darauf mit dem gemeinsamen Zufall `.inhalt`
++ Schritte: `karte_digger` gräbt mit dem Digger; `karte_fest` übernimmt die feste Karte samt Treppen; `tueren` setzt an Raumzugängen mit `tuerChance` Prozent Türen; `treppen` setzt die Treppe hinauf in die Mitte des ersten Raums und die Treppe hinab in die Mitte des Raums, der davon am weitesten entfernt ist, jeweils nur, wenn es die Tiefe im Plan gibt; `gelaende_objekte` setzt Objekte nur ins Innere der Räume außer dem ersten, so sperren sie keinen Durchgang; `wand_objekte` setzt Objekte auf Wandfelder, die waagrecht oder senkrecht an den Boden eines Raums grenzen (Zufall `.wandobjekte`); `erreichbarkeit` verlangt, dass jedes Feld, das ein laufendes Wesen betreten kann (Türen zählen als offen), von der Treppe hinauf (sonst hinab, sonst der Mitte des ersten Raums) in acht Richtungen erreichbar ist; `ebene_anlegen` setzt `zustand.ebene` samt `licht` aus der Vorlage; `wegpunkte` legt die Wegpunkte (Vorbild Brogue): die begehbaren Felder (Türen zählen als offen) in einer Reihenfolge aus dem Zufall `.wegpunkte`, ein Feld wird Wegpunkt, wenn es noch kein Wegpunkt innerhalb von `wegpunktSicht` sieht (Schattenwurf durch das Gelände), so liegt jedes begehbare Feld in Sicht eines Wegpunkts; `freie_felder` sammelt Bodenfelder außerhalb des ersten Raums und seines Rands ohne Zugänge; `population`, `gegenstaende` und `fallen` setzen darauf mit dem gemeinsamen Zufall `.inhalt`
 + Verwirft ein Schritt den Versuch, beginnt der Bau neu mit dem Schlüssel `ebene.<tiefe>.<name>.versuch<n>`, höchstens `regeln.ebenen.versuche` Mal, danach wirft die Erzeugung; der erste Versuch behält den Schlüssel ohne Zusatz
 + Ninkasi legt die Erzeugung nicht an; zu Beginn steht Ninkasi auf der Treppe hinauf der Starttiefe (oder in der Mitte des ersten Raums)
 + Wechsel: die alte Ebene kommt mit allen Entitäten außer den Mitgenommenen und deren Einträgen der Warteschlange (Akteure, gebundene Zeitereignisse) samt Zeitpunkt nach `abgelegteEbenen`; die Weltuhr gehört keiner Ebene und läuft weiter
@@ -146,6 +146,7 @@ Regeln:
 ## Sichtweite
 
 + Die Sichtweite (`reichweiteSicht` in `src/systeme/sicht.js`, Modifikatoren auf `reichweiteSicht`) ergibt sich aus Grundwert (`sicht.reichweite` über `sichtVon`), Skills und Zuständen; Hindernisse begrenzt der Schattenwurf des Sichtfelds
++ Die Sicht im Dunkeln (`sichtImDunkeln`, Modifikatoren auf `sichtImDunkeln`, die Nachtsicht) aus `sicht.imDunkeln`, Vorgabe `regeln.licht.imDunkeln` (1), Ninkasi 2: so weit sieht ein Wesen auf finstere Felder (siehe Licht)
 + Ist sie größer als der Ausschnitt, wird nicht herausgezoomt; die Liste "In Sicht" der Seitenleiste nennt alle sichtbaren Wesen; Markierungen am Kartenrand siehe [Anzeige.md](Anzeige.md), Kamera
 
 ## Sicht und Erinnerung
@@ -166,16 +167,30 @@ Schnittstellen:
 
 ## Licht
 
-Vorläufige Ideen, noch nicht umgesetzt (Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 3). Licht ist hauptsächlich Spielmechanik, Stimmung ein Nebeneffekt. Vorbilder: Brogue (im Dunkeln halbiert sich die Heimlichkeitsweite, im Licht verdoppelt sie sich), Torchbearer (Licht als Verbrauchsgut: Kerze, Fackel und Laterne leuchten unterschiedlich weit und lange; im Dämmer wird jede Probe schwerer).
+Vorbilder: Brogue (im Dunkeln halbiert sich die Heimlichkeitsweite), Sil und NetHack (Lichtquellen mit Radius, finstere Felder sieht man nur aus der Nähe), Torchbearer (Licht als Ausrüstung mit Preis). Licht ist Spielmechanik, Stimmung ein Nebeneffekt.
 
-+ Die Logik rechnet je Feld eine Helligkeit als ganze Zahl (z. B. 0 bis 100); sie ist Teil des Zustands oder wird daraus deterministisch berechnet
-+ Lichtquellen sind eine Komponente mit Reichweite und Stärke, die Farbe ist nur für die Anzeige; Beispiele: Fackel an der Wand mit Reichweite 10, glühender Kessel, getragene Laterne
-+ Ausbreitung je Quelle über dasselbe Verfahren wie das Sichtfeld (rot.js PreciseShadowcasting), Stärke nimmt mit der Entfernung ganzzahlig ab; mehrere Quellen addieren sich bis zu einer Obergrenze
-+ Feste Quellen werden nur neu berechnet, wenn sich etwas ändert (Tür, gelöschte Fackel, bewegte Quelle)
-+ Anzeige: Eine Lichtkarte mit einem Pixel je Feld wird geglättet auf Kartengröße skaliert und per Mischmodus "multiply" über die Karte gelegt; Schwarz ist dunkel, Weiß unverändert, Farben tönen (Fackel warm, Psi cyan); so entstehen weiche Übergänge statt Stufen
-+ Leuchtende Pixel (Augen, Leuchtfarben, Glut) zeichnet der Renderer nach der Abdunklung erneut, sie bleiben im Dunkeln sichtbar; dafür trägt ein Tile eine Maske seiner leuchtenden Pixel
-+ Flackern ist reine Anzeige über den kosmetischen Zufall, die Logik rechnet mit festen Werten
-+ Dieselbe Abdunklung kann auch bekannte, aber gerade nicht sichtbare Felder darstellen
+Daten:
+
++ Grundhelligkeit je Ebene: `ebene.licht: { grundhelligkeit }` (0 bis 100) aus der Vorlage in `daten/ebenen.js`, Vorgabe 100; im Probeinhalt `keller_dunkel` mit 0 und 14 Wandfackeln
++ Lichtquelle: `licht: { reichweite, staerke, farbe? }` (Stärke 0 bis 100, Farbe nur für die Anzeige) an einer Entität (Wesen, Gegenstand), am Gelände (`daten/gelaende.js`, Probe: `wandfackel` mit Reichweite 5 und Stärke 80), an einer Art der Feldschichten (`daten/schichten.js`) und am Feuer (`regeln.feuer.licht`: Reichweite 4, Stärke 70)
++ Stufen `regeln.licht.stufen` aufsteigend `{ name, ab, heimlichkeit, verbirgt? }` mit Text `licht.<name>`: `finster` ab 0 (verbirgt, Heimlichkeit 50 %), `dunkel` ab 20 (50 %), `daemmrig` ab 40 (70 %), `hell` ab 60 (85 %), `taghell` ab 80 (100 %); `regeln.licht.imDunkeln` 1
++ Nichts davon steht im Zustand außer der Grundhelligkeit; die Helligkeit wird bei jeder Frage aus den Quellen berechnet
+
+Schnittstellen (`src/systeme/licht.js`, reine Lesefunktionen):
+
++ `helligkeitAuf(spiel, x, y)`, `lichtstufeAuf`, `stufeVonHelligkeit`, `lichtWirkt` (nur, wenn die Grundhelligkeit unter der obersten Stufe liegt), `heimlichkeitImLicht(spiel, feld)` (Prozent), `lichtbeitrag(licht, entfernung)`, `lichtquellenNahe`, `lichtVon`, `grundhelligkeit`; für die Anzeige `lichtAufFeld` mit den Beiträgen und ihren Farben
++ `src/systeme/sicht.js`: `hellGenug(spiel, betrachter, feld)`, `sichtImDunkeln`, `traegtLicht`
++ Handler der Weltuhr `licht` (`src/systeme/schichten.js`, nach dem Feuer): wo Licht wirkt, berechnet er Ninkasis Sichtfeld neu; `versetzen` (`src/systeme/bewegung.js`) tut es gleich, wenn sich ein anderes Wesen mit Licht bewegt; die Lichter des Geländes hält der `zwischenspeicher`, `gelaendeSetzen` verwirft sie
+
+Regeln:
+
++ Helligkeit eines Felds: Grundhelligkeit plus die Beiträge aller Quellen, höchstens 100; liegt schon die Grundhelligkeit in der obersten Stufe, wirkt Licht gar nicht und das Spiel verhält sich wie ohne Licht
++ Beitrag einer Quelle im Schachbrett-Abstand d bis zur Reichweite r: `staerke * (2r - d) / (2r)`, abgerundet, am Rand also die halbe Stärke (eine Lampe mit Stärke 80 und Reichweite 3: 80, 66, 53, 40); nur auf Felder mit freier Sichtlinie von der Quelle (siehe [Wirkungen.md](Wirkungen.md), Zielauswahl), eine Wand als Quelle leuchtet in den Raum davor
++ Wo eine Quelle leuchtet: eine Entität mit Position (Wesen, Gegenstand am Boden), ein angelegter Gegenstand vom Feld der Trägerin aus, im Gepäck nichts; dazu Gelände, Schichten und Feuer
++ Sehen braucht Licht: ein Feld einer Stufe mit `verbirgt` (finster) sieht ein Wesen nur bis zum Abstand `sichtImDunkeln`; das gilt für Ninkasis Sichtfeld und für `sieht` aller anderen (siehe [Wesen.md](Wesen.md), Wahrnehmung)
++ Heimlichkeit: die Heimlichkeitsweite eines Wesens skaliert mit der Stufe seines eigenen Felds; wer Licht trägt, macht sein Feld hell und wird weit gesehen
++ Wiederholbar: die Abfrage liest nur den Zustand und rechnet ganzzahlig; die Summe hängt nicht von der Reihenfolge der Quellen ab
++ Anzeige: Lichtkarte über der Karte nach den Stufen, getönt nach den Farben der Quellen (siehe [Anzeige.md](Anzeige.md), Anzeige)
 
 ## Gefahrenprüfung
 
@@ -190,11 +205,11 @@ Regeln:
 
 ## Tests
 
-+ `tests/gelaende.test.js` (Türen, Benutzen, Fallen, Entdecken), `tests/schichten.test.js` (Oberfläche, Gas, Feuer), `tests/ebenen.test.js` (Plan des Laufs, Erzeugung in Schritten samt Vergleich mit den Ebenen vor dem Umbau, Erreichbarkeit, Treppen, Ruhen, Population), `tests/wege.test.js`, `tests/gefahr.test.js`, `tests/geometrie.test.js`
++ `tests/gelaende.test.js` (Türen, Benutzen, Fallen, Entdecken), `tests/schichten.test.js` (Oberfläche, Gas, Feuer), `tests/licht.test.js` (Quellen, Stufen, Sehen im Dunkeln, Heimlichkeit, dunkler Keller), `tests/ebenen.test.js` (Plan des Laufs, Erzeugung in Schritten samt Vergleich mit den Ebenen vor dem Umbau, Erreichbarkeit, Treppen, Ruhen, Population), `tests/wege.test.js`, `tests/gefahr.test.js`, `tests/geometrie.test.js`
 
 ## Verweise
 
 + Spieldesign der Welt und des Hubs: [Grundlagen.md](Grundlagen.md); Darstellung von Karte und Schichten: [Anzeige.md](Anzeige.md); Tiles: [Tileset.md](Tileset.md)
-+ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 3 (Licht), Punkt 8 (Sturz in den Abgrund, Suchen nach Fallen), Punkt 14 (Nachholen verlassener Ebenen, Dienste des Hubs, Ebenenarten); Themenräume, Schatzräume, Quests und feste Strukturen als Ideen in [Ausblick.md](Ausblick.md), sie bauen auf den Plan des Laufs und die Schritte
++ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 3 (Wahrnehmungsarten, Spüren, Duft), Punkt 8 (Licht schalten, Sturz in den Abgrund, Suchen nach Fallen), Punkt 14 (Nachholen verlassener Ebenen, Dienste des Hubs, Ebenenarten); Themenräume, Schatzräume, Quests und feste Strukturen als Ideen in [Ausblick.md](Ausblick.md), sie bauen auf den Plan des Laufs und die Schritte
 
 Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

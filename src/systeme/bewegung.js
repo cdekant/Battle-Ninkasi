@@ -5,11 +5,12 @@
 // ein unbewegliches Wesen greift an, bewegt sich aber nicht und lässt sich nicht verschieben (systeme/verschieben.js).
 
 import { anmelden } from "../kern/register.js";
-import { entitaetenAuf, bewegungVon, positionSetzen, istGesteuert } from "../kern/zustand.js";
+import { entitaetenAuf, bewegungVon, positionSetzen, istGesteuert, gesteuerteEntitaet } from "../kern/zustand.js";
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
 import { betretbar } from "../welt/karte.js";
 import { istWesen, feindlich, nahkampf, kannAngreifen } from "./kampf.js";
-import { sichtfeldAktualisieren } from "./sicht.js";
+import { sichtfeldAktualisieren, traegtLicht } from "./sicht.js";
+import { lichtWirkt } from "./licht.js";
 import { aktionAbbrechen } from "./laufendeAktionen.js";
 
 export const VERSETZARTEN = ["schritt", "stoss", "zug", "tausch", "teleport", "herausgedrueckt"];
@@ -27,6 +28,8 @@ export function versetzen(spiel, wesen, feld, art, { urheberId = wesen.id, kette
   const beteiligte = { quelleId: urheberId, urheberId, zielId: wesen.id, ursache: "bewegung", kettentiefe, art };
   hakenAusloesen(spiel, "verlaesst_feld", { ...beteiligte, position: { x: wesen.position.x, y: wesen.position.y } });
   positionSetzen(spiel.zustand, wesen, feld);
+  // eine bewegte Lichtquelle ändert, was Ninkasi sieht (systeme/licht.js)
+  if (!istGesteuert(spiel.zustand, wesen) && lichtWirkt(spiel) && traegtLicht(spiel, wesen) && gesteuerteEntitaet(spiel.zustand)?.position) sichtfeldAktualisieren(spiel);
   if (istGesteuert(spiel.zustand, wesen)) {
     sichtfeldAktualisieren(spiel);
     for (const gegenstand of entitaetenAuf(spiel.zustand, feld.x, feld.y)) {
