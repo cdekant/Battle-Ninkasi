@@ -151,12 +151,13 @@ Regeln:
 
 Daten:
 
-+ Zustand (`datenproben/zustaende.js`, mit Vorlagen): `{ text, tags, dauer, stapel, hoechstStapel, verlauf, modifikatoren, auren, jeTick, beimBeginn, beimEnde, beimAblauf, ausloeser, ersatz, gebundenAnQuelle, unterhalt, handlungsunfaehig, befehl, ki, fraktion, faehigkeiten }`
++ Zustand (`datenproben/zustaende.js`, mit Vorlagen): `{ text, adjektiv, tags, dauer, stapel, hoechstStapel, verlauf, modifikatoren, auren, jeTick, beimBeginn, beimEnde, beimAblauf, ausloeser, ersatz, gebundenAnQuelle, unterhalt, handlungsunfaehig, befehl, ki, fraktion, faehigkeiten }`
   + `dauer` in Zeiteinheiten, ohne Angabe unbegrenzt bis zum Entfernen
   + `stapel`: `erneuern` (Vorgabe: eine Instanz, höhere Stärke, längere Dauer), `aufaddieren` (Stärken addiert bis `hoechstStapel` Anwendungen, Dauer erneuert), `staerkster` (nur eine mindestens gleich starke Anwendung ersetzt, sonst nichts), `einzeln` (eigene Instanzen mit eigenem Ende, höchstens `hoechstStapel`)
   + `verlauf`: `gleichbleibend` (Vorgabe), `abklingend`, `ansteigend` oder eine eigene Kurve `[[anteilProzent, staerkeProzent], ...]` über den Anteil der verstrichenen Dauer
   + `unterhalt: { mp: 2 }` kostet die Trägerin je Welttick (aufrechterhaltene Zauber); `gebundenAnQuelle: true` endet mit dem Tod oder Verschwinden der Quelle
   + `faehigkeiten: [name]` gewährt der Trägerin diese Fähigkeiten, solange der Zustand wirkt (siehe Fähigkeiten)
+  + `adjektiv`: Textschlüssel eines Adjektivs, das vor dem Namen der Trägerin steht, solange der Zustand wirkt (Affix, siehe [Texte.md](Texte.md), Grammatik); die Instanz trägt es mit, wie Fraktion und KI
   + `handlungsunfaehig: true` (Betäubung, Lähmung, Filmriss); `befehl: { veraenderer, ...parameter }`; `ki: { modul, ...parameter }`; `fraktion`: `"urheber"` (Psi-Kontrolle), `"eigene"` (Zwietracht, mit allen verfeindet) oder ein Fraktionsname
 + Instanzen an der Entität: `zustaende: [{ nummer, name, quelleId, urheberId, urheberFraktion, beginn, ende, staerke, stapel, ausFaehigkeit? }]` (`ausFaehigkeit`: gesetzt von einer aufrechten Fähigkeit); die Nummer zählt `naechsteZustandsnummer` im Zustand des Spiels hoch; `staerke` Vorgabe 1; Fraktion und KI werden beim Beginn in die Instanz geschrieben
 

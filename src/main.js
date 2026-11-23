@@ -4,9 +4,11 @@
 // Adresse, damit Neuladen wieder zum Titel führt.
 
 import VERSION from "./version.js";
-import { rohdaten, texteDe } from "./inhalt.js";
+import { rohdaten, texte as texteJeSprache } from "./inhalt.js";
 import tileset from "../grafik/tileset.js";
 import grammatikDe from "../sprache/de/grammatik.js";
+import grammatikEn from "../sprache/en/grammatik.js";
+import { spracheWaehlen } from "./eingabe/einstellungskatalog.js";
 import belegungsVorgabe from "./eingabe/belegung.js";
 import { abweichungenAnwenden, abweichungenGueltig } from "./eingabe/belegunganpassen.js";
 import { einstellungsfensterOeffnen } from "./eingabe/einstellungsfenster.js";
@@ -75,8 +77,15 @@ const MINIKARTE_HOECHSTENS = 3; // Pixel je Feld; in Variante B streckt CSS sie 
 const UEBERSICHT_HOECHSTENS = 10; // Pixel je Feld auf der Übersichtskarte
 const TOOLTIP_ABSTAND = 6; // Pixel zwischen Feld und Tooltip
 
+// Sprache aus der Einstellung (eingabe/einstellungskatalog.js); fehlt ein Text, gilt der deutsche (anzeige/texte.js);
+// die Datenprüfung nimmt immer die deutschen Texte, die englischen prüft tests/sprachen.test.js
+const einstellungen = einstellungenLaden();
+const sprache = spracheWaehlen(einstellungen.sprache, navigator.languages ?? [navigator.language]);
+document.documentElement.lang = sprache;
+const GRAMMATIKREGELN = { de: grammatikDe, en: grammatikEn };
 const grammatik = erstelleGrammatik(grammatikDe);
-const texte = erstelleTexte(texteDe, grammatik);
+const texte = sprache === "de" ? erstelleTexte(texteJeSprache.de, grammatik)
+  : erstelleTexte(texteJeSprache[sprache], erstelleGrammatik(GRAMMATIKREGELN[sprache]), { texte: texteJeSprache.de, grammatik });
 
 function fehlerZeigen(titel, meldung) {
   const fehlerElement = document.getElementById("fehler");
@@ -180,7 +189,7 @@ function zufaelligerStartwert() {
 
 let daten, tilebilder;
 try {
-  daten = datenLaden(rohdaten, { texte: texteDe, nomenPruefen: grammatik.pruefen });
+  daten = datenLaden(rohdaten, { texte: texteJeSprache.de, nomenPruefen: grammatik.pruefen });
   tilebilder = tilebilderErstellen(tileset);
 } catch (fehler) {
   fehlerZeigen(texte.text("ui.datenfehler"), fehler.message);
@@ -191,7 +200,6 @@ try {
 const ninkasiBild = tilebilder.bild("ninkasi", 32);
 if (ninkasiBild) document.getElementById("favicon").href = ninkasiBild.toDataURL("image/png");
 
-const einstellungen = einstellungenLaden();
 const spielElement = document.getElementById("spiel");
 
 const kartenCanvas = document.getElementById("karte-canvas");
@@ -220,13 +228,15 @@ function einstellungenAnwenden() {
 }
 einstellungenAnwenden();
 
-// Neue Einstellungen aus dem Einstellungsfenster: übernehmen, anwenden, speichern
+// Neue Einstellungen aus dem Einstellungsfenster: übernehmen, anwenden, speichern; eine andere Sprache lädt die Seite
+// neu (die Texte entstehen einmal beim Laden, ein Lauf ist beim Verlassen der Seite gespeichert)
 function einstellungenUebernehmen(neu) {
-  const zoomVorher = einstellungen.zoom;
+  const zoomVorher = einstellungen.zoom, spracheVorher = einstellungen.sprache;
   Object.assign(einstellungen, neu);
   einstellungenAnwenden();
   einstellungenSpeichern(einstellungen);
   if (einstellungen.zoom !== zoomVorher) kamera.gesetzt = false;
+  if (einstellungen.sprache !== spracheVorher) location.reload();
 }
 
 // Neue Tastenbelegung aus dem Einstellungsfenster

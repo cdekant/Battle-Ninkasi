@@ -1,6 +1,6 @@
-// Deutsche Texte. Schlüssel -> Text, für Wesen und Gegenstände ein Hauptwort mit Geschlecht und Fällen.
-// Artikel kommen aus grammatik.js. Platzhalter: {menge}, {ziel.akk}, {was.nom.ein}, {wer.gen.ohne},
-// siehe docs/Texte.md.
+// Deutsche Texte. Schlüssel -> Text, für Wesen und Gegenstände ein Hauptwort mit Geschlecht und den Fällen in Einzahl
+// und Mehrzahl, für Adjektive { adjektiv }. Artikel und Endungen kommen aus grammatik.js. Platzhalter: {menge},
+// {ziel.akk}, {was.nom.ein}, {was.akk.zahl}, {wer.gen.ohne}, siehe docs/Texte.md.
 export default {
   // Wesen und Gegenstände
   "wesen.ninkasi": {
@@ -17,6 +17,7 @@ export default {
   "log.tod": "{opfer.nom} zerplatzt zu saurem Matsch.",
   "log.tod_ninkasi": "Ninkasi stirbt. Ausgerechnet nüchterner als ihr lieb war. [Eingabe] zeigt, wie es weitergeht.",
   "log.liegt_hier": "Hier liegt {was.nom.ein}.",
+  "log.liegt_hier.mehrzahl": "Hier liegen {was.nom.ein}.",
   "log.aufgehoben": "{wer.nom} nimmt {was.akk} an sich.",
   "log.getrunken": "{wer.nom} leert {was.akk} in einem Zug.",
   "log.gelesen": "{wer.nom} liest {was.akk}.",
@@ -320,7 +321,7 @@ export default {
   "ui.skill_vorschau": "{ep} EP, danach Stufe {stufe}, {frei} freie EP übrig",
   "ui.erstellung": "Charaktererstellung",
   "ui.restpunkte": "Noch zu verteilen",
-  "hilfe.thema.erstellung": "Eigenschaften haben einen Mindestwert von {start}, du verteilst {punkte} Punkte. {hoechstens} ist der maximale Wert einer Eigenschaft zu Beginn eines Runs. Eigenschaften machen Ninkasi nicht stärker, sie bestimmen, wie schnell sie verschiedene Skills lernt, und welche Ausrüstung sie ohne Abzug verwenden kann.",
+  "hilfe.thema.erstellung": "Eigenschaften haben einen Mindestwert von {start}, du verteilst {punkte} Punkte. {hoechstens} ist der maximale Wert einer Eigenschaft zu Beginn eines Laufs. Eigenschaften machen Ninkasi nicht stärker, sie bestimmen, wie schnell sie verschiedene Skills lernt, und welche Ausrüstung sie ohne Abzug verwenden kann.",
   "ui.erstellung_hinweis": "Pfeile hoch/runter wählen, links/rechts oder -/+ ändern; ?: Hilfe.",
   "aktion.bewegen_nw": "nach links oben",
   "aktion.bewegen_n": "nach oben",
@@ -463,6 +464,11 @@ export default {
   "menue.beenden_hinweis": "Der Browser lässt sich das Fenster nicht schließen. Strg+W schließt es.",
   "menue.zum_titel": "Zum Titel",
   "sprache.code": "de",
+  "einstellung.sprache": "Sprache",
+  "einstellung.sprache.erklaerung": "Sprache der Texte im Spiel. Automatisch folgt dem Browser. Ein Wechsel lädt die Seite neu, ein laufender Lauf bleibt gespeichert.",
+  "einstellung.sprache.wert.browser": "Automatisch",
+  "einstellung.sprache.wert.de": "Deutsch",
+  "einstellung.sprache.wert.en": "English",
   "titel.name": "Battle Ninkasi",
   "titel.untertitel": "Die Rückkehr der Bierschlächterin",
   "titel.fortsetzen": "Fortsetzen",

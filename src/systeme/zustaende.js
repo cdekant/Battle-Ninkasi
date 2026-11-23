@@ -1,7 +1,8 @@
 // Zustände (siehe docs/Wirkungen.md, Zustände): zeitlich begrenzte Wirkungen an einer Entität.
 // Daten (datenproben/zustaende.js):
-//   name: { text, tags?, dauer?, stapel?, hoechstStapel?, verlauf?, modifikatoren?, jeTick?, beimBeginn?, beimEnde?,
-//           beimAblauf?, ausloeser?, gebundenAnQuelle?, faehigkeiten? }
+//   name: { text, adjektiv?, tags?, dauer?, stapel?, hoechstStapel?, verlauf?, modifikatoren?, jeTick?, beimBeginn?,
+//           beimEnde?, beimAblauf?, ausloeser?, gebundenAnQuelle?, faehigkeiten? }
+//   adjektiv:     Textschlüssel eines Adjektivs, das vor dem Namen der Trägerin steht (Affix: ein gereiztes Essigbakterium)
 //   dauer:        Zeiteinheiten; ohne Angabe unbegrenzt, bis der Zustand entfernt wird
 //   stapel:       was beim erneuten Anwenden desselben Zustands geschieht (Vorgabe "erneuern"):
 //                 "erneuern"    eine Instanz, die höhere Stärke, die längere Dauer
@@ -24,7 +25,8 @@
 //   ki: { modul, ...parameter }            überlagert die KI, bei Ninkasi übernimmt sie die KI für die Dauer
 //   fraktion: "urheber" | "eigene" | Name  überlagert die Fraktion ("eigene": mit allen verfeindet)
 //   bewegung: Bewegungsart                  überlagert die Bewegungsart (Levitation, Phasen; welt/karte.js)
-//   Fraktion und KI werden beim Beginn in die Instanz geschrieben; es gilt die jüngste Überlagerung
+//   Fraktion, KI und Adjektiv werden beim Beginn in die Instanz geschrieben; es gilt die jüngste Überlagerung; das
+//   Adjektiv steht so im Bezug der Meldungen (kern/ereignisse.js bezugAuf), ohne die Daten zu fragen
 // Instanz an der Entität: zustaende: [{ nummer, name, quelleId, urheberId, urheberFraktion, beginn, ende, staerke, stapel }]
 //   dazu ausFaehigkeit, wenn eine aufrechte Fähigkeit ihn gesetzt hat (systeme/faehigkeiten.js)
 // Takt: Weltuhr (je Welttick, solange zeit < ende); Hast und Verlangsamung der Trägerin ändern daran nichts.
@@ -129,6 +131,7 @@ function neueInstanz(spiel, traegerin, name, angaben, ende) {
     instanz.fraktion = definition.fraktion in nachArt ? nachArt[definition.fraktion] : definition.fraktion;
   }
   if (definition.bewegung !== undefined) instanz.bewegung = definition.bewegung;
+  if (definition.adjektiv !== undefined) instanz.adjektiv = definition.adjektiv;
   if (definition.ki) instanz.ki = { ...structuredClone(definition.ki), letzteBekanntePosition: null, bedrohungId: angaben.urheberId };
   if (!traegerin.zustaende) traegerin.zustaende = [];
   traegerin.zustaende.push(instanz);

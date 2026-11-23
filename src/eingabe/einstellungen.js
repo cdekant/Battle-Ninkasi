@@ -2,6 +2,7 @@
 // der Browser speichert Abweichungen getrennt (localStorage).
 // Was im Einstellungsfenster änderbar ist, beschreibt eingabe/einstellungskatalog.js.
 export default {
+  sprache: "browser",         // "de", "en" oder "browser": die erste Sprache des Browsers, die es gibt, sonst Englisch
   layout: "a",                // Variante des Layouts: "a" (Log unter der Karte), "b" (Log links), "kompakt", docs/Oberflaeche.md
   oberflaecheGroesse: 15,     // Schriftgröße von :root in px; alle Maße der Oberfläche hängen daran (rem), nicht die Tiles
   logZeilen: 8,               // sichtbare Logzeilen in Variante A (kompakt fest 3, B so hoch wie die Spalte)

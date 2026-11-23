@@ -81,7 +81,7 @@ Schnittstellen:
 
 Regeln:
 
-+ Gruppen: `daten` (jede Meldung der Datenprüfung, Stufe Fehler), `tiles` (Eintrag aus `daten/zeichen.js` ohne Tile in einem oder allen Sätzen, Tile ohne Eintrag), `verweise` (Wesen, Gegenstand, Effekt, Zustand, Fähigkeit, Falle, Oberfläche oder Gas, dessen Name sonst nirgends in den Daten steht, weder als Wert noch als Schlüssel; Vorlagen und vom Code verwendete Einträge in `VOM_CODE_VERWENDET` ausgenommen), `texte` (Textschlüssel mit dem Vorsatz eines Datenbereichs wie `wesen.`, den kein Eintrag nennt), `korpus` (Kopf unvollständig, `art` unbekannt, Quelle fehlt in `sprache/literatur.json`, Stufe Fehler)
++ Gruppen: `daten` (jede Meldung der Datenprüfung, Stufe Fehler), `tiles` (Eintrag aus `daten/zeichen.js` ohne Tile in einem oder allen Sätzen, Tile ohne Eintrag), `verweise` (Wesen, Gegenstand, Effekt, Zustand, Fähigkeit, Falle, Oberfläche oder Gas, dessen Name sonst nirgends in den Daten steht, weder als Wert noch als Schlüssel; Vorlagen und vom Code verwendete Einträge in `VOM_CODE_VERWENDET` ausgenommen), `texte` (Textschlüssel mit dem Vorsatz eines Datenbereichs wie `wesen.`, den kein Eintrag nennt; feste Adjektive eines genannten Hauptworts zählen als genannt), `korpus` (Kopf unvollständig, `art` unbekannt, Quelle fehlt in `sprache/literatur.json`, Stufe Fehler)
 + Stufen: Fehler für jede Meldung der Datenprüfung und des Korpus und für Tiles, Verweise und Texte des echten Inhalts; Warnung für den Probeinhalt, für Tiles in `TILES_AUSSTEHEND` und für alles, wenn die Quellen keine Namen des Probeinhalts nennen (Tests mit eigenen Daten); der geladene Inhalt hat keine Lücke der Stufe Fehler (geprüft von `tests/kompendium.test.js`); die Tabellen haben eine Spalte Herkunft (Probe oder echt)
 + Die Verweisprüfung ist eine Näherung: ein Name, der zufällig wie ein anderer Text in den Daten lautet, gilt als verwendet
 
@@ -135,7 +135,7 @@ Vorläufiger Inhalt in `datenproben/`, nur zum Ausprobieren der Systeme; er vers
 
 Daten:
 
-+ `datenproben/index.js`: `{ eintraege, ergaenzen, abfolge, starttiefe }` für `datenZusammenfuegen` (siehe [Architektur.md](Architektur.md), Inhalte als Daten); die übrigen Dateien in `datenproben/` sind Sammlungen wie in `daten/`, Texte in `sprache/de/proben.js`
++ `datenproben/index.js`: `{ eintraege, ergaenzen, abfolge, starttiefe }` für `datenZusammenfuegen` (siehe [Architektur.md](Architektur.md), Inhalte als Daten); die übrigen Dateien in `datenproben/` sind Sammlungen wie in `daten/`, Texte in `sprache/de/proben.js` (nur deutsch, im Englischen als Rückfall, siehe [Texte.md](Texte.md), Sprachdateien)
 
 Regeln:
 
@@ -151,11 +151,11 @@ Inhalt:
 + Fernkämpfer-Test (Zeichen F, ohne Tile): Testgegner für die KI mit Fähigkeiten, 10 LP, 15 gebundene EP, hält 3 Felder Abstand, Säurespucke (Geschoss über Verbündete, Abklingzeit 3, nutzt 1 ab) und angekündigter Säureschwall (Kreis mit Radius 1 auf das Feld beim Beginn, 3 Schritte, durch Schaden unterbrechbar, 30 %, nutzt 2 ab); trägt ein Bier und trinkt es unter 80 % LP mit 50 % Chance (Handlung `nutzen`, siehe [Wesen.md](Wesen.md), KI)
 + Fallen: Säuredüse (Tarnung 40, 2W4 Säure, nutzt 2 ab, hinterlässt Säure, die 1W3 je Tick verätzt und trocknet) und Klappergeschirr (Tarnung 20, Lärm 14, weckt die Nachbarschaft)
 + Feldschichten: Gärbottiche geben CO2 ab, das sich hinter geschlossenen Türen sammelt (ab 30 benommen, ab 70 Ersticken, vorläufig Giftschaden statt Zuständen); Brandflaschen zerspringen beim Wurf zu Hochprozentigem und entzünden es; Feuer 1W6, Rauch ab 40 undurchsichtig, ab 60 Husten
-+ Getränke: Bier (+20 LP, Pegel +0,5 ‰, 900 g, stapelbar) wird zur leeren Flasche (400 g) und verdirbt nach 50000 Zeiteinheiten zu Sauerbier (LP +5, Pegel +0,3 ‰); Bierfass mit 20 Schlucken zu einer Halben (2 kg Holz und 500 g je Schluck, voll 12 kg), wird zum Fass und verdirbt nicht; Bier und Bierfass dienen dem Zweck `heilen`; Brandflasche (900 g, stapelbar) dem Zweck `angriff`; Riechwasser (300 g, stapelbar) setzt den Zustand `witterung` (Spüren +5 für 200 Züge), zum Ausprobieren über die Testkammer
++ Getränke: Bier (+20 LP, Pegel +0,5 ‰, 900 g, stapelbar) wird zur leeren Flasche (400 g, Hauptwort mit festem Adjektiv) und verdirbt nach 50000 Zeiteinheiten zu Sauerbier (LP +5, Pegel +0,3 ‰); Bierfass mit 20 Schlucken zu einer Halben (2 kg Holz und 500 g je Schluck, voll 12 kg), wird zum Fass und verdirbt nicht; Bier und Bierfass dienen dem Zweck `heilen`; Brandflasche (900 g, stapelbar) dem Zweck `angriff`; Riechwasser (300 g, stapelbar) setzt den Zustand `witterung` (Spüren +5 für 200 Züge), zum Ausprobieren über die Testkammer
 + Ausrüstung von 20 g bis 6 kg: Schöpfkelle (Hand, flink), Fasshammer (beide Hände, langsam, Ausweichen -5), Lederschürze (Brust, Rüstung 2, Ausweichen -5), Kupferhelm (Kopf), Lederhose (Beine), Hopfenkette (Hals, LP-Regeneration +20 %), Kupferring (Finger), Laterne (Hand, Licht mit Reichweite 4 und Stärke 80, leuchtet angelegt und am Boden); Kupferhelm und Kupferringe bilden ein Set (Willenskraft); Lederschürze und Lederhose (Haltbarkeit 20, werden zu Lederfetzen) und Kupferhelm (30, wird zu Kupferschrott) nutzen sich unter Säure ab
 + Unbekanntes: noch kein unbekannter Gegenstand; die Gruppe `biere` (Tonkrug, Steinkrug, Bügelflasche, Henkelflasche, Bocksbeutel) wartet auf die Biersorten
 + Skills: Zähigkeit (Grund und Expertin, LP), Nahkampf (Genauigkeit mit Tag `nahkampf`), Ausweichen
-+ Arenen (`datenproben/arenen.js`): Essigbakterien (drei, mit Varianten Ninkasi nackt, gerüstet, geübt und Gegner drei oder fünf), Fernkämpfer in zwei Wellen (mit zwei Bier), Rudel im Engpass (sechs Essigbakterien vor dem Gang), Reihe aus dem Keller (sechs Rudel aus Tiefe 1, mit Bier und Brandflaschen, Taktik `fernkampf`), alle Gegner des Kellers; Befund siehe Messwerte
++ Arenen (`datenproben/arenen.js`): Essigbakterien (drei, mit Varianten Ninkasi nackt, gerüstet, geübt und Gegner drei, fünf oder drei gereizte, ein Affix mit dem Zustand `gereizt`, Ausweichen -1, als Probe für Adjektive), Fernkämpfer in zwei Wellen (mit zwei Bier), Rudel im Engpass (sechs Essigbakterien vor dem Gang), Reihe aus dem Keller (sechs Rudel aus Tiefe 1, mit Bier und Brandflaschen, Taktik `fernkampf`), alle Gegner des Kellers; Befund siehe Messwerte
 + Auslöser sind im System vorhanden, im Probeinhalt aber nicht benutzt
 
 ## Verweise

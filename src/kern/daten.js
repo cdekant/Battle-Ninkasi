@@ -67,10 +67,21 @@ function pruefeText(texte, schluessel, ort, fehler) {
   if (texte && !(schluessel in texte)) fehler.push(`${ort}: Text "${schluessel}" fehlt in der Sprachdatei`);
 }
 
-// Texte von Wesen und Gegenständen sind Hauptwörter; die Prüfung kommt von der Grammatik der Sprache
+// Ein Adjektiv ist in jeder Sprache ein Eintrag { adjektiv, … }; die Einzelheiten prüft die Grammatik (tests/sprachen.test.js)
+function pruefeAdjektiv(texte, schluessel, ort, fehler) {
+  pruefeText(texte, schluessel, ort, fehler);
+  if (texte && schluessel in texte && typeof texte[schluessel]?.adjektiv !== "string") fehler.push(`${ort}: Text "${schluessel}" ist kein Adjektiv`);
+}
+
+// Texte von Wesen und Gegenständen sind Hauptwörter; die Prüfung kommt von der Grammatik der Sprache, die festen
+// Adjektive des Hauptworts (adjektive: [Schlüssel]) müssen Adjektive sein
 function pruefeNomen(sprache, schluessel, fehler) {
-  if (!sprache.nomenPruefen || !sprache.texte || !(schluessel in sprache.texte)) return;
-  fehler.push(...sprache.nomenPruefen(sprache.texte[schluessel], `Text "${schluessel}"`));
+  if (!sprache.texte || !(schluessel in sprache.texte)) return;
+  const eintrag = sprache.texte[schluessel];
+  if (sprache.nomenPruefen) fehler.push(...sprache.nomenPruefen(eintrag, `Text "${schluessel}"`));
+  if (eintrag?.adjektive === undefined) return;
+  if (!Array.isArray(eintrag.adjektive)) return fehler.push(`Text "${schluessel}": adjektive muss eine Liste von Textschlüsseln sein`);
+  for (const adjektiv of eintrag.adjektive) pruefeAdjektiv(sprache.texte, adjektiv, `Text "${schluessel}".adjektive`, fehler);
 }
 
 function pruefeEffektVerweis(daten, effektName, ort, fehler) {
@@ -1015,6 +1026,7 @@ function pruefeZustand(daten, sprache, name, zustand, fehler) {
   const ort = `zustaende.${name}`;
   if (zustand.abstrakt) return;
   pruefeText(sprache.texte, zustand.text, ort, fehler);
+  if (zustand.adjektiv !== undefined) pruefeAdjektiv(sprache.texte, zustand.adjektiv, `${ort}.adjektiv`, fehler);
   if (zustand.dauer !== undefined && !(istGanzzahl(zustand.dauer) && zustand.dauer > 0)) fehler.push(`${ort}: dauer muss eine ganze Zahl > 0 sein`);
   if (zustand.hoechstStapel !== undefined && !(istGanzzahl(zustand.hoechstStapel) && zustand.hoechstStapel > 0)) fehler.push(`${ort}: hoechstStapel muss eine ganze Zahl > 0 sein`);
   const felder = { stapel: STAPELREGELN, jeTick: "effekt?", beimBeginn: "effekt?", beimEnde: "effekt?", beimAblauf: "effekt?", gebundenAnQuelle: "wahrheitswert?", handlungsunfaehig: "wahrheitswert?", fraktion: "text?", bewegung: BEWEGUNGSARTEN };

@@ -115,9 +115,11 @@ function verweisLuecken(rohdaten, melden, stufeAm) {
   }
 }
 
-// Textschlüssel mit dem Vorsatz eines Datenbereichs (wesen., gegenstand. usw.), die kein Eintrag nennt
+// Textschlüssel mit dem Vorsatz eines Datenbereichs (wesen., gegenstand. usw.), die kein Eintrag nennt; die festen
+// Adjektive eines genannten Hauptworts (adjektive, siehe docs/Texte.md, Grammatik) zählen als genannt
 function textLuecken(rohdaten, texte, melden, stufeFuer) {
   const genannt = texteSammeln(rohdaten, [], () => false, () => true, new Set());
+  for (const schluessel of [...genannt]) for (const adjektiv of texte[schluessel]?.adjektive ?? []) genannt.add(adjektiv);
   const vorsaetze = new Set([...genannt].filter((text) => text in texte && text.includes(".")).map((text) => text.split(".")[0]));
   for (const schluessel of Object.keys(texte)) {
     const vorsatz = schluessel.split(".")[0];

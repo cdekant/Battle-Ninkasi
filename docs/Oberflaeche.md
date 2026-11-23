@@ -282,10 +282,10 @@ Umsetzung: offen
 + Spiel: Reisetempo, Haltegründe, Bestätigungen, Animationen und Geschossbahn, "sofort auslösen" der Schnellleiste
 + Tasten: Belegung jeder Aktion mit Erkennung von Konflikten, Vorgabe wiederherstellen
 + Barrierefreiheit: Kontrast, Palette für Farbenblinde, Bewegung reduzieren (schaltet alle bewegten Effekte ab), jeder Metaeffekt einzeln an oder aus, Stärke der Metaeffekte
-+ Später: Ton, Sprache, Gamepad
++ Später: Ton, Gamepad
 + Gespeichert wird wie bisher nur die Abweichung von der Vorgabe (`src/eingabe/einstellungen.js`)
 
-Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Einstellungen; offen: Ton, Sprache, Gamepad, Metaeffekte, Seitenleiste links, Log oben, Verzögerung des Tooltips, Schnellleiste an oder aus, Bestätigungen außer beim Neustart
+Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Einstellungen; offen: Ton, Gamepad, Metaeffekte, Seitenleiste links, Log oben, Verzögerung des Tooltips, Schnellleiste an oder aus, Bestätigungen außer beim Neustart
 
 ## Mechaniken, die noch kommen, und ihr Platz
 

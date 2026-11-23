@@ -200,7 +200,7 @@ test("Werkzeug: Kurzform, Wilson-Intervall, Quantile, Varianten und ein Kampf au
   assert.deepEqual(wilson(0, 10).unten, 0);
   assert.equal(quantil([5, 1, 3, 2, 4], 0.5), 3);
   assert.equal(quantil([], 0.5), null);
-  assert.equal(variantenpaare(daten, "essigbakterien").length, 6);
+  assert.equal(variantenpaare(daten, "essigbakterien").length, 9);
   assert.deepEqual(variantenpaare(daten, "essigbakterien", { ninkasi: "nackt", gegner: "drei" }), [{ ninkasi: "nackt", gegner: "drei" }]);
   assert.deepEqual(variantenpaare(daten, "engpass"), [{ ninkasi: null, gegner: null }]);
   const aufstellung = aufstellungAus(daten, "essigbakterien");

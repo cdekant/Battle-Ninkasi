@@ -1,2 +1,2 @@
 // Einzige Quelle der Versionsnummer, Schema Ära.Feature.Fix (siehe docs/Architektur.md, Versionen)
-export default "0.53.0";
+export default "0.54.0";

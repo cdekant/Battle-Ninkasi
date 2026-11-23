@@ -10,6 +10,9 @@
 
 export const REITER = ["anzeige", "spiel", "tasten", "barrierefreiheit"];
 
+// Sprachen mit Texten (sprache/<code>/, geladen in src/inhalt.js)
+export const SPRACHEN = ["de", "en"];
+
 export const EINSTELLUNGEN = {
   layout: { reiter: "anzeige", art: "auswahl", werte: ["a", "b", "kompakt"] },
   oberflaecheGroesse: { reiter: "anzeige", art: "zahl", min: 12, max: 22, schritt: 1, einheit: "einheit.px" },
@@ -17,6 +20,7 @@ export const EINSTELLUNGEN = {
   logZeilen: { reiter: "anzeige", art: "zahl", min: 3, max: 14, schritt: 1 },
   minikarte: { reiter: "anzeige", art: "schalter" },
   vollbild: { reiter: "anzeige", art: "knopf", aktion: "vollbild" },
+  sprache: { reiter: "anzeige", art: "auswahl", werte: ["browser", ...SPRACHEN] },
   reisePause: { reiter: "spiel", art: "zahl", min: 0, max: 200, schritt: 10, einheit: "einheit.ms" },
   geschossPause: { reiter: "spiel", art: "zahl", min: 0, max: 100, schritt: 10, einheit: "einheit.ms" },
   reiseTrotzFeinden: { reiter: "spiel", art: "schalter" },
@@ -30,6 +34,17 @@ export const EINSTELLUNGEN = {
 };
 
 export const einstellungenImReiter = (reiter) => Object.keys(EINSTELLUNGEN).filter((id) => EINSTELLUNGEN[id].reiter === reiter);
+
+// Sprache der Texte: die gewählte, bei "browser" die erste der Sprachen des Browsers (navigator.languages, z.B.
+// "de-AT"), die es gibt, sonst Englisch
+export function spracheWaehlen(einstellung, browserSprachen = []) {
+  if (SPRACHEN.includes(einstellung)) return einstellung;
+  for (const browserSprache of browserSprachen) {
+    const code = String(browserSprache ?? "").slice(0, 2).toLowerCase();
+    if (SPRACHEN.includes(code)) return code;
+  }
+  return "en";
+}
 
 // Wert einer Einstellung aus den Einstellungen (Listenschalter als wahr oder falsch)
 export function einstellungLesen(einstellungen, id) {

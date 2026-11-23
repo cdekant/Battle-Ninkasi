@@ -68,7 +68,7 @@ function schadenszahlen(texte, meldung) {
 // Zeilen zu einer Meldung (meist eine, manchmal keine); kontext: { spiel, texte, zustandsname(name) }
 export function zeilenAusMeldung(kontext, meldung) {
   const { spiel, texte } = kontext;
-  const { text, hatSchluessel } = texte;
+  const { text, textNachZahl, hatSchluessel } = texte;
   const spielerinId = spiel.zustand.spielerinId;
   const geschehen = (zeilentext, art = "geschehen") => [{ spalte: "geschehen", art, text: zeilentext }];
   const kampf = (zeilentext, art, seite, ton, zusatz = {}) => [{ spalte: "kampf", art, text: zeilentext, seite, ton, ...zusatz }];
@@ -181,8 +181,11 @@ export function zeilenAusMeldung(kontext, meldung) {
       return geschehen(text("log.ruf", { fraktion, menge: (meldung.menge > 0 ? "+" : "") + meldung.menge }));
     }
     case "liegt_hier":
-    case "aufgehoben":
-      return hatSchluessel(`log.${meldung.art}`) ? geschehen(text(`log.${meldung.art}`, meldung), "fund") : [];
+    case "aufgehoben": {
+      // ein ganzer Stapel steht in der Mehrzahl: Ninkasi nimmt die 3 Biere an sich, hier liegen 3 Biere
+      const platzhalter = meldung.anzahl > 1 ? { ...meldung, was: { ...meldung.was, anzahl: meldung.anzahl } } : meldung;
+      return hatSchluessel(`log.${meldung.art}`) ? geschehen(textNachZahl(`log.${meldung.art}`, meldung.anzahl, platzhalter), "fund") : [];
+    }
     default: {
       const schluessel = `log.${meldung.art}`;
       return hatSchluessel(schluessel) ? geschehen(text(schluessel, meldung)) : [];

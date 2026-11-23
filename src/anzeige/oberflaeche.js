@@ -16,7 +16,6 @@ import { hoechstwert } from "../kern/werte.js";
 import { optimalerPegel } from "../systeme/stoffwechsel.js";
 import { promilleText, leistenanteil, TEILSTRICHE } from "./pegelanzeige.js";
 
-import { anzahlVon } from "../systeme/inventar.js";
 import { faehigkeitVon } from "../systeme/faehigkeiten.js";
 import { lastText } from "./fenster.js";
 import { feldBeschreiben, zustaendeVon, laufendeAktionVon, werteAufschluesseln, wesenBeschreiben } from "../systeme/untersuchen.js";
@@ -80,7 +79,7 @@ export class Oberflaeche {
     const zustand = spiel.zustand;
     const { auswahl } = ziel.modus, vorschau = ziel.vorschau;
     const gegenstand = auswahl.zweck === "werfen" ? entitaetMitId(zustand, auswahl.gegenstandId) : null;
-    const was = gegenstand ? `${text("ui.werfen")}: ${nomenForm(gegenstand, "akk", "bestimmt")}` : text(faehigkeitVon(spiel, auswahl.faehigkeit)?.text ?? "ui.zielen");
+    const was = gegenstand ? `${text("ui.werfen")}: ${nomenForm({ ...gegenstand, anzahl: 1 }, "akk", "bestimmt")}` : text(faehigkeitVon(spiel, auswahl.faehigkeit)?.text ?? "ui.zielen");
     const grundSchluessel = `log.abgelehnt.${vorschau.grund}`;
     const grund = vorschau.ok ? "" : `<li class="schlimm">${hatSchluessel(grundSchluessel) ? text(grundSchluessel) : vorschau.grund}</li>`;
     const betroffene = vorschau.betroffene.map(({ id, chance }) => {
@@ -172,12 +171,10 @@ export class Oberflaeche {
     // ein unbekanntes Feld mit gespürten Wesen: kein Gelände
     if (beschreibung.gelaende === null) return [...zeilen, `<li class="leise">${text("ui.unerkundet")}</li>`];
     for (const id of beschreibung.gegenstaende) {
-      const gegenstand = entitaetMitId(zustand, id);
-      const anzahl = anzahlVon(gegenstand) > 1 ? ` x ${anzahlVon(gegenstand)}` : "";
-      zeilen.push(`<li>${nomenForm(gegenstand, "nom", "ohne")}${anzahl}</li>`);
+      zeilen.push(`<li>${nomenForm(entitaetMitId(zustand, id), "nom", "zahl")}</li>`);
     }
     for (const id of beschreibung.fallen) zeilen.push(`<li class="schlimm">${nomenForm(entitaetMitId(zustand, id), "nom", "ohne")}</li>`);
-    for (const bezug of beschreibung.erinnert.gegenstaende) zeilen.push(`<li>${nomenForm(bezug, "nom", "ohne")}${bezug.anzahl > 1 ? ` x ${bezug.anzahl}` : ""}</li>`);
+    for (const bezug of beschreibung.erinnert.gegenstaende) zeilen.push(`<li>${nomenForm(bezug, "nom", "zahl")}</li>`);
     for (const bezug of beschreibung.erinnert.fallen) zeilen.push(`<li class="schlimm">${nomenForm(bezug, "nom", "ohne")}</li>`);
     for (const eintrag of beschreibung.schichten) zeilen.push(`<li>${this.schichtText(spiel, eintrag)}</li>`);
     const erinnert = beschreibung.sichtbar ? "" : ` <span class="leise">(${text("ui.erinnert")})</span>`;

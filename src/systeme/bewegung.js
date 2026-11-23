@@ -33,7 +33,7 @@ export function versetzen(spiel, wesen, feld, art, { urheberId = wesen.id, kette
   if (istGesteuert(spiel.zustand, wesen)) {
     sichtfeldAktualisieren(spiel);
     for (const gegenstand of entitaetenAuf(spiel.zustand, feld.x, feld.y)) {
-      if (gegenstand.aufhebbar) melden(spiel, "liegt_hier", { wer: bezugAuf(wesen), was: bezugAuf(gegenstand) });
+      if (gegenstand.aufhebbar) melden(spiel, "liegt_hier", { wer: bezugAuf(wesen), was: bezugAuf(gegenstand), anzahl: gegenstand.anzahl ?? 1 });
     }
   }
   hakenAusloesen(spiel, "betritt_feld", { ...beteiligte, position: { x: feld.x, y: feld.y } });

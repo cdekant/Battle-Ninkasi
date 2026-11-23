@@ -30,7 +30,7 @@ export class Bedienzeile {
     const { text, nomenForm } = this.texte;
     if (platz.art === "faehigkeit") return text(faehigkeitFuer(spiel, gesteuerteEntitaet(spiel.zustand), platz.faehigkeit)?.text ?? platz.faehigkeit);
     const stueck = erstesStueck(spiel, platz.typ);
-    if (stueck) return nomenForm(stueck, "nom", "ohne");
+    if (stueck) return nomenForm({ ...stueck, anzahl: 1 }, "nom", "ohne");
     // aufgebraucht: der Name aus den Daten, eine unbekannte Art mit ihrem Etikett (verrät nicht mehr als das Inventar)
     const vorlage = spiel.daten.gegenstaende?.[platz.typ];
     if (!vorlage?.text) return "?";

@@ -51,13 +51,11 @@ Status: offen, jeweils mit dem ersten Bedarf
 
 ## 9. Englisch, Mehrzahl und Glossar
 
-Status: offen
+Status: in Arbeit; erledigt ist 9a (Grammatik mit Mehrzahl und Adjektiven, englische Grammatik, Sprachwahl, Prüfung der Sprachdateien, Anrede, siehe [Texte.md](Texte.md), Grammatik)
 
-+ Englische Sprachdatei mit eigener Grammatik (a/an); Texte werden im Englischen frei nachgeschrieben, nicht Satz für Satz übersetzt; ab dann entsteht jeder Text in beiden Sprachen
-+ Die Datenprüfung meldet jeden Schlüssel, der in einer der Sprachen fehlt
-+ Mehrzahl in beiden Sprachen (Holzpantinen), Adjektivendungen für Affixe (siehe [Texte.md](Texte.md), Sprachdateien)
-+ Anrede einheitlich: Oberflächentexte sprechen die Spielerin mit "du" an, erzählende Texte (Log, Beschreibungen) bleiben in der dritten Person über Ninkasi, ein Lauf heißt "Lauf" (offen in [Texte.md](Texte.md), Offen)
-+ Glossar der Fachbegriffe des Brauens als Daten mit Deutsch, Englisch und kurzer Erklärung; daraus ein Wörterbuch de-en und en-de im Kompendium, später das Glossar im Spiel (siehe [Ausblick.md](Ausblick.md), Bestiarium, Glossar, Rezeptbuch)
++ 9b, englische Texte: jeder Schlüssel des Grundgerüsts frei nachgeschrieben, ab dann entsteht jeder Text in beiden Sprachen; mit dem letzten fällt das `todo` des Tests "das Grundgerüst hat in beiden Sprachen dieselben Schlüssel" in `tests/sprachen.test.js`; das Kompendium meldet fehlende englische Schlüssel (Probeinhalt als Warnung)
++ 9b, englischer Korpus: eigene Nachdichtung der Ninkasi-Hymne nach `etcsl4231ninkasi` ohne deren Wortlaut, die übrigen Korpustexte aus den deutschen Nachdichtungen übersetzt; der Spruch im Titel kommt aus dem Korpus der gewählten Sprache (heute immer deutsch)
++ 9c, Glossar der Fachbegriffe des Brauens als Daten (`daten/glossar.js` mit Textschlüsseln, Begriff und Erklärung in beiden Sprachdateien), etwa 40 Kernbegriffe; daraus ein Wörterbuch de-en und en-de als Reiter des Kompendiums, später das Glossar im Spiel (siehe [Ausblick.md](Ausblick.md), Bestiarium, Glossar, Rezeptbuch)
 
 ## 10. Spieldesign vor dem Inhalt
 

@@ -14,6 +14,8 @@ export default {
       gegner: {
         drei: { wellen: [[{ typ: "essigbakterium", anzahl: 3 }]] },
         fuenf: { wellen: [[{ typ: "essigbakterium", anzahl: 5 }]] },
+        // Affix mit Adjektiv: drei gereizte Essigbakterien (Probe für docs/Texte.md, Grammatik)
+        gereizt: { wellen: [[{ typ: "essigbakterium", anzahl: 3, affixe: [{ zustand: "gereizt", chance: 100 }] }]] },
       },
     },
   },

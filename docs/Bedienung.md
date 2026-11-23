@@ -197,7 +197,7 @@ Regeln:
 
 Daten:
 
-+ Vorgaben (`src/eingabe/einstellungen.js`): `layout` ("a", "b", "kompakt"), `oberflaecheGroesse` (15), `logZeilen` (8), `minikarte`, `zoom` (16) mit `zoomstufen` (16, 32, 48, 64), `reisePause` und `geschossPause` (je 30 ms), `reiseTrotzFeinden`, `reiseHalt`, `rastenBis`, `rastenTrotzFeinden`, `rastenHalt`, `rastenHoechstens`, `sofortAusloesen`, `neustartNachfragen`, `bewegungReduzieren`, `hoherKontrast`, `farbenblind`
++ Vorgaben (`src/eingabe/einstellungen.js`): `sprache` ("browser", "de", "en"), `layout` ("a", "b", "kompakt"), `oberflaecheGroesse` (15), `logZeilen` (8), `minikarte`, `zoom` (16) mit `zoomstufen` (16, 32, 48, 64), `reisePause` und `geschossPause` (je 30 ms), `reiseTrotzFeinden`, `reiseHalt`, `rastenBis`, `rastenTrotzFeinden`, `rastenHalt`, `rastenHoechstens`, `sofortAusloesen`, `neustartNachfragen`, `bewegungReduzieren`, `hoherKontrast`, `farbenblind`
 + Gespeichert werden nur Abweichungen, unter `battle-ninkasi.einstellungen`; Einstellungen sind keine Befehle und kommen nicht in den Spielstand
 + Einstellungskatalog (`EINSTELLUNGEN` in `src/eingabe/einstellungskatalog.js`): jede Einstellung einmal mit Reiter (`REITER`: anzeige, spiel, tasten, barrierefreiheit) und Art: `schalter`, `auswahl` (feste Werte), `zahl` (min, max, schritt, einheit), `listenschalter` (ein Eintrag einer Liste, z.B. `gegenstand` in `reiseHalt`), `knopf` (Aktion ohne gespeicherten Wert, z.B. Vollbild)
 + Texte `einstellung.<id>` und `.erklaerung`, Werte einer Auswahl `einstellung.<id>.wert.<wert>`, die Null einer Zahl darf eigenen Text haben (`.null`, z.B. "aus")
@@ -206,11 +206,12 @@ Daten:
 Schnittstellen:
 
 + `einstellungenImReiter`, `einstellungLesen`, `einstellungSetzen` (bringt Zahlen auf Grenzen und Schritt), `einstellungSchritt`, `einstellungVorgabe`
++ `spracheWaehlen(einstellung, browserSprachen)`: die gewählte Sprache aus `SPRACHEN`, bei "browser" die erste der Sprachen des Browsers (`navigator.languages`, nach den ersten zwei Buchstaben), die es gibt, sonst Englisch
 + `einstellungenAnwenden` in `src/main.js`: `data-layout` an `#spiel`, `--log-zeilen` in Layout A, Schriftgröße von `:root`, `data-kontrast` und `data-palette` an `<html>` (überschreiben Farbvariablen in `stil.css`), Minikarte ein oder aus
 
 Regeln:
 
-+ Reiter Anzeige: Layout (A, B, kompakt), Größe der Oberfläche (Schriftgröße von `:root` in px, 12 bis 22, alle Maße in `rem` folgen), Zoom, Logzeilen (Layout A), Minikarte, Vollbild; Spiel: Reisetempo (auch für Laufen, Rasten, Erkunden), Geschossbahn (0 aus), Reisen und Rasten trotz Feinden, Halt bei Gegenständen, Schnellleiste sofort auslösen, Neustart nachfragen; Barrierefreiheit: Bewegung reduzieren (Geschossbahn, Effekte des Titelbilds), hoher Kontrast, Palette für Farbenblinde (Blau und Orange statt Grün und Rot)
++ Reiter Anzeige: Layout (A, B, kompakt), Größe der Oberfläche (Schriftgröße von `:root` in px, 12 bis 22, alle Maße in `rem` folgen), Zoom, Logzeilen (Layout A), Minikarte, Vollbild, Sprache (automatisch, Deutsch, English; ein Wechsel lädt die Seite neu, siehe [Texte.md](Texte.md), Sprachdateien); Spiel: Reisetempo (auch für Laufen, Rasten, Erkunden), Geschossbahn (0 aus), Reisen und Rasten trotz Feinden, Halt bei Gegenständen, Schnellleiste sofort auslösen, Neustart nachfragen; Barrierefreiheit: Bewegung reduzieren (Geschossbahn, Effekte des Titelbilds), hoher Kontrast, Palette für Farbenblinde (Blau und Orange statt Grün und Rot)
 + Layout kompakt ist A mit 3 Logzeilen, Seitenleiste 20rem und kleineren Knöpfen, nur von Hand einstellbar
 + Sofort auslösen: ein Platz der Schnellleiste mit vorbelegtem, gültigem Ziel wirkt ohne zweiten Tastendruck; sonst bleibt der Zielmodus offen
 + Einstellungsfenster: die Kopfzeile nennt alle Reiter, Tab und Umschalt+Tab wechseln; Buchstabe oder Pfeile wählen, links und rechts oder - und + ändern, Enter schaltet um bzw. löst aus, Entf stellt die Vorgabe her; die Einzelheiten nennen Erklärung und Vorgabe; jede Änderung wirkt sofort und wird gespeichert

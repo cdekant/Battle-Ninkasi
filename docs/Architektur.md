@@ -118,7 +118,7 @@ Daten:
 + Reserviert für den Ausbau ([Systemausbau.md](Systemausbau.md)): `zug_beginn`
 + Kontext der Haken mit Beteiligten: `{ quelleId, urheberId, zielId, ursache, kettentiefe, mittel, tags, kritisch }`, dazu je Haken weitere Felder (`menge`, `position`)
 + Meldung: `{ art, zeit, ...daten }`, eingefroren; die Felder `art` und `zeit` sind reserviert
-+ Bezug auf eine Entität in Meldungen (`bezugAuf`): `{ id, typ, text, etikett?, ort? }`, `ort` die Position zur Zeit der Meldung; bleibt gültig, auch wenn die Entität entfernt wird; ein unbekannter Gegenstand trägt sein Etikett mit, alte Log-Zeilen ändern sich beim Erkennen nicht
++ Bezug auf eine Entität in Meldungen (`bezugAuf`): `{ id, typ, text, etikett?, adjektive?, ort? }`, `ort` die Position zur Zeit der Meldung; bleibt gültig, auch wenn die Entität entfernt wird; ein unbekannter Gegenstand trägt sein Etikett mit, alte Log-Zeilen ändern sich beim Erkennen nicht; `adjektive` sind die Textschlüssel der Adjektive aus den Zuständen (`adjektiveVon`, siehe [Texte.md](Texte.md), Grammatik)
 
 Schnittstellen:
 
@@ -158,7 +158,7 @@ Regeln:
 Daten:
 
 + Alle Inhalte liegen als JavaScript-Dateien vor, die nur Daten enthalten (`export default { ... }`), mit Kommentaren: das Grundgerüst und der echte Inhalt in `daten/` (gesammelt in `daten/index.js`, neue Datendateien dort eintragen), der Probeinhalt in `datenproben/` (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt); `daten/regeln.js` hält die Regelwerte, die das Balancing ändern darf, ohne Code anzufassen
-+ Geladen wird über `src/inhalt.js`: `rohdaten` (Grundgerüst plus Probeinhalt), `texte` je Sprache, `texteDe`, `probenamen` und `probentexte` für das Kompendium; Browser, Werkzeuge und Tests laden Inhalte nur hierüber, entsteht echter Inhalt, ändert sich nur diese Datei
++ Geladen wird über `src/inhalt.js`: `rohdaten` (Grundgerüst plus Probeinhalt), `texte` je Sprache, `texteDe`, `texteDesGrundgeruests` je Sprache für den Vergleich der Sprachen, `probenamen` und `probentexte` für das Kompendium; Browser, Werkzeuge und Tests laden Inhalte nur hierüber, entsteht echter Inhalt, ändert sich nur diese Datei
 + Dazu gehören Charakter, Eigenschaften, Makel, Skills, Fähigkeiten, Gegner, Verbündete, Händler, Items, Getränke, Zutaten, Rezepte, Kessel, Effekte, Zustände, Levelparameter; Tiles liegen wegen ihrer Lizenz in `grafik/`
 + Vorlagen mit Vererbung für Wesen, Gegenstände und Zustände: Einträge mit `abstrakt: true` sind Vorlagen, `vorlage` erbt von ihnen (z.B. "Bakterium", davon abgeleitet "Essigbakterium" mit Abweichungen)
 + Namensbuch (`daten/namensbuch.js`): je Art (`wesen`, `gegenstaende`, `eigenschaften`, `skills`, `faehigkeiten`, `zustaende`, `fallen`, ohne Vorlagen) die Listen `fest` und `vorlaeufig`, nur für Namen aus `daten/`; fest sind bisher `ninkasi` und die sechs Eigenschaften; vorläufig ist ein Name echten Inhalts, solange er sich noch ändern darf; der Probeinhalt steht nicht darin

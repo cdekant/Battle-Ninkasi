@@ -111,13 +111,12 @@ fensterinhaltAnmelden("inventar", ({ spiel, texte, leisten }, zustand) => {
   const zeilen = gegenstaende.map((gegenstand, stelle) => {
     const angelegt = istAngelegt(gesteuerte, gegenstand.id) ? ` <span class="leise">(${text("ui.angelegt")})</span>` : "";
     const gewaehlt = zustand.gewaehlt === gegenstand.id ? ' class="gewaehlt"' : "";
-    const anzahl = anzahlVon(gegenstand) > 1 ? ` x ${anzahlVon(gegenstand)}` : "";
     const ladungen = gegenstand.ladungen ? ` (${ladungenVon(gegenstand)}/${gegenstand.ladungen.hoechstens})` : "";
-    return `<li${gewaehlt}${zielAttribut({ stelle })}${ziehbar(`gegenstand:${gegenstand.typ}`)}>${buchstabeHtml(stelle)}${nomenForm(gegenstand, "nom", "ohne")}${anzahl}${ladungen}${verschleissText(texte, gegenstand)}${angelegt}</li>`;
+    return `<li${gewaehlt}${zielAttribut({ stelle })}${ziehbar(`gegenstand:${gegenstand.typ}`)}>${buchstabeHtml(stelle)}${nomenForm(gegenstand, "nom", "zahl")}${ladungen}${verschleissText(texte, gegenstand)}${angelegt}</li>`;
   });
   const gewaehlt = zustand.gewaehlt !== null ? entitaetMitId(spiel.zustand, zustand.gewaehlt) : null;
   const details = gewaehlt
-    ? `<h2>${nomenForm(gewaehlt, "nom", "ohne")}</h2><ul>
+    ? `<h2>${nomenForm({ ...gewaehlt, anzahl: 1 }, "nom", "ohne")}</h2><ul>
         ${anzahlVon(gewaehlt) > 1 ? `<li>${text("ui.anzahl")}: ${anzahlVon(gewaehlt)}</li>` : ""}
         ${gewaehlt.ladungen ? `<li>${text("ui.ladungen")}: ${ladungenVon(gewaehlt)} / ${gewaehlt.ladungen.hoechstens}</li>` : ""}
         ${gewaehlt.haltbarkeit ? `<li>${text("ui.haltbarkeit")}: ${haltbarkeitProzent(gewaehlt)} %</li>` : ""}
@@ -162,7 +161,7 @@ function herkunftText(spiel, texte, wesen, name) {
   const quellen = herkunft.quellen.map((eintrag) => {
     if (eintrag.gegenstandId !== undefined) {
       const gegenstand = entitaetMitId(spiel.zustand, eintrag.gegenstandId);
-      return gegenstand ? texte.nomenForm(gegenstand, "nom", "ohne") : "";
+      return gegenstand ? texte.nomenForm({ ...gegenstand, anzahl: 1 }, "nom", "ohne") : "";
     }
     const definition = spiel.daten.zustaende?.[eintrag.zustand];
     return definition ? texte.text(definition.text) : eintrag.zustand;
