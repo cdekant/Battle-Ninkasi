@@ -13,6 +13,7 @@ import { zufallErzeugen, zufallsGanzzahl } from "../src/kern/zufall.js";
 import { alleEntitaeten, spielerin, gesteuerteEntitaet } from "../src/kern/zustand.js";
 import { passierbar, bekanntesGelaendeAuf } from "../src/welt/karte.js";
 import { erstesGetraenk } from "../src/systeme/inventar.js";
+import { faehigkeitenVon } from "../src/systeme/faehigkeiten.js";
 import { hoererAnmelden } from "../src/kern/ereignisse.js";
 import { hoechstwert } from "../src/kern/werte.js";
 import { reiseBeginnen, naechsterReiseschritt } from "../src/eingabe/reise.js";
@@ -270,7 +271,7 @@ function zufallsbefehl(botZufall, spiel) {
     const ziel = { x: gesteuerte.position.x + zufallsGanzzahl(botZufall, -5, 5), y: gesteuerte.position.y + zufallsGanzzahl(botZufall, -5, 5) };
     return { art: "werfen", gegenstandId: gesteuerte.inventar[0], ziel };
   }
-  if (wurf >= 18 && wurf <= 20 && gesteuerte.faehigkeiten?.length) return faehigkeitUeberZielmodus(botZufall, spiel, gesteuerte);
+  if (wurf >= 18 && wurf <= 20 && faehigkeitenVon(spiel, gesteuerte).length) return faehigkeitUeberZielmodus(botZufall, spiel, gesteuerte);
   if (wurf === 22 && gesteuerte.freieEp > 0) {
     const befehl = lernenUeberSkillfenster(botZufall, spiel);
     if (befehl) return befehl;
@@ -336,7 +337,8 @@ function eigenschaftenUeberErstellung(botZufall) {
 // Fähigkeit wie im Browser über den Zielmodus (eingabe/zielmodus.js): ein Ziel per Tab oder ein Feld in der Nähe;
 // den Befehl gibt der Bot auch, wenn die Vorschau einen Grund dagegen nennt, so wird die Ablehnung mitgeprüft
 function faehigkeitUeberZielmodus(botZufall, spiel, gesteuerte) {
-  const faehigkeit = gesteuerte.faehigkeiten[zufallsGanzzahl(botZufall, 0, gesteuerte.faehigkeiten.length - 1)];
+  const faehigkeiten = faehigkeitenVon(spiel, gesteuerte);
+  const faehigkeit = faehigkeiten[zufallsGanzzahl(botZufall, 0, faehigkeiten.length - 1)];
   const beginn = zielmodusBeginnen(spiel, { zweck: "faehigkeit", faehigkeit });
   if (beginn.befehl) return beginn.befehl;
   if (!beginn.modus) return { art: "faehigkeit", faehigkeit };

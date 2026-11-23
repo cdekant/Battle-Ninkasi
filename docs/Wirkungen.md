@@ -19,7 +19,7 @@ Skills, Items, Zustände und Fähigkeiten wirken über sechs Arten, die frei kom
 3. Aktionsveränderer ändern, wie eine Aktion abläuft: Zielmuster, Reichweite, Fläche; z.B. "Braupaddel des Rundumschlags trifft alle angrenzenden Felder", "Speer trifft zwei Felder in Linie"; Zielmuster sind Daten (`muster: { art: "angrenzend" }`, `muster: { art: "linie", laenge: 2 }`), siehe Zielauswahl
 4. Zustände sind zeitlich begrenzt, mit Verlauf (gleichbleibend, abklingend, ansteigend) und Stapelregel (erneuern, aufaddieren, nur der stärkste, einzeln); sie bündeln selbst Modifikatoren und Auslöser; z.B. Schaden über Zeit, abklingender Segen, sich steigernde Vergiftung; siehe Zustände
 5. Auren wirken auf andere im Umkreis der Trägerin, z.B. "Gegner in der Nähe langsamer", "Hefen in der Nähe sprossen schneller"; siehe Modifikatoren
-6. Gewährte Aktionen schalten eine neue Aktion frei, z.B. "Braupaddel erlaubt Ansturm"; siehe Fähigkeiten (noch offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 5)
+6. Gewährte Aktionen schalten eine Fähigkeit frei, solange ein angelegter Gegenstand oder ein Zustand sie gewährt, z.B. "Braupaddel erlaubt Ansturm"; siehe Fähigkeiten
 
 Jede Wirkungsart kann zusätzlich Bedingungen tragen (nur ab Pegel X, nur gegen Bakterien, nur unter 30 % LP, nur mit zwei Kupfer-Items: Sets, Synergien) und Nachteile (negative Werte, z.B. für verfluchte Items). Jeder Modifikator kennt seine Quelle (Skill, Item, Zustand, Aura); Schwellen des Pegels sind Bedingungen; entfällt die Quelle, entfallen genau ihre Modifikatoren.
 
@@ -50,6 +50,7 @@ Schnittstellen:
   + `src/systeme/kampf.js`: `trefferwurf`, `angreifen` (siehe [Wesen.md](Wesen.md), Kampfwerte); `src/systeme/verschieben.js`: `stossen`, `ziehen`, `tauschen`, `teleportieren` (siehe [Wesen.md](Wesen.md), Bewegung); `src/systeme/wahrnehmung.js`: `laerm`; `src/systeme/fraktionen.js`: `ruf_aendern` (siehe [Wesen.md](Wesen.md), Fraktionen); `src/systeme/skills.js`: `eigenschaft_aendern`, `skill_freischalten`
   + `src/systeme/gelaende.js`: `gelaende_setzen`, `gelaende_zerstoeren`; `src/systeme/schichten.js`: `oberflaeche_setzen`, `gas_setzen`, `entzuenden` (siehe [Welt.md](Welt.md))
   + `src/systeme/verschleiss.js`: `abnutzen`; `src/systeme/ausruestung.js`: `fluch_aufheben` (siehe [Gegenstaende.md](Gegenstaende.md))
+  + `src/systeme/faehigkeiten.js`: `faehigkeit_lehren` (siehe Fähigkeiten)
 + Baustein `zufall { chance, effekt, sonst? }`: mit `chance` Prozent wirkt `effekt`, sonst `sonst` (oder nichts), mit demselben Kontext und derselben Ablage; Wurf `zufall`, für eine Chance innerhalb eines Effekts (die Vorstufe einer Krankheit heilt von selbst aus, ein Treffer betäubt manchmal); Chancen an Ereignissen haben schon die Auslöser, Chancen über den Pegel die Risikotabellen
 + Baustein `angreifen { profil? }`: die Quelle greift das Ziel mit ihren Angriffsprofilen an wie bei einer Angriffsaktion, ohne Zeitkosten, mit `profil` nur dieses eine; nur gegen ein Ziel daneben; für Konter aus Auslösern, z.B. `{ bei: "verfehlt", rolle: "ziel", ziel: "quelle", effekt: "konter" }`; die Angriffe laufen auf der Kettentiefe des Effekts, gegenseitige Konter enden so an der Kettengrenze
 
@@ -122,13 +123,14 @@ Regeln:
 
 Daten:
 
-+ Zustand (`datenproben/zustaende.js`, mit Vorlagen): `{ text, tags, dauer, stapel, hoechstStapel, verlauf, modifikatoren, auren, jeTick, beimBeginn, beimEnde, beimAblauf, ausloeser, gebundenAnQuelle, unterhalt, handlungsunfaehig, befehl, ki, fraktion }`
++ Zustand (`datenproben/zustaende.js`, mit Vorlagen): `{ text, tags, dauer, stapel, hoechstStapel, verlauf, modifikatoren, auren, jeTick, beimBeginn, beimEnde, beimAblauf, ausloeser, gebundenAnQuelle, unterhalt, handlungsunfaehig, befehl, ki, fraktion, faehigkeiten }`
   + `dauer` in Zeiteinheiten, ohne Angabe unbegrenzt bis zum Entfernen
   + `stapel`: `erneuern` (Vorgabe: eine Instanz, höhere Stärke, längere Dauer), `aufaddieren` (Stärken addiert bis `hoechstStapel` Anwendungen, Dauer erneuert), `staerkster` (nur eine mindestens gleich starke Anwendung ersetzt, sonst nichts), `einzeln` (eigene Instanzen mit eigenem Ende, höchstens `hoechstStapel`)
   + `verlauf`: `gleichbleibend` (Vorgabe), `abklingend`, `ansteigend` oder eine eigene Kurve `[[anteilProzent, staerkeProzent], ...]` über den Anteil der verstrichenen Dauer
   + `unterhalt: { mp: 2 }` kostet die Trägerin je Welttick (aufrechterhaltene Zauber); `gebundenAnQuelle: true` endet mit dem Tod oder Verschwinden der Quelle
+  + `faehigkeiten: [name]` gewährt der Trägerin diese Fähigkeiten, solange der Zustand wirkt (siehe Fähigkeiten)
   + `handlungsunfaehig: true` (Betäubung, Lähmung, Filmriss); `befehl: { veraenderer, ...parameter }`; `ki: { modul, ...parameter }`; `fraktion`: `"urheber"` (Psi-Kontrolle), `"eigene"` (Zwietracht, mit allen verfeindet) oder ein Fraktionsname
-+ Instanzen an der Entität: `zustaende: [{ nummer, name, quelleId, urheberId, urheberFraktion, beginn, ende, staerke, stapel }]`; die Nummer zählt `naechsteZustandsnummer` im Zustand des Spiels hoch; `staerke` Vorgabe 1; Fraktion und KI werden beim Beginn in die Instanz geschrieben
++ Instanzen an der Entität: `zustaende: [{ nummer, name, quelleId, urheberId, urheberFraktion, beginn, ende, staerke, stapel, ausFaehigkeit? }]` (`ausFaehigkeit`: gesetzt von einer aufrechten Fähigkeit); die Nummer zählt `naechsteZustandsnummer` im Zustand des Spiels hoch; `staerke` Vorgabe 1; Fraktion und KI werden beim Beginn in die Instanz geschrieben
 
 Schnittstellen:
 
@@ -194,7 +196,7 @@ Vorbilder: Tales of Maj'Eyal (aktive Talente mit Kosten und Abklingzeit, aufrech
 
 Daten:
 
-+ Fähigkeit (`datenproben/faehigkeiten.js`, umgesetzt in `src/systeme/faehigkeiten.js`): `{ text, art?, tags?, zweck?, verbrauch?, material?, zeit?, abklingzeit?, voraussetzungen?, ziel?, zielvorgabe?, wirkung?, zustand?, risiko?, skill?, anforderung?, ausbau?, dauer?, beimAbbruch?, ankuendigung?, unterbrechbar? }`; Wesen kennen sie als Liste `faehigkeiten: ["name"]`
++ Fähigkeit (`datenproben/faehigkeiten.js`, umgesetzt in `src/systeme/faehigkeiten.js`): `{ text, art?, tags?, zweck?, verbrauch?, material?, zeit?, abklingzeit?, voraussetzungen?, ziel?, zielvorgabe?, wirkung?, zustand?, risiko?, skill?, anforderung?, ausbau?, dauer?, beimAbbruch?, ankuendigung?, unterbrechbar? }`; Wesen kennen eigene als Liste `faehigkeiten: ["name"]`, dazu gewährte aus angelegten Gegenständen (`ausruestung.faehigkeiten`, siehe [Gegenstaende.md](Gegenstaende.md), Ausrüstung) und Zuständen (`faehigkeiten`, siehe Zustände)
   + `art`: `aktiv` (Vorgabe) wirkt einmal; `aufrecht` setzt `zustand` an der Wirkenden, erneutes Benutzen beendet ihn ohne Kosten; den laufenden Preis trägt der Zustand als `unterhalt` (siehe Zustände)
   + `verbrauch: { mp, pp, pegel, ... }` aus den Vorräten; `material: [{ typ, anzahl }]` aus dem Inventar, wird verbraucht
   + `zeit`: Grundkosten, Vorgabe `aktionen.faehigkeit`
@@ -209,20 +211,26 @@ Daten:
   + `dauer: { schritte }`: lange Aktion (Ritual, Kanalisieren); `beimAbbruch`: Effekt auf die Wirkende beim Abbruch; `ankuendigung`: Textschlüssel für das Log; `unterbrechbar`: Liste aus `schaden` und `versetzt`, `true` heißt `["schaden"]` (siehe Lange Aktionen)
 + Risikotabellen (`datenproben/risiken.js`): `[{ name, chance, wirkt, effekt? }]`, die Chance jedes Ausgangs ist eine Kurve über x: bei `risiko` der Pegel der Wirkenden, bei `skill.risiko` die fehlenden Stufen, bei `anforderung.risiko` die fehlenden Punkte
 + Befehl `{ art: "faehigkeit", faehigkeit, ziel?: { x, y } | { id } | { dx, dy } }`
++ Baustein `faehigkeit_lehren { faehigkeit }`: nimmt die Fähigkeit dauerhaft in die eigene Liste des Ziels auf (Schriftrolle, HACCP-Aushang); nur an Wesen mit einer Liste `faehigkeiten`
 
 Schnittstellen:
+
++ `faehigkeitenVon(spiel, wesen)`: alle Fähigkeiten, die das Wesen jetzt kennt, zuerst die eigenen, dann die gewährten, jede einmal; nie `wesen.faehigkeiten` direkt lesen, außer für die eigenen; `kenntFaehigkeit(spiel, wesen, name)`, `gewaehrteFaehigkeiten`, `herkunftDer(spiel, wesen, name)` (`{ eigen, quellen }` für die Anzeige)
++ Register `faehigkeitsquellen` (`(spiel, wesen) => [{ faehigkeit, quelle, gegenstandId? | zustand? }]`), angemeldet: `ausruestung` (Quelle `ausruestung:<id>`, `src/systeme/ausruestung.js`), `zustaende` (Quelle `zustand:<nummer>`, `src/systeme/zustaende.js`)
 
 + `faehigkeitFuer(spiel, wesen, name)` liefert die nach `ausbau` geltende Definition und wird überall benutzt, wo die Wirkende bekannt ist (Prüfen, Wirken, lange Aktion, Vorschau, KI, Anzeige)
 + Gründe der Ablehnung: `ungueltig`, `nicht_gelernt`, `abklingend`, `voraussetzung`, `zu_wenig_<wert>`, `material_fehlt` und die der Zielauswahl
 + Modifikatoren mit den Tags der Fähigkeit: `verbrauch.<wert>` und `verbrauch.alle` auf den Verbrauch, `kosten.faehigkeit` und `kosten.alle` auf die Zeit (`kosten.*` bleibt der Zeit vorbehalten), `abklingzeit`
-+ Meldungen: `faehigkeit`, `risiko` (mit `wegen`), `geschoss` bzw. `flaeche`, `verpufft`, bei langen Aktionen `aktion_beginnt` (mit `faehigkeit`, `ankuendigung` und den Zielfeldern `felder`)
++ Meldungen: `faehigkeit`, `risiko` (mit `wegen`), `geschoss` bzw. `flaeche`, `verpufft`, `faehigkeit_gelernt`, `faehigkeit_schon_bekannt`, bei langen Aktionen `aktion_beginnt` (mit `faehigkeit`, `ankuendigung` und den Zielfeldern `felder`)
 + Lange Aktion der Art `faehigkeit` im Register `laufendeaktionen`; wann Gegner Fähigkeiten einsetzen, steht an ihrer KI (siehe [Wesen.md](Wesen.md), KI)
 
 Regeln:
 
 + Ablauf: Verbrauch und Material bezahlen, Abklingzeit setzen, Meldung `faehigkeit`, Risiko würfeln, wirken; die Wirkung trifft mit `muster` jede betroffene Entität, bei durchdringendem Geschoss jedes Wesen der Bahn, sonst einmal das Ziel oder das Feld
 + Risiko: gewürfelt wird in der Reihenfolge Skill, Anforderung, Risiko, der erste Ausgang mit `wirkt: false` beendet; je Tabelle ein Wurf von 1 bis 100, die Ausgänge liegen hintereinander, sind alle Chancen 0, wird nicht gewürfelt; `wirkt: false` heißt, die Fähigkeit selbst wirkt nicht, der Verbrauch ist in jedem Fall bezahlt; `effekt` trifft die Wirkende (Ursache `risiko`)
-+ Mit `dauer` wird am Anfang bezahlt, jeder Schritt kostet `zeit`, Risiko und Wirkung kommen nach dem letzten Schritt; das Ziel wird dann neu aufgelöst, passt es nicht mehr, verpufft die Wirkung
++ Mit `dauer` wird am Anfang bezahlt, jeder Schritt kostet `zeit`, Risiko und Wirkung kommen nach dem letzten Schritt; das Ziel wird dann neu aufgelöst, passt es nicht mehr, verpufft die Wirkung; ist die Fähigkeit dann nicht mehr da (Quelle weggefallen), verpufft sie mit dem Grund `nicht_gelernt`
++ Gewährt: eine Fähigkeit gilt, solange ihre Quelle besteht; nur angelegte Gegenstände gewähren, aus dem Gepäck wirkt nichts; die Abklingzeit hängt an der Fähigkeit, Ablegen und Anlegen setzt sie nicht zurück; eine aufrechte Fähigkeit endet, sobald sie wegfällt (Zustandsprüfung `aufrecht_ohne_quelle`, Grund `entfernt`)
++ Gelehrt ist gelernt: `faehigkeit_lehren` nimmt eine Fähigkeit auch dann in die eigene Liste, wenn sie gerade gewährt ist, und sie bleibt nach dem Ablegen; nur eine schon eigene meldet `faehigkeit_schon_bekannt`, die Quelle ist dann verschwendet
 + Angekündigte Angriffe sind lange Aktionen mit `ankuendigung` und meist der Zielart `feld`: das Ziel ist das Feld beim Beginn, wer bis zum letzten Schritt das Muster verlässt, weicht aus; die Anzeige markiert die Felder, solange die Aktion läuft; der erste Schritt läuft sofort, `schritte: 3` lässt dem Ziel also zwei Züge
 + Vorläufige Tabelle `psi`: Fehlschlag nüchtern 30 %, bei 1,5 ‰ am seltensten (5 %), darüber wieder steigend; Rückschlag ab 3 ‰ bis 20 % bei 8 ‰ (Effekt `psi_rueckschlag`); dass Psi mit dem Pegel stärker wirkt, geht über Modifikatoren mit `pegel_ab` und dem Tag `psi`; dazu `ohne_skill` (1 fehlende Stufe 25 %, 3: 60 %, 5: 85 %) und `anforderung` (1 fehlender Punkt 5 %, 10: 50 %), beide vorläufig
 + Der Rückschlag ist Psi-Schaden: Modifikatoren auf Schaden mit dem Tag `psi` (z.B. mit `pegel_ab`) verstärken auch ihn, gewollt; ein Skill kann ihn gezielt dämpfen
@@ -266,7 +274,7 @@ Daten:
 Schnittstellen:
 
 + `vorgangAbschliessen(spiel)` (`src/kern/vorgang.js`) nach jedem Vorgang (ausgeführter Befehl, Handler der Weltuhr, Zeitereignis): abwechselnd alle Zustandsprüfungen und der nächste vorgemerkte Auslöser, bis nichts mehr ansteht; mehr als 100000 Durchläufe werfen
-+ Register `zustandspruefungen` (`(spiel) => true`, wenn etwas verändert wurde), in dieser Reihenfolge: `tod` (`src/systeme/tod.js`), `lage` (siehe [Wesen.md](Wesen.md), Bewegung), `kaputt` (siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß); später z.B. der Filmriss
++ Register `zustandspruefungen` (`(spiel) => true`, wenn etwas verändert wurde), in dieser Reihenfolge: `tod` (`src/systeme/tod.js`), `lage` (siehe [Wesen.md](Wesen.md), Bewegung), `aufrecht_ohne_quelle` (siehe Fähigkeiten), `kaputt` (siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß); später z.B. der Filmriss
 + Haken `vor_tod` und `nach_tod` (mit der letzten Position), Meldung `tod` mit Urheberin, Ursache und Mittel aus `letzterVerlust`; am `vor_tod` hängt als letzte die Allmacht, die Ninkasi im allmächtigen Lauf bewahrt (siehe [Architektur.md](Architektur.md), Spielarten)
 
 Regeln:
@@ -280,11 +288,11 @@ Regeln:
 
 ## Tests
 
-+ `tests/werte.test.js` und `tests/modifikatoren.test.js` (Verrechnung, Quellen, Bedingungen, Auren), `tests/ausloeser.test.js` (Kaskade, Ketten, Dämpfung), `tests/zustaende.test.js` (Stapelregeln, Verlauf, Unterhalt, Überlagerung), `tests/beschwoerung.test.js`, `tests/zielauswahl.test.js`, `tests/zielbausteine.test.js` und `tests/geometrie.test.js` (Muster, Linien, Kreis, Kegel), `tests/faehigkeiten.test.js` (Verbrauch, Risiko, Ausbau), `tests/laufendeAktionen.test.js`, `tests/tod.test.js`, `tests/verhalten.test.js` (Befehlsveränderer)
++ `tests/werte.test.js` und `tests/modifikatoren.test.js` (Verrechnung, Quellen, Bedingungen, Auren), `tests/ausloeser.test.js` (Kaskade, Ketten, Dämpfung), `tests/zustaende.test.js` (Stapelregeln, Verlauf, Unterhalt, Überlagerung), `tests/beschwoerung.test.js`, `tests/zielauswahl.test.js`, `tests/zielbausteine.test.js` und `tests/geometrie.test.js` (Muster, Linien, Kreis, Kegel), `tests/faehigkeiten.test.js` (Verbrauch, Risiko, Ausbau, gewährte und gelehrte Fähigkeiten), `tests/laufendeAktionen.test.js`, `tests/tod.test.js`, `tests/verhalten.test.js` (Befehlsveränderer)
 
 ## Verweise
 
 + Spieldesign der Fähigkeiten, des Pegels und des Brauens: [Grundlagen.md](Grundlagen.md); Skills, die Fähigkeiten ausbauen: [Charakter.md](Charakter.md)
-+ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkte 4 bis 6 (Ersatzwirkungen, gewährte und gelehrte Fähigkeiten, Teilung) und Punkt 8 (u.a. Auslöser am nicht angelegten Inventar, `zug_beginn`); erster Auslöser im Inhalt in Punkt 14
++ Offene Reste in [Systemausbau.md](Systemausbau.md), Punkte 4 und 6 (Ersatzwirkungen, Teilung) und Punkt 8 (u.a. `zug_beginn`, Ladungen als Verbrauch, Lesen mit Ziel); erster Auslöser im Inhalt in Punkt 14
 
 Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

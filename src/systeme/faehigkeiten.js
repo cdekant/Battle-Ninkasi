@@ -29,16 +29,26 @@
 //   unterbrechbar:   Liste der Gründe, die die lange Aktion abbrechen: "schaden", "versetzt"; true heißt ["schaden"]
 //                    (systeme/laufendeAktionen.js)
 // Befehl: { art: "faehigkeit", faehigkeit, ziel?: { x, y } | { id } | { dx, dy } }
-// Wesen kennen ihre Fähigkeiten als Liste: faehigkeiten: ["name"]; Abklingen über den Zugzähler zuege (kern/spiel.js)
+// Wesen kennen ihre eigenen Fähigkeiten als Liste: faehigkeiten: ["name"]; dazu kommen gewährte aus dem Register
+//   "faehigkeitsquellen" (angelegte Gegenstände mit ausruestung.faehigkeiten, Zustände mit faehigkeiten), solange die
+//   Quelle besteht; alle zusammen liefert faehigkeitenVon, nie wesen.faehigkeiten direkt lesen.
+//   Abklingen über den Zugzähler zuege (kern/spiel.js), je Fähigkeit und nicht je Quelle:
 //   abklingendBis: { name: zugnummer } ab diesem Stand des Zugzählers wieder bereit
+// Aufrecht: die Instanz des Zustands merkt sich ausFaehigkeit; fällt die Fähigkeit weg (Gegenstand abgelegt, Zustand
+//   vorbei), beendet die Zustandsprüfung "aufrecht_ohne_quelle" sie mit dem Grund "entfernt".
+// Lange Aktion: ist die Fähigkeit beim letzten Schritt nicht mehr da, verpufft sie (Grund "nicht_gelernt").
+// Baustein faehigkeit_lehren { faehigkeit }: nimmt die Fähigkeit dauerhaft in die eigene Liste des Ziels auf (Meldung
+//   faehigkeit_gelernt, schon eigen: faehigkeit_schon_bekannt); nur an Wesen mit einer Liste faehigkeiten.
 // Risikotabelle: [{ name, chance: Kurve in Prozent, wirkt, effekt? }]; ein Wurf, die Ausgänge liegen
 //   hintereinander; wirkt: false heißt, die Fähigkeit selbst wirkt nicht; der Verbrauch ist in jedem Fall bezahlt.
 
-import { anmelden } from "../kern/register.js";
+import { anmelden, alle } from "../kern/register.js";
+import { bausteinAnmelden } from "../kern/bausteine.js";
 import { modifiziert, hatWert, bedingungenErfuellt } from "../kern/werte.js";
 import { effektAnwenden, wertAendern } from "../kern/effekte.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { entitaetMitId, entitaetEntfernen, fraktionVon } from "../kern/zustand.js";
+import { traegerinnenIds } from "../kern/raumindex.js";
 import { wurfGanzzahl } from "../kern/wurf.js";
 import { wertAufKurve } from "../kern/kurven.js";
 import { zielAufloesen, entitaetenAufFeldern } from "./zielauswahl.js";
@@ -64,8 +74,30 @@ export function faehigkeitFuer(spiel, wesen, name) {
   return ergebnis;
 }
 
-export function kenntFaehigkeit(wesen, name) {
-  return (wesen.faehigkeiten || []).includes(name);
+// Gewährte Fähigkeiten aller Quellen in der Reihenfolge der Anmeldung: [{ faehigkeit, quelle, gegenstandId? | zustand? }]
+export function gewaehrteFaehigkeiten(spiel, wesen) {
+  const ergebnis = [];
+  for (const [, quelle] of alle("faehigkeitsquellen")) ergebnis.push(...quelle(spiel, wesen));
+  return ergebnis;
+}
+
+// Alle Fähigkeiten, die das Wesen jetzt kennt: zuerst die eigenen, dann die gewährten, jede einmal
+export function faehigkeitenVon(spiel, wesen) {
+  const namen = [...(wesen.faehigkeiten || [])];
+  for (const { faehigkeit } of gewaehrteFaehigkeiten(spiel, wesen)) if (!namen.includes(faehigkeit)) namen.push(faehigkeit);
+  return namen;
+}
+
+export function kenntFaehigkeit(spiel, wesen, name) {
+  return (wesen.faehigkeiten || []).includes(name) || gewaehrteFaehigkeiten(spiel, wesen).some((eintrag) => eintrag.faehigkeit === name);
+}
+
+// Woher eine Fähigkeit kommt: { eigen, quellen: [Einträge der gewährten] } (Anzeige)
+export function herkunftDer(spiel, wesen, name) {
+  return {
+    eigen: (wesen.faehigkeiten || []).includes(name),
+    quellen: gewaehrteFaehigkeiten(spiel, wesen).filter((eintrag) => eintrag.faehigkeit === name),
+  };
 }
 
 const tagsVon = (definition) => definition.tags || [];
@@ -124,7 +156,7 @@ function aufrechteInstanz(wesen, definition) {
 // null, wenn die Fähigkeit jetzt benutzbar ist, sonst der Grund
 export function faehigkeitPruefen(spiel, wesen, name, zielangabe) {
   const definition = faehigkeitFuer(spiel, wesen, name);
-  if (!definition || !kenntFaehigkeit(wesen, name)) return "nicht_gelernt";
+  if (!definition || !kenntFaehigkeit(spiel, wesen, name)) return "nicht_gelernt";
   if (definition.art === "aufrecht" && aufrechteInstanz(wesen, definition)) return null; // Beenden geht immer
   if (zuegeBisBereit(wesen, name) > 0) return "abklingend";
   if (!voraussetzungenErfuellt(spiel, wesen, definition)) return "voraussetzung";
@@ -226,13 +258,20 @@ function faehigkeitWirken(spiel, wesen, name, definition, zielangabe) {
     }
     if (!ausgang.wirkt) return;
   }
-  if (definition.art === "aufrecht") zustandSetzen(spiel, wesen, definition.zustand, { quelleId: wesen.id, urheberId: wesen.id });
-  else wirkungAnwenden(spiel, wesen, name, definition, zielangabe);
+  if (definition.art === "aufrecht") {
+    const instanz = zustandSetzen(spiel, wesen, definition.zustand, { quelleId: wesen.id, urheberId: wesen.id });
+    if (instanz) instanz.ausFaehigkeit = name;
+  } else wirkungAnwenden(spiel, wesen, name, definition, zielangabe);
 }
 
 anmelden("laufendeaktionen", "faehigkeit", {
   schrittkosten: (spiel, akteur, aktion) => zeitergebnis(spiel, faehigkeitFuer(spiel, akteur, aktion.faehigkeit)),
   abschliessen(spiel, akteur, aktion) {
+    // die Quelle einer gewährten Fähigkeit kann während der langen Aktion weggefallen sein
+    if (!kenntFaehigkeit(spiel, akteur, aktion.faehigkeit)) {
+      melden(spiel, "verpufft", { wer: bezugAuf(akteur), faehigkeit: aktion.faehigkeit, grund: "nicht_gelernt" });
+      return;
+    }
     faehigkeitWirken(spiel, akteur, aktion.faehigkeit, faehigkeitFuer(spiel, akteur, aktion.faehigkeit), aktion.ziel);
   },
   abbrechen(spiel, akteur, aktion) {
@@ -276,3 +315,31 @@ anmelden("befehle", "faehigkeit", {
     return faehigkeitAusfuehren(spiel, akteur, befehl.faehigkeit, befehl.ziel);
   },
 });
+
+// Aufrechte Zustände, deren Fähigkeit weggefallen ist (Gegenstand abgelegt, gewährender Zustand vorbei), enden;
+// Kandidaten sind nur Trägerinnen von Zuständen (kern/raumindex.js)
+anmelden("zustandspruefungen", "aufrecht_ohne_quelle", (spiel) => {
+  let geaendert = false;
+  for (const id of traegerinnenIds(spiel.zustand)) {
+    const wesen = spiel.zustand.entitaeten[id];
+    for (const instanz of [...(wesen?.zustaende || [])]) {
+      if (!instanz.ausFaehigkeit || kenntFaehigkeit(spiel, wesen, instanz.ausFaehigkeit)) continue;
+      zustandBeenden(spiel, wesen, instanz, "entfernt");
+      geaendert = true;
+    }
+  }
+  return geaendert;
+});
+
+// Lehrt eine Fähigkeit dauerhaft (Schriftrolle, HACCP-Aushang); gelernt ist gelernt, auch wenn sie schon gewährt war
+bausteinAnmelden("faehigkeit_lehren", { faehigkeit: "faehigkeit" }, (spiel, kontext, parameter) => {
+  const ziel = spiel.zustand.entitaeten[kontext.zielId];
+  if (!ziel.faehigkeiten) return;
+  const text = faehigkeitVon(spiel, parameter.faehigkeit)?.text;
+  if (ziel.faehigkeiten.includes(parameter.faehigkeit)) {
+    melden(spiel, "faehigkeit_schon_bekannt", { wer: bezugAuf(ziel), faehigkeit: parameter.faehigkeit, text });
+    return;
+  }
+  ziel.faehigkeiten.push(parameter.faehigkeit);
+  melden(spiel, "faehigkeit_gelernt", { wer: bezugAuf(ziel), faehigkeit: parameter.faehigkeit, text });
+}, { brauchtZiel: true });

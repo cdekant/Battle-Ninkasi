@@ -12,12 +12,14 @@ import { inventarTaste } from "../src/eingabe/inventar.js";
 import { vorbereiten } from "../src/kern/daten.js";
 
 const RAUM = ["#######", "#.....#", "#.....#", "#######"];
-const EFFEKTE = { schluck: { schritte: [{ baustein: "heilen", wertName: "lp", menge: 1 }] }, nichts: { schritte: [{ baustein: "heilen", wertName: "lp", menge: 0 }] } };
+const EFFEKTE = { schluck: { schritte: [{ baustein: "heilen", wertName: "lp", menge: 1 }] }, nichts: { schritte: [{ baustein: "heilen", wertName: "lp", menge: 0 }] }, weisheit: { schritte: [{ baustein: "heilen", wertName: "lp", menge: 1 }] } };
 const GEGENSTAENDE = {
   testbier: { typ: "testbier", text: "g.testbier", aufhebbar: true, stapelbar: true, gewicht: 900, trinkbar: { effekt: "schluck" }, wirdZu: "testflasche" },
   testflasche: { text: "g.testflasche", aufhebbar: true, stapelbar: true, gewicht: 400 },
   testfass: { typ: "testfass", text: "g.testfass", aufhebbar: true, gewicht: 2000, ladungen: { hoechstens: 20, gewichtJe: 500 }, trinkbar: { effekt: "schluck" }, wirdZu: "testleerfass" },
   testleerfass: { text: "g.testleerfass", aufhebbar: true, gewicht: 2000 },
+  testrolle: { text: "g.testrolle", aufhebbar: true, stapelbar: true, lesbar: { effekt: "weisheit" } },
+  testbuch: { text: "g.testbuch", aufhebbar: true, lesbar: { effekt: "weisheit", bleibt: true } },
 };
 
 function aufstellen() {
@@ -115,6 +117,27 @@ test("Material für Fähigkeiten kommt auch aus Stapeln", () => {
   assert.equal(stapel.anzahl, 1);
   assert.equal(alleEntitaeten(spiel.zustand).filter((entitaet) => entitaet.typ === "testbier").length, 1, "keine verwaisten Abspaltungen");
   assert.equal(befehlGeben(spiel, { art: "faehigkeit", faehigkeit: "brauen" }).grund, "material_fehlt");
+});
+
+test("Lesen: eine Rolle vom Stapel ist verbraucht, ein Buch bleibt; der Effekt trifft die Leserin", () => {
+  const { spiel, ninkasi } = aufstellen();
+  ninkasi.werte.lp.aktuell = 50;
+  hinlegen(spiel, 1, 1, "testrolle", { anzahl: 2 });
+  befehlGeben(spiel, { art: "aufheben" });
+  hinlegen(spiel, 1, 1, "testbuch");
+  befehlGeben(spiel, { art: "aufheben" });
+  const [rolle, buch] = ninkasi.inventar;
+  assert.equal(befehlGeben(spiel, { art: "lesen", gegenstandId: rolle }).ok, true);
+  assert.deepEqual(imGepaeck(spiel, ninkasi), [["testrolle", 1], ["testbuch", 1]]);
+  assert.equal(befehlGeben(spiel, { art: "lesen", gegenstandId: buch }).ok, true);
+  assert.deepEqual(imGepaeck(spiel, ninkasi), [["testrolle", 1], ["testbuch", 1]], "das Buch bleibt");
+  assert.equal(ninkasi.werte.lp.aktuell, 52);
+  hinlegen(spiel, 1, 1, "testbier");
+  befehlGeben(spiel, { art: "aufheben" });
+  assert.equal(befehlGeben(spiel, { art: "lesen", gegenstandId: ninkasi.inventar.at(-1) }).grund, "nicht_lesbar");
+  assert.equal(befehlGeben(spiel, { art: "lesen", gegenstandId: 999 }).grund, "nicht_im_gepaeck");
+  assert.deepEqual(inventarTaste({ gewaehlt: buch }, "KeyL", spiel).befehl, { art: "lesen", gegenstandId: buch });
+  assert.deepEqual(inventarTaste({ gewaehlt: buch }, "Enter", spiel).befehl, { art: "lesen", gegenstandId: buch });
 });
 
 test("Inventarfenster: F lässt fallen", () => {

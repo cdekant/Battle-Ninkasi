@@ -1,7 +1,7 @@
 // Zustände (siehe docs/Wirkungen.md, Zustände): zeitlich begrenzte Wirkungen an einer Entität.
 // Daten (datenproben/zustaende.js):
 //   name: { text, tags?, dauer?, stapel?, hoechstStapel?, verlauf?, modifikatoren?, jeTick?, beimBeginn?, beimEnde?,
-//           beimAblauf?, ausloeser?, gebundenAnQuelle? }
+//           beimAblauf?, ausloeser?, gebundenAnQuelle?, faehigkeiten? }
 //   dauer:        Zeiteinheiten; ohne Angabe unbegrenzt, bis der Zustand entfernt wird
 //   stapel:       was beim erneuten Anwenden desselben Zustands geschieht (Vorgabe "erneuern"):
 //                 "erneuern"    eine Instanz, die höhere Stärke, die längere Dauer
@@ -15,6 +15,7 @@
 //   beimEnde:     bei jedem Grund des Endes (aufräumen, z.B. verschwinden)
 //   beimAblauf:   nur wenn die Dauer abgelaufen ist, nach beimEnde (die nächste Stufe einer Krankheit, die geheilte
 //                 Vorstufe bricht so nicht aus)
+//   faehigkeiten: ["name"] gewährt der Trägerin, solange der Zustand wirkt (Fähigkeitsquelle "zustaende")
 //   gebundenAnQuelle: endet mit dem Tod oder Verschwinden der Quelle (aufrechterhaltener Zauber, Beschworene)
 //   unterhalt: { mp: 2 } kostet die Trägerin je Welttick, vor jeTick; Modifikatoren auf unterhalt.<wert> mit den Tags;
 //              reicht ein Vorrat nicht, endet der Zustand mit dem Grund "unterhalt" (aufrechterhaltene Zauber)
@@ -25,6 +26,7 @@
 //   bewegung: Bewegungsart                  überlagert die Bewegungsart (Levitation, Phasen; welt/karte.js)
 //   Fraktion und KI werden beim Beginn in die Instanz geschrieben; es gilt die jüngste Überlagerung
 // Instanz an der Entität: zustaende: [{ nummer, name, quelleId, urheberId, urheberFraktion, beginn, ende, staerke, stapel }]
+//   dazu ausFaehigkeit, wenn eine aufrechte Fähigkeit ihn gesetzt hat (systeme/faehigkeiten.js)
 // Takt: Weltuhr (je Welttick, solange zeit < ende); Hast und Verlangsamung der Trägerin ändern daran nichts.
 // Ende: Zeitereignis "zustand_ende", gebunden an die Trägerin; wurde der Zustand inzwischen verlängert,
 // reiht es sich zum neuen Ende wieder ein. Modifikatoren liefert die Modifikatorquelle "zustaende" bei jeder
@@ -81,6 +83,15 @@ anmelden("modifikatorquellen", "zustaende", (spiel, traegerin) => {
     if (!modifikatoren?.length) continue;
     const prozent = staerkeProzent(spiel, instanz);
     for (const modifikator of modifikatoren) ergebnis.push({ ...modifikatorSkaliert(modifikator, prozent), quelle: modifikatorQuelle(instanz) });
+  }
+  return ergebnis;
+});
+
+// Fähigkeiten, die Zustände gewähren, in der Reihenfolge der Instanzen
+anmelden("faehigkeitsquellen", "zustaende", (spiel, traegerin) => {
+  const ergebnis = [];
+  for (const instanz of traegerin.zustaende || []) {
+    for (const faehigkeit of definitionVon(spiel, instanz.name).faehigkeiten || []) ergebnis.push({ faehigkeit, quelle: modifikatorQuelle(instanz), zustand: instanz.name });
   }
   return ergebnis;
 });

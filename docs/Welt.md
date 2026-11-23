@@ -26,7 +26,7 @@ Schnittstellen:
 + Karte (`src/welt/karte.js`): `feldIndex`, `aufDerKarte`, `gelaendeAuf`, `gelaendeName`, `passierbar`, `betretbar`, `betretbarFuer`, `oeffnetTueren`, `fest`, `durchsichtig`, `geschossdurchlaessig`, `abstand`, `BEWEGUNGSARTEN`
 + `gelaendeSetzen(spiel, feld, name)` (`src/systeme/gelaende.js`): ändert ein Feld, meldet `gelaende_geaendert`, berechnet Ninkasis Sichtfeld neu, wenn das Feld in ihrer Sichtweite liegt, und merkt Wesen darauf für die Lageprüfung vor (eine Wand auf ihrem Feld klemmt sie ein, siehe [Wesen.md](Wesen.md), Bewegung)
 + Bausteine `gelaende_setzen { gelaende, muster? }` (Zielfeld oder Felder des Musters) und `gelaende_zerstoeren { muster? }` (Gelände mit `zerstoerbar` wird zu `wird`, z.B. eine Tür zu Boden); Parameterart `gelaende` in der Datenprüfung
-+ Befehl `benutzen { dx, dy }` auf ein Nachbarfeld oder das eigene: Gelände mit `beimBenutzen` (Hebel, Schalter), Ziel des Effekts ist das Feld, Ursache `benutzen`, Meldung `benutzt`, Zeitkosten `aktionen.benutzen`; Ablehnung `nichts_zu_benutzen`
++ Befehl `benutzen { dx, dy }` auf ein Nachbarfeld oder das eigene: Gelände mit `beimBenutzen` (Hebel, Schalter, Aushang), Ziel des Effekts ist die Benutzerin (`zielId`) und das Feld (`zielfeld`), Ursache `benutzen`, Meldung `benutzt`, Zeitkosten `aktionen.benutzen`; Ablehnung `nichts_zu_benutzen`
 + Fallen (`src/systeme/fallen.js`): `istBekannt`, `fallenMeiden` (für die Wegfindung), `entdeckenVon`, `entdeckenChance`; Meldungen `falle_ausgeloest`, `falle_entdeckt`
 
 Regeln:

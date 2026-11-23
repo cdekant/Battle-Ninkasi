@@ -158,6 +158,9 @@ export function zeilenAusMeldung(kontext, meldung) {
     case "gelernt":
     case "skill_freigeschaltet":
       return meldung.wer.id === spielerinId ? geschehen(text(`log.${meldung.art}`, { ...meldung, skill: hatSchluessel(meldung.text) ? text(meldung.text) : meldung.skill }), "lernen") : [];
+    case "faehigkeit_gelernt":
+    case "faehigkeit_schon_bekannt":
+      return meldung.wer.id === spielerinId ? geschehen(text(`log.${meldung.art}`, { ...meldung, faehigkeit: hatSchluessel(meldung.text) ? text(meldung.text) : meldung.faehigkeit }), "lernen") : [];
     case "ep_erhalten":
       return meldung.ep > 0 ? geschehen(text("log.ep_erhalten", meldung), "lernen") : [];
     case "eigenschaft_geaendert": {

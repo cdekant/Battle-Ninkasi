@@ -1,11 +1,14 @@
-// Inventar (siehe docs/Gegenstaende.md, Inventar): aufheben, trinken, fallenlassen, Stapel, Ladungen, Behälter, Gewicht.
-// Befehle: { art: "aufheben" }, { art: "trinken", gegenstandId }, { art: "fallenlassen", gegenstandId }
+// Inventar (siehe docs/Gegenstaende.md, Inventar): aufheben, trinken, lesen, fallenlassen, Stapel, Ladungen, Behälter, Gewicht.
+// Befehle: { art: "aufheben" }, { art: "trinken", gegenstandId }, { art: "lesen", gegenstandId }, { art: "fallenlassen", gegenstandId }
 // Getragene Gegenstände haben keine Position, sondern getragenVon; die Trägerin führt sie in inventar.
 // Daten am Gegenstand:
 //   stapelbar: true   gleiche Gegenstände bilden einen Stapel (anzahl an der Entität, Vorgabe 1); gleich heißt: derselbe
 //                     Typ und sonst dieselben Komponenten; Trinken und Werfen nehmen einen, Fallenlassen den ganzen Stapel
 //   ladungen: { hoechstens, gewichtJe? }  z.B. ein Fass mit Schlucken; der Stand steht in ladungen.aktuell (Vorgabe
 //                     hoechstens); Trinken nimmt eine Ladung
+//   lesbar: { effekt, bleibt? }  Lesen wendet effekt auf die Leserin an (Ursache "lesen"); ohne bleibt ist ein Stück
+//                     verbraucht (Schriftrolle), mit bleibt: true bleibt der Gegenstand (Braubuch); was er tut, sagt
+//                     allein der Effekt: lehren (faehigkeit_lehren) oder einmal wirken (Verbrauchsgegenstand)
 //   wirdZu: Typ       was nach dem letzten Gebrauch bleibt (leere Flasche, leeres Fass), kommt ins Gepäck
 //   gewicht           in Gramm, mit Ladungen zuzüglich gewichtJe je Ladung; die Last ist die Summe über das Gepäck
 //   verdirbt: { nach, wird }  nach so vielen Zeiteinheiten wird der Gegenstand zu wird (systeme/verschleiss.js); der
@@ -186,6 +189,29 @@ anmelden("befehle", "trinken", {
     erkennen(spiel, akteur, typ);
     effektAnwenden(spiel, effekt, { quelleId: akteur.id, zielId: akteur.id, ursache: "trinken", mittel: { art: "gegenstand", name: typ } });
     return "trinken";
+  },
+});
+
+anmelden("befehle", "lesen", {
+  pruefen(spiel, akteur, befehl) {
+    if (!imGepaeck(akteur, befehl.gegenstandId)) return "nicht_im_gepaeck";
+    return entitaetMitId(spiel.zustand, befehl.gegenstandId)?.lesbar ? null : "nicht_lesbar";
+  },
+  ausfuehren(spiel, akteur, befehl) {
+    const gegenstand = entitaetMitId(spiel.zustand, befehl.gegenstandId);
+    melden(spiel, "gelesen", { wer: bezugAuf(akteur), was: bezugAuf(gegenstand) });
+    benutzt(spiel, akteur, gegenstand, "lesen");
+    const { effekt, bleibt } = gegenstand.lesbar, typ = gegenstand.typ;
+    if (!bleibt) {
+      const gelesen = einenAbnehmen(spiel, akteur, gegenstand);
+      entitaetEntfernen(spiel.zustand, gelesen.id);
+      rueckstandAblegen(spiel, akteur, gelesen);
+    }
+    // wer liest, weiß, was es war; erkannt vor der Wirkung, damit deren Meldungen den Namen tragen
+    erkennen(spiel, akteur, typ);
+    const position = akteur.position ? { ...akteur.position } : null;
+    effektAnwenden(spiel, effekt, { quelleId: akteur.id, zielId: akteur.id, ursprung: position, zielfeld: position, ursache: "lesen", mittel: { art: "gegenstand", name: typ } });
+    return "lesen";
   },
 });
 

@@ -16,7 +16,7 @@ Vorbilder: NetHack (Last in Stufen, jede bremst mehr), Brogue und DCSS (Stapel g
 
 Daten:
 
-+ Am Gegenstand: `stapelbar: true`, `ladungen: { hoechstens, gewichtJe? }` (Stand in `ladungen.aktuell`, Vorgabe `hoechstens`), `wirdZu: Typ` (Behälter nach dem letzten Gebrauch), `gewicht` in Gramm; an der Entität `anzahl` (Vorgabe 1) und `getragenVon`
++ Am Gegenstand: `stapelbar: true`, `ladungen: { hoechstens, gewichtJe? }` (Stand in `ladungen.aktuell`, Vorgabe `hoechstens`), `wirdZu: Typ` (Behälter nach dem letzten Gebrauch), `gewicht` in Gramm, `lesbar: { effekt, bleibt? }` (Schriftrolle, Braubuch); an der Entität `anzahl` (Vorgabe 1) und `getragenVon`
 + Am Wesen: `inventar: [IDs]`, `tragkraft` (sonst `regeln.tragen.tragkraft`, 20000 g)
 + Ausstattung in den Daten eines Wesens: `ausstattung: [{ typ, anzahl? }]` (Vorgabe `anzahl` 1), keine Komponente; beim Erzeugen aus Daten liegt sie im Gepäck
 + Zweck für die KI: `zweck: [name]` an `trinkbar` (und an `wurf`, siehe [Wesen.md](Wesen.md), KI)
@@ -25,7 +25,7 @@ Daten:
 
 Schnittstellen (`src/systeme/inventar.js`):
 
-+ Befehle `aufheben`, `trinken { gegenstandId }`, `fallenlassen { gegenstandId }` (der ganze Stapel aufs eigene Feld, Angelegtes wird dabei abgelegt, Meldung `fallengelassen`, Zeitkosten `aktionen.fallenlassen`)
++ Befehle `aufheben`, `trinken { gegenstandId }`, `lesen { gegenstandId }` (Ablehnungen `nicht_im_gepaeck`, `nicht_lesbar`, Meldung `gelesen`, Zeitkosten `aktionen.lesen`), `fallenlassen { gegenstandId }` (der ganze Stapel aufs eigene Feld, Angelegtes wird dabei abgelegt, Meldung `fallengelassen`, Zeitkosten `aktionen.fallenlassen`)
 + `insInventar` (fließt in einen gleichen Stapel), `einenAbnehmen` (spaltet einen ab), `anzahlVon`, `ladungenVon`, `einzelgewicht`, `lastVon`, `tragkraftVon`, `lastZuschlag` (wirkt in `zeitkosten`, siehe [Architektur.md](Architektur.md), Befehle), `erstesGetraenk`, `verderbenEinplanen`
 + `ausDemInventarNehmen` in `src/kern/zustand.js` nimmt einen Gegenstand aus Inventar und Ausrüstung
 + Handler `ausstattung` im Register `ausDaten` (siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); Nutzung `trinken` im Register `nutzungen` (siehe [Wesen.md](Wesen.md), KI)
@@ -33,7 +33,8 @@ Schnittstellen (`src/systeme/inventar.js`):
 Regeln:
 
 + Beim Aufheben fließt ein Gegenstand in einen Stapel, der in allen übrigen Komponenten gleich ist, so stapeln sich z.B. Sauerbier und Bier nicht; nur der Zeitpunkt des Verderbens zählt nicht, er wird gemittelt (siehe Verschleiß); auf dem Boden fließt nichts zusammen
-+ Trinken, Werfen und Material für Fähigkeiten nehmen ein Stück, Fallenlassen den ganzen Stapel; Trinken nimmt bei Ladungen eine Ladung; ein Gegenstand mit Ladungen stapelt sich nicht
++ Lesen wendet `lesbar.effekt` auf die Leserin an (Ursache `lesen`) und erkennt den Gegenstand vorher wie das Trinken; ohne `bleibt` ist ein Stück verbraucht, mit `bleibt: true` bleibt er; was er tut, sagt allein der Effekt: lehren mit `faehigkeit_lehren` (siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten) oder einmal wirken wie ein Verbrauchsgegenstand
++ Trinken, Lesen, Werfen und Material für Fähigkeiten nehmen ein Stück, Fallenlassen den ganzen Stapel; Trinken nimmt bei Ladungen eine Ladung; ein Gegenstand mit Ladungen stapelt sich nicht
 + Ausstattung geht über `insInventar`, stapelbare fließen also zu einem Stapel zusammen; ein Wesen lässt sie beim Tod fallen wie alles im Gepäck (siehe [Wirkungen.md](Wirkungen.md), Tod und Zustandsprüfung)
 + Nach dem letzten Gebrauch kommt `wirdZu` ins Gepäck (Bier zu leerer Flasche, Bierfass zu Fass), Grundlage für das Brauen; der Ballast ist gewollt
 + Gewicht mit Ladungen zuzüglich `gewichtJe` je Ladung; die Last ist die Summe über das Gepäck, Angelegtes eingeschlossen
@@ -47,7 +48,7 @@ Vorbilder: Brogue (wenige Plätze), DCSS (Tauschen in einem Befehl), NetHack (Fl
 Daten:
 
 + Plätze am Wesen: `plaetze: { hand: 2, kopf: 1, brust: 1, beine: 1, hals: 1, finger: 2 }` (Ninkasi); die Namen stehen in `regeln.ausruestung.plaetze`
-+ Gegenstand (`datenproben/ausruestung.js`): `ausruestung: { platz, belegt?, angriffe?, modifikatoren?, ausloeser?, anforderung?, abzugJePunkt? }` und `tags`; `belegt` (Vorgabe 1) zählt die Stellen, ein Zweihänder belegt beide Hände; Anforderungen siehe [Wesen.md](Wesen.md), Skills und Lernen
++ Gegenstand (`datenproben/ausruestung.js`): `ausruestung: { platz, belegt?, angriffe?, modifikatoren?, ausloeser?, faehigkeiten?, anforderung?, abzugJePunkt? }` und `tags`; `faehigkeiten: [name]` gewährt diese Fähigkeiten, solange der Gegenstand angelegt ist (z.B. ein Zauberstab in der Hand); `belegt` (Vorgabe 1) zählt die Stellen, ein Zweihänder belegt beide Hände; Anforderungen siehe [Wesen.md](Wesen.md), Skills und Lernen
 + `verflucht: true` am Gegenstand, `fluchBekannt` nach dem Anlegen
 + Angelegt ist, was in `ausgeruestet: [IDs]` am Wesen steht; der Gegenstand bleibt im Inventar
 
@@ -55,12 +56,13 @@ Schnittstellen (`src/systeme/ausruestung.js`):
 
 + Befehle `anlegen { gegenstandId }` und `ablegen { gegenstandId }`; Ablehnungen `nicht_im_gepaeck`, `nicht_anlegbar`, `schon_angelegt`, `kein_platz`, `nicht_angelegt`, `verflucht`; Meldungen `angelegt`, `abgelegt`, `fluch_entdeckt`, `fluch_aufgehoben`
 + `ausgeruestete` (nur Gegenstände mit der Komponente `ausruestung`, ein anderer in `ausgeruestet` zählt nicht), `istAngelegt`, `zuTauschen` (Plätze aus `plaetzeVon`, siehe [Architektur.md](Architektur.md), Entitäten und Komponenten), `fluchHindert`, `waffenprofile` (für `angriffeVon` in `src/systeme/kampf.js`), `haltbarkeitProzent`
-+ Modifikatorquelle `ausruestung` (Quelle `ausruestung:<id>`); Auslöser der Ausrüstung in der Kaskade (siehe [Wirkungen.md](Wirkungen.md), Auslöser); Baustein `fluch_aufheben`
-+ Haken `gegenstand_benutzt` mit `gegenstandId` und `art` (`trinken`, `werfen`, `anlegen`, `ablegen`)
++ Modifikatorquelle `ausruestung` (Quelle `ausruestung:<id>`); Fähigkeitsquelle `ausruestung` (siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten); Auslöser der Ausrüstung in der Kaskade (siehe [Wirkungen.md](Wirkungen.md), Auslöser); Baustein `fluch_aufheben`
++ Haken `gegenstand_benutzt` mit `gegenstandId` und `art` (`trinken`, `lesen`, `werfen`, `anlegen`, `ablegen`)
 
 Regeln:
 
 + Waffen in den Händen, Rüstung und Schmuck an Kopf, Brust, Beinen, Hals und zwei Fingern
++ Nur Angelegtes wirkt: Modifikatoren, Auslöser und gewährte Fähigkeiten gelten erst nach dem Anlegen, ein Wechsel kostet also Zeit; aus dem Gepäck gehen nur Trinken, Lesen, Werfen und Material
 + Ist der Platz voll, legt derselbe Befehl `anlegen` die ältesten Gegenstände dort ab, bis genug frei ist, und kostet beides (`aktionen.anlegen` plus je `aktionen.ablegen`)
 + Angelegte Gegenstände stapeln sich nicht und sind kein Material; beim Tod fällt alles mit dem Inventar zu Boden
 + Modifikatoren wirken z.B. als Rüstung und als Abzug aufs Ausweichen bei schwerer Rüstung; Sets über die Bedingung `traegt_tag { tag, anzahl }` an einem gewöhnlichen Modifikator

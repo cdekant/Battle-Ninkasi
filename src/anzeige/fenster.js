@@ -20,7 +20,7 @@
 import { gesteuerteEntitaet, entitaetMitId } from "../kern/zustand.js";
 import { istAngelegt, haltbarkeitProzent } from "../systeme/ausruestung.js";
 import { anzahlVon, ladungenVon, lastVon, tragkraftVon, lastZuschlag } from "../systeme/inventar.js";
-import { faehigkeitFuer, verbrauchVon, zuegeBisBereit } from "../systeme/faehigkeiten.js";
+import { faehigkeitFuer, faehigkeitenVon, herkunftDer, verbrauchVon, zuegeBisBereit } from "../systeme/faehigkeiten.js";
 import { BUCHSTABEN } from "../eingabe/inventar.js";
 import { hilfeGruppen } from "../eingabe/hilfe.js";
 import { stellenVon } from "../eingabe/schnellleiste.js";
@@ -131,6 +131,7 @@ fensterinhaltAnmelden("inventar", ({ spiel, texte, leisten }, zustand) => {
   const knoepfe = [];
   if (gewaehlt) {
     if (gewaehlt.trinkbar) knoepfe.push({ taste: { code: "KeyT", zeichen: "t" }, text: text("ui.knopf.trinken") });
+    if (gewaehlt.lesbar) knoepfe.push({ taste: { code: "KeyL", zeichen: "l" }, text: text("ui.knopf.lesen") });
     if (gewaehlt.ausruestung) knoepfe.push({ taste: { code: "KeyA", zeichen: "a" }, text: text(istAngelegt(gesteuerte, gewaehlt.id) ? "ui.knopf.ablegen" : "ui.knopf.anlegen") });
     knoepfe.push({ taste: { code: "KeyW", zeichen: "w" }, text: text("ui.knopf.werfen") }, { taste: { code: "KeyF", zeichen: "f" }, text: text("ui.knopf.fallenlassen") });
     knoepfe.push({ taste: { code: "Delete" }, text: text("ui.knopf.herunter") });
@@ -154,10 +155,25 @@ export function verbrauchText(spiel, texte, wesen, definition) {
     .map(([wertName, menge]) => `${menge} ${texte.text(`ui.${wertName}`)}`).join(", ");
 }
 
+// Woher eine gewährte Fähigkeit kommt, als Zeile (leer bei eigenen): "Gewährt von: Braupaddel"
+function herkunftText(spiel, texte, wesen, name) {
+  const herkunft = herkunftDer(spiel, wesen, name);
+  if (herkunft.eigen || !herkunft.quellen.length) return "";
+  const quellen = herkunft.quellen.map((eintrag) => {
+    if (eintrag.gegenstandId !== undefined) {
+      const gegenstand = entitaetMitId(spiel.zustand, eintrag.gegenstandId);
+      return gegenstand ? texte.nomenForm(gegenstand, "nom", "ohne") : "";
+    }
+    const definition = spiel.daten.zustaende?.[eintrag.zustand];
+    return definition ? texte.text(definition.text) : eintrag.zustand;
+  });
+  return `<li>${texte.text("ui.gewaehrt_von")}: ${quellen.join(", ")}</li>`;
+}
+
 fensterinhaltAnmelden("faehigkeiten", ({ spiel, texte, leisten }, zustand) => {
   const { text } = texte;
   const gesteuerte = gesteuerteEntitaet(spiel.zustand);
-  const namen = gesteuerte.faehigkeiten || [];
+  const namen = faehigkeitenVon(spiel, gesteuerte);
   const gewaehlt = zustand.gewaehlt ?? null;
   const zeilen = namen.map((name, stelle) => {
     const definition = faehigkeitFuer(spiel, gesteuerte, name);
@@ -171,6 +187,7 @@ fensterinhaltAnmelden("faehigkeiten", ({ spiel, texte, leisten }, zustand) => {
     const definition = faehigkeitFuer(spiel, gesteuerte, gewaehlt);
     const verbrauch = verbrauchText(spiel, texte, gesteuerte, definition);
     details = `<h2>${text(definition.text)}</h2><ul>
+      ${herkunftText(spiel, texte, gesteuerte, gewaehlt)}
       <li>${text("ui.verbrauch")}: ${verbrauch || text("ui.nichts")}</li>
       ${definition.abklingzeit ? `<li>${text("ui.abklingzeit", { zuege: definition.abklingzeit })}</li>` : ""}
       ${zuegeBisBereit(gesteuerte, gewaehlt) > 0 ? `<li class="schlimm">${text("ui.abklingend", { zuege: zuegeBisBereit(gesteuerte, gewaehlt) })}</li>` : ""}

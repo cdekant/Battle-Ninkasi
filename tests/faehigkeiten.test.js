@@ -6,7 +6,11 @@ import { holen } from "../src/kern/register.js";
 import { werteAusDaten, modifikatorHinzufuegen } from "../src/kern/werte.js";
 import { effektAnwenden } from "../src/kern/effekte.js";
 import { zustandSetzen } from "../src/systeme/zustaende.js";
-import { zuegeBisBereit, risikoWuerfeln } from "../src/systeme/faehigkeiten.js";
+import { zuegeBisBereit, risikoWuerfeln, faehigkeitenVon, herkunftDer } from "../src/systeme/faehigkeiten.js";
+import { rohdatenMitTesteintraegen, spielerinSetzen, allesSichtbar } from "./hilfen.js";
+import { befehlGeben } from "../src/kern/spiel.js";
+import { akteurEinreihen } from "../src/kern/zeit.js";
+import { vorbereiten } from "../src/kern/daten.js";
 import { positionSetzen } from "../src/kern/zustand.js";
 
 const KARTE = [
@@ -179,4 +183,115 @@ test("auf: quelle lässt einen Schritt auf die Quelle wirken (Vampirbiss)", () =
   effektAnwenden(spiel, "vampirbiss", { quelleId: hexe.id, zielId: feind.id });
   assert.equal(feind.werte.lp.aktuell, 14);
   assert.equal(hexe.werte.lp.aktuell, 33);
+});
+
+// Gewährte und gelehrte Fähigkeiten
+
+const GEWAEHRT = {
+  effekte: { ...EFFEKTE, gabe: { schritte: [{ baustein: "wert_aendern", wertName: "mp", menge: 1 }] }, spucke_lehren: { schritte: [{ baustein: "faehigkeit_lehren", faehigkeit: "spucke" }] } },
+  faehigkeiten: { ...FAEHIGKEITEN, langsam: { ...FAEHIGKEITEN.langsam, abklingzeit: 5 }, eingebung: { text: "f.eingebung", zeit: 100, dauer: { schritte: 3 }, ziel: { art: "selbst" }, wirkung: "gabe" } },
+  zustaende: { ...ZUSTAENDE, erleuchtet: { text: "z.erleuchtet", dauer: 150, faehigkeiten: ["eingebung", "langsam"] } },
+  risiken: RISIKEN,
+};
+
+function gewaehrtAufstellen() {
+  const spiel = miniSpiel(KARTE, GEWAEHRT);
+  const hexe = wesen(spiel, 1, 2, "hefen", 50, {
+    werte: werteAusDaten({ lp: { grundwert: 50 }, mp: { grundwert: 100 } }), faehigkeiten: ["langsam"], inventar: [], plaetze: { hand: 2 },
+  });
+  const feind = wesen(spiel, 4, 2, "bakterien", 20);
+  return { spiel, hexe, feind };
+}
+
+const paddel = (spiel, traegerin, faehigkeiten = ["spucke", "schild"]) => gegenstandTragen(spiel, traegerin, { typ: "paddel", ausruestung: { platz: "hand", faehigkeiten } });
+
+test("Gewährt: angelegte Gegenstände und Zustände geben Fähigkeiten, eigene zuerst, jede nur einmal", () => {
+  const { spiel, hexe } = gewaehrtAufstellen();
+  const stueck = paddel(spiel, hexe);
+  assert.deepEqual(faehigkeitenVon(spiel, hexe), ["langsam"], "im Gepäck wirkt nichts");
+  befehlAusfuehren(spiel, hexe, { art: "anlegen", gegenstandId: stueck.id });
+  zustandSetzen(spiel, hexe, "erleuchtet");
+  assert.deepEqual(faehigkeitenVon(spiel, hexe), ["langsam", "spucke", "schild", "eingebung"]);
+  assert.deepEqual(hexe.faehigkeiten, ["langsam"], "die eigene Liste bleibt");
+  assert.deepEqual(herkunftDer(spiel, hexe, "spucke"), { eigen: false, quellen: [{ faehigkeit: "spucke", quelle: `ausruestung:${stueck.id}`, gegenstandId: stueck.id }] });
+  assert.equal(herkunftDer(spiel, hexe, "langsam").eigen, true);
+  befehlAusfuehren(spiel, hexe, { art: "ablegen", gegenstandId: stueck.id });
+  assert.equal(pruefen(spiel, hexe, benutzen("spucke", { id: 0 })), "nicht_gelernt");
+});
+
+test("Gewährt: die Abklingzeit hängt an der Fähigkeit, nicht an der Quelle", () => {
+  const { spiel, hexe, feind } = gewaehrtAufstellen();
+  hexe.faehigkeiten = [];
+  const stueck = paddel(spiel, hexe, ["langsam"]);
+  befehlAusfuehren(spiel, hexe, { art: "anlegen", gegenstandId: stueck.id });
+  befehlAusfuehren(spiel, hexe, benutzen("langsam", { id: feind.id }));
+  befehlAusfuehren(spiel, hexe, { art: "ablegen", gegenstandId: stueck.id });
+  befehlAusfuehren(spiel, hexe, { art: "anlegen", gegenstandId: stueck.id });
+  assert.equal(pruefen(spiel, hexe, benutzen("langsam", { id: feind.id })), "abklingend", "Ablegen und Anlegen setzt nichts zurück");
+});
+
+test("Gewährt: eine aufrechte Fähigkeit endet, wenn ihre Quelle wegfällt", () => {
+  const { spiel, hexe } = gewaehrtAufstellen();
+  const meldungen = meldungenMitschneiden(spiel);
+  const stueck = paddel(spiel, hexe);
+  befehlAusfuehren(spiel, hexe, { art: "anlegen", gegenstandId: stueck.id });
+  befehlAusfuehren(spiel, hexe, benutzen("schild"));
+  assert.equal(hexe.zustaende[0].ausFaehigkeit, "schild");
+  befehlAusfuehren(spiel, hexe, { art: "ablegen", gegenstandId: stueck.id });
+  assert.equal(hexe.zustaende, undefined);
+  assert.equal(meldungen.filter((meldung) => meldung.art === "zustand_endet").at(-1).grund, "entfernt");
+});
+
+test("Gewährt: eine lange Aktion verpufft, wenn die Fähigkeit vor dem letzten Schritt wegfällt", () => {
+  const { spiel } = gewaehrtAufstellen();
+  const ninkasi = spielerinSetzen(spiel, 7, 2);
+  ninkasi.werte = werteAusDaten({ lp: { grundwert: 100 }, mp: { grundwert: 100, anfangswert: 50 } });
+  ninkasi.faehigkeiten = [];
+  akteurEinreihen(spiel.zustand, ninkasi.id, 0);
+  allesSichtbar(spiel);
+  const meldungen = meldungenMitschneiden(spiel);
+  zustandSetzen(spiel, ninkasi, "erleuchtet");
+  assert.equal(befehlGeben(spiel, { art: "faehigkeit", faehigkeit: "eingebung" }).ok, true);
+  assert.equal(ninkasi.werte.mp.aktuell, 50, "die Erleuchtung endet nach 150, die Eingebung erst nach dem dritten Schritt");
+  assert.equal(meldungen.find((meldung) => meldung.art === "verpufft").grund, "nicht_gelernt");
+});
+
+test("faehigkeit_lehren: gelernt ist gelernt, auch wenn sie schon gewährt war; schon eigen bleibt alles", () => {
+  const { spiel, hexe, feind } = gewaehrtAufstellen();
+  const meldungen = meldungenMitschneiden(spiel);
+  const stueck = paddel(spiel, hexe);
+  befehlAusfuehren(spiel, hexe, { art: "anlegen", gegenstandId: stueck.id });
+  effektAnwenden(spiel, "spucke_lehren", { quelleId: hexe.id, zielId: hexe.id });
+  assert.deepEqual(hexe.faehigkeiten, ["langsam", "spucke"]);
+  befehlAusfuehren(spiel, hexe, { art: "ablegen", gegenstandId: stueck.id });
+  assert.deepEqual(faehigkeitenVon(spiel, hexe), ["langsam", "spucke"], "bleibt nach dem Ablegen");
+  effektAnwenden(spiel, "spucke_lehren", { quelleId: hexe.id, zielId: hexe.id });
+  assert.deepEqual(hexe.faehigkeiten, ["langsam", "spucke"]);
+  assert.deepEqual(meldungen.filter((meldung) => meldung.art.startsWith("faehigkeit_")).map((meldung) => meldung.art), ["faehigkeit_gelernt", "faehigkeit_schon_bekannt"]);
+  effektAnwenden(spiel, "spucke_lehren", { quelleId: hexe.id, zielId: feind.id });
+  assert.equal(feind.faehigkeiten, undefined, "ohne eigene Liste lernt ein Wesen nichts");
+});
+
+test("Datenprüfung: gewährte Fähigkeiten, lesbar und faehigkeit_lehren", () => {
+  const pruefenDaten = (aendern) => {
+    const daten = rohdatenMitTesteintraegen();
+    aendern(daten);
+    return vorbereiten(daten).fehler;
+  };
+  assert.deepEqual(pruefenDaten((daten) => {
+    daten.gegenstaende.testkeule.ausruestung.faehigkeiten = ["testgeschoss"];
+    daten.gegenstaende.testgegenstand.lesbar = { effekt: "testeffekt", bleibt: true };
+    daten.effekte.testlehre = { schritte: [{ baustein: "faehigkeit_lehren", faehigkeit: "testritual" }] };
+  }), []);
+  const erwartet = [
+    [(daten) => { daten.gegenstaende.testkeule.ausruestung.faehigkeiten = ["gibt_es_nicht"]; }, 'Fähigkeit "gibt_es_nicht"'],
+    [(daten) => { daten.gegenstaende.testkeule.ausruestung.faehigkeiten = "testgeschoss"; }, "faehigkeiten muss"],
+    [(daten) => { daten.zustaende[Object.keys(daten.zustaende)[0]].faehigkeiten = ["gibt_es_nicht"]; }, 'Fähigkeit "gibt_es_nicht"'],
+    [(daten) => { daten.gegenstaende.testgegenstand.lesbar = { effekt: "gibt_es_nicht" }; }, 'Effekt "gibt_es_nicht"'],
+    [(daten) => { daten.gegenstaende.testgegenstand.lesbar = { effekt: "testeffekt", bleibt: "ja" }; }, "bleibt"],
+    [(daten) => { daten.gegenstaende.testgegenstand.lesbar = "rolle"; }, "lesbar muss"],
+    [(daten) => { daten.gegenstaende.testgegenstand.lesbar = { effekt: "testeffekt" }; delete daten.aktionen.lesen; }, "aktionen.lesen"],
+    [(daten) => { daten.effekte.testlehre = { schritte: [{ baustein: "faehigkeit_lehren", faehigkeit: "gibt_es_nicht" }] }; }, 'Fähigkeit "gibt_es_nicht"'],
+  ];
+  for (const [aendern, teilDerMeldung] of erwartet) assert.ok(pruefenDaten(aendern).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
 });

@@ -4,14 +4,16 @@
 //   platz:   { art: "faehigkeit", faehigkeit, vonHand? } | { art: "gegenstand", typ, vonHand? }
 // Gegenstände liegen nach ihrer Art (typ) auf dem Platz, nicht als einzelnes Stück: ist ein Stapel aufgebraucht, bleibt
 // der Platz grau mit Anzahl 0 und füllt sich wieder, sobald Ninkasi ein Stück derselben Art trägt.
-// Automatisch nachgeführt (leistenNachfuehren, nach jedem Befehl): neue Fähigkeiten und neue Getränkearten rücken auf
+// Automatisch nachgeführt (leistenNachfuehren, nach jedem Befehl): neue Fähigkeiten (auch gewährte; fällt die Quelle
+// weg, bleibt der Platz grau) und neue Getränkearten rücken auf
 // den ersten freien Platz, zuerst der Leiste 1, dann 2 bis 5; was die Spielerin heruntergenommen hat (abgelegt), kommt
-// nicht von selbst wieder; ein von Hand belegter Platz wird nie überschrieben. Wurfwaffen kommen nur von Hand dazu.
+// nicht von selbst wieder; ein von Hand belegter Platz wird nie überschrieben. Wurfwaffen und Lesbares kommen nur von
+// Hand dazu.
 // Zustand eines Platzes für die Anzeige: { platz, anzahl?, abklingend?, grund? }
 
 import { gesteuerteEntitaet, entitaetMitId } from "../kern/zustand.js";
 import { anzahlVon } from "../systeme/inventar.js";
-import { faehigkeitPruefen, zuegeBisBereit } from "../systeme/faehigkeiten.js";
+import { faehigkeitPruefen, faehigkeitenVon, zuegeBisBereit } from "../systeme/faehigkeiten.js";
 import { PLAETZE_DER_LEISTE } from "./aktionskatalog.js";
 
 export const ANZAHL_LEISTEN = 5;
@@ -54,7 +56,7 @@ export function leistenNachfuehren(spiel, leisten) {
   const gesteuerte = gesteuerteEntitaet(spiel.zustand);
   const neu = structuredClone(leisten);
   const belegt = belegteSchluessel(neu);
-  const kandidaten = (gesteuerte.faehigkeiten || []).map((faehigkeit) => ({ art: "faehigkeit", faehigkeit }));
+  const kandidaten = faehigkeitenVon(spiel, gesteuerte).map((faehigkeit) => ({ art: "faehigkeit", faehigkeit }));
   for (const gegenstand of gepaeck(spiel)) if (gegenstand.trinkbar) kandidaten.push({ art: "gegenstand", typ: gegenstand.typ });
   for (const platz of kandidaten) {
     const schluessel = platzSchluessel(platz);
@@ -134,14 +136,16 @@ export function platzZustand(spiel, platz) {
 
 // Was ein Platz der aktiven Leiste tut: { befehl } (Getränk), { auswahl } (Fähigkeit oder Wurf, weiter über den
 // Zielmodus), { grund } (geht nicht) oder null (leerer Platz). Ein Gegenstand wird getrunken, wenn er trinkbar ist,
-// sonst geworfen.
+// gelesen, wenn er lesbar ist, sonst geworfen.
 export function platzAusloesen(spiel, leisten, stelle) {
   const platz = aktivePlaetze(leisten)[stelle];
   if (!platz) return null;
   if (platz.art === "gegenstand") {
     const stueck = erstesStueck(spiel, platz.typ);
     if (!stueck) return { grund: "nichts_mehr_davon" };
-    return stueck.trinkbar ? { befehl: { art: "trinken", gegenstandId: stueck.id } } : { auswahl: { zweck: "werfen", gegenstandId: stueck.id } };
+    if (stueck.trinkbar) return { befehl: { art: "trinken", gegenstandId: stueck.id } };
+    if (stueck.lesbar) return { befehl: { art: "lesen", gegenstandId: stueck.id } };
+    return { auswahl: { zweck: "werfen", gegenstandId: stueck.id } };
   }
   return { auswahl: { zweck: "faehigkeit", faehigkeit: platz.faehigkeit } };
 }

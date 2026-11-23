@@ -26,10 +26,12 @@ const GELAENDE = {
   bruechig: { kennung: "%", passierbar: false, durchsichtig: false, zerstoerbar: { wird: "boden" } },
   hebel_aus: { kennung: "h", passierbar: false, durchsichtig: true, beimBenutzen: "hebel_umlegen" },
   hebel_an: { kennung: "H", passierbar: false, durchsichtig: true },
+  aushang: { kennung: "a", passierbar: false, durchsichtig: true, beimBenutzen: "aushang_lesen" },
 };
 
 const EFFEKTE = {
   hebel_umlegen: { schritte: [{ baustein: "gelaende_setzen", gelaende: "hebel_an" }] },
+  aushang_lesen: { schritte: [{ baustein: "heilen", menge: 5 }] },
   sprengen: { schritte: [{ baustein: "gelaende_zerstoeren", muster: { art: "kreis", radius: 1 } }] },
   mauern: { schritte: [{ baustein: "gelaende_setzen", gelaende: "wand" }] },
   eingeklemmt: { schritte: [{ baustein: "schaden", art: "stumpf", menge: 4 }] },
@@ -109,6 +111,15 @@ test("Benutzen: ein Hebel nebenan legt sich um; ohne Hebel wird abgelehnt", () =
   assert.equal(befehlGeben(spiel, { art: "benutzen", dx: 1, dy: 0 }).ok, true);
   assert.equal(gelaendeName(spiel, 2, 1), "hebel_an");
   assert.ok(meldungen.some((meldung) => meldung.art === "benutzt"));
+});
+
+test("Benutzen: der Effekt trifft auch die Benutzerin, z.B. ein Aushang, der lehrt", () => {
+  const { spiel } = spielBauen(["#####", "#.a.#", "#####"]);
+  const ninkasi = ninkasiAmZug(spiel, 1, 1);
+  ninkasi.werte.lp.aktuell = 50;
+  assert.equal(befehlGeben(spiel, { art: "benutzen", dx: 1, dy: 0 }).ok, true);
+  assert.equal(ninkasi.werte.lp.aktuell, 55);
+  assert.equal(gelaendeName(spiel, 2, 1), "aushang", "das Feld bleibt, wie es ist");
 });
 
 test("Fallen lösen beim Betreten aus und gelten dann als entdeckt; Fliegende gehen darüber; kein Zorn auf Fallen", () => {

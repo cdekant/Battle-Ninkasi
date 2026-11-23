@@ -96,10 +96,7 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
   if (wesen.angriff !== undefined) fehler.push(`${ort}: angriff gibt es nicht mehr, Angriffe stehen als Liste in angriffe`);
   if (wesen.angriffe !== undefined) pruefeAngriffe(daten, wesen.angriffe, ort, fehler);
   pruefeKampfwerte(daten, wesen, ort, fehler);
-  if (wesen.faehigkeiten !== undefined) {
-    if (!istTextliste(wesen.faehigkeiten)) fehler.push(`${ort}: faehigkeiten muss eine Liste von Namen sein`);
-    else for (const faehigkeit of wesen.faehigkeiten) if (!daten.faehigkeiten?.[faehigkeit]) fehler.push(`${ort}: Fähigkeit "${faehigkeit}" gibt es nicht`);
-  }
+  if (wesen.faehigkeiten !== undefined) pruefeFaehigkeitsliste(daten, wesen.faehigkeiten, ort, fehler);
   pruefeParameter(daten, { bewegung: BEWEGUNGSARTEN, tueren: ["oeffnen", "nicht"], tragkraft: "ganzzahl?", folgt: "wahrheitswert?" }, wesen, ort, fehler);
   // gebundene EP und Eigenschaften, siehe systeme/lernen.js und systeme/skills.js
   pruefeParameter(daten, { ep: "ganzzahl?" }, wesen, ort, fehler);
@@ -356,12 +353,24 @@ function pruefeFalle(daten, sprache, name, falle, fehler) {
   if (!daten.zeichen.fallen?.[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js`);
 }
 
+// Liste von Namen bekannter Fähigkeiten (Wesen, Ausrüstung, Zustand)
+function pruefeFaehigkeitsliste(daten, liste, ort, fehler) {
+  if (!istTextliste(liste)) fehler.push(`${ort}: faehigkeiten muss eine Liste von Namen sein`);
+  else for (const faehigkeit of liste) if (!daten.faehigkeiten?.[faehigkeit]) fehler.push(`${ort}: Fähigkeit "${faehigkeit}" gibt es nicht`);
+}
+
 function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
   const ort = `gegenstaende.${name}`;
   if (gegenstand.abstrakt) return;
   pruefeText(sprache.texte, gegenstand.text, ort, fehler);
   pruefeNomen(sprache, gegenstand.text, fehler);
   if (gegenstand.trinkbar) pruefeEffektVerweis(daten, gegenstand.trinkbar.effekt, `${ort}.trinkbar`, fehler);
+  // Lesen, siehe systeme/inventar.js
+  if (gegenstand.lesbar !== undefined) {
+    if (!istObjekt(gegenstand.lesbar)) fehler.push(`${ort}: lesbar muss ein Objekt { effekt, bleibt? } sein`);
+    else pruefeParameter(daten, { effekt: "effekt", bleibt: "wahrheitswert?" }, gegenstand.lesbar, `${ort}.lesbar`, fehler);
+    if (daten.aktionen.lesen === undefined) fehler.push(`${ort}: lesbar braucht aktionen.lesen`);
+  }
   // Zwecke der Nutzungen für die KI, siehe ki/nutzen.js
   for (const [, nutzung] of alle("nutzungen")) {
     const zwecke = gegenstand[nutzung.feld]?.zweck;
@@ -388,6 +397,7 @@ function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
       if (ausruestung.angriffe !== undefined) pruefeAngriffe(daten, ausruestung.angriffe, `${ort}.ausruestung`, fehler);
       if (ausruestung.modifikatoren !== undefined) pruefeModifikatoren(daten, ausruestung.modifikatoren, `${ort}.ausruestung.modifikatoren`, fehler);
       if (ausruestung.ausloeser !== undefined) pruefeAusloeser(daten, ausruestung.ausloeser, `${ort}.ausruestung`, fehler);
+      if (ausruestung.faehigkeiten !== undefined) pruefeFaehigkeitsliste(daten, ausruestung.faehigkeiten, `${ort}.ausruestung`, fehler);
       // Anforderungen, siehe systeme/skills.js
       if (ausruestung.anforderung !== undefined) pruefeAnforderung(daten, ausruestung.anforderung, `${ort}.ausruestung.anforderung`, fehler);
       if (ausruestung.abzugJePunkt !== undefined) pruefeAnforderungsabzug(daten, ausruestung.abzugJePunkt, `${ort}.ausruestung.abzugJePunkt`, fehler);
@@ -468,7 +478,7 @@ function pruefeMenge(schritt, ort, fehler) {
 const istZahlAbNull = (wert) => istGanzzahl(wert) && wert >= 0;
 
 // Parameter nach Beschreibung (siehe kern/bausteine.js): "text", "ganzzahl", "wahrheitswert", "effekt",
-// "muster", "zustand", "wesen", "schadensart", "fraktion", "gelaende", "oberflaeche", "gas", "skill", "eigenschaft", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
+// "muster", "zustand", "wesen", "schadensart", "fraktion", "gelaende", "oberflaeche", "gas", "skill", "eigenschaft", "faehigkeit", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
 function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
   for (const [feld, typ] of Object.entries(beschreibung)) {
     const wert = werte[feld];
@@ -500,6 +510,7 @@ function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
     else if (grundtyp === "gas" && !daten.schichten?.gase?.[wert]) fehler.push(`${ort}.${feld}: Gas "${wert}" gibt es nicht`);
     else if (grundtyp === "skill" && !daten.skills?.[wert]) fehler.push(`${ort}.${feld}: Skill "${wert}" gibt es nicht`);
     else if (grundtyp === "eigenschaft" && !daten.eigenschaften?.[wert]) fehler.push(`${ort}.${feld}: Eigenschaft "${wert}" gibt es nicht`);
+    else if (grundtyp === "faehigkeit" && !daten.faehigkeiten?.[wert]) fehler.push(`${ort}.${feld}: Fähigkeit "${wert}" gibt es nicht`);
   }
 }
 
@@ -955,6 +966,7 @@ function pruefeZustand(daten, sprache, name, zustand, fehler) {
   if (zustand.auren !== undefined) pruefeAuren(daten, zustand.auren, ort, fehler);
   if (zustand.ausloeser !== undefined) pruefeAusloeser(daten, zustand.ausloeser, ort, fehler);
   if (zustand.unterhalt !== undefined) pruefeVorratsmengen(zustand.unterhalt, `${ort}: unterhalt`, fehler);
+  if (zustand.faehigkeiten !== undefined) pruefeFaehigkeitsliste(daten, zustand.faehigkeiten, ort, fehler);
 }
 
 // Feste Karte: gleich lange Zeilen aus Kennungen bekannter Gelände

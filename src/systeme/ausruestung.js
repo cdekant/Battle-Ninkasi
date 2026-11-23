@@ -1,13 +1,15 @@
 // Ausrüstung (siehe docs/Gegenstaende.md, Ausrüstung): Plätze, anlegen und ablegen, Modifikatoren, Waffen, Sets.
 // Plätze am Wesen: plaetze: { hand: 2, kopf: 1, brust: 1, beine: 1, hals: 1, finger: 2 } (Namen aus
 //   regeln.ausruestung.plaetze); angelegt ist, was in ausgeruestet: [IDs] steht, der Gegenstand bleibt im Inventar.
-// Gegenstand: ausruestung: { platz, belegt?, angriffe?, modifikatoren?, ausloeser? }, dazu tags am Gegenstand für Sets
+// Gegenstand: ausruestung: { platz, belegt?, angriffe?, modifikatoren?, ausloeser?, faehigkeiten? }, dazu tags für Sets
 //   belegt:        so viele Stellen des Platzes (Vorgabe 1), ein Zweihänder belegt beide Hände
 //   angriffe:      Angriffsprofile; angelegte Waffen ersetzen die eigenen Profile des Wesens (die Faust), zwei Waffen
 //                  sind zwei Profile (die Aktion kostet so viel wie das langsamste, systeme/kampf.js angriffeVon)
 //   modifikatoren: wirken, solange der Gegenstand angelegt ist (Modifikatorquelle "ausruestung", Quelle
 //                  "ausruestung:<id>"), z.B. Rüstung, Abzug aufs Ausweichen, Set-Boni mit wenn traegt_tag
 //   ausloeser:     gelten für die Trägerin, nach ihren eigenen und denen ihrer Zustände (kern/ausloeser.js)
+//   faehigkeiten:  ["name"] gewährt, solange der Gegenstand angelegt ist (Fähigkeitsquelle "ausruestung", Quelle
+//                  "ausruestung:<id>", systeme/faehigkeiten.js); im Gepäck wirkt ein Gegenstand nicht
 // Befehle: { art: "anlegen", gegenstandId } legt an; ist der Platz voll, legt derselbe Befehl die ältesten Gegenstände
 //   dort ab, bis genug frei ist (tauschen), und kostet beides (aktionen.anlegen plus je aktionen.ablegen);
 //   { art: "ablegen", gegenstandId }. Ablehnungen: nicht_im_gepaeck, nicht_anlegbar, schon_angelegt, kein_platz,
@@ -152,3 +154,10 @@ export function waffenprofile(spiel, wesen) {
   const profile = ausgeruestete(spiel, wesen).flatMap((gegenstand) => gegenstand.ausruestung.angriffe || []);
   return profile.length ? profile : null;
 }
+
+// Fähigkeiten der angelegten Gegenstände, in der Reihenfolge des Anlegens
+anmelden("faehigkeitsquellen", "ausruestung", (spiel, wesen) => {
+  if (!wesen.ausgeruestet?.length) return [];
+  return ausgeruestete(spiel, wesen).flatMap((gegenstand) => (gegenstand.ausruestung.faehigkeiten || [])
+    .map((faehigkeit) => ({ faehigkeit, quelle: `ausruestung:${gegenstand.id}`, gegenstandId: gegenstand.id })));
+});

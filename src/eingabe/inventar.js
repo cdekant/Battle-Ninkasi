@@ -3,11 +3,11 @@
 //   zu:                 Taste i öffnet; d und w öffnen mit absicht "fallenlassen" bzw. "werfen"
 //   offen, nichts gewählt: a bis z wählt den Gegenstand an dieser Stelle des Gepäcks, Esc oder i schließt;
 //                       mit absicht lässt der Buchstabe den Gegenstand gleich fallen bzw. wirft ihn
-//   offen, gewählt:     t trinken, a anlegen oder ablegen (je nachdem), f fallen lassen (der ganze Stapel),
+//   offen, gewählt:     t trinken, l lesen, a anlegen oder ablegen (je nachdem), f fallen lassen (der ganze Stapel),
 //                       w werfen (schließt und gibt die Auswahl für den Zielmodus zurück, eingabe/zielmodus.js),
 //                       eine Ziffer legt die Art auf diesen Platz der aktiven Leiste, Entf nimmt sie von allen Leisten
 //                       (ergebnis.leiste, eingabe/schnellleiste.js), Enter die Standardhandlung (trinken, wenn trinkbar,
-//                       sonst anlegen oder ablegen, wenn ausrüstbar), Esc zurück zur Auswahl
+//                       lesen, wenn lesbar, sonst anlegen oder ablegen, wenn ausrüstbar), Esc zurück zur Auswahl
 // Maus (klick mit { stelle }): wählt die Zeile; mit Absicht wirkt sie gleich; die schon gewählte Zeile wirkt wie Enter
 // Buchstaben gelten nach dem Zeichen der Taste (KeyboardEvent.key), so passen sie zu jeder Tastaturbelegung;
 // ohne Zeichen (Tests, Bot) nach dem Tastencode der US-Belegung.
@@ -59,6 +59,7 @@ export function inventarTaste(fenster, tastencode, spiel, zeichen, belegung) {
   }
   const gesteuerte = gesteuerteEntitaet(spiel.zustand);
   if (buchstabe === "t") return { fenster: null, befehl: { art: "trinken", gegenstandId: fenster.gewaehlt } };
+  if (buchstabe === "l") return { fenster: null, befehl: { art: "lesen", gegenstandId: fenster.gewaehlt } };
   if (buchstabe === "w") return { fenster: null, auswahl: { zweck: "werfen", gegenstandId: fenster.gewaehlt } };
   if (buchstabe === "f") return { fenster: null, befehl: { art: "fallenlassen", gegenstandId: fenster.gewaehlt } };
   if (buchstabe === "a") {
@@ -68,11 +69,12 @@ export function inventarTaste(fenster, tastencode, spiel, zeichen, belegung) {
   return { fenster };
 }
 
-// Enter auf einem gewählten Gegenstand: trinken, wenn trinkbar, sonst anlegen oder ablegen, wenn ausrüstbar
+// Enter auf einem gewählten Gegenstand: trinken, wenn trinkbar, lesen, wenn lesbar, sonst anlegen oder ablegen
 function standardhandlung(fenster, spiel) {
   const gegenstand = entitaetMitId(spiel.zustand, fenster.gewaehlt);
   if (!gegenstand) return { fenster };
   if (gegenstand.trinkbar) return { fenster: null, befehl: { art: "trinken", gegenstandId: gegenstand.id } };
+  if (gegenstand.lesbar) return { fenster: null, befehl: { art: "lesen", gegenstandId: gegenstand.id } };
   if (gegenstand.ausruestung) {
     const art = istAngelegt(gesteuerteEntitaet(spiel.zustand), gegenstand.id) ? "ablegen" : "anlegen";
     return { fenster: null, befehl: { art, gegenstandId: gegenstand.id } };

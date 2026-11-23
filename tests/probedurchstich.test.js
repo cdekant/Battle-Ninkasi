@@ -259,8 +259,7 @@ test("Phönixbier: verhindert einmal den Tod und ist dann verbraucht", { todo: "
 
 const ANSTURM = { ansturm: { text: "faehigkeit.ansturm", ziel: { art: "wesen", reichweite: 3 }, wirkung: "ritual_patzer" } };
 
-test("Braupaddel: angelegt gewährt es den Ansturm", { todo: "Punkt 5: Fähigkeiten kommen nur aus der Liste faehigkeiten am Wesen" }, () => {
-  // Entwurf: ausruestung.faehigkeiten: ["ansturm"]
+test("Braupaddel: angelegt gewährt es den Ansturm", () => {
   const { spiel, ninkasi } = aufstellen({ faehigkeiten: ANSTURM });
   ninkasi.faehigkeiten = [];
   ninkasi.plaetze = { hand: 2 };
@@ -270,8 +269,7 @@ test("Braupaddel: angelegt gewährt es den Ansturm", { todo: "Punkt 5: Fähigkei
   assert.equal(holen("befehle", "faehigkeit").pruefen(spiel, ninkasi, { art: "faehigkeit", faehigkeit: "ansturm", ziel: { id: feind.id } }), null);
 });
 
-test("Schriftrolle: Lesen lehrt den Ansturm dauerhaft, die Rolle ist verbraucht", { todo: "Punkt 5: kein Befehl zum Lesen oder Benutzen eines Gegenstands, kein Baustein, der eine Fähigkeit lehrt" }, () => {
-  // Entwurf: Befehl "lesen { gegenstandId }" mit lesbar: { effekt }, Baustein faehigkeit_lehren { faehigkeit }
+test("Schriftrolle: Lesen lehrt den Ansturm dauerhaft, die Rolle ist verbraucht", () => {
   const { spiel, ninkasi } = aufstellen({ faehigkeiten: ANSTURM, effekte: { ansturm_lehren: { schritte: [{ baustein: "faehigkeit_lehren", faehigkeit: "ansturm" }] } } });
   ninkasi.faehigkeiten = [];
   const rolle = gegenstandTragen(spiel, ninkasi, { typ: "schriftrolle", lesbar: { effekt: "ansturm_lehren" } });

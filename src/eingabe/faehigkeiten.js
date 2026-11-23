@@ -1,13 +1,14 @@
 // Fähigkeitenfenster (siehe docs/Bedienung.md, Zielmodus und Schnellleiste): reine Tastenlogik ohne DOM, wie
 // eingabe/inventar.js. Fenster-Zustand der Anzeige (nicht im Spielzustand): null (zu) oder { gewaehlt: null | name }.
 //   zu:       Taste f öffnet
-//   offen:    a bis z wählt die Fähigkeit an dieser Stelle der Liste (faehigkeiten am Wesen); die Einzelheiten zeigen
-//             Verbrauch, Abklingzeit und ihren Platz in der Schnellleiste
+//   offen:    a bis z wählt die Fähigkeit an dieser Stelle der Liste (eigene, dann gewährte, faehigkeitenVon); die
+//             Einzelheiten zeigen Herkunft, Verbrauch, Abklingzeit und ihren Platz in der Schnellleiste
 //   gewählt:  Enter oder derselbe Buchstabe noch einmal wirkt (schließt und gibt die Auswahl für den Zielmodus zurück,
 //             eingabe/zielmodus.js), eine Ziffer legt sie auf diesen Platz der aktiven Leiste, Entf nimmt sie von
 //             allen Leisten (ergebnis.leiste, eingabe/schnellleiste.js), Esc zurück zur Auswahl bzw. schließt
 
 import { gesteuerteEntitaet } from "../kern/zustand.js";
+import { faehigkeitenVon } from "../systeme/faehigkeiten.js";
 import { BUCHSTABEN, buchstabeDerTaste } from "./inventar.js";
 import { fensterartAnmelden } from "./fenster.js";
 import { platzDerTaste } from "./aktionskatalog.js";
@@ -17,7 +18,7 @@ const ENTFERNEN = ["Delete", "Backspace"];
 
 // Name der Fähigkeit an einer Stelle der Liste oder null
 export function faehigkeitAnStelle(spiel, stelle) {
-  return (gesteuerteEntitaet(spiel.zustand).faehigkeiten || [])[stelle] ?? null;
+  return faehigkeitenVon(spiel, gesteuerteEntitaet(spiel.zustand))[stelle] ?? null;
 }
 
 const auswahlVon = (name) => ({ zweck: "faehigkeit", faehigkeit: name });

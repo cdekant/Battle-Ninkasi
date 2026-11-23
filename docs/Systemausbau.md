@@ -16,17 +16,16 @@ Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und wäh
 
 Stand 2026-11-23, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer Wirkung auf den Inhalt, das Kleine und Breite zuerst:
 
-1. Gewährte und gelehrte Fähigkeiten (Punkt 5)
-2. Ersatzwirkungen (Punkt 4)
-3. KI: Unterstützung und Umherziehen (Punkt 7)
-4. Teilung und Wachstum (Punkt 6), braucht Punkt 7
-5. Licht und Wahrnehmung (Punkt 3)
-6. Englisch, Mehrzahl und Glossar (Punkt 9)
-7. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
-8. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
-9. Danach der Inhalt (Punkt 14)
+1. Ersatzwirkungen (Punkt 4)
+2. KI: Unterstützung und Umherziehen (Punkt 7)
+3. Teilung und Wachstum (Punkt 6), braucht Punkt 7
+4. Licht und Wahrnehmung (Punkt 3)
+5. Englisch, Mehrzahl und Glossar (Punkt 9)
+6. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10)
+7. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
+8. Danach der Inhalt (Punkt 14)
 
-Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
+Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 5 (gewährte und gelehrte Fähigkeiten) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
 
 Die Proben des Probedurchstichs stehen in `tests/probedurchstich.test.js`; jede Lücke dort ist ein Test mit `todo` und dem Punkt, der sie schließt, mit einem Entwurf der Daten (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing). Wer einen Punkt umsetzt, nimmt dort das `todo` weg.
 
@@ -56,17 +55,6 @@ Status: offen, erst Recherche
 + Wirkungen aus Daten, die sofort an einem Haken "davor" eingreifen und sich verbrauchen können, z.B. "Phönixbier verhindert einmal den Tod", "Schild fängt einen Treffer ab"; heute gibt es dafür nur Code-Handler am Haken `vor_tod` (siehe [Wirkungen.md](Wirkungen.md), Auslöser)
 + Sie achten den Marker `unblockbar` (siehe [Wesen.md](Wesen.md), Kampfwerte)
 
-## 5. Gewährte und gelehrte Fähigkeiten
-
-Status: offen, erst Recherche
-
-+ Proben: das angelegte Braupaddel gewährt den Ansturm; eine Schriftrolle lehrt ihn beim Lesen dauerhaft und ist dann verbraucht
-+ Gegenstände aus dem Gepäck lesen oder benutzen: einen Befehl dafür gibt es noch nicht, `benutzen` kennt nur Gelände; Entwurf `lesbar: { effekt }` am Gegenstand
-
-+ Gewährt: eine Fähigkeit, solange ein Gegenstand angelegt oder getragen ist oder ein Zustand wirkt ("Braupaddel erlaubt Ansturm", siehe [Wirkungen.md](Wirkungen.md), Wirkungsarten); heute kennt ein Wesen Fähigkeiten nur aus seiner Liste `faehigkeiten`
-+ Gelehrt: eine Fähigkeit dauerhaft, z.B. durch eine Schriftrolle oder einen HACCP-Aushang, als Baustein neben `skill_freischalten` (Entwurf `faehigkeit_lehren { faehigkeit }`)
-+ Spieldesign dazu: ob eine Quelle verbraucht wird oder dauerhaft lehrt (offen in [Charakter.md](Charakter.md), Offen); Quellen der Fähigkeiten in [Charakter.md](Charakter.md), Skills
-
 ## 6. Teilung und Wachstum
 
 Status: offen, erst Recherche und Spieldesign
@@ -89,7 +77,8 @@ Status: offen
 
 Status: offen, jeweils mit dem ersten Bedarf
 
-+ Auslöser am Inventar der Trägerin, das nicht angelegt ist (Talismane, Verfluchtes in der Tasche)
++ Ladungen als Verbrauch einer gewährten Fähigkeit (Zauberstab, Regel in [Grundlagen.md](Grundlagen.md), Spielkern): Entwurf `verbrauch: { ladungen: 1 }`, bezahlt vom zuerst angelegten Gegenstand der Quelle, der noch Ladungen hat; jede gewährte Fähigkeit kennt ihre Quelle (`gegenstandId`, siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten); das Fähigkeitenfenster zeigt die Summe der Ladungen
++ Lesen mit Ziel: eine Rolle wirkt eine Fähigkeit einmal, ohne sie zu lehren (Entwurf `lesbar: { faehigkeit }`, Befehl `lesen { gegenstandId, ziel? }` über den Zielmodus); heute wirkt ein lesbarer Gegenstand nur auf die Leserin
 + Haken `zug_beginn` in Betrieb nehmen
 + Angefressene Waffen: wie sie schwächer werden, braucht einen Eingriff in die Schadensrechnung (siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß)
 + Sturz in einen Abgrund auf die Ebene darunter (siehe [Wesen.md](Wesen.md), Bewegung)

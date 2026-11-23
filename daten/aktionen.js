@@ -6,6 +6,7 @@ export default {
   warten: 100,
   aufheben: 100,
   trinken: 100,
+  lesen: 100,
   werfen: 100,
   benutzen: 100,
   treppe: 100,

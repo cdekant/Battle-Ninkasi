@@ -88,7 +88,7 @@ Daten (`src/kern/zeit.js`):
 
 + Ein einziger Zeitstrahl in ganzzahligen Zeiteinheiten; Dauern werden in Zeiteinheiten angegeben, nicht in Ticks
 + Die Warteschlange enthält drei Arten von Einträgen: Akteure (`art: "akteur"`, Ninkasi, Gegner, Verbündete), die nach dem Handeln mit ihren Aktionskosten wieder eingereiht werden; die Weltuhr (`art: "weltuhr"`) alle `WELTTICK` = 100 Einheiten; Zeitereignisse (`art: "ereignis"`, z.B. "Status endet bei T=4350"), optional an eine Entität gebunden (`gebundenAn`), dann entfallen sie mit ihr
-+ Kosten je Aktionsart in `daten/aktionen.js` (Standard 100; Bewegen, Nahkampf, Warten, Aufheben, Trinken, Werfen, Benutzen, Treppe, Anlegen, Ablegen, Fallenlassen und die Vorgabe für Fähigkeiten); Modifikatoren zielen auf eine Aktionsart oder auf alle
++ Kosten je Aktionsart in `daten/aktionen.js` (Standard 100; Bewegen, Nahkampf, Warten, Aufheben, Trinken, Lesen, Werfen, Benutzen, Treppe, Anlegen, Ablegen, Fallenlassen und die Vorgabe für Fähigkeiten); Modifikatoren zielen auf eine Aktionsart oder auf alle
 
 Schnittstellen:
 
@@ -139,7 +139,7 @@ Regeln:
 
 Daten (`src/kern/register.js`): feste Liste der Registerarten, jede eine Zuordnung Name → Eintrag:
 
-+ `befehle` (`{ pruefen, ausfuehren, ohneZeit? }`), `bausteine` (`(spiel, kontext, parameter) => void`), `ki` (`(spiel, akteur, ki) => befehl`), `modifikatorquellen` (`(spiel, entitaet) => [modifikator]`), `modifikatorbedingungen`, `befehlsveraenderer`, `zielmuster` (`(spiel, auswahl, parameter) => [{x, y}]`), `welttick`, `zeitereignisse`, `haken` (Listen je Name), `gefahren`, `zustandspruefungen` (`(spiel) => true`, wenn sie etwas verändert haben), `laufendeaktionen`, `beimErzeugen`, `ausDaten` (siehe Entitäten und Komponenten), `laufbeginn` (`(spiel, ninkasi) => void`, in `neuesSpiel` nach dem Einrichten Ninkasis, siehe Spielarten), `ausloeserquellen`, `lernanlaesse`, `planschritte` (`(spiel, plan, zufall) => void`), `ebenenschritte` (`{ braucht, liefert, verwirft?, ausfuehren }`) und `mitnehmen` (`(spiel, ninkasi, wechsel) => [id]`), siehe [Welt.md](Welt.md), Plan des Laufs und [Welt.md](Welt.md), Ebenen; `kihandlungen`, `kieingaben` und `nutzungen`, siehe [Wesen.md](Wesen.md), KI
++ `befehle` (`{ pruefen, ausfuehren, ohneZeit? }`), `bausteine` (`(spiel, kontext, parameter) => void`), `ki` (`(spiel, akteur, ki) => befehl`), `modifikatorquellen` (`(spiel, entitaet) => [modifikator]`), `faehigkeitsquellen` (`(spiel, wesen) => [{ faehigkeit, quelle, ... }]`, siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten), `modifikatorbedingungen`, `befehlsveraenderer`, `zielmuster` (`(spiel, auswahl, parameter) => [{x, y}]`), `welttick`, `zeitereignisse`, `haken` (Listen je Name), `gefahren`, `zustandspruefungen` (`(spiel) => true`, wenn sie etwas verändert haben), `laufendeaktionen`, `beimErzeugen`, `ausDaten` (siehe Entitäten und Komponenten), `laufbeginn` (`(spiel, ninkasi) => void`, in `neuesSpiel` nach dem Einrichten Ninkasis, siehe Spielarten), `ausloeserquellen`, `lernanlaesse`, `planschritte` (`(spiel, plan, zufall) => void`), `ebenenschritte` (`{ braucht, liefert, verwirft?, ausfuehren }`) und `mitnehmen` (`(spiel, ninkasi, wechsel) => [id]`), siehe [Welt.md](Welt.md), Plan des Laufs und [Welt.md](Welt.md), Ebenen; `kihandlungen`, `kieingaben` und `nutzungen`, siehe [Wesen.md](Wesen.md), KI
 
 Schnittstellen:
 

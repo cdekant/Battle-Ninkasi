@@ -5,7 +5,8 @@
 //   Baustein gelaende_setzen { gelaende, muster? }   auf das Zielfeld oder jedes Feld des Musters
 //   Baustein gelaende_zerstoeren { muster? }         Gelände mit zerstoerbar: { wird } wird zu "wird"
 //   Befehl benutzen { dx, dy }                       Nachbarfeld oder eigenes Feld mit beimBenutzen: Effekt, z.B. Hebel;
-//                                                    Ziel des Effekts ist das Feld (Ursache "benutzen")
+//                                                    Ziel des Effekts ist die Benutzerin und das Feld (zielId und
+//                                                    zielfeld, Ursache "benutzen"), z.B. ein HACCP-Aushang, der lehrt
 // Türen: die geschlossene trägt tuer: { offen: Gelände }, die offene tuer: { zu: Gelände }. Betritt ein Wesen, das
 // Türen öffnet (tueren, welt/karte.js), eine geschlossene Tür, geht sie auf; verlässt das letzte Wesen eine offene Tür
 // und liegt nichts mehr darin, geht sie zu (Haken betritt_feld und verlaesst_feld). Geschlossen versperrt sie die Sicht.
@@ -69,7 +70,7 @@ anmelden("befehle", "benutzen", {
     const name = gelaendeName(spiel, feld.x, feld.y);
     melden(spiel, "benutzt", { wer: bezugAuf(akteur), gelaende: name, feld });
     effektAnwenden(spiel, gelaendeAuf(spiel, feld.x, feld.y).beimBenutzen, {
-      quelleId: akteur.id, zielId: null, ursprung: feld, zielfeld: feld, ursache: "benutzen", mittel: { art: "gelaende", name },
+      quelleId: akteur.id, zielId: akteur.id, ursprung: feld, zielfeld: feld, ursache: "benutzen", mittel: { art: "gelaende", name },
     });
     return "benutzen";
   },
