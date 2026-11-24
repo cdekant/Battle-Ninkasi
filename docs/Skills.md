@@ -377,13 +377,29 @@ Werfen ist eine angeborene Grundfähigkeit wie der Sprint: Jede Ninkasi wirft, d
 
 ### Schilde
 
-+ Blocken und Schildschlag; Schildschlag-Schaden setzt die Grundfertigkeit voraus
+#### Schildkampf
+
++ Eigenschaften: Körperlichkeit, sekundär Gewandtheit
++ Lernt aus: Blocken mit dem Schild (Tag `schild`)
++ Ein Schild blockt Angriffe im Nahkampf und Geschosse; besondere, magische Schilde auch Magie, Psi und Strahlen, wenn ihre Daten es sagen
++ Jeder Tier senkt nebenbei Gewicht und Verlangsamung des Schilds: Wer mit dem Schild blockt, lernt ihn auch zu tragen; Schilde brauchen so keine Rüstungsskills
++ Grund: mehr Blocken
++ Experte: Deckung, hinter dem Schild trifft Ninkasi von Flächen und Explosionen nur ein Teil
++ Meister: der Schildschlag wird stärker, eine Fähigkeit aus der Welt, die stößt oder kurz betäubt; Schildkampf ist ihre Voraussetzung
++ Göttlich: Zurückwerfen, ein geblocktes Geschoss oder ein geblockter Strahl prallt mit einer Chance auf die Schützin zurück; nur, was der Schild blocken kann
++ Schildarten in den Daten: Buckler (leicht, schnell, passt zum Fechten), Schild, Turmschild (schwer, viel Deckung, bremst), später etwa ein Energieschild
 
 ### Präzision
 
-+ Kritchance und Kritfaktor für alles, was trifft
++ Eigenschaften: Gewandtheit, sekundär Sinnlichkeit
++ Lernt aus: jedem Krit (Lernanlass Kritisch)
++ Nur für körperliche Angriffe (Nahkampf, Fernkampf, Wurf); Magie und Psi haben eigene Skills für Krits, sonst würde Präzision zum Pflichtskill jedes Builds
++ Grund: Kritchance
++ Experte: Kritfaktor
++ Meister: gezielter Treffer, ein Teil des Ausweichens des Ziels zählt nicht
++ Göttlich: Schwachstelle, ein Krit macht das Ziel für kurze Zeit verwundbar (weniger Rüstung), auch für Verbündete
 
-Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Kampfwerte (Profile mit Tags, Kampfwerte, Bedingungen `gegenueber_ahnungslos` und `pegel_ab`) und Skills und Lernen; im Probeinhalt Nahkampf und Ausweichen als Grundskills; offen: Gerüst der Gattungen, Tags der Waffen, Wehrlos, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Kampfwerte (Profile mit Tags, Kampfwerte, Bedingungen `gegenueber_ahnungslos` und `pegel_ab`) und Skills und Lernen; im Probeinhalt Nahkampf und Ausweichen als Grundskills; offen: alle Sets, Tags der Waffen, Wehrlos, Abzug der zweiten Hand, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20, Fernwaffen in Punkt 22
 
 ## Brauen
 
@@ -422,5 +438,4 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Offen
 
-+ Kategorie Kampf Unterkategorie für Unterkategorie ausarbeiten, Verteidigung, waffenloser Kampf, Nahkampf mit Waffen, Handhabung und Fernkampf entworfen, weiter mit Schilden und Präzision
 + Bier- und Brandfontäne (Getrunkenes im Kegel speien, kostet Pegel): eher Fähigkeit als Skill, vielleicht zu Stoffwechsel und Pegel oder zu Magie, wo die Fontäne beschworen wird
