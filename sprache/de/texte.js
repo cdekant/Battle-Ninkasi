@@ -8,7 +8,7 @@ export default {
     einzahl: { nom: "Ninkasi", gen: "Ninkasis", dat: "Ninkasi", akk: "Ninkasi" },
   },
   // Log
-  "log.willkommen": "Ninkasi erwacht in einem feuchten Keller. Nüchtern. Das muss sich ändern.",
+  "log.willkommen": "... ninkasi ... Ninkasi ... NINKASI, wach auf!",
   "log.schaden": "{quelle.nom} trifft {ziel.akk}: {menge} Schaden ({art}).",
   "log.schaden_kritisch": "{quelle.nom} trifft {ziel.akk} kritisch: {menge} Schaden ({art}).",
   "log.schaden_immun": "{quelle.nom} trifft {ziel.akk}, doch {art} richtet nichts aus.",
