@@ -19,7 +19,7 @@ Form: Die Kategorien ordnen nach Themen, nicht nach Eigenschaften. Jedes Set nen
 + Eigenschaften: Körperlichkeit, sekundär Trinkfestigkeit
 + Lernt aus: erlittenem Schaden
 + Mehr LP, über alle Tiers bis etwa das Dreifache des Startwerts
-+ Ein höherer Tier darf die Regeneration der LP ändern, etwa auch im Kampf; offen bis zur Sitzung über Regeneration ([Systemausbau.md](Systemausbau.md), Punkt 10)
++ Die Regeneration der LP gehört zur Rauschheilung (siehe Stoffwechsel und Pegel), als Versuch
 
 ### Laufen
 
@@ -55,6 +55,47 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Lern
 
 ## Stoffwechsel und Pegel
 
+Die Kategorie hält alle Skills, die den Stoffwechsel verändern: Abbau des Pegels, Strafen des Rauschs, die Kurven der Regeneration aller drei Vorräte und die Abwehr gegen das, was im Körper wirkt. Magie und Psi verweisen für ihre Vorräte hierher. Wer im Rausch kämpft, lernt daraus (Lernanlass Berauscht).
+
+### Leber
+
++ Eigenschaften: Trinkfestigkeit, sekundär Körperlichkeit
++ Lernt aus: nur freien EP, Trinken ist nichts Bewältigtes
++ Der Pegel baut schneller ab, über alle Tiers etwa doppelt so schnell; zweischneidig und bewusst einfach: hilft Magie, schadet Psi, ob man sie lernt, entscheidet der Build
++ Zwei Tiers
+
+### Standfestigkeit
+
++ Eigenschaften: Trinkfestigkeit, sekundär Gewandtheit
++ Lernt aus: Berauscht
++ Mildert die Strafen des Rauschs (Torkeln, Fehlschläge, Filmriss), ohne die Schwellen zu verschieben; so bleibt, was an den Schwellen hängt (Mindestpegel, Regeneration der PP), wo es ist, und der Rausch wird nur weniger gefährlich
++ Wirkung hängt an den Pegelschwellen mit Wirkung ([Systemausbau.md](Systemausbau.md), Punkt 10)
+
+### Rauschheilung
+
++ Eigenschaften: Trinkfestigkeit, sekundär Körperlichkeit
++ Lernt aus: Berauscht
++ Das Optimum der Regeneration der LP wandert zu höherem Pegel, höhere Tiers heben auch die Rate; ob hier auch die Regeneration im Kampf hingehört, klärt die Sitzung über Regeneration ([Systemausbau.md](Systemausbau.md), Punkt 10)
+
+### Klarer Kopf
+
++ Eigenschaften: Klugheit, sekundär Trinkfestigkeit
++ Lernt aus: Berauscht
++ MP regenerieren auch bei mittlerem Pegel noch gut, die Kurve wandert zu höherem Pegel; erleichtert Mischbuilds aus Magie und Rausch
+
+### Rauschgeist
+
++ Eigenschaften: Sinnlichkeit, sekundär Trinkfestigkeit
++ Lernt aus: Berauscht
++ PP schwinden bei niedrigem Pegel weniger, bei hohem regenerieren sie schneller; ein höherer Tier lässt die Regeneration schon bei niedrigerem Pegel beginnen
+
+### Abwehr
+
++ Eigenschaften: Trinkfestigkeit, sekundär Körperlichkeit
++ Lernt aus: erlittenem Schaden durch Gift und Alkohol
++ Mehr Widerstand gegen Gift und Alkohol, später gegen Infektion, sobald es sie als Zustand gibt; das göttliche Niveau gibt vielleicht Immunität gegen Gift
++ Widerstand gegen äußere Schadensarten gehört zu Kampf, Verteidigung, gegen Magie und Psi in die eigenen Kategorien; mehr Schaden einer Art gehört zu dem, der ihn austeilt
+
 Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Wahrnehmung
@@ -66,6 +107,7 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 ### Verteidigung
 
 + Ausweichen
++ Abhärtung gegen äußere Schadensarten (Feuer, Säure, Lauge, Elektrisch), lernt aus erlittenem Schaden der Art
 
 ### Waffenloser Kampf
 
@@ -102,10 +144,13 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 ## Magie
 
 + Buffs, Schaden, Effekte von Tränken werden gesteigert
++ Abwehr gegen Magie; die Kurve der MP gehört zu Stoffwechsel und Pegel (Klarer Kopf)
 
 Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Psi
+
++ Abwehr gegen Psi; die Kurve der PP gehört zu Stoffwechsel und Pegel (Rauschgeist)
 
 Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 

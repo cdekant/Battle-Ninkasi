@@ -35,7 +35,7 @@ Umsetzung: siehe [Entwicklung.md](Entwicklung.md), Grundgerüst
 + Sechs Eigenschaften: Körperlichkeit, Trinkfestigkeit, Gewandtheit, Sinnlichkeit, Klugheit, Braukunde
 + Vorbild D&D (sechs Eigenschaften), Weisheit und Intelligenz geschärft zu Lebendigem (Braukunde) und Mechanischem (Klugheit)
 + Eigenschaften haben zwei Aufgaben: Sie bestimmen das Lerntempo der Skills und sind weiche Anforderungen an Gegenstände und Fähigkeiten
-+ Eigenschaften speisen keine Kampfwerte direkt; Kampfwerte, Vorräte und Stoffwechsel ändern sich über Skills aus dem Bereich der Eigenschaft (z.B. ein Skill der Trinkfestigkeit hebt die Schwellen des Pegels über `abbau.pegel` und `kurvenverschiebung.lp`)
++ Eigenschaften speisen keine Kampfwerte direkt; Kampfwerte, Vorräte und Stoffwechsel ändern sich über Skills aus dem Bereich der Eigenschaft (z.B. ein Skill der Trinkfestigkeit baut den Pegel schneller ab über `abbau.pegel` oder verschiebt das Optimum der LP über `kurvenverschiebung.lp`)
 + Jeder Skill hat eine primäre und eine sekundäre Eigenschaft (Vorbild: EVE Online)
 + Beispiel: Hohe Körperlichkeit lässt Skills, die LP erhöhen, schneller lernen
 
@@ -161,7 +161,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skil
 
 + Gebundene EP gibt nur Bewältigtes, das es je Ebene endlich oft gibt: besiegte Gegner, entschärfte Fallen, geöffnete Schlösser, ein Rezept beim ersten Gelingen, ein Hinterhalt; jedes davon trägt in den Daten einen festen Wert `ep`
 + Die Anwendung selbst bringt keine EP, sie bestimmt, wohin die EP fließen; so bleibt die Menge je Ebene begrenzt und Farmen an harmlosen Zielen bringt nichts
-+ Jedes Wesen führt ein Beitragsbuch: welche Lernanlässe Ninkasi an ihm hatte (Wirkung mit den Tags von Angriff, Fähigkeit und Effekt, dazu Ausweichen, Blocken, Rüstung nach ihrer Art und erlittener Schaden für passive Skills, Entkommen für die Skills der Bewegung)
++ Jedes Wesen führt ein Beitragsbuch: welche Lernanlässe Ninkasi an ihm hatte (Wirkung mit den Tags von Angriff, Fähigkeit und Effekt, dazu Ausweichen, Blocken, Rüstung nach ihrer Art und erlittener Schaden für passive Skills, Entkommen für die Skills der Bewegung, Berauscht für die Skills des Stoffwechsels)
 + Gewichtung vorerst nach der ersten erfolgreichen Anwendung: Jeder Lernanlass zählt je Gegner einmal; als Regelwert `regeln.lernen.gewichtung` (`erste`, später zum Vergleich `anteil` nach Schadensanteil)
 + Beim Tod des Gegners teilen sich seine EP auf die Skills auf, deren Lernanlässe im Buch stehen; passen mehrere Skills zum selben Anlass, wird gleich geteilt
 + Stirbt der Gegner durch eine Falle oder eine Verbündete, zählt das Buch trotzdem, sobald Ninkasi beigetragen hat
@@ -182,7 +182,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skil
 + Nachrückende Gegner sind nicht ausgeschlossen, mit eigenem EP-Faktor (Idee in [Ausblick.md](Ausblick.md), Nachrückende Gegner)
 + Vorschlag, noch nicht bestätigt: Varianten durch Affixe vervielfachen die Gegnertypen
 
-Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Entkommen, nachrückende Gegner, Rätsel
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Entkommen, Berauscht, nachrückende Gegner, Rätsel
 
 ## Offen
 

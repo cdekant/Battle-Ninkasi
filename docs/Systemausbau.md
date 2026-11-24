@@ -47,6 +47,7 @@ Status: offen, jeweils mit dem ersten Bedarf
 + Ausdrückliches Suchen nach Fallen (mehrere Züge, doppeltes Entdecken), vielleicht zusammen mit dem Rasten
 + Index im `zwischenspeicher`, welche Entitäten Auslöser für einen Haken tragen (Vorbild "WantEvent" in Caves of Qud), erst wenn mehr als die Beteiligten gefragt werden
 + Nach dem Anspielen prüfen, ob die Sichtlinie Ersatzlinien oder einen symmetrischen Schattenwurf braucht (siehe [Wirkungen.md](Wirkungen.md), Zielauswahl)
++ Skills der Arena in EP statt in Stufen (`skills: { name: ep }` in `datenproben/arenen.js`), die EP fließen mit den Eigenschaften der Arena-Ninkasi in Lernpunkte wie beim Verteilen freier EP; so vergleicht die Arena Builds mit gleichem Budget; später vielleicht ein Budget `ep` mit Verteilregel; alle Inhaltsdaten nennen EP, nur Unittests setzen Stufen direkt
 + Gewichtung `anteil` der gebundenen EP zum Vergleich mit `erste`; Ortsbindung des Verteilens (`regeln.lernen.ort`), falls gewünscht
 + Leistung, wenn viele Wesen zugleich jagen (etwa nach Teilungen um Ninkasi): 389 Wesen etwa 12 ms je Befehl gegen das Ziel 2 ms für 300 (siehe [Entwicklung.md](Entwicklung.md), Messwerte); mit dem ersten Inhalt, der so viele Teilende bringt, Zielwahl der Handlungen und Umkreissuche verbessern, dazu einen Zähler je Typ für `anzahl_unter`
 
@@ -176,11 +177,14 @@ Status: offen
 
 Status: in Arbeit, Kategorie für Kategorie in [Skills.md](Skills.md); das Dokument ist der Skillkatalog im Entwurf und gehört zu den Grundfesten des Spieldesigns
 
-+ Kategorien abwandern: Körper und Bewegung entworfen; weiter mit Stoffwechsel und Pegel, Wahrnehmung, Kampf (darin waffenloser Kampf), Brauen, Anlagen und Fallen, Soziales, Magie, Psi
++ Kategorien abwandern: Körper und Bewegung, Stoffwechsel und Pegel entworfen; weiter mit Wahrnehmung, Kampf (darin waffenloser Kampf), Brauen, Anlagen und Fallen, Soziales, Magie, Psi
 + Höchstens eine angeborene Grundfähigkeit je Vorrat; die erste ist der Sprint, die anderen beiden bleiben offen (siehe [Charakter.md](Charakter.md), Skills)
 + Lernanlass `entkommen` für Laufen und Sprint: zählt, wenn ein Wesen Ninkasi aus dem Kampf verliert, während sie läuft oder sprintet, je Wesen einmal wie alle Anlässe (siehe [Wesen.md](Wesen.md), Skills und Lernen)
++ Lernanlass `berauscht` für die Skills des Stoffwechsels: zählt, wenn Ninkasi an einem Wesen wirkt, während ihr Pegel über einer Schwelle liegt (welche, mit den Pegelschwellen aus Punkt 10), je Wesen einmal
++ Standfestigkeit braucht Strafen des Rauschs, die sich über Modifikatoren mildern lassen (mit den Pegelschwellen aus Punkt 10); Rauschgeist braucht die Verschiebung der Kurve zu niedrigerem Pegel (negatives `kurvenverschiebung.pp`, rechnerisch möglich, ungetestet)
++ Abwehr nach Kategorien: innere Schadensarten (Gift, Alkohol, Infektion) bei Stoffwechsel und Pegel, äußere (Feuer, Säure, Lauge, Elektrisch) bei Kampf, Verteidigung, Magie und Psi in ihren Kategorien
 + Laufen, Sprint und Rüstungsskills brauchen die Zeitskala aus Punkt 10 (Tempo je Wesen, Sprint, Verlangsamung durch Rüstung)
-+ Probewerte aus dem Entwurf, bis die Skills umgesetzt sind: Zähigkeit LP von 100 auf 300 über vier Tiers, Regeneration der LP von 0 auf 1 je Tick, Laufen Kosten fürs Bewegen von 120 auf 80 über vier Tiers, Tragkraft von 20 kg auf 40 kg, Bremsen durch die Last von 100 % auf 50 %
++ Probewerte aus dem Entwurf, bis die Skills umgesetzt sind: Zähigkeit LP von 100 auf 300 über vier Tiers, Regeneration der LP von 0 auf 1 je Tick, Laufen Kosten fürs Bewegen von 120 auf 80 über vier Tiers, Tragkraft von 20 kg auf 40 kg, Bremsen durch die Last von 100 % auf 50 %; Leber Abbau des Pegels von 100 auf 200 Hundertstel je Welttick über zwei Tiers, Rauschheilung Optimum der LP von 1,5 ‰ auf 3 ‰, Klarer Kopf Kurve der MP um 1 ‰ nach rechts, Rauschgeist Schwund der PP von 100 % auf 25 %, Abwehr Widerstand gegen Gift und Alkohol bis 50 %
 
 ## 21. Skills für Anhänger
 
