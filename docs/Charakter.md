@@ -155,7 +155,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skil
 + Erkundung: EP für jedes Feld, das zum ersten Mal wirklich gesehen wird
 + Magisch kartierte Felder gelten als bekannt, bringen EP aber erst beim wirklichen Sehen; vergessene Felder (Filmriss) bringen beim Wiedersehen keine EP mehr
 + Offen, ob EP je Feld die beste Form ist: Ein Ablaufen jeder Ecke wird belohnt; Abwägung in [Ausblick.md](Ausblick.md), EP für Erkundung
-+ Jedes Rätsel bringt seine EP nur einmal
++ Jedes Rätsel bringt seine EP nur einmal; Rätsel löst die Spielerin, kein Skill löst sie für sie (siehe [Skills.md](Skills.md), Anlagen und Fallen)
 + Freie EP lassen sich sparen, etwa bis entscheidende Fundstücke auftauchen
 + Freie EP lassen sich jederzeit verteilen, das Lernen kostet keine Spielzeit; Orte, an die das Verteilen gebunden ist (Altar, Hub), kommen vielleicht später, ein Schalter in den Regeln hält das offen
 

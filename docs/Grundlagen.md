@@ -33,7 +33,7 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Kapitel, Dienste 
   + Regeneration und Schwund sind für jeden Vorrat möglich; Skills, Schriftrollen, Items und Zustände passen Rate, Schwund und Lage der Verläufe an, siehe Stoffwechsel in [Wesen.md](Wesen.md)
 + Folge: Auf Magie bereitet man sich nüchtern vor, Psi braucht für Regeneration und Wirksamkeit einen möglichst hohen Pegel, bei dem das Risiko steigt; Mischbuilds müssen ihren Rausch planen
 + Meditieren und Schriftrollen schreiben nur nüchtern
-+ Waffen und Rüstung können verschleißen und kaputtgehen, auch durch Gebrauch; damit das kein Ärgernis wird, gibt es wirksame Wege, sie sehr gut in Schuss zu halten (Pflege über Kennerschaft, siehe [Skills.md](Skills.md), Wahrnehmung, und Reparatur)
++ Waffen und Rüstung können verschleißen und kaputtgehen, auch durch Gebrauch; damit das kein Ärgernis wird, gibt es wirksame Wege, sie sehr gut in Schuss zu halten (Pflege über Kennerschaft, siehe [Skills.md](Skills.md), Wahrnehmung, und Reparatur über das Handwerk, siehe [Skills.md](Skills.md), Anlagen und Fallen)
 + Gegenstände wirken nur angelegt, das Gepäck ist Vorrat: Waffen, Rüstung, Schmuck und Zauberstäbe geben ihre Werte und Fähigkeiten erst in der Hand oder am Körper, ein Wechsel kostet Zeit; aus dem Gepäck wird nur getrunken, gelesen, geworfen und verbraucht; Ausnahmen sind passive Wirkungen wie ein Bier, das einmal vor dem Tod bewahrt
 + Ein Zauberstab bezahlt seine Fähigkeit mit eigenen Ladungen statt mit den Vorräten der Trägerin; trägt sie zwei gleiche, wird zuerst der zuerst angelegte geleert
 + Fähigkeiten aus Fundstücken: ein angelegter Gegenstand gewährt sie, solange er angelegt ist; ein Lehrstück (Schriftrolle, HACCP-Aushang) lehrt sie dauerhaft, gelernt ist gelernt; daneben gibt es Verbrauchsgegenstände, die einmal wirken
@@ -50,7 +50,7 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Kapitel, Dienste 
 + Bestimmte Aktionen sind nur mit einem bestimmten Pegel durchführbar
 + Pegel bringt Risiko
 + Brausystem mit Zutaten und Rezepten
-+ Brauen ist die einzige Herstellung: Getränke, Tränke und Gifte entstehen beim Brauen, Magie steigert nur ihre Wirkung; Brauen und Mälzen kann jede Ninkasi von Anfang an (siehe [Skills.md](Skills.md), Brauen)
++ Brauen ist die einzige Herstellung von Getränken, Tränken und Giften, Magie steigert nur ihre Wirkung; Bauen und Reparieren gehören zum Handwerk; Brauen und Mälzen kann jede Ninkasi von Anfang an (siehe [Skills.md](Skills.md), Brauen)
 + Gebraut wird an festen Altären (Braukessel) oder in mobilen Kesseln
 + Ninkasi muss beim Brauen am Kessel bleiben, damit das Bier gut wird; eine Gärung, die ohne sie weiterläuft, gibt es nicht
 + Kessel in Tiers nach Material: Kupfer, Eisen, Edelstahl, Silber, Gold

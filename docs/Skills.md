@@ -403,7 +403,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Kampfwerte (Profile mit Tags, 
 
 ## Brauen
 
-Brauen ist die einzige Herstellung: Bier, Wein, Met, Kvas, Kefir, Kombucha, auch Tränke und Gifte entstehen beim Brauen; Magie hat keine eigene Alchemie, die etwas herstellt, sie steigert die Wirkung des Gebrauten (siehe Magie). Brauen und Mälzen sind Gaben der Göttin, angeborene Fähigkeiten jeder Ninkasi wie das Werfen (siehe [Charakter.md](Charakter.md), Fähigkeiten); die Skills heben Gelingen, Ausbeute und Güte und erweitern die Fähigkeiten in Ausbaustufen. Die Sets folgen den Schritten des Brauens und dem, was ein Sud ergibt, damit sie tragen, wie immer das Brausystem im Einzelnen aussieht (offen in [Grundlagen.md](Grundlagen.md), Spielkern). Vorbilder: EVE Online (Industry macht die Fertigung schneller), RimWorld (die Fertigkeit senkt die Gefahr verdorbener Speisen, die Sauberkeit wirkt daneben), Caves of Qud (Baupläne finden sich unterwegs, die Skills machen sie baubar).
+Brauen ist die einzige Herstellung von Getränken, Tränken und Giften: Bier, Wein, Met, Kvas, Kefir, Kombucha, auch Tränke und Gifte entstehen beim Brauen; Magie hat keine eigene Alchemie, die etwas herstellt, sie steigert die Wirkung des Gebrauten (siehe Magie). Bauen und Reparieren gehören zum Handwerk (siehe Anlagen und Fallen). Brauen und Mälzen sind Gaben der Göttin, angeborene Fähigkeiten jeder Ninkasi wie das Werfen (siehe [Charakter.md](Charakter.md), Fähigkeiten); die Skills heben Gelingen, Ausbeute und Güte und erweitern die Fähigkeiten in Ausbaustufen. Die Sets folgen den Schritten des Brauens und dem, was ein Sud ergibt, damit sie tragen, wie immer das Brausystem im Einzelnen aussieht (offen in [Grundlagen.md](Grundlagen.md), Spielkern). Vorbilder: EVE Online (Industry macht die Fertigung schneller), RimWorld (die Fertigkeit senkt die Gefahr verdorbener Speisen, die Sauberkeit wirkt daneben), Caves of Qud (Baupläne finden sich unterwegs, die Skills machen sie baubar).
 
 Muster der Tiers: Grund Gelingen, Experte Ausbeute, Meister Güte; einzelne Sets weichen ab. Die Schulen schließen sich so wenig aus wie die Waffengattungen. Die Kessel aufzustellen, zu bauen und zu pflegen gehört zu Anlagen und Fallen.
 
@@ -486,10 +486,60 @@ Umsetzung: offen, braucht das Brausystem und die Bierstile ([Systemausbau.md](Sy
 
 ## Anlagen und Fallen
 
-+ Fallenstellen und Entschärfen als eigene Sets, quer verwandt mit der Reaktion (siehe Kampf, Verteidigung); erweist sich das Thema als ergiebig, gern mehr Sets rund um Fallen
-+ Kessel als Anlage: aufstellen, bauen und pflegen, feste Altäre und mobile Kessel (siehe Brauen)
+Die Kategorie der Klugheit: Fallen entschärfen und stellen, Schlösser öffnen, Anlagen bedienen, bauen und reparieren. Anlagen sind Kessel (feste Altäre und mobile Kessel, siehe Brauen), Gärbottiche, Pumpen, Ventile, Druckkessel, später Dampfmaschinen. Entdecken gehört zur Wahrnehmung (Fallengespür), Rettungswurf und Ausweichen vor Fallen zur Verteidigung (Reaktion, quer verwandt mit Entschärfen und Fallenstellen). Rätsel bekommen keinen Skill: Sie löst die Spielerin, ein Skill nähme ihnen den Sinn. Vorbilder: Brogue (Fallen treffen Gegner wie die Spielerin), Cataclysm DDA (ein misslungenes Entschärfen löst die Falle aus), Tales of Maj'Eyal (ein ganzer Baum für Fallen, der Köder lockt Wesen und löst zuletzt Fallen in der Nähe aus).
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
+Gegner und Fallen: Ein Wesen kennt die Fallen der Ebene, auf der es erzeugt wurde, und meidet sie; ein Verfolger auf einer fremden Ebene kennt dort keine, Ninkasis eigene Fallen kennt kein Gegner. Unbekannten Fallen entgehen Gegner nach ihren Daten auf verschiedene Weise: sie entdecken sie (Kontrolleure oft), lösen sie nicht aus (Fliegende), weichen aus oder halten die Wirkung aus.
+
+Falle und Wurf: Die Falle bestimmt die Form, das Gebraute die Wirkung. Ein Trank wirkt in der Falle so stark wie geworfen, Güte und Alchemie steigern beides gleich, Fallenstellen steigert die Wirkung nicht. Die Art der Falle gibt die Form (Düse ein Feld, Sprengfalle eine Fläche, Stolperdraht eine Linie). Die Falle trifft genau, ohne Streuung und Ausweichen, solange ihre Tarnung hält, und kostet Zeit vorher statt im Kampf, aber ob ein Gegner hineintritt, ist nicht sicher; der Wurf wirkt sofort, wo es brennt, kann aber streuen und kostet eine Aktion im Kampf. Fallen und Köder sind Gegenstände aus der Welt, gefunden oder geborgen.
+
+### Entschärfen
+
++ Eigenschaften: Klugheit, sekundär Gewandtheit
++ Lernt aus: jeder entschärften Falle, mit dem Teil ihrer EP, den das Entdecken übrig lässt (siehe Wahrnehmung, Fallengespür)
++ Entschärfen ist eine Grundaktion wie Benutzen, keine Fähigkeit; misslingt es, kann die Falle auslösen
++ Grund: höhere Chance
++ Experte: ein Fehlschlag löst die Falle seltener aus
++ Meister: Bergen, die entschärfte Falle wird ein Gegenstand, den Ninkasi wieder aufstellen kann
++ Göttlich: Umpolen, die Falle bleibt liegen und gehört nun Ninkasi
+
+### Fallenstellen
+
++ Eigenschaften: Klugheit, sekundär Sinnlichkeit
++ Lernt aus: Wirkung mit dem Tag `falle`, wenn Ninkasi die Falle gestellt hat; sie ist die Urheberin, das Beitragsbuch zählt wie bei einer Waffe
++ Grund: bessere Tarnung
++ Experte: Laden, eine Falle wirkt mit Gebrautem, das Ninkasi in sie füllt (Trank, Gift, Bier), nach dessen Wirkung in der Form der Falle
++ Meister: schneller aufstellen, auch kurz vor einem Kampf
++ Göttlich: Kettenfalle, eine ausgelöste Falle löst Ninkasis Fallen in der Nähe mit aus
+
+### Schlösser
+
++ Eigenschaften: Klugheit, sekundär Gewandtheit
++ Lernt aus: jedem geöffneten Schloss
++ Grund: höhere Chance
++ Experte: leiser und schneller
++ Meister: Fallen an Schlössern und Truhen fallen beim Öffnen auf
++ Göttlich: Verschließen, Ninkasi schließt Türen hinter sich ab und hält Verfolger auf
++ Die Türen von Schatzräumen öffnet nur ihr Schlüssel (siehe [Ausblick.md](Ausblick.md), Schatzräume mit Schlüssel)
+
+### Anlagenkunde
+
++ Eigenschaften: Klugheit, sekundär Braukunde
++ Lernt aus: dem ersten Inbetriebnehmen jeder Art von Anlage, je Art einmal wie die Kennerschaft je Typ
++ Grund: weniger Risiko beim Bedienen
++ Experte: eine Anlage wirkt voll; ein Kessel aus edlem Material entfaltet sein Tier erst mit dem Skill, ohne ihn ist er nutzbar, aber riskant (siehe [Charakter.md](Charakter.md), Fähigkeiten, Fundstück ohne passenden Skill)
++ Meister: Überlasten, eine Anlage wird absichtlich zur Falle, etwa ein Druckkessel, der platzt
++ Die Kennerschaft erkennt eine Anlage, die Anlagenkunde bedient sie (siehe Wahrnehmung, Kennerschaft)
+
+### Handwerk
+
++ Eigenschaften: Klugheit, sekundär Körperlichkeit
++ Lernt aus: freien EP und quer von der Anlagenkunde; Reparieren bringt keine gebundenen EP, sonst ließe es sich endlos wiederholen
++ Grund: Reparieren mit Werkzeug und Material wirkt mehr, an Ausrüstung, Kesseln und Anlagen
++ Experte: mobile Kessel und Fallen schneller aufstellen und abbauen
++ Meister: Bauen, Barrikaden und einfache Anlagen aus Teilen
++ Die Pflege bleibt bei der Kennerschaft, die Reparatur gehört hierher (siehe [Grundlagen.md](Grundlagen.md), Spielkern)
+
+Umsetzung: teilweise, siehe [Welt.md](Welt.md), Gelände (Fallen mit Tarnung und Effekt, Entdecken, Benutzen); offen: alle Sets, Kenntnis der Fallen je Ebene, eigene Fallen, Schlösser, Anlagen, Reparatur, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Soziales
 
