@@ -1,6 +1,8 @@
 // Befehle "bewegen" (mit Angriff durch Hineinlaufen) und "warten"; versetzen für alles, was Wesen bewegt.
-// Befehle: { art: "bewegen", dx: -1..1, dy: -1..1, angreifen? }, { art: "warten" }
+// Befehle: { art: "bewegen", dx: -1..1, dy: -1..1, angreifen?, insLeere? }, { art: "warten" }
 // Hineinlaufen greift Feinde an; mit angreifen: true jedes Wesen (Rausch, Verwirrung, gezielter Angriff auf Freunde).
+// insLeere: true ist ein Schlag auf ein Feld ohne Wesen (Fehlschlag im Rausch, systeme/befehlsveraenderer.js): kostet
+// einen Angriff, bewegt nicht und trifft nichts; steht doch ein Wesen dort, gilt es als Angriff mit angreifen: true.
 // Bewegungsarten siehe welt/karte.js: betretbar ist, was die wirksame Bewegungsart des Wesens zulässt;
 // ein unbewegliches Wesen greift an, bewegt sich aber nicht und lässt sich nicht verschieben (systeme/verschieben.js).
 // Tür: der Schritt auf eine geschlossene Tür mit tuer.aufschlag (daten/gelaende.js) kostet so viel Prozent mehr als
@@ -11,7 +13,7 @@ import { entitaetenAuf, bewegungVon, positionSetzen, istGesteuert, gesteuerteEnt
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
 import { betretbar, gelaendeAuf } from "../welt/karte.js";
 import { prozentVon } from "../kern/werte.js";
-import { istWesen, feindlich, nahkampf, kannAngreifen } from "./kampf.js";
+import { istWesen, feindlich, nahkampf, kannAngreifen, angriffskosten } from "./kampf.js";
 import { sichtfeldAktualisieren, traegtLicht } from "./sicht.js";
 import { lichtWirkt } from "./licht.js";
 import { aktionAbbrechen } from "./laufendeAktionen.js";
@@ -57,9 +59,11 @@ anmelden("befehle", "bewegen", {
   pruefen(spiel, akteur, befehl) {
     if (!istEinzelschritt(befehl.dx) || !istEinzelschritt(befehl.dy) || (befehl.dx === 0 && befehl.dy === 0)) return "ungueltig";
     if (befehl.angreifen !== undefined && typeof befehl.angreifen !== "boolean") return "ungueltig";
+    if (befehl.insLeere !== undefined && typeof befehl.insLeere !== "boolean") return "ungueltig";
     const feld = zielfeld(akteur, befehl);
     const anderesWesen = wesenAuf(spiel, feld.x, feld.y);
-    if (anderesWesen) return kannAngreifen(spiel, akteur) && (feindlich(spiel, akteur, anderesWesen) || befehl.angreifen === true) ? null : "besetzt";
+    if (anderesWesen) return kannAngreifen(spiel, akteur) && (feindlich(spiel, akteur, anderesWesen) || befehl.angreifen === true || befehl.insLeere === true) ? null : "besetzt";
+    if (befehl.insLeere === true) return kannAngreifen(spiel, akteur) ? null : "ungueltig";
     if (istUnbeweglich(akteur)) return "unbeweglich";
     if (!betretbar(spiel, akteur, feld)) return "wand";
     return null;
@@ -69,6 +73,10 @@ anmelden("befehle", "bewegen", {
     const anderesWesen = wesenAuf(spiel, feld.x, feld.y);
     if (anderesWesen) {
       return { aktion: "nahkampf", grundkosten: nahkampf(spiel, akteur, anderesWesen) };
+    }
+    if (befehl.insLeere === true) {
+      melden(spiel, "ins_leere", { wer: bezugAuf(akteur), felder: [feld] });
+      return { aktion: "nahkampf", grundkosten: angriffskosten(spiel, akteur) ?? grundkostenVon(spiel, akteur, "nahkampf") };
     }
     const aufschlag = gelaendeAuf(spiel, feld.x, feld.y)?.tuer?.aufschlag ?? 0;
     versetzen(spiel, akteur, feld, "schritt");

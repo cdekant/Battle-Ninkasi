@@ -13,7 +13,7 @@
 import { spielerin, gesteuerteEntitaet, entitaetMitId } from "../kern/zustand.js";
 import { beziehungZwischen, urheberVon } from "../systeme/fraktionen.js";
 import { hoechstwert } from "../kern/werte.js";
-import { optimalerPegel } from "../systeme/stoffwechsel.js";
+import { optimalerPegel, rauschstufe } from "../systeme/stoffwechsel.js";
 import { promilleText, leistenanteil, TEILSTRICHE } from "./pegelanzeige.js";
 
 import { faehigkeitVon } from "../systeme/faehigkeiten.js";
@@ -40,8 +40,8 @@ function balken(beschriftung, aktuellerWert, hoechsterWert, cssKlasse) {
   </div>`;
 }
 
-// Pegel nach oben offen: Leiste in Verdopplungsschritten, Schwellen, Optimum der LP, genauer Wert
-function pegelLeiste(beschriftung, pegel, schwellen, optimumLp) {
+// Pegel nach oben offen: Leiste in Verdopplungsschritten, Schwellen der Stufen, Optimum der LP, genauer Wert und Stufe
+function pegelLeiste(beschriftung, pegel, schwellen, optimumLp, stufe) {
   const prozentAufLeiste = (wert) => (leistenanteil(wert) * 100).toFixed(2);
   const schwellenMarken = schwellen
     .map((schwelle) => `<span class="schwelle" style="left:${prozentAufLeiste(schwelle)}%"></span>`)
@@ -51,7 +51,7 @@ function pegelLeiste(beschriftung, pegel, schwellen, optimumLp) {
     .map((teilstrich) => `<span style="left:${prozentAufLeiste(teilstrich)}%">${promilleText(teilstrich).replace(",0 ‰", "").replace(" ‰", "")}</span>`)
     .join("");
   return `<div class="wert pegel">
-    <div class="wert-kopf"><span>${beschriftung}</span><span>${promilleText(pegel)}</span></div>
+    <div class="wert-kopf"><span>${beschriftung}</span><span>${stufe} · ${promilleText(pegel)}</span></div>
     <div class="balken"><div class="fuellung" style="width:${prozentAufLeiste(pegel)}%"></div>${schwellenMarken}${optimumMarke}</div>
     <div class="teilstriche">${teilstrichBeschriftung}</div>
   </div>`;
@@ -284,7 +284,7 @@ export class Oberflaeche {
         ${balken(text("ui.lp"), werte.lp.aktuell, hoechstwert(spiel, gesteuerte, "lp"), "lp")}
         ${balken(text("ui.mp"), werte.mp.aktuell, hoechstwert(spiel, gesteuerte, "mp"), "mp")}
         ${balken(text("ui.pp"), werte.pp.aktuell, hoechstwert(spiel, gesteuerte, "pp"), "pp")}
-        ${pegelLeiste(text("ui.promille"), werte.pegel.aktuell, gesteuerte.stoffwechsel.schwellen || [], optimalerPegel(spiel, gesteuerte, "lp"))}
+        ${pegelLeiste(text("ui.promille"), werte.pegel.aktuell, (gesteuerte.stoffwechsel.stufen || []).map((stufe) => stufe.ab), optimalerPegel(spiel, gesteuerte, "lp"), text(`rausch.${rauschstufe(gesteuerte)}`))}
         <div class="freie-ep">${text("ui.freie_ep")}: <b>${spielerin(zustand).freieEp ?? 0}</b> <span class="leise">${text("ui.freie_ep_hinweis")}</span></div>
         ${this.lageHtml(spiel, gesteuerte)}
         <div class="leise last">${lastText(spiel, this.texte, gesteuerte)}</div>

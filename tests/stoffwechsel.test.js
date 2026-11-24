@@ -10,7 +10,7 @@ import { vorgangAbschliessen } from "../src/kern/vorgang.js";
 import { hakenAusloesen } from "../src/kern/ereignisse.js";
 import "../src/systeme/tod.js";
 import "../src/systeme/kampfzustand.js";
-import { rateBeimPegel, optimalerPegel, wirksameRate, gewinnJeTreffer } from "../src/systeme/stoffwechsel.js";
+import { rateBeimPegel, optimalerPegel, wirksameRate, gewinnJeTreffer, rauschstufe, rauschchance } from "../src/systeme/stoffwechsel.js";
 import { rohdaten } from "../src/inhalt.js";
 import { wertAufKurve, stelleDesHoechstwerts } from "../src/kern/kurven.js";
 
@@ -18,7 +18,7 @@ const welttick = (spiel, anzahl = 1) => {
   for (let i = 0; i < anzahl; i++) holen("welttick", "stoffwechsel")(spiel);
 };
 
-function spielMitTrinkerin({ pegel = 0, lp = 50, mp = 50, pp = 50, regeneration = {}, abbauHundertstel = 0, schwellen = [], imKampf, kampfgewinn } = {}) {
+function spielMitTrinkerin({ pegel = 0, lp = 50, mp = 50, pp = 50, regeneration = {}, abbauHundertstel = 0, stufen = [], rausch, imKampf, kampfgewinn } = {}) {
   const spiel = { ...miniSpiel(["###", "#.#", "###"]), hoerer: [] };
   const trinkerin = entitaetErzeugen(spiel.zustand, {
     fraktion: "feinde",
@@ -29,7 +29,7 @@ function spielMitTrinkerin({ pegel = 0, lp = 50, mp = 50, pp = 50, regeneration 
       pp: { grundwert: 100, anfangswert: pp },
       pegel: { anfangswert: pegel },
     }),
-    stoffwechsel: { abbauHundertstel, schwellen, regeneration, imKampf, kampfgewinn },
+    stoffwechsel: { abbauHundertstel, stufen, rausch, regeneration, imKampf, kampfgewinn },
   });
   const meldungen = [];
   hoererAnmelden(spiel, (meldung) => meldungen.push(meldung));
@@ -91,14 +91,19 @@ test("Raten gelten für den Pegel vor dem Abbau", () => {
   assert.equal(trinkerin.werte.pegel.aktuell, 0);
 });
 
-test("Schwellen und Nüchternheit werden in beide Richtungen gemeldet", () => {
-  const { spiel, trinkerin, meldungen } = spielMitTrinkerin({ pegel: 101, abbauHundertstel: 100, schwellen: [100] });
+test("Stufen und Nüchternheit werden in beide Richtungen gemeldet, mit der Stufe danach", () => {
+  const stufen = [{ name: "angeheitert", ab: 100 }, { name: "beschwipst", ab: 200 }];
+  const { spiel, trinkerin, meldungen } = spielMitTrinkerin({ pegel: 101, abbauHundertstel: 100, stufen });
+  assert.equal(rauschstufe(trinkerin), "angeheitert");
   welttick(spiel);
   assert.deepEqual(meldungen.map((meldung) => meldung.art), []);
   welttick(spiel);
-  assert.deepEqual(meldungen.map((meldung) => [meldung.art, meldung.schwelle]), [["pegel_sinkt", 100]]);
-  wertAendern(spiel, trinkerin, "pegel", 50);
-  assert.deepEqual(meldungen.at(-1).art, "pegel_steigt");
+  assert.deepEqual(meldungen.map((meldung) => [meldung.art, meldung.schwelle, meldung.stufe]), [["pegel_sinkt", 100, "nuechtern"]]);
+  assert.equal(rauschstufe(trinkerin), "nuechtern");
+  wertAendern(spiel, trinkerin, "pegel", 250);
+  assert.deepEqual(meldungen.slice(-2).map((meldung) => [meldung.art, meldung.stufe]), [["pegel_steigt", "angeheitert"], ["pegel_steigt", "beschwipst"]]);
+  wertAendern(spiel, trinkerin, "pegel", -300);
+  assert.deepEqual(meldungen.slice(-2).map((meldung) => [meldung.art, meldung.stufe]), [["pegel_sinkt", "angeheitert"], ["pegel_sinkt", "nuechtern"]]);
   trinkerin.werte.pegel.aktuell = 1;
   welttick(spiel);
   assert.equal(meldungen.at(-1).art, "nuechtern");

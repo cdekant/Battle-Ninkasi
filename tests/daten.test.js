@@ -40,6 +40,22 @@ test("Stoffwechsel: Kurven werden geprüft, nur für vorhandene Werte, Pegel ist
   assert.ok(gewinnFalsch.some((meldung) => meldung.includes("kampfgewinn.ausdauer ohne Wert")));
 });
 
+test("Stoffwechsel: Stufen aufsteigend mit Namen, Strafen des Rauschs mit angemeldeten Veränderern und Kurven", () => {
+  const mitStoffwechsel = (aenderung) => mitNinkasi((ninkasi) => ({ stoffwechsel: { ...ninkasi.stoffwechsel, ...aenderung } }));
+  const erwartet = [
+    [{ schwellen: [100] }, "heißen jetzt stoffwechsel.stufen"],
+    [{ stufen: [{ name: "a", ab: 200 }, { name: "b", ab: 100 }] }, "aufsteigendem ab"],
+    [{ stufen: [{ name: "a", ab: 0 }] }, "aufsteigendem ab"],
+    [{ rausch: { befehle: [{ veraenderer: "zaubern", chance: [[0, 1]] }] } }, 'Befehlsveränderer "zaubern"'],
+    [{ rausch: { befehle: [{ veraenderer: "abweichen", chance: [[10, 1], [5, 2]] }] } }, "rausch.befehle[0].chance"],
+    [{ rausch: { befehle: [{ veraenderer: "abweichen", chance: [[0, 1]], freundeAngreifen: "ja" }] } }, "freundeAngreifen"],
+    [{ rausch: { modifikatoren: [{ ziel: "genauigkeit", art: "plus" }] } }, "rausch.modifikatoren[0]"],
+  ];
+  for (const [aenderung, teilDerMeldung] of erwartet) {
+    assert.ok(mitStoffwechsel(aenderung).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
+  }
+});
+
 test("Auslöser: Haken, Rolle, Ziel, Prozente und Effekt werden geprüft", () => {
   const mitAusloeser = (ausloeser) => mitNinkasi(() => ({ ausloeser: [ausloeser] }));
   const gueltig = { bei: "nach_schaden", rolle: "ziel", ziel: "quelle", effekt: "biss_klein", chance: 30, daempfung: 50 };

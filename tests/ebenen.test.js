@@ -156,9 +156,10 @@ test("Datenprüfung: Abfolge, Starttiefe, feste Karte, Population und Tabellen",
 // den alten Werten blieben die Werte gleich); neu mit 0.61.0 für die Sicht (Ninkasis Sichtweite 6, Sicht je Lichtstufe
 // und sicht.imFinstern statt imDunkeln; mit Sichtweite 8, vollem Anteil und dem alten Namen blieben die Werte gleich);
 // neu mit 0.62.0 für Ninkasis Stoffwechsel (Kurven nach der Norm, imKampf, kampfgewinn; mit den alten Daten des
-// Stoffwechsels blieben die Werte gleich).
+// Stoffwechsels blieben die Werte gleich); neu mit 0.63.0 für Ninkasis Skala des Pegels (Kurven mal 4, Stufen,
+// Strafen des Rauschs; mit dem alten Stoffwechsel blieben die Werte gleich).
 test("Erzeugung in Schritten: dieselben Ebenen wie vorher", () => {
-  const erwartet = { 1: "3a71994fa33acdad", 2: "4f5f22d5e62e348c", 3: "bd8e042150e29ab4", 42: "be9a489a5dd1103e", 4711: "5eb3891249cfa40a" };
+  const erwartet = { 1: "18b33e54ee812fd0", 2: "452b2bc802e0a248", 3: "8264bda5dd6292e2", 42: "2a89a43feb471fda", 4711: "0180da7cd96a5309" };
   for (const [startwert, fingerabdruck] of Object.entries(erwartet)) {
     const spiel = neuesSpiel(DATEN, Number(startwert));
     for (const tiefe of [2, 3, 0]) ebeneWechseln(spiel, tiefe);

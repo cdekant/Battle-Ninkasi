@@ -8,13 +8,17 @@
 //   ziel_verfehlen: { chance } Verwirrung beim Befehl "faehigkeit": mit der Chance (skaliert mit der Stärke) verrutscht
 //              das Ziel, ein Wesen auf ein anderes Wesen daneben, ein Feld auf ein Nachbarfeld, eine Richtung um 45°;
 //              nur auf Ziele, die der Befehl zulässt; gibt es keins, bleibt der Befehl. Andere Befehle bleiben unverändert.
+//   daneben_schlagen: { chance } Fehlschlag im Rausch beim Angriff durch Hineinlaufen: mit der Chance (skaliert mit der
+//              Stärke) trifft der Schlag ein Nachbarfeld um 45° daneben; steht dort ein Wesen, Feind wie Verbündeter,
+//              wird es angegriffen, sonst geht der Schlag ins Leere (insLeere, systeme/bewegung.js). Schritte ohne
+//              Angriff und andere Befehle bleiben unverändert.
 
 import { anmelden, holen } from "../kern/register.js";
 import { wurfProzent, wurfAuswahl } from "../kern/wurf.js";
 import { prozentVon } from "../kern/werte.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { ACHT_RICHTUNGEN, wesenAufFeld } from "../welt/geometrie.js";
-import { feindlich } from "./kampf.js";
+import { feindlich, kannAngreifen } from "./kampf.js";
 
 function veraendererAnmelden(name, parameterBeschreibung, funktion) {
   funktion.parameter = parameterBeschreibung;
@@ -83,4 +87,26 @@ veraendererAnmelden("ziel_verfehlen", { chance: "ganzzahl" }, (spiel, akteur, be
   if (!kandidaten.length) return befehl;
   melden(spiel, "abgewichen", { wer: bezugAuf(akteur) });
   return wurfAuswahl(spiel, "ziel_verfehlen_wohin", kandidaten);
+});
+
+// Ein Angriff durch Hineinlaufen: auf dem Zielfeld steht ein Wesen, das der Befehl angreift
+function istAngriff(spiel, akteur, befehl) {
+  if (befehl?.art !== "bewegen" || !kannAngreifen(spiel, akteur)) return false;
+  const wesenDort = wesenAufFeld(spiel, { x: akteur.position.x + befehl.dx, y: akteur.position.y + befehl.dy })[0];
+  return Boolean(wesenDort) && (befehl.angreifen === true || feindlich(spiel, akteur, wesenDort));
+}
+
+veraendererAnmelden("daneben_schlagen", { chance: "ganzzahl" }, (spiel, akteur, befehl, parameter, staerkeProzent) => {
+  if (!istAngriff(spiel, akteur, befehl)) return befehl;
+  if (!trittEin(spiel, "daneben_schlagen", prozentVon(parameter.chance, staerkeProzent))) return befehl;
+  const bewegen = holen("befehle", "bewegen");
+  const kandidaten = verrutschteZiele(spiel, akteur, { dx: befehl.dx, dy: befehl.dy })
+    .map(({ dx, dy }) => {
+      const wesenDort = wesenAufFeld(spiel, { x: akteur.position.x + dx, y: akteur.position.y + dy })[0];
+      return wesenDort ? { art: "bewegen", dx, dy, angreifen: true } : { art: "bewegen", dx, dy, insLeere: true };
+    })
+    .filter((kandidat) => !bewegen.pruefen(spiel, akteur, kandidat));
+  if (!kandidaten.length) return befehl;
+  melden(spiel, "daneben_geschlagen", { wer: bezugAuf(akteur) });
+  return wurfAuswahl(spiel, "daneben_schlagen_wohin", kandidaten);
 });

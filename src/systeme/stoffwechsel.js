@@ -4,10 +4,16 @@
 // Komponente in den Daten:
 //   stoffwechsel: {
 //     abbauHundertstel: 100,              // Abbau des Pegels je Welttick, in Hundertsteln eines Pegelpunkts
-//     schwellen: [50, 100, 200, 300],     // Pegel, deren Über- und Unterschreiten gemeldet wird
+//     stufen: [{ name: "angeheitert", ab: 200 }, ...],  // Stufen des Rauschs aufsteigend; darunter "nuechtern";
+//                                         // Über- und Unterschreiten wird gemeldet, Texte rausch.<name>
 //     regeneration: { lp: [[0, 30], [150, 80]], ... },  // je Wert eine Kurve: [pegel, Hundertstel je Welttick]
 //     imKampf: { lp: 0, mp: 0 },          // Prozent der Rate im Kampf (systeme/kampfzustand.js), fehlt ein Wert: 100
 //     kampfgewinn: { pp: { jeTreffer: 200, kurve: [[50, 0], [150, 100]] } },  // Hundertstel je Treffer, ausgeteilt
+//     rausch: {                           // Strafen des Rauschs über dem Pegel
+//       befehle: [{ veraenderer, chance: kurve, ...parameter }],  // Befehlsveränderer (systeme/befehlsveraenderer.js)
+//                                         // mit der Chance in Prozent nach der Kurve über dem Pegel
+//       modifikatoren: [{ ziel, art, betrag, wenn? }],  // gelten immer, Schwellen über pegel_ab (Quelle "rausch")
+//     },
 //   }                                     // wie erlitten, mal Prozent der Kurve über dem Pegel
 // Negative Kurvenwerte sind Schwund. Modifikatoren (siehe kern/werte.js):
 //   "regeneration.<wert>"       Plus oder Prozent auf eine positive Rate
@@ -16,8 +22,9 @@
 //   "abbau.pegel"               Plus oder Prozent auf den Abbau des Pegels
 //   "imKampf.<wert>"            Plus in Prozentpunkten auf den Anteil der Rate im Kampf (z.B. Regeneration im Kampf)
 //   "kampfgewinn.<wert>"        Plus oder Prozent auf den Gewinn je Treffer
+//   "rausch.<veraenderer>"      Plus oder Prozent auf die Chance eines Befehlsveränderers aus dem Rausch (Standfestigkeit)
 
-import { anmelden } from "../kern/register.js";
+import { anmelden, holen } from "../kern/register.js";
 import { alleEntitaeten, istWesen } from "../kern/zustand.js";
 import { modifiziert, hatWert, prozentVon } from "../kern/werte.js";
 import { wertAufKurve, stelleDesHoechstwerts } from "../kern/kurven.js";
@@ -57,6 +64,24 @@ export function gewinnJeTreffer(spiel, entitaet, wertName) {
   if (!gewinn) return 0;
   const anteil = wertAufKurve(gewinn.kurve, entitaet.werte.pegel.aktuell);
   return Math.max(0, modifiziert(spiel, entitaet, `kampfgewinn.${wertName}`, prozentVon(gewinn.jeTreffer, anteil)));
+}
+
+// Stufe des Rauschs beim aktuellen Pegel: Name der höchsten erreichten Stufe, darunter "nuechtern"
+export function rauschstufe(entitaet) {
+  const pegel = entitaet.werte?.pegel?.aktuell ?? 0;
+  return stufeBeimPegel(entitaet.stoffwechsel?.stufen || [], pegel);
+}
+
+function stufeBeimPegel(stufen, pegel) {
+  let name = "nuechtern";
+  for (const stufe of stufen) if (pegel >= stufe.ab) name = stufe.name;
+  return name;
+}
+
+// Chance eines Befehlsveränderers aus dem Rausch in Prozent beim aktuellen Pegel, mit Modifikatoren, 0 bis 100
+export function rauschchance(spiel, entitaet, eintrag) {
+  const grundchance = wertAufKurve(eintrag.chance, entitaet.werte.pegel.aktuell);
+  return Math.min(100, Math.max(0, modifiziert(spiel, entitaet, `rausch.${eintrag.veraenderer}`, grundchance)));
 }
 
 // Pegel mit der schnellsten Regeneration eines Werts, z.B. für die Anzeige des LP-Optimums
@@ -100,12 +125,36 @@ function kampfgewinnVerbuchen(spiel, kontext) {
 
 anmelden("haken", "nach_treffer", kampfgewinnVerbuchen);
 
-// Schwellen des Pegels beim Steigen und Sinken melden
+// Stufen des Rauschs beim Steigen und Sinken melden: stufe ist die Stufe, die beim Überschreiten beginnt bzw. nach
+// dem Unterschreiten gilt
 anmelden("haken", "nach_wertaenderung", (spiel, { entitaet, wertName, vorher, nachher }) => {
   if (wertName !== "pegel" || !entitaet.stoffwechsel) return;
-  for (const schwelle of entitaet.stoffwechsel.schwellen || []) {
-    if (vorher < schwelle && nachher >= schwelle) melden(spiel, "pegel_steigt", { wer: bezugAuf(entitaet), schwelle });
-    if (vorher >= schwelle && nachher < schwelle) melden(spiel, "pegel_sinkt", { wer: bezugAuf(entitaet), schwelle });
+  const stufen = entitaet.stoffwechsel.stufen || [];
+  for (const stufe of stufen) {
+    if (vorher < stufe.ab && nachher >= stufe.ab) melden(spiel, "pegel_steigt", { wer: bezugAuf(entitaet), schwelle: stufe.ab, stufe: stufe.name });
+  }
+  for (const stufe of [...stufen].reverse()) {
+    if (vorher >= stufe.ab && nachher < stufe.ab) melden(spiel, "pegel_sinkt", { wer: bezugAuf(entitaet), schwelle: stufe.ab, stufe: stufeBeimPegel(stufen, stufe.ab - 1) });
   }
   if (vorher > 0 && nachher === 0) melden(spiel, "nuechtern", { wer: bezugAuf(entitaet) });
+});
+
+// Strafen des Rauschs: die Befehlsveränderer aus rausch.befehle in ihrer Reihenfolge, jeder mit seiner Chance beim Pegel;
+// sichere Fälle (Chance 0) rufen den Veränderer nicht auf, so bleibt die Zahlenfolge des Zufalls nüchtern ungestört
+anmelden("haken", "vor_befehl", (spiel, kontext) => {
+  const akteur = spiel.zustand.entitaeten[kontext.akteurId];
+  const befehle = akteur?.stoffwechsel?.rausch?.befehle;
+  if (!befehle || !hatWert(akteur, "pegel")) return;
+  for (const eintrag of befehle) {
+    const chance = rauschchance(spiel, akteur, eintrag);
+    if (chance <= 0) continue;
+    const { veraenderer, chance: _kurve, ...parameter } = eintrag;
+    kontext.befehl = holen("befehlsveraenderer", veraenderer)(spiel, akteur, kontext.befehl, { ...parameter, chance }, 100);
+  }
+});
+
+// Modifikatoren des Rauschs (Genauigkeit über pegel_ab), Quelle "rausch"
+anmelden("modifikatorquellen", "rausch", (spiel, entitaet) => {
+  const modifikatoren = entitaet.stoffwechsel?.rausch?.modifikatoren;
+  return modifikatoren?.length ? modifikatoren.map((modifikator) => ({ ...modifikator, quelle: "rausch" })) : [];
 });

@@ -128,7 +128,7 @@ export function zeilenAusMeldung(kontext, meldung) {
     }
     case "pegel_steigt":
     case "pegel_sinkt":
-      return geschehen(text(`log.${meldung.art}`, { ...meldung, schwelle: promilleText(meldung.schwelle) }), "pegel");
+      return geschehen(text(`log.${meldung.art}`, { ...meldung, schwelle: promilleText(meldung.schwelle), stufe: text(`rausch.${meldung.stufe}`) }), "pegel");
     case "abgelehnt": {
       const schluessel = `log.abgelehnt.${meldung.grund}`;
       return hatSchluessel(schluessel) ? geschehen(text(schluessel), "hinweis") : [];

@@ -22,19 +22,30 @@ export default {
     plaetze: { hand: 2, kopf: 1, brust: 1, beine: 1, hals: 1, finger: 2 },
     // Stoffwechsel, siehe src/systeme/stoffwechsel.js; alle Zahlen vorläufig, LP und MP nach regeln.normierung.regeneration.
     // Kurven: [Pegel in Hundertstel Promille, Hundertstel je Welttick], negativ ist Schwund.
-    // Schwellen vorerst nur angezeigt und gemeldet.
+    // Ninkasis Skala liegt viermal so hoch wie die der Sterblichen: bis 2 ‰ ist sie nüchtern (docs/Grundlagen.md, Spielkern).
     stoffwechsel: {
-      abbauHundertstel: 100, // 0,01 ‰ je Welttick
-      schwellen: [50, 100, 200, 300], // 0,5, 1, 2 und 3 ‰
+      abbauHundertstel: 200, // 0,02 ‰ je Welttick
+      stufen: [
+        { name: "angeheitert", ab: 200 }, { name: "beschwipst", ab: 400 }, { name: "berauscht", ab: 800 },
+        { name: "im_rausch", ab: 1200 }, { name: "sturzbetrunken", ab: 2000 }, { name: "vollrausch", ab: 3200 },
+      ],
       regeneration: {
-        lp: [[0, 25], [150, 67], [300, 25], [800, 0]], // voll nüchtern in 400 Ticks, im Optimum bei 1,5 ‰ in 150, bei 3 ‰ in 400
-        mp: [[0, 50], [100, 25], [300, 0]], // nüchtern am schnellsten, voll in 200 Ticks
-        pp: [[0, -30], [150, -10], [400, 0]], // außerhalb des Kampfes nur Schwund, bei hohem Pegel kaum
+        lp: [[0, 25], [600, 67], [1200, 25], [3200, 0]], // voll nüchtern in 400 Ticks, im Optimum bei 6 ‰ in 150, bei 12 ‰ in 400
+        mp: [[0, 50], [400, 25], [1200, 0]], // nüchtern am schnellsten, voll in 200 Ticks
+        pp: [[0, -30], [600, -10], [1600, 0]], // außerhalb des Kampfes nur Schwund, bei hohem Pegel kaum
       },
       imKampf: { lp: 0, mp: 0, pp: 0 }, // im Kampf ruhen alle drei; Regeneration im Kampf später über Skills (imKampf.lp)
-      // Kampfespegel: PP je Treffer, ausgeteilt wie erlitten; unter 0,5 ‰ nichts, bei 1,5 ‰ 2 PP, bei 4 ‰ 4 PP;
-      // so reicht ein gewöhnlicher Kampf (etwa 3 Treffer ausgeteilt, 1 bis 2 erlitten) bei 1,5 ‰ für eine Psi-Fähigkeit (10 PP)
-      kampfgewinn: { pp: { jeTreffer: 200, kurve: [[50, 0], [150, 100], [400, 200]] } },
+      // Kampfespegel: PP je Treffer, ausgeteilt wie erlitten; unter 2 ‰ nichts, bei 6 ‰ 2 PP, ab 16 ‰ 4 PP;
+      // so reicht ein gewöhnlicher Kampf (etwa 3 Treffer ausgeteilt, 1 bis 2 erlitten) bei 6 ‰ für eine Psi-Fähigkeit (10 PP)
+      kampfgewinn: { pp: { jeTreffer: 200, kurve: [[200, 0], [600, 100], [1600, 200]] } },
+      // Strafen des Rauschs: ab berauscht (8 ‰) sinkt die Genauigkeit, im Rausch (ab 12 ‰) torkelt sie und schlägt daneben
+      rausch: {
+        befehle: [
+          { veraenderer: "abweichen", chance: [[1199, 0], [1200, 5], [2000, 15], [3200, 30]] },
+          { veraenderer: "daneben_schlagen", chance: [[1199, 0], [1200, 5], [2000, 15], [3200, 30]] },
+        ],
+        modifikatoren: [800, 1200, 2000, 3200].map((wert) => ({ ziel: "genauigkeit", art: "plus", betrag: -5, wenn: [{ bedingung: "pegel_ab", wert }] })),
+      },
     },
   },
 };

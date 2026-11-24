@@ -22,6 +22,7 @@
 //   anforderung:     { eigenschaften: { koerperlichkeit: 15 }, risiko } weiche Anforderung; die Tabelle wird über die
 //                    Summe der fehlenden Punkte (wirksame Werte) gewürfelt
 //                    Reihenfolge der Würfe: skill, anforderung, risiko; der erste Ausgang mit wirkt: false beendet
+//                    Modifikator risiko.<ausgang>: Plus oder Prozent auf die Chance eines Ausgangs (risikochance)
 //   ausbau:          [{ wenn, aendert }] Ausbau durch Skills: gilt wenn (Bedingungen an der Wirkenden, z.B. skill_ab),
 //                    legt sich aendert flach über die Definition, in Datenreihenfolge (faehigkeitFuer)
 //   dauer:           { schritte } lange Aktion (Ritual, Kanalisieren): bezahlt wird am Anfang, jeder Schritt kostet zeit,
@@ -190,12 +191,18 @@ function kostenBezahlen(spiel, wesen, name, definition) {
   }
 }
 
+// Chance eines Ausgangs in Prozent bei x, mit dem Modifikator risiko.<ausgang> (Standfestigkeit, Selbstbeherrschung)
+export function risikochance(spiel, wesen, ausgang, x) {
+  const grundchance = Math.max(0, wertAufKurve(ausgang.chance, x));
+  return grundchance === 0 ? 0 : Math.max(0, modifiziert(spiel, wesen, `risiko.${ausgang.name}`, grundchance));
+}
+
 // Würfelt eine Risikotabelle über x (Vorgabe: der Pegel der Wirkenden); gibt den Ausgang zurück oder null (nichts passiert)
 export function risikoWuerfeln(spiel, wesen, tabellenName, x = undefined) {
   const tabelle = spiel.daten.risiken?.[tabellenName];
   if (!tabelle) throw new Error(`Unbekannte Risikotabelle "${tabellenName}"`);
   const wert = x ?? (hatWert(wesen, "pegel") ? wesen.werte.pegel.aktuell : 0);
-  const chancen = tabelle.map((ausgang) => Math.max(0, wertAufKurve(ausgang.chance, wert)));
+  const chancen = tabelle.map((ausgang) => risikochance(spiel, wesen, ausgang, wert));
   if (chancen.every((chance) => chance === 0)) return null;
   let wurf = wurfGanzzahl(spiel, "risiko", 1, 100);
   for (let i = 0; i < tabelle.length; i++) {

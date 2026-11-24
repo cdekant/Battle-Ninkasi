@@ -150,7 +150,7 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
     });
   }
   if (wesen.ki) pruefeKi(daten, wesen.ki, `${ort}.ki`, fehler, istTextliste(wesen.faehigkeiten) ? wesen.faehigkeiten : []);
-  if (wesen.stoffwechsel) pruefeStoffwechsel(wesen, ort, fehler);
+  if (wesen.stoffwechsel) pruefeStoffwechsel(daten, sprache, wesen, ort, fehler);
   if (wesen.sicht && !istGanzzahl(wesen.sicht.reichweite)) fehler.push(`${ort}: sicht.reichweite muss eine ganze Zahl sein`);
   if (wesen.sicht?.imDunkeln !== undefined) fehler.push(`${ort}: sicht.imDunkeln heißt jetzt sicht.imFinstern`);
   if (wesen.sicht?.imFinstern !== undefined && !istZahlAbNull(wesen.sicht.imFinstern)) fehler.push(`${ort}: sicht.imFinstern muss eine ganze Zahl >= 0 sein`);
@@ -353,16 +353,19 @@ function pruefeSchadensarten(daten, sprache, fehler) {
 }
 
 // Stoffwechsel: braucht den Wert pegel, Kurven nur für vorhandene Werte (siehe systeme/stoffwechsel.js)
-function pruefeStoffwechsel(wesen, ort, fehler) {
+function pruefeStoffwechsel(daten, sprache, wesen, ort, fehler) {
   const stoffwechsel = wesen.stoffwechsel;
   if (!wesen.werte || !wesen.werte.pegel) fehler.push(`${ort}: stoffwechsel braucht den Wert pegel`);
   if (stoffwechsel.abbauHundertstel !== undefined && (!istGanzzahl(stoffwechsel.abbauHundertstel) || stoffwechsel.abbauHundertstel < 0)) {
     fehler.push(`${ort}: stoffwechsel.abbauHundertstel muss eine ganze Zahl >= 0 sein`);
   }
-  const schwellen = stoffwechsel.schwellen || [];
-  if (!Array.isArray(schwellen) || !schwellen.every((schwelle) => istGanzzahl(schwelle) && schwelle > 0)) {
-    fehler.push(`${ort}: stoffwechsel.schwellen müssen ganze Zahlen > 0 sein`);
-  }
+  if (stoffwechsel.schwellen !== undefined) fehler.push(`${ort}: stoffwechsel.schwellen heißen jetzt stoffwechsel.stufen [{ name, ab }]`);
+  const stufen = stoffwechsel.stufen || [];
+  const stufenGueltig = Array.isArray(stufen) && stufen.every((stufe, nummer) => istObjekt(stufe) && typeof stufe.name === "string"
+    && istGanzzahl(stufe.ab) && stufe.ab > 0 && (nummer === 0 || stufe.ab > stufen[nummer - 1].ab));
+  if (!stufenGueltig) fehler.push(`${ort}: stoffwechsel.stufen muss eine Liste [{ name, ab }] mit aufsteigendem ab > 0 sein`);
+  else for (const name of ["nuechtern", ...stufen.map((stufe) => stufe.name)]) pruefeText(sprache.texte, `rausch.${name}`, `${ort}.stoffwechsel.stufen`, fehler);
+  if (stoffwechsel.rausch !== undefined) pruefeRausch(daten, stoffwechsel.rausch, `${ort}.stoffwechsel.rausch`, fehler);
   for (const [wertName, kurve] of Object.entries(stoffwechsel.regeneration || {})) {
     if (!wesen.werte || !wesen.werte[wertName]) fehler.push(`${ort}: stoffwechsel.regeneration.${wertName} ohne Wert ${wertName}`);
     fehler.push(...kurvenfehler(kurve, `${ort}.stoffwechsel.regeneration.${wertName}`));
@@ -376,6 +379,22 @@ function pruefeStoffwechsel(wesen, ort, fehler) {
     if (!istGanzzahl(gewinn?.jeTreffer) || gewinn.jeTreffer < 0) fehler.push(`${ort}: stoffwechsel.kampfgewinn.${wertName}.jeTreffer muss eine ganze Zahl >= 0 sein`);
     fehler.push(...kurvenfehler(gewinn?.kurve, `${ort}.stoffwechsel.kampfgewinn.${wertName}.kurve`));
   }
+}
+
+// Strafen des Rauschs: { befehle?: [{ veraenderer, chance: kurve, ...parameter }], modifikatoren? } (systeme/stoffwechsel.js)
+function pruefeRausch(daten, rausch, ort, fehler) {
+  if (!istObjekt(rausch)) return fehler.push(`${ort}: muss { befehle?, modifikatoren? } sein`);
+  if (rausch.befehle !== undefined) {
+    if (!Array.isArray(rausch.befehle)) fehler.push(`${ort}.befehle: muss eine Liste sein`);
+    else rausch.befehle.forEach((eintrag, nummer) => {
+      const stelle = `${ort}.befehle[${nummer}]`;
+      if (!hat("befehlsveraenderer", eintrag?.veraenderer)) return fehler.push(`${stelle}: Befehlsveränderer "${eintrag?.veraenderer}" ist nicht angemeldet`);
+      fehler.push(...kurvenfehler(eintrag.chance, `${stelle}.chance`));
+      // die Chance kommt aus der Kurve, die übrigen Parameter prüft der Veränderer
+      pruefeParameter(daten, holen("befehlsveraenderer", eintrag.veraenderer).parameter || {}, { ...eintrag, chance: 0 }, stelle, fehler);
+    });
+  }
+  if (rausch.modifikatoren !== undefined) pruefeModifikatoren(daten, rausch.modifikatoren, `${ort}.modifikatoren`, fehler);
 }
 
 // Feldschichten: { oberflaechen, gase }, siehe systeme/schichten.js; Zeichen in zeichen.schichten

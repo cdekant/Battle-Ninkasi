@@ -77,7 +77,7 @@ Die Kategorie hält alle Skills, die den Stoffwechsel verändern: Abbau des Pege
 + Eigenschaften: Trinkfestigkeit, sekundär Gewandtheit
 + Lernt aus: Berauscht
 + Mildert die Strafen des Rauschs (Torkeln, Fehlschläge, Filmriss), ohne die Schwellen zu verschieben; so bleibt, was an den Schwellen hängt (Mindestpegel, Regeneration der PP), wo es ist, und der Rausch wird nur weniger gefährlich
-+ Wirkung hängt an den Pegelschwellen mit Wirkung ([Systemausbau.md](Systemausbau.md), Punkt 10)
++ Die Hebel stehen: die Chancen von Torkeln, Danebenschlagen und Fehlschlägen lassen sich senken (siehe [Wesen.md](Wesen.md), Stoffwechsel, und [Wirkungen.md](Wirkungen.md), Fähigkeiten); der Filmriss folgt ([Systemausbau.md](Systemausbau.md), Punkt 10)
 + Tiers: je eine Strafe des Rauschs, Grund Torkeln milder, Experte seltener Fehlschläge, Meister seltener Filmriss
 
 ### Rauschheilung

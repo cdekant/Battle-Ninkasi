@@ -11,5 +11,7 @@ export default {
   sprint: { text: "zustand.sprint", dauer: 750, modifikatoren: [{ ziel: "kosten.bewegen", art: "prozent", betrag: -50 }, { ziel: "abbau.pegel", art: "prozent", betrag: 100 }] },
   // Vorläufig: Betäubung (src/systeme/betaeubung.js), die Dauer setzt der Baustein betaeuben; wehrlos bis zum nächsten Zug
   betaeubt: { text: "zustand.betaeubt", adjektiv: "adjektiv.betaeubt", tags: ["kontrolle", "wehrlos"] },
+  // Vorläufig: Kontrollverlust der Psi (datenproben/risiken.js), Schritte weichen ab und treffen auch Verbündete
+  verwirrt: { text: "zustand.verwirrt", adjektiv: "adjektiv.verwirrt", tags: ["kontrolle"], dauer: 300, befehl: { veraenderer: "abweichen", chance: 50, freundeAngreifen: true } },
   gereizt: { text: "zustand.gereizt", adjektiv: "adjektiv.gereizt", modifikatoren: [{ ziel: "ausweichen", art: "plus", betrag: -1 }] },
 };

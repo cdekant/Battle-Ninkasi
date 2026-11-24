@@ -77,7 +77,7 @@ Daten:
 | 4 | gefährlich | 6 | 9 | 40 |
 | 5 | Elite, ein Duell | 8 | 6 | 80 |
 
-+ `regeneration`: Weltticks von leer bis voll außerhalb des Kampfes für Ninkasi zu Beginn, LP nüchtern 400, im Optimum der Kurve 150 und bei `pegelRausch` (3 ‰) 400, MP nüchtern 200; `tests/stoffwechsel.test.js` prüft Ninkasis Kurven dagegen
++ `regeneration`: Weltticks von leer bis voll außerhalb des Kampfes für Ninkasi zu Beginn, LP nüchtern 400, im Optimum der Kurve 150 und bei `pegelRausch` (12 ‰, Ninkasis Stufe `im_rausch`) 400, MP nüchtern 200; `tests/stoffwechsel.test.js` prüft Ninkasis Kurven dagegen
 + Weitere Normen, nach denen sich Inhalt richtet: `kontrolle` kurz 100, mittel 200, lang 400 Zeiteinheiten; `abklingzeit` kurz 300, mittel 1000, lang 3000; `verbrauch` Standardzauber 10 MP, Psi-Fähigkeit 10 PP; Bezug fürs Tragen ist `regeln.tragen.tragkraft` (20 kg)
 + Normwesen (`datenproben/gegner.js`, Vorlage `normwesen`, in keiner Population, Sichtweite 7): `normwesen_1` bis `normwesen_5` mit 11, 16, 22, 33 und 44 LP, Genauigkeit 47, stumpfer Schlag mit 2W3, 1W6+2, 2W6+1, 2W8+2 und 3W8+3 (Mittel 4, 5,5, 8, 11, 16,5), Tempo 100; Arenen `normwesen` und `normwesen_drei` mit den Varianten `s1` bis `s5`
 
@@ -228,7 +228,7 @@ Schnittstellen:
 
 Regeln:
 
-+ `bewegen` greift durch Hineinlaufen Feinde an, mit `angreifen: true` jedes Wesen (gezielter Angriff, Rausch, Verwirrung); `warten` wartet eine Aktion
++ `bewegen` greift durch Hineinlaufen Feinde an, mit `angreifen: true` jedes Wesen (gezielter Angriff, Rausch, Verwirrung); mit `insLeere: true` ist es ein Schlag auf ein Feld ohne Wesen (Danebenschlagen im Rausch, siehe Stoffwechsel): er kostet einen Angriff (`angriffskosten`), bewegt nicht und trifft nichts, Meldung `ins_leere`; steht doch ein Wesen dort, wird es angegriffen; gültig nur mit Angriffsprofilen; `warten` wartet eine Aktion
 + Jedes Wesen belegt genau ein Feld, auch ein Boss; Bossphasen laufen über Auslöser mit Bedingungen (siehe [Wirkungen.md](Wirkungen.md), Auslöser)
 + Was eine Bewegungsart kann, sagen die Daten des Geländes; `phasend` betritt jedes Gelände außer `undurchdringlich`; `unbeweglich` steht, wo `laufend` steht; Sicht und Lärm hängen weiter am Gelände selbst
 + Unbeweglich: der Schritt auf ein freies Feld wird mit `unbeweglich` abgelehnt, Angreifen durch Hineinlaufen geht; `jagen` setzt Fähigkeiten ein, greift an, was daneben steht, und wartet sonst; Stoßen, Ziehen, Tauschen und Teleportieren wirken nicht
@@ -243,15 +243,21 @@ Regeln:
 Daten:
 
 + Der Pegel ist ein Wert in Hundertsteln Promille (100 entsprechen 1 ‰), ohne Grundwert und damit nach oben offen
-+ Komponente `stoffwechsel` (`src/systeme/stoffwechsel.js`, Werte für Ninkasi in `daten/ninkasi.js`): Abbau des Pegels, Schwellen und je Wert eine Kurve der Regeneration über dem Pegel (Hundertstel je Welttick, Kurven siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); `imKampf: { <wert>: prozent }` Anteil der Rate im Kampf (0 bis 100, fehlt ein Wert: 100, nur für Werte mit Kurve); `kampfgewinn: { <wert>: { jeTreffer, kurve } }` Gewinn je Treffer in Hundertsteln mal Prozent der Kurve über dem Pegel (Kampfespegel)
-+ Ninkasi (vorläufig): LP `[[0, 25], [150, 67], [300, 25], [800, 0]]`, MP `[[0, 50], [100, 25], [300, 0]]` nach der Norm `regeln.normierung.regeneration` (siehe Normierung); PP außerhalb des Kampfes nur Schwund `[[0, -30], [150, -10], [400, 0]]`; im Kampf ruhen alle drei (`imKampf` je 0); `kampfgewinn.pp` 200 je Treffer mal `[[50, 0], [150, 100], [400, 200]]`, also nichts unter 0,5 ‰, 2 PP bei 1,5 ‰ und 4 PP ab 4 ‰; ein gewöhnlicher Kampf (rund 3 Treffer ausgeteilt, 1 bis 2 erlitten) reicht bei 1,5 ‰ für eine Psi-Fähigkeit nach der Norm `verbrauch.psi`
++ Komponente `stoffwechsel` (`src/systeme/stoffwechsel.js`, Werte für Ninkasi in `daten/ninkasi.js`): Abbau des Pegels, Stufen und Strafen des Rauschs und je Wert eine Kurve der Regeneration über dem Pegel (Hundertstel je Welttick, Kurven siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); `imKampf: { <wert>: prozent }` Anteil der Rate im Kampf (0 bis 100, fehlt ein Wert: 100, nur für Werte mit Kurve); `kampfgewinn: { <wert>: { jeTreffer, kurve } }` Gewinn je Treffer in Hundertsteln mal Prozent der Kurve über dem Pegel (Kampfespegel)
++ `stufen: [{ name, ab }]` aufsteigend, darunter gilt `nuechtern`; Texte `rausch.<name>` in den Sprachdateien
++ `rausch: { befehle?, modifikatoren? }`: `befehle: [{ veraenderer, chance: kurve, ...parameter }]` Befehlsveränderer (siehe [Wirkungen.md](Wirkungen.md), Zustände) mit der Chance in Prozent nach der Kurve über dem Pegel; `modifikatoren` gelten immer, mit der Quelle `rausch`, Schwellen über `pegel_ab`
++ Ninkasis Skala liegt viermal so hoch wie die der Sterblichen (Entscheidung in [Grundlagen.md](Grundlagen.md), Spielkern); die Getränke heben den Pegel mit Werten für Sterbliche
++ Ninkasi (vorläufig): Abbau 0,02 ‰ je Welttick; Stufen angeheitert ab 2 ‰, beschwipst ab 4, berauscht ab 8, `im_rausch` ab 12, sturzbetrunken ab 20, Vollrausch ab 32 ‰; LP `[[0, 25], [600, 67], [1200, 25], [3200, 0]]`, MP `[[0, 50], [400, 25], [1200, 0]]` nach der Norm `regeln.normierung.regeneration` (siehe Normierung); PP außerhalb des Kampfes nur Schwund `[[0, -30], [600, -10], [1600, 0]]`; im Kampf ruhen alle drei (`imKampf` je 0); `kampfgewinn.pp` 200 je Treffer mal `[[200, 0], [600, 100], [1600, 200]]`, also nichts unter 2 ‰, 2 PP bei 6 ‰ und 4 PP ab 16 ‰; ein gewöhnlicher Kampf (rund 3 Treffer ausgeteilt, 1 bis 2 erlitten) reicht bei 6 ‰ für eine Psi-Fähigkeit nach der Norm `verbrauch.psi`
++ Strafen des Rauschs für Ninkasi (vorläufig): ab 8 ‰ Genauigkeit -5 je Schwelle bei 8, 12, 20 und 32 ‰; ab 12 ‰ `abweichen` (Torkeln) und `daneben_schlagen` mit je 5 %, 15 % bei 20 ‰ und 30 % ab 32 ‰
 
 Schnittstellen:
 
 + Handler der Weltuhr (Register `welttick`): je Welttick Regeneration oder Schwund nach den Kurven, im Kampf (`imKampf`, siehe Kampfzustand) mal dem Anteil aus `imKampf`, danach Abbau des Pegels
 + Haken `nach_treffer`: jeder Treffer zwischen zwei verschiedenen Wesen bringt beiden ihren `kampfgewinn`, der Angreiferin (`quelleId`) wie dem Ziel
-+ `rateBeimPegel`, `anteilImKampf`, `wirksameRate` und `gewinnJeTreffer` für Anzeige und Tests
-+ Modifikatoren: `regeneration.<wert>` auf positive Raten, `schwund.<wert>` auf den Betrag negativer Raten, `kurvenverschiebung.<wert>` verschiebt die Kurve nach rechts (z.B. Optimum der LP nach oben), `abbau.pegel` auf den Abbau, `imKampf.<wert>` in Prozentpunkten auf den Anteil im Kampf (bis 100, z.B. Regeneration der LP im Kampf), `kampfgewinn.<wert>` auf den Gewinn je Treffer; Quellen sind Skills, Schriftrollen, Items und Zustände
++ `rateBeimPegel`, `anteilImKampf`, `wirksameRate` und `gewinnJeTreffer` für Anzeige und Tests; `rauschstufe(entitaet)` (Name der Stufe, sonst `nuechtern`) und `rauschchance(spiel, entitaet, eintrag)` (Chance eines Veränderers aus dem Rausch, 0 bis 100)
++ Haken `nach_wertaenderung`: Meldungen `pegel_steigt` und `pegel_sinkt` mit `schwelle` und `stufe` (beim Steigen die beginnende Stufe, beim Sinken die danach geltende), je überschrittene Schwelle eine; `nuechtern`, wenn der Pegel ganz abgebaut ist
++ Haken `vor_befehl`: die Veränderer aus `rausch.befehle` in ihrer Reihenfolge, nur mit einer Chance über 0 (nüchtern bleibt die Zahlenfolge des Zufalls ungestört); Modifikatorquelle `rausch`
++ Modifikatoren: `regeneration.<wert>` auf positive Raten, `schwund.<wert>` auf den Betrag negativer Raten, `kurvenverschiebung.<wert>` verschiebt die Kurve nach rechts (z.B. Optimum der LP nach oben), `abbau.pegel` auf den Abbau, `imKampf.<wert>` in Prozentpunkten auf den Anteil im Kampf (bis 100, z.B. Regeneration der LP im Kampf), `kampfgewinn.<wert>` auf den Gewinn je Treffer, `rausch.<veraenderer>` auf die Chance eines Veränderers aus dem Rausch (Standfestigkeit, ohne die Schwellen zu verschieben); Quellen sind Skills, Schriftrollen, Items und Zustände
 
 Regeln:
 
@@ -302,7 +308,7 @@ Regeln:
 
 ## Tests
 
-+ `tests/kampf.test.js` (Trefferwurf, Blocken, Krit, Schadensrechnung, Profile), `tests/zeitskala.test.js` (wehrlos, Kampfzustand als Bedingung), `tests/normierung.test.js` (Normwesen, Einordnung, Datenprüfung), `tests/fraktionen.test.js` (Beziehungen, Zorn, Ruf, Kampfzustand, Beistand), `tests/wahrnehmung.test.js` (Wachzustand, Bemerken, Lärm, Hinterhalt), `tests/sinne.test.js` (Arten der Wahrnehmung, Spüren entlang offener Felder, Bemerken und Jagen nach Gespürtem), `tests/faehigkeitenwahl.test.js`, `tests/verhalten.test.js`, `tests/handlungen.test.js` (auch Ziele unter Verbündeten), `tests/nutzen.test.js` und `tests/arena.test.js` (KI, Taktik), `tests/umherziehen.test.js` (Wegpunkte, Wachzustand der Population, Umherziehen, Rudel, Abstandskarte), `tests/verschieben.test.js` (Bewegungsarten, Stoßen, Ziehen, Tauschen, Teleportieren, Lage, Werfen), `tests/wege.test.js`, `tests/stoffwechsel.test.js`, `tests/skills.test.js` und `tests/lernen.test.js`
++ `tests/kampf.test.js` (Trefferwurf, Blocken, Krit, Schadensrechnung, Profile), `tests/zeitskala.test.js` (wehrlos, Kampfzustand als Bedingung), `tests/normierung.test.js` (Normwesen, Einordnung, Datenprüfung), `tests/fraktionen.test.js` (Beziehungen, Zorn, Ruf, Kampfzustand, Beistand), `tests/wahrnehmung.test.js` (Wachzustand, Bemerken, Lärm, Hinterhalt), `tests/sinne.test.js` (Arten der Wahrnehmung, Spüren entlang offener Felder, Bemerken und Jagen nach Gespürtem), `tests/faehigkeitenwahl.test.js`, `tests/verhalten.test.js`, `tests/handlungen.test.js` (auch Ziele unter Verbündeten), `tests/nutzen.test.js` und `tests/arena.test.js` (KI, Taktik), `tests/umherziehen.test.js` (Wegpunkte, Wachzustand der Population, Umherziehen, Rudel, Abstandskarte), `tests/verschieben.test.js` (Bewegungsarten, Stoßen, Ziehen, Tauschen, Teleportieren, Lage, Werfen), `tests/wege.test.js`, `tests/stoffwechsel.test.js`, `tests/rausch.test.js` (Strafen des Rauschs, Danebenschlagen, Schlag ins Leere, `risiko.<ausgang>`, Ninkasis Skala), `tests/skills.test.js` und `tests/lernen.test.js`
 
 ## Verweise
 

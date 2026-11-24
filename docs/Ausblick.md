@@ -218,10 +218,10 @@ Umsetzung: offen
 ## Filmriss
 
 + Wichtigkeit: ungeklärt
-+ Inhalt: Zeitsprung und verlorene Erinnerung an erkundete Felder bei sehr hohem Pegel
-+ Braucht: die Erinnerung der Karte aus "Veränderbares Gelände"; eine Weise, Zeit vergehen zu lassen, in der Ninkasi von der KI geführt wird
++ Inhalt: Während des Filmrisses führt die KI Ninkasi, statt dass sie still steht; sie wacht woanders auf. Der Filmriss selbst ist entschieden (Zeitsprung ohne Handeln, die Karte der Ebene vergessen, siehe [Grundlagen.md](Grundlagen.md), Spielkern)
++ Braucht: eine KI für Ninkasi im Rausch (wohin sie torkelt, ob sie trinkt oder kämpft)
 + Umbaurisiko: gering
-+ Vorkehrung (erledigt): `vergessen` löscht die Erinnerung an Felder, nicht `erkundet`; ein Wiedersehen bringt keine EP (siehe [Welt.md](Welt.md), Sicht und Erinnerung)
++ Vorkehrung (erledigt): ein Zustand mit `ki` übernimmt bei Ninkasi die KI für seine Dauer (siehe [Wirkungen.md](Wirkungen.md), Zustände); `vergessen` löscht die Erinnerung an Felder, nicht `erkundet`, ein Wiedersehen bringt keine EP (siehe [Welt.md](Welt.md), Sicht und Erinnerung)
 
 Umsetzung: offen
 
@@ -413,7 +413,7 @@ Umsetzung: offen
 + Wichtigkeit: hoch, "eine bisher in Spielen noch wenig aufgetauchte Mechanik" (2026-11-24)
 + Vorbilder: NetHack (Bones: die Ebene, auf der eine Figur starb, kann in einem späteren Spiel mit ihrem Geist und ihrer verfluchten Habe wieder auftauchen); Dungeon Crawl Stone Soup (Geister toter Figuren mit Name, Stufe und Zaubern aus Bones-Dateien); Middle-earth: Shadow of Mordor (Nemesis-System: Gegner erinnern sich an frühere Begegnungen); neu gegenüber diesen: die Geister jagen Psi und Rausch
 + Idee: Jeder Tod legt eine Geist-Ninkasi in eine wachsende Bibliothek, mit ihren Skills, Fähigkeiten und Gegenständen; in späteren Läufen erscheinen Geister als Psi-Jägerinnen, angelockt von hohem Pegel und vom Einsatz von Psi; die Bibliothek erzählt so die Geschichte der eigenen Läufe ("Ninkasi die Dritte, ertrunken im Gärbottich auf Level 7"); ein gleicher Startwert ist nicht nötig, weil nur der Geist mitkommt, nicht die Ebene
-+ Zusammenhang: die Geister wären der Inhalt der Idee, dass häufiges Psi Gegner erscheinen lässt (Glimmer, siehe [Grundlagen.md](Grundlagen.md), Spielkern), und der Folgen des Pegels (siehe [Systemausbau.md](Systemausbau.md), Punkt 10)
++ Zusammenhang: entschieden ist, dass der Glimmer Psi-Jägerinnen anlockt (siehe [Grundlagen.md](Grundlagen.md), Spielkern); die Geister wären ihr Inhalt, zuerst kommt eine Jägerin im Probeinhalt (siehe [Systemausbau.md](Systemausbau.md), Punkt 10)
 + Braucht: beim Tod einen Eintrag in der Bibliothek außerhalb des Laufs (Name, Todestiefe und Ursache, Skillstufen, Fähigkeiten, Ausrüstung), nur aus Spielarten, die zählen; beim Start übernimmt die Oberfläche eine Auswahl als Startoption wie das Vorwissen (siehe [Architektur.md](Architektur.md), Speichern), so bleibt der Lauf wiederholbar; ein Auslöser über Pegel und Psi ruft einen Geist herbei; die KI des Geists handelt mit ihren Fähigkeiten nach der Taktik der gesteuerten Entität (siehe [Wesen.md](Wesen.md), KI)
 + Machtkurve: Es erscheinen nur Geister aus ähnlicher Tiefe oder mit ähnlichen EP wie Ninkasi; bis die Bibliothek gefüllt ist, wird ein Geist auf die heutige Tiefe skaliert
 + Beute: Der Geist hinterlässt keine Ausrüstung, höchstens einen Gegenstand, der für Psi nützlich ist und den Pegel hebt (Arbeitsnamen "reiner Alkohol", "Ninkasis Essenz"); so bleibt die Regel gewahrt, dass zwischen Läufen nur Wissen bleibt ([Grundlagen.md](Grundlagen.md), Spiel)

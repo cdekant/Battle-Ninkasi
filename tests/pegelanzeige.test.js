@@ -15,8 +15,8 @@ test("promilleText: deutsches Komma, eine oder zwei Nachkommastellen", () => {
 test("leistenanteil: Teilstriche gleich breit, dazwischen linear", () => {
   const abschnitte = TEILSTRICHE.length - 1;
   TEILSTRICHE.forEach((teilstrich, nummer) => assert.equal(leistenanteil(teilstrich), nummer / abschnitte));
-  assert.equal(leistenanteil(25), 0.5 / abschnitte);
-  assert.equal(leistenanteil(300), 3.5 / abschnitte);
+  assert.equal(leistenanteil(100), 0.5 / abschnitte);
+  assert.equal(leistenanteil(1200), 3.5 / abschnitte);
 });
 
 test("leistenanteil: unter 0 leer, über dem letzten Teilstrich voll", () => {

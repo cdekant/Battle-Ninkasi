@@ -76,6 +76,10 @@ export default {
   psi_rueckschlag: {
     schritte: [{ baustein: "schaden", art: "psi", wuerfel: "1W6" }],
   },
+  // Kontrollverlust einer Psi-Fähigkeit: Rückschlag und für eine Weile verwirrt; vorläufig
+  psi_kontrollverlust: {
+    schritte: [{ baustein: "schaden", art: "psi", wuerfel: "1W6" }, { baustein: "zustand_setzen", zustand: "verwirrt", dauer: 300 }],
+  },
   riechwasser_trinken: {
     schritte: [{ baustein: "zustand_setzen", zustand: "witterung" }],
   },

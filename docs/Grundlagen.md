@@ -57,10 +57,14 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Kapitel, Dienste 
 + Ninkasi muss beim Brauen am Kessel bleiben, damit das Bier gut wird; eine Gärung, die ohne sie weiterläuft, gibt es nicht
 + Kessel in Tiers nach Material: Kupfer, Eisen, Edelstahl, Silber, Gold
 + Vorschlag, noch nicht bestätigt: weitere Materialien wie Ton (sumerische Brautradition), Holz (Fass), Bronze
-+ Idee, noch nicht bestätigt: häufige Anwendung von Psi lässt Gegner erscheinen (Vorbild: Glimmer in Caves of Qud)
-+ Vorschlag, noch nicht bestätigt: über einer Schwelle drohen Torkeln, Fehlschläge, Filmriss
++ Ninkasis Pegel misst sich nicht an Sterblichen: wo Sterbliche längst tot wären, dreht sie erst richtig auf, und bis zu einem Pegel, der Sterbliche schwer berauscht, ist sie nüchtern; Getränke wirken nach ihrem Alkoholgehalt wie bei Sterblichen, ein gewöhnliches Bier bringt ihr wenig, stärkere Gebräue aus dem Brausystem bringen sie schneller voran
++ Stufen des Rauschs mit Namen: nüchtern, angeheitert, beschwipst, berauscht, im Rausch, sturzbetrunken, Vollrausch; das Optimum der LP-Regeneration und das sicherste Psi liegen in den Stufen ohne Strafen
++ Strafen des Rauschs, mit jeder Stufe stärker: ab berauscht Fehlschläge (Nah- und Fernkampf treffen schlechter, Magie und feine Arbeit misslingen öfter); im Rausch Torkeln (ein Schritt geht auf ein anderes Feld) und Danebenschlagen (der Schlag trifft ein Feld daneben, leer, mit einem Verbündeten oder einem anderen Feind); im Vollrausch der Filmriss: nur außerhalb des Kampfes ein Zeitsprung, in dem Ninkasi nicht handelt, danach ist die Karte der Ebene vergessen bis auf das, was sie gerade sieht
++ Risiko der Psi über den Pegel: nüchtern Fehlschläge, im Rausch der Rückschlag (Psi-Schaden an Ninkasi), sturzbetrunken dazu der Kontrollverlust (für eine Weile verwirrt, auch gegen Verbündete)
++ Glimmer (Vorbild: Caves of Qud): jede Psi-Fähigkeit hebt ihn, umso mehr, je höher der Pegel; er bleibt für den ganzen Lauf, die Gefahr steigt also mit der Zeit; über Schwellen des Glimmers erscheinen Psi-Jägerinnen, gewürfelt beim Betreten einer Ebene (sie trifft zu einer zufälligen Zeit ein) und bei jeder Psi-Fähigkeit (dann meist mitten im Kampf); sie wissen, wo Ninkasi ist; wer die Mechaniken kennt, besiegt sie irgendwann verlässlich; später werden die Geister früherer Läufe zu den Jägerinnen (siehe [Ausblick.md](Ausblick.md), Geister früherer Läufe)
++ Skills mildern die Strafen, ohne die Schwellen zu verschieben (Standfestigkeit, Selbstbeherrschung, Abschirmen, siehe [Skills.md](Skills.md))
 
-Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Stoffwechsel; siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten; siehe [Gegenstaende.md](Gegenstaende.md), Inventar; offen: Brausystem, Ausdauer, Schwellen und Risiken des Pegels, Brand füllt PP (mit dem Brausystem), Regeneration im Kampf über einen Skill, Ladungen der Zauberstäbe, Lesen mit Ziel, Verschleiß durch Gebrauch, Reparatur
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Stoffwechsel; siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten; siehe [Gegenstaende.md](Gegenstaende.md), Inventar; offen: Brausystem, Ausdauer, Filmriss, Glimmer und Psi-Jägerinnen, Fehlschläge der feinen Arbeit außer Magie (mit Lesen, Fallen und Brauen), Brand füllt PP (mit dem Brausystem), Regeneration im Kampf über einen Skill, Ladungen der Zauberstäbe, Lesen mit Ziel, Verschleiß durch Gebrauch, Reparatur
 
 ## Zeit und Tempo
 
@@ -165,9 +169,8 @@ Umsetzung: teilweise, siehe [Tileset.md](Tileset.md), Artstyle-Fibel; offen: Sig
 + Ob die LP-Regeneration bei sehr hohem Pegel negativ wird (Alkoholvergiftung), als natürliche Grenze des offenen Pegels
 + Ob die MP-Regeneration bei hohem Pegel auf null sinkt oder nur immer langsamer wird
 + Ab welcher Schwelle "nüchtern" für Schriftrollen gilt und wo das Optimum des Meditierens liegt
-+ Worin das Risiko von Psi besteht (Fehlschlag, Kontrollverlust, Rückschlag); der Mechanismus (Risikotabellen über den Pegel) steht, siehe Fähigkeiten in [Wirkungen.md](Wirkungen.md)
 + Magie im Detail: welche Wirkungen über die Zeit (Schaden, Flächen, Segen und Fluch, Beschwörung)
-+ Pegel im Detail: Schwellen, Risiken, Aktionen mit Mindestpegel
++ Aktionen mit Mindestpegel
 + Ausdauer: ob überhaupt, Zuordnung zu Gewandtheit oder Körperlichkeit, Verhältnis zu einer Nahrungsuhr
 + Unterschiede der Mikroorganismen ausarbeiten (Hefen, Bakterien, Schimmel, weitere Gruppen)
 + Brausystem im Detail: Zutaten, Rezepte, Wirkung der Kessel-Tiers, Reihenfolge der Materialien

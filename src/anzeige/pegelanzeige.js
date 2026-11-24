@@ -2,8 +2,8 @@
 // Reine Rechnung ohne DOM, getestet in tests/pegelanzeige.test.js.
 // Der Pegel zählt in Hundertstel Promille (100 = 1 ‰).
 
-// Teilstriche der Leiste in Verdopplungsschritten, gleich breit: 0, 0,5, 1, 2, 4, 8, 16 ‰
-export const TEILSTRICHE = [0, 50, 100, 200, 400, 800, 1600];
+// Teilstriche der Leiste in Verdopplungsschritten, gleich breit: 0, 2, 4, 8, 16, 32, 64 ‰ (Ninkasis Skala)
+export const TEILSTRICHE = [0, 200, 400, 800, 1600, 3200, 6400];
 
 // "2,35 ‰", "1,5 ‰", "1,0 ‰", "0,25 ‰": mindestens eine, höchstens zwei Nachkommastellen
 export function promilleText(pegel) {

@@ -1,6 +1,6 @@
 # Battle Ninkasi - Anzeige
 
-Stand: 2026-11-23
+Stand: 2026-11-24
 
 Zuständig für: `src/anzeige/renderer.js`, `src/anzeige/kamera.js`, `src/anzeige/oberflaeche.js`, `src/anzeige/log.js`, `src/anzeige/logzeilen.js`, `src/anzeige/ankuendigungen.js`, `src/anzeige/animation.js`, `src/anzeige/pegelanzeige.js`, `src/anzeige/minikarte.js`, `src/anzeige/bedienzeile.js`, `src/anzeige/beschreibung.js`, `src/anzeige/stil.css`, `src/systeme/wahrnehmbar.js`
 
@@ -50,7 +50,7 @@ Daten:
 Schnittstellen:
 
 + `Oberflaeche` (`src/anzeige/oberflaeche.js`): Seitenleiste (`kopfHtml` für Tiefe und Zug) und `tooltipHtml` (siehe [Bedienung.md](Bedienung.md), Untersuchen)
-+ Pegel (`src/anzeige/pegelanzeige.js`): `promilleText`, `leistenanteil`, `TEILSTRICHE` (0, 0,5, 1, 2, 4, 8, 16 ‰)
++ Pegel (`src/anzeige/pegelanzeige.js`): `promilleText`, `leistenanteil`, `TEILSTRICHE` (0, 2, 4, 8, 16, 32, 64 ‰, Ninkasis Skala)
 + `Bedienzeile` (`src/anzeige/bedienzeile.js`): links die Nummer der aktiven Leiste und die Schnellleiste (siehe [Bedienung.md](Bedienung.md), Schnellleiste), rechts die Knöpfe aus dem Aktionskatalog (`KNOEPFE`, Text `knopf`)
 + Minikarte und Übersichtskarte (`src/anzeige/minikarte.js`): `minikartenBild` (ohne DOM), `feldgroesseFuer`, `feldAmPunkt`, `zeichnen`
 + `layoutAnwenden` und `einstellungenAnwenden` in `src/main.js` setzen Layout, Größe und Farben (siehe [Bedienung.md](Bedienung.md), Einstellungen)
@@ -60,7 +60,7 @@ Regeln:
 + Das Layout folgt [Oberflaeche.md](Oberflaeche.md); die Größe der Oberfläche skaliert über die Schriftgröße, getrennt vom Zoom der Tiles
 + Variante A (Vorgabe): Karte, darunter das Log in zwei Spalten, rechts die Seitenleiste, unten die Bedienzeile; Variante B: links oben die Minikarte so breit wie die Spalte, darunter das Log (Geschehen über Kampf), Karte in der Mitte; `layoutAnwenden` setzt das Canvas der Minikarte dafür um; kompakt siehe [Bedienung.md](Bedienung.md), Einstellungen
 + Seitenleiste: Kopf mit Tiefe und Zug (eine andere Spielart als "normal" dahinter, z.B. "Testkammer", siehe [Architektur.md](Architektur.md), Spielarten), darunter die Minikarte, dann Ninkasi (LP, MP und PP als Balken, Pegel, freie EP immer, auch 0, ihre Kosten in Zeiteinheiten "Bewegen 120 · Angriff 50", Heimlichkeitsweite, wo Licht wirkt die Lichtstufe ihres Felds ("Licht: dämmrig"), laufende Aktion "Schritt 2 von 5", Zustände mit Stärke und Restdauer in Zeiteinheiten, Last), Zielen bzw. Untersuchen nur im Zielmodus, Gefährten mit LP, dann "In Sicht": die übrigen Wesen nach Abstand (Schachbrett, dann ID) mit Wachzustand (außer `jagt`), Zuständen (Restdauer nur bei denen, die Ninkasi zugefügt hat) und "wirkt etwas" bei einer laufenden Aktion (Vorbild Brogue); Startwert und Version zeigt das Spielmenü
-+ Der Pegel ist nach oben offen und wird logarithmisch angezeigt, in Verdopplungsschritten gleicher Breite; eingezeichnet sind Schwellen und das Optimum der LP-Regeneration, daneben steht der genaue Wert (z.B. 2,35 ‰)
++ Der Pegel ist nach oben offen und wird logarithmisch angezeigt, in Verdopplungsschritten gleicher Breite; eingezeichnet sind die Schwellen der Stufen des Rauschs und das Optimum der LP-Regeneration, daneben stehen die Stufe und der genaue Wert (z.B. "angeheitert · 2,35 ‰")
 + Bedienzeile: acht Knöpfe in zwei Reihen, je mit Taste und Wort: Gepäck, Fähigkeiten, Charakter, Karte; Rasten, Erkunden, Hilfe, Menü; den Verlauf öffnet Tab oder ein Klick auf das Log; ein Klick wirkt wie die Taste, bei offenem Fenster oder im Zielmodus geht nur Menü (wie Esc); Knöpfe nehmen keinen Fokus
 + Minikarte: je Feld die Farbe des bekannten Geländes (Unbekanntes leer, gerade nicht Sichtbares gedämpft aus der Erinnerung, siehe [Welt.md](Welt.md), Sicht und Erinnerung) und Punkte für Treppen, Gegenstände in Sicht oder erinnert und Wesen in Sicht (Ninkasi zuletzt); gezeichnet mit höchstens 3 px je Feld in der Seitenleiste, die Übersichtskarte (Taste m, Fenster `karte`) mit höchstens 10 px und Legende; ein Klick auf eine von beiden reist dorthin (nur über Bekanntes)
 + Hervorheben (Vorbild Brogue): Steht der Zeiger über einem Wesen der Seitenleiste (`data-wesen`), bekommt sein Feld auf der Karte und auf der Minikarte einen Rahmen; das Wesen unter dem Zeiger auf der Karte oder unter dem Cursor beim Untersuchen ist in der Seitenleiste hervorgehoben

@@ -6,7 +6,7 @@
 export default {
   // Vorläufig für Ninkasi: Fläche auf ein Feld in Sicht, Trefferwurf je Wesen, sie selbst bleibt verschont
   testfaehigkeit: {
-    text: "faehigkeit.testfaehigkeit", zweck: ["angriff"], tags: ["magie"], verbrauch: { mp: 10 }, abklingzeit: 300,
+    text: "faehigkeit.testfaehigkeit", zweck: ["angriff"], tags: ["magie"], verbrauch: { mp: 10 }, abklingzeit: 300, risiko: "magie",
     ziel: { art: "feld", reichweite: 6, muster: { art: "kreis", radius: 1 }, trifft: "wesen", ohneUrheber: true }, wirkung: "testfaehigkeit",
   },
   // Vorläufig für Ninkasi: Sprint ohne Zeit (siehe docs/Grundlagen.md, Zeit und Tempo), angeboren mit dem Inhalt
