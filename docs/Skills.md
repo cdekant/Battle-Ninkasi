@@ -20,24 +20,28 @@ Form: Die Kategorien ordnen nach Themen, nicht nach Eigenschaften. Jedes Set nen
 + Lernt aus: erlittenem Schaden
 + Mehr LP, über alle Tiers bis etwa das Dreifache des Startwerts
 + Die Regeneration der LP gehört zur Rauschheilung (siehe Stoffwechsel und Pegel), als Versuch
++ Tiers: Grund, Experte und Meister je mehr LP, göttlich Letzter Stand: ein tödlicher Treffer lässt Ninkasi einmal je Ebene mit 1 LP stehen
 
 ### Laufen
 
 + Eigenschaften: Gewandtheit, sekundär Körperlichkeit
 + Lernt aus: Entkommen
 + Bewegen wird schneller: Ninkasi beginnt etwa ein Fünftel langsamer als ein normal schnelles Wesen, die unteren Tiers holen das auf, die oberen machen sie schneller als normal schnelle Wesen (siehe [Grundlagen.md](Grundlagen.md), Zeit und Tempo)
++ Tiers: Grund und Experte holen den Rückstand auf, Meister macht schneller als normal schnelle Wesen, göttlich bremst schwieriges Gelände (Wasser, Schlamm) weniger
 
 ### Sprint
 
 + Eigenschaften: Gewandtheit, sekundär Trinkfestigkeit
 + Lernt aus: Entkommen
-+ Verbessert die angeborene Grundfähigkeit: stärker, länger, kürzere Abklingzeit, weniger Mehrverbrauch des Stoffwechsels; welcher Tier was bewirkt, ist offen
++ Verbessert die angeborene Grundfähigkeit: stärker, länger, kürzere Abklingzeit, weniger Mehrverbrauch des Stoffwechsels
++ Tiers: Grund stärker, Experte länger, Meister kürzere Abklingzeit, göttlich beendet der Sprint Festhalten und Verlangsamung
 
 ### Tragen
 
 + Eigenschaften: Körperlichkeit, sekundär Gewandtheit
 + Lernt aus: nur freien EP
 + Mehr Tragkraft, über alle Tiers etwa das Doppelte; die Last bremst weniger, bei voller Spezialisierung etwa halb so stark
++ Tiers: Grund und Experte mehr Tragkraft, Meister die Last bremst halb so stark
 
 ### Leichte Rüstung
 
@@ -45,6 +49,7 @@ Form: Die Kategorien ordnen nach Themen, nicht nach Eigenschaften. Jedes Set nen
 + Lernt aus: Rüstung, wenn ein leichtes Stück den Schaden mindert
 + Gefühltes Gewicht und Verlangsamung sinken; bei voller Spezialisierung bremst leichte Rüstung kaum noch
 + Der Abzug aufs Ausweichen sinkt, bei voller Spezialisierung fast auf null
++ Tiers: Grund weniger Gewicht und Verlangsamung, Experte weniger Abzug aufs Ausweichen, Meister bremst kaum noch
 
 ### Schwere Rüstung
 
@@ -52,6 +57,7 @@ Form: Die Kategorien ordnen nach Themen, nicht nach Eigenschaften. Jedes Set nen
 + Lernt aus: Rüstung, wenn ein schweres Stück den Schaden mindert
 + Gefühltes Gewicht und Verlangsamung sinken; bei voller Spezialisierung bremst schwere Rüstung spürbar weniger, aber nie gar nicht
 + Der Abzug aufs Ausweichen sinkt nur etwas; so bleibt die Wahl zwischen Panzern und Ausweichen (Vorbild Caves of Qud)
++ Tiers: Grund weniger Gewicht, Experte weniger Verlangsamung, Meister etwas weniger Abzug aufs Ausweichen, göttlich schützt schwere Rüstung auch gegen Krits
 
 Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Lernanlass Entkommen, Laufen, Sprint, Tragen, Rüstungsskills, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
@@ -72,24 +78,28 @@ Die Kategorie hält alle Skills, die den Stoffwechsel verändern: Abbau des Pege
 + Lernt aus: Berauscht
 + Mildert die Strafen des Rauschs (Torkeln, Fehlschläge, Filmriss), ohne die Schwellen zu verschieben; so bleibt, was an den Schwellen hängt (Mindestpegel, Regeneration der PP), wo es ist, und der Rausch wird nur weniger gefährlich
 + Wirkung hängt an den Pegelschwellen mit Wirkung ([Systemausbau.md](Systemausbau.md), Punkt 10)
++ Tiers: je eine Strafe des Rauschs, Grund Torkeln milder, Experte seltener Fehlschläge, Meister seltener Filmriss
 
 ### Rauschheilung
 
 + Eigenschaften: Trinkfestigkeit, sekundär Körperlichkeit
 + Lernt aus: Berauscht
 + Das Optimum der Regeneration der LP wandert zu höherem Pegel, höhere Tiers heben auch die Rate; ob hier auch die Regeneration im Kampf hingehört, klärt die Sitzung über Regeneration ([Systemausbau.md](Systemausbau.md), Punkt 10)
++ Tiers: Grund und Experte verschieben das Optimum, Meister hebt die Rate
 
 ### Klarer Kopf
 
 + Eigenschaften: Klugheit, sekundär Trinkfestigkeit
 + Lernt aus: Berauscht
 + MP regenerieren auch bei mittlerem Pegel noch gut, die Kurve wandert zu höherem Pegel; erleichtert Mischbuilds aus Magie und Rausch
++ Zwei Tiers, jeder verschiebt die Kurve
 
 ### Rauschgeist
 
 + Eigenschaften: Sinnlichkeit, sekundär Trinkfestigkeit
 + Lernt aus: Berauscht
 + PP schwinden bei niedrigem Pegel weniger, bei hohem regenerieren sie schneller; ein höherer Tier lässt die Regeneration schon bei niedrigerem Pegel beginnen
++ Tiers: Grund weniger Schwund, Experte schnellere Regeneration bei hohem Pegel, Meister die Regeneration beginnt bei niedrigerem Pegel
 
 ### Abwehr
 
@@ -97,6 +107,28 @@ Die Kategorie hält alle Skills, die den Stoffwechsel verändern: Abbau des Pege
 + Lernt aus: erlittenem Schaden durch Gift und Alkohol
 + Mehr Widerstand gegen Gift und Alkohol, später gegen Infektion, sobald es sie als Zustand gibt; nie volle Immunität (siehe Kampf, Verteidigung)
 + Widerstand gegen äußere Schadensarten gehört zu Kampf, Verteidigung, gegen Magie und Psi in die eigenen Kategorien; mehr Schaden einer Art gehört zu dem, der ihn austeilt
++ Tiers: Grund und Experte mehr Widerstand, Meister wirkt auch gegen Infektion
+
+### Kampftrinken
+
++ Eigenschaften: Trinkfestigkeit, sekundär Gewandtheit
++ Lernt aus: Berauscht
++ Das Trinken mitten im Kampf, das Brot der Bier-Göttin
++ Tiers: Grund Trinken kostet weniger Zeit, Experte aus einem Gefäß in der Hand trinken, ohne es erst aus dem Gepäck zu holen, Meister ein zweiter Schluck in derselben Aktion
+
+### Rauschkraft
+
++ Eigenschaften: Trinkfestigkeit, sekundär Körperlichkeit
++ Lernt aus: Berauscht mit dem Tag `nahkampf`
++ Die körperliche Seite zur Ekstase (siehe Psi), für die Brauserkerin
++ Tiers: Grund Nahkampfschaden steigt mit dem Pegel, Experte auch der Rückstoß, Meister im hohen Rausch spürt Ninkasi Schmerz später und Betäubung hält kürzer
+
+### Fontäne
+
++ Eigenschaften: Trinkfestigkeit, sekundär Körperlichkeit
++ Lernt aus: Wirkung mit dem Tag `fontaene`
++ Die Bier- und Brandfontäne ist eine Fähigkeit aus der Welt: Getrunkenes im Kegel speien, kostet Pegel; das Set macht sie wirksamer
++ Tiers: Grund größerer Kegel, Experte weniger Pegel als Kosten, Meister das Gebraute wirkt mit, ein Trank wird gespien
 
 Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
@@ -111,12 +143,14 @@ Die Kategorie hält die eigenen Sinne der Göttin: Sehen, Spüren und Hören in 
 + Ninkasi beginnt knapp unter der Sichtweite eines gewöhnlichen Gegners und wird zuerst gesehen; schon wenige Grundstufen drehen das um, mit vertretbarem Aufwand sieht sie etwa doppelt so weit wie ein gewöhnlicher Gegner (siehe [Grundlagen.md](Grundlagen.md), Licht und Wahrnehmung)
 + Darüber bringt mehr Reichweite wenig, weil nur Beleuchtetes zu sehen ist; der göttliche Tier spezialisiert anders: Werte und Ausrüstung eines Wesens auf volle Sichtweite erkennen, weniger Abzug im Fernkampf auf große Entfernung
 + Querlernen zum Fernkampf
++ Tiers: Grund leicht weiter, Experte und Meister bis etwa doppelt so weit wie ein gewöhnlicher Gegner, göttlich wie oben
 
 ### Nachtsicht
 
 + Eigenschaften: Sinnlichkeit, sekundär Trinkfestigkeit
 + Lernt aus: Erspäht im Finstern
 + Ninkasi sieht im Finstern weiter, auf dem göttlichen Tier etwa halb so weit wie im Licht, nie ganz; das Licht behält seinen Wert
++ Tiers: stufenweise weiter, Meister bis zur halben Sichtweite
 
 ### Dämmersicht
 
@@ -124,6 +158,7 @@ Die Kategorie hält die eigenen Sinne der Göttin: Sehen, Spüren und Hören in 
 + Lernt aus: Erspäht im Dunkeln
 + Ninkasi sieht auf dämmrigen und dunklen Feldern weiter, bis sie sie wie helle sieht
 + Setzt voraus, dass auch diese Lichtstufen die Sichtweite begrenzen; heute verbirgt nur die finstere (offen in [Systemausbau.md](Systemausbau.md), Punkt 20)
++ Zwei Tiers: Grund dämmrig wie hell, Experte dunkel wie hell
 
 ### Gespür für Wesen
 
@@ -137,14 +172,14 @@ Die Kategorie hält die eigenen Sinne der Göttin: Sehen, Spüren und Hören in 
 + Eigenschaften: Sinnlichkeit, sekundär Klugheit
 + Lernt aus: nur freien EP, ein gespürter Gegenstand ist nichts Bewältigtes
 + Ninkasi spürt Gegenstände in der Nähe, entlang von allem, was offen ist
-+ Ein oder zwei Tiers
++ Zwei Tiers: Grund spürt Gegenstände, Experte erkennt ihre Art (Waffe, Trank)
 
 ### Gespür für Magie
 
 + Eigenschaften: Sinnlichkeit, sekundär Braukunde
 + Lernt aus: nur freien EP
 + Ninkasi spürt Gegenstände und Wesen mit magischen Wirkungen in der Nähe, entlang von allem, was offen ist
-+ Ein oder zwei Tiers
++ Zwei Tiers: Grund spürt, Experte unterscheidet Segen und Fluch
 
 ### Lauschen
 
@@ -152,12 +187,14 @@ Die Kategorie hält die eigenen Sinne der Göttin: Sehen, Spüren und Hören in 
 + Lernt aus: Erspäht durch Hören
 + Die Richtung eines Geräuschs kennt Ninkasi ohne Skill; die Tiers machen das Hören genauer: weiter hören, die Art erkennen ("ein Ork"), die Anzahl ("zwei Orks"), zuletzt gehörte Wesen kurz auf der Karte
 + Lohnt erst, wenn auch Schritte leisen Lärm machen
++ Tiers: Grund weiter hören, Experte die Art, Meister die Anzahl, göttlich gehörte Wesen kurz auf der Karte
 
 ### Fallengespür
 
 + Eigenschaften: Sinnlichkeit, sekundär Klugheit
 + Lernt aus: entdeckten Fallen; das Entdecken bringt einen Teil der EP einer Falle, das Entschärfen den Rest (siehe Anlagen und Fallen)
 + Fallen werden öfter und aus größerer Entfernung entdeckt
++ Tiers: Grund öfter, Experte weiter, Meister eine Warnung, dass in der Nähe eine Falle liegt
 
 ### Kennerschaft
 
@@ -168,6 +205,7 @@ Die Kategorie hält die eigenen Sinne der Göttin: Sehen, Spüren und Hören in 
 + Pflegen: Waffen und Rüstung nutzen sich langsamer ab, Gegenstände verderben langsamer; einer der wirksamen Wege, Ausrüstung in Schuss zu halten (siehe [Grundlagen.md](Grundlagen.md), Spielkern)
 + Die Wirksamkeit im Gebrauch hebt Kennerschaft nicht, sie gehört den Skills der Waffen und Rüstungen; ein höherer Tier darf verborgene Stärken eines Stücks wecken, die erst wirken, wenn es erkannt ist
 + Später auch für Anlagen: unbekannte Anlagen tragen ein Etikett, Kennerschaft senkt das Risiko des ersten Inbetriebnehmens (mit Anlagen und Fallen)
++ Tiers: Grund schneller erkennen, Experte die Art beim Aufheben, Meister die Pflege, göttlich verborgene Stärken wecken
 
 ### Schleichen
 
@@ -175,6 +213,7 @@ Die Kategorie hält die eigenen Sinne der Göttin: Sehen, Spüren und Hören in 
 + Lernt aus: Hinterhalt
 + Ninkasi wird später bemerkt (Heimlichkeit); ein höherer Tier hinterlässt weniger Duft, Jäger verlieren ihre Spur früher
 + Heimlichkeit ist ein Wert jedes Wesens, Gegner tragen ihn fest in ihren Daten; Fähigkeiten wie "im Schatten verstecken" kommen aus der Welt, Schleichen ist ihre Voraussetzung und macht sie wirksamer
++ Tiers: Grund Heimlichkeit, Experte weniger Duft, Meister Jäger verlieren die Spur früher, göttlich bemerken Zeugen Ninkasi nach einem tödlichen Hinterhalt nicht
 
 Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Wahrnehmung (Sichtweite, Sicht im Finstern, Spüren, Heimlichkeit als Werte mit Modifikatoren), [Welt.md](Welt.md), Gelände (Entdecken) und [Gegenstaende.md](Gegenstaende.md), Unbekanntes (Kennerschaft); offen: alle Skills, Lernanlässe Erspäht und Hinterhalt, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
@@ -226,7 +265,7 @@ Jede Schadensart hat ihre Abwehr an genau einer Stelle: Stumpf und Schnitt Rüst
 + Hitze: Feuer; Körperlichkeit, sekundär Trinkfestigkeit
 + Ätzendes: Säure und Lauge, das Brauereithema Reinigungsmittel; Körperlichkeit, sekundär Braukunde
 + Strom: Elektrisch; Körperlichkeit, sekundär Gewandtheit
-+ Je zwei bis drei Tiers, jedes lernt aus erlittenem Schaden seiner Art
++ Je drei Tiers: Grund und Experte Widerstand, Meister Folgeschaden wie Brennen oder Verätzen hält kürzer; jedes lernt aus erlittenem Schaden seiner Art
 
 ### Waffenloser Kampf
 
@@ -245,7 +284,7 @@ Die Faust ist, was bleibt, wenn die Waffe bricht, und sie soll bis in die Tiefe 
 
 #### Trunkene Faust
 
-+ Eigenschaften: Gewandtheit, sekundär Trinkfestigkeit
++ Eigenschaften: Trinkfestigkeit, sekundär Gewandtheit
 + Lernt aus: Berauscht mit dem Tag `waffenlos`
 + Was der Pegel sonst bestraft, wird im waffenlosen Kampf zum Vorteil, Gegenstück zur Standfestigkeit; der Faustkampf schlägt öfter, die Trunkene Faust weicht aus und wirft
 + Grund: Torkeln gibt Ausweichen, je höher der Pegel, desto mehr
@@ -258,7 +297,7 @@ Die Faust ist, was bleibt, wenn die Waffe bricht, und sie soll bis in die Tiefe 
 + Eigenschaften: Körperlichkeit, sekundär Gewandtheit
 + Lernt aus: Wirkung mit dem Tag `ringen`
 + Voraussetzung für Fähigkeiten aus der Welt: Festhalten (das Ziel kann sich nicht bewegen und weicht schlechter aus) und Griffe, die nur gegen ein festgehaltenes Ziel gehen und es danach wieder freigeben: Gegner werfen (ein Feld weit, danach umgeworfen und damit wehrlos), Würgen, ein Kopfstoß mit mehr Wirkung
-+ Tiers: Chance und Dauer des Festhaltens, Schaden und Weite der Griffe, zuletzt auch große Wesen halten (braucht eine Größe der Wesen)
++ Tiers: Grund Chance des Festhaltens, Experte Dauer, Meister Schaden und Weite der Griffe, göttlich auch große Wesen halten (braucht eine Größe der Wesen)
 
 ### Nahkampf mit Waffen
 
@@ -316,7 +355,7 @@ Quer zu den Gattungen: Eine Waffe lernt beide Seiten, das Braupaddel als Wuchtwa
 + Eigenschaften: Gewandtheit, sekundär Klugheit
 + Lernt aus: Wirkung mit einer einzelnen Waffe in einer Hand, die andere frei
 + Mehr Genauigkeit und Parieren, solange die zweite Hand frei ist; ohne diesen Stil hätte die freie Hand keinen Wert
-+ Ein höherer Tier gibt die Finte: sie senkt die Verteidigung des Ziels für den nächsten Angriff
++ Tiers: Grund Genauigkeit, Experte Parieren, Meister die Finte: sie senkt die Verteidigung des Ziels für den nächsten Angriff
 + Passt zu langen Klingen und Parieren, die Fechterin
 
 ### Fernkampf
@@ -445,9 +484,9 @@ Muster der Tiers: Grund Gelingen, Experte Ausbeute, Meister Güte; einzelne Sets
 
 ### Rohstoffe
 
-Ein Set je Art von Rohstoffen, je zwei bis drei Tiers: Ohne Skill gibt eine Art weniger Ausbeute und Güte, ihr Set macht sie konkurrenzfähig, höhere Tiers holen mehr aus ihr heraus. Jedes lernt aus den Rezepten mit seiner Art.
+Ein Set je Art von Rohstoffen mit zwei Tiers: Ohne Skill gibt eine Art weniger Ausbeute und Güte, Grund macht sie konkurrenzfähig, Experte hebt die Güte. Jedes lernt aus den Rezepten mit seiner Art.
 
-+ Getreide: Gerste, Emmer, Weizen, Brot (Kvas, Bappir); Braukunde, sekundär Klugheit; die Grundlage, schon ohne Skill brauchbar; macht auch das Mälzen wirksamer
++ Getreide: Gerste, Emmer, Weizen, Brot (Kvas, Bappir); Braukunde, sekundär Klugheit; die Grundlage, schon ohne Skill brauchbar; drei Tiers, Meister macht das Mälzen wirksamer
 + Früchte: Datteln, Feigen, Trauben, Granatäpfel, Äpfel; Braukunde, sekundär Sinnlichkeit
 + Honig und Zucker: Braukunde, sekundär Trinkfestigkeit
 + Kräuter und Würze: Gruit, die Würze vor dem Hopfen; Braukunde, sekundär Sinnlichkeit
@@ -653,6 +692,7 @@ Meditieren ist die angeborene Fähigkeit des MP-Vorrats (siehe [Charakter.md](Ch
 + Eigenschaften: Klugheit, sekundär Sinnlichkeit
 + Lernt aus: jedem Krit mit dem Tag `magie` (Lernanlass Kritisch)
 + Kritchance und Kritfaktor der Magie, das Gegenstück zur Präzision (siehe Kampf, Präzision)
++ Tiers: Grund Kritchance, Experte Kritfaktor, Meister ein Krit verlängert die Zustände des Zaubers, göttlich ein Krit erstattet die MP
 
 ### Schulen
 
@@ -667,8 +707,8 @@ Muster: Grund Wirkung, Experte geringere Kosten, Meister Fläche und Reichweite,
 ### Wege
 
 + Formel: Zauber aus Schriftrollen, Keilschrifttafeln und HACCP-Aushängen; Klugheit, sekundär Braukunde; Experte Schriftrollen schreiben gelingt (nur nüchtern), Meister eine gelesene Rolle bleibt mit einer Chance erhalten
-+ Alchemie: Braukunde, sekundär Klugheit; lernt aus den Tags `trank` und `gift`; Gebrautes wirkt stärker und länger, getrunken, geworfen und in Fallen gleich (siehe Anlagen und Fallen); sie stellt nichts her, das tut allein das Brauen
-+ Göttliche Gabe: Gaben von Altären und Nebengottheiten wirken stärker; Braukunde, sekundär Sinnlichkeit; hängt an der Gunst (Idee in [Ausblick.md](Ausblick.md), Gunst der Nebengottheiten)
++ Alchemie: Braukunde, sekundär Klugheit; lernt aus den Tags `trank` und `gift`; Gebrautes wirkt stärker und länger, getrunken, geworfen und in Fallen gleich (siehe Anlagen und Fallen); sie stellt nichts her, das tut allein das Brauen; Tiers: Grund stärker, Experte länger, Meister größere Fläche des Gebrauten
++ Göttliche Gabe: Gaben von Altären und Nebengottheiten wirken stärker; Braukunde, sekundär Sinnlichkeit; hängt an der Gunst (Idee in [Ausblick.md](Ausblick.md), Gunst der Nebengottheiten); Tiers: Grund stärkere Gaben, Experte die Gunst wächst schneller, Meister der Zorn der Gottheit fällt milder aus
 + Braupaddel: die Zauberstäbe der Welt sind verzauberte Braupaddel, in der Hand eine Wuchtwaffe, als Stab ein Zauber mit eigenen Ladungen; Klugheit, sekundär Gewandtheit; Grund Wirkung, Experte sparsamer mit Ladungen, Meister laden sich schneller wieder auf; schlägt Ninkasi mit dem Paddel, lernt sie Wuchtwaffen und die Spezialisierung Braupaddel (siehe Kampf, Nahkampf mit Waffen), zaubert sie damit, diesen Weg
 
 ### Ritual
@@ -683,6 +723,7 @@ Muster: Grund Wirkung, Experte geringere Kosten, Meister Fläche und Reichweite,
 + Eigenschaften: Klugheit, sekundär Trinkfestigkeit
 + Lernt aus: erlittenem Schaden und erlittenen Zuständen mit dem Tag `magie`
 + Widerstand gegen die Schadensart `magie` und gegen magische Kontrolle, mit der Obergrenze aller Widerstände (siehe Kampf, Verteidigung)
++ Tiers: Grund Widerstand, Experte magische Kontrolle hält kürzer, Meister Flüche halten kürzer
 
 Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Kampfwerte (Schadensart und Tag `magie`) und [Wirkungen.md](Wirkungen.md), Fähigkeiten (Risikotabellen, Unterhalt, lange Aktionen, Lehren); offen: alle Sets, Meditieren und Sammlung, verzauberte Braupaddel, Schriftrollen schreiben, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
@@ -701,7 +742,7 @@ Drei Wege zu den Vorräten des Geistes: Die Meditation ist aktiv und nüchtern v
 
 ### Ekstase
 
-+ Eigenschaften: Sinnlichkeit, sekundär Trinkfestigkeit
++ Eigenschaften: Trinkfestigkeit, sekundär Sinnlichkeit
 + Lernt aus: Wirkung einer entladenen Ekstase (Tag `ekstase`)
 + Passiv, keine Fähigkeit: Ab einem hohen Pegel wächst die Ekstase im Kampf mit jedem Schaden, den Ninkasi nimmt oder austeilt, und entlädt sich als Psi-Stoß oder als Raserei; die Form des Kampfespegels (siehe [Systemausbau.md](Systemausbau.md), Punkt 10)
 + Grund: wächst schneller
@@ -736,23 +777,25 @@ Die angeborene Fähigkeit des PP-Vorrats (siehe [Charakter.md](Charakter.md), F�
 + Eigenschaften: Sinnlichkeit, sekundär Klugheit
 + Lernt aus: jedem Krit mit dem Tag `psi` (Lernanlass Kritisch)
 + Kritchance und Kritfaktor der Psi, das Gegenstück zu Präzision und Fokus
++ Tiers: Grund Kritchance, Experte Kritfaktor, Meister ein Krit verlängert die Zustände der Fähigkeit, göttlich ein Krit erstattet die PP
 
 ### Abschirmen
 
 + Eigenschaften: Sinnlichkeit, sekundär Klugheit
 + Lernt aus: freien EP und quer von Psi allgemein
 + Der Glimmer wächst langsamer, Psi-Jägerinnen und Geister früherer Läufe finden Ninkasi später (siehe [Ausblick.md](Ausblick.md), Geister früherer Läufe), telepathische Gegner spüren sie schlechter; die Heimlichkeit gegen den Geist
++ Tiers: Grund Glimmer langsamer, Experte Jägerinnen finden Ninkasi später, Meister telepathische Gegner spüren sie schlechter
 
 ### Willenskraft
 
 + Eigenschaften: Klugheit, sekundär Trinkfestigkeit
 + Lernt aus: Psi, das Ninkasi trifft oder das sie abwehrt
 + Hebt die Verteidigung `willenskraft` gegen Psi und den Widerstand gegen die Schadensart `psi`, mit der Obergrenze aller Widerstände (siehe Kampf, Verteidigung)
++ Tiers: Grund Verteidigung, Experte Widerstand gegen Psi, Meister geistige Kontrolle hält kürzer
 
 Umsetzung: teilweise, siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten (Risikotabelle `psi` mit Fehlschlag und Rückschlag, Glimmer als vorbereiteter Wert, Kontrolle über die Fraktion, Springen) und [Wesen.md](Wesen.md), Kampfwerte (`willenskraft`, Schadensart `psi`); offen: alle Sets, Ekstase, Zeitblinzeln, Glimmer, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Offen
 
-+ Bier- und Brandfontäne (Getrunkenes im Kegel speien, kostet Pegel): eher Fähigkeit als Skill, vielleicht zu Stoffwechsel und Pegel oder zu Magie, wo die Fontäne beschworen wird
 + Verwandlung als mögliche Schule der Magie (Idee in [Ausblick.md](Ausblick.md), Verwandlung)
 + Mehrere Kessel zugleich (Vorbild Mass Production in EVE Online), nur als Konzept: ein späterer Tier von Brauen allgemein, wenn das Brausystem es trägt; nebeneinander stehende Kessel widersprechen dem Bleiben am Kessel nicht
