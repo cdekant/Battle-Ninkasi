@@ -16,6 +16,7 @@ export default [
   "istar-unterwelt.md",
   "ninkasi-hymne.md",
   "ninkasi-hymne-b.md",
+  "palme-und-rebe.md",
   "trinklied.md",
   "trinklied-b.md",
 ];

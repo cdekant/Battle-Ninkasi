@@ -170,7 +170,7 @@
     "URL": "https://www.ebl.lmu.de/corpus/L/1/4",
     "language": "en",
     "keyword": "akkadisch, Gilgamesch, Epos",
-    "note": "Nur Fachquelle: Edition und englische Übersetzung unter CC BY-NC-SA 4.0 (nicht kommerziell), daher kein Wortlaut; jungbabylonische Fassung Tafel I-XII und altbabylonische Stücke, Kandidat für die Nachdichtung neben ungnad1911gilgamesch. Rohtext in sprache/Literatur/ebl/."
+    "note": "Nur Fachquelle: Edition und englische Übersetzung unter CC BY-NC-SA 4.0 (nicht kommerziell), daher kein Wortlaut; jungbabylonische Fassung Tafel I-XII und altbabylonische Stücke, Grundlage der Nachdichtungen sprache/de/korpus/gilgamesch-tafel-01.md bis -12.md, Lücken aus den altbabylonischen Stücken. Rohtext in sprache/Literatur/ebl/."
   },
   {
     "id": "abusch2024maqlu",
@@ -208,6 +208,6 @@
     "URL": "https://www.ebl.lmu.de/corpus/L/2/12",
     "language": "en",
     "keyword": "akkadisch, Streitgespräch, Bier, Wein, Dattelpalme",
-    "note": "Nur Fachquelle: Edition und englische Übersetzung unter CC BY-NC-SA 4.0 (nicht kommerziell), daher kein Wortlaut; Kandidat für die Nachdichtung (Bier und Wein im Streit). Rohtext in sprache/Literatur/ebl/."
+    "note": "Nur Fachquelle: Edition und englische Übersetzung unter CC BY-NC-SA 4.0 (nicht kommerziell), daher kein Wortlaut; nachgedichtet aus der akkadischen Fassung. Grundlage von sprache/de/korpus/palme-und-rebe.md. Rohtext in sprache/Literatur/ebl/."
   }
 ]
