@@ -103,8 +103,10 @@ Umsetzung: siehe [Wesen.md](Wesen.md), Skills und Lernen
 + Biofilm: Kolonie, die sich gemeinsam panzert, einzeln schwach, im Verbund zäh
 + Endosporen: ruhende Bakterien, erwachen später (Wärme, Feuer)
 + Protozoen und Amöben: einzelne Jäger, die andere Mikroorganismen fressen
++ Gegner haben eine Stärke auf einer festen Skala von Futter bis Elite, gemessen an der Ninkasi zu Beginn; ein gewöhnlicher Gegner ist allein nie ebenbürtig, gefährlich wird die Menge, und selbst eine Elite bleibt allein knapp schlagbar
++ Mit jeder Stärke wächst die Gefahr ungefähr auf das Doppelte, die EP wachsen mit; Stärke kommt aus Leben und Schaden, nicht aus der Trefferchance, die bleibt den Skills
 
-Umsetzung: teilweise, siehe [Entwicklung.md](Entwicklung.md), Probeinhalt; siehe [Wesen.md](Wesen.md), KI; Teilung, Sprossung, Myzel, Zerfall und Bossphasen gehen aus Daten, siehe [Wirkungen.md](Wirkungen.md), Effektsystem; offen: die Mikroorganismen und Bosse als Inhalt
+Umsetzung: teilweise, siehe [Entwicklung.md](Entwicklung.md), Probeinhalt; siehe [Wesen.md](Wesen.md), KI; Stärke siehe [Wesen.md](Wesen.md), Normierung; Teilung, Sprossung, Myzel, Zerfall und Bossphasen gehen aus Daten, siehe [Wirkungen.md](Wirkungen.md), Effektsystem; offen: die Mikroorganismen und Bosse als Inhalt
 
 ## Licht und Wahrnehmung
 

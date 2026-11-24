@@ -8,7 +8,7 @@ Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [C
 
 ## Zweck
 
-Was Wesen können und wie sie entscheiden: Kampfwerte und Schadensrechnung, Kampfzustand, Fraktionen mit Ruf und Beistand, Wahrnehmung, KI, Bewegung samt Verschieben und Werfen, Stoffwechsel, Skills und Lernen. Jeder Abschnitt nennt, soweit vorhanden, Daten, Schnittstellen und Regeln.
+Was Wesen können und wie sie entscheiden: Kampfwerte und Schadensrechnung, Kampfzustand, Normierung, Fraktionen mit Ruf und Beistand, Wahrnehmung, KI, Bewegung samt Verschieben und Werfen, Stoffwechsel, Skills und Lernen. Jeder Abschnitt nennt, soweit vorhanden, Daten, Schnittstellen und Regeln.
 
 ## Kampfwerte
 
@@ -60,6 +60,37 @@ Ein Wesen ist im Kampf, solange sein letzter Angriff, eigener oder erlittener, k
 
 + Am Wesen `kampfZuletzt`: Zeitpunkt des letzten Treffers, Fehlschlags oder Schadens zwischen zwei Wesen, gesetzt an beiden (Haken `nach_treffer`, `verfehlt`, `nach_schaden`); Fallen und Fässer bringen niemanden in den Kampf
 + `imKampf(spiel, wesen)` (`src/systeme/kampfzustand.js`): wahr, solange seit `kampfZuletzt` weniger als `regeln.kampf.nachwirkung` vergangen ist (500); ein Zeitstempel statt eines Zeitereignisses, nichts muss ablaufen
+
+## Normierung
+
+Maßstab für Gegner und später für die Machtkurve (Spieldesign in [Grundlagen.md](Grundlagen.md), Gegner): Normwesen in fünf Stärken, gemessen am Standardangriff gegen Ninkasi zu Beginn und umgekehrt. Vorbilder: Brogue (die Ratte, 6 LP, Genauigkeit 80, 1 bis 3 Schaden, fällt nach etwa 2 Treffern und braucht selbst rund 20), RuggRogue und Luddite (LP der Gegner aus einer Zielzahl an Treffern).
+
+Daten:
+
++ Regelwerte `regeln.normierung` (vorläufig): `toleranz` 10 % der Treffer; `trefferchance` Ninkasi 80 %, Wesen 70 %, für alle Stärken gleich, Stärke wächst nur über LP und Schaden; `staerken` je Stufe Treffer bis zum Tod in beide Richtungen und EP:
+
+| Stärke | Rolle | Ninkasi braucht | Wesen braucht | EP |
+|---|---|---|---|---|
+| 1 | Futter | 2 | 25 | 5 |
+| 2 | gewöhnlich | 3 | 18 | 10 |
+| 3 | zäh | 4 | 12 | 20 |
+| 4 | gefährlich | 6 | 9 | 40 |
+| 5 | Elite, ein Duell | 8 | 6 | 80 |
+
++ Weitere Normen, nach denen sich Inhalt richtet: `kontrolle` kurz 100, mittel 200, lang 400 Zeiteinheiten; `abklingzeit` kurz 300, mittel 1000, lang 3000; `verbrauch` Standardzauber 10 MP, Psi-Fähigkeit 10 PP; Bezug fürs Tragen ist `regeln.tragen.tragkraft` (20 kg)
++ Normwesen (`datenproben/gegner.js`, Vorlage `normwesen`, in keiner Population): `normwesen_1` bis `normwesen_5` mit 11, 16, 22, 33 und 44 LP, Genauigkeit 47, stumpfer Schlag mit 2W3, 1W6+2, 2W6+1, 2W8+2 und 3W8+3 (Mittel 4, 5,5, 8, 11, 16,5), Tempo 100; Arenen `normwesen` und `normwesen_drei` mit den Varianten `s1` bis `s5`
+
+Schnittstellen (`werkzeuge/normierung.js`, siehe [Entwicklung.md](Entwicklung.md), Bot und Werkzeuge):
+
++ `normwerte(daten, typen?)`: je Wesen mit Angriff `{ typ, lp, ep, ninkasi, wesen, staerke }`, `ninkasi` und `wesen` je `{ trefferchance, treffer, zeit }`; `abweichungenVon(daten, zeile, staerke?)`; `mittlererSchaden(daten, effekt)`
+
+Regeln:
+
++ Ninkasi zu Beginn ist die der Arena `normwesen`: Faust, ohne Skills und Ausrüstung, 100 LP
++ Standardangriff ist das erste Angriffsprofil; sein mittlerer Schaden kommt aus dem ersten Baustein `schaden`, auch hinter einem `trefferwurf`; Fernangriffe aus Fähigkeiten zählen nicht mit
++ Treffer bis zum Tod sind LP durch mittleren Schaden, ohne Rüstung und Widerstand; Zeit bis zum Tod sind Treffer durch Trefferchance mal Kosten des Profils
++ Die Stärke eines Wesens ist die nächste nach der Summe der Abweichungen beider Trefferzahlen; ein Normwesen muss seine Ziele innerhalb der Toleranz treffen, seine EP genau, die Trefferchancen auf 2 Punkte (`tests/normierung.test.js`)
++ Eingeordnet: das Essigbakterium ist Stärke 1, der Fernkämpfer-Test im Nahkampf Stärke 2 (seine Fernangriffe kommen dazu); Befund der Arena siehe [Entwicklung.md](Entwicklung.md), Messwerte
 
 ## Fraktionen
 
@@ -266,7 +297,7 @@ Regeln:
 
 ## Tests
 
-+ `tests/kampf.test.js` (Trefferwurf, Blocken, Krit, Schadensrechnung, Profile), `tests/zeitskala.test.js` (wehrlos, Kampfzustand als Bedingung), `tests/fraktionen.test.js` (Beziehungen, Zorn, Ruf, Kampfzustand, Beistand), `tests/wahrnehmung.test.js` (Wachzustand, Bemerken, Lärm, Hinterhalt), `tests/sinne.test.js` (Arten der Wahrnehmung, Spüren entlang offener Felder, Bemerken und Jagen nach Gespürtem), `tests/faehigkeitenwahl.test.js`, `tests/verhalten.test.js`, `tests/handlungen.test.js` (auch Ziele unter Verbündeten), `tests/nutzen.test.js` und `tests/arena.test.js` (KI, Taktik), `tests/umherziehen.test.js` (Wegpunkte, Wachzustand der Population, Umherziehen, Rudel, Abstandskarte), `tests/verschieben.test.js` (Bewegungsarten, Stoßen, Ziehen, Tauschen, Teleportieren, Lage, Werfen), `tests/wege.test.js`, `tests/stoffwechsel.test.js`, `tests/skills.test.js` und `tests/lernen.test.js`
++ `tests/kampf.test.js` (Trefferwurf, Blocken, Krit, Schadensrechnung, Profile), `tests/zeitskala.test.js` (wehrlos, Kampfzustand als Bedingung), `tests/normierung.test.js` (Normwesen, Einordnung, Datenprüfung), `tests/fraktionen.test.js` (Beziehungen, Zorn, Ruf, Kampfzustand, Beistand), `tests/wahrnehmung.test.js` (Wachzustand, Bemerken, Lärm, Hinterhalt), `tests/sinne.test.js` (Arten der Wahrnehmung, Spüren entlang offener Felder, Bemerken und Jagen nach Gespürtem), `tests/faehigkeitenwahl.test.js`, `tests/verhalten.test.js`, `tests/handlungen.test.js` (auch Ziele unter Verbündeten), `tests/nutzen.test.js` und `tests/arena.test.js` (KI, Taktik), `tests/umherziehen.test.js` (Wegpunkte, Wachzustand der Population, Umherziehen, Rudel, Abstandskarte), `tests/verschieben.test.js` (Bewegungsarten, Stoßen, Ziehen, Tauschen, Teleportieren, Lage, Werfen), `tests/wege.test.js`, `tests/stoffwechsel.test.js`, `tests/skills.test.js` und `tests/lernen.test.js`
 
 ## Verweise
 

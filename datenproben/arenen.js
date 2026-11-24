@@ -39,4 +39,31 @@ export default {
     text: "arena.keller_alle", karte: "arena_offen", taktik: "nahkampf",
     population: { tabelle: "keller", tiefe: 1, alle: true },
   },
+  // Normierung (siehe docs/Wesen.md, Normierung): Ninkasi zu Beginn gegen ein bzw. drei Normwesen je Stärke
+  normwesen: {
+    text: "arena.normwesen", karte: "arena_offen", taktik: "nahkampf",
+    wellen: [[{ typ: "normwesen_1" }]],
+    varianten: {
+      gegner: {
+        s1: { wellen: [[{ typ: "normwesen_1" }]] },
+        s2: { wellen: [[{ typ: "normwesen_2" }]] },
+        s3: { wellen: [[{ typ: "normwesen_3" }]] },
+        s4: { wellen: [[{ typ: "normwesen_4" }]] },
+        s5: { wellen: [[{ typ: "normwesen_5" }]] },
+      },
+    },
+  },
+  normwesen_drei: {
+    text: "arena.normwesen_drei", karte: "arena_offen", taktik: "nahkampf",
+    wellen: [[{ typ: "normwesen_1", anzahl: 3 }]],
+    varianten: {
+      gegner: {
+        s1: { wellen: [[{ typ: "normwesen_1", anzahl: 3 }]] },
+        s2: { wellen: [[{ typ: "normwesen_2", anzahl: 3 }]] },
+        s3: { wellen: [[{ typ: "normwesen_3", anzahl: 3 }]] },
+        s4: { wellen: [[{ typ: "normwesen_4", anzahl: 3 }]] },
+        s5: { wellen: [[{ typ: "normwesen_5", anzahl: 3 }]] },
+      },
+    },
+  },
 };

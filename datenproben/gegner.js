@@ -9,12 +9,13 @@ export default {
     spueren: { reichweite: 3 }, // spüren Beute ohne Licht entlang offener Felder (src/systeme/sinne.js), vorläufig
   },
 
+  // Stärke 1 der Normierung (daten/regeln.js normierung, werkzeuge/normierung.js)
   essigbakterium: {
     vorlage: "bakterium",
     text: "wesen.essigbakterium",
-    werte: { lp: { grundwert: 15 } },
-    ep: 10, // gebundene EP beim Tod (src/systeme/lernen.js), vorläufig
-    angriffe: [{ name: "biss", genauigkeit: 70, effekt: "biss_klein" }],
+    werte: { lp: { grundwert: 11 } },
+    ep: 5, // gebundene EP beim Tod (src/systeme/lernen.js), vorläufig
+    angriffe: [{ name: "biss", genauigkeit: 47, effekt: "biss_klein" }],
   },
 
   // Testgegner für die KI mit Fähigkeiten und Gepäck: hält Abstand, spuckt, kündigt einen Säureschwall an und trinkt
@@ -22,9 +23,9 @@ export default {
   fernkaempfer_test: {
     vorlage: "bakterium",
     text: "wesen.fernkaempfer_test",
-    werte: { lp: { grundwert: 10 } },
-    ep: 15,
-    angriffe: [{ name: "biss", genauigkeit: 60, effekt: "biss_klein" }],
+    werte: { lp: { grundwert: 16 } },
+    ep: 10,
+    angriffe: [{ name: "biss", genauigkeit: 47, effekt: "biss_mittel" }], // Stärke 2 der Normierung, dazu die Fernangriffe
     faehigkeiten: ["saeurespucke", "saeureschwall"],
     ausstattung: [{ typ: "bier" }],
     ki: {
@@ -37,4 +38,18 @@ export default {
       ],
     },
   },
+
+  // Normwesen der Stärken 1 bis 5 (siehe docs/Wesen.md, Normierung): Maßstab für Arena und Werkzeug, in keiner
+  // Population; Tempo 100, Trefferchance gegen Ninkasi zu Beginn 70 %, Schaden stumpf
+  normwesen: {
+    abstrakt: true,
+    fraktion: "verderber",
+    ki: { modul: "jagen", letzteBekanntePosition: null },
+    sicht: { reichweite: 7 },
+  },
+  normwesen_1: { vorlage: "normwesen", text: "wesen.normwesen_1", werte: { lp: { grundwert: 11 } }, ep: 5, angriffe: [{ name: "normschlag", genauigkeit: 47, effekt: "normschlag_1" }] },
+  normwesen_2: { vorlage: "normwesen", text: "wesen.normwesen_2", werte: { lp: { grundwert: 16 } }, ep: 10, angriffe: [{ name: "normschlag", genauigkeit: 47, effekt: "normschlag_2" }] },
+  normwesen_3: { vorlage: "normwesen", text: "wesen.normwesen_3", werte: { lp: { grundwert: 22 } }, ep: 20, angriffe: [{ name: "normschlag", genauigkeit: 47, effekt: "normschlag_3" }] },
+  normwesen_4: { vorlage: "normwesen", text: "wesen.normwesen_4", werte: { lp: { grundwert: 33 } }, ep: 40, angriffe: [{ name: "normschlag", genauigkeit: 47, effekt: "normschlag_4" }] },
+  normwesen_5: { vorlage: "normwesen", text: "wesen.normwesen_5", werte: { lp: { grundwert: 44 } }, ep: 80, angriffe: [{ name: "normschlag", genauigkeit: 47, effekt: "normschlag_5" }] },
 };

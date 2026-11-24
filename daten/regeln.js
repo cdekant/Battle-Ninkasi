@@ -136,6 +136,24 @@ export default {
   // Kontrolle in Folge in Prozent der Dauer, danach immun; die Folge beginnt neu, wenn so lange nach dem Ende der
   // letzten keine mehr kam; Zahlen vorläufig
   kontrolle: { stufen: [100, 50, 25], erholung: 1000 },
+  // Normierung, siehe werkzeuge/normierung.js und docs/Wesen.md, Normierung: Zielwerte gegen Ninkasi zu Beginn (Faust,
+  // ohne Skills und Ausrüstung); Treffer bis zum Tod in beide Richtungen und EP je Stärke 1 bis 5, Trefferchancen in
+  // Prozent, toleranz in Prozent der Treffer; dazu die Stufen von Kontrolldauer und Abklingzeit und der Verbrauch eines
+  // Standardzaubers und einer Psi-Fähigkeit, nach denen sich Inhalt richtet; alle Zahlen vorläufig
+  normierung: {
+    toleranz: 10,
+    trefferchance: { ninkasi: 80, wesen: 70 },
+    staerken: [
+      { ninkasiTreffer: 2, wesenTreffer: 25, ep: 5 }, // Futter
+      { ninkasiTreffer: 3, wesenTreffer: 18, ep: 10 }, // gewöhnlich
+      { ninkasiTreffer: 4, wesenTreffer: 12, ep: 20 }, // zäh
+      { ninkasiTreffer: 6, wesenTreffer: 9, ep: 40 }, // gefährlich
+      { ninkasiTreffer: 8, wesenTreffer: 6, ep: 80 }, // Elite, ein Duell
+    ],
+    kontrolle: { kurz: 100, mittel: 200, lang: 400 },
+    abklingzeit: { kurz: 300, mittel: 1000, lang: 3000 },
+    verbrauch: { zauber: { mp: 10 }, psi: { pp: 10 } },
+  },
   // Tempo in Worten beim Untersuchen (src/systeme/untersuchen.js): stufen [bis Zeiteinheiten, Stufe] aufsteigend, darüber
   // die Stufe darueber; Texte tempo.bewegen.<stufe> und tempo.angriff.<stufe>; Norm 100, Ninkasi bewegt sich anfangs mit 120
   tempo: {

@@ -12,6 +12,31 @@ export default {
     einzahl: { nom: "Fernkämpfer-Test", gen: "Fernkämpfer-Tests", dat: "Fernkämpfer-Test", akk: "Fernkämpfer-Test" },
     mehrzahl: { nom: "Fernkämpfer-Tests", gen: "Fernkämpfer-Tests", dat: "Fernkämpfer-Tests", akk: "Fernkämpfer-Tests" },
   },
+  "wesen.normwesen_1": {
+    geschlecht: "n",
+    einzahl: { nom: "Normwesen 1", gen: "Normwesens 1", dat: "Normwesen 1", akk: "Normwesen 1" },
+    mehrzahl: { nom: "Normwesen 1", gen: "Normwesen 1", dat: "Normwesen 1", akk: "Normwesen 1" },
+  },
+  "wesen.normwesen_2": {
+    geschlecht: "n",
+    einzahl: { nom: "Normwesen 2", gen: "Normwesens 2", dat: "Normwesen 2", akk: "Normwesen 2" },
+    mehrzahl: { nom: "Normwesen 2", gen: "Normwesen 2", dat: "Normwesen 2", akk: "Normwesen 2" },
+  },
+  "wesen.normwesen_3": {
+    geschlecht: "n",
+    einzahl: { nom: "Normwesen 3", gen: "Normwesens 3", dat: "Normwesen 3", akk: "Normwesen 3" },
+    mehrzahl: { nom: "Normwesen 3", gen: "Normwesen 3", dat: "Normwesen 3", akk: "Normwesen 3" },
+  },
+  "wesen.normwesen_4": {
+    geschlecht: "n",
+    einzahl: { nom: "Normwesen 4", gen: "Normwesens 4", dat: "Normwesen 4", akk: "Normwesen 4" },
+    mehrzahl: { nom: "Normwesen 4", gen: "Normwesen 4", dat: "Normwesen 4", akk: "Normwesen 4" },
+  },
+  "wesen.normwesen_5": {
+    geschlecht: "n",
+    einzahl: { nom: "Normwesen 5", gen: "Normwesens 5", dat: "Normwesen 5", akk: "Normwesen 5" },
+    mehrzahl: { nom: "Normwesen 5", gen: "Normwesen 5", dat: "Normwesen 5", akk: "Normwesen 5" },
+  },
   "falle.saeureduese": {
     geschlecht: "f",
     einzahl: { nom: "Säuredüse", gen: "Säuredüse", dat: "Säuredüse", akk: "Säuredüse" },
@@ -162,6 +187,8 @@ export default {
   "arena.fernkaempfer": "Fernkämpfer in zwei Wellen",
   "arena.engpass": "Rudel im Engpass",
   "arena.keller_reihe": "Reihe aus dem Keller, Tiefe 1",
+  "arena.normwesen": "Normwesen der Stärken 1 bis 5",
+  "arena.normwesen_drei": "Drei Normwesen derselben Stärke",
   "arena.keller_alle": "Alle Gegner des Kellers, Tiefe 1",
   "skillset.zaehigkeit": "Zähigkeit",
   "skillset.nahkampf": "Nahkampf",

@@ -2,8 +2,17 @@
 export default {
   // Säure frisst an angelegter Rüstung (Baustein abnutzen, src/systeme/verschleiss.js)
   biss_klein: {
-    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "1W4" }, { baustein: "abnutzen", menge: 1 }],
+    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "2W3" }, { baustein: "abnutzen", menge: 1 }],
   },
+  biss_mittel: {
+    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "1W6+2" }, { baustein: "abnutzen", menge: 1 }],
+  },
+  // Normwesen (datenproben/gegner.js): mittlerer Schaden 4, 5,5, 8, 11 und 16,5 gegen 100 LP
+  normschlag_1: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "2W3" }] },
+  normschlag_2: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "1W6+2" }] },
+  normschlag_3: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "2W6+1" }] },
+  normschlag_4: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "2W8+2" }] },
+  normschlag_5: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "3W8+3" }] },
   // Vorläufige Fähigkeit Ninkasis (daten/faehigkeiten.js)
   testfaehigkeit: {
     schritte: [{ baustein: "trefferwurf", genauigkeit: 70, effekt: "testfaehigkeit_treffer" }],

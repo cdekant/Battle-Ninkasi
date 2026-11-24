@@ -24,9 +24,10 @@ test("Kompendium: Steckbrief eines Wesens mit Werten, Angriffen, Vorlage und Vor
   const brief = steckbrief(daten, "wesen", "essigbakterium");
   assert.equal(brief.text, "wesen.essigbakterium");
   assert.equal(brief.zeichen.zeichen, "e");
-  assert.deepEqual(brief.merkmale.werte, ["lp 15"]);
+  const essigbakterium = rohdaten.wesen.essigbakterium;
+  assert.deepEqual(brief.merkmale.werte, [`lp ${essigbakterium.werte.lp.grundwert}`]);
   assert.equal(brief.merkmale.fraktion, "verderber"); // aus der Vorlage bakterium
-  assert.deepEqual(brief.merkmale.angriffe, ["biss 70 % → biss_klein"]);
+  assert.deepEqual(brief.merkmale.angriffe, [`biss ${essigbakterium.angriffe[0].genauigkeit} % → biss_klein`]);
   assert.ok(brief.merkmale.vorkommen.includes("keller 1–3"));
   assert.equal(steckbrief(daten, "wesen", "bakterium").abstrakt, true);
 });

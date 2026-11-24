@@ -7,6 +7,11 @@ export default {
   wesen: {
     essigbakterium: { zeichen: "e", farbe: "#b4bd62" },
     fernkaempfer_test: { zeichen: "F", farbe: "#d2763a" },
+    normwesen_1: { zeichen: "1", farbe: "#9a9a9a" },
+    normwesen_2: { zeichen: "2", farbe: "#9a9a9a" },
+    normwesen_3: { zeichen: "3", farbe: "#9a9a9a" },
+    normwesen_4: { zeichen: "4", farbe: "#9a9a9a" },
+    normwesen_5: { zeichen: "5", farbe: "#9a9a9a" },
   },
   gegenstaende: {
     bier: { zeichen: "!", farbe: "#e0952b" },

@@ -253,6 +253,20 @@ function pruefeErsatz(daten, liste, ort, fehler) {
 // Regelwerte des Kampfs: Untergrenze je Feld
 const KAMPFREGELN = { grundverteidigung: 0, halbwertWiderstand: 1, halbwertBlocken: 1, halbwertKritchance: 1, kritfaktor: 100, mindestschadenNachRuestung: 0 };
 
+// Zielwerte der Normierung (werkzeuge/normierung.js): Prozente, Treffer je Stärke über 0, Stufen als ganze Zahlen
+function pruefeNormierung(normierung, fehler) {
+  const ort = "regeln.normierung";
+  if (!istObjekt(normierung)) return fehler.push(`${ort} fehlt`);
+  if (!istProzent(normierung.toleranz)) fehler.push(`${ort}.toleranz muss eine ganze Zahl von 0 bis 100 sein`);
+  if (!istProzent(normierung.trefferchance?.ninkasi) || !istProzent(normierung.trefferchance?.wesen)) fehler.push(`${ort}.trefferchance muss { ninkasi, wesen } in Prozent sein`);
+  const stufeGut = (stufe) => istObjekt(stufe) && ["ninkasiTreffer", "wesenTreffer"].every((feld) => istGanzzahl(stufe[feld]) && stufe[feld] > 0) && istZahlAbNull(stufe.ep);
+  if (!Array.isArray(normierung.staerken) || !normierung.staerken.length || !normierung.staerken.every(stufeGut)) fehler.push(`${ort}.staerken muss eine Liste [{ ninkasiTreffer, wesenTreffer, ep }] sein`);
+  for (const feld of ["kontrolle", "abklingzeit"]) {
+    if (!istObjekt(normierung[feld]) || !Object.values(normierung[feld]).every(istZahlAbNull)) fehler.push(`${ort}.${feld} muss { stufe: Zeiteinheiten } sein`);
+  }
+  if (!istObjekt(normierung.verbrauch) || !Object.values(normierung.verbrauch).every((menge) => istObjekt(menge) && Object.values(menge).every(istZahlAbNull))) fehler.push(`${ort}.verbrauch muss { art: { wert: menge } } sein`);
+}
+
 function pruefeRegeln(daten, regeln, fehler) {
   const ausloeser = regeln?.ausloeser;
   if (!ausloeser) return fehler.push("regeln.ausloeser fehlt");
@@ -264,6 +278,7 @@ function pruefeRegeln(daten, regeln, fehler) {
   if (!BEZIEHUNGEN.includes(regeln.fraktionen?.beziehungVorgabe)) fehler.push(`regeln.fraktionen.beziehungVorgabe muss eines von ${BEZIEHUNGEN.join(", ")} sein`);
   pruefeRufregeln(daten, regeln.fraktionen ?? {}, fehler);
   if (!istZahlAbNull(regeln.kampf?.nachwirkung)) fehler.push("regeln.kampf.nachwirkung muss eine ganze Zahl >= 0 sein");
+  pruefeNormierung(regeln.normierung, fehler);
   // abnehmende Kontrolle, siehe systeme/zustaende.js kontrollDauer
   if (!Array.isArray(regeln.kontrolle?.stufen) || !regeln.kontrolle.stufen.every((stufe) => istZahlAbNull(stufe))) fehler.push("regeln.kontrolle.stufen muss eine Liste von Prozenten >= 0 sein");
   if (!istZahlAbNull(regeln.kontrolle?.erholung)) fehler.push("regeln.kontrolle.erholung muss eine ganze Zahl >= 0 sein");

@@ -152,9 +152,10 @@ test("Datenprüfung: Abfolge, Starttiefe, feste Karte, Population und Tabellen",
 // ohne imDunkeln blieben die Werte gleich); neu mit 0.58.0 für das Tempo Ninkasis (kosten am Wesen und an der Faust)
 // und die Kosten der Waffen (mit den alten Kosten blieben die Werte gleich); neu mit 0.59.0 für den Sprint in Ninkasis
 // Fähigkeiten und zeit und verlangsamung an der Ausrüstung (ohne diese Felder blieben die Werte gleich, auch mit dem
-// Aufschlag der Türen).
+// Aufschlag der Türen); neu mit 0.60.0 für die Normierung von Essigbakterium und Fernkämpfer-Test (LP, EP, Biss; mit
+// den alten Werten blieben die Werte gleich).
 test("Erzeugung in Schritten: dieselben Ebenen wie vorher", () => {
-  const erwartet = { 1: "764624a46881f55f", 2: "bf1a29052928607e", 3: "1462961919def4bb", 42: "cfbc7d054804a9f9", 4711: "6eb1d0755fad560a" };
+  const erwartet = { 1: "ae481be8396eea34", 2: "df6a8038bd3df49a", 3: "f74abff37c71e4ac", 42: "f744f2d72e10dd0d", 4711: "8096270f11af1728" };
   for (const [startwert, fingerabdruck] of Object.entries(erwartet)) {
     const spiel = neuesSpiel(DATEN, Number(startwert));
     for (const tiefe of [2, 3, 0]) ebeneWechseln(spiel, tiefe);
