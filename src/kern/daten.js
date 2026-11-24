@@ -367,6 +367,15 @@ function pruefeStoffwechsel(wesen, ort, fehler) {
     if (!wesen.werte || !wesen.werte[wertName]) fehler.push(`${ort}: stoffwechsel.regeneration.${wertName} ohne Wert ${wertName}`);
     fehler.push(...kurvenfehler(kurve, `${ort}.stoffwechsel.regeneration.${wertName}`));
   }
+  for (const [wertName, anteil] of Object.entries(stoffwechsel.imKampf || {})) {
+    if (!stoffwechsel.regeneration?.[wertName]) fehler.push(`${ort}: stoffwechsel.imKampf.${wertName} ohne Kurve in regeneration`);
+    if (!istGanzzahl(anteil) || anteil < 0 || anteil > 100) fehler.push(`${ort}: stoffwechsel.imKampf.${wertName} muss eine ganze Zahl von 0 bis 100 sein`);
+  }
+  for (const [wertName, gewinn] of Object.entries(stoffwechsel.kampfgewinn || {})) {
+    if (!wesen.werte || !wesen.werte[wertName]) fehler.push(`${ort}: stoffwechsel.kampfgewinn.${wertName} ohne Wert ${wertName}`);
+    if (!istGanzzahl(gewinn?.jeTreffer) || gewinn.jeTreffer < 0) fehler.push(`${ort}: stoffwechsel.kampfgewinn.${wertName}.jeTreffer muss eine ganze Zahl >= 0 sein`);
+    fehler.push(...kurvenfehler(gewinn?.kurve, `${ort}.stoffwechsel.kampfgewinn.${wertName}.kurve`));
+  }
 }
 
 // Feldschichten: { oberflaechen, gase }, siehe systeme/schichten.js; Zeichen in zeichen.schichten

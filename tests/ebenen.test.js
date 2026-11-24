@@ -154,9 +154,11 @@ test("Datenprüfung: Abfolge, Starttiefe, feste Karte, Population und Tabellen",
 // Fähigkeiten und zeit und verlangsamung an der Ausrüstung (ohne diese Felder blieben die Werte gleich, auch mit dem
 // Aufschlag der Türen); neu mit 0.60.0 für die Normierung von Essigbakterium und Fernkämpfer-Test (LP, EP, Biss; mit
 // den alten Werten blieben die Werte gleich); neu mit 0.61.0 für die Sicht (Ninkasis Sichtweite 6, Sicht je Lichtstufe
-// und sicht.imFinstern statt imDunkeln; mit Sichtweite 8, vollem Anteil und dem alten Namen blieben die Werte gleich).
+// und sicht.imFinstern statt imDunkeln; mit Sichtweite 8, vollem Anteil und dem alten Namen blieben die Werte gleich);
+// neu mit 0.62.0 für Ninkasis Stoffwechsel (Kurven nach der Norm, imKampf, kampfgewinn; mit den alten Daten des
+// Stoffwechsels blieben die Werte gleich).
 test("Erzeugung in Schritten: dieselben Ebenen wie vorher", () => {
-  const erwartet = { 1: "7b82c55bffdc8d1f", 2: "c40a2c361345e421", 3: "e220e5110d41d9d7", 42: "c8466272fb23f4e2", 4711: "8ac54d27a5cf9cf4" };
+  const erwartet = { 1: "3a71994fa33acdad", 2: "4f5f22d5e62e348c", 3: "bd8e042150e29ab4", 42: "be9a489a5dd1103e", 4711: "5eb3891249cfa40a" };
   for (const [startwert, fingerabdruck] of Object.entries(erwartet)) {
     const spiel = neuesSpiel(DATEN, Number(startwert));
     for (const tiefe of [2, 3, 0]) ebeneWechseln(spiel, tiefe);

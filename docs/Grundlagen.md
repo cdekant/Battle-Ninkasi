@@ -26,18 +26,20 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Kapitel, Dienste 
 + Magie und Psi sind getrennte Systeme mit eigenem Vorrat
 + Magie: gebunden an Ritual, Schrift und Alchemie, kostet neben MP auch Zeit und Material; langsamer, wirkt über die Zeit, etwas mehr in Richtung Crowd Control
 + Psi: sofort und rein geistig, hohes Risiko, hoher Ertrag; wirkt auf Einzelziele (Gedanken, Furcht, Kontrolle, Teleport, Vorahnung); Wirksamkeit und Risiko steigen mit dem Pegel; jede Ninkasi kann durch Zeitblinzeln einen Zug zurückgehen, der Zufall fällt dabei nicht neu aus (siehe [Skills.md](Skills.md), Psi)
-+ Jeder Vorrat regeneriert mit eigenem Verlauf über den Pegel:
-  + LP regenerieren immer, langsam (Vorbild: Brogue); ohne Pegel etwas langsamer, am schnellsten bei einem optimalen Pegel weit über dem von Normalsterblichen, darüber wieder abnehmend
-  + MP regenerieren nüchtern am schnellsten, je höher der Pegel, desto langsamer
-  + PP regenerieren nur bei hohem Pegel, je höher, desto schneller; unter einer niedrigen Schwelle schwinden sie
-  + Regeneration und Schwund sind für jeden Vorrat möglich; Skills, Schriftrollen, Items und Zustände passen Rate, Schwund und Lage der Verläufe an, siehe Stoffwechsel in [Wesen.md](Wesen.md)
-+ Folge: Auf Magie bereitet man sich nüchtern vor, Psi braucht für Regeneration und Wirksamkeit einen möglichst hohen Pegel, bei dem das Risiko steigt; Mischbuilds müssen ihren Rausch planen
++ Jeder Vorrat regeneriert mit eigenem Verlauf über den Pegel, LP und MP außerhalb des Kampfes, die PP im Kampf:
+  + LP regenerieren außerhalb des Kampfes langsam; ohne Pegel etwas langsamer, am schnellsten bei einem optimalen Pegel weit über dem von Normalsterblichen, darüber wieder abnehmend; im Kampf ruhen sie, ein Skill lässt sie später auch dort fließen (siehe [Skills.md](Skills.md), Rauschheilung); im Kampf heilt das Bier, außerhalb die Zeit
+  + MP regenerieren außerhalb des Kampfes, nüchtern am schnellsten, je höher der Pegel, desto langsamer; im Kampf ruhen sie
+  + PP sind der Kampfespegel (Vorbild: die Wut des Kriegers in World of Warcraft): Ninkasi gewinnt sie im Kampf mit jedem Treffer, ausgeteilt wie erlitten, je höher der Pegel, desto mehr, unter einer niedrigen Schwelle gar nicht; außerhalb des Kampfes schwinden sie langsam, bei hohem Pegel kaum; je Treffer statt nach der Höhe des Schadens, damit der Gewinn nicht mit der Tiefe wächst; schnelle Waffen treffen öfter und gewinnen so mehr
+  + Regeneration und Schwund sind für jeden Vorrat möglich; Skills, Schriftrollen, Items und Zustände passen Rate, Schwund, Gewinn im Kampf und Lage der Verläufe an, siehe Stoffwechsel in [Wesen.md](Wesen.md)
+  + Wie lange die Leisten bis voll brauchen, gibt eine Norm vor (nüchtern, im Optimum, im Rausch), siehe [Wesen.md](Wesen.md), Normierung
++ Folge: Auf Magie bereitet man sich nüchtern vor, Psi braucht für Gewinn und Wirksamkeit einen möglichst hohen Pegel und den Nahkampf, bei dem das Risiko steigt; daraus Berserker-Builds aus Psi und Nahkampf, deren Form die Ekstase ist (siehe [Skills.md](Skills.md), Psi); Mischbuilds müssen ihren Rausch planen
 + Schriftrollen schreiben nur nüchtern; Meditieren am besten bei leichtem Pegel, nüchtern etwas schwächer, darüber immer schwächer (siehe [Skills.md](Skills.md), Magie)
 + Waffen und Rüstung können verschleißen und kaputtgehen, auch durch Gebrauch; damit das kein Ärgernis wird, gibt es wirksame Wege, sie sehr gut in Schuss zu halten (Pflege über Kennerschaft, siehe [Skills.md](Skills.md), Wahrnehmung, und Reparatur über das Handwerk, siehe [Skills.md](Skills.md), Anlagen und Fallen)
 + Gegenstände wirken nur angelegt, das Gepäck ist Vorrat: Waffen, Rüstung, Schmuck und Zauberstäbe geben ihre Werte und Fähigkeiten erst in der Hand oder am Körper, ein Wechsel kostet Zeit; aus dem Gepäck wird nur getrunken, gelesen, geworfen und verbraucht; Ausnahmen sind passive Wirkungen wie ein Bier, das einmal vor dem Tod bewahrt
 + Ein Zauberstab, in der Spielwelt ein verzaubertes Braupaddel, bezahlt seine Fähigkeit mit eigenen Ladungen statt mit den Vorräten der Trägerin; trägt sie zwei gleiche, wird zuerst der zuerst angelegte geleert
 + Fähigkeiten aus Fundstücken: ein angelegter Gegenstand gewährt sie, solange er angelegt ist; ein Lehrstück (Schriftrolle, HACCP-Aushang) lehrt sie dauerhaft, gelernt ist gelernt; daneben gibt es Verbrauchsgegenstände, die einmal wirken
-+ Vorschlag, noch nicht bestätigt: Bier füllt LP, Wein füllt MP, Brand füllt PP oder wirkt nur über den Pegel; jedes Getränk hebt den Pegel nach seinem Alkoholgehalt
++ Brand füllt PP direkt; so geht Ninkasi mit PP in einen Kampf, die sie sonst erst darin gewinnt
++ Vorschlag, noch nicht bestätigt: Bier füllt LP, Wein füllt MP; jedes Getränk hebt den Pegel nach seinem Alkoholgehalt
 + Brand hebt den Pegel schneller als Wein und Bier
 + Wein füllt MP sofort, bremst über den Pegel aber die MP-Regeneration
 + Pegel klingt über die Zeit ab
@@ -58,7 +60,7 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Kapitel, Dienste 
 + Idee, noch nicht bestätigt: häufige Anwendung von Psi lässt Gegner erscheinen (Vorbild: Glimmer in Caves of Qud)
 + Vorschlag, noch nicht bestätigt: über einer Schwelle drohen Torkeln, Fehlschläge, Filmriss
 
-Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Stoffwechsel; siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten; siehe [Gegenstaende.md](Gegenstaende.md), Inventar; offen: Brausystem, Ausdauer, Schwellen und Risiken des Pegels, Ladungen der Zauberstäbe, Lesen mit Ziel, Verschleiß durch Gebrauch, Reparatur
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Stoffwechsel; siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten; siehe [Gegenstaende.md](Gegenstaende.md), Inventar; offen: Brausystem, Ausdauer, Schwellen und Risiken des Pegels, Brand füllt PP (mit dem Brausystem), Regeneration im Kampf über einen Skill, Ladungen der Zauberstäbe, Lesen mit Ziel, Verschleiß durch Gebrauch, Reparatur
 
 ## Zeit und Tempo
 
@@ -162,7 +164,6 @@ Umsetzung: teilweise, siehe [Tileset.md](Tileset.md), Artstyle-Fibel; offen: Sig
 + Wo das Optimum der LP-Regeneration liegt und ob Trinkfestigkeit es nach oben verschiebt
 + Ob die LP-Regeneration bei sehr hohem Pegel negativ wird (Alkoholvergiftung), als natürliche Grenze des offenen Pegels
 + Ob die MP-Regeneration bei hohem Pegel auf null sinkt oder nur immer langsamer wird
-+ Wofür der Brand gut ist: PP direkt füllen oder nur über den Pegel wirken
 + Ab welcher Schwelle "nüchtern" für Schriftrollen gilt und wo das Optimum des Meditierens liegt
 + Worin das Risiko von Psi besteht (Fehlschlag, Kontrollverlust, Rückschlag); der Mechanismus (Risikotabellen über den Pegel) steht, siehe Fähigkeiten in [Wirkungen.md](Wirkungen.md)
 + Magie im Detail: welche Wirkungen über die Zeit (Schaden, Flächen, Segen und Fluch, Beschwörung)

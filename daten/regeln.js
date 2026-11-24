@@ -155,6 +155,9 @@ export default {
     kontrolle: { kurz: 100, mittel: 200, lang: 400 },
     abklingzeit: { kurz: 300, mittel: 1000, lang: 3000 },
     verbrauch: { zauber: { mp: 10 }, psi: { pp: 10 } },
+    // Weltticks von leer bis voll außerhalb des Kampfes für Ninkasi zu Beginn (tests/stoffwechsel.test.js): nüchtern,
+    // im Optimum der Kurve und im Rausch bei pegelRausch (3 ‰)
+    regeneration: { pegelRausch: 300, lp: { nuechtern: 400, optimum: 150, rausch: 400 }, mp: { nuechtern: 200 } },
   },
   // Tempo in Worten beim Untersuchen (src/systeme/untersuchen.js): stufen [bis Zeiteinheiten, Stufe] aufsteigend, darüber
   // die Stufe darueber; Texte tempo.bewegen.<stufe> und tempo.angriff.<stufe>; Norm 100, Ninkasi bewegt sich anfangs mit 120

@@ -56,7 +56,7 @@ Regeln:
 
 ## Kampfzustand
 
-Ein Wesen ist im Kampf, solange sein letzter Angriff, eigener oder erlittener, kurz zurückliegt. Bisher fragen der Beistand und die Bedingungen `im_kampf` und `ausser_kampf` danach (z.B. Rituale nur außerhalb des Kampfes als `voraussetzungen` einer Fähigkeit); Rasten, Erholung und Abläufe können es später tun.
+Ein Wesen ist im Kampf, solange sein letzter Angriff, eigener oder erlittener, kurz zurückliegt. Bisher fragen der Beistand, der Stoffwechsel (Raten im Kampf, siehe Stoffwechsel) und die Bedingungen `im_kampf` und `ausser_kampf` danach (z.B. Rituale nur außerhalb des Kampfes als `voraussetzungen` einer Fähigkeit); Abläufe können es später tun.
 
 + Am Wesen `kampfZuletzt`: Zeitpunkt des letzten Treffers, Fehlschlags oder Schadens zwischen zwei Wesen, gesetzt an beiden (Haken `nach_treffer`, `verfehlt`, `nach_schaden`); Fallen und Fässer bringen niemanden in den Kampf
 + `imKampf(spiel, wesen)` (`src/systeme/kampfzustand.js`): wahr, solange seit `kampfZuletzt` weniger als `regeln.kampf.nachwirkung` vergangen ist (500); ein Zeitstempel statt eines Zeitereignisses, nichts muss ablaufen
@@ -77,6 +77,7 @@ Daten:
 | 4 | gefährlich | 6 | 9 | 40 |
 | 5 | Elite, ein Duell | 8 | 6 | 80 |
 
++ `regeneration`: Weltticks von leer bis voll außerhalb des Kampfes für Ninkasi zu Beginn, LP nüchtern 400, im Optimum der Kurve 150 und bei `pegelRausch` (3 ‰) 400, MP nüchtern 200; `tests/stoffwechsel.test.js` prüft Ninkasis Kurven dagegen
 + Weitere Normen, nach denen sich Inhalt richtet: `kontrolle` kurz 100, mittel 200, lang 400 Zeiteinheiten; `abklingzeit` kurz 300, mittel 1000, lang 3000; `verbrauch` Standardzauber 10 MP, Psi-Fähigkeit 10 PP; Bezug fürs Tragen ist `regeln.tragen.tragkraft` (20 kg)
 + Normwesen (`datenproben/gegner.js`, Vorlage `normwesen`, in keiner Population, Sichtweite 7): `normwesen_1` bis `normwesen_5` mit 11, 16, 22, 33 und 44 LP, Genauigkeit 47, stumpfer Schlag mit 2W3, 1W6+2, 2W6+1, 2W8+2 und 3W8+3 (Mittel 4, 5,5, 8, 11, 16,5), Tempo 100; Arenen `normwesen` und `normwesen_drei` mit den Varianten `s1` bis `s5`
 
@@ -242,16 +243,20 @@ Regeln:
 Daten:
 
 + Der Pegel ist ein Wert in Hundertsteln Promille (100 entsprechen 1 ‰), ohne Grundwert und damit nach oben offen
-+ Komponente `stoffwechsel` (`src/systeme/stoffwechsel.js`, Werte für Ninkasi in `daten/ninkasi.js`): Abbau des Pegels, Schwellen und je Wert eine Kurve der Regeneration über dem Pegel (Hundertstel je Welttick, Kurven siehe [Architektur.md](Architektur.md), Entitäten und Komponenten)
++ Komponente `stoffwechsel` (`src/systeme/stoffwechsel.js`, Werte für Ninkasi in `daten/ninkasi.js`): Abbau des Pegels, Schwellen und je Wert eine Kurve der Regeneration über dem Pegel (Hundertstel je Welttick, Kurven siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); `imKampf: { <wert>: prozent }` Anteil der Rate im Kampf (0 bis 100, fehlt ein Wert: 100, nur für Werte mit Kurve); `kampfgewinn: { <wert>: { jeTreffer, kurve } }` Gewinn je Treffer in Hundertsteln mal Prozent der Kurve über dem Pegel (Kampfespegel)
++ Ninkasi (vorläufig): LP `[[0, 25], [150, 67], [300, 25], [800, 0]]`, MP `[[0, 50], [100, 25], [300, 0]]` nach der Norm `regeln.normierung.regeneration` (siehe Normierung); PP außerhalb des Kampfes nur Schwund `[[0, -30], [150, -10], [400, 0]]`; im Kampf ruhen alle drei (`imKampf` je 0); `kampfgewinn.pp` 200 je Treffer mal `[[50, 0], [150, 100], [400, 200]]`, also nichts unter 0,5 ‰, 2 PP bei 1,5 ‰ und 4 PP ab 4 ‰; ein gewöhnlicher Kampf (rund 3 Treffer ausgeteilt, 1 bis 2 erlitten) reicht bei 1,5 ‰ für eine Psi-Fähigkeit nach der Norm `verbrauch.psi`
 
 Schnittstellen:
 
-+ Handler der Weltuhr (Register `welttick`): je Welttick Regeneration oder Schwund nach den Kurven, danach Abbau des Pegels
-+ Modifikatoren: `regeneration.<wert>` auf positive Raten, `schwund.<wert>` auf den Betrag negativer Raten, `kurvenverschiebung.<wert>` verschiebt die Kurve nach rechts (z.B. Optimum der LP nach oben), `abbau.pegel` auf den Abbau; Quellen sind Skills, Schriftrollen, Items und Zustände
++ Handler der Weltuhr (Register `welttick`): je Welttick Regeneration oder Schwund nach den Kurven, im Kampf (`imKampf`, siehe Kampfzustand) mal dem Anteil aus `imKampf`, danach Abbau des Pegels
++ Haken `nach_treffer`: jeder Treffer zwischen zwei verschiedenen Wesen bringt beiden ihren `kampfgewinn`, der Angreiferin (`quelleId`) wie dem Ziel
++ `rateBeimPegel`, `anteilImKampf`, `wirksameRate` und `gewinnJeTreffer` für Anzeige und Tests
++ Modifikatoren: `regeneration.<wert>` auf positive Raten, `schwund.<wert>` auf den Betrag negativer Raten, `kurvenverschiebung.<wert>` verschiebt die Kurve nach rechts (z.B. Optimum der LP nach oben), `abbau.pegel` auf den Abbau, `imKampf.<wert>` in Prozentpunkten auf den Anteil im Kampf (bis 100, z.B. Regeneration der LP im Kampf), `kampfgewinn.<wert>` auf den Gewinn je Treffer; Quellen sind Skills, Schriftrollen, Items und Zustände
 
 Regeln:
 
-+ Negative Kurvenwerte sind Schwund, für jeden Wert möglich; Schwund der LP kann töten (Ursache `schwund.<wert>`)
++ Negative Kurvenwerte sind Schwund, für jeden Wert möglich; Schwund der LP kann töten (Ursache `schwund.<wert>`); der Anteil im Kampf gilt für Regeneration wie Schwund
++ Gewinn nur aus Treffern mit Trefferwurf (Angriffe und der Baustein `trefferwurf`), nicht aus Schaden ohne Wurf, Fallen oder Treffern an sich selbst; je Treffer statt nach dem Schaden (Vorbild: die Wut in World of Warcraft seit 8.0.1, siehe [Grundlagen.md](Grundlagen.md), Spielkern)
 + Bruchteile laufen über Speicher in Hundertsteln (siehe [Architektur.md](Architektur.md), Zeitmodell)
 
 ## Skills und Lernen

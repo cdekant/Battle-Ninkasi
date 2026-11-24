@@ -20,17 +20,21 @@ export default {
     faehigkeiten: [], // eigene Fähigkeiten folgen mit dem Inhalt; der Probeinhalt ergänzt die testfaehigkeit (datenproben/index.js)
     // Plätze für Ausrüstung (src/systeme/ausruestung.js): Waffen in den Händen, Rüstung und Schmuck am Körper
     plaetze: { hand: 2, kopf: 1, brust: 1, beine: 1, hals: 1, finger: 2 },
-    // Stoffwechsel, siehe src/systeme/stoffwechsel.js; alle Zahlen vorläufig.
+    // Stoffwechsel, siehe src/systeme/stoffwechsel.js; alle Zahlen vorläufig, LP und MP nach regeln.normierung.regeneration.
     // Kurven: [Pegel in Hundertstel Promille, Hundertstel je Welttick], negativ ist Schwund.
     // Schwellen vorerst nur angezeigt und gemeldet.
     stoffwechsel: {
       abbauHundertstel: 100, // 0,01 ‰ je Welttick
       schwellen: [50, 100, 200, 300], // 0,5, 1, 2 und 3 ‰
       regeneration: {
-        lp: [[0, 30], [150, 80], [400, 30], [800, 0]], // langsam, Optimum bei 1,5 ‰, darüber abnehmend
-        mp: [[0, 80], [100, 40], [300, 0]], // nüchtern am schnellsten
-        pp: [[0, -30], [50, 0], [150, 0], [400, 100]], // Schwund unter 0,5 ‰, Regeneration ab 1,5 ‰
+        lp: [[0, 25], [150, 67], [300, 25], [800, 0]], // voll nüchtern in 400 Ticks, im Optimum bei 1,5 ‰ in 150, bei 3 ‰ in 400
+        mp: [[0, 50], [100, 25], [300, 0]], // nüchtern am schnellsten, voll in 200 Ticks
+        pp: [[0, -30], [150, -10], [400, 0]], // außerhalb des Kampfes nur Schwund, bei hohem Pegel kaum
       },
+      imKampf: { lp: 0, mp: 0, pp: 0 }, // im Kampf ruhen alle drei; Regeneration im Kampf später über Skills (imKampf.lp)
+      // Kampfespegel: PP je Treffer, ausgeteilt wie erlitten; unter 0,5 ‰ nichts, bei 1,5 ‰ 2 PP, bei 4 ‰ 4 PP;
+      // so reicht ein gewöhnlicher Kampf (etwa 3 Treffer ausgeteilt, 1 bis 2 erlitten) bei 1,5 ‰ für eine Psi-Fähigkeit (10 PP)
+      kampfgewinn: { pp: { jeTreffer: 200, kurve: [[50, 0], [150, 100], [400, 200]] } },
     },
   },
 };

@@ -31,6 +31,13 @@ test("Stoffwechsel: Kurven werden geprüft, nur für vorhandene Werte, Pegel ist
     return { werte: werteOhnePegel };
   });
   assert.ok(ohnePegel.some((meldung) => meldung.includes("braucht den Wert pegel")));
+  const kampfFalsch = mitNinkasi((ninkasi) => ({ stoffwechsel: { ...ninkasi.stoffwechsel, imKampf: { lp: 150, ausdauer: 0 } } }));
+  assert.ok(kampfFalsch.some((meldung) => meldung.includes("imKampf.lp muss")));
+  assert.ok(kampfFalsch.some((meldung) => meldung.includes("imKampf.ausdauer ohne Kurve")));
+  const gewinnFalsch = mitNinkasi((ninkasi) => ({ stoffwechsel: { ...ninkasi.stoffwechsel, kampfgewinn: { pp: { jeTreffer: -1, kurve: [] }, ausdauer: { jeTreffer: 1, kurve: [[0, 1]] } } } }));
+  assert.ok(gewinnFalsch.some((meldung) => meldung.includes("kampfgewinn.pp.jeTreffer")));
+  assert.ok(gewinnFalsch.some((meldung) => meldung.includes("kampfgewinn.pp.kurve")));
+  assert.ok(gewinnFalsch.some((meldung) => meldung.includes("kampfgewinn.ausdauer ohne Wert")));
 });
 
 test("Auslöser: Haken, Rolle, Ziel, Prozente und Effekt werden geprüft", () => {

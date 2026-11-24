@@ -198,7 +198,7 @@ Umsetzung: teilweise, siehe [Architektur.md](Architektur.md), Speichern; offen: 
 
 + Wichtigkeit: ungeklärt
 + Vorbilder: Dungeon Crawl Stone Soup (Nahrung galt als schlecht gemachte Uhr und wurde durch die Zot-Uhr ersetzt: sehr locker, sie trifft nur grobes Trödeln, dann schnell); Cogmind (Alarmstufe ruft Trupps, Vernichtungstrupps kommen nach Zeit); Torchbearer (alle vier Runden ein Zustand in fester Folge: hungrig, erschöpft, wütend, krank, verletzt, verängstigt); Blades in the Dark (sichtbare Uhren mit Segmenten für drohendes Unheil)
-+ Vorhanden: Bier verdirbt; LP regenerieren immer, Pegelabbau und Psi-Schwund allein sind kein Druck
++ Vorhanden: Bier verdirbt; LP und MP regenerieren außerhalb des Kampfes immer, Pegelabbau und Psi-Schwund allein sind kein Druck
 + Braucht: Zeit je Ebene im Zustand; Nachrücken der Population verlassener Ebenen (logistisch auf eine Tragfähigkeit, siehe [Systemausbau.md](Systemausbau.md), Punkt 14); sichtbare Uhr in der Anzeige (passt zu "durchschaubar statt geheim")
 + Umbaurisiko: gering, Zeitereignisse und Weltuhr reichen
 + Vorkehrung: keine; das Spieldesign gehört zur Ökonomie der Vorräte in [Systemausbau.md](Systemausbau.md), Punkt 10

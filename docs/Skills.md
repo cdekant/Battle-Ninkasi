@@ -84,7 +84,7 @@ Die Kategorie hält alle Skills, die den Stoffwechsel verändern: Abbau des Pege
 
 + Eigenschaften: Trinkfestigkeit, sekundär Körperlichkeit
 + Lernt aus: Berauscht
-+ Das Optimum der Regeneration der LP wandert zu höherem Pegel, höhere Tiers heben auch die Rate; ob hier auch die Regeneration im Kampf hingehört, klärt die Sitzung über Regeneration ([Systemausbau.md](Systemausbau.md), Punkt 10)
++ Das Optimum der Regeneration der LP wandert zu höherem Pegel, höhere Tiers heben auch die Rate; ein höherer Tier lässt die LP auch im Kampf regenerieren, wo sie sonst ruhen (siehe [Grundlagen.md](Grundlagen.md), Spielkern)
 + Tiers: Grund und Experte verschieben das Optimum, Meister hebt die Rate
 
 ### Klarer Kopf
@@ -98,8 +98,8 @@ Die Kategorie hält alle Skills, die den Stoffwechsel verändern: Abbau des Pege
 
 + Eigenschaften: Sinnlichkeit, sekundär Trinkfestigkeit
 + Lernt aus: Berauscht
-+ PP schwinden bei niedrigem Pegel weniger, bei hohem regenerieren sie schneller; ein höherer Tier lässt die Regeneration schon bei niedrigerem Pegel beginnen
-+ Tiers: Grund weniger Schwund, Experte schnellere Regeneration bei hohem Pegel, Meister die Regeneration beginnt bei niedrigerem Pegel
++ PP schwinden außerhalb des Kampfes weniger, im Kampf bringt jeder Treffer bei hohem Pegel mehr; ein höherer Tier lässt den Gewinn schon bei niedrigerem Pegel beginnen
++ Tiers: Grund weniger Schwund, Experte mehr Gewinn bei hohem Pegel, Meister der Gewinn beginnt bei niedrigerem Pegel
 
 ### Abwehr
 
@@ -743,7 +743,7 @@ Drei Wege zu den Vorräten des Geistes: Die Meditation ist aktiv und nüchtern v
 
 + Eigenschaften: Trinkfestigkeit, sekundär Sinnlichkeit
 + Lernt aus: Wirkung einer entladenen Ekstase (Tag `ekstase`)
-+ Passiv, keine Fähigkeit: Ab einem hohen Pegel wächst die Ekstase im Kampf mit jedem Schaden, den Ninkasi nimmt oder austeilt, und entlädt sich als Psi-Stoß oder als Raserei; die Form des Kampfespegels (siehe [Systemausbau.md](Systemausbau.md), Punkt 10)
++ Passiv, keine Fähigkeit: Ab einem hohen Pegel wächst die Ekstase im Kampf mit jedem Schaden, den Ninkasi nimmt oder austeilt, und entlädt sich als Psi-Stoß oder als Raserei; die Form des Kampfespegels, der die PP im Kampf füllt (siehe [Grundlagen.md](Grundlagen.md), Spielkern)
 + Grund: wächst schneller
 + Experte: hält länger
 + Meister: stärkere Entladung

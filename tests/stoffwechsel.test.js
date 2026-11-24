@@ -7,14 +7,18 @@ import { wertAendern } from "../src/kern/effekte.js";
 import { holen } from "../src/kern/register.js";
 import { hoererAnmelden } from "../src/kern/ereignisse.js";
 import { vorgangAbschliessen } from "../src/kern/vorgang.js";
+import { hakenAusloesen } from "../src/kern/ereignisse.js";
 import "../src/systeme/tod.js";
-import { rateBeimPegel, optimalerPegel } from "../src/systeme/stoffwechsel.js";
+import "../src/systeme/kampfzustand.js";
+import { rateBeimPegel, optimalerPegel, wirksameRate, gewinnJeTreffer } from "../src/systeme/stoffwechsel.js";
+import { rohdaten } from "../src/inhalt.js";
+import { wertAufKurve, stelleDesHoechstwerts } from "../src/kern/kurven.js";
 
 const welttick = (spiel, anzahl = 1) => {
   for (let i = 0; i < anzahl; i++) holen("welttick", "stoffwechsel")(spiel);
 };
 
-function spielMitTrinkerin({ pegel = 0, lp = 50, mp = 50, pp = 50, regeneration = {}, abbauHundertstel = 0, schwellen = [] } = {}) {
+function spielMitTrinkerin({ pegel = 0, lp = 50, mp = 50, pp = 50, regeneration = {}, abbauHundertstel = 0, schwellen = [], imKampf, kampfgewinn } = {}) {
   const spiel = { ...miniSpiel(["###", "#.#", "###"]), hoerer: [] };
   const trinkerin = entitaetErzeugen(spiel.zustand, {
     fraktion: "feinde",
@@ -25,7 +29,7 @@ function spielMitTrinkerin({ pegel = 0, lp = 50, mp = 50, pp = 50, regeneration 
       pp: { grundwert: 100, anfangswert: pp },
       pegel: { anfangswert: pegel },
     }),
-    stoffwechsel: { abbauHundertstel, schwellen, regeneration },
+    stoffwechsel: { abbauHundertstel, schwellen, regeneration, imKampf, kampfgewinn },
   });
   const meldungen = [];
   hoererAnmelden(spiel, (meldung) => meldungen.push(meldung));
@@ -108,4 +112,50 @@ test("Schwund der LP tötet nach dem Vorgang, Ursache ist der Schwund", () => {
   assert.equal(spiel.zustand.entitaeten[trinkerin.id], undefined);
   assert.equal(meldungen.at(-1).art, "tod");
   assert.equal(meldungen.at(-1).ursache, "schwund.lp");
+});
+
+test("Im Kampf ruhen die Raten nach imKampf, ein Modifikator hebt den Anteil, danach wirkt wieder die volle Rate", () => {
+  const { spiel, trinkerin } = spielMitTrinkerin({ regeneration: { lp: [[0, 100]], mp: [[0, 100]], pp: [[0, -100]] }, imKampf: { lp: 0, pp: 0 } });
+  spiel.daten.regeln.kampf = { ...spiel.daten.regeln.kampf, nachwirkung: 500 };
+  trinkerin.kampfZuletzt = spiel.zustand.zeit;
+  welttick(spiel);
+  assert.deepEqual([trinkerin.werte.lp.aktuell, trinkerin.werte.mp.aktuell, trinkerin.werte.pp.aktuell], [50, 51, 50], "ohne Eintrag gilt die volle Rate");
+  modifikatorHinzufuegen(trinkerin, { ziel: "imKampf.lp", art: "plus", betrag: 25, quelle: "rauschheilung" });
+  assert.equal(wirksameRate(spiel, trinkerin, "lp"), 25);
+  modifikatorHinzufuegen(trinkerin, { ziel: "imKampf.lp", art: "plus", betrag: 200, quelle: "zuviel" });
+  assert.equal(wirksameRate(spiel, trinkerin, "lp"), 100, "höchstens die volle Rate");
+  spiel.zustand.zeit += 500;
+  assert.equal(wirksameRate(spiel, trinkerin, "pp"), -100, "nach der Nachwirkung gilt die Kurve");
+});
+
+function zweiImKampf({ pegel }) {
+  const { spiel, trinkerin } = spielMitTrinkerin({ pegel, pp: 0, kampfgewinn: { pp: { jeTreffer: 200, kurve: [[50, 0], [150, 100], [400, 200]] } } });
+  const gegner = entitaetErzeugen(spiel.zustand, { fraktion: "freunde", position: { x: 1, y: 1 }, werte: werteAusDaten({ lp: { grundwert: 10 } }) });
+  return { spiel, trinkerin, gegner };
+}
+
+test("Kampfespegel: jeder Treffer bringt Gewinn nach der Kurve über dem Pegel, ausgeteilt wie erlitten", () => {
+  const { spiel, trinkerin, gegner } = zweiImKampf({ pegel: 150 });
+  hakenAusloesen(spiel, "nach_treffer", { quelleId: trinkerin.id, urheberId: trinkerin.id, zielId: gegner.id, tags: [] });
+  hakenAusloesen(spiel, "nach_treffer", { quelleId: gegner.id, urheberId: gegner.id, zielId: trinkerin.id, tags: [] });
+  assert.equal(trinkerin.werte.pp.aktuell, 4);
+  hakenAusloesen(spiel, "nach_treffer", { quelleId: trinkerin.id, urheberId: trinkerin.id, zielId: trinkerin.id, tags: [] });
+  assert.equal(trinkerin.werte.pp.aktuell, 4, "kein Gewinn aus Treffern an sich selbst");
+
+  trinkerin.werte.pegel.aktuell = 40;
+  assert.equal(gewinnJeTreffer(spiel, trinkerin, "pp"), 0, "unter 0,5 ‰ nichts");
+  trinkerin.werte.pegel.aktuell = 400;
+  assert.equal(gewinnJeTreffer(spiel, trinkerin, "pp"), 400);
+  modifikatorHinzufuegen(trinkerin, { ziel: "kampfgewinn.pp", art: "prozent", betrag: 50, quelle: "ekstase" });
+  assert.equal(gewinnJeTreffer(spiel, trinkerin, "pp"), 600);
+});
+
+test("Ninkasis Regeneration erfüllt die Norm in Weltticks bis zur vollen Leiste", () => {
+  const ninkasi = rohdaten.wesen.ninkasi;
+  const norm = rohdaten.regeln.normierung.regeneration;
+  const ticksBisVoll = (wertName, pegel) => Math.ceil((ninkasi.werte[wertName].grundwert * 100) / wertAufKurve(ninkasi.stoffwechsel.regeneration[wertName], pegel));
+  assert.equal(ticksBisVoll("lp", 0), norm.lp.nuechtern);
+  assert.equal(ticksBisVoll("lp", stelleDesHoechstwerts(ninkasi.stoffwechsel.regeneration.lp)), norm.lp.optimum);
+  assert.equal(ticksBisVoll("lp", norm.pegelRausch), norm.lp.rausch);
+  assert.equal(ticksBisVoll("mp", 0), norm.mp.nuechtern);
 });
