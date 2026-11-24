@@ -157,7 +157,7 @@ Status: offen, als eigene Sitzung vor dem Brausystem (Punkt 10)
 Status: offen, als eigene Sitzung
 
 + `ungnad1911gilgamesch` (gemeinfrei) aus `sprache/Literatur/` einlesen und daraus neue Korpustexte gewinnen, in beiden Sprachen (siehe [Texte.md](Texte.md), Korpus)
-+ Das Epos ganz nachdichten, Tafel für Tafel, aus der akkadischen Fassung des eBL-Korpus (`george2022gilgamesch`, Rohtext in `sprache/Literatur/ebl/`), Ungnad zum Abgleich; der Reihe nach ab Tafel I, eine Datei je Tafel (`gilgamesch-tafel-<nn>.md`), Lücken der jungbabylonischen Fassung aus den altbabylonischen Stücken ergänzt (vermerkt in `vorlage`), wörtliche Wiederholungen der Vorlage gekürzt (beim ersten Mal ganz, danach in Kurzform), weil sie Titelsprüche und Markow-Ketten gleichförmig machen; erledigt: Tafel I bis VII
++ Das Epos ganz nachdichten, Tafel für Tafel, aus der akkadischen Fassung des eBL-Korpus (`george2022gilgamesch`, Rohtext in `sprache/Literatur/ebl/`), Ungnad zum Abgleich; der Reihe nach ab Tafel I, eine Datei je Tafel (`gilgamesch-tafel-<nn>.md`), Lücken der jungbabylonischen Fassung aus den altbabylonischen Stücken ergänzt (vermerkt in `vorlage`), wörtliche Wiederholungen der Vorlage gekürzt (beim ersten Mal ganz, danach in Kurzform), weil sie Titelsprüche und Markow-Ketten gleichförmig machen; erledigt: Tafel I bis VIII
 + Danach weitere Werke aus dem eBL-Korpus nach der Kandidatenliste in [Texte.md](Texte.md), Korpus
 
 ## 19. Auszeichnung in Texten
