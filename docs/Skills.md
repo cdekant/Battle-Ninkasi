@@ -290,10 +290,34 @@ Muster: Grund Genauigkeit, Experte Schaden, Meister Tempo, göttlich wie bei der
 
 ### Handhabung
 
-+ Quer zu den Gattungen: eine Waffe lernt beide Seiten, das Braupaddel als Wuchtwaffe und als Zweihand
-+ Zweihand: Voraussetzung für Rundumschlag und Anstürmen
-+ Einhand mit Schild
-+ Zwei Waffen, wenn die Plätze es hergeben
+Quer zu den Gattungen: Eine Waffe lernt beide Seiten, das Braupaddel als Wuchtwaffe und als Zweihand. Die Handhabung hat ihr eigenes Muster, damit Gattung und Handhabung nicht beide Genauigkeit und Schaden geben. Vier Wahlen für die Hände: Zweihänder, zwei Waffen, Waffe und freie Hand (Fechten), Waffe und Schild (siehe Schilde). Die zweite Hand trifft schlechter, schwächer und langsamer; Zwei Waffen baut diesen Abzug ab, damit zwei Waffen eine Wahl sind und nicht einfach mehr.
+
+#### Zweihand
+
++ Eigenschaften: Körperlichkeit, sekundär Gewandtheit
++ Lernt aus: Wirkung mit dem Tag `zweihand`
++ Grund: der Abzug fehlender Körperlichkeit sinkt, schwere Waffen werden früher führbar
++ Experte: mehr Kritfaktor, wuchtige Hiebe
++ Meister: Rundumschlag und Anstürmen werden stärker, mit kürzerer Abklingzeit
++ Göttlich: Durchschlag, was ein tödlicher Hieb an Schaden übrig hat, trifft einen Feind daneben
++ Voraussetzung für Rundumschlag und Anstürmen, Fähigkeiten aus der Welt
+
+#### Zwei Waffen
+
++ Eigenschaften: Gewandtheit, sekundär Sinnlichkeit
++ Lernt aus: Wirkung mit zwei angelegten Waffen
++ Grund: der Abzug der zweiten Hand auf die Genauigkeit sinkt
++ Experte: der Abzug auf den Schaden sinkt
++ Meister: der Abzug auf das Tempo sinkt, die Aktion kostet nicht mehr als die langsamere Waffe
++ Göttlich: nach einem Krit der einen Waffe schlägt die andere sofort noch einmal
+
+#### Fechten
+
++ Eigenschaften: Gewandtheit, sekundär Klugheit
++ Lernt aus: Wirkung mit einer einzelnen Waffe in einer Hand, die andere frei
++ Mehr Genauigkeit und Parieren, solange die zweite Hand frei ist; ohne diesen Stil hätte die freie Hand keinen Wert
++ Ein höherer Tier gibt die Finte: sie senkt die Verteidigung des Ziels für den nächsten Angriff
++ Passt zu langen Klingen und Parieren, die Fechterin
 
 ### Fernkampf
 
@@ -351,5 +375,5 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Offen
 
-+ Kategorie Kampf Unterkategorie für Unterkategorie ausarbeiten, Verteidigung, waffenloser Kampf und Nahkampf mit Waffen entworfen, weiter mit Handhabung
++ Kategorie Kampf Unterkategorie für Unterkategorie ausarbeiten, Verteidigung, waffenloser Kampf, Nahkampf mit Waffen und Handhabung entworfen, weiter mit Fernkampf
 + Bier- und Brandfontäne (Getrunkenes im Kegel speien, kostet Pegel): eher Fähigkeit als Skill, vielleicht zu Stoffwechsel und Pegel oder zu Magie, wo die Fontäne beschworen wird
