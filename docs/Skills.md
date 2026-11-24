@@ -262,12 +262,31 @@ Die Faust ist, was bleibt, wenn die Waffe bricht, und sie soll bis in die Tiefe 
 
 ### Nahkampf mit Waffen
 
-+ Drei Schichten: Nahkampf allgemein (Genauigkeit mit allem im Nahkampf, Voraussetzung für alles darunter), Gattungen bis vier Tiers, Spezialisierungen je Waffentyp mit ein oder zwei Tiers für prägende Waffen
-+ Klingen: Schnitt, schnell, Krit; Dolch, Sichel, Schwert, Säbel, später Kettensäge und Vibroklinge; göttlich etwa Krits auch gegen Wachsame
-+ Wuchtwaffen: stumpf, langsam, viel Schaden, schlägt sich durch Rüstung; Fasshammer, Schöpfkelle, Streitkolben, später Dampfhammer und Elektroschlagstock; göttlich etwa ein Teil der Rüstung ignoriert oder ein Krit betäubt
-+ Stangenwaffen: Reichweite und Abstand halten; Maischegabel, Hellebarde, später Bajonett und Energielanze; göttlich etwa wer heranrückt, wird zuerst getroffen
-+ Spezialisierungen entstehen mit den Waffen des Inhalts, etwa Dolch (Hinterhalt, die Meuchelmörderin) oder Braupaddel (die Brauserkerin)
-+ Hinterhalt: Schleichen bringt Ninkasi ungesehen heran (siehe Wahrnehmung), die Waffe bestimmt, was er anrichtet (Klingen, Spezialisierung Dolch); kein eigenes Set
+Drei Schichten: Nahkampf allgemein, vier Gattungen, Spezialisierungen je Waffentyp. Was eine einzelne Waffe besonders macht (schnell oder langsam, Reichweite, Rüstung durchschlagen, schwer zu blocken, trifft alle Nachbarn), tragen ihre Daten; eine Axt ist so eine Klinge mit dem Zielmuster angrenzend, ein Flegel eine Wuchtwaffe, die sich nicht blocken lässt. Zweihändig ist keine Gattung, sondern Handhabung. Ein Stich mit dem Dolch lernt Nahkampf, kurze Klingen, Dolch und die Handhabung, die EP teilen sich gleich.
+
+#### Nahkampf allgemein
+
++ Eigenschaften: Körperlichkeit, sekundär Gewandtheit
++ Lernt aus: Wirkung mit dem Tag `nahkampf`
++ Zwei Tiers: Grund Genauigkeit, Experte etwas Schaden für alles im Nahkampf
++ Voraussetzung für jede Gattung; die Tiefe liegt in den Gattungen, die allgemeine Fertigkeit bleibt billig
+
+#### Gattungen
+
+Muster: Grund Genauigkeit, Experte Schaden, Meister Tempo, göttlich wie bei der Gattung.
+
++ Kurze Klingen: Gewandtheit, sekundär Sinnlichkeit; schnell, Krit, Hinterhalt, die Meuchelmörderin; Hopfenmesser, Dolch, Sichel, später Vibromesser; göttlich mehr Krit gegen Wehrlose und Ahnungslose, zusammen mit Wurf und Betäubung eine eigene Kette
++ Lange Klingen: Gewandtheit, sekundär Körperlichkeit; Schaden, Parieren, die Fechterin; Schwert, Säbel, Zweihänder (mit Zweihand), später Kettensäge; göttlich lässt ein Krit bluten; Querlernen zum Parieren
++ Wuchtwaffen: Körperlichkeit, sekundär Trinkfestigkeit; stumpf, langsam, viel Schaden, die Brauserkerin; Schöpfkelle, Fasshammer, Streitkolben, Braupaddel, später Dampfhammer und Elektroschlagstock; göttlich betäubt ein Krit kurz, betäubt ist wehrlos
++ Stangenwaffen: Gewandtheit, sekundär Klugheit; Reichweite und Abstand halten als Taktik; Maischegabel, Speer, Hellebarde, später Bajonett und Energielanze; göttlich wird zuerst getroffen, wer in die Reichweite tritt
+
+#### Spezialisierungen
+
++ Je Waffentyp ein oder zwei Tiers, wirksam nur für Waffen mit dem Tag ihres Typs
++ Voraussetzungen: der erste Tier die Gattung im Experten-Tier auf Stufe 3, der zweite die Gattung im Meister-Tier auf Stufe 3; so kommt sie früh genug, um einen Fund zu nutzen, ist aber nicht der erste Kauf
++ Jede bringt mehr Schaden und einen eigenen Kniff, etwa Dolch (mehr Kritfaktor im Hinterhalt), Braupaddel (Rundumschlag und Anstürmen stärker), Schöpfkelle (schöpft Flüssigkeit vom Boden und schleudert sie)
++ Sie entstehen mit den Waffen des Inhalts, der Katalog legt nur das Muster fest
++ Hinterhalt: Schleichen bringt Ninkasi ungesehen heran (siehe Wahrnehmung), die Waffe bestimmt, was er anrichtet (kurze Klingen, Spezialisierung Dolch); kein eigenes Set
 
 ### Handhabung
 
@@ -332,5 +351,5 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Offen
 
-+ Kategorie Kampf Unterkategorie für Unterkategorie ausarbeiten, Verteidigung und waffenloser Kampf entworfen, weiter mit Nahkampf mit Waffen
++ Kategorie Kampf Unterkategorie für Unterkategorie ausarbeiten, Verteidigung, waffenloser Kampf und Nahkampf mit Waffen entworfen, weiter mit Handhabung
 + Bier- und Brandfontäne (Getrunkenes im Kegel speien, kostet Pegel): eher Fähigkeit als Skill, vielleicht zu Stoffwechsel und Pegel oder zu Magie, wo die Fontäne beschworen wird
