@@ -17,7 +17,6 @@ Abgrenzung: [Systemausbau.md](Systemausbau.md) ist die Arbeitsliste beschlossene
 | Fraktionen: Ruf und Beistand | hoch | gering | erledigt (Ruf und Beistand) |
 | Vorschau durch Simulation | hoch | mittel | erledigt (Würfe über eine Schnittstelle) |
 | Hellsicht, Spüren, Unsichtbarkeit | hoch | mittel | teils erledigt (Erinnerung, Kartieren, Arten der Wahrnehmung, Spüren), offen: Telepathie, Orten, Unsichtbarkeit |
-| Zeitumkehr | hoch | mittel | ja |
 | Verwandlung | mittel | mittel | erledigt (Lesefunktionen) |
 | Veränderbares Gelände | hoch | mittel | erledigt (Erinnerung der Karte) |
 | Flüssigkeiten und Gase | ungeklärt | gering, Mischen mittel | ja (über das Mischen entscheiden) |
@@ -122,18 +121,6 @@ Umsetzung: offen
 + Berührt: das Format der Feldschichten (`{ art, menge }` je Feld), Wegfindung (Kosten statt nur Meiden), Ebenenerzeugung (Seen, Bäche), Brausystem, Inventar (Gefäße, Last), Licht (brennender Alkohol), Leistung (Fließen am Welttick)
 + Umbaurisiko: gering für Tiefe, Strömung, Fließen, Verdunsten und Schwere (Register `welttick`, Haken `betritt_feld`, Daten der Schichten); mittel für das Mischen, weil dann ein Feld mehrere Arten trägt und sich das Format der Feldschichten ändert
 + Vorkehrung: vor dem Inhalt entscheiden, ob Flüssigkeiten sich mischen sollen (siehe [Systemausbau.md](Systemausbau.md), Punkt 10); bis dahin keine Daten anlegen, die auf genau einer Art je Feld bestehen
-
-Umsetzung: offen
-
-## Zeitumkehr
-
-+ Wichtigkeit: hoch, Zeitumkehr um einige Runden "sehr interessant" (2026-11-22)
-+ Vorbilder: Caves of Qud, Präkognition (eine Vision beginnen und beenden; stirbt man darin, geht es zurück an den Anfang; Zufälliges kann dabei neu ausfallen); Into the Breach (Rückgängig bis zum Festlegen, dazu ein Zurücksetzen der ganzen Runde je Kampf; alles ist vorhersehbar, darum zählt nur anderes Handeln); Blades in the Dark (Rückblende: man legt nachträglich fest, was man vorbereitet hatte, und bezahlt mit Stress)
-+ Braucht: Haltepunkte, also Kopien des Zustands vor den letzten N Zügen (der Schnappschuss existiert, siehe [Architektur.md](Architektur.md), Speichern); die Umkehr ist selbst ein Befehl, beim Nachspielen entstehen dieselben Haltepunkte von selbst
-+ Entscheidungen für das Spieldesign: Was bleibt nach der Umkehr erhalten (Wissen über die Karte und Gegenstände, bezahlte Kosten, Pegel)? Fällt der Zufall neu aus? Mit dem alten Zufallszustand fällt jeder Wurf gleich, die Umkehr lohnt dann nur für anderes Handeln wie in Into the Breach; zum Neuwürfeln muss der Zufall nach der Umkehr weiterlaufen
-+ Berührt: Speichern (fehlen die Haltepunkte nach dem Laden aus einem Schnappschuss, oder gehören sie hinein?), Log und Chronik (Meldungen aus der verworfenen Zeit), Lernen (EP aus der verworfenen Zeit)
-+ Umbaurisiko: mittel
-+ Vorkehrung: weiter alles außerhalb des Zustands ableitbar halten (räumlicher Index, Zwischenspeicher), dann ist eine Kopie vollständig; nichts Laufbezogenes in die Chronik schreiben, bevor der Lauf endet
 
 Umsetzung: offen
 

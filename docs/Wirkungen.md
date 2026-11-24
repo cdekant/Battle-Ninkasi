@@ -262,7 +262,7 @@ Regeln:
 + Gelehrt ist gelernt: `faehigkeit_lehren` nimmt eine Fähigkeit auch dann in die eigene Liste, wenn sie gerade gewährt ist, und sie bleibt nach dem Ablegen; nur eine schon eigene meldet `faehigkeit_schon_bekannt`, die Quelle ist dann verschwendet
 + Angekündigte Angriffe sind lange Aktionen mit `ankuendigung` und meist der Zielart `feld`: das Ziel ist das Feld beim Beginn, wer bis zum letzten Schritt das Muster verlässt, weicht aus; die Anzeige markiert die Felder, solange die Aktion läuft; der erste Schritt läuft sofort, `schritte: 3` lässt dem Ziel also zwei Züge
 + Vorläufige Tabelle `psi`: Fehlschlag nüchtern 30 %, bei 1,5 ‰ am seltensten (5 %), darüber wieder steigend; Rückschlag ab 3 ‰ bis 20 % bei 8 ‰ (Effekt `psi_rueckschlag`); dass Psi mit dem Pegel stärker wirkt, geht über Modifikatoren mit `pegel_ab` und dem Tag `psi`; dazu `ohne_skill` (1 fehlende Stufe 25 %, 3: 60 %, 5: 85 %) und `anforderung` (1 fehlender Punkt 5 %, 10: 50 %), beide vorläufig
-+ Der Rückschlag ist Psi-Schaden: Modifikatoren auf Schaden mit dem Tag `psi` (z.B. mit `pegel_ab`) verstärken auch ihn, gewollt; ein Skill kann ihn gezielt dämpfen
++ Der Rückschlag ist Psi-Schaden: Modifikatoren auf Schaden mit dem Tag `psi` (z.B. mit `pegel_ab`) verstärken auch ihn, gewollt; ein Skill kann ihn gezielt dämpfen (Selbstbeherrschung, siehe [Skills.md](Skills.md), Psi)
 + Glimmer (Psi lockt Gegner an) wäre ein Wert `glimmer`, den Psi-Fähigkeiten über `wert_aendern` erhöhen; seine Folgen sind Spieldesign ([Grundlagen.md](Grundlagen.md))
 
 ## Lange Aktionen

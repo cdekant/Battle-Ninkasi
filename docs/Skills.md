@@ -1,6 +1,6 @@
 # Battle Ninkasi - Skills
 
-Stand: 2026-11-24, Entwurf; entsteht Kategorie für Kategorie ([Systemausbau.md](Systemausbau.md), Punkt 20)
+Stand: 2026-11-24, Entwurf; alle Kategorien entworfen ([Systemausbau.md](Systemausbau.md), Punkt 20)
 
 Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Wesen.md](Wesen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md), [Wirkungen.md](Wirkungen.md)
 
@@ -688,10 +688,68 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Kampfwerte (Schadensart und Ta
 
 ## Psi
 
-+ Abwehr gegen Psi; die Kurve der PP gehört zu Stoffwechsel und Pegel (Rauschgeist)
-+ Ortswechsel (Blinzeln, Teleport) gehört zu Psi
+Psi wirkt sofort und rein geistig auf Einzelziele, mit hohem Risiko und hohem Ertrag; Wirksamkeit und Risiko steigen mit dem Pegel (siehe [Grundlagen.md](Grundlagen.md), Spielkern). Psi-Fähigkeiten kommen aus der Welt, ohne Skill mit hohem Risiko (Risikotabelle nach den fehlenden Stufen). Aufbau wie bei der Magie: Psi allgemein, Disziplinen nach der Wirkung wie die Gattungen, dazu Sets quer zu ihnen für Risiko, Krits, Glimmer und Abwehr. Muster der Disziplinen: Grund Wirkung, Experte geringere Kosten, Meister qualitativ, göttlich je Disziplin eigen; Tiers für Fläche gibt es nicht. Die Kurve der PP gehört zu Stoffwechsel und Pegel (Rauschgeist). Vorbild Caves of Qud (Glimmer als Summe geistiger Macht, ab einer Schwelle jagen Psi-Jäger die Spielerin, häufiger und stärker mit wachsendem Glimmer; Präkognition als Vision, aus der man zurückkehrt).
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
+Drei Wege zu den Vorräten des Geistes: Die Meditation ist aktiv und nüchtern vor dem Kampf (siehe Magie), die Ekstase passiv und im Rausch während des Kampfes, das Zeitblinzeln die Rettung im Moment.
+
+### Psi allgemein
+
++ Eigenschaften: Sinnlichkeit, sekundär Klugheit
++ Lernt aus: Wirkung mit dem Tag `psi`
++ Zwei Tiers: Grund seltener Fehlschläge, Experte geringere Kosten an PP
++ Voraussetzung für Disziplinen und die Sets quer zu ihnen
+
+### Ekstase
+
++ Eigenschaften: Sinnlichkeit, sekundär Trinkfestigkeit
++ Lernt aus: Wirkung einer entladenen Ekstase (Tag `ekstase`)
++ Passiv, keine Fähigkeit: Ab einem hohen Pegel wächst die Ekstase im Kampf mit jedem Schaden, den Ninkasi nimmt oder austeilt, und entlädt sich als Psi-Stoß oder als Raserei; die Form des Kampfespegels (siehe [Systemausbau.md](Systemausbau.md), Punkt 10)
++ Grund: wächst schneller
++ Experte: hält länger
++ Meister: stärkere Entladung
++ Göttlich: nach der Entladung bleibt die Strafe aus
+
+### Zeitblinzeln
+
+Die angeborene Fähigkeit des PP-Vorrats (siehe [Charakter.md](Charakter.md), Fähigkeiten): Ninkasi geht einen eigenen Zug zurück, für PP, mit einer Abklingzeit in Weltzeit und dem Risiko der Psi über den Pegel. Der Zufall fällt danach nicht neu aus: wer dasselbe tut, bekommt dasselbe, es lohnt nur anderes Handeln, und die Spielerin wird anders entscheiden. Erhalten bleiben Ninkasis Wissen (was sie gesehen hat, bleibt in der Erinnerung der Karte, das ist die Vorahnung), die Kosten und die Abklingzeit des Blinzelns und der gestiegene Glimmer; alles andere wird verworfen, auch EP und Meldungen aus der verworfenen Zeit, das Log vermerkt die Vorahnung. Vorbilder: Into the Breach (Zurücksetzen bei vorhersehbarem Ausgang, darum zählt nur anderes Handeln), Caves of Qud (Präkognition).
+
+### Disziplinen
+
++ Telepathie: Sinnlichkeit, sekundär Klugheit; Wesen durch Wände spüren, Gedanken lesen (Absichten, Tempo), Gedankenstich als Psi-Schaden; göttlich sieht Ninkasi durch die Sinne eines Ziels
++ Furcht: Sinnlichkeit, sekundär Körperlichkeit; Furcht, Panik, Wahn; göttlich steckt Panik die Nachbarn an
++ Kontrolle: Sinnlichkeit, sekundär Klugheit; ein Wesen kämpft für Ninkasi, Zwietracht; göttlich springt die Kontrolle beim Tod des Ziels über; Voraussetzung, falls die Besessenheit kommt (Idee in [Ausblick.md](Ausblick.md), Steuerung anderer Wesen)
++ Ortswechsel: Sinnlichkeit, sekundär Gewandtheit; Blinzeln, Teleport; Meister nimmt ein Ziel mit, göttlich Platztausch mit einem Gegner
++ Psychokinese: Sinnlichkeit, sekundär Trinkfestigkeit; Stoßen, Geschosse ablenken, Pyrokinese (Getrunkenes oder Alkohol am Boden mit dem Geist entzünden); göttlich ein Kraftfeld
++ Vorahnung: Sinnlichkeit, sekundär Klugheit; verbessert das Zeitblinzeln: Grund geringere Kosten, Experte mehrere Züge zurück, Meister kürzere Abklingzeit, göttlich Vision, Ninkasi spielt einige Züge voraus und entscheidet danach, ob sie gelten, stirbt sie in der Vision, ist sie zurück am Anfang
+
+### Selbstbeherrschung
+
++ Eigenschaften: Sinnlichkeit, sekundär Trinkfestigkeit
++ Lernt aus: Fehlschlägen und Rückschlägen der Psi, die Ninkasi überlebt
++ Grund: ein Rückschlag wird schwächer
++ Experte: seltener
++ Meister: ein Kontrollverlust dauert kürzer
++ Göttlich: der Rückschlag trifft das Ziel statt Ninkasi
+
+### Schärfe
+
++ Eigenschaften: Sinnlichkeit, sekundär Klugheit
++ Lernt aus: jedem Krit mit dem Tag `psi` (Lernanlass Kritisch)
++ Kritchance und Kritfaktor der Psi, das Gegenstück zu Präzision und Fokus
+
+### Abschirmen
+
++ Eigenschaften: Sinnlichkeit, sekundär Klugheit
++ Lernt aus: freien EP und quer von Psi allgemein
++ Der Glimmer wächst langsamer, Psi-Jägerinnen und Geister früherer Läufe finden Ninkasi später (siehe [Ausblick.md](Ausblick.md), Geister früherer Läufe), telepathische Gegner spüren sie schlechter; die Heimlichkeit gegen den Geist
+
+### Willenskraft
+
++ Eigenschaften: Klugheit, sekundär Trinkfestigkeit
++ Lernt aus: Psi, das Ninkasi trifft oder das sie abwehrt
++ Hebt die Verteidigung `willenskraft` gegen Psi und den Widerstand gegen die Schadensart `psi`, mit der Obergrenze aller Widerstände (siehe Kampf, Verteidigung)
+
+Umsetzung: teilweise, siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten (Risikotabelle `psi` mit Fehlschlag und Rückschlag, Glimmer als vorbereiteter Wert, Kontrolle über die Fraktion, Springen) und [Wesen.md](Wesen.md), Kampfwerte (`willenskraft`, Schadensart `psi`); offen: alle Sets, Ekstase, Zeitblinzeln, Glimmer, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Offen
 

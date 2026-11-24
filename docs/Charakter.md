@@ -71,9 +71,8 @@ Umsetzung: siehe [Entwicklung.md](Entwicklung.md), Grundgerüst
 
 + Getrennte Systeme, siehe [Grundlagen.md](Grundlagen.md): Magie gebunden an Ritual, Schrift und Alchemie (MP), Psi sofort und rein geistig (PP)
 + Alchemie stellt nichts her: Getränke, Tränke und Gifte entstehen allein beim Brauen, die Alchemie steigert ihre Wirkung (siehe [Skills.md](Skills.md), Brauen)
-+ Psi: primär Sinnlichkeit
++ Psi: primär Sinnlichkeit, sekundär meist Klugheit; die Paarungen je Set stehen in [Skills.md](Skills.md), Psi
 + Magie gehört keiner einzelnen Eigenschaft, die Paarung prägt ihren Charakter: Klugheit für Formel und Zerstörung, Braukunde für Alchemie, Gabe und Segen; die Paarungen je Set stehen in [Skills.md](Skills.md), Magie
-+ Vorschlag, noch nicht bestätigt: Psi sekundär Klugheit
 
 Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Neuverteilung im Lauf
 
@@ -140,7 +139,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Neuv
 + Je Quelle festgelegt, ob sie lehrt oder nur gewährt: ein Lehrstück lehrt dauerhaft und ist meist verbraucht, ein Braubuch bleibt; angelegte Ausrüstung gewährt, solange sie angelegt ist (siehe [Grundlagen.md](Grundlagen.md), Spielkern)
 + Der Zufall prägt den Build
 + Fundstück ohne passenden Skill: nutzbar, aber mit hohem Fehlschlagrisiko über eine Risikotabelle nach dem fehlenden Skill (Vorbild DCSS)
-+ Angeboren sind nur wenige Grundfähigkeiten, mit Vorsicht gewählt: körperliche, die jede Ninkasi kann (Faustschlag, Werfen, siehe [Skills.md](Skills.md), Kampf), die Gaben der Göttin, die Zeit und Material statt eines Vorrats kosten (Brauen und Mälzen, siehe [Skills.md](Skills.md), Brauen), und höchstens eine je Vorrat; die erste solche ist der Sprint, den jede Ninkasi hat, wie wirksam und sparsam sie ihn einsetzt, bestimmen ihre Skills (siehe [Grundlagen.md](Grundlagen.md), Zeit und Tempo); eine spätere Fähigkeit aus der Welt kann ihn erweitern, etwa aus einer Betäubung heraus loszusprinten; die zweite ist das Meditieren für die MP (siehe [Skills.md](Skills.md), Magie)
++ Angeboren sind nur wenige Grundfähigkeiten, mit Vorsicht gewählt: körperliche, die jede Ninkasi kann (Faustschlag, Werfen, siehe [Skills.md](Skills.md), Kampf), die Gaben der Göttin, die Zeit und Material statt eines Vorrats kosten (Brauen und Mälzen, siehe [Skills.md](Skills.md), Brauen), und höchstens eine je Vorrat; die erste solche ist der Sprint, den jede Ninkasi hat, wie wirksam und sparsam sie ihn einsetzt, bestimmen ihre Skills (siehe [Grundlagen.md](Grundlagen.md), Zeit und Tempo); eine spätere Fähigkeit aus der Welt kann ihn erweitern, etwa aus einer Betäubung heraus loszusprinten; die zweite ist das Meditieren für die MP (siehe [Skills.md](Skills.md), Magie), die dritte das Zeitblinzeln für die PP (siehe [Skills.md](Skills.md), Psi)
 
 Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skillkatalog, siehe [Systemausbau.md](Systemausbau.md), Punkt 20
 

@@ -25,7 +25,7 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Kapitel, Dienste 
 + Dazu der Pegel, gemessen in Promille, nach oben offen; in der Oberfläche als ‰, in Text und Doku "Pegel"
 + Magie und Psi sind getrennte Systeme mit eigenem Vorrat
 + Magie: gebunden an Ritual, Schrift und Alchemie, kostet neben MP auch Zeit und Material; langsamer, wirkt über die Zeit, etwas mehr in Richtung Crowd Control
-+ Psi: sofort und rein geistig, hohes Risiko, hoher Ertrag; wirkt auf Einzelziele (Gedanken, Furcht, Kontrolle, Teleport); Wirksamkeit und Risiko steigen mit dem Pegel
++ Psi: sofort und rein geistig, hohes Risiko, hoher Ertrag; wirkt auf Einzelziele (Gedanken, Furcht, Kontrolle, Teleport, Vorahnung); Wirksamkeit und Risiko steigen mit dem Pegel; jede Ninkasi kann durch Zeitblinzeln einen Zug zurückgehen, der Zufall fällt dabei nicht neu aus (siehe [Skills.md](Skills.md), Psi)
 + Jeder Vorrat regeneriert mit eigenem Verlauf über den Pegel:
   + LP regenerieren immer, langsam (Vorbild: Brogue); ohne Pegel etwas langsamer, am schnellsten bei einem optimalen Pegel weit über dem von Normalsterblichen, darüber wieder abnehmend
   + MP regenerieren nüchtern am schnellsten, je höher der Pegel, desto langsamer
