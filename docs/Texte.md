@@ -114,6 +114,8 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 | `en/korpus/trinklied-b.md` | Nachdichtung, aus der deutschen übertragen | `sallaberger2020ninkasi` | eigener Text, CC BY-NC-SA 4.0; sumerisches Original gemeinfrei |
 | `de/korpus/istar-unterwelt.md` | Nachdichtung aus der akkadischen Normalisierung, eigene Lesart an einzelnen Stellen | `setaelae2022istar` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
 | `en/korpus/istar-unterwelt.md` | Nachdichtung, aus der deutschen übertragen | `setaelae2022istar` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
+| `de/korpus/gilgamesch-tafel-01.md` | Nachdichtung aus der akkadischen Normalisierung, jungbabylonische Tafel I | `george2022gilgamesch` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
+| `en/korpus/gilgamesch-tafel-01.md` | Nachdichtung, aus der deutschen übertragen | `george2022gilgamesch` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
 
 + Varianten desselben Originals tragen die Endung `-b`, `-c` usw.; sie folgen einer anderen Lesart oder anderen Bildern und erweitern so den Wortschatz der Markow-Ketten
 + Die englischen Korpustexte sind aus unseren deutschen Nachdichtungen übertragen, im selben altertümlichen Ton (thou, hath) und mit denselben Dateinamen; aus den modernen Übersetzungen der Fachquellen stammt kein Wortlaut
