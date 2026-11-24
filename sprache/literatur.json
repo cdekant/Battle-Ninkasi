@@ -125,5 +125,89 @@
     "language": "de",
     "keyword": "Bier, Bierstile, European Beer Star",
     "note": "Nur Fachquelle: keine freie Lizenz angegeben; nicht zitieren, Merkmale und Kennzahlen eigenständig zusammenfassen."
+  },
+  {
+    "id": "setaelae2022istar",
+    "type": "webpage",
+    "author": [
+      { "family": "Setälä", "given": "Albert" },
+      { "family": "Földi", "given": "Zsombor J." },
+      { "family": "Hätinen", "given": "Aino" },
+      { "family": "Jiménez", "given": "Enrique" },
+      { "family": "Rozzi", "given": "Geraldina" }
+    ],
+    "translator": [{ "family": "Foster", "given": "Benjamin R." }],
+    "title": "Descent of Ištar",
+    "container-title": "electronic Babylonian Library (eBL), Corpus",
+    "publisher": "Ludwig-Maximilians-Universität München",
+    "publisher-place": "München",
+    "issued": { "date-parts": [[2022, 11, 29]] },
+    "accessed": { "date-parts": [[2026, 11, 24]] },
+    "number": "L I.8",
+    "DOI": "10.5282/ebl/l/1/8",
+    "URL": "https://www.ebl.lmu.de/corpus/L/1/8",
+    "language": "en",
+    "keyword": "akkadisch, Ištar, Unterwelt, Mythos",
+    "note": "Nur Fachquelle: Edition und englische Übersetzung unter CC BY-NC-SA 4.0 (nicht kommerziell), daher kein Wortlaut; nachgedichtet aus der akkadischen Fassung. Grundlage von sprache/de/korpus/istar-unterwelt.md. Rohtext in sprache/Literatur/ebl/. Gemeinfreie deutsche Übersetzung zum Abgleich: Jensen 1900, Assyrisch-Babylonische Mythen und Epen (Keilinschriftliche Bibliothek 6/1), S. 80-91."
+  },
+  {
+    "id": "george2022gilgamesch",
+    "type": "webpage",
+    "author": [
+      { "family": "George", "given": "Andrew R." },
+      { "family": "Rozzi", "given": "Geraldina" },
+      { "family": "Jiménez", "given": "Enrique" }
+    ],
+    "translator": [{ "family": "George", "given": "Andrew R." }],
+    "title": "Poem of Gilgameš",
+    "container-title": "electronic Babylonian Library (eBL), Corpus",
+    "publisher": "Ludwig-Maximilians-Universität München",
+    "publisher-place": "München",
+    "issued": { "date-parts": [[2022, 10, 13]] },
+    "accessed": { "date-parts": [[2026, 11, 24]] },
+    "number": "L I.4",
+    "DOI": "10.5282/ebl/l/1/4",
+    "URL": "https://www.ebl.lmu.de/corpus/L/1/4",
+    "language": "en",
+    "keyword": "akkadisch, Gilgamesch, Epos",
+    "note": "Nur Fachquelle: Edition und englische Übersetzung unter CC BY-NC-SA 4.0 (nicht kommerziell), daher kein Wortlaut; jungbabylonische Fassung Tafel I-XII und altbabylonische Stücke, Kandidat für die Nachdichtung neben ungnad1911gilgamesch. Rohtext in sprache/Literatur/ebl/."
+  },
+  {
+    "id": "abusch2024maqlu",
+    "type": "webpage",
+    "author": [
+      { "family": "Abusch", "given": "Tzvi" },
+      { "family": "Schwemer", "given": "Daniel" }
+    ],
+    "translator": [{ "family": "Abusch", "given": "Tzvi" }],
+    "title": "Maqlû",
+    "container-title": "electronic Babylonian Library (eBL), Corpus",
+    "publisher": "Ludwig-Maximilians-Universität München",
+    "publisher-place": "München",
+    "issued": { "date-parts": [[2024, 3, 1]] },
+    "accessed": { "date-parts": [[2026, 11, 24]] },
+    "number": "Mag I.1",
+    "URL": "https://www.ebl.lmu.de/corpus/Mag/1/1",
+    "language": "en",
+    "keyword": "akkadisch, Beschwörung, Hexe, Zauber",
+    "note": "Nur Fachquelle: englische Übersetzung von Abusch auch als Buch erschienen, Lizenz für das Korpus nicht eindeutig, daher kein Wortlaut; Kandidat für die Nachdichtung. Rohtext in sprache/Literatur/ebl/."
+  },
+  {
+    "id": "jimenez2021palmeundrebe",
+    "type": "webpage",
+    "author": [{ "family": "Jiménez", "given": "Enrique" }],
+    "translator": [{ "family": "Jiménez", "given": "Enrique" }],
+    "title": "Palm and Vine",
+    "container-title": "electronic Babylonian Library (eBL), Corpus",
+    "publisher": "Ludwig-Maximilians-Universität München",
+    "publisher-place": "München",
+    "issued": { "date-parts": [[2021, 5, 3]] },
+    "accessed": { "date-parts": [[2026, 11, 24]] },
+    "number": "L II.12",
+    "DOI": "10.5282/ebl/l/2/12",
+    "URL": "https://www.ebl.lmu.de/corpus/L/2/12",
+    "language": "en",
+    "keyword": "akkadisch, Streitgespräch, Bier, Wein, Dattelpalme",
+    "note": "Nur Fachquelle: Edition und englische Übersetzung unter CC BY-NC-SA 4.0 (nicht kommerziell), daher kein Wortlaut; Kandidat für die Nachdichtung (Bier und Wein im Streit). Rohtext in sprache/Literatur/ebl/."
   }
 ]

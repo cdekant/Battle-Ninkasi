@@ -157,6 +157,8 @@ Status: offen, als eigene Sitzung vor dem Brausystem (Punkt 10)
 Status: offen, als eigene Sitzung
 
 + `ungnad1911gilgamesch` (gemeinfrei) aus `sprache/Literatur/` einlesen und daraus neue Korpustexte gewinnen, in beiden Sprachen (siehe [Texte.md](Texte.md), Korpus)
++ Das Epos ganz nachdichten, Tafel für Tafel, aus der akkadischen Fassung des eBL-Korpus (`george2022gilgamesch`, Rohtext in `sprache/Literatur/ebl/`), Ungnad zum Abgleich; zuerst die Stellen um Bier, Schenke und Šiduri (altbabylonisch Tafel II, jungbabylonisch Tafel X)
++ Danach weitere Werke aus dem eBL-Korpus nach der Kandidatenliste in [Texte.md](Texte.md), Korpus
 
 ## 19. Auszeichnung in Texten
 

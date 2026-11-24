@@ -1,6 +1,6 @@
 # Battle Ninkasi - Texte und Textkorpus
 
-Stand: 2026-11-23
+Stand: 2026-11-24
 
 Zuständig für: `sprache/*`, `src/anzeige/texte.js`, `src/anzeige/grammatik.js`, `src/anzeige/korpus.js`, `src/anzeige/glossar.js`, `daten/glossar.js`
 
@@ -84,8 +84,12 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 + Bei Übersetzungen zählt der Übersetzer: gemeinfrei erst 70 Jahre nach seinem Tod; Keilschrift-Originale sind gemeinfrei, viele moderne Übersetzungen nicht (z.B. ETCSL)
 + Herkunft und Rechtsgrundlage jedes Korpustextes werden festgehalten
 + Geschützte moderne Übersetzungen dienen nur als Fachquelle: Wir dichten aus dem gemeinfreien Original eigenständig nach und übernehmen keinen Wortlaut; das Zitatrecht deckt Zitate als Spielausstattung nicht
++ Übersetzungen unter nicht kommerzieller Lizenz (CC BY-NC-SA, etwa das eBL-Korpus) gelten ebenso nur als Fachquelle, damit das Spiel verkäuflich bleibt; die Quelle wird trotzdem angegeben
++ Eine Nachdichtung geht vom Original aus (Umschrift oder Normalisierung), die moderne Übersetzung dient dem Verständnis; eigene Wortwahl, eigene Bilder und wo möglich eine eigene Lesart, damit sie keine Bearbeitung der Übersetzung ist; gemeinfreie alte Übersetzungen dürfen zum Abgleich dienen
 + Gilgamesch-Epos in der gemeinfreien Übersetzung `ungnad1911gilgamesch`, einzulesen mit [Systemausbau.md](Systemausbau.md), Punkt 18
-+ Kandidaten, zu prüfen: weitere alte Übersetzungen des Gilgamesch-Epos, mittelalterliche Brauanleitungen, Brauordnungen, Bibelstellen und antike Autoren zu Bier und Wein
++ eBL-Korpus (electronic Babylonian Library, LMU München, `https://www.ebl.lmu.de/corpus`): akkadische Literatur (L), Magie (Mag) und Divination (D) mit Normalisierung und englischer Übersetzung; lokal als Rohtext in `sprache/Literatur/ebl/` (`text/` je Kapitel eine Zeile mit Nummer, Akkadisch und Englisch, `json/` die Antworten der Schnittstelle `https://www.ebl.lmu.de/api/texts`, `treffer-<gruppe>.txt` Fundstellen je Suchbegriff); ein Werk bekommt seinen Eintrag im Literaturverzeichnis, sobald daraus nachgedichtet wird oder es als Kandidat feststeht
++ Kandidaten aus dem eBL-Korpus: Gilgameš (`george2022gilgamesch`, ganz, Tafel für Tafel), Maqlû (`abusch2024maqlu`, Beschwörungen gegen Hexen), Dattelpalme und Weinstock (`jimenez2021palmeundrebe`, Bier und Wein im Streit), Omen aus Šumma ālu zu Schenke und Bier als Vorbild eigener Omen
++ Weitere Kandidaten, zu prüfen: weitere alte Übersetzungen des Gilgamesch-Epos, mittelalterliche Brauanleitungen, Brauordnungen, Bibelstellen und antike Autoren zu Bier und Wein
 
 ### Ablage und Format
 
@@ -108,6 +112,8 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 | `en/korpus/ninkasi-hymne-b.md` | Nachdichtung, aus der deutschen übertragen | `etcsl4231ninkasi` | eigener Text, CC BY-NC-SA 4.0; sumerisches Original gemeinfrei |
 | `en/korpus/trinklied.md` | Nachdichtung, aus der deutschen übertragen | `sallaberger2020ninkasi` | eigener Text, CC BY-NC-SA 4.0; sumerisches Original gemeinfrei |
 | `en/korpus/trinklied-b.md` | Nachdichtung, aus der deutschen übertragen | `sallaberger2020ninkasi` | eigener Text, CC BY-NC-SA 4.0; sumerisches Original gemeinfrei |
+| `de/korpus/istar-unterwelt.md` | Nachdichtung aus der akkadischen Normalisierung, eigene Lesart an einzelnen Stellen | `setaelae2022istar` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
+| `en/korpus/istar-unterwelt.md` | Nachdichtung, aus der deutschen übertragen | `setaelae2022istar` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
 
 + Varianten desselben Originals tragen die Endung `-b`, `-c` usw.; sie folgen einer anderen Lesart oder anderen Bildern und erweitern so den Wortschatz der Markow-Ketten
 + Die englischen Korpustexte sind aus unseren deutschen Nachdichtungen übertragen, im selben altertümlichen Ton (thou, hath) und mit denselben Dateinamen; aus den modernen Übersetzungen der Fachquellen stammt kein Wortlaut
