@@ -152,7 +152,8 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
   if (wesen.ki) pruefeKi(daten, wesen.ki, `${ort}.ki`, fehler, istTextliste(wesen.faehigkeiten) ? wesen.faehigkeiten : []);
   if (wesen.stoffwechsel) pruefeStoffwechsel(wesen, ort, fehler);
   if (wesen.sicht && !istGanzzahl(wesen.sicht.reichweite)) fehler.push(`${ort}: sicht.reichweite muss eine ganze Zahl sein`);
-  if (wesen.sicht?.imDunkeln !== undefined && !istZahlAbNull(wesen.sicht.imDunkeln)) fehler.push(`${ort}: sicht.imDunkeln muss eine ganze Zahl >= 0 sein`);
+  if (wesen.sicht?.imDunkeln !== undefined) fehler.push(`${ort}: sicht.imDunkeln heißt jetzt sicht.imFinstern`);
+  if (wesen.sicht?.imFinstern !== undefined && !istZahlAbNull(wesen.sicht.imFinstern)) fehler.push(`${ort}: sicht.imFinstern muss eine ganze Zahl >= 0 sein`);
   // Spüren, siehe systeme/sinne.js
   if (wesen.spueren !== undefined && !(istObjekt(wesen.spueren) && istZahlAbNull(wesen.spueren.reichweite))) fehler.push(`${ort}: spueren muss { reichweite } mit einer ganzen Zahl >= 0 sein`);
   pruefeLicht(wesen.licht, ort, fehler);
@@ -259,6 +260,7 @@ function pruefeNormierung(normierung, fehler) {
   if (!istObjekt(normierung)) return fehler.push(`${ort} fehlt`);
   if (!istProzent(normierung.toleranz)) fehler.push(`${ort}.toleranz muss eine ganze Zahl von 0 bis 100 sein`);
   if (!istProzent(normierung.trefferchance?.ninkasi) || !istProzent(normierung.trefferchance?.wesen)) fehler.push(`${ort}.trefferchance muss { ninkasi, wesen } in Prozent sein`);
+  if (![normierung.sicht?.ninkasi, normierung.sicht?.wesen].every((weite) => istGanzzahl(weite) && weite > 0)) fehler.push(`${ort}.sicht muss { ninkasi, wesen } als ganze Zahlen > 0 sein`);
   const stufeGut = (stufe) => istObjekt(stufe) && ["ninkasiTreffer", "wesenTreffer"].every((feld) => istGanzzahl(stufe[feld]) && stufe[feld] > 0) && istZahlAbNull(stufe.ep);
   if (!Array.isArray(normierung.staerken) || !normierung.staerken.length || !normierung.staerken.every(stufeGut)) fehler.push(`${ort}.staerken muss eine Liste [{ ninkasiTreffer, wesenTreffer, ep }] sein`);
   for (const feld of ["kontrolle", "abklingzeit"]) {
@@ -391,7 +393,7 @@ function pruefeTemporegeln(tempo, sprache, fehler) {
 
 function pruefeLichtregeln(licht, sprache, fehler) {
   if (!istObjekt(licht)) return fehler.push("regeln.licht fehlt");
-  if (!istZahlAbNull(licht.imDunkeln)) fehler.push("regeln.licht.imDunkeln muss eine ganze Zahl >= 0 sein");
+  if (!istZahlAbNull(licht.imFinstern)) fehler.push("regeln.licht.imFinstern muss eine ganze Zahl >= 0 sein");
   const stufen = licht.stufen;
   if (!Array.isArray(stufen) || !stufen.length) return fehler.push("regeln.licht.stufen muss eine Liste sein");
   stufen.forEach((stufe, nummer) => {
@@ -402,11 +404,13 @@ function pruefeLichtregeln(licht, sprache, fehler) {
     else if (nummer === 0 && stufe.ab !== 0) fehler.push(`${stelle}: die erste Stufe beginnt bei 0`);
     else if (nummer > 0 && stufe.ab <= stufen[nummer - 1].ab) fehler.push(`${stelle}: ab muss aufsteigen`);
     if (!istZahlAbNull(stufe.heimlichkeit)) fehler.push(`${stelle}: heimlichkeit muss eine ganze Zahl >= 0 sein`);
-    if (stufe.verbirgt !== undefined && typeof stufe.verbirgt !== "boolean") fehler.push(`${stelle}: verbirgt muss ein Wahrheitswert sein`);
+    if (stufe.verbirgt !== undefined) fehler.push(`${stelle}: verbirgt ist ersetzt durch sichtAnteil (Prozent der Sichtweite, finster 0)`);
+    if (!istProzent(stufe.sichtAnteil)) fehler.push(`${stelle}: sichtAnteil muss eine ganze Zahl von 0 bis 100 sein`);
+    else if (nummer > 0 && stufe.sichtAnteil < stufen[nummer - 1].sichtAnteil) fehler.push(`${stelle}: sichtAnteil darf nicht fallen`);
   });
   // die oberste Stufe ist der Stand ohne Licht in den Daten: dort verhält sich das Spiel wie ohne Licht
   const oberste = stufen.at(-1);
-  if (oberste?.verbirgt || oberste?.heimlichkeit !== 100) fehler.push("regeln.licht.stufen: die oberste Stufe hat heimlichkeit 100 und verbirgt nicht");
+  if (oberste?.sichtAnteil !== 100 || oberste?.heimlichkeit !== 100) fehler.push("regeln.licht.stufen: die oberste Stufe hat heimlichkeit 100 und sichtAnteil 100");
 }
 
 function pruefeSchichten(daten, sprache, fehler) {

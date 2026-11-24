@@ -49,17 +49,18 @@ export default {
   },
   // Licht, siehe src/systeme/licht.js; alle Zahlen vorläufig
   licht: {
-    // Stufen der Helligkeit (0 bis 100) aufsteigend, die erste ab 0: auf einem Feld einer Stufe mit verbirgt sieht man
-    // ein Ziel nur aus nächster Nähe (sicht.imDunkeln); heimlichkeit skaliert die Heimlichkeitsweite in Prozent;
-    // Text unter licht.<name>; die oberste Stufe ist der Stand ohne Licht in den Daten (Grundhelligkeit 100)
+    // Stufen der Helligkeit (0 bis 100) aufsteigend, die erste ab 0: Felder einer Stufe sieht ein Wesen bis zum Anteil
+    // sichtAnteil (Prozent) seiner Sichtweite, abgerundet, nie unter sicht.imFinstern; heimlichkeit skaliert die
+    // Heimlichkeitsweite in Prozent; Text unter licht.<name>; die oberste Stufe ist der Stand ohne Licht in den Daten
+    // (Grundhelligkeit 100)
     stufen: [
-      { name: "finster", ab: 0, heimlichkeit: 50, verbirgt: true },
-      { name: "dunkel", ab: 20, heimlichkeit: 50 },
-      { name: "daemmrig", ab: 40, heimlichkeit: 70 },
-      { name: "hell", ab: 60, heimlichkeit: 85 },
-      { name: "taghell", ab: 80, heimlichkeit: 100 },
+      { name: "finster", ab: 0, heimlichkeit: 50, sichtAnteil: 0 },
+      { name: "dunkel", ab: 20, heimlichkeit: 50, sichtAnteil: 50 },
+      { name: "daemmrig", ab: 40, heimlichkeit: 70, sichtAnteil: 75 },
+      { name: "hell", ab: 60, heimlichkeit: 85, sichtAnteil: 100 },
+      { name: "taghell", ab: 80, heimlichkeit: 100, sichtAnteil: 100 },
     ],
-    imDunkeln: 1, // so weit sieht ein Wesen ohne eigene Angabe sicht.imDunkeln auf finstere Felder
+    imFinstern: 1, // so weit sieht ein Wesen ohne eigene Angabe sicht.imFinstern auf finstere Felder
   },
   // Bewegung, siehe src/systeme/verschieben.js
   bewegung: {
@@ -143,6 +144,7 @@ export default {
   normierung: {
     toleranz: 10,
     trefferchance: { ninkasi: 80, wesen: 70 },
+    sicht: { ninkasi: 6, wesen: 7 }, // Sichtweite zu Beginn und eines gewöhnlichen Wesens, je Lichtstufe nach regeln.licht
     staerken: [
       { ninkasiTreffer: 2, wesenTreffer: 25, ep: 5 }, // Futter
       { ninkasiTreffer: 3, wesenTreffer: 18, ep: 10 }, // gewöhnlich

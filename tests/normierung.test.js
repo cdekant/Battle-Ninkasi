@@ -40,6 +40,14 @@ test("Probegegner: das Essigbakterium ist Stärke 1, der Fernkämpfer-Test im Na
   for (const zeile of zeilen) assert.deepEqual(abweichungenVon(DATEN, zeile), [], zeile.typ);
 });
 
+test("Sicht: Ninkasi zu Beginn knapp unter einem gewöhnlichen Wesen, die Normwesen und Probegegner auf der Norm", () => {
+  const { sicht } = DATEN.regeln.normierung;
+  assert.ok(sicht.ninkasi < sicht.wesen, "Ninkasi wird zuerst gesehen");
+  assert.equal(DATEN.wesen.ninkasi.sicht.reichweite, sicht.ninkasi);
+  const typen = [1, 2, 3, 4, 5].map((stelle) => `normwesen_${stelle}`).concat("essigbakterium");
+  for (const typ of typen) assert.equal(DATEN.wesen[typ].sicht.reichweite, sicht.wesen, typ);
+});
+
 test("Datenprüfung: Zielwerte der Normierung", () => {
   const pruefen = (aendern) => {
     const daten = rohdatenMitTesteintraegen();
@@ -50,6 +58,7 @@ test("Datenprüfung: Zielwerte der Normierung", () => {
     [(daten) => { delete daten.regeln.normierung; }, "regeln.normierung fehlt"],
     [(daten) => { daten.regeln.normierung.toleranz = 150; }, "regeln.normierung.toleranz"],
     [(daten) => { daten.regeln.normierung.trefferchance = { ninkasi: 80 }; }, "regeln.normierung.trefferchance"],
+    [(daten) => { daten.regeln.normierung.sicht = { ninkasi: 0, wesen: 7 }; }, "regeln.normierung.sicht"],
     [(daten) => { daten.regeln.normierung.staerken = [{ ninkasiTreffer: 0, wesenTreffer: 5, ep: 1 }]; }, "regeln.normierung.staerken"],
     [(daten) => { daten.regeln.normierung.abklingzeit = { kurz: -1 }; }, "regeln.normierung.abklingzeit"],
     [(daten) => { daten.regeln.normierung.verbrauch = { zauber: 10 }; }, "regeln.normierung.verbrauch"],

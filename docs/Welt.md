@@ -146,7 +146,8 @@ Regeln:
 ## Sichtweite
 
 + Die Sichtweite (`reichweiteSicht` in `src/systeme/sicht.js`, Modifikatoren auf `reichweiteSicht`) ergibt sich aus Grundwert (`sicht.reichweite` über `sichtVon`), Skills und Zuständen; Hindernisse begrenzt der Schattenwurf des Sichtfelds
-+ Die Sicht im Dunkeln (`sichtImDunkeln`, Modifikatoren auf `sichtImDunkeln`, die Nachtsicht) aus `sicht.imDunkeln`, Vorgabe `regeln.licht.imDunkeln` (1), Ninkasi 2: so weit sieht ein Wesen auf finstere Felder (siehe Licht)
++ Die Sicht im Finstern (`sichtImFinstern`, Modifikatoren auf `sichtImFinstern`, die Nachtsicht) aus `sicht.imFinstern`, Vorgabe `regeln.licht.imFinstern` (1), Ninkasi 2: so weit sieht ein Wesen auf finstere Felder, und nie weniger auf Felder jeder Stufe (siehe Licht)
++ Die Sicht je Lichtstufe (`sichtAufStufe`, `sichtJeStufe`): der Anteil `sichtAnteil` der Stufe an der Sichtweite, mit Modifikatoren auf `sichtAnteil.<stufe>` (die Dämmersicht) höchstens 100 %, abgerundet; Ninkasi zu Beginn (6) dämmrig 4, dunkel 3, finster 2, ein gewöhnliches Wesen (7) 5, 3 und 1
 + Ist sie größer als der Ausschnitt, wird nicht herausgezoomt; die Liste "In Sicht" der Seitenleiste nennt alle sichtbaren Wesen; Markierungen am Kartenrand siehe [Anzeige.md](Anzeige.md), Kamera
 
 ## Sicht und Erinnerung
@@ -173,13 +174,13 @@ Daten:
 
 + Grundhelligkeit je Ebene: `ebene.licht: { grundhelligkeit }` (0 bis 100) aus der Vorlage in `daten/ebenen.js`, Vorgabe 100; im Probeinhalt `keller_dunkel` mit 0 und 14 Wandfackeln
 + Lichtquelle: `licht: { reichweite, staerke, farbe? }` (Stärke 0 bis 100, Farbe nur für die Anzeige) an einer Entität (Wesen, Gegenstand), am Gelände (`daten/gelaende.js`, Probe: `wandfackel` mit Reichweite 5 und Stärke 80), an einer Art der Feldschichten (`daten/schichten.js`) und am Feuer (`regeln.feuer.licht`: Reichweite 4, Stärke 70)
-+ Stufen `regeln.licht.stufen` aufsteigend `{ name, ab, heimlichkeit, verbirgt? }` mit Text `licht.<name>`: `finster` ab 0 (verbirgt, Heimlichkeit 50 %), `dunkel` ab 20 (50 %), `daemmrig` ab 40 (70 %), `hell` ab 60 (85 %), `taghell` ab 80 (100 %); `regeln.licht.imDunkeln` 1
++ Stufen `regeln.licht.stufen` aufsteigend `{ name, ab, heimlichkeit, sichtAnteil }` mit Text `licht.<name>`: `finster` ab 0 (Heimlichkeit 50 %, Sicht 0 %), `dunkel` ab 20 (50 %, 50 %), `daemmrig` ab 40 (70 %, 75 %), `hell` ab 60 (85 %, 100 %), `taghell` ab 80 (100 %, 100 %); `regeln.licht.imFinstern` 1; die Datenprüfung verlangt einen Anteil, der mit der Stufe nicht fällt, und für die oberste Stufe Heimlichkeit und Sicht 100 %; das alte `verbirgt` weist sie mit dem Ersatz ab
 + Nichts davon steht im Zustand außer der Grundhelligkeit; die Helligkeit wird bei jeder Frage aus den Quellen berechnet
 
 Schnittstellen (`src/systeme/licht.js`, reine Lesefunktionen):
 
 + `helligkeitAuf(spiel, x, y)`, `lichtstufeAuf`, `stufeVonHelligkeit`, `lichtWirkt` (nur, wenn die Grundhelligkeit unter der obersten Stufe liegt), `heimlichkeitImLicht(spiel, feld)` (Prozent), `lichtbeitrag(licht, entfernung)`, `lichtquellenNahe`, `lichtVon`, `grundhelligkeit`; für die Anzeige `lichtAufFeld` mit den Beiträgen und ihren Farben
-+ `src/systeme/sicht.js`: `hellGenug(spiel, betrachter, feld)`, `sichtImDunkeln`, `traegtLicht`
++ `src/systeme/sicht.js`: `hellGenug(spiel, betrachter, feld, weiten?)`, `sichtImFinstern`, `sichtAufStufe`, `sichtJeStufe`, `traegtLicht`
 + Handler der Weltuhr `licht` (`src/systeme/schichten.js`, nach dem Feuer): wo Licht wirkt, berechnet er Ninkasis Sichtfeld neu; `versetzen` (`src/systeme/bewegung.js`) tut es gleich, wenn sich ein anderes Wesen mit Licht bewegt; die Lichter des Geländes hält der `zwischenspeicher`, `gelaendeSetzen` verwirft sie
 
 Regeln:
@@ -187,7 +188,7 @@ Regeln:
 + Helligkeit eines Felds: Grundhelligkeit plus die Beiträge aller Quellen, höchstens 100; liegt schon die Grundhelligkeit in der obersten Stufe, wirkt Licht gar nicht und das Spiel verhält sich wie ohne Licht
 + Beitrag einer Quelle im Schachbrett-Abstand d bis zur Reichweite r: `staerke * (2r - d) / (2r)`, abgerundet, am Rand also die halbe Stärke (eine Lampe mit Stärke 80 und Reichweite 3: 80, 66, 53, 40); nur auf Felder mit freier Sichtlinie von der Quelle (siehe [Wirkungen.md](Wirkungen.md), Zielauswahl), eine Wand als Quelle leuchtet in den Raum davor
 + Wo eine Quelle leuchtet: eine Entität mit Position (Wesen, Gegenstand am Boden), ein angelegter Gegenstand vom Feld der Trägerin aus, im Gepäck nichts; dazu Gelände, Schichten und Feuer
-+ Sehen braucht Licht: ein Feld einer Stufe mit `verbirgt` (finster) sieht ein Wesen nur bis zum Abstand `sichtImDunkeln`; das gilt für Ninkasis Sichtfeld und für `sieht` aller anderen (siehe [Wesen.md](Wesen.md), Wahrnehmung)
++ Sehen braucht Licht: ein Feld sieht ein Wesen nur bis zu seiner Sicht auf der Stufe dieses Felds (`sichtAufStufe`), ein finsteres nur bis `sichtImFinstern`; das gilt für Ninkasis Sichtfeld und für `sieht` aller anderen (siehe [Wesen.md](Wesen.md), Wahrnehmung)
 + Heimlichkeit: die Heimlichkeitsweite eines Wesens skaliert mit der Stufe seines eigenen Felds; wer Licht trägt, macht sein Feld hell und wird weit gesehen
 + Wiederholbar: die Abfrage liest nur den Zustand und rechnet ganzzahlig; die Summe hängt nicht von der Reihenfolge der Quellen ab
 + Anzeige: Lichtkarte über der Karte nach den Stufen, getönt nach den Farben der Quellen (siehe [Anzeige.md](Anzeige.md), Anzeige)

@@ -1,8 +1,10 @@
 // Sichtfeld von Ninkasi: PreciseShadowcasting aus rot.js.
 // Ergebnis im Zustand: zustand.sichtbareFelder (Feldindizes), zustand.ebene.erkundet und die Erinnerung der Karte
 // (systeme/erinnerung.js).
-// Komponente in den Daten: sicht: { reichweite: 8, imDunkeln? } (imDunkeln: so weit sieht das Wesen auf finstere Felder,
-// Vorgabe regeln.licht.imDunkeln; Modifikatorziel sichtImDunkeln, die Nachtsicht); Licht siehe systeme/licht.js
+// Komponente in den Daten: sicht: { reichweite: 6, imFinstern? } (imFinstern: so weit sieht das Wesen auf finstere
+// Felder, Vorgabe regeln.licht.imFinstern; Modifikatorziel sichtImFinstern, die Nachtsicht); auf Felder jeder Lichtstufe
+// sieht es den Anteil stufe.sichtAnteil seiner Sichtweite (Modifikatorziel sichtAnteil.<stufe>, die Dämmersicht);
+// Licht siehe systeme/licht.js
 
 import PreciseShadowcasting from "../../lib/rot/fov/precise-shadowcasting.js";
 import { feldIndex, aufDerKarte, abstand } from "../welt/karte.js";
@@ -18,16 +20,29 @@ export function reichweiteSicht(spiel, entitaet) {
   return modifiziert(spiel, entitaet, "reichweiteSicht", sichtVon(entitaet)?.reichweite ?? 0);
 }
 
-export function sichtImDunkeln(spiel, entitaet) {
-  return modifiziert(spiel, entitaet, "sichtImDunkeln", sichtVon(entitaet)?.imDunkeln ?? spiel.daten.regeln.licht.imDunkeln);
+export function sichtImFinstern(spiel, entitaet) {
+  return modifiziert(spiel, entitaet, "sichtImFinstern", sichtVon(entitaet)?.imFinstern ?? spiel.daten.regeln.licht.imFinstern);
 }
 
-// Ob genug Licht auf dem Feld liegt, dass der Betrachter es sieht: ein Feld einer Stufe mit verbirgt (finster) nur
-// bis zum Abstand sichtImDunkeln; weite: sichtImDunkeln, falls schon bekannt
-export function hellGenug(spiel, betrachter, feld, weite = null) {
+// Wie weit ein Wesen auf Felder einer Lichtstufe sieht: der Anteil stufe.sichtAnteil seiner Sichtweite in Prozent, mit
+// Modifikatoren auf sichtAnteil.<stufe> (Dämmersicht) höchstens 100, abgerundet, nie unter sichtImFinstern
+export function sichtAufStufe(spiel, entitaet, stufe) {
+  const anteil = stufe.sichtAnteil >= 100 ? 100 : Math.min(100, modifiziert(spiel, entitaet, `sichtAnteil.${stufe.name}`, stufe.sichtAnteil));
+  return Math.max(sichtImFinstern(spiel, entitaet), Math.floor((reichweiteSicht(spiel, entitaet) * anteil) / 100));
+}
+
+// Sicht eines Wesens je Lichtstufe: { <stufe>: Abstand }
+export function sichtJeStufe(spiel, entitaet) {
+  return Object.fromEntries(spiel.daten.regeln.licht.stufen.map((stufe) => [stufe.name, sichtAufStufe(spiel, entitaet, stufe)]));
+}
+
+// Ob genug Licht auf dem Feld liegt, dass der Betrachter es aus seinem Abstand sieht (sichtAufStufe); weiten:
+// sichtJeStufe, falls schon bekannt
+export function hellGenug(spiel, betrachter, feld, weiten = null) {
   if (!lichtWirkt(spiel)) return true;
-  if (abstand(betrachter.position, feld) <= (weite ?? sichtImDunkeln(spiel, betrachter))) return true;
-  return !lichtstufeAuf(spiel, feld.x, feld.y).verbirgt;
+  const stufe = lichtstufeAuf(spiel, feld.x, feld.y);
+  const weite = weiten ? weiten[stufe.name] : sichtAufStufe(spiel, betrachter, stufe);
+  return abstand(betrachter.position, feld) <= weite;
 }
 
 export function sichtfeldAktualisieren(spiel) {
@@ -38,10 +53,10 @@ export function sichtfeldAktualisieren(spiel) {
   // Gelände und dichter Rauch (welt/schichten.js) halten die Sicht auf
   const lichtDurchlaessig = (x, y) => aufDerKarte(ebene, x, y) && sichtdurchlaessig(spiel, x, y);
   const schattenwurf = new PreciseShadowcasting(lichtDurchlaessig, { topology: 8 });
-  // finstere Felder sieht Ninkasi nur aus der Nähe (hellGenug)
-  const weiteImDunkeln = sichtImDunkeln(spiel, gesteuerte);
+  // dunkle Felder sieht Ninkasi nur aus der Nähe (hellGenug)
+  const weiten = lichtWirkt(spiel) ? sichtJeStufe(spiel, gesteuerte) : null;
   schattenwurf.compute(gesteuerte.position.x, gesteuerte.position.y, reichweiteSicht(spiel, gesteuerte), (x, y) => {
-    if (aufDerKarte(ebene, x, y) && hellGenug(spiel, gesteuerte, { x, y }, weiteImDunkeln)) sichtbareFelder.add(feldIndex(ebene, x, y));
+    if (aufDerKarte(ebene, x, y) && hellGenug(spiel, gesteuerte, { x, y }, weiten)) sichtbareFelder.add(feldIndex(ebene, x, y));
   });
   // die bisher sichtbaren Felder halten fest, wie Ninkasi sie zuletzt gesehen hat, die jetzt sichtbaren den heutigen Stand
   const bisher = zustand.sichtbareFelder.filter((index) => !sichtbareFelder.has(index));

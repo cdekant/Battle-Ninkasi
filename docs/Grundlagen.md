@@ -113,7 +113,7 @@ Umsetzung: teilweise, siehe [Entwicklung.md](Entwicklung.md), Probeinhalt; siehe
 + Licht ist Spielmechanik, Stimmung ein Nebeneffekt
 + Ebenen sind je nach Plan des Laufs hell oder dunkel; kein Wechsel von Tag und Nacht, weil Warten auf Dunkelheit das Rasten belohnte; später vielleicht helle Räume und dunkle Gänge auf derselben Ebene
 + Lichtquellen leuchten in einem Umkreis und werden zum Rand hin schwächer: Wandfackeln, Feuer, getragene Laternen; Kontrolleure tragen Taschenlampen
-+ Helligkeit in fünf Stufen, so fein, dass mehr als hell, mittel und dunkel entsteht, und so grob, dass man jeden Unterschied bemerkt; nur die finsterste verbirgt ganz, die übrigen machen das Schleichen stufenweise leichter
++ Helligkeit in fünf Stufen, so fein, dass mehr als hell, mittel und dunkel entsteht, und so grob, dass man jeden Unterschied bemerkt; nur die finsterste verbirgt ganz, die übrigen begrenzen die Sicht und machen das Schleichen stufenweise leichter
 + Ninkasi sieht zu Beginn knapp weniger weit als ein gewöhnlicher Gegner und wird zuerst gesehen; schon wenige Stufen Fernsicht drehen das um
 + Im Finstern sieht man nur aus nächster Nähe, Ninkasi als Göttin etwas weiter als Sterbliche; Nachtsicht und Fernsicht kommen als Skills
 + Wer Licht trägt, sieht weiter und wird selbst von weitem gesehen

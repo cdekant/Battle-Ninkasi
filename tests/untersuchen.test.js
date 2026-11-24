@@ -146,6 +146,13 @@ test("Zustände mit Restdauer in Zeiteinheiten, laufende Aktion, Aufschlüsselun
   assert.deepEqual(werte.find((eintrag) => eintrag.name === "ruestung").modifikatoren[0].herkunft, { art: "eigen" });
   assert.deepEqual(herkunftVon(ninkasi, `ausruestung:${helm.id}`), { art: "gegenstand", id: helm.id });
   assert.deepEqual(herkunftVon(ninkasi, "aura:zustand:3"), { art: "aura" });
+  // Sicht je Lichtstufe als fertiger Abstand gleich nach der Sichtweite (systeme/sicht.js sichtAufStufe)
+  ninkasi.sicht = { reichweite: 6, imFinstern: 2 };
+  const mitSicht = werteAufschluesseln(spiel, ninkasi);
+  const namenMitSicht = mitSicht.map((eintrag) => eintrag.name);
+  const stelle = namenMitSicht.indexOf("reichweiteSicht");
+  assert.deepEqual(namenMitSicht.slice(stelle, stelle + 4), ["reichweiteSicht", "sicht.daemmrig", "sicht.dunkel", "sichtImFinstern"]);
+  assert.deepEqual(mitSicht.slice(stelle, stelle + 4).map((eintrag) => eintrag.wert), [6, 4, 3, 2]);
 });
 
 test("Untersuchen mit X: Cursor ohne Befehl, Enter bleibt, X und Esc schließen, Tab springt", () => {
@@ -234,7 +241,7 @@ test("Texte für Untersuchen, Zustände, Geräusche und Gelände sind vorhanden"
     ...["n", "no", "o", "so", "s", "sw", "w", "nw", "nah"].map((richtung) => `richtung.${richtung}`),
     ...["schlaeft", "wach", "jagt"].map((wachzustand) => `ui.wachzustand.${wachzustand}`),
     ...["eigen", "aura", "sonstige"].map((herkunft) => `ui.herkunft.${herkunft}`),
-    ...["lp", "mp", "pp", "genauigkeit", ...KAMPFWERTE, "reichweiteSicht", "sichtImDunkeln", "reichweiteSpueren"].map((wert) => `ui.wert.${wert}`),
+    ...["lp", "mp", "pp", "genauigkeit", ...KAMPFWERTE, "reichweiteSicht", "sicht.daemmrig", "sicht.dunkel", "sichtImFinstern", "reichweiteSpueren"].map((wert) => `ui.wert.${wert}`),
     "ui.gespuert",
     ...Object.values(rohdaten.gelaende).map((gelaende) => gelaende.text),
   ];

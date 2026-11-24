@@ -13,7 +13,7 @@ export default {
     eigenschaften: { koerperlichkeit: 14, trinkfestigkeit: 14, gewandtheit: 13, sinnlichkeit: 13, klugheit: 13, braukunde: 13 },
     // Tempo in Zeiteinheiten (siehe docs/Grundlagen.md, Zeit und Tempo): zu Fuß ein Fünftel langsamer als die Norm 100
     kosten: { bewegen: 120 },
-    sicht: { reichweite: 8, imDunkeln: 2 }, // auf finstere Felder sieht sie zwei Felder weit (src/systeme/sicht.js)
+    sicht: { reichweite: 6, imFinstern: 2 }, // knapp unter einem gewöhnlichen Gegner (7); auf finstere Felder zwei Felder weit (src/systeme/sicht.js)
     // gegen Ausweichen 0 und Grundverteidigung 20: 80 %; Tag für den Skill nahkampf_grund; Fäuste in der halben Zeit der Norm
     angriffe: [{ name: "faust", genauigkeit: 80, effekt: "faustschlag", kosten: 50, tags: ["nahkampf"] }],
     inventar: [],

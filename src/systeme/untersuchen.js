@@ -12,7 +12,7 @@ import { aufDerKarte, feldBekannt, feldIndex, gelaendeName, bekannterGelaendeNam
 import { wahrnehmungsart } from "./sinne.js";
 import { schichtAuf } from "../welt/schichten.js";
 import { hatHoechstwert, hoechstwert, modifikatorenAufgeschluesselt, verrechnet, lebenswertName } from "../kern/werte.js";
-import { istSichtbar } from "./sicht.js";
+import { istSichtbar, sichtAufStufe } from "./sicht.js";
 import { istBekannt } from "./fallen.js";
 import { erinnerteDingeAuf } from "./erinnerung.js";
 import { istUnbekannt } from "./kennen.js";
@@ -154,8 +154,8 @@ export function herkunftVon(wesen, quelle) {
 function grundwertVon(spiel, wesen, name) {
   if (HOECHSTWERTE.includes(name)) return wesen.werte[name].grundwert;
   if (name === "reichweiteSicht") return sichtVon(wesen)?.reichweite ?? 0;
-  // ohne Sicht auch keine Sicht im Dunkeln
-  if (name === "sichtImDunkeln") return sichtVon(wesen) ? sichtVon(wesen).imDunkeln ?? spiel.daten.regeln.licht.imDunkeln : 0;
+  // ohne Sicht auch keine Sicht im Finstern
+  if (name === "sichtImFinstern") return sichtVon(wesen) ? sichtVon(wesen).imFinstern ?? spiel.daten.regeln.licht.imFinstern : 0;
   if (name === "reichweiteSpueren") return spuerenVon(wesen)?.reichweite ?? 0;
   if (name === "genauigkeit") return angriffeVon(spiel, wesen)[0]?.genauigkeit ?? 0;
   if (name === "heimlichkeit") return wesen.kampfwerte?.heimlichkeit ?? spiel.daten.regeln.wahrnehmung.heimlichkeitVorgabe;
@@ -166,7 +166,7 @@ function grundwertVon(spiel, wesen, name) {
 // nicht 0 sind oder Modifikatoren haben; Modifikatoren mit Bedingungen an ein Gegenüber zählen hier nicht
 // (ohne Umstände); Kampfwerte nie unter 0 wie in systeme/kampf.js
 export function werteAufschluesseln(spiel, wesen) {
-  const namen = [...HOECHSTWERTE.filter((name) => wesen.werte?.[name] && hatHoechstwert(wesen, name)), "genauigkeit", ...KAMPFWERTE, "reichweiteSicht", "sichtImDunkeln", "reichweiteSpueren"];
+  const namen = [...HOECHSTWERTE.filter((name) => wesen.werte?.[name] && hatHoechstwert(wesen, name)), "genauigkeit", ...KAMPFWERTE, "reichweiteSicht", "sichtImFinstern", "reichweiteSpueren"];
   const ergebnis = [];
   for (const name of namen) {
     const grundwert = grundwertVon(spiel, wesen, name);
@@ -178,6 +178,17 @@ export function werteAufschluesseln(spiel, wesen) {
       name, grundwert, wert,
       modifikatoren: modifikatoren.map((modifikator) => ({ art: modifikator.art, betrag: modifikator.betrag, herkunft: herkunftVon(wesen, modifikator.quelle) })),
     });
+  }
+  // Sicht auf den Lichtstufen zwischen finster und voller Sichtweite als fertiger Abstand ohne Rechenweg
+  // (systeme/sicht.js sichtAufStufe), nach der Sichtweite eingereiht
+  if (sichtVon(wesen)) {
+    const zwischenstufen = spiel.daten.regeln.licht.stufen.filter((stufe) => stufe.sichtAnteil > 0 && stufe.sichtAnteil < 100).reverse();
+    const abgeleitet = zwischenstufen.map((stufe) => {
+      const wert = sichtAufStufe(spiel, wesen, stufe);
+      return { name: `sicht.${stufe.name}`, grundwert: wert, wert, modifikatoren: [] };
+    });
+    const stelle = ergebnis.findIndex((eintrag) => eintrag.name === "reichweiteSicht") + 1;
+    ergebnis.splice(stelle || ergebnis.length, 0, ...abgeleitet);
   }
   return ergebnis;
 }

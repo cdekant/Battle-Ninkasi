@@ -67,7 +67,7 @@ Maßstab für Gegner und später für die Machtkurve (Spieldesign in [Grundlagen
 
 Daten:
 
-+ Regelwerte `regeln.normierung` (vorläufig): `toleranz` 10 % der Treffer; `trefferchance` Ninkasi 80 %, Wesen 70 %, für alle Stärken gleich, Stärke wächst nur über LP und Schaden; `staerken` je Stufe Treffer bis zum Tod in beide Richtungen und EP:
++ Regelwerte `regeln.normierung` (vorläufig): `toleranz` 10 % der Treffer; `trefferchance` Ninkasi 80 %, Wesen 70 %, für alle Stärken gleich, Stärke wächst nur über LP und Schaden; `sicht` Ninkasi 6, Wesen 7, also je Lichtstufe (siehe [Welt.md](Welt.md), Sichtweite) Ninkasi dämmrig 4, dunkel 3, finster 2, ein Wesen 5, 3 und 1; `staerken` je Stufe Treffer bis zum Tod in beide Richtungen und EP:
 
 | Stärke | Rolle | Ninkasi braucht | Wesen braucht | EP |
 |---|---|---|---|---|
@@ -78,7 +78,7 @@ Daten:
 | 5 | Elite, ein Duell | 8 | 6 | 80 |
 
 + Weitere Normen, nach denen sich Inhalt richtet: `kontrolle` kurz 100, mittel 200, lang 400 Zeiteinheiten; `abklingzeit` kurz 300, mittel 1000, lang 3000; `verbrauch` Standardzauber 10 MP, Psi-Fähigkeit 10 PP; Bezug fürs Tragen ist `regeln.tragen.tragkraft` (20 kg)
-+ Normwesen (`datenproben/gegner.js`, Vorlage `normwesen`, in keiner Population): `normwesen_1` bis `normwesen_5` mit 11, 16, 22, 33 und 44 LP, Genauigkeit 47, stumpfer Schlag mit 2W3, 1W6+2, 2W6+1, 2W8+2 und 3W8+3 (Mittel 4, 5,5, 8, 11, 16,5), Tempo 100; Arenen `normwesen` und `normwesen_drei` mit den Varianten `s1` bis `s5`
++ Normwesen (`datenproben/gegner.js`, Vorlage `normwesen`, in keiner Population, Sichtweite 7): `normwesen_1` bis `normwesen_5` mit 11, 16, 22, 33 und 44 LP, Genauigkeit 47, stumpfer Schlag mit 2W3, 1W6+2, 2W6+1, 2W8+2 und 3W8+3 (Mittel 4, 5,5, 8, 11, 16,5), Tempo 100; Arenen `normwesen` und `normwesen_drei` mit den Varianten `s1` bis `s5`
 
 Schnittstellen (`werkzeuge/normierung.js`, siehe [Entwicklung.md](Entwicklung.md), Bot und Werkzeuge):
 
@@ -132,7 +132,7 @@ Daten:
 
 Schnittstellen:
 
-+ `src/systeme/sicht.js`: `sieht` (Ninkasi sieht, was in ihrem Sichtfeld liegt; alle anderen sehen ein Ziel mit freier Sichtlinie innerhalb ihrer Sichtweite, auch Ninkasi, wenn genug Licht auf seinem Feld liegt, siehe [Welt.md](Welt.md), Licht), `reichweiteSicht`, `sichtImDunkeln`, `hellGenug`, `sichtfeldAktualisieren` (PreciseShadowcasting aus rot.js), `istSichtbar`, `kandidatenInSicht`
++ `src/systeme/sicht.js`: `sieht` (Ninkasi sieht, was in ihrem Sichtfeld liegt; alle anderen sehen ein Ziel mit freier Sichtlinie innerhalb ihrer Sichtweite, auch Ninkasi, wenn genug Licht auf seinem Feld liegt, siehe [Welt.md](Welt.md), Licht), `reichweiteSicht`, `sichtImFinstern`, `sichtAufStufe`, `sichtJeStufe`, `hellGenug`, `sichtfeldAktualisieren` (PreciseShadowcasting aus rot.js), `istSichtbar`, `kandidatenInSicht`
 + `src/systeme/sinne.js`: Register `sinne` (`{ art, reichweite(spiel, betrachter), nimmtWahr(spiel, betrachter, ziel) }`, die Anmeldereihenfolge ist der Vorrang): `sehen` (Art `gesehen`, über `sieht`), `spueren` (Art `gespuert`, über `spuert`); `wahrnehmungsart(spiel, betrachter, ziel)` (die Art des ersten Sinns, der wahrnimmt, sonst `null`; Arten in `WAHRNEHMUNGSARTEN`), `nimmtWahr`, `kandidatenWahrnehmbar` (für die gesteuerte Entität alle mit Position, sonst der Umkreis der größten Reichweite ihrer Sinne), `wesenMitWahrnehmungsart`, `reichweiteSpueren`, `offenFuerSpueren`
 + `src/systeme/wahrnehmung.js`: `wahrnehmen` (vor dem Zug eines Wesens mit KI, aus `warteschlangeAbarbeiten`), `wachzustandVon`, `istAhnungslos`, `heimlichkeitsweite`, `spurweite`, `laermMachen`, `laermFelder`; Baustein `laerm { lautstaerke }`
 + Meldungen `bemerkt`, `aufgewacht`, `laerm` (mit `geraeusch` aus `GERAEUSCHE`: `nahkampf`, `aufschlag`, `sonstiges`, und `gesteuerteHoert`, nicht bei eigenem Lärm; siehe [Anzeige.md](Anzeige.md), Anzeige)
@@ -146,7 +146,7 @@ Regeln:
 + Ahnungslos ist ein Wesen mit KI, das nicht jagt; Angriffe darauf sind ein Hinterhalt (siehe Kampfwerte)
 + Lärm breitet sich aus wie eine Wegsuche mit Kosten: ein passierbares Feld kostet 1, anderes Gelände seine `laermdaempfung`, ohne Angabe dringt nichts durch; wer innerhalb der Lautstärke liegt, hört ihn: Schlafende werden wach, Wache gehen der Quelle nach, wer jagt, bleibt dabei; jeder Nahkampf macht Lärm
 + Dichter Rauch versperrt Ninkasis Sichtfeld und die Sichtlinie aller anderen (siehe [Welt.md](Welt.md), Feldschichten)
-+ Sehen braucht Licht: auf einem finsteren Feld sieht ein Wesen ein Ziel nur bis `sichtImDunkeln`; Nachtsicht und Fernsicht wirken als Modifikatoren auf `sichtImDunkeln` und `reichweiteSicht` (siehe [Welt.md](Welt.md), Licht und Sichtweite)
++ Sehen braucht Licht: auf ein Feld sieht ein Wesen nur den Anteil seiner Sichtweite, den die Lichtstufe dort erlaubt, auf ein finsteres nur bis `sichtImFinstern`; Nachtsicht, Dämmersicht und Fernsicht wirken als Modifikatoren auf `sichtImFinstern`, `sichtAnteil.<stufe>` und `reichweiteSicht` (siehe [Welt.md](Welt.md), Licht und Sichtweite)
 + Arten der Wahrnehmung: ein Ziel ist gesehen, gespürt oder gar nicht wahrgenommen; die KI jagt, bemerkt und flieht nach allem, was sie auf irgendeine Art wahrnimmt; Ninkasis Sehen ist ihr Sichtfeld, ihr Spüren dasselbe wie bei allen anderen
 + Spüren: ein Ziel innerhalb von `reichweiteSpueren` Schritten, ohne Licht und ohne Rücksicht auf Rauch, entlang dessen, was offen ist: jeder Schritt auf ein Nachbarfeld (auch schräg) kostet 1, offen ist ein Feld, das Gas durchlässt oder für irgendeine Bewegungsart passierbar ist (Wasser, Abgrund); Wände und geschlossene Türen halten es auf; das Feld des Ziels selbst muss nicht offen sein
 + Durch Wände spüren nur künftige Sinne wie Telepathie (siehe [Ausblick.md](Ausblick.md), Hellsicht, Spüren, Unsichtbarkeit)

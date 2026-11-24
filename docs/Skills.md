@@ -157,7 +157,6 @@ Die Kategorie hält die eigenen Sinne der Göttin: Sehen, Spüren und Hören in 
 + Eigenschaften: Sinnlichkeit, sekundär Klugheit
 + Lernt aus: Erspäht im Dunkeln
 + Ninkasi sieht auf dämmrigen und dunklen Feldern weiter, bis sie sie wie helle sieht
-+ Setzt voraus, dass auch diese Lichtstufen die Sichtweite begrenzen; heute verbirgt nur die finstere (offen in [Systemausbau.md](Systemausbau.md), Punkt 20)
 + Zwei Tiers: Grund dämmrig wie hell, Experte dunkel wie hell
 
 ### Gespür für Wesen
@@ -215,7 +214,7 @@ Die Kategorie hält die eigenen Sinne der Göttin: Sehen, Spüren und Hören in 
 + Heimlichkeit ist ein Wert jedes Wesens, Gegner tragen ihn fest in ihren Daten; Fähigkeiten wie "im Schatten verstecken" kommen aus der Welt, Schleichen ist ihre Voraussetzung und macht sie wirksamer
 + Tiers: Grund Heimlichkeit, Experte weniger Duft, Meister Jäger verlieren die Spur früher, göttlich bemerken Zeugen Ninkasi nach einem tödlichen Hinterhalt nicht
 
-Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Wahrnehmung (Sichtweite, Sicht im Finstern, Spüren, Heimlichkeit als Werte mit Modifikatoren), [Welt.md](Welt.md), Gelände (Entdecken) und [Gegenstaende.md](Gegenstaende.md), Unbekanntes (Kennerschaft); offen: alle Skills, Lernanlässe Erspäht und Hinterhalt, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Wahrnehmung (Sichtweite, Sicht je Lichtstufe und im Finstern, Spüren, Heimlichkeit als Werte mit Modifikatoren), [Welt.md](Welt.md), Gelände (Entdecken) und [Gegenstaende.md](Gegenstaende.md), Unbekanntes (Kennerschaft); offen: alle Skills, Lernanlässe Erspäht und Hinterhalt, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Kampf
 

@@ -10,7 +10,7 @@ import { vorbereiten } from "../src/kern/daten.js";
 import { entitaetErzeugen } from "../src/kern/zustand.js";
 import { feldIndex, gelaendeName } from "../src/welt/karte.js";
 import { helligkeitAuf, lichtbeitrag, lichtWirkt, lichtstufeAuf, stufeVonHelligkeit, lichtAufFeld } from "../src/systeme/licht.js";
-import { sieht, sichtfeldAktualisieren, istSichtbar, sichtImDunkeln } from "../src/systeme/sicht.js";
+import { sieht, sichtfeldAktualisieren, istSichtbar, sichtImFinstern, sichtAufStufe, sichtJeStufe } from "../src/systeme/sicht.js";
 import { heimlichkeitsweite } from "../src/systeme/wahrnehmung.js";
 import { versetzen } from "../src/systeme/bewegung.js";
 import { holen } from "../src/kern/register.js";
@@ -35,7 +35,7 @@ function dunkel({ karte = RAUM, grundhelligkeit = 0, gelaende = {} } = {}) {
   const spiel = miniSpiel(karte, { gelaende: { ...GELAENDE, ...gelaende } });
   spiel.zustand.ebene.licht = { grundhelligkeit };
   const ninkasi = spielerinSetzen(spiel, 1, 2);
-  ninkasi.sicht = { reichweite: 12, imDunkeln: 2 };
+  ninkasi.sicht = { reichweite: 12, imFinstern: 2 };
   return { spiel, ninkasi };
 }
 
@@ -95,20 +95,53 @@ test("Quellen: Gelände und Feuer; Wände halten das Licht auf", () => {
   assert.equal(beitraege[0].licht.farbe, feuerlicht.farbe, "die Anzeige kennt die Farbe");
 });
 
-test("Sehen: ein Ziel auf einem finsteren Feld nur bis sichtImDunkeln, im Licht so weit wie die Sichtweite", () => {
+test("Sehen: ein Ziel auf einem finsteren Feld nur bis sichtImFinstern, im Licht so weit wie die Sichtweite", () => {
   const { spiel, ninkasi } = dunkel();
   const waechter = wesen(spiel, 7, 2, "feinde", 10, { sicht: { reichweite: 9 } });
-  assert.equal(sichtImDunkeln(spiel, waechter), 1, "Vorgabe aus regeln.licht.imDunkeln");
+  assert.equal(sichtImFinstern(spiel, waechter), 1, "Vorgabe aus regeln.licht.imFinstern");
   assert.equal(sieht(spiel, waechter, ninkasi), false);
   positionSetzen(spiel.zustand, ninkasi, { x: 6, y: 2 });
   assert.equal(sieht(spiel, waechter, ninkasi), true, "aus nächster Nähe");
   positionSetzen(spiel.zustand, ninkasi, { x: 3, y: 2 });
-  waechter.modifikatoren = [{ ziel: "sichtImDunkeln", art: "plus", betrag: 3 }];
+  waechter.modifikatoren = [{ ziel: "sichtImFinstern", art: "plus", betrag: 3 }];
   assert.equal(sieht(spiel, waechter, ninkasi), true, "Nachtsicht als Modifikator");
   waechter.modifikatoren = [];
   entitaetErzeugen(spiel.zustand, { typ: "lampe_am_boden", position: { x: 3, y: 3 }, licht: { reichweite: 1, staerke: 40 } });
   assert.equal(lichtstufeAuf(spiel, 3, 2).name, "dunkel");
-  assert.equal(sieht(spiel, waechter, ninkasi), true, "schon dunkel reicht zum Sehen");
+  assert.equal(sieht(spiel, waechter, ninkasi), true, "dunkel: die halbe Sichtweite, abgerundet 4");
+  positionSetzen(spiel.zustand, ninkasi, { x: 2, y: 2 });
+  assert.equal(lichtstufeAuf(spiel, 2, 2).name, "dunkel", "am Rand des Scheins");
+  assert.equal(sieht(spiel, waechter, ninkasi), false, "auf Abstand 5 ist ein dunkles Feld zu weit");
+});
+
+test("Sicht je Lichtstufe: Anteil der Sichtweite, abgerundet, nie unter der Sicht im Finstern", () => {
+  const { spiel, ninkasi } = dunkel();
+  ninkasi.sicht = { reichweite: 6, imFinstern: 2 };
+  assert.deepEqual(sichtJeStufe(spiel, ninkasi), { finster: 2, dunkel: 3, daemmrig: 4, hell: 6, taghell: 6 });
+  const gegner = wesen(spiel, 9, 2, "feinde", 10, { sicht: { reichweite: 7 } });
+  assert.deepEqual(sichtJeStufe(spiel, gegner), { finster: 1, dunkel: 3, daemmrig: 5, hell: 7, taghell: 7 });
+  ninkasi.modifikatoren = [{ ziel: "reichweiteSicht", art: "plus", betrag: 4 }];
+  assert.equal(sichtJeStufe(spiel, ninkasi).dunkel, 5, "Fernsicht wirkt auch im Dunkeln");
+  // Dämmersicht: der Anteil einer Stufe steigt, höchstens auf die volle Sichtweite
+  ninkasi.modifikatoren = [{ ziel: "sichtAnteil.daemmrig", art: "plus", betrag: 50 }];
+  const stufen = Object.fromEntries(spiel.daten.regeln.licht.stufen.map((stufe) => [stufe.name, stufe]));
+  assert.equal(sichtAufStufe(spiel, ninkasi, stufen.daemmrig), 6, "dämmrig wie hell, nicht weiter");
+  assert.equal(sichtAufStufe(spiel, ninkasi, stufen.dunkel), 3, "dunkel bleibt");
+});
+
+test("Ninkasis Sichtfeld: dämmrige und dunkle Felder bis zu ihrem Anteil der Sichtweite", () => {
+  const { spiel, ninkasi } = dunkel({ grundhelligkeit: 45 });
+  ninkasi.sicht = { reichweite: 8, imFinstern: 2 };
+  sichtfeldAktualisieren(spiel);
+  assert.equal(istSichtbar(spiel.zustand, 7, 2), true, "dämmrig: 75 % von 8 sind 6");
+  assert.equal(istSichtbar(spiel.zustand, 8, 2), false);
+  spiel.zustand.ebene.licht.grundhelligkeit = 25;
+  sichtfeldAktualisieren(spiel);
+  assert.equal(istSichtbar(spiel.zustand, 5, 2), true, "dunkel: die Hälfte, 4");
+  assert.equal(istSichtbar(spiel.zustand, 6, 2), false);
+  ninkasi.modifikatoren = [{ ziel: "sichtAnteil.dunkel", art: "plus", betrag: 50 }];
+  sichtfeldAktualisieren(spiel);
+  assert.equal(istSichtbar(spiel.zustand, 9, 2), true, "Dämmersicht: dunkel wie hell");
 });
 
 test("Ninkasis Sichtfeld: finstere Felder nur aus der Nähe, beleuchtete auch von weitem", () => {
@@ -119,7 +152,8 @@ test("Ninkasis Sichtfeld: finstere Felder nur aus der Nähe, beleuchtete auch vo
   entitaetErzeugen(spiel.zustand, { typ: "lampe_am_boden", position: { x: 10, y: 2 }, licht: LAMPE });
   sichtfeldAktualisieren(spiel);
   assert.equal(istSichtbar(spiel.zustand, 10, 2), true);
-  assert.equal(istSichtbar(spiel.zustand, 13, 2), true, "der Rand des Scheins ist noch dämmrig");
+  assert.equal(istSichtbar(spiel.zustand, 11, 2), true, "helle Felder auf die volle Sichtweite");
+  assert.equal(istSichtbar(spiel.zustand, 13, 2), false, "der dämmrige Rand des Scheins liegt jenseits von 75 % der Sichtweite");
   assert.equal(istSichtbar(spiel.zustand, 6, 2), false, "dazwischen bleibt es finster");
   assert.equal(spiel.zustand.ebene.erkundet[feldIndex(spiel.zustand.ebene, 6, 2)], 1, "der Test-Ebene gilt alles als erkundet");
 });
@@ -183,7 +217,12 @@ test("Datenprüfung: Licht an Quellen, Ebenen, Sicht und in den Regeln", () => {
     [(daten) => { daten.gegenstaende.testgegenstand = { ...daten.gegenstaende.testgegenstand, licht: { reichweite: 2, staerke: 150 } }; }, "gegenstaende.testgegenstand: licht muss"],
     [(daten) => { daten.ebenen.keller.licht = { grundhelligkeit: 101 }; }, "ebenen.keller: licht muss"],
     [(daten) => { daten.ebenen.keller.wandObjekte = [{ gelaende: "gibtsnicht", anzahl: 1 }]; }, "ebenen.keller.wandObjekte"],
-    [(daten) => { daten.wesen.ninkasi.sicht.imDunkeln = -1; }, "sicht.imDunkeln"],
+    [(daten) => { daten.wesen.ninkasi.sicht.imFinstern = -1; }, "sicht.imFinstern"],
+    [(daten) => { daten.wesen.ninkasi.sicht.imDunkeln = 2; }, "sicht.imDunkeln heißt jetzt sicht.imFinstern"],
+    [(daten) => { daten.regeln.licht.stufen[0].verbirgt = true; }, "verbirgt ist ersetzt"],
+    [(daten) => { daten.regeln.licht.stufen[1].sichtAnteil = 120; }, "sichtAnteil muss eine ganze Zahl von 0 bis 100"],
+    [(daten) => { daten.regeln.licht.stufen[2].sichtAnteil = 10; }, "sichtAnteil darf nicht fallen"],
+    [(daten) => { daten.regeln.licht.stufen.at(-1).sichtAnteil = 90; }, "die oberste Stufe"],
     [(daten) => { daten.regeln.licht.stufen[2].ab = 10; }, "ab muss aufsteigen"],
     [(daten) => { daten.regeln.licht.stufen[0].ab = 5; }, "die erste Stufe beginnt bei 0"],
     [(daten) => { daten.regeln.licht.stufen.at(-1).heimlichkeit = 90; }, "die oberste Stufe"],
