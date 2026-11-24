@@ -33,7 +33,8 @@ import { modifikatorSkaliert, hatWert } from "../kern/werte.js";
 import { traegerinnenIds } from "../kern/raumindex.js";
 import { inReichweite, sichtlinieFrei } from "../welt/geometrie.js";
 import { trifftZu } from "./zielauswahl.js";
-import { staerkeProzent } from "./zustaende.js";
+import { staerkeProzent, istWehrlos } from "./zustaende.js";
+import { imKampf } from "./kampfzustand.js";
 import { istAhnungslos } from "./wahrnehmung.js";
 
 export function bedingungAnmelden(name, parameterBeschreibung, funktion) {
@@ -59,6 +60,13 @@ bedingungAnmelden("gegenueber_tag", { tag: "text" }, (spiel, entitaet, parameter
 });
 
 bedingungAnmelden("gegenueber_ahnungslos", {}, (spiel, entitaet, parameter, umstaende) => istAhnungslos(spiel.zustand.entitaeten[umstaende.gegenueberId]));
+
+bedingungAnmelden("gegenueber_wehrlos", {}, (spiel, entitaet, parameter, umstaende) => istWehrlos(spiel, spiel.zustand.entitaeten[umstaende.gegenueberId]));
+
+// Kampfzustand (systeme/kampfzustand.js), z.B. Rituale nur außerhalb des Kampfes
+bedingungAnmelden("im_kampf", {}, (spiel, entitaet) => imKampf(spiel, entitaet));
+
+bedingungAnmelden("ausser_kampf", {}, (spiel, entitaet) => !imKampf(spiel, entitaet));
 
 bedingungAnmelden("hat_tag", { tag: "text" }, (spiel, entitaet, parameter) => Boolean(entitaet.tags?.includes(parameter.tag)));
 

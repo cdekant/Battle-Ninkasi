@@ -26,6 +26,7 @@ import "./schichten.js";
 import "./ebenen.js";
 import "./modifikatoren.js";
 import "./laufendeAktionen.js";
+import "./betaeubung.js";
 import "./faehigkeiten.js";
 import "./verschleiss.js";
 import "./kennen.js";

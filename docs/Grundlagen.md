@@ -79,7 +79,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Stoffwechsel; siehe [Wirkungen
 + Durchschaubar: Ninkasis eigene Kosten, Restdauern und Abklingzeiten zeigt die Oberfläche auf eine Zeiteinheit genau, ebenso Zustände, die sie anderen zugefügt hat; das Tempo anderer Wesen steht in Worten in ihrer Beschreibung (siehe [Oberflaeche.md](Oberflaeche.md), Seitenleiste)
 + Handeln mehrere Wesen dicht hintereinander, zeigt die Animation sie nacheinander (siehe [Animationen.md](Animationen.md), Entschieden)
 
-Umsetzung: teilweise, siehe [Architektur.md](Architektur.md), Zeitmodell; offen: Sprint, Betäubung und abnehmende Kontrolle, Verlangsamung durch Rüstung, Türen und Waffenwechsel, Fernkämpfer im Wechsel, Rituale nur außerhalb des Kampfes, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 10
+Umsetzung: teilweise, siehe [Architektur.md](Architektur.md), Zeitmodell; siehe [Wirkungen.md](Wirkungen.md), Kontrolle; siehe [Gegenstaende.md](Gegenstaende.md), Ausrüstung; Sprint, Rüstung, Türen und Waffenwechsel mit Probewerten, Fernkämpfer wechseln im Probeinhalt zwischen Schießen und Ausweichen, Rituale nur außerhalb des Kampfes über die Bedingung `ausser_kampf`; offen: der Sprint als angeborene Fähigkeit und die Zahlen mit dem Inhalt, Normierung in [Systemausbau.md](Systemausbau.md), Punkt 10
 
 ## Charakter
 

@@ -96,6 +96,16 @@ export function akteurEntfernen(zustand, akteurId) {
   entfernenWo(zustand, (eintrag) => eintrag.art === "akteur" && eintrag.akteurId === akteurId);
 }
 
+// Schiebt den Eintrag einer Akteurin um verzoegerung nach hinten (Betäubung, systeme/betaeubung.js); gibt den neuen
+// Zeitpunkt zurück oder null, wenn sie gerade keinen Eintrag hat (sie handelt in diesem Moment)
+export function akteurVerschieben(zustand, akteurId, verzoegerung) {
+  const eintrag = zustand.warteschlange.find((kandidat) => kandidat.art === "akteur" && kandidat.akteurId === akteurId);
+  if (!eintrag) return null;
+  eintrag.zeit += verzoegerung;
+  heapAufbauen(zustand.warteschlange);
+  return eintrag.zeit;
+}
+
 // Entfernt die an eine Entität gebundenen Zeitereignisse, mit ereignistyp nur die dieses Typs
 export function gebundeneEreignisseEntfernen(zustand, entitaetId, ereignistyp = null) {
   entfernenWo(zustand, (eintrag) => eintrag.gebundenAn === entitaetId && (ereignistyp === null || eintrag.ereignistyp === ereignistyp));

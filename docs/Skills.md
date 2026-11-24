@@ -438,7 +438,7 @@ Werfen ist eine angeborene Grundfähigkeit wie der Sprint: Jede Ninkasi wirft, d
 + Meister: gezielter Treffer, ein Teil des Ausweichens des Ziels zählt nicht
 + Göttlich: Schwachstelle, ein Krit macht das Ziel für kurze Zeit verwundbar (weniger Rüstung), auch für Verbündete
 
-Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Kampfwerte (Profile mit Tags, Kampfwerte, Bedingungen `gegenueber_ahnungslos` und `pegel_ab`) und Skills und Lernen; im Probeinhalt Nahkampf und Ausweichen als Grundskills; offen: alle Sets, Tags der Waffen, Wehrlos, Abzug der zweiten Hand, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20, Fernwaffen in Punkt 22
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Kampfwerte (Profile mit Tags, Kampfwerte, Wehrlos, Bedingungen `gegenueber_ahnungslos`, `gegenueber_wehrlos` und `pegel_ab`) und Skills und Lernen; im Probeinhalt Nahkampf und Ausweichen als Grundskills; offen: alle Sets, Tags der Waffen, Abzug der zweiten Hand, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20, Fernwaffen in Punkt 22
 
 ## Brauen
 

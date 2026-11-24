@@ -8,6 +8,9 @@
 //   zeit:            Grundkosten in Zeiteinheiten (Vorgabe kosten.faehigkeit der Wirkenden, sonst aktionen.faehigkeit);
 //                    Modifikatoren auf kosten.faehigkeit, kosten.alle
 //   abklingzeit:     Zeiteinheiten Weltzeit ab dem Wirken, bis die Fähigkeit wieder bereit ist; Modifikatoren auf abklingzeit
+//   ohneZeit:        true kostet keine Zeit (Sprint): kein Zug, die Wirkende ist sofort wieder an der Reihe; zwischen
+//                    zwei Aktionen mit Zeit höchstens eine ohne (Ablehnung schon_ohne_zeit, Merker ohneZeitGenutzt in
+//                    kern/spiel.js befehlAusfuehren); nicht mit dauer
 //   voraussetzungen: [{ bedingung, ...parameter }] aus dem Register "modifikatorbedingungen", z.B. pegel_unter (nüchtern)
 //   ziel:            Zielart wie in zielAufloesen (systeme/zielauswahl.js); bei "aktiv" Pflicht
 //   wirkung:         benannter Effekt; mit muster im Ziel auf jede betroffene Entität, bei durchdringendem
@@ -159,6 +162,7 @@ export function faehigkeitPruefen(spiel, wesen, name, zielangabe) {
   if (!definition || !kenntFaehigkeit(spiel, wesen, name)) return "nicht_gelernt";
   if (definition.art === "aufrecht" && aufrechteInstanz(wesen, definition)) return null; // Beenden geht immer
   if (zeitBisBereit(spiel, wesen, name) > 0) return "abklingend";
+  if (definition.ohneZeit && wesen.ohneZeitGenutzt) return "schon_ohne_zeit";
   if (!voraussetzungenErfuellt(spiel, wesen, definition)) return "voraussetzung";
   for (const [wertName, menge] of Object.entries(verbrauchVon(spiel, wesen, definition))) {
     if (menge > 0 && (!hatWert(wesen, wertName) || wesen.werte[wertName].aktuell < menge)) return `zu_wenig_${wertName}`;
@@ -247,7 +251,7 @@ function wirkungAnwenden(spiel, wesen, name, definition, zielangabe) {
 
 // Zeitkosten einer Fähigkeit bzw. eines Schritts ihrer langen Aktion
 function zeitergebnis(spiel, wesen, definition) {
-  return { aktion: "faehigkeit", grundkosten: definition.zeit ?? grundkostenVon(spiel, wesen, "faehigkeit"), umstaende: umstaendeVon(definition) };
+  return { aktion: "faehigkeit", grundkosten: definition.zeit ?? grundkostenVon(spiel, wesen, "faehigkeit"), umstaende: umstaendeVon(definition), ohneZeit: Boolean(definition.ohneZeit) };
 }
 
 // Risiko und Wirkung, sofort oder nach dem letzten Schritt einer langen Aktion

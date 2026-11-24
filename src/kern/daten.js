@@ -264,6 +264,9 @@ function pruefeRegeln(daten, regeln, fehler) {
   if (!BEZIEHUNGEN.includes(regeln.fraktionen?.beziehungVorgabe)) fehler.push(`regeln.fraktionen.beziehungVorgabe muss eines von ${BEZIEHUNGEN.join(", ")} sein`);
   pruefeRufregeln(daten, regeln.fraktionen ?? {}, fehler);
   if (!istZahlAbNull(regeln.kampf?.nachwirkung)) fehler.push("regeln.kampf.nachwirkung muss eine ganze Zahl >= 0 sein");
+  // abnehmende Kontrolle, siehe systeme/zustaende.js kontrollDauer
+  if (!Array.isArray(regeln.kontrolle?.stufen) || !regeln.kontrolle.stufen.every((stufe) => istZahlAbNull(stufe))) fehler.push("regeln.kontrolle.stufen muss eine Liste von Prozenten >= 0 sein");
+  if (!istZahlAbNull(regeln.kontrolle?.erholung)) fehler.push("regeln.kontrolle.erholung muss eine ganze Zahl >= 0 sein");
   const wahrnehmung = regeln.wahrnehmung;
   if (!wahrnehmung) fehler.push("regeln.wahrnehmung fehlt");
   else {
@@ -489,6 +492,9 @@ function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
       const plaetze = daten.regeln?.ausruestung?.plaetze || [];
       if (!plaetze.includes(ausruestung.platz)) fehler.push(`${ort}.ausruestung: platz muss eines von ${plaetze.join(", ")} sein`);
       if (ausruestung.belegt !== undefined && !(istGanzzahl(ausruestung.belegt) && ausruestung.belegt > 0)) fehler.push(`${ort}.ausruestung: belegt muss eine ganze Zahl > 0 sein`);
+      // Zeit des Wechsels und Verlangsamung durch Rüstung
+      if (ausruestung.zeit !== undefined && !(istGanzzahl(ausruestung.zeit) && ausruestung.zeit > 0)) fehler.push(`${ort}.ausruestung: zeit muss eine ganze Zahl > 0 sein`);
+      if (ausruestung.verlangsamung !== undefined && !istZahlAbNull(ausruestung.verlangsamung)) fehler.push(`${ort}.ausruestung: verlangsamung muss eine ganze Zahl >= 0 sein`);
       if (ausruestung.angriffe !== undefined) pruefeAngriffe(daten, ausruestung.angriffe, `${ort}.ausruestung`, fehler);
       if (ausruestung.modifikatoren !== undefined) pruefeModifikatoren(daten, ausruestung.modifikatoren, `${ort}.ausruestung.modifikatoren`, fehler);
       if (ausruestung.ausloeser !== undefined) pruefeAusloeser(daten, ausruestung.ausloeser, `${ort}.ausruestung`, fehler);
@@ -694,6 +700,8 @@ function pruefeFaehigkeit(daten, sprache, name, faehigkeit, fehler) {
   if (faehigkeit.zeit !== undefined && !(istGanzzahl(faehigkeit.zeit) && faehigkeit.zeit > 0)) fehler.push(`${ort}: zeit muss eine ganze Zahl > 0 sein`);
   if (faehigkeit.zeit === undefined && daten.aktionen.faehigkeit === undefined) fehler.push(`${ort}: ohne zeit braucht es aktionen.faehigkeit`);
   if (faehigkeit.abklingzeit !== undefined && !istZahlAbNull(faehigkeit.abklingzeit)) fehler.push(`${ort}: abklingzeit muss eine ganze Zahl >= 0 sein`);
+  pruefeParameter(daten, { ohneZeit: "wahrheitswert?" }, faehigkeit, ort, fehler);
+  if (faehigkeit.ohneZeit && faehigkeit.dauer !== undefined) fehler.push(`${ort}: ohneZeit gibt es nicht mit dauer`);
   if (faehigkeit.material !== undefined) {
     if (!Array.isArray(faehigkeit.material)) fehler.push(`${ort}: material muss eine Liste sein`);
     else faehigkeit.material.forEach((eintrag, nummer) => {
@@ -1323,8 +1331,13 @@ export function vorbereiten(rohdaten, sprache = {}) {
     pruefeParameter(daten, { passierbar: "wahrheitswert?", undurchdringlich: "wahrheitswert?", beimFestsitzen: "effekt?", beimBenutzen: "effekt?", geschossdurchlaessig: "wahrheitswert?" }, gelaende, `gelaende.${name}`, fehler);
     // Türen und Zerstören, siehe systeme/gelaende.js
     if (gelaende.tuer !== undefined) {
-      if (!istObjekt(gelaende.tuer) || Object.keys(gelaende.tuer).length !== 1 || !["offen", "zu"].includes(Object.keys(gelaende.tuer)[0])) fehler.push(`gelaende.${name}: tuer muss { offen } oder { zu } sein`);
-      else pruefeParameter(daten, { offen: "gelaende?", zu: "gelaende?" }, gelaende.tuer, `gelaende.${name}.tuer`, fehler);
+      const tuer = gelaende.tuer;
+      const felder = istObjekt(tuer) ? Object.keys(tuer) : [];
+      const geschlossen = felder.includes("offen") && felder.every((feld) => ["offen", "aufschlag"].includes(feld));
+      const geoeffnet = felder.length === 1 && felder[0] === "zu";
+      if (!geschlossen && !geoeffnet) fehler.push(`gelaende.${name}: tuer muss { offen, aufschlag? } oder { zu } sein`);
+      else pruefeParameter(daten, { offen: "gelaende?", zu: "gelaende?", aufschlag: "ganzzahl?" }, tuer, `gelaende.${name}.tuer`, fehler);
+      if (tuer?.aufschlag !== undefined && !istZahlAbNull(tuer.aufschlag)) fehler.push(`gelaende.${name}.tuer: aufschlag muss eine ganze Zahl >= 0 sein`);
     }
     // Feldschichten, siehe systeme/schichten.js
     pruefeParameter(daten, { gasdurchlaessig: "wahrheitswert?", brenndauer: "ganzzahl?", verbrenntZu: "gelaende?" }, gelaende, `gelaende.${name}`, fehler);

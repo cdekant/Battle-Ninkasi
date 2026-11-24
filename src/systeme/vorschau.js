@@ -9,6 +9,7 @@ import { holen } from "../kern/register.js";
 import { entitaetMitId, istWesen, istGesteuert } from "../kern/zustand.js";
 import { trefferanteil, anteilInProzent, angriffeVon } from "./kampf.js";
 import { istAhnungslos } from "./wahrnehmung.js";
+import { istWehrlos } from "./zustaende.js";
 import { istSichtbar } from "./sicht.js";
 import { zielAufloesen } from "./zielauswahl.js";
 import { faehigkeitFuer, faehigkeitPruefen, wirkungsziele } from "./faehigkeiten.js";
@@ -39,6 +40,7 @@ export function trefferchanceVorschau(spiel, quelle, ziel, effektName, tags = []
   const ersterSchritt = effekt.schritte[0];
   if (ersterSchritt?.baustein !== "trefferwurf") return enthaeltTrefferwurf(spiel, effektName) ? null : { sicher: true };
   if (quelle && istAhnungslos(ziel)) return { prozent: 100, hinterhalt: true };
+  if (istWehrlos(spiel, ziel)) return { prozent: 100 };
   const alleTags = ohneDoppelte([...tags, ...tagsDesEffekts(spiel, effektName), ...tagsDesEffekts(spiel, ersterSchritt.effekt)]);
   const { zaehler, nenner } = trefferanteil(spiel, { quelle, ziel, genauigkeit: ersterSchritt.genauigkeit, gegen: ersterSchritt.gegen, tags: alleTags });
   return { prozent: anteilInProzent(zaehler, nenner) };
@@ -50,6 +52,7 @@ export function nahkampfchanceVorschau(spiel, angreifer, ziel) {
   const profil = angriffeVon(spiel, angreifer)[0];
   if (!profil) return null;
   if (istAhnungslos(ziel)) return { prozent: 100, hinterhalt: true };
+  if (istWehrlos(spiel, ziel)) return { prozent: 100 };
   const tags = ohneDoppelte([...(profil.tags || []), ...tagsDesEffekts(spiel, profil.effekt)]);
   const { zaehler, nenner } = trefferanteil(spiel, { quelle: angreifer, ziel, genauigkeit: profil.genauigkeit, tags });
   return { prozent: anteilInProzent(zaehler, nenner) };

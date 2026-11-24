@@ -132,6 +132,10 @@ export default {
     mindestschadenNachRuestung: 1, // Rüstung senkt einen Treffer mit Schaden nicht unter diesen Wert
     nachwirkung: 500, // so lange nach dem letzten Angriff (eigener oder erlittener) ist ein Wesen im Kampf (src/systeme/kampfzustand.js)
   },
+  // Abnehmende Kontrolle, siehe src/systeme/zustaende.js kontrollDauer: Wirkung der ersten, zweiten, dritten
+  // Kontrolle in Folge in Prozent der Dauer, danach immun; die Folge beginnt neu, wenn so lange nach dem Ende der
+  // letzten keine mehr kam; Zahlen vorläufig
+  kontrolle: { stufen: [100, 50, 25], erholung: 1000 },
   // Tempo in Worten beim Untersuchen (src/systeme/untersuchen.js): stufen [bis Zeiteinheiten, Stufe] aufsteigend, darüber
   // die Stufe darueber; Texte tempo.bewegen.<stufe> und tempo.angriff.<stufe>; Norm 100, Ninkasi bewegt sich anfangs mit 120
   tempo: {

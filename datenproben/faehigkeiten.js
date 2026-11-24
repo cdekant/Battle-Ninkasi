@@ -1,6 +1,6 @@
 // Fähigkeiten: Magie, Psi, Fernkampf und körpereigene Aktionen (Aufbau siehe src/systeme/faehigkeiten.js).
-// Fähigkeiten für Ninkasi folgen, wenn der Systemausbau abgeschlossen ist; bis dahin kennt sie nur testfaehigkeit,
-// damit sich der Zielmodus im Browser ausprobieren lässt. Saeurespucke und Saeureschwall gehören dem Testgegner
+// Fähigkeiten für Ninkasi folgen, wenn der Systemausbau abgeschlossen ist; bis dahin kennt sie testfaehigkeit, damit
+// sich der Zielmodus im Browser ausprobieren lässt, und sprint. Saeurespucke und Saeureschwall gehören dem Testgegner
 // fernkaempfer_test (daten/gegner.js). zweck: wozu die KI sie mit der Handlung nutzen wählt (src/ki/nutzen.js).
 // Alle Zahlen vorläufig.
 export default {
@@ -8,6 +8,10 @@ export default {
   testfaehigkeit: {
     text: "faehigkeit.testfaehigkeit", zweck: ["angriff"], tags: ["magie"], verbrauch: { mp: 10 }, abklingzeit: 300,
     ziel: { art: "feld", reichweite: 6, muster: { art: "kreis", radius: 1 }, trifft: "wesen", ohneUrheber: true }, wirkung: "testfaehigkeit",
+  },
+  // Vorläufig für Ninkasi: Sprint ohne Zeit (siehe docs/Grundlagen.md, Zeit und Tempo), angeboren mit dem Inhalt
+  sprint: {
+    text: "faehigkeit.sprint", tags: ["koerper"], ohneZeit: true, abklingzeit: 3000, ziel: { art: "selbst" }, wirkung: "sprint",
   },
   // Geschoss über Verbündete hinweg, mit Trefferwurf
   saeurespucke: {

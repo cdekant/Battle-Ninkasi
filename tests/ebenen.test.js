@@ -150,9 +150,11 @@ test("Datenprüfung: Abfolge, Starttiefe, feste Karte, Population und Tabellen",
 // schon beim Wechsel der Ebene; ohne diese Felder und ohne ihre Züge blieb die Erzeugung gleich); neu mit 0.52.0 für
 // den dunklen Keller in Tiefe 2, die Laterne und sicht.imDunkeln an Ninkasi (mit der alten Abfolge, ohne Laterne und
 // ohne imDunkeln blieben die Werte gleich); neu mit 0.58.0 für das Tempo Ninkasis (kosten am Wesen und an der Faust)
-// und die Kosten der Waffen (mit den alten Kosten blieben die Werte gleich).
+// und die Kosten der Waffen (mit den alten Kosten blieben die Werte gleich); neu mit 0.59.0 für den Sprint in Ninkasis
+// Fähigkeiten und zeit und verlangsamung an der Ausrüstung (ohne diese Felder blieben die Werte gleich, auch mit dem
+// Aufschlag der Türen).
 test("Erzeugung in Schritten: dieselben Ebenen wie vorher", () => {
-  const erwartet = { 1: "216ec4acd16a000d", 2: "992579118c55c89b", 3: "371ef8273b0e3f1d", 42: "5733bfa822d6cc79", 4711: "62b31f09aa3cabee" };
+  const erwartet = { 1: "764624a46881f55f", 2: "bf1a29052928607e", 3: "1462961919def4bb", 42: "cfbc7d054804a9f9", 4711: "6eb1d0755fad560a" };
   for (const [startwert, fingerabdruck] of Object.entries(erwartet)) {
     const spiel = neuesSpiel(DATEN, Number(startwert));
     for (const tiefe of [2, 3, 0]) ebeneWechseln(spiel, tiefe);

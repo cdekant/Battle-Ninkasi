@@ -1,6 +1,6 @@
 # Battle Ninkasi - Architektur
 
-Stand: 2026-11-23
+Stand: 2026-11-24
 
 Zuständig für: `index.html`, `package.json`, `lib/*`, `src/main.js`, `src/version.js`, `src/kern/spiel.js`, `src/kern/zustand.js`, `src/kern/zeit.js`, `src/kern/zufall.js`, `src/kern/wurf.js`, `src/kern/ereignisse.js`, `src/kern/hakenkatalog.js`, `src/kern/register.js`, `src/kern/daten.js`, `src/kern/raumindex.js`, `src/kern/kurven.js`, `src/kern/pruefsumme.js`, `src/kern/zusammenfuegen.js`, `src/inhalt.js`, `src/systeme/index.js`, `src/systeme/allmacht.js`, `src/systeme/arena.js`, `src/eingabe/speicherstand.js`, `src/eingabe/umbenennen.js`, `daten/index.js`, `daten/regeln.js`, `daten/aktionen.js`, `daten/namensbuch.js`, `daten/umbenennungen.js`
 
@@ -35,7 +35,7 @@ Der Kern, auf dem alle Systeme stehen: wie Befehle in die Logik kommen, wie Zust
 Daten:
 
 + Ein Befehl ist ein reines Datenobjekt, z.B. `{ art: "trinken", gegenstandId: 4711 }`
-+ Befehlsarten stehen im Register `befehle` als `{ pruefen, ausfuehren, ohneZeit? }`; `ausfuehren` gibt die Aktionsart zurück oder `{ aktion, grundkosten?, umstaende? }`
++ Befehlsarten stehen im Register `befehle` als `{ pruefen, ausfuehren, ohneZeit? }`; `ausfuehren` gibt die Aktionsart zurück oder `{ aktion, grundkosten?, umstaende?, ohneZeit? }`
 
 Schnittstellen (`src/kern/spiel.js`):
 
@@ -44,7 +44,9 @@ Schnittstellen (`src/kern/spiel.js`):
 + Befehle gehen an die gesteuerte Entität (siehe Entitäten und Komponenten), Befehlsarten mit `ohneZeit` an Ninkasi selbst
 + Ist die gesteuerte Entität handlungsunfähig, wird jede Eingabe angenommen, aufgezeichnet und als `warten` ausgeführt (Meldung `handlungsunfaehig`, Rückgabe mit `handlungsunfaehig: true`)
 + Befehlsarten mit `ohneZeit: true` (bisher `lernen`, siehe [Wesen.md](Wesen.md), Skills und Lernen) sind Entscheidungen ohne Spielzeit: geprüft, aufgezeichnet und ausgeführt, aber ohne Zug, Zugzähler, `vor_befehl`, `zug_ende` und ohne eine laufende Aktion abzubrechen
-+ `zeitkosten(spiel, entitaet, aktion, umstaende, grundkosten)`: Grundkosten aus dem Angriffsprofil oder der Fähigkeit, sonst das Tempo der Entität (`grundkostenVon` in `src/kern/zustand.js`), Modifikatoren `kosten.<aktion>` und `kosten.alle`, Zuschlag bei Überlast (siehe [Gegenstaende.md](Gegenstaende.md), Inventar)
++ Aktionen ohne Zeit (`ohneZeit: true` im Ergebnis von `ausfuehren`, bisher der Sprint, siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten) sind dagegen Handlungen in der Welt: sie laufen durch `vor_befehl` und `zug_ende`, zählen aber keinen Zug, lassen `letzteAktion` stehen und reihen mit 0 wieder ein; der Merker `ohneZeitGenutzt` an der Akteurin hält bis zur nächsten Aktion mit Zeit
++ `zeitkosten(spiel, entitaet, aktion, umstaende, grundkosten)`: Grundkosten aus dem Angriffsprofil, der Fähigkeit, dem Stück der Ausrüstung oder dem Schritt durch eine Tür, sonst das Tempo der Entität (`grundkostenVon` in `src/kern/zustand.js`), Modifikatoren `kosten.<aktion>` und `kosten.alle`, danach in einem Schritt die Aufschläge in Prozent für Rüstung (jede Aktion, siehe [Gegenstaende.md](Gegenstaende.md), Ausrüstung) und Überlast (nur Bewegen, siehe [Gegenstaende.md](Gegenstaende.md), Inventar); mindestens 1
++ Wiedereinreihen mit den Kosten und dem `aufschub` einer Betäubung, die die Akteurin traf, während sie selbst handelte (siehe [Wirkungen.md](Wirkungen.md), Kontrolle)
 
 Regeln:
 
@@ -88,12 +90,12 @@ Daten (`src/kern/zeit.js`):
 
 + Ein einziger Zeitstrahl in ganzzahligen Zeiteinheiten; Dauern werden in Zeiteinheiten angegeben, nicht in Ticks
 + Die Warteschlange enthält drei Arten von Einträgen: Akteure (`art: "akteur"`, Ninkasi, Gegner, Verbündete), die nach dem Handeln mit ihren Aktionskosten wieder eingereiht werden; die Weltuhr (`art: "weltuhr"`) alle `WELTTICK` = 100 Einheiten; Zeitereignisse (`art: "ereignis"`, z.B. "Status endet bei T=4350"), optional an eine Entität gebunden (`gebundenAn`), dann entfallen sie mit ihr
-+ Kosten je Aktionsart in `daten/aktionen.js` (Standard 100, die Norm eines normal schnellen Wesens; Bewegen, Nahkampf, Warten, Aufheben, Trinken, Lesen, Werfen, Benutzen, Treppe, Anlegen, Ablegen, Fallenlassen und die Vorgabe für Fähigkeiten); Modifikatoren zielen auf eine Aktionsart oder auf alle
++ Kosten je Aktionsart in `daten/aktionen.js` (Standard 100, die Norm eines normal schnellen Wesens; Bewegen, Nahkampf, Warten, Aufheben, Trinken, Lesen, Werfen, Benutzen, Treppe, Anlegen, Ablegen, Fallenlassen und die Vorgabe für Fähigkeiten); Modifikatoren zielen auf eine Aktionsart oder auf alle; Stücke der Ausrüstung tragen ihre eigene Zeit zum An- und Ablegen, Türen einen Aufschlag aufs Bewegen (siehe [Gegenstaende.md](Gegenstaende.md), Ausrüstung und [Welt.md](Welt.md), Gelände)
 + Tempo je Wesen: `kosten: { bewegen: 120 }` in den Daten des Wesens ersetzt die Vorgabe für diese Aktionsarten (Ninkasi bewegt sich zu Beginn mit 120); das Tempo des Angriffs tragen die Angriffsprofile (siehe [Wesen.md](Wesen.md), Kampfwerte), ein Profil ohne `kosten` nimmt `kosten.nahkampf` des Wesens
 
 Schnittstellen:
 
-+ `einreihen`, `akteurEinreihen(zustand, id, verzoegerung)`, `ereignisEinreihen(zustand, zeitpunkt, typ, daten, gebundenAn)`, `ersterEintrag`, `ersterEintragEntnehmen`, `akteurEntfernen`, `gebundeneEreignisseEntfernen`, `eintraegeHerausnehmen` und `eintraegeEinfuegen` (Wechsel der Ebene), `warteschlangeGueltig` (Bot)
++ `einreihen`, `akteurEinreihen(zustand, id, verzoegerung)`, `akteurVerschieben(zustand, id, verzoegerung)` (Betäubung, siehe [Wirkungen.md](Wirkungen.md), Kontrolle), `ereignisEinreihen(zustand, zeitpunkt, typ, daten, gebundenAn)`, `ersterEintrag`, `ersterEintragEntnehmen`, `akteurEntfernen`, `gebundeneEreignisseEntfernen`, `eintraegeHerausnehmen` und `eintraegeEinfuegen` (Wechsel der Ebene), `warteschlangeGueltig` (Bot)
 + Register `welttick` (`(spiel) => void`, z.B. Stoffwechsel, Feldschichten) und `zeitereignisse` (`(spiel, daten) => void`)
 + `warteschlangeAbarbeiten` in `src/kern/spiel.js`: Weltuhr, Zeitereignisse, KI-Akteure (`wahrnehmen`, dann Verhaltensmodul aus dem Register `ki`, ungültige Befehle werden zu `warten`) und Schritte langer Aktionen, bis die gesteuerte Entität am Zug ist; nach jedem Eintrag `vorgangAbschliessen`
 

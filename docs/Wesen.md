@@ -51,11 +51,12 @@ Regeln:
 + Widerstand R in Punkten aus `widerstaende` und Modifikatoren auf `widerstand` mit der Art als Tag (ohne Tag gegen alles): Schaden × H / (H + R); mit dem Halbwert H 100 halbieren 100 Punkte, 300 Punkte lassen ein Viertel; negative Punkte machen verwundbar, Schaden × (H − 2R) / (H − R), das nähert sich dem Doppelten (−100 Punkte: x1,5); einmal gerundet
 + Immunität als Sonderfall: `immun` am Wesen oder ein Modifikator auf `immunitaet` mit der Art als Tag (Betrag über 0), Schaden genau 0
 + Hinterhalt: Ein Angriff mit Quelle auf ein ahnungsloses Ziel (siehe Wahrnehmung) trifft sicher, wird nicht geblockt und ist kritisch; mehr Schaden im Hinterhalt geben Modifikatoren mit der Bedingung `gegenueber_ahnungslos`, z.B. auf `kritfaktor` für einen Dolch-Skill
++ Wehrlos: ein Ziel mit einem Zustand mit dem Tag `wehrlos` (betäubt) wird sicher getroffen und nicht geblockt, aber nicht kritisch, auch von einer Falle; ahnungslos geht vor (siehe [Wirkungen.md](Wirkungen.md), Kontrolle); dafür die Bedingung `gegenueber_wehrlos`
 + Keine Gelegenheitsangriffe: wer sich von einem Gegner wegbewegt, wird dafür nicht angegriffen
 
 ## Kampfzustand
 
-Ein Wesen ist im Kampf, solange sein letzter Angriff, eigener oder erlittener, kurz zurückliegt. Bisher fragt nur der Beistand danach; Rasten, Erholung und Abläufe können es später tun.
+Ein Wesen ist im Kampf, solange sein letzter Angriff, eigener oder erlittener, kurz zurückliegt. Bisher fragen der Beistand und die Bedingungen `im_kampf` und `ausser_kampf` danach (z.B. Rituale nur außerhalb des Kampfes als `voraussetzungen` einer Fähigkeit); Rasten, Erholung und Abläufe können es später tun.
 
 + Am Wesen `kampfZuletzt`: Zeitpunkt des letzten Treffers, Fehlschlags oder Schadens zwischen zwei Wesen, gesetzt an beiden (Haken `nach_treffer`, `verfehlt`, `nach_schaden`); Fallen und Fässer bringen niemanden in den Kampf
 + `imKampf(spiel, wesen)` (`src/systeme/kampfzustand.js`): wahr, solange seit `kampfZuletzt` weniger als `regeln.kampf.nachwirkung` vergangen ist (500); ein Zeitstempel statt eines Zeitereignisses, nichts muss ablaufen
@@ -265,11 +266,11 @@ Regeln:
 
 ## Tests
 
-+ `tests/kampf.test.js` (Trefferwurf, Blocken, Krit, Schadensrechnung, Profile), `tests/fraktionen.test.js` (Beziehungen, Zorn, Ruf, Kampfzustand, Beistand), `tests/wahrnehmung.test.js` (Wachzustand, Bemerken, Lärm, Hinterhalt), `tests/sinne.test.js` (Arten der Wahrnehmung, Spüren entlang offener Felder, Bemerken und Jagen nach Gespürtem), `tests/faehigkeitenwahl.test.js`, `tests/verhalten.test.js`, `tests/handlungen.test.js` (auch Ziele unter Verbündeten), `tests/nutzen.test.js` und `tests/arena.test.js` (KI, Taktik), `tests/umherziehen.test.js` (Wegpunkte, Wachzustand der Population, Umherziehen, Rudel, Abstandskarte), `tests/verschieben.test.js` (Bewegungsarten, Stoßen, Ziehen, Tauschen, Teleportieren, Lage, Werfen), `tests/wege.test.js`, `tests/stoffwechsel.test.js`, `tests/skills.test.js` und `tests/lernen.test.js`
++ `tests/kampf.test.js` (Trefferwurf, Blocken, Krit, Schadensrechnung, Profile), `tests/zeitskala.test.js` (wehrlos, Kampfzustand als Bedingung), `tests/fraktionen.test.js` (Beziehungen, Zorn, Ruf, Kampfzustand, Beistand), `tests/wahrnehmung.test.js` (Wachzustand, Bemerken, Lärm, Hinterhalt), `tests/sinne.test.js` (Arten der Wahrnehmung, Spüren entlang offener Felder, Bemerken und Jagen nach Gespürtem), `tests/faehigkeitenwahl.test.js`, `tests/verhalten.test.js`, `tests/handlungen.test.js` (auch Ziele unter Verbündeten), `tests/nutzen.test.js` und `tests/arena.test.js` (KI, Taktik), `tests/umherziehen.test.js` (Wegpunkte, Wachzustand der Population, Umherziehen, Rudel, Abstandskarte), `tests/verschieben.test.js` (Bewegungsarten, Stoßen, Ziehen, Tauschen, Teleportieren, Lage, Werfen), `tests/wege.test.js`, `tests/stoffwechsel.test.js`, `tests/skills.test.js` und `tests/lernen.test.js`
 
 ## Verweise
 
 + Spieldesign: Gegner und Pegel in [Grundlagen.md](Grundlagen.md), Eigenschaften, Skills und EP in [Charakter.md](Charakter.md)
-+ Offene Reste in [Systemausbau.md](Systemausbau.md): Punkt 10 (Zeitskala, Machtkurve, Anfangsbalance), Punkt 14 (Makel und Vorzüge, Kampfwerte aus Skills), Punkt 20 (Skillkatalog), Punkt 21 (Skills für Anhänger)
++ Offene Reste in [Systemausbau.md](Systemausbau.md): Punkt 10 (Normierung, Machtkurve, Anfangsbalance), Punkt 14 (Makel und Vorzüge, Kampfwerte aus Skills), Punkt 20 (Skillkatalog), Punkt 21 (Skills für Anhänger)
 
 Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

@@ -34,6 +34,7 @@ export { istWesen };
 import { musterFelder, entitaetenAufFeldern } from "./zielauswahl.js";
 import { beziehungZwischen, urheberVon } from "./fraktionen.js";
 import { istAhnungslos, laermMachen } from "./wahrnehmung.js";
+import { istWehrlos } from "./zustaende.js";
 import { abstand } from "../welt/karte.js";
 import { waffenprofile } from "./ausruestung.js";
 
@@ -74,13 +75,15 @@ export function trefferanteil(spiel, { quelle, ziel, genauigkeit, gegen = "auswe
 // Trefferwurf, Blocken und Krit nacheinander; gibt { ergebnis: "treffer" | "ausgewichen" | "geblockt", kritisch, hinterhalt,
 // trefferchance } zurück (trefferchance in Prozent vor dem Blocken, nur für die Anzeige im Log)
 // wurf wie bei trefferanteil, dazu kritchance? (Punkte zusätzlich zu denen der Quelle)
-// Hinterhalt: ein ahnungsloses Ziel (systeme/wahrnehmung.js) wird sicher getroffen, nicht geblockt und kritisch
+// Hinterhalt: ein ahnungsloses Ziel (systeme/wahrnehmung.js) wird sicher getroffen, nicht geblockt und kritisch;
+// ein wehrloses (systeme/zustaende.js istWehrlos) sicher und nicht geblockt, aber ohne Krit, auch von einer Falle
 export function trefferwurf(spiel, wurf) {
   const { quelle, ziel, tags = [] } = wurf;
   if (quelle && istAhnungslos(ziel)) {
     melden(spiel, "hinterhalt", { quelle: bezugAuf(quelle), ziel: bezugAuf(ziel) });
     return { ergebnis: "treffer", kritisch: true, hinterhalt: true, trefferchance: 100 };
   }
+  if (istWehrlos(spiel, ziel)) return { ergebnis: "treffer", kritisch: false, hinterhalt: false, trefferchance: 100 };
   const regeln = kampfregeln(spiel);
   const { zaehler, nenner } = trefferanteil(spiel, wurf);
   const trefferchance = anteilInProzent(zaehler, nenner);

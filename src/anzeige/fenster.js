@@ -18,7 +18,8 @@
 // Inhalte von Inventar, Fähigkeiten und Hilfe stehen hier, Charakter und Erstellung in anzeige/charakterfenster.js.
 
 import { gesteuerteEntitaet, entitaetMitId } from "../kern/zustand.js";
-import { istAngelegt, haltbarkeitProzent } from "../systeme/ausruestung.js";
+import { istAngelegt, haltbarkeitProzent, wechselzeit, verlangsamungDes } from "../systeme/ausruestung.js";
+import { zeitkosten } from "../kern/spiel.js";
 import { anzahlVon, ladungenVon, lastVon, tragkraftVon, lastZuschlag } from "../systeme/inventar.js";
 import { faehigkeitFuer, faehigkeitenVon, herkunftDer, verbrauchVon, zeitBisBereit } from "../systeme/faehigkeiten.js";
 import { BUCHSTABEN } from "../eingabe/inventar.js";
@@ -121,6 +122,8 @@ fensterinhaltAnmelden("inventar", ({ spiel, texte, leisten }, zustand) => {
         ${gewaehlt.ladungen ? `<li>${text("ui.ladungen")}: ${ladungenVon(gewaehlt)} / ${gewaehlt.ladungen.hoechstens}</li>` : ""}
         ${gewaehlt.haltbarkeit ? `<li>${text("ui.haltbarkeit")}: ${haltbarkeitProzent(gewaehlt)} %</li>` : ""}
         ${istAngelegt(gesteuerte, gewaehlt.id) ? `<li>${text("ui.angelegt")}</li>` : ""}
+        ${gewaehlt.ausruestung ? `<li>${text("ui.wechselzeit", { zeit: zeitkosten(spiel, gesteuerte, "anlegen", {}, wechselzeit(spiel, gesteuerte, gewaehlt, "anlegen")) })}</li>` : ""}
+        ${verlangsamungDes(spiel, gesteuerte, gewaehlt) ? `<li>${text("ui.verlangsamung", { prozent: verlangsamungDes(spiel, gesteuerte, gewaehlt) })}</li>` : ""}
         ${gewaehlt.fluchBekannt ? `<li class="schlimm">${text("ui.verflucht")}</li>` : ""}
         <li class="leise">${platzText(texte, leisten, `gegenstand:${gewaehlt.typ}`)}</li>
       </ul>`
@@ -188,6 +191,7 @@ fensterinhaltAnmelden("faehigkeiten", ({ spiel, texte, leisten }, zustand) => {
     details = `<h2>${text(definition.text)}</h2><ul>
       ${herkunftText(spiel, texte, gesteuerte, gewaehlt)}
       <li>${text("ui.verbrauch")}: ${verbrauch || text("ui.nichts")}</li>
+      ${definition.ohneZeit ? `<li>${text("ui.ohne_zeit")}</li>` : ""}
       ${definition.abklingzeit ? `<li>${text("ui.abklingzeit", { zeit: definition.abklingzeit })}</li>` : ""}
       ${zeitBisBereit(spiel, gesteuerte, gewaehlt) > 0 ? `<li class="schlimm">${text("ui.abklingend", { zeit: zeitBisBereit(spiel, gesteuerte, gewaehlt) })}</li>` : ""}
       <li class="leise">${platzText(texte, leisten, `faehigkeit:${gewaehlt}`)}</li>

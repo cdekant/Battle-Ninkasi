@@ -29,6 +29,7 @@
 //   Adjektiv steht so im Bezug der Meldungen (kern/ereignisse.js bezugAuf), ohne die Daten zu fragen
 // Instanz an der Entität: zustaende: [{ nummer, name, quelleId, urheberId, urheberFraktion, beginn, ende, staerke, stapel }]
 //   dazu ausFaehigkeit, wenn eine aufrechte Fähigkeit ihn gesetzt hat (systeme/faehigkeiten.js)
+// Tags mit Mechanik: "kontrolle" (abnehmende Kontrolle, kontrollDauer), "wehrlos" (sicher getroffen, systeme/kampf.js)
 // Takt: Weltuhr (je Welttick, solange zeit < ende); Hast und Verlangsamung der Trägerin ändern daran nichts.
 // Ende: Zeitereignis "zustand_ende", gebunden an die Trägerin; wurde der Zustand inzwischen verlängert,
 // reiht es sich zum neuen Ende wieder ein. Modifikatoren liefert die Modifikatorquelle "zustaende" bei jeder
@@ -42,7 +43,7 @@ import { hakenAusloesen, melden, bezugAuf } from "../kern/ereignisse.js";
 import { effektAnwenden, wertAendern } from "../kern/effekte.js";
 import { bausteinAnmelden } from "../kern/bausteine.js";
 import { wertAufKurve } from "../kern/kurven.js";
-import { modifikatorSkaliert, modifiziert, hatWert } from "../kern/werte.js";
+import { modifikatorSkaliert, modifiziert, hatWert, prozentVon } from "../kern/werte.js";
 
 export const STAPELREGELN = ["erneuern", "aufaddieren", "staerkster", "einzeln"];
 
@@ -60,6 +61,29 @@ function definitionVon(spiel, name) {
 
 export function istHandlungsunfaehig(spiel, entitaet) {
   return (entitaet?.zustaende || []).some((instanz) => definitionVon(spiel, instanz.name).handlungsunfaehig);
+}
+
+// Wehrlos ist, wer einen Zustand mit dem Tag "wehrlos" trägt (betäubt, gefesselt, umgeworfen)
+export function istWehrlos(spiel, entitaet) {
+  return (entitaet?.zustaende || []).some((instanz) => (definitionVon(spiel, instanz.name).tags || []).includes("wehrlos"));
+}
+
+// Abnehmende Kontrolle (regeln.kontrolle: { stufen, erholung }): die n-te Kontrollwirkung in Folge wirkt mit stufen[n]
+// Prozent der Dauer, jenseits der Liste gar nicht (immun); am Ziel zählt kontrolle: { anzahl, ende } mit, ende ist das
+// späteste Ende der bisherigen; ist danach erholung vergangen, beginnt die Folge neu. Gibt die wirksame Dauer zurück,
+// 0 heißt immun (Meldung kontrolle_immun); eine Wirkung mit Dauer 0 zählt nicht.
+export function kontrollDauer(spiel, ziel, dauer) {
+  const { stufen, erholung } = spiel.daten.regeln.kontrolle;
+  const jetzt = spiel.zustand.zeit;
+  if (ziel.kontrolle && jetzt >= ziel.kontrolle.ende + erholung) delete ziel.kontrolle;
+  const anzahl = ziel.kontrolle?.anzahl ?? 0;
+  const wirksam = anzahl < stufen.length ? prozentVon(dauer, stufen[anzahl]) : 0;
+  if (wirksam <= 0) {
+    if (dauer > 0) melden(spiel, "kontrolle_immun", { wer: bezugAuf(ziel) });
+    return 0;
+  }
+  ziel.kontrolle = { anzahl: anzahl + 1, ende: Math.max(ziel.kontrolle?.ende ?? 0, jetzt + wirksam) };
+  return wirksam;
 }
 
 export function hatZustand(entitaet, name) {
@@ -153,10 +177,20 @@ function dauerErneuern(spiel, instanz, angaben, ende) {
   instanz.ende = ende;
 }
 
-// Setzt einen Zustand nach seiner Stapelregel; angaben: { quelleId, urheberId, urheberFraktion, dauer?, staerke?, kettentiefe? }
+// Setzt einen Zustand nach seiner Stapelregel; angaben: { quelleId, urheberId, urheberFraktion, dauer?, staerke?, kettentiefe?,
+// kontrolleGeprueft? }. Ein Zustand mit dem Tag "kontrolle" und einer Dauer wirkt nach kontrollDauer kürzer oder gar
+// nicht, außer die Dauer ist schon so bemessen (kontrolleGeprueft, Betäubung).
 // Gibt die betroffene Instanz zurück oder null, wenn die Anwendung nichts geändert hat.
 export function zustandSetzen(spiel, traegerin, name, angaben = {}) {
   const definition = definitionVon(spiel, name);
+  if ((definition.tags || []).includes("kontrolle") && !angaben.kontrolleGeprueft) {
+    const grunddauer = angaben.dauer ?? definition.dauer;
+    if (grunddauer !== undefined) {
+      const wirksam = kontrollDauer(spiel, traegerin, grunddauer);
+      if (wirksam === 0) return null;
+      angaben = { ...angaben, dauer: wirksam };
+    }
+  }
   const vollstaendig = {
     quelleId: angaben.quelleId ?? null, urheberId: angaben.urheberId ?? angaben.quelleId ?? null,
     urheberFraktion: angaben.urheberFraktion ?? fraktionVon(spiel.zustand.entitaeten[angaben.urheberId ?? angaben.quelleId]) ?? null,

@@ -7,5 +7,9 @@ export default {
   // Vorläufig: Spüren ohne Licht für eine Weile (src/systeme/sinne.js), aus dem Riechwasser
   witterung: { text: "zustand.witterung", dauer: 20000, modifikatoren: [{ ziel: "reichweiteSpueren", art: "plus", betrag: 5 }] },
   // Vorläufig: Affix mit Adjektiv (ein gereiztes Essigbakterium), aus der Arena essigbakterien, Variante gereizt
+  // Vorläufig: Sprint (datenproben/faehigkeiten.js), Bewegen in der halben Zeit, der Pegel sinkt doppelt so schnell
+  sprint: { text: "zustand.sprint", dauer: 750, modifikatoren: [{ ziel: "kosten.bewegen", art: "prozent", betrag: -50 }, { ziel: "abbau.pegel", art: "prozent", betrag: 100 }] },
+  // Vorläufig: Betäubung (src/systeme/betaeubung.js), die Dauer setzt der Baustein betaeuben; wehrlos bis zum nächsten Zug
+  betaeubt: { text: "zustand.betaeubt", adjektiv: "adjektiv.betaeubt", tags: ["kontrolle", "wehrlos"] },
   gereizt: { text: "zustand.gereizt", adjektiv: "adjektiv.gereizt", modifikatoren: [{ ziel: "ausweichen", art: "plus", betrag: -1 }] },
 };

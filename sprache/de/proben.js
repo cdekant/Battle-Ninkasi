@@ -136,6 +136,7 @@ export default {
   // Adjektive: fest am Hauptwort (leer) und als Affix aus einem Zustand (gereizt)
   "adjektiv.leer": { adjektiv: "leer" },
   "adjektiv.gereizt": { adjektiv: "gereizt" },
+  "adjektiv.betaeubt": { adjektiv: "betäubt" },
   "skill.zaehigkeit_grund": "Zähigkeit",
   "skill.zaehigkeit_experte": "Zähigkeit (Expertin)",
   "skill.nahkampf_grund": "Nahkampf",
@@ -144,6 +145,9 @@ export default {
   "zustand.testzustand": "Testzustand",
   "zustand.witterung": "Witterung",
   "zustand.gereizt": "Gereizt",
+  "faehigkeit.sprint": "Sprint",
+  "zustand.sprint": "Sprint",
+  "zustand.betaeubt": "Betäubt",
   "gelaende.gaerbottich": "Gärbottich",
   "gelaende.wandfackel": "Wandfackel",
   "faehigkeit.saeurespucke": "Säurespucke",

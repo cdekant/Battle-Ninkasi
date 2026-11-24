@@ -25,8 +25,16 @@ export default {
   kellenschlag: {
     schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "1W8+2" }],
   },
+  // ein Viertel der Treffer betäubt (src/systeme/betaeubung.js)
   hammerschlag: {
-    schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "2W6+3" }],
+    schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "2W6+3" }, { baustein: "zufall", chance: 25, effekt: "betaeubender_schlag" }],
+  },
+  betaeubender_schlag: {
+    schritte: [{ baustein: "betaeuben", dauer: 100, zustand: "betaeubt" }],
+  },
+  // Sprint (datenproben/faehigkeiten.js): der Zustand macht das Bewegen schneller
+  sprint: {
+    schritte: [{ baustein: "zustand_setzen", zustand: "sprint" }],
   },
   // Fallen (daten/fallen.js); vorläufig
   saeureduese: {

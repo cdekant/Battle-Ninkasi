@@ -16,7 +16,7 @@ Vorbild Brogue: Türen öffnen sich beim Hindurchgehen und schließen sich von s
 
 Daten:
 
-+ Gelände (`daten/gelaende.js`): `kennung` (ein Zeichen, so steht das Feld in `zustand.ebene.felder`, einer Liste von Zeichenketten), `text` (Name für Untersuchen und Tooltip, Pflicht), `passierbar`, `passierbarFuer`, `undurchdringlich`, `durchsichtig`, `geschossdurchlaessig` (Vorgabe wie `durchsichtig`), `gasdurchlaessig` (Vorgabe wie passierbar), `laermdaempfung`, `treppe` ("ab" oder "auf"), `tuer` (`{ offen }` an der geschlossenen, `{ zu }` an der offenen Tür), `zerstoerbar: { wird }`, `beimBenutzen` (Effekt), `beimFestsitzen` (Effekt), `brennbar`, `brenndauer`, `verbrenntZu`, `quelle: { gas, menge }`; jede Art braucht ein Zeichen in `daten/zeichen.js`
++ Gelände (`daten/gelaende.js`): `kennung` (ein Zeichen, so steht das Feld in `zustand.ebene.felder`, einer Liste von Zeichenketten), `text` (Name für Untersuchen und Tooltip, Pflicht), `passierbar`, `passierbarFuer`, `undurchdringlich`, `durchsichtig`, `geschossdurchlaessig` (Vorgabe wie `durchsichtig`), `gasdurchlaessig` (Vorgabe wie passierbar), `laermdaempfung`, `treppe` ("ab" oder "auf"), `tuer` (`{ offen, aufschlag? }` an der geschlossenen, `{ zu }` an der offenen Tür; `aufschlag` in Prozent, `tuer_zu` 50), `zerstoerbar: { wird }`, `beimBenutzen` (Effekt), `beimFestsitzen` (Effekt), `brennbar`, `brenndauer`, `verbrenntZu`, `quelle: { gas, menge }`; jede Art braucht ein Zeichen in `daten/zeichen.js`
 + Am Wesen `tueren`: `"oeffnen"` (Vorgabe) oder `"nicht"`
 + Fallen (`datenproben/fallen.js`): Entitäten auf einem Feld mit `falle: { tarnung, effekt, ausloesenFuer? }` und `verborgen` (Vorgabe ja), nach dem Auslösen oder Entdecken `entdeckt`; die Ebene legt sie nach `fallen: [{ typ, anzahl }]`
 + Regelwerte `regeln.fallen`: `entdeckenVorgabe` 30, `reichweite` 5; an der Ebene `tuerChance`
@@ -32,7 +32,7 @@ Schnittstellen:
 Regeln:
 
 + Ein Gitter ist undurchsichtig, lässt aber Geschosse durch, Glas umgekehrt; die Sichtlinie bleibt von `geschossdurchlaessig` unberührt
-+ Türen: betritt ein Wesen, das Türen öffnet, die geschlossene, geht sie auf (Haken `betritt_feld`), verlässt das letzte Wesen die offene und liegt nichts darin, geht sie zu (`verlaesst_feld`); geschlossen versperrt sie die Sicht und dämpft Lärm (`laermdaempfung` 3)
++ Türen: betritt ein Wesen, das Türen öffnet, die geschlossene, geht sie auf (Haken `betritt_feld`), verlässt das letzte Wesen die offene und liegt nichts darin, geht sie zu (`verlaesst_feld`); geschlossen versperrt sie die Sicht und dämpft Lärm (`laermdaempfung` 3); der Schritt auf die geschlossene kostet `aufschlag` Prozent mehr als die eigenen Grundkosten fürs Bewegen (vor den Modifikatoren, `src/systeme/bewegung.js`), aus der offenen heraus nicht
 + Bakterien öffnen keine Türen, eine geschlossene Tür hält sie auf; für sie ist die Tür wie eine Wand, auch in der Wegfindung (Option `oeffnetTueren`)
 + Die Ebene setzt Türen an die Zugänge der Räume, die rot.js meldet, mit `tuerChance` Prozent und eigenem abgeleitetem Zufall; in Türöffnungen entsteht nichts
 + Fallen lösen am Haken `betritt_feld` aus, nur für die Bewegungsarten in `ausloesenFuer` (Vorgabe `laufend`), Quelle die Falle, Ursache `falle`, eine Kettenstufe tiefer; danach gilt sie als entdeckt; Fallen wecken nicht und ziehen keinen Zorn auf sich (das gilt nur für Wesen als Urheberin)

@@ -1,8 +1,15 @@
 // Ausrüstung (siehe docs/Gegenstaende.md, Ausrüstung): Plätze, anlegen und ablegen, Modifikatoren, Waffen, Sets.
 // Plätze am Wesen: plaetze: { hand: 2, kopf: 1, brust: 1, beine: 1, hals: 1, finger: 2 } (Namen aus
 //   regeln.ausruestung.plaetze); angelegt ist, was in ausgeruestet: [IDs] steht, der Gegenstand bleibt im Inventar.
-// Gegenstand: ausruestung: { platz, belegt?, angriffe?, modifikatoren?, ausloeser?, faehigkeiten? }, dazu tags für Sets
+// Gegenstand: ausruestung: { platz, belegt?, zeit?, verlangsamung?, angriffe?, modifikatoren?, ausloeser?, faehigkeiten? },
+//   dazu tags für Sets und die Art der Rüstung (ruestung_leicht, ruestung_schwer)
 //   belegt:        so viele Stellen des Platzes (Vorgabe 1), ein Zweihänder belegt beide Hände
+//   zeit:          Zeiteinheiten, um dieses Stück an- oder abzulegen (Vorgabe die Kosten anlegen bzw. ablegen der
+//                  Trägerin); ein Waffenwechsel kostet so die Summe der Stücke, die ab- und angelegt werden
+//   verlangsamung: Prozent Aufschlag auf jede Aktion, solange das Stück angelegt ist (kern/spiel.js zeitkosten);
+//                  Modifikatoren auf verlangsamung.<tag> für jeden Tag des Stücks mindern ihn (Rüstungsskills), nie unter 0
+// Gefühltes Gewicht: ein angelegtes Stück wiegt für die Last nach Modifikatoren auf gewicht.<tag> für jeden seiner Tags
+//   (systeme/inventar.js lastVon); im Gepäck zählt das volle Gewicht.
 //   angriffe:      Angriffsprofile; angelegte Waffen ersetzen die eigenen Profile des Wesens (die Faust), zwei Waffen
 //                  sind zwei Profile (die Aktion kostet so viel wie das langsamste, systeme/kampf.js angriffeVon)
 //   modifikatoren: wirken, solange der Gegenstand angelegt ist (Modifikatorquelle "ausruestung", Quelle
@@ -12,7 +19,7 @@
 //                  "ausruestung:<id>", systeme/faehigkeiten.js); im Gepäck wirkt ein Gegenstand nicht
 // Befehle: { art: "anlegen", gegenstandId } legt an; ist der Platz voll, legt derselbe Befehl die ältesten Gegenstände
 //   dort ab, bis genug frei ist (tauschen), und kostet beides (aktionen.anlegen plus je aktionen.ablegen);
-//   { art: "ablegen", gegenstandId }. Ablehnungen: nicht_im_gepaeck, nicht_anlegbar, schon_angelegt, kein_platz,
+//   { art: "ablegen", gegenstandId } kostet die zeit des Stücks. Ablehnungen: nicht_im_gepaeck, nicht_anlegbar, schon_angelegt, kein_platz,
 //   nicht_angelegt, verflucht. Haken gegenstand_benutzt mit art "anlegen" bzw. "ablegen".
 // Fluch: verflucht: true am Gegenstand; angelegt lässt er sich weder ablegen noch fallen lassen, werfen oder beim
 //   Anlegen wegtauschen (Ablehnung verflucht); bekannt wird der Fluch erst beim Anlegen (fluchBekannt, Meldung
@@ -22,8 +29,8 @@
 
 import { anmelden } from "../kern/register.js";
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
-import { entitaetMitId, plaetzeVon } from "../kern/zustand.js";
-import { modifikatorSkaliert } from "../kern/werte.js";
+import { entitaetMitId, plaetzeVon, grundkostenVon } from "../kern/zustand.js";
+import { modifikatorSkaliert, modifiziert } from "../kern/werte.js";
 import { bausteinAnmelden } from "../kern/bausteine.js";
 
 // Angelegte Gegenstände; einer ohne Komponente ausruestung (nur in einem kaputten Zustand möglich) zählt nicht
@@ -36,6 +43,32 @@ export function istAngelegt(wesen, gegenstandId) {
 }
 
 const belegtVon = (gegenstand) => gegenstand.ausruestung.belegt ?? 1;
+
+// Modifikatorziele je Tag eines Stücks, z.B. verlangsamung.ruestung_leicht
+const zieleNachTags = (gegenstand, ziel) => (gegenstand.tags || []).map((tag) => `${ziel}.${tag}`);
+
+// Zeiteinheiten, um ein Stück anzulegen oder abzulegen (art "anlegen" oder "ablegen")
+export function wechselzeit(spiel, wesen, gegenstand, art) {
+  return gegenstand.ausruestung.zeit ?? grundkostenVon(spiel, wesen, art);
+}
+
+// Verlangsamung eines Stücks in Prozent für diese Trägerin, nach den Modifikatoren je Tag (0 ohne)
+export function verlangsamungDes(spiel, wesen, gegenstand) {
+  const grundwert = gegenstand.ausruestung?.verlangsamung;
+  return grundwert ? Math.max(0, modifiziert(spiel, wesen, zieleNachTags(gegenstand, "verlangsamung"), grundwert)) : 0;
+}
+
+// Aufschlag in Prozent auf jede Aktion aus der angelegten Rüstung (0 ohne)
+export function verlangsamungVon(spiel, wesen) {
+  if (!wesen?.ausgeruestet?.length) return 0;
+  return ausgeruestete(spiel, wesen).reduce((summe, gegenstand) => summe + verlangsamungDes(spiel, wesen, gegenstand), 0);
+}
+
+// Gefühltes Gewicht eines Stücks in Gramm: angelegt nach Modifikatoren auf gewicht.<tag>, sonst unverändert
+export function gefuehltesGewicht(spiel, traegerin, gegenstand, gewicht) {
+  if (!gegenstand.tags?.length || !istAngelegt(traegerin, gegenstand.id)) return gewicht;
+  return Math.max(0, modifiziert(spiel, traegerin, zieleNachTags(gegenstand, "gewicht"), gewicht));
+}
 
 // Ob ein Fluch das Wesen hindert, den Gegenstand loszuwerden (nur angelegt wirkt er)
 export function fluchHindert(spiel, wesen, gegenstandId) {
@@ -106,8 +139,8 @@ anmelden("befehle", "anlegen", {
       melden(spiel, "fluch_entdeckt", { wer: bezugAuf(akteur), was: bezugAuf(gegenstand) });
     }
     benutztMelden(spiel, akteur, gegenstand, "anlegen");
-    const aktionen = spiel.daten.aktionen;
-    return { aktion: "anlegen", grundkosten: aktionen.anlegen + weg.length * aktionen.ablegen };
+    const grundkosten = weg.reduce((summe, abgelegt) => summe + wechselzeit(spiel, akteur, abgelegt, "ablegen"), wechselzeit(spiel, akteur, gegenstand, "anlegen"));
+    return { aktion: "anlegen", grundkosten };
   },
 });
 
@@ -117,8 +150,9 @@ anmelden("befehle", "ablegen", {
     return fluchHindert(spiel, akteur, befehl.gegenstandId) ? "verflucht" : null;
   },
   ausfuehren(spiel, akteur, befehl) {
-    abnehmen(spiel, akteur, entitaetMitId(spiel.zustand, befehl.gegenstandId));
-    return "ablegen";
+    const gegenstand = entitaetMitId(spiel.zustand, befehl.gegenstandId);
+    abnehmen(spiel, akteur, gegenstand);
+    return { aktion: "ablegen", grundkosten: wechselzeit(spiel, akteur, gegenstand, "ablegen") };
   },
 });
 

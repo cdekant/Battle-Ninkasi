@@ -2,13 +2,13 @@
 
 Stand: 2026-11-24
 
-Zuständig für: `src/kern/effekte.js`, `src/kern/bausteine.js`, `src/kern/ausloeser.js`, `src/kern/vorgang.js`, `src/kern/werte.js`, `src/systeme/modifikatoren.js`, `src/systeme/zustaende.js`, `src/systeme/befehlsveraenderer.js`, `src/systeme/beschwoerung.js`, `src/systeme/zielauswahl.js`, `src/systeme/zielbausteine.js`, `src/systeme/faehigkeiten.js`, `src/systeme/laufendeAktionen.js`, `src/systeme/tod.js`, `src/systeme/ersatz.js`, `src/welt/geometrie.js`, `daten/effekte.js`
+Zuständig für: `src/kern/effekte.js`, `src/kern/bausteine.js`, `src/kern/ausloeser.js`, `src/kern/vorgang.js`, `src/kern/werte.js`, `src/systeme/modifikatoren.js`, `src/systeme/zustaende.js`, `src/systeme/betaeubung.js`, `src/systeme/befehlsveraenderer.js`, `src/systeme/beschwoerung.js`, `src/systeme/zielauswahl.js`, `src/systeme/zielbausteine.js`, `src/systeme/faehigkeiten.js`, `src/systeme/laufendeAktionen.js`, `src/systeme/tod.js`, `src/systeme/ersatz.js`, `src/welt/geometrie.js`, `daten/effekte.js`
 
 Mitprüfen bei Änderungen: [Architektur.md](Architektur.md), [Wesen.md](Wesen.md), [Gegenstaende.md](Gegenstaende.md), [Grundlagen.md](Grundlagen.md), [Skills.md](Skills.md)
 
 ## Zweck
 
-Wie Skills, Gegenstände, Zustände und Fähigkeiten wirken: die sechs Wirkungsarten, das Effektsystem aus Bausteinen, Modifikatoren, Auslöser, Zustände, Zielauswahl, Fähigkeiten, lange Aktionen und der Tod als Zustandsprüfung. Jeder Abschnitt nennt, soweit vorhanden, Daten, Schnittstellen und Regeln.
+Wie Skills, Gegenstände, Zustände und Fähigkeiten wirken: die sechs Wirkungsarten, das Effektsystem aus Bausteinen, Modifikatoren, Auslöser, Zustände, Kontrolle, Zielauswahl, Fähigkeiten, lange Aktionen und der Tod als Zustandsprüfung. Jeder Abschnitt nennt, soweit vorhanden, Daten, Schnittstellen und Regeln.
 
 ## Wirkungsarten
 
@@ -47,7 +47,7 @@ Schnittstellen:
 + Grundbausteine, nach Datei (beschrieben im jeweiligen Dokument):
   + `src/kern/bausteine.js`: `schaden`, `heilen`, `wert_aendern`, `zufall`
   + `src/systeme/zielbausteine.js`: `fuer_jedes_ziel`, `auf_feld`, `geschoss`, `springen` (siehe Zielauswahl)
-  + `src/systeme/zustaende.js`: `zustand_setzen`, `zustand_entfernen`; `src/systeme/beschwoerung.js`: `beschwoeren`, `verschwinden` (siehe Zustände)
+  + `src/systeme/zustaende.js`: `zustand_setzen`, `zustand_entfernen`; `src/systeme/beschwoerung.js`: `beschwoeren`, `verschwinden` (siehe Zustände); `src/systeme/betaeubung.js`: `betaeuben` (siehe Kontrolle)
   + `src/systeme/kampf.js`: `trefferwurf`, `angreifen` (siehe [Wesen.md](Wesen.md), Kampfwerte); `src/systeme/verschieben.js`: `stossen`, `ziehen`, `tauschen`, `teleportieren` (siehe [Wesen.md](Wesen.md), Bewegung); `src/systeme/wahrnehmung.js`: `laerm`; `src/systeme/fraktionen.js`: `ruf_aendern` (siehe [Wesen.md](Wesen.md), Fraktionen); `src/systeme/skills.js`: `eigenschaft_aendern`, `skill_freischalten`
   + `src/systeme/gelaende.js`: `gelaende_setzen`, `gelaende_zerstoeren`; `src/systeme/schichten.js`: `oberflaeche_setzen`, `gas_setzen`, `entzuenden` (siehe [Welt.md](Welt.md))
   + `src/systeme/verschleiss.js`: `abnutzen`; `src/systeme/ausruestung.js`: `fluch_aufheben` (siehe [Gegenstaende.md](Gegenstaende.md))
@@ -68,7 +68,7 @@ Regeln:
 Daten:
 
 + Modifikator: `{ ziel, art, betrag, quelle, tag?, wenn? }`, z.B. `{ ziel: "kosten.bewegen", art: "prozent", betrag: -5 }`
-+ Ziele sind Namen wie `lp`, `genauigkeit`, `ausweichen`, `ruestung`, `ruestung.<art>`, `widerstand`, `schaden`, `kritfaktor`, `immunitaet` und jeder Kampfwert unter seinem Namen (siehe [Wesen.md](Wesen.md), Kampfwerte), `tragkraft` (siehe [Gegenstaende.md](Gegenstaende.md), Inventar), `reichweiteSicht`, `sichtImDunkeln` (siehe [Welt.md](Welt.md), Licht), `reichweiteSpueren` (siehe [Wesen.md](Wesen.md), Wahrnehmung), `kosten.<aktion>`, `kosten.alle`, `verbrauch.<wert>`, `verbrauch.alle`, `abklingzeit`, `unterhalt.<wert>` (siehe Fähigkeiten), `regeneration.<wert>`, `schwund.<wert>`, `kurvenverschiebung.<wert>`, `abbau.pegel` (siehe [Wesen.md](Wesen.md), Stoffwechsel), `eigenschaft.<name>` (siehe [Wesen.md](Wesen.md), Skills und Lernen)
++ Ziele sind Namen wie `lp`, `genauigkeit`, `ausweichen`, `ruestung`, `ruestung.<art>`, `widerstand`, `schaden`, `kritfaktor`, `immunitaet` und jeder Kampfwert unter seinem Namen (siehe [Wesen.md](Wesen.md), Kampfwerte), `tragkraft` (siehe [Gegenstaende.md](Gegenstaende.md), Inventar), `reichweiteSicht`, `sichtImDunkeln` (siehe [Welt.md](Welt.md), Licht), `reichweiteSpueren` (siehe [Wesen.md](Wesen.md), Wahrnehmung), `kosten.<aktion>`, `kosten.alle`, `verlangsamung.<tag>`, `gewicht.<tag>` (siehe [Gegenstaende.md](Gegenstaende.md), Ausrüstung), `verbrauch.<wert>`, `verbrauch.alle`, `abklingzeit`, `unterhalt.<wert>` (siehe Fähigkeiten), `regeneration.<wert>`, `schwund.<wert>`, `kurvenverschiebung.<wert>`, `abbau.pegel` (siehe [Wesen.md](Wesen.md), Stoffwechsel), `eigenschaft.<name>` (siehe [Wesen.md](Wesen.md), Skills und Lernen)
 + Arten (`MODIFIKATORARTEN` in `src/kern/werte.js`): `plus`, `prozent`, `mal` (Betrag in Prozent, `150` heißt x1,5), `mindestens`, `hoechstens`, `setzen` (zählt als `mindestens` und `hoechstens` mit demselben Betrag); alle Beträge ganzzahlig
 + Bedingungen: `wenn: [{ bedingung, ...parameter }]`, alle müssen gelten
 + Auren: `auren: [{ reichweite, trifft, selbst?, sichtlinie?, modifikatoren }]` an Wesen und Zuständen
@@ -78,7 +78,7 @@ Schnittstellen:
 + `modifiziert(spiel, entitaet, ziele, basiswert, umstaende?)` sammelt bei jeder Abfrage aus allen Quellen in der Reihenfolge der Anmeldung; `verrechnet(basiswert, modifikatoren)`; `modifikatorenAufgeschluesselt(spiel, entitaet, ziele, umstaende?)` liefert die wirksamen Modifikatoren mit ihrer Quelle für Erklärungen in der Oberfläche; `hoechstwert(spiel, entitaet, wertName)`
 + Umstände: `{ gegenueberId?, tags? }`; der Trefferwurf gibt für Genauigkeit und Verteidigung das Gegenüber und die Tags von Angriff und Effekt mit, die Schadensrechnung dazu die Schadensart, `zeitkosten` reicht Umstände durch
 + Register `modifikatorquellen` (`(spiel, entitaet) => [modifikator]`), mitgeliefert: `eigene` (die Liste `entitaet.modifikatoren`, gepflegt mit `modifikatorHinzufuegen` und `modifikatorenEntfernen` je Quelle), `auren` (Quelle `aura:<id>` bzw. `aura:zustand:<nummer>`), `zustaende` (Quelle `zustand:<nummer>`, siehe Zustände), `ausruestung` (siehe [Gegenstaende.md](Gegenstaende.md), Ausrüstung), `skills` (Quelle `skill:<name>`) und `anforderungen` (Abzüge für nicht erfüllte Anforderungen angelegter Gegenstände, Quelle `anforderung:<id>`, beide siehe [Wesen.md](Wesen.md), Skills und Lernen)
-+ Register `modifikatorbedingungen` (`(spiel, entitaet, parameter, umstaende) => boolean`, Parameter für die Datenprüfung wie bei den Bausteinen, `src/systeme/modifikatoren.js`), mitgeliefert: `pegel_ab { wert }`, `pegel_unter { wert }` (z.B. nüchtern), `wert_unter_prozent { wert, prozent }` (gemessen am Grundwert ohne Modifikatoren), `gegenueber_tag { tag }`, `gegenueber_ahnungslos` (Hinterhalt, siehe [Wesen.md](Wesen.md), Wahrnehmung), `hat_zustand { zustand }`, `ohne_zustand { zustand }`, `hat_tag { tag }`, `ohne_tag { tag }`, `traegt_tag { tag, anzahl? }` (Sets aus angelegten Gegenständen), `anzahl_unter { anzahl, wesen?, linie? }` (weniger als `anzahl` Wesen vom Typ `wesen`, Vorgabe der eigene, auf der Ebene; mit `linie: true` nur die eigene Abstammungslinie, also gleiche `topfId`, wer keine hat, beginnt seine eigene), `skill_ab { skill, stufe }`, `eigenschaft_ab { eigenschaft, wert }`, `eigenschaft_unter { eigenschaft, wert }`
++ Register `modifikatorbedingungen` (`(spiel, entitaet, parameter, umstaende) => boolean`, Parameter für die Datenprüfung wie bei den Bausteinen, `src/systeme/modifikatoren.js`), mitgeliefert: `pegel_ab { wert }`, `pegel_unter { wert }` (z.B. nüchtern), `wert_unter_prozent { wert, prozent }` (gemessen am Grundwert ohne Modifikatoren), `gegenueber_tag { tag }`, `gegenueber_ahnungslos` (Hinterhalt, siehe [Wesen.md](Wesen.md), Wahrnehmung), `gegenueber_wehrlos` (siehe Kontrolle), `im_kampf` und `ausser_kampf` (siehe [Wesen.md](Wesen.md), Kampfzustand), `hat_zustand { zustand }`, `ohne_zustand { zustand }`, `hat_tag { tag }`, `ohne_tag { tag }`, `traegt_tag { tag, anzahl? }` (Sets aus angelegten Gegenständen), `anzahl_unter { anzahl, wesen?, linie? }` (weniger als `anzahl` Wesen vom Typ `wesen`, Vorgabe der eigene, auf der Ebene; mit `linie: true` nur die eigene Abstammungslinie, also gleiche `topfId`, wer keine hat, beginnt seine eigene), `skill_ab { skill, stufe }`, `eigenschaft_ab { eigenschaft, wert }`, `eigenschaft_unter { eigenschaft, wert }`
 + `bedingungenErfuellt(spiel, entitaet, liste, umstaende)` in `src/kern/werte.js` prüft dieselben Bedingungen für `voraussetzungen` an Fähigkeiten, `wenn` an Auslösern und an Einträgen der KI; Schwellen des Pegels sind damit gewöhnliche Modifikatoren mit `pegel_ab`
 
 Regeln:
@@ -158,12 +158,13 @@ Daten:
   + `unterhalt: { mp: 2 }` kostet die Trägerin je Welttick (aufrechterhaltene Zauber); `gebundenAnQuelle: true` endet mit dem Tod oder Verschwinden der Quelle
   + `faehigkeiten: [name]` gewährt der Trägerin diese Fähigkeiten, solange der Zustand wirkt (siehe Fähigkeiten)
   + `adjektiv`: Textschlüssel eines Adjektivs, das vor dem Namen der Trägerin steht, solange der Zustand wirkt (Affix, siehe [Texte.md](Texte.md), Grammatik); die Instanz trägt es mit, wie Fraktion und KI
-  + `handlungsunfaehig: true` (Betäubung, Lähmung, Filmriss); `befehl: { veraenderer, ...parameter }`; `ki: { modul, ...parameter }`; `fraktion`: `"urheber"` (Psi-Kontrolle), `"eigene"` (Zwietracht, mit allen verfeindet) oder ein Fraktionsname
+  + `tags` mit Mechanik: `kontrolle` (abnehmende Kontrolle) und `wehrlos` (sicher getroffen), siehe Kontrolle
+  + `handlungsunfaehig: true` (Lähmung, Filmriss; die Betäubung schiebt stattdessen den Zug hinaus, siehe Kontrolle); `befehl: { veraenderer, ...parameter }`; `ki: { modul, ...parameter }`; `fraktion`: `"urheber"` (Psi-Kontrolle), `"eigene"` (Zwietracht, mit allen verfeindet) oder ein Fraktionsname
 + Instanzen an der Entität: `zustaende: [{ nummer, name, quelleId, urheberId, urheberFraktion, beginn, ende, staerke, stapel, ausFaehigkeit? }]` (`ausFaehigkeit`: gesetzt von einer aufrechten Fähigkeit); die Nummer zählt `naechsteZustandsnummer` im Zustand des Spiels hoch; `staerke` Vorgabe 1; Fraktion und KI werden beim Beginn in die Instanz geschrieben
 
 Schnittstellen:
 
-+ Bausteine `zustand_setzen { zustand, dauer?, staerke? }` und `zustand_entfernen { zustand?, tag? }` auf das Ziel
++ Bausteine `zustand_setzen { zustand, dauer?, staerke? }` und `zustand_entfernen { zustand?, tag? }` auf das Ziel; `zustandSetzen(spiel, traegerin, name, angaben)` mit `angaben.kontrolleGeprueft`, wenn die Dauer schon durch die abnehmende Kontrolle lief
 + Haken `zustand_beginnt` und `zustand_endet` (mit `grund`: `abgelaufen`, `entfernt`, `quelle_tot`, `unterhalt`, `verbraucht`), Meldungen gleichen Namens
 + Zeitereignis `zustand_ende`, gebunden an die Trägerin; Modifikatorquelle `zustaende`; `modifikatorSkaliert` in `src/kern/werte.js`
 + Register `befehlsveraenderer` (`src/systeme/befehlsveraenderer.js`, aufgerufen am Haken `vor_befehl`), mitgeliefert: `ziel_verfehlen { chance }` für Verwirrung beim Befehl `faehigkeit` (das Ziel rutscht auf ein anderes Wesen daneben, ein Feld auf ein Nachbarfeld, eine Richtung um 45°, nur auf Ziele, die der Befehl zulässt) und `abweichen { chance, freundeAngreifen? }` für Torkeln und Verwirrung: ein Schritt geht mit der Chance, skaliert mit der Stärke, auf ein zufälliges anderes freies Nachbarfeld (im Gang also zurück), gibt es keins, wie gewollt; ein Feind dort wird angegriffen, ein Verbündeter nur mit `freundeAngreifen`, sonst zählt sein Feld nicht als frei
@@ -184,6 +185,29 @@ Regeln:
 + `ki` überlagert die KI (Furcht mit `fliehen`, Rausch mit `jagen` und `trifft: "wesen"`); bei Ninkasi übernimmt die KI für die Dauer, das Spiel wartet dann nicht auf Eingaben; nach dem Ende gilt von selbst wieder der ursprüngliche Stand, die eigene KI behält ihr Gedächtnis
 + Beispiel ganz als Daten: `beschworen: { gebundenAnQuelle: true, beimEnde: "verschwinden" }`, mit `dauer` auch eine Beschwörung auf Zeit (Vorbild Brogue: Geisterklingen verschwinden mit dem Goblin-Beschwörer)
 + Die Datenprüfung verfolgt Kreise auch über Zustände: ein Effekt, der einen Zustand setzt, dessen `beimBeginn` ihn wieder aufruft, ist ein Fehler; `jeTick` und `beimAblauf` wirken erst später und zählen nicht
+
+## Kontrolle
+
+Vorbilder: die abnehmende Wirkung wiederholter Kontrolle ("diminishing returns") in World of Warcraft, Betäubung als Aufschub der nächsten Aktion wie die Verzögerung in DCSS.
+
+Daten:
+
++ Regelwerte `regeln.kontrolle: { stufen: [100, 50, 25], erholung: 1000 }`, vorläufig
++ Am Ziel: `kontrolle: { anzahl, ende }` zählt die Kontrollwirkungen in Folge, `ende` ist das späteste Ende der bisherigen; `aufschub` hält eine Betäubung fest, die das Ziel traf, während es selbst handelte
++ Zustände mit dem Tag `kontrolle` (Probeinhalt: `betaeubt`) laufen durch die abnehmende Kontrolle; der Tag `wehrlos` (`betaeubt`, später gefesselt und umgeworfen, nicht festgehalten) macht wehrlos
+
+Schnittstellen:
+
++ `kontrollDauer(spiel, ziel, dauer)` (`src/systeme/zustaende.js`): die wirksame Dauer, 0 heißt immun (Meldung `kontrolle_immun`); `istWehrlos(spiel, wesen)`
++ Baustein `betaeuben { dauer, zustand }` (`src/systeme/betaeubung.js`) auf das Ziel; `akteurVerschieben(zustand, akteurId, verzoegerung)` in `src/kern/zeit.js`
++ Bedingung `gegenueber_wehrlos`
+
+Regeln:
+
++ Die n-te Kontrollwirkung in Folge wirkt mit `stufen[n]` Prozent ihrer Dauer, jenseits der Liste gar nicht; ist nach `ende` die Zeit `erholung` ohne neue Kontrolle vergangen, beginnt die Folge neu; so hält niemand ein Wesen dauerhaft fest
++ Das gilt für jeden Zustand mit dem Tag `kontrolle` und einer Dauer, gleich ob ihn `zustand_setzen`, ein Auslöser oder die Betäubung setzt; eine Betäubung zählt einmal, nicht noch einmal über ihren Zustand
++ Betäubung: die wirksame Dauer schiebt den Eintrag des Ziels in der Warteschlange nach hinten, eine laufende lange Aktion bricht ab (Grund `betaeubt`); hat das Ziel gerade keinen Eintrag, weil es selbst handelt, kommt der Aufschub beim Wiedereinreihen dazu; der Zustand hält bis zu seinem nächsten Zug und zeigt die Restzeit an
++ Wehrlos: der Trefferwurf trifft sicher und wird nicht geblockt, aber ohne Krit, auch ohne Quelle (Falle); ein ahnungsloses Ziel bleibt beim Hinterhalt mit Krit (siehe [Wesen.md](Wesen.md), Kampfwerte); die Vorschau zeigt 100 %
 
 ## Zielauswahl
 
@@ -228,7 +252,7 @@ Daten:
 + Fähigkeit (`datenproben/faehigkeiten.js`, umgesetzt in `src/systeme/faehigkeiten.js`): `{ text, art?, tags?, zweck?, verbrauch?, material?, zeit?, abklingzeit?, voraussetzungen?, ziel?, zielvorgabe?, wirkung?, zustand?, risiko?, skill?, anforderung?, ausbau?, dauer?, beimAbbruch?, ankuendigung?, unterbrechbar? }`; Wesen kennen eigene als Liste `faehigkeiten: ["name"]`, dazu gewährte aus angelegten Gegenständen (`ausruestung.faehigkeiten`, siehe [Gegenstaende.md](Gegenstaende.md), Ausrüstung) und Zuständen (`faehigkeiten`, siehe Zustände)
   + `art`: `aktiv` (Vorgabe) wirkt einmal; `aufrecht` setzt `zustand` an der Wirkenden, erneutes Benutzen beendet ihn ohne Kosten; den laufenden Preis trägt der Zustand als `unterhalt` (siehe Zustände)
   + `verbrauch: { mp, pp, pegel, ... }` aus den Vorräten; `material: [{ typ, anzahl }]` aus dem Inventar, wird verbraucht
-  + `zeit`: Grundkosten, Vorgabe `aktionen.faehigkeit`
+  + `zeit`: Grundkosten, Vorgabe `aktionen.faehigkeit`; `ohneZeit: true` kostet keine Zeit (Sprint), nicht mit `dauer`
   + `zweck: [name]`: wozu die KI sie mit der Handlung `nutzen` wählt (siehe [Wesen.md](Wesen.md), KI)
   + `abklingzeit`: Zeiteinheiten Weltzeit ab dem Wirken (siehe [Architektur.md](Architektur.md), Zeitmodell); schnelles Handeln beschleunigt sie nicht; am Wesen `abklingendBis: { name: zeitpunkt }`, `zeitBisBereit(spiel, wesen, name)` sagt, wie lange noch
   + `voraussetzungen`: Bedingungen aus dem Register `modifikatorbedingungen`, z.B. `pegel_unter` (nüchtern), `pegel_ab`, `skill_ab`, `eigenschaft_ab`
@@ -248,7 +272,7 @@ Schnittstellen:
 + Register `faehigkeitsquellen` (`(spiel, wesen) => [{ faehigkeit, quelle, gegenstandId? | zustand? }]`), angemeldet: `ausruestung` (Quelle `ausruestung:<id>`, `src/systeme/ausruestung.js`), `zustaende` (Quelle `zustand:<nummer>`, `src/systeme/zustaende.js`)
 
 + `faehigkeitFuer(spiel, wesen, name)` liefert die nach `ausbau` geltende Definition und wird überall benutzt, wo die Wirkende bekannt ist (Prüfen, Wirken, lange Aktion, Vorschau, KI, Anzeige)
-+ Gründe der Ablehnung: `ungueltig`, `nicht_gelernt`, `abklingend`, `voraussetzung`, `zu_wenig_<wert>`, `material_fehlt`, die der Zielauswahl und die der Vorabprüfung der Wirkung (`wirkungVorab` mit dem aufgelösten Ziel, z.B. `kein_freies_feld`); so verliert niemand einen Zug an eine Wirkung ohne Folge, auch die KI nicht
++ Gründe der Ablehnung: `ungueltig`, `nicht_gelernt`, `abklingend`, `schon_ohne_zeit`, `voraussetzung`, `zu_wenig_<wert>`, `material_fehlt`, die der Zielauswahl und die der Vorabprüfung der Wirkung (`wirkungVorab` mit dem aufgelösten Ziel, z.B. `kein_freies_feld`); so verliert niemand einen Zug an eine Wirkung ohne Folge, auch die KI nicht
 + Modifikatoren mit den Tags der Fähigkeit: `verbrauch.<wert>` und `verbrauch.alle` auf den Verbrauch, `kosten.faehigkeit` und `kosten.alle` auf die Zeit (`kosten.*` bleibt der Zeit vorbehalten), `abklingzeit`
 + Meldungen: `faehigkeit`, `risiko` (mit `wegen`), `geschoss` bzw. `flaeche`, `verpufft`, `faehigkeit_gelernt`, `faehigkeit_schon_bekannt`, bei langen Aktionen `aktion_beginnt` (mit `faehigkeit`, `ankuendigung` und den Zielfeldern `felder`)
 + Lange Aktion der Art `faehigkeit` im Register `laufendeaktionen`; wann Gegner Fähigkeiten einsetzen, steht an ihrer KI (siehe [Wesen.md](Wesen.md), KI)
@@ -263,6 +287,7 @@ Regeln:
 + Angekündigte Angriffe sind lange Aktionen mit `ankuendigung` und meist der Zielart `feld`: das Ziel ist das Feld beim Beginn, wer bis zum letzten Schritt das Muster verlässt, weicht aus; die Anzeige markiert die Felder, solange die Aktion läuft; der erste Schritt läuft sofort, `schritte: 3` lässt dem Ziel also zwei Züge
 + Vorläufige Tabelle `psi`: Fehlschlag nüchtern 30 %, bei 1,5 ‰ am seltensten (5 %), darüber wieder steigend; Rückschlag ab 3 ‰ bis 20 % bei 8 ‰ (Effekt `psi_rueckschlag`); dass Psi mit dem Pegel stärker wirkt, geht über Modifikatoren mit `pegel_ab` und dem Tag `psi`; dazu `ohne_skill` (1 fehlende Stufe 25 %, 3: 60 %, 5: 85 %) und `anforderung` (1 fehlender Punkt 5 %, 10: 50 %), beide vorläufig
 + Der Rückschlag ist Psi-Schaden: Modifikatoren auf Schaden mit dem Tag `psi` (z.B. mit `pegel_ab`) verstärken auch ihn, gewollt; ein Skill kann ihn gezielt dämpfen (Selbstbeherrschung, siehe [Skills.md](Skills.md), Psi)
++ Ohne Zeit: die Wirkende kommt sofort wieder an die Reihe, ohne Zug und ohne neue letzte Aktion; zwischen zwei Aktionen mit Zeit ist höchstens eine ohne erlaubt (Merker `ohneZeitGenutzt`, siehe [Architektur.md](Architektur.md), Befehle); die Abklingzeit begrenzt sie zusätzlich
 + Glimmer (Psi lockt Gegner an) wäre ein Wert `glimmer`, den Psi-Fähigkeiten über `wert_aendern` erhöhen; seine Folgen sind Spieldesign ([Grundlagen.md](Grundlagen.md))
 
 ## Lange Aktionen
@@ -286,7 +311,7 @@ Regeln:
 + Rituale, Kanalisieren und später das Brauen laufen in der Logik, weil sie einen Fortschritt und Folgen beim Abbruch haben; Rasten und Auto-Erkunden sind dagegen Abläufe der Eingabe aus gewöhnlichen Befehlen (siehe [Bedienung.md](Bedienung.md), Maus, Reise, Laufen, Rasten und Erkunden)
 + Der startende Befehl führt den ersten Schritt aus; ist die Akteurin wieder dran, führt die Logik den nächsten Schritt selbst aus (Befehl `fortsetzen`, nicht aufgezeichnet, das Nachspielen ergibt ihn wieder); aufgezeichnet wird nur, was die Spielerin eingibt
 + Trifft vor einem automatischen Schritt Ninkasis eine Gefahrenprüfung gegen die Lage beim letzten Schritt zu, pausiert die Aktion und Ninkasi wird gefragt; die Liste steht in den Regeln, nicht in den Einstellungen, weil sie das Nachspielen bestimmt
-+ `fortsetzen` macht weiter, jeder andere Befehl bricht ab; bezahlte Kosten bleiben bezahlt, `abbrechen` der Art wirkt (bei Fähigkeiten `beimAbbruch`); Handlungsunfähigkeit bricht ebenfalls ab
++ `fortsetzen` macht weiter, jeder andere Befehl bricht ab; bezahlte Kosten bleiben bezahlt, `abbrechen` der Art wirkt (bei Fähigkeiten `beimAbbruch`); Handlungsunfähigkeit und Betäubung (Grund `betaeubt`, siehe Kontrolle) brechen ebenfalls ab
 + Gegner mit langer Aktion führen ihre Schritte ohne Gefahrenprüfung aus
 + Bei Fähigkeiten kommt `unterbrechbar` aus deren Daten, so legt jede Fähigkeit und später jedes Rezept selbst fest, wie störanfällig es ist
 
@@ -317,7 +342,7 @@ Regeln:
 
 ## Tests
 
-+ `tests/werte.test.js` und `tests/modifikatoren.test.js` (Verrechnung, Quellen, Bedingungen, Auren), `tests/ausloeser.test.js` (Kaskade, Ketten, Dämpfung), `tests/zustaende.test.js` (Stapelregeln, Verlauf, Unterhalt, Überlagerung), `tests/beschwoerung.test.js`, `tests/zielauswahl.test.js`, `tests/zielbausteine.test.js` und `tests/geometrie.test.js` (Muster, Linien, Kreis, Kegel), `tests/faehigkeiten.test.js` (Verbrauch, Risiko, Ausbau, gewährte und gelehrte Fähigkeiten), `tests/laufendeAktionen.test.js`, `tests/tod.test.js`, `tests/ersatz.test.js` (Barriere, Phönix, Kaskade, Verbrauch), `tests/verhalten.test.js` (Befehlsveränderer)
++ `tests/werte.test.js` und `tests/modifikatoren.test.js` (Verrechnung, Quellen, Bedingungen, Auren), `tests/ausloeser.test.js` (Kaskade, Ketten, Dämpfung), `tests/zustaende.test.js` (Stapelregeln, Verlauf, Unterhalt, Überlagerung), `tests/beschwoerung.test.js`, `tests/zielauswahl.test.js`, `tests/zielbausteine.test.js` und `tests/geometrie.test.js` (Muster, Linien, Kreis, Kegel), `tests/faehigkeiten.test.js` (Verbrauch, Risiko, Ausbau, gewährte und gelehrte Fähigkeiten), `tests/laufendeAktionen.test.js`, `tests/tod.test.js`, `tests/ersatz.test.js` (Barriere, Phönix, Kaskade, Verbrauch), `tests/verhalten.test.js` (Befehlsveränderer), `tests/zeitskala.test.js` (ohne Zeit, Kontrolle, Betäubung, wehrlos)
 
 ## Verweise
 

@@ -1,6 +1,6 @@
 # Battle Ninkasi - Bedienung
 
-Stand: 2026-11-23
+Stand: 2026-11-24
 
 Zuständig für: `src/eingabe/aktionskatalog.js`, `src/eingabe/befehlszeile.js`, `src/eingabe/belegung.js`, `src/eingabe/belegunganpassen.js`, `src/eingabe/charakter.js`, `src/eingabe/eingabe.js`, `src/eingabe/einstellungen.js`, `src/eingabe/einstellungsfenster.js`, `src/eingabe/einstellungskatalog.js`, `src/eingabe/erkunden.js`, `src/eingabe/arenakampf.js`, `src/eingabe/erstellung.js`, `src/eingabe/esckette.js`, `src/eingabe/faehigkeiten.js`, `src/eingabe/fenster.js`, `src/eingabe/hilfe.js`, `src/eingabe/inventar.js`, `src/eingabe/karte.js`, `src/eingabe/laufen.js`, `src/eingabe/maus.js`, `src/eingabe/menue.js`, `src/eingabe/rasten.js`, `src/eingabe/reise.js`, `src/eingabe/schnellleiste.js`, `src/eingabe/texteingabe.js`, `src/eingabe/verlauf.js`, `src/eingabe/zielmodus.js`, `src/anzeige/fenster.js`, `src/anzeige/charakterfenster.js`, `src/anzeige/systemfenster.js`, `src/anzeige/einstellungsanzeige.js`, `src/systeme/vorschau.js`, `src/systeme/untersuchen.js`
 
@@ -153,7 +153,7 @@ Schnittstellen:
 
 + `zielmodusBeginnen(spiel, auswahl, { platz, letztesZielId })` gibt den Modus zurück, bei Fähigkeiten ohne Ziel, mit Zielart `selbst` oder `aufrecht` gleich den Befehl, bei Gründen, die nicht am Ziel liegen (z.B. `abklingend`, `zu_wenig_mp`), den Grund
 + `zielmodusTaste`, `cursorSetzen`, `zielmodusBestaetigen`, `zielmodusVorschau`, `zieleInSicht`, `zielvorgabeVon`, `zielangabeVon`
-+ Fähigkeitenfenster (`src/eingabe/faehigkeiten.js`, Taste f): listet eigene, dann gewährte Fähigkeiten (`faehigkeitenVon`); a bis z wählt und zeigt bei gewährten die Quelle ("Gewährt von"), dazu Verbrauch, Abklingzeit und Platz in der Schnellleiste, Enter oder derselbe Buchstabe wirkt, Esc zurück bzw. schließt
++ Fähigkeitenfenster (`src/eingabe/faehigkeiten.js`, Taste f): listet eigene, dann gewährte Fähigkeiten (`faehigkeitenVon`); a bis z wählt und zeigt bei gewährten die Quelle ("Gewährt von"), dazu Verbrauch, ob sie ohne Zeit geht, Abklingzeit und Platz in der Schnellleiste, Enter oder derselbe Buchstabe wirkt, Esc zurück bzw. schließt
 + Vorschau (`src/systeme/vorschau.js`, ändert nichts, würfelt nicht): `zielvorschau(spiel, akteur, auswahl, zielangabe)` gibt `ok`, den Grund (aus der Prüfung des Befehls), die Auflösung aus `zielAufloesen` (Felder, Bahn, siehe [Wirkungen.md](Wirkungen.md), Zielauswahl) und die betroffenen Wesen mit ihrer Trefferchance zurück; `trefferchanceVorschau`, `nahkampfchanceVorschau`
 + Geschossbahn: `src/anzeige/animation.js` (ohne Timer und DOM), abgespielt für jede Meldung `geschoss`, Takt `geschossPause` aus `src/main.js`
 

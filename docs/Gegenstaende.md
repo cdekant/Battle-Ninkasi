@@ -37,7 +37,7 @@ Regeln:
 + Trinken, Lesen, Werfen und Material für Fähigkeiten nehmen ein Stück, Fallenlassen den ganzen Stapel; Trinken nimmt bei Ladungen eine Ladung; ein Gegenstand mit Ladungen stapelt sich nicht
 + Ausstattung geht über `insInventar`, stapelbare fließen also zu einem Stapel zusammen; ein Wesen lässt sie beim Tod fallen wie alles im Gepäck (siehe [Wirkungen.md](Wirkungen.md), Tod und Zustandsprüfung)
 + Nach dem letzten Gebrauch kommt `wirdZu` ins Gepäck (Bier zu leerer Flasche, Bierfass zu Fass), Grundlage für das Brauen; der Ballast ist gewollt
-+ Gewicht mit Ladungen zuzüglich `gewichtJe` je Ladung; die Last ist die Summe über das Gepäck, Angelegtes eingeschlossen
++ Gewicht mit Ladungen zuzüglich `gewichtJe` je Ladung; die Last ist die Summe über das Gepäck, Angelegtes eingeschlossen, dieses mit seinem gefühlten Gewicht (siehe Ausrüstung)
 + Tragkraft mit Modifikatoren auf `tragkraft` (Skills folgen); verboten ist nichts, Überladung verteuert nur das Bewegen, nach allen Modifikatoren
 + Anzeige: das Inventarfenster zeigt Stapel (x 3), Ladungen (19/20), Angelegtes und die Last (Last 3,2 / 20 kg, rot "überladen"), die Seitenleiste nur die Last
 
@@ -48,7 +48,9 @@ Vorbilder: Brogue (wenige Plätze), DCSS (Tauschen in einem Befehl), NetHack (Fl
 Daten:
 
 + Plätze am Wesen: `plaetze: { hand: 2, kopf: 1, brust: 1, beine: 1, hals: 1, finger: 2 }` (Ninkasi); die Namen stehen in `regeln.ausruestung.plaetze`
-+ Gegenstand (`datenproben/ausruestung.js`): `ausruestung: { platz, belegt?, angriffe?, modifikatoren?, ausloeser?, faehigkeiten?, anforderung?, abzugJePunkt? }` und `tags` (Sets, Art der Rüstung für die Rüstungsskills, siehe [Wesen.md](Wesen.md), Skills und Lernen); `faehigkeiten: [name]` gewährt diese Fähigkeiten, solange der Gegenstand angelegt ist (z.B. ein Zauberstab in der Hand); `belegt` (Vorgabe 1) zählt die Stellen, ein Zweihänder belegt beide Hände; Anforderungen siehe [Wesen.md](Wesen.md), Skills und Lernen
++ Gegenstand (`datenproben/ausruestung.js`): `ausruestung: { platz, belegt?, zeit?, verlangsamung?, angriffe?, modifikatoren?, ausloeser?, faehigkeiten?, anforderung?, abzugJePunkt? }` und `tags` (Sets, Art der Rüstung für die Rüstungsskills, siehe [Wesen.md](Wesen.md), Skills und Lernen); `faehigkeiten: [name]` gewährt diese Fähigkeiten, solange der Gegenstand angelegt ist (z.B. ein Zauberstab in der Hand); `belegt` (Vorgabe 1) zählt die Stellen, ein Zweihänder belegt beide Hände; Anforderungen siehe [Wesen.md](Wesen.md), Skills und Lernen
++ `zeit`: Zeiteinheiten, um dieses Stück an- oder abzulegen, Vorgabe die Kosten `anlegen` bzw. `ablegen` der Trägerin; Probewerte Ring, Kette, Laterne und Kelle 50, Helm 100, Fasshammer 150, Schürze und Hose 200
++ `verlangsamung`: Prozent Aufschlag auf jede Aktion, solange das Stück angelegt ist; Probewerte so, dass eine volle leichte Rüstung um 10 % bremst, eine volle schwere um 30 %
 + `verflucht: true` am Gegenstand, `fluchBekannt` nach dem Anlegen
 + Angelegt ist, was in `ausgeruestet: [IDs]` am Wesen steht; der Gegenstand bleibt im Inventar
 + `licht` am Gegenstand (etwa eine Laterne): leuchtet angelegt vom Feld der Trägerin aus und am Boden, im Gepäck nicht (siehe [Welt.md](Welt.md), Licht)
@@ -56,7 +58,7 @@ Daten:
 Schnittstellen (`src/systeme/ausruestung.js`):
 
 + Befehle `anlegen { gegenstandId }` und `ablegen { gegenstandId }`; Ablehnungen `nicht_im_gepaeck`, `nicht_anlegbar`, `schon_angelegt`, `kein_platz`, `nicht_angelegt`, `verflucht`; Meldungen `angelegt`, `abgelegt`, `fluch_entdeckt`, `fluch_aufgehoben`
-+ `ausgeruestete` (nur Gegenstände mit der Komponente `ausruestung`, ein anderer in `ausgeruestet` zählt nicht), `istAngelegt`, `zuTauschen` (Plätze aus `plaetzeVon`, siehe [Architektur.md](Architektur.md), Entitäten und Komponenten), `fluchHindert`, `waffenprofile` (für `angriffeVon` in `src/systeme/kampf.js`), `haltbarkeitProzent`
++ `ausgeruestete` (nur Gegenstände mit der Komponente `ausruestung`, ein anderer in `ausgeruestet` zählt nicht), `istAngelegt`, `zuTauschen` (Plätze aus `plaetzeVon`, siehe [Architektur.md](Architektur.md), Entitäten und Komponenten), `fluchHindert`, `waffenprofile` (für `angriffeVon` in `src/systeme/kampf.js`), `haltbarkeitProzent`, `wechselzeit(spiel, wesen, gegenstand, art)`, `verlangsamungDes` (ein Stück) und `verlangsamungVon` (Summe, wirkt in `zeitkosten`, siehe [Architektur.md](Architektur.md), Befehle), `gefuehltesGewicht` (für `lastVon`)
 + Modifikatorquelle `ausruestung` (Quelle `ausruestung:<id>`); Fähigkeitsquelle `ausruestung` (siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten); Auslöser der Ausrüstung in der Kaskade (siehe [Wirkungen.md](Wirkungen.md), Auslöser); Baustein `fluch_aufheben`
 + Haken `gegenstand_benutzt` mit `gegenstandId` und `art` (`trinken`, `lesen`, `werfen`, `anlegen`, `ablegen`)
 
@@ -64,9 +66,11 @@ Regeln:
 
 + Waffen in den Händen, Rüstung und Schmuck an Kopf, Brust, Beinen, Hals und zwei Fingern
 + Nur Angelegtes wirkt: Modifikatoren, Auslöser, Ersatzwirkungen (`ausruestung.ersatz`) und gewährte Fähigkeiten gelten erst nach dem Anlegen, ein Wechsel kostet also Zeit; aus dem Gepäck gehen nur Trinken, Lesen, Werfen, Material und passive Ersatzwirkungen (`ersatz` am Gegenstand, z.B. Phönixbier)
-+ Ist der Platz voll, legt derselbe Befehl `anlegen` die ältesten Gegenstände dort ab, bis genug frei ist, und kostet beides (`aktionen.anlegen` plus je `aktionen.ablegen`)
++ Ist der Platz voll, legt derselbe Befehl `anlegen` die ältesten Gegenstände dort ab, bis genug frei ist, und kostet beides: die `zeit` des neuen Stücks plus die jedes abgelegten; ein Waffenwechsel kostet so vom Tausch zweier Dolche bis zum Wechsel vom Zweihänder auf Schwert und Schild verschieden viel
 + Angelegte Gegenstände stapeln sich nicht und sind kein Material; beim Tod fällt alles mit dem Inventar zu Boden
 + Modifikatoren wirken z.B. als Rüstung und als Abzug aufs Ausweichen bei schwerer Rüstung; Sets über die Bedingung `traegt_tag { tag, anzahl }` an einem gewöhnlichen Modifikator
++ Rüstung bremst doppelt (entschieden in [Grundlagen.md](Grundlagen.md), Zeit und Tempo): ihr Gewicht zählt zur Last, und `verlangsamung` verteuert jede Aktion; Modifikatoren auf `verlangsamung.<tag>` und `gewicht.<tag>` mindern beides für jedes angelegte Stück mit diesem Tag (die Rüstungsskills mit `ruestung_leicht` und `ruestung_schwer`), nie unter 0; im Gepäck zählt das volle Gewicht und nichts bremst
++ Anzeige: das Inventarfenster nennt bei Ausrüstung die Zeit zum An- und Ablegen mit allen Modifikatoren und die wirksame Verlangsamung
 + Waffen: angelegte Gegenstände mit `angriffe` ersetzen die eigenen Profile des Wesens (die Faust), zwei Waffen sind zwei Profile, die Aktion kostet so viel wie das langsamste
 + Auslöser an der Ausrüstung gelten für die Trägerin, nach ihren eigenen und denen ihrer Zustände
 + Fluch: angelegt lässt sich ein verfluchter Gegenstand weder ablegen noch fallen lassen, werfen oder beim Anlegen eines anderen wegtauschen; bekannt wird der Fluch erst beim Anlegen (im Gepäck dann "verflucht"); beim Tod fällt er mit allem anderen; `fluch_aufheben` nimmt die Flüche aller angelegten Gegenstände des Ziels, einen Gegenstand dafür gibt es noch nicht
@@ -124,7 +128,7 @@ Regeln:
 
 ## Tests
 
-+ `tests/inventar.test.js` (Stapel, Ladungen, Behälter, Last), `tests/nutzen.test.js` (Ausstattung, Zwecke), `tests/ausruestung.test.js` (Plätze, Tauschen, Waffen, Sets, Flüche), `tests/verschleiss.test.js` (Verderben, Haltbarkeit, kaputt), `tests/kennen.test.js` (Etiketten, Vertrautheit, Erkennen)
++ `tests/inventar.test.js` (Stapel, Ladungen, Behälter, Last), `tests/nutzen.test.js` (Ausstattung, Zwecke), `tests/ausruestung.test.js` (Plätze, Tauschen, Waffen, Sets, Flüche), `tests/zeitskala.test.js` (Wechselzeit, Verlangsamung, gefühltes Gewicht), `tests/verschleiss.test.js` (Verderben, Haltbarkeit, kaputt), `tests/kennen.test.js` (Etiketten, Vertrautheit, Erkennen)
 
 ## Verweise
 

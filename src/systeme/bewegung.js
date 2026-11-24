@@ -3,11 +3,14 @@
 // Hineinlaufen greift Feinde an; mit angreifen: true jedes Wesen (Rausch, Verwirrung, gezielter Angriff auf Freunde).
 // Bewegungsarten siehe welt/karte.js: betretbar ist, was die wirksame Bewegungsart des Wesens zulässt;
 // ein unbewegliches Wesen greift an, bewegt sich aber nicht und lässt sich nicht verschieben (systeme/verschieben.js).
+// Tür: der Schritt auf eine geschlossene Tür mit tuer.aufschlag (daten/gelaende.js) kostet so viel Prozent mehr als
+// die eigenen Grundkosten fürs Bewegen; geöffnet wird sie beim Betreten (systeme/gelaende.js).
 
 import { anmelden } from "../kern/register.js";
-import { entitaetenAuf, bewegungVon, positionSetzen, istGesteuert, gesteuerteEntitaet } from "../kern/zustand.js";
+import { entitaetenAuf, bewegungVon, positionSetzen, istGesteuert, gesteuerteEntitaet, grundkostenVon } from "../kern/zustand.js";
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
-import { betretbar } from "../welt/karte.js";
+import { betretbar, gelaendeAuf } from "../welt/karte.js";
+import { prozentVon } from "../kern/werte.js";
 import { istWesen, feindlich, nahkampf, kannAngreifen } from "./kampf.js";
 import { sichtfeldAktualisieren, traegtLicht } from "./sicht.js";
 import { lichtWirkt } from "./licht.js";
@@ -67,8 +70,10 @@ anmelden("befehle", "bewegen", {
     if (anderesWesen) {
       return { aktion: "nahkampf", grundkosten: nahkampf(spiel, akteur, anderesWesen) };
     }
+    const aufschlag = gelaendeAuf(spiel, feld.x, feld.y)?.tuer?.aufschlag ?? 0;
     versetzen(spiel, akteur, feld, "schritt");
-    return "bewegen";
+    if (!aufschlag) return "bewegen";
+    return { aktion: "bewegen", grundkosten: prozentVon(grundkostenVon(spiel, akteur, "bewegen"), 100 + aufschlag) };
   },
 });
 

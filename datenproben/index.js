@@ -42,9 +42,9 @@ export default {
     arenen,
     zeichen,
   },
-  // Ninkasi bekommt die vorläufige Fähigkeit für den Zielmodus
+  // Ninkasi bekommt die vorläufige Fähigkeit für den Zielmodus und den Sprint
   ergaenzen: {
-    wesen: { ninkasi: { faehigkeiten: ["testfaehigkeit"] } },
+    wesen: { ninkasi: { faehigkeiten: ["testfaehigkeit", "sprint"] } },
   },
   // Hub, darunter drei Kellertiefen; der Lauf beginnt im ersten Keller
   abfolge: ["hub", "keller", "keller_dunkel", "keller"],

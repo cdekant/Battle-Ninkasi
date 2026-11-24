@@ -26,7 +26,7 @@ import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
 import { modifiziert } from "../kern/werte.js";
 import { ereignisEinreihen, gebundeneEreignisseEntfernen } from "../kern/zeit.js";
 import { erkennen, beimAufhebenErkennen } from "./kennen.js";
-import { fluchHindert } from "./ausruestung.js";
+import { fluchHindert, gefuehltesGewicht } from "./ausruestung.js";
 
 // Verderben: ein Gegenstand mit verdirbt bekommt beim Erzeugen seinen Zeitpunkt und ein gebundenes Zeitereignis
 // (Handler in systeme/verschleiss.js); ein abgespaltener Teil eines Stapels behält den Zeitpunkt
@@ -58,12 +58,13 @@ export function einzelgewicht(gegenstand) {
   return (gegenstand.gewicht ?? 0) + (ladungen ? ladungen * (gegenstand.ladungen.gewichtJe ?? 0) : 0);
 }
 
-// Last einer Trägerin in Gramm: alles im Gepäck, auch das Angelegte
+// Last einer Trägerin in Gramm: alles im Gepäck, auch das Angelegte, dieses mit seinem gefühlten Gewicht
+// (systeme/ausruestung.js gefuehltesGewicht)
 export function lastVon(spiel, traegerin) {
   let summe = 0;
   for (const id of traegerin.inventar || []) {
     const gegenstand = entitaetMitId(spiel.zustand, id);
-    if (gegenstand) summe += einzelgewicht(gegenstand) * anzahlVon(gegenstand);
+    if (gegenstand) summe += gefuehltesGewicht(spiel, traegerin, gegenstand, einzelgewicht(gegenstand)) * anzahlVon(gegenstand);
   }
   return summe;
 }

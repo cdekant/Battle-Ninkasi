@@ -25,6 +25,7 @@ import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 import { aktionAbbrechen, laufendeAktionVorDemZug } from "../systeme/laufendeAktionen.js";
 import { wahrnehmen } from "../systeme/wahrnehmung.js";
 import { lastZuschlag } from "../systeme/inventar.js";
+import { verlangsamungVon } from "../systeme/ausruestung.js";
 import { etikettenZuordnen } from "../systeme/kennen.js";
 import { lernenEinrichten } from "../systeme/lernen.js";
 
@@ -72,11 +73,12 @@ export function neuesSpiel(daten, startwert, optionen = {}) {
 
 // Zeitkosten einer Aktion für eine Entität, mit Modifikatoren für die Aktion und für alle; umstaende siehe kern/werte.js
 // grundkosten: abweichende Grundkosten (z.B. eines Angriffsprofils), Vorgabe das Tempo der Entität (grundkostenVon)
-// Überladung (systeme/inventar.js lastZuschlag) verteuert das Bewegen danach um ihre Prozent.
+// Danach zwei Aufschläge in Prozent, zusammengezählt: Rüstung verlangsamt jede Aktion (systeme/ausruestung.js
+// verlangsamungVon), Überladung (systeme/inventar.js lastZuschlag) nur das Bewegen.
 export function zeitkosten(spiel, entitaet, aktion, umstaende = {}, grundkosten = grundkostenVon(spiel, entitaet, aktion)) {
   if (grundkosten === undefined) throw new Error(`Keine Kosten für Aktion "${aktion}" in daten/aktionen.js`);
   const kosten = modifiziert(spiel, entitaet, [`kosten.${aktion}`, "kosten.alle"], grundkosten, umstaende);
-  const zuschlag = aktion === "bewegen" ? lastZuschlag(spiel, entitaet) : 0;
+  const zuschlag = verlangsamungVon(spiel, entitaet) + (aktion === "bewegen" ? lastZuschlag(spiel, entitaet) : 0);
   return Math.max(1, zuschlag ? prozentVon(kosten, 100 + zuschlag) : kosten);
 }
 
@@ -114,21 +116,31 @@ export function befehlAusfuehren(spiel, akteur, befehl) {
   const wirksamerBefehl = befehlVeraendern(spiel, akteur, befehl);
   // jeder andere Befehl als "fortsetzen" bricht eine laufende Aktion ab
   if (akteur.laufendeAktion && wirksamerBefehl.art !== "fortsetzen") aktionAbbrechen(spiel, akteur, "befehl");
-  // ausfuehren gibt die Aktionsart zurück oder { aktion, grundkosten?, umstaende? }
+  // ausfuehren gibt die Aktionsart zurück oder { aktion, grundkosten?, umstaende?, ohneZeit? }
   const ergebnis = holen("befehle", wirksamerBefehl.art).ausfuehren(spiel, akteur, wirksamerBefehl);
-  const { aktion, grundkosten, umstaende = {} } = typeof ergebnis === "string" ? { aktion: ergebnis } : ergebnis;
-  // Zugzähler: jede ausgeführte Aktion zählt als ein eigener Zug (Abklingzeit der Fähigkeiten);
-  // die letzte Aktion bestimmt die Heimlichkeitsweite (systeme/wahrnehmung.js)
-  akteur.zuege = (akteur.zuege ?? 0) + 1;
-  akteur.letzteAktion = aktion;
+  const { aktion, grundkosten, umstaende = {}, ohneZeit = false } = typeof ergebnis === "string" ? { aktion: ergebnis } : ergebnis;
+  // Eine Aktion ohne Zeit (Sprint) zählt keinen Zug und lässt die letzte Aktion stehen; der Merker ohneZeitGenutzt
+  // erlaubt bis zur nächsten Aktion mit Zeit keine weitere (systeme/faehigkeiten.js)
+  if (ohneZeit) akteur.ohneZeitGenutzt = true;
+  else {
+    delete akteur.ohneZeitGenutzt;
+    // Zugzähler: jede ausgeführte Aktion zählt als ein eigener Zug (Bilanz, Log, Speicherplätze);
+    // die letzte Aktion bestimmt die Heimlichkeitsweite (systeme/wahrnehmung.js)
+    akteur.zuege = (akteur.zuege ?? 0) + 1;
+    akteur.letzteAktion = aktion;
+  }
   // Haken zug_ende, solange die Akteurin noch im Spiel ist (z.B. Fallen entdecken, systeme/fallen.js)
   if (entitaetMitId(spiel.zustand, akteur.id)) hakenAusloesen(spiel, "zug_ende", { quelleId: akteur.id, zielId: akteur.id, akteurId: akteur.id, kettentiefe: 0 });
   vorgangAbschliessen(spiel);
   const zustand = spiel.zustand;
   const akteurNochImSpiel = entitaetMitId(zustand, akteur.id) && !(akteur.id === zustand.spielerinId && zustand.vorbei);
   if (!akteurNochImSpiel) return null;
-  const kosten = zeitkosten(spiel, akteur, aktion, umstaende, grundkosten);
-  akteurEinreihen(zustand, akteur.id, kosten);
+  // ohne Zeit kommt sie sofort wieder an die Reihe; bei Gleichstand ordnet die ID, also vor allen, die nach ihr kamen
+  const kosten = ohneZeit ? 0 : zeitkosten(spiel, akteur, aktion, umstaende, grundkosten);
+  // Aufschub: eine Betäubung, während sie selbst handelte und keinen Eintrag hatte (systeme/betaeubung.js)
+  const aufschub = akteur.aufschub ?? 0;
+  delete akteur.aufschub;
+  akteurEinreihen(zustand, akteur.id, kosten + aufschub);
   return kosten;
 }
 
