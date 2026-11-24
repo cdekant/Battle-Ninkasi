@@ -44,12 +44,14 @@ Form: Die Kategorien ordnen nach Themen, nicht nach Eigenschaften. Jedes Set nen
 + Eigenschaften: Gewandtheit, sekundär Körperlichkeit
 + Lernt aus: Rüstung, wenn ein leichtes Stück den Schaden mindert
 + Gefühltes Gewicht und Verlangsamung sinken; bei voller Spezialisierung bremst leichte Rüstung kaum noch
++ Der Abzug aufs Ausweichen sinkt, bei voller Spezialisierung fast auf null
 
 ### Schwere Rüstung
 
 + Eigenschaften: Körperlichkeit, sekundär Trinkfestigkeit
 + Lernt aus: Rüstung, wenn ein schweres Stück den Schaden mindert
 + Gefühltes Gewicht und Verlangsamung sinken; bei voller Spezialisierung bremst schwere Rüstung spürbar weniger, aber nie gar nicht
++ Der Abzug aufs Ausweichen sinkt nur etwas; so bleibt die Wahl zwischen Panzern und Ausweichen (Vorbild Caves of Qud)
 
 Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Lernanlass Entkommen, Laufen, Sprint, Tragen, Rüstungsskills, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
@@ -93,7 +95,7 @@ Die Kategorie hält alle Skills, die den Stoffwechsel verändern: Abbau des Pege
 
 + Eigenschaften: Trinkfestigkeit, sekundär Körperlichkeit
 + Lernt aus: erlittenem Schaden durch Gift und Alkohol
-+ Mehr Widerstand gegen Gift und Alkohol, später gegen Infektion, sobald es sie als Zustand gibt; das göttliche Niveau gibt vielleicht Immunität gegen Gift
++ Mehr Widerstand gegen Gift und Alkohol, später gegen Infektion, sobald es sie als Zustand gibt; nie volle Immunität (siehe Kampf, Verteidigung)
 + Widerstand gegen äußere Schadensarten gehört zu Kampf, Verteidigung, gegen Magie und Psi in die eigenen Kategorien; mehr Schaden einer Art gehört zu dem, der ihn austeilt
 
 Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
@@ -188,8 +190,43 @@ Wehrlos: Ein Gegner, der betäubt, gefesselt, umgeworfen oder festgehalten ist, 
 
 ### Verteidigung
 
-+ Ausweichen: Gewandtheit, sekundär Sinnlichkeit; lernt aus jedem Angriff, dem Ninkasi ausweicht
-+ Abhärtung gegen äußere Schadensarten (Feuer, Säure, Lauge, Elektrisch), je Art oder Paar ein Set; lernt aus erlittenem Schaden der Art
+Jede Schadensart hat ihre Abwehr an genau einer Stelle: Stumpf und Schnitt Rüstung und Zähigkeit (Körper und Bewegung), Gift und Alkohol Abwehr (Stoffwechsel und Pegel), Feuer, Säure, Lauge und Elektrisch die Abhärtung hier, Magie und Psi in ihren Kategorien; neue Schadensarten späterer Epochen (etwa Kälte, Strahlung) bringen ihr eigenes Set mit. Skills geben nie volle Immunität: Spezialisierung, Gegenstände, Buffs und Fähigkeiten nähern den Widerstand zusammen einer Obergrenze, die nur sehr schwer zu erreichen ist; Skills allein tragen etwa die Hälfte. Angeborene Immunität von Gegnern ist Gegnerdesign und bleibt.
+
+#### Ausweichen
+
++ Eigenschaften: Gewandtheit, sekundär Sinnlichkeit
++ Lernt aus: jedem Angriff, dem Ninkasi ausweicht
++ Grund: mehr Ausweichen
++ Experte: gegen Flächen und Explosionen bleibt Ninkasi bei gelungenem Rettungswurf ganz ohne Schaden statt mit halbem (Vorbild Evasion in D&D)
++ Meister: mehr Ausweichen gegen Geschosse
++ Göttlich: Ausweichschritt, nach einem Ausweichen im Nahkampf tritt Ninkasi ohne Zeit auf ein freies Feld vom Angreifer weg; bricht Umzingelungen
++ Der Abzug der Rüstung aufs Ausweichen gehört den Rüstungsskills (siehe Körper und Bewegung)
+
+#### Reaktion
+
++ Eigenschaften: Gewandtheit, sekundär Sinnlichkeit
++ Lernt aus: erlittenem Schaden durch Fallen
++ Grund: Rettungswurf gegen ausgelöste Fallen
++ Experte: weniger Schaden durch Fallen
++ Meister: Rettungswurf auch gegen andere Überraschungen, etwa herabfallende Steine oder einen Angriff aus dem Verborgenen
++ Göttlich: beim Auslösen springt Ninkasi auf ein Nachbarfeld, die Falle verpufft
++ Querlernen zu Fallenstellen und Entschärfen (siehe Anlagen und Fallen)
+
+#### Parieren
+
++ Eigenschaften: Gewandtheit, sekundär Körperlichkeit
++ Lernt aus: jedem Blocken mit einer Waffe
++ Mit einer Nahkampfwaffe in der Hand blockt Ninkasi manchmal einen Nahkampfangriff, nie ein Geschoss; Klingen und Stangen bekommen so eine Rolle in der Verteidigung, auch ohne Schild
++ Meister: Riposte, nach einem Parieren schlägt Ninkasi mit einer Chance zurück, die mit jeder Stufe steigt; sie kostet keine Zeit, auf eine Riposte folgt keine weitere
++ Göttlich: höhere Chance der Riposte
++ Die Riposte ist ein Auslöser am Skill, eine passive Reaktion ohne eigenen Befehl; eine Fähigkeit aus der Welt wie eine Konterhaltung (für einige Züge kontert jedes Parieren) ist die aktive Fassung, Parieren ihre Voraussetzung
+
+#### Abhärtung
+
++ Hitze: Feuer; Körperlichkeit, sekundär Trinkfestigkeit
++ Ätzendes: Säure und Lauge, das Brauereithema Reinigungsmittel; Körperlichkeit, sekundär Braukunde
++ Strom: Elektrisch; Körperlichkeit, sekundär Gewandtheit
++ Je zwei bis drei Tiers, jedes lernt aus erlittenem Schaden seiner Art
 
 ### Waffenloser Kampf
 
@@ -246,6 +283,8 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Anlagen und Fallen
 
++ Fallenstellen und Entschärfen als eigene Sets, quer verwandt mit der Reaktion (siehe Kampf, Verteidigung); erweist sich das Thema als ergiebig, gern mehr Sets rund um Fallen
+
 Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Soziales
@@ -270,4 +309,4 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Offen
 
-+ Kategorie Kampf Unterkategorie für Unterkategorie ausarbeiten, ab Verteidigung
++ Kategorie Kampf Unterkategorie für Unterkategorie ausarbeiten, Verteidigung entworfen, weiter mit waffenlosem Kampf
