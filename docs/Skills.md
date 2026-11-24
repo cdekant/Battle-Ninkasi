@@ -184,9 +184,9 @@ Die breiteste Kategorie, in sechs Unterkategorien: Verteidigung, waffenloser Kam
 
 Gattungen ordnen nach ihrem Prinzip, nicht nach der Epoche: Spätere Waffen (Steampunk, Motoren, Schusswaffen, Science-Fiction, siehe [Spielverlauf.md](Spielverlauf.md), Epochen und Wertschöpfungskette) passen im Nahkampf in dieselben Gattungen und zeigen ihre Epoche über Schadensart und Spezialisierung; im Fernkampf ändert die Epoche die Mechanik und bekommt eigene Gattungen. Gattungen späterer Epochen werden erst mit dem ersten Fund einer solchen Waffe lernbar, damit ein Lauf in Sumer keine Laser-Skills zeigt.
 
-Muster der Tiers einer Gattung, einzelne Sets weichen ab: Grund Genauigkeit, Experte Schaden, Meister Tempo (geringere Kosten des Angriffs), göttlich qualitativ und je Gattung eigen. Waffen tragen Tags für Gattung und Handhabung, über die sie wirken und lernen. Fähigkeiten wie Kopfstoß, Ringen, Bierfontäne, Anstürmen, Rundumschlag oder Schildschlag kommen aus der Welt; die Skills sind ihre Voraussetzung und machen sie wirksamer.
+Muster der Tiers einer Gattung, einzelne Sets weichen ab: Grund Genauigkeit, Experte Schaden, Meister Tempo (geringere Kosten des Angriffs), göttlich qualitativ und je Gattung eigen. Waffen tragen Tags für Gattung und Handhabung, über die sie wirken und lernen. Fähigkeiten wie Kopfstoß, Festhalten, Anstürmen, Rundumschlag oder Schildschlag kommen aus der Welt; die Skills sind ihre Voraussetzung und machen sie wirksamer.
 
-Wehrlos: Ein Gegner, der betäubt, gefesselt, umgeworfen oder festgehalten ist, wird sicher und ohne Blocken getroffen, aber nicht von selbst kritisch; der Hinterhalt gegen Ahnungslose bleibt wehrlos und kritisch. Skills dürfen gegen Wehrlose stärker machen.
+Wehrlos: Ein Gegner, der betäubt, gefesselt oder umgeworfen ist, wird sicher und ohne Blocken getroffen, aber nicht von selbst kritisch; der Hinterhalt gegen Ahnungslose bleibt wehrlos und kritisch. Skills dürfen gegen Wehrlose stärker machen. Wer festgehalten wird, ist nicht wehrlos: Er kann sich nicht bewegen und weicht schlechter aus, wehrt sich aber noch (siehe Waffenloser Kampf, Ringen).
 
 ### Verteidigung
 
@@ -230,12 +230,35 @@ Jede Schadensart hat ihre Abwehr an genau einer Stelle: Stumpf und Schnitt Rüst
 
 ### Waffenloser Kampf
 
-+ Faustkampf: Körperlichkeit, sekundär Gewandtheit; genauer, mehr Schaden, schneller mit den Fäusten; Voraussetzung für Kopfstoß, Ringen und Bierfontäne
-+ Trunkene Faust: Gewandtheit, sekundär Trinkfestigkeit; was der Pegel sonst bestraft, wird im waffenlosen Kampf zum Vorteil, Gegenstück zur Standfestigkeit
-  + Grund: Torkeln gibt Ausweichen, je höher der Pegel, desto mehr
-  + Experte: Tritt, der waffenlose Angriff bekommt mit einer Chance einen zweiten, der zurückstößt; der Skill baut den angeborenen Angriff aus, er gibt keine Fähigkeit
-  + Meister: Gegenwurf, weicht Ninkasi einem Nahkampfangriff aus, wirft sie den Angreifer mit einer Chance um, er ist dann wehrlos
-  + Göttlich: im Rausch wird die Strafe des Pegels für waffenlose Angriffe zum Bonus
+Die Faust ist, was bleibt, wenn die Waffe bricht, und sie soll bis in die Tiefe mithalten: Fäuste wachsen nicht mit der Tiefe wie Fundstücke, das gleichen kräftige Skills und Waffen für die Faust aus (Vorbild der waffenlose Kampf in DCSS, der spät mit Waffen mithält). Waffen für die Faust tragen den Tag `waffenlos` und bleiben so Faustkampf, durch die Epochen: Cestus, Schlagring, Krallenhandschuh, Dampffaust, Energiehandschuh; manche sind extrem schnell und schlagen viel öfter als jede Waffe.
+
+#### Faustkampf
+
++ Eigenschaften: Körperlichkeit, sekundär Gewandtheit
++ Lernt aus: Wirkung mit dem Tag `waffenlos`
++ Die nüchterne Technik, das Boxen
++ Grund: Genauigkeit
++ Experte: Schaden, kräftig steigend
++ Meister: Kombination, mit einer Chance folgt ein zweiter Schlag; der Skill baut den angeborenen Angriff aus, er gibt keine Fähigkeit
++ Göttlich: die Faust der Göttin ignoriert einen Teil der Rüstung
++ Voraussetzung für den Kopfstoß, eine Fähigkeit aus der Welt (kurz betäubend, mit einer Chance auf Rückschlag gegen Ninkasi selbst)
+
+#### Trunkene Faust
+
++ Eigenschaften: Gewandtheit, sekundär Trinkfestigkeit
++ Lernt aus: Berauscht mit dem Tag `waffenlos`
++ Was der Pegel sonst bestraft, wird im waffenlosen Kampf zum Vorteil, Gegenstück zur Standfestigkeit; der Faustkampf schlägt öfter, die Trunkene Faust weicht aus und wirft
++ Grund: Torkeln gibt Ausweichen, je höher der Pegel, desto mehr
++ Experte: Tritt, der waffenlose Angriff bekommt mit einer Chance einen zweiten, der zurückstößt; der Skill baut den angeborenen Angriff aus, er gibt keine Fähigkeit
++ Meister: Gegenwurf, weicht Ninkasi einem Nahkampfangriff aus, wirft sie den Angreifer mit einer Chance um, er ist dann wehrlos
++ Göttlich: im Rausch wird die Strafe des Pegels für waffenlose Angriffe zum Bonus
+
+#### Ringen
+
++ Eigenschaften: Körperlichkeit, sekundär Gewandtheit
++ Lernt aus: Wirkung mit dem Tag `ringen`
++ Voraussetzung für Fähigkeiten aus der Welt: Festhalten (das Ziel kann sich nicht bewegen und weicht schlechter aus) und Griffe, die nur gegen ein festgehaltenes Ziel gehen und es danach wieder freigeben: Gegner werfen (ein Feld weit, danach umgeworfen und damit wehrlos), Würgen, ein Kopfstoß mit mehr Wirkung
++ Tiers: Chance und Dauer des Festhaltens, Schaden und Weite der Griffe, zuletzt auch große Wesen halten (braucht eine Größe der Wesen)
 
 ### Nahkampf mit Waffen
 
@@ -309,4 +332,5 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Offen
 
-+ Kategorie Kampf Unterkategorie für Unterkategorie ausarbeiten, Verteidigung entworfen, weiter mit waffenlosem Kampf
++ Kategorie Kampf Unterkategorie für Unterkategorie ausarbeiten, Verteidigung und waffenloser Kampf entworfen, weiter mit Nahkampf mit Waffen
++ Bier- und Brandfontäne (Getrunkenes im Kegel speien, kostet Pegel): eher Fähigkeit als Skill, vielleicht zu Stoffwechsel und Pegel oder zu Magie, wo die Fontäne beschworen wird
