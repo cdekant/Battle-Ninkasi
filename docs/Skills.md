@@ -2,7 +2,7 @@
 
 Stand: 2026-11-24, Entwurf; entsteht Kategorie für Kategorie ([Systemausbau.md](Systemausbau.md), Punkt 20)
 
-Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Wesen.md](Wesen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md)
+Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Wesen.md](Wesen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md), [Wirkungen.md](Wirkungen.md)
 
 Dieses Designdokument ist der Skillkatalog im Entwurf, die Vision eines tiefen Skillsystems für Ninkasi. Die Regeln des Systems (Aufbau, Kosten, Wirkung, Fähigkeiten) stehen in [Charakter.md](Charakter.md), Skills.
 
@@ -628,19 +628,73 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Fraktionen (Ruf, Zorn, Beistan
 
 ## Magie
 
-+ Buffs, Schaden, Effekte von Tränken werden gesteigert
-+ Alchemie stellt nichts her, das tut allein das Brauen; sie steigert über Modifikatoren die Wirkung des Gebrauten (siehe Brauen)
-+ Abwehr gegen Magie; die Kurve der MP gehört zu Stoffwechsel und Pegel (Klarer Kopf)
+Magie ist an Ritual, Schrift und Alchemie gebunden, kostet MP, Zeit und Material und wirkt eher über die Zeit und als Kontrolle (siehe [Grundlagen.md](Grundlagen.md), Spielkern). Zauber sind Fähigkeiten aus der Welt; ohne Skill sind sie nutzbar, aber mit hohem Risiko des Fehlschlags (Risikotabelle nach den fehlenden Stufen, siehe [Charakter.md](Charakter.md), Fähigkeiten). Aufbau wie im Kampf: Magie allgemein, Schulen nach der Wirkung wie die Gattungen, Wege nach der Quelle wie die Handhabung, dazu das Ritual quer zu beiden; ein Zauber trägt die Tags seiner Schule und seines Wegs und lernt beide, wie ein Dolch Gattung und Handhabung lernt. Die Kurve der MP gehört zu Stoffwechsel und Pegel (Klarer Kopf). Vorbilder: DCSS (Schulen nach Wirkung, die Fehlschlagrate folgt dem allgemeinen Skill und den Schulen des Zaubers), Brogue (Stäbe laden sich mit der Zeit wieder auf).
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
+### Magie allgemein
+
++ Eigenschaften: Klugheit, sekundär Braukunde
++ Lernt aus: Wirkung mit dem Tag `magie`
++ Zwei Tiers: Grund seltener Fehlschläge, Experte geringere Kosten an MP
++ Voraussetzung für Schulen, Wege und Ritual
+
+### Meditation
+
+Meditieren ist die angeborene Fähigkeit des MP-Vorrats (siehe [Charakter.md](Charakter.md), Fähigkeiten). Es beginnt nur außerhalb eines Kampfes und legt eine Sammlung an, die mit der Dauer wächst, bis zu einer Obergrenze; währenddessen kommen MP schneller zurück. Die Sammlung hält, bis Ninkasi zum ersten Mal Schaden nimmt oder austeilt; halten Verbündete die Gegner beschäftigt, meditiert sie weiter, auch wenn um sie gekämpft wird. Dann entlädt sich die Sammlung, je nach Art der Meditation als kurzer Buff (Kraft für Schaden, Klarheit für MP und sichere Zauber, Schutz und weitere) oder als massiver erster Schlag. Die Grundform gibt wenig, die Arten kommen als Fähigkeiten aus der Welt (Lehrer, Schriftrollen). Am besten meditiert Ninkasi bei einem leichten Pegel: je nüchterner, desto besser, aber ganz nüchtern etwas schwächer als im Optimum, darüber immer schwächer.
+
++ Eigenschaften: Klugheit, sekundär Sinnlichkeit
++ Lernt aus: Wirkung einer entladenen Sammlung (Tag `sammlung`)
++ Grund: die Sammlung wächst schneller
++ Experte: der Buff hält länger, der Schlag trifft härter
++ Meister: Ninkasi gilt früher als außerhalb des Kampfes und kann so zwischen zwei Kämpfen meditieren
++ Göttlich: die Sammlung entlädt sich auch auf Verbündete in der Nähe
+
+### Fokus
+
++ Eigenschaften: Klugheit, sekundär Sinnlichkeit
++ Lernt aus: jedem Krit mit dem Tag `magie` (Lernanlass Kritisch)
++ Kritchance und Kritfaktor der Magie, das Gegenstück zur Präzision (siehe Kampf, Präzision)
+
+### Schulen
+
+Muster: Grund Wirkung, Experte geringere Kosten, Meister Fläche und Reichweite, göttlich je Schule eigen.
+
++ Zerstörung: Feuer, Säure und Lauge, Strom, reine Magie, Flächen; Klugheit, sekundär Braukunde; göttlich springt die Wirkung auf ein Ziel daneben über
++ Bann: Verwirrung, Schlaf, Verlangsamen, die Kontrolle der Magie; Klugheit, sekundär Sinnlichkeit; göttlich springt ein Bann bei seinem Ende auf einen Nachbarn über; Kontrolle wirkt bei Wiederholung weiter schwächer (siehe [Grundlagen.md](Grundlagen.md), Zeit und Tempo)
++ Segen und Fluch: Stärkung Ninkasis und ihrer Verbündeten, Schwächung der Gegner; Braukunde, sekundär Sinnlichkeit; göttlich wirkt ein Segen auf alle Verbündeten in Sicht
++ Beschwörung: lernt aus dem Tag `beschworen`, neben der Führung (siehe Soziales); Beschworene werden stärker und bleiben länger, wie viele zugleich, regelt die Führung; Braukunde, sekundär Klugheit; göttlich bringen Beschworene beim Tod einen Nachhall hervor
++ Hellsicht: Orten von Gegenständen und Magie, Kartieren; Klugheit, sekundär Sinnlichkeit; göttlich sieht Ninkasi durch die Augen einer Beschworenen; Telepathie gehört zu Psi
+
+### Wege
+
++ Formel: Zauber aus Schriftrollen, Keilschrifttafeln und HACCP-Aushängen; Klugheit, sekundär Braukunde; Experte Schriftrollen schreiben gelingt (nur nüchtern), Meister eine gelesene Rolle bleibt mit einer Chance erhalten
++ Alchemie: Braukunde, sekundär Klugheit; lernt aus den Tags `trank` und `gift`; Gebrautes wirkt stärker und länger, getrunken, geworfen und in Fallen gleich (siehe Anlagen und Fallen); sie stellt nichts her, das tut allein das Brauen
++ Göttliche Gabe: Gaben von Altären und Nebengottheiten wirken stärker; Braukunde, sekundär Sinnlichkeit; hängt an der Gunst (Idee in [Ausblick.md](Ausblick.md), Gunst der Nebengottheiten)
++ Braupaddel: die Zauberstäbe der Welt sind verzauberte Braupaddel, in der Hand eine Wuchtwaffe, als Stab ein Zauber mit eigenen Ladungen; Klugheit, sekundär Gewandtheit; Grund Wirkung, Experte sparsamer mit Ladungen, Meister laden sich schneller wieder auf; schlägt Ninkasi mit dem Paddel, lernt sie Wuchtwaffen und die Spezialisierung Braupaddel (siehe Kampf, Nahkampf mit Waffen), zaubert sie damit, diesen Weg
+
+### Ritual
+
++ Eigenschaften: Klugheit, sekundär Trinkfestigkeit
++ Lernt aus: Wirkung mit dem Tag `ritual`
++ Die zweite Art zu zaubern neben dem Kampfzauber, quer zu den Schulen: Rituale sind lange Aktionen, die nur außerhalb des Kampfes beginnen und dafür mächtig oder lange wirken (siehe [Grundlagen.md](Grundlagen.md), Zeit und Tempo)
++ Tiers: kürzere Dauer, seltener unterbrochen, länger wirksam; das Gegenstück zum Schnellsud (siehe Brauen)
+
+### Magieabwehr
+
++ Eigenschaften: Klugheit, sekundär Trinkfestigkeit
++ Lernt aus: erlittenem Schaden und erlittenen Zuständen mit dem Tag `magie`
++ Widerstand gegen die Schadensart `magie` und gegen magische Kontrolle, mit der Obergrenze aller Widerstände (siehe Kampf, Verteidigung)
+
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Kampfwerte (Schadensart und Tag `magie`) und [Wirkungen.md](Wirkungen.md), Fähigkeiten (Risikotabellen, Unterhalt, lange Aktionen, Lehren); offen: alle Sets, Meditieren und Sammlung, verzauberte Braupaddel, Schriftrollen schreiben, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Psi
 
 + Abwehr gegen Psi; die Kurve der PP gehört zu Stoffwechsel und Pegel (Rauschgeist)
++ Ortswechsel (Blinzeln, Teleport) gehört zu Psi
 
 Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Offen
 
 + Bier- und Brandfontäne (Getrunkenes im Kegel speien, kostet Pegel): eher Fähigkeit als Skill, vielleicht zu Stoffwechsel und Pegel oder zu Magie, wo die Fontäne beschworen wird
++ Verwandlung als mögliche Schule der Magie (Idee in [Ausblick.md](Ausblick.md), Verwandlung)
 + Mehrere Kessel zugleich (Vorbild Mass Production in EVE Online), nur als Konzept: ein späterer Tier von Brauen allgemein, wenn das Brausystem es trägt; nebeneinander stehende Kessel widersprechen dem Bleiben am Kessel nicht
