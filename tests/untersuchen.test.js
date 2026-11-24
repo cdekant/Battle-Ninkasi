@@ -12,7 +12,7 @@ import { zustandSetzen } from "../src/systeme/zustaende.js";
 import { laermMachen, GERAEUSCHE } from "../src/systeme/wahrnehmung.js";
 import { KAMPFWERTE } from "../src/systeme/kampf.js";
 import { nahkampfchanceVorschau } from "../src/systeme/vorschau.js";
-import { feldBeschreiben, zustaendeVon, werteAufschluesseln, herkunftVon, laufendeAktionVon } from "../src/systeme/untersuchen.js";
+import { feldBeschreiben, zustaendeVon, werteAufschluesseln, herkunftVon, laufendeAktionVon, kostenVon, tempoVon, tempostufe, wesenBeschreiben } from "../src/systeme/untersuchen.js";
 import { meldungWahrnehmbar, richtungZu, geraeuschGehoert } from "../src/systeme/wahrnehmbar.js";
 import { zielmodusBeginnen, zielmodusTaste, zielmodusVorschau, zielmodusBestaetigen } from "../src/eingabe/zielmodus.js";
 import { buchstabeDerTaste, inventarTaste } from "../src/eingabe/inventar.js";
@@ -32,6 +32,7 @@ const EFFEKTE = { treffer: { schritte: [{ baustein: "schaden", art: "stumpf", me
 const ZUSTAENDE = {
   test: { text: "t", dauer: 250, modifikatoren: [{ ziel: "ausweichen", art: "plus", betrag: 3 }] },
   ewig: { text: "e" },
+  anderer: { text: "a", dauer: 300 },
 };
 const SCHICHTEN = { oberflaechen: { saeure: { text: "oberflaeche.saeure", hoechstens: 6 } }, gase: {} };
 
@@ -94,16 +95,43 @@ test("Untersuchen: verborgene Fallen bleiben verborgen, Wachzustand und Hinterha
   assert.equal(nahkampfchanceVorschau(spiel, ninkasi, gegner), null);
 });
 
-test("Zustände mit Restdauer in Zügen, laufende Aktion, Aufschlüsselung der Werte mit Herkunft", () => {
+test("Restdauer an anderen Wesen nur für Zustände, die Ninkasi zugefügt hat", () => {
+  const { spiel, ninkasi, gegner } = aufstellen();
+  zustandSetzen(spiel, gegner, "test", { quelleId: ninkasi.id, urheberId: ninkasi.id });
+  zustandSetzen(spiel, gegner, "anderer", { quelleId: gegner.id, urheberId: gegner.id });
+  const [vonNinkasi, vonSelbst] = zustaendeVon(spiel, gegner);
+  assert.equal(vonNinkasi.restzeit, 250);
+  assert.equal(vonSelbst.restzeit, null);
+});
+
+test("Eigene Kosten genau, Tempo anderer Wesen in Stufen", () => {
+  const { spiel, ninkasi, gegner } = aufstellen();
+  ninkasi.kosten = { bewegen: 120 };
+  ninkasi.angriffe = [{ name: "faust", genauigkeit: 80, effekt: "treffer", kosten: 50 }];
+  assert.deepEqual(kostenVon(spiel, ninkasi), { bewegen: 120, angriff: 50 });
+  assert.equal(wesenBeschreiben(spiel, ninkasi).tempo, null, "Ninkasi sieht ihre Zahlen, nicht die Worte");
+  assert.deepEqual(tempoVon(spiel, gegner), { bewegen: "normal", angriff: "normal" });
+  gegner.kosten = { bewegen: 40 };
+  gegner.angriffe = [{ name: "biss", genauigkeit: 60, effekt: "treffer", kosten: 200 }];
+  assert.deepEqual(wesenBeschreiben(spiel, gegner).tempo, { bewegen: "sehr_schnell", angriff: "sehr_langsam" });
+  gegner.angriffe = [];
+  assert.deepEqual(kostenVon(spiel, gegner), { bewegen: 40, angriff: null });
+  assert.equal(tempoVon(spiel, gegner).angriff, null);
+  const { stufen } = spiel.daten.regeln.tempo;
+  assert.equal(tempostufe(spiel, stufen[0][0]), stufen[0][1], "die Grenze gehört zur Stufe");
+  assert.equal(tempostufe(spiel, stufen[0][0] + 1), stufen[1][1]);
+});
+
+test("Zustände mit Restdauer in Zeiteinheiten, laufende Aktion, Aufschlüsselung der Werte mit Herkunft", () => {
   const { spiel, ninkasi } = aufstellen();
   zustandSetzen(spiel, ninkasi, "test", { quelleId: ninkasi.id, urheberId: ninkasi.id });
   zustandSetzen(spiel, ninkasi, "ewig", { quelleId: ninkasi.id, urheberId: ninkasi.id });
   const [test1, ewig] = zustaendeVon(spiel, ninkasi);
   assert.equal(test1.name, "test");
-  assert.equal(test1.zuege, 3); // 250 Zeiteinheiten sind angefangene 3 Züge
-  assert.equal(ewig.zuege, null);
+  assert.equal(test1.restzeit, 250);
+  assert.equal(ewig.restzeit, null);
   spiel.zustand.zeit = 240;
-  assert.equal(zustaendeVon(spiel, ninkasi)[0].zuege, 1);
+  assert.equal(zustaendeVon(spiel, ninkasi)[0].restzeit, 10);
 
   ninkasi.laufendeAktion = { art: "faehigkeit", faehigkeit: "ritual", schritteGesamt: 5, schritteErledigt: 2, unterbrochen: null };
   assert.deepEqual(laufendeAktionVon(ninkasi), { art: "faehigkeit", faehigkeit: "ritual", erledigt: 2, gesamt: 5, unterbrochen: null });

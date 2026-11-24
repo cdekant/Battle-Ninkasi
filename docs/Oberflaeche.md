@@ -147,7 +147,7 @@ Umsetzung: siehe [Anzeige.md](Anzeige.md), Oberfläche
 + Seitenleiste und Karte heben sich beim Darüberfahren und beim Untersuchen gegenseitig hervor (Brogue)
 + Gepäck und Fähigkeitenliste stehen nicht mehr in der Seitenleiste, sondern in Fenstern; die Schnellleiste zeigt das Wichtigste davon
 
-Umsetzung: teilweise, siehe [Anzeige.md](Anzeige.md), Oberfläche; offen: Ausdauer, Helligkeit des eigenen Feldes, Kosten und Abklingzeiten auf eine Zeiteinheit genau, Tempo in Worten
+Umsetzung: teilweise, siehe [Anzeige.md](Anzeige.md), Oberfläche; offen: Ausdauer, Helligkeit des eigenen Feldes
 
 ## Schnellleiste
 
@@ -155,7 +155,7 @@ Umsetzung: teilweise, siehe [Anzeige.md](Anzeige.md), Oberfläche; offen: Ausdau
 + Automatische Belegung: neu gelernte Fähigkeiten und neue Arten von Getränken rücken auf den ersten freien Platz (Vorbild Qud); umbelegen und umsortieren im Fähigkeiten- bzw. Inventarfenster und per Ziehen mit der Maus; ein von Hand belegter Platz wird nie automatisch überschrieben
 + Mehrere Leisten (Vorbild Qud), umgeschaltet mit einer Taste, die Nummer der Leiste steht daneben
 + Gegenstände liegen nach ihrer Art auf dem Platz, nicht als einzelnes Stück: ist ein Stapel aufgebraucht, bleibt der Platz grau mit Anzahl 0 und füllt sich wieder, sobald Ninkasi ein Stück derselben Art trägt
-+ Je Platz: Symbol, Taste, Anzahl bzw. Ladungen, Abklingzeit als Zahl der Züge mit abgedunkeltem Symbol (ToME, Qud), Mindestpegel als Kante mit eigener Form, nicht verfügbar grau mit dem Grund aus der Prüfung des Befehls im Tooltip
++ Je Platz: Symbol, Taste, Anzahl bzw. Ladungen, Abklingzeit als Zahl der Zeiteinheiten mit abgedunkeltem Symbol (ToME, Qud), Mindestpegel als Kante mit eigener Form, nicht verfügbar grau mit dem Grund aus der Prüfung des Befehls im Tooltip
 + Unbekannte Gegenstände zeigen, was Ninkasi weiß (siehe Unbekanntes in [Gegenstaende.md](Gegenstaende.md)): Etikett statt Name, Ladungen als "?", bis sie bekannt sind; eine Abklingzeit zeigt der Platz erst, wenn die Art bekannt ist oder Ninkasi sie einmal erlebt hat; die Leiste verrät nie mehr als das Inventarfenster
 + Zielen: braucht die Wirkung ein Ziel, öffnet die Taste den Zielmodus mit vorbelegtem Cursor; ein zweiter Druck derselben Taste bestätigt (Vorbild DCSS), Tab wechselt das Ziel, Esc bricht ab
 + Vorbelegung des Cursors nach der Art der Wirkung: schädlich auf den nächsten Feind in Sicht, nützlich auf den nächsten verletzten Gefährten bzw. Ninkasi selbst; lebt das zuletzt gewählte Ziel und ist in Sicht, gewinnt es; die Art steht als Angabe `zielvorgabe` ("feind", "gefaehrte", "selbst") in den Daten der Fähigkeit bzw. des Gegenstands, ohne Angabe folgt sie aus den Tags der Wirkung

@@ -132,6 +132,12 @@ export default {
     mindestschadenNachRuestung: 1, // Rüstung senkt einen Treffer mit Schaden nicht unter diesen Wert
     nachwirkung: 500, // so lange nach dem letzten Angriff (eigener oder erlittener) ist ein Wesen im Kampf (src/systeme/kampfzustand.js)
   },
+  // Tempo in Worten beim Untersuchen (src/systeme/untersuchen.js): stufen [bis Zeiteinheiten, Stufe] aufsteigend, darüber
+  // die Stufe darueber; Texte tempo.bewegen.<stufe> und tempo.angriff.<stufe>; Norm 100, Ninkasi bewegt sich anfangs mit 120
+  tempo: {
+    stufen: [[50, "sehr_schnell"], [80, "schnell"], [110, "normal"], [160, "langsam"]],
+    darueber: "sehr_langsam",
+  },
   // Eigenschaften, Skills und EP, siehe docs/Charakter.md, src/systeme/skills.js und src/systeme/lernen.js; alle Zahlen vorläufig
   lernen: {
     eigenschaftStart: 10, // jede Eigenschaft beginnt hier

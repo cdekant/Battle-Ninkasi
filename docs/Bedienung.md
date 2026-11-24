@@ -128,7 +128,7 @@ Schnittstellen:
 + `neueLeisten`, `leistenGueltig`, `aktivePlaetze`
 + `leistenNachfuehren(spiel, leisten)` nach jedem angenommenen Befehl
 + Umbelegen: `platzBelegen` (zieht von einem anderen Platz um, gilt als von Hand), `plaetzeTauschen`, `platzLeeren` und `ohneSchluessel` (merken den Schlüssel als abgelegt), `leisteWechseln`
-+ `platzZustand(spiel, platz)`: bei Gegenständen die Anzahl aller Stücke der Art, bei Fähigkeiten die Abklingzeit in Zügen, dazu ein Grund aus `faehigkeitPruefen`, der nicht am Ziel liegt
++ `platzZustand(spiel, platz)`: bei Gegenständen die Anzahl aller Stücke der Art, bei Fähigkeiten die verbleibende Abklingzeit in Zeiteinheiten (`zeitBisBereit`), dazu ein Grund aus `faehigkeitPruefen`, der nicht am Ziel liegt
 + `platzAusloesen(spiel, leisten, stelle)`: ein trinkbarer Gegenstand wird sofort zum Befehl `trinken` mit dem ersten Stück der Art (`erstesStueck`), ein lesbarer zu `lesen`, ein anderer zur Auswahl zum Werfen, eine Fähigkeit zur Auswahl für den Zielmodus mit `platz`; ein leerer Platz tut nichts
 + `stellenVon(leisten, schluessel)` sagt, wo ein Eintrag liegt; Inventar und Fähigkeitenfenster zeigen es in den Einzelheiten
 
@@ -180,7 +180,8 @@ Daten:
 Schnittstellen (`src/systeme/untersuchen.js`, reine Lesefunktionen):
 
 + `feldBeschreiben(spiel, feld)`: nichts für ein unbekanntes Feld, für ein bekanntes, das Ninkasi gerade nicht sieht, das Erinnerte (Gelände, Oberfläche ohne Menge, unter `erinnert` Gegenstände und Fallen als Aussehen ohne ID), für ein sichtbares Gelände, Feldschichten mit Menge, Gegenstände, bekannte Fallen und Wesen; Wesen, die Ninkasi nur spürt, zählt `gespuert` ohne ihre Art, auch auf einem unbekannten Feld (dann ist `gelaende` null; `gespuerteWesenAuf`)
-+ `wesenBeschreiben`: LP, Zustände mit Restdauer (`zustaendeVon`: angefangene Züge zu 100 Zeiteinheiten, unbegrenzt ohne), Wachzustand, laufende Aktion (`laufendeAktionVon`), Trefferchance des ersten Angriffsprofils in beide Richtungen (`nahkampfchanceVorschau`)
++ `wesenBeschreiben`: LP, Zustände mit Restdauer (`zustaendeVon`: `restzeit` in Zeiteinheiten; null bei unbegrenzter Dauer und an anderen Wesen bei Zuständen, die Ninkasi nicht zugefügt hat), Wachzustand, laufende Aktion (`laufendeAktionVon`), Tempo anderer Wesen in Stufen (`tempoVon`: `{ bewegen, angriff }` nach `regeln.tempo`, `stufen` als `[bis, Stufe]` aufsteigend, darüber `darueber`; Texte `tempo.bewegen.<stufe>` und `tempo.angriff.<stufe>`), Trefferchance des ersten Angriffsprofils in beide Richtungen (`nahkampfchanceVorschau`)
++ `kostenVon`: Ninkasis eigene Kosten `{ bewegen, angriff }` mit allen Modifikatoren für die Seitenleiste (`angriff` null ohne Angriffsprofil)
 + `werteAufschluesseln`: Höchstwerte, Genauigkeit des ersten Profils, Kampfwerte, Sichtweite, Sicht im Dunkeln und Spüren Ninkasis, je mit Grundwert, Wert und jedem Modifikator samt Herkunft (`herkunftVon`: angeboren, Gegenstand, Zustand, Aura)
 + Tooltip: `tooltipHtml` in `src/anzeige/oberflaeche.js`, Element `#tooltip` über der Karte (siehe [Anzeige.md](Anzeige.md), Oberfläche)
 

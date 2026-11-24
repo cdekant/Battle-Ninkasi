@@ -5,8 +5,9 @@
 //   art:             "aktiv" (Vorgabe) wirkt einmal; "aufrecht" setzt den Zustand an der Wirkenden, erneutes Benutzen beendet ihn
 //   verbrauch:       { mp: 10, pp: 5, pegel: 20 } Vorräte; Modifikatoren auf verbrauch.<wert> und verbrauch.alle mit den Tags
 //   material:        [{ typ, anzahl }] Gegenstände aus dem Inventar, werden verbraucht
-//   zeit:            Grundkosten in Zeiteinheiten (Vorgabe aktionen.faehigkeit); Modifikatoren auf kosten.faehigkeit, kosten.alle
-//   abklingzeit:     eigene Züge der Wirkenden, bis die Fähigkeit wieder bereit ist; Modifikatoren auf abklingzeit
+//   zeit:            Grundkosten in Zeiteinheiten (Vorgabe kosten.faehigkeit der Wirkenden, sonst aktionen.faehigkeit);
+//                    Modifikatoren auf kosten.faehigkeit, kosten.alle
+//   abklingzeit:     Zeiteinheiten Weltzeit ab dem Wirken, bis die Fähigkeit wieder bereit ist; Modifikatoren auf abklingzeit
 //   voraussetzungen: [{ bedingung, ...parameter }] aus dem Register "modifikatorbedingungen", z.B. pegel_unter (nüchtern)
 //   ziel:            Zielart wie in zielAufloesen (systeme/zielauswahl.js); bei "aktiv" Pflicht
 //   wirkung:         benannter Effekt; mit muster im Ziel auf jede betroffene Entität, bei durchdringendem
@@ -32,8 +33,8 @@
 // Wesen kennen ihre eigenen Fähigkeiten als Liste: faehigkeiten: ["name"]; dazu kommen gewährte aus dem Register
 //   "faehigkeitsquellen" (angelegte Gegenstände mit ausruestung.faehigkeiten, Zustände mit faehigkeiten), solange die
 //   Quelle besteht; alle zusammen liefert faehigkeitenVon, nie wesen.faehigkeiten direkt lesen.
-//   Abklingen über den Zugzähler zuege (kern/spiel.js), je Fähigkeit und nicht je Quelle:
-//   abklingendBis: { name: zugnummer } ab diesem Stand des Zugzählers wieder bereit
+//   Abklingen in Weltzeit, je Fähigkeit und nicht je Quelle; schnelles Handeln beschleunigt es nicht:
+//   abklingendBis: { name: zeitpunkt } ab diesem Zeitpunkt (zustand.zeit) wieder bereit
 // Aufrecht: die Instanz des Zustands merkt sich ausFaehigkeit; fällt die Fähigkeit weg (Gegenstand abgelegt, Zustand
 //   vorbei), beendet die Zustandsprüfung "aufrecht_ohne_quelle" sie mit dem Grund "entfernt".
 // Lange Aktion: ist die Fähigkeit beim letzten Schritt nicht mehr da, verpufft sie (Grund "nicht_gelernt").
@@ -47,7 +48,7 @@ import { bausteinAnmelden, wirkungVorab } from "../kern/bausteine.js";
 import { modifiziert, hatWert, bedingungenErfuellt } from "../kern/werte.js";
 import { effektAnwenden, wertAendern } from "../kern/effekte.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
-import { entitaetMitId, entitaetEntfernen, fraktionVon } from "../kern/zustand.js";
+import { entitaetMitId, entitaetEntfernen, fraktionVon, grundkostenVon } from "../kern/zustand.js";
 import { traegerinnenIds } from "../kern/raumindex.js";
 import { wurfGanzzahl } from "../kern/wurf.js";
 import { wertAufKurve } from "../kern/kurven.js";
@@ -112,18 +113,17 @@ export function verbrauchVon(spiel, wesen, definition) {
   return ergebnis;
 }
 
-// Wie viele eigene Züge die Fähigkeit noch abklingt (0 = bereit)
-export function zuegeBisBereit(wesen, name) {
+// Wie viele Zeiteinheiten die Fähigkeit noch abklingt (0 = bereit)
+export function zeitBisBereit(spiel, wesen, name) {
   const bereitAb = wesen.abklingendBis?.[name];
-  return bereitAb === undefined ? 0 : Math.max(0, bereitAb - (wesen.zuege ?? 0));
+  return bereitAb === undefined ? 0 : Math.max(0, bereitAb - spiel.zustand.zeit);
 }
 
 function abklingenLassen(spiel, wesen, name, definition) {
   const abklingzeit = Math.max(0, modifiziert(spiel, wesen, "abklingzeit", definition.abklingzeit ?? 0, umstaendeVon(definition)));
   if (abklingzeit === 0) return;
   if (!wesen.abklingendBis) wesen.abklingendBis = {};
-  // der Zugzähler steigt nach dieser Aktion um eins; danach zählen abklingzeit weitere eigene Züge
-  wesen.abklingendBis[name] = (wesen.zuege ?? 0) + 1 + abklingzeit;
+  wesen.abklingendBis[name] = spiel.zustand.zeit + abklingzeit;
 }
 
 export function voraussetzungenErfuellt(spiel, wesen, definition) {
@@ -158,7 +158,7 @@ export function faehigkeitPruefen(spiel, wesen, name, zielangabe) {
   const definition = faehigkeitFuer(spiel, wesen, name);
   if (!definition || !kenntFaehigkeit(spiel, wesen, name)) return "nicht_gelernt";
   if (definition.art === "aufrecht" && aufrechteInstanz(wesen, definition)) return null; // Beenden geht immer
-  if (zuegeBisBereit(wesen, name) > 0) return "abklingend";
+  if (zeitBisBereit(spiel, wesen, name) > 0) return "abklingend";
   if (!voraussetzungenErfuellt(spiel, wesen, definition)) return "voraussetzung";
   for (const [wertName, menge] of Object.entries(verbrauchVon(spiel, wesen, definition))) {
     if (menge > 0 && (!hatWert(wesen, wertName) || wesen.werte[wertName].aktuell < menge)) return `zu_wenig_${wertName}`;
@@ -246,8 +246,8 @@ function wirkungAnwenden(spiel, wesen, name, definition, zielangabe) {
 }
 
 // Zeitkosten einer Fähigkeit bzw. eines Schritts ihrer langen Aktion
-function zeitergebnis(spiel, definition) {
-  return { aktion: "faehigkeit", grundkosten: definition.zeit ?? spiel.daten.aktionen.faehigkeit, umstaende: umstaendeVon(definition) };
+function zeitergebnis(spiel, wesen, definition) {
+  return { aktion: "faehigkeit", grundkosten: definition.zeit ?? grundkostenVon(spiel, wesen, "faehigkeit"), umstaende: umstaendeVon(definition) };
 }
 
 // Risiko und Wirkung, sofort oder nach dem letzten Schritt einer langen Aktion
@@ -270,7 +270,7 @@ function faehigkeitWirken(spiel, wesen, name, definition, zielangabe) {
 }
 
 anmelden("laufendeaktionen", "faehigkeit", {
-  schrittkosten: (spiel, akteur, aktion) => zeitergebnis(spiel, faehigkeitFuer(spiel, akteur, aktion.faehigkeit)),
+  schrittkosten: (spiel, akteur, aktion) => zeitergebnis(spiel, akteur, faehigkeitFuer(spiel, akteur, aktion.faehigkeit)),
   abschliessen(spiel, akteur, aktion) {
     // die Quelle einer gewährten Fähigkeit kann während der langen Aktion weggefallen sein
     if (!kenntFaehigkeit(spiel, akteur, aktion.faehigkeit)) {
@@ -289,7 +289,7 @@ anmelden("laufendeaktionen", "faehigkeit", {
 
 function faehigkeitAusfuehren(spiel, wesen, name, zielangabe) {
   const definition = faehigkeitFuer(spiel, wesen, name);
-  const ergebnis = zeitergebnis(spiel, definition);
+  const ergebnis = zeitergebnis(spiel, wesen, definition);
   if (definition.art === "aufrecht") {
     const instanz = aufrechteInstanz(wesen, definition);
     if (instanz) {

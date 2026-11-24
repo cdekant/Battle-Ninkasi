@@ -63,12 +63,16 @@ test("Eingaben und Kurven: Wertung ist Gewicht mal Promille, abgerundet; 0 schei
   assert.equal(holen("kieingaben", "eigeneLpProzent")(spiel, wesenMitKi, ninkasi), 30);
 });
 
-test("erste: Reihenfolge ist Vorrang; Fliehen bei wenig LP vor dem Spucken", () => {
+test("erste: Reihenfolge ist Vorrang; Fliehen bei wenig LP vor dem Spucken, nur vor Langsameren", () => {
   const { spiel, ninkasi } = aufstellen();
   const spuckerin = jaeger(spiel, 5, 2, { handlungen: [FLUCHT_BEI_WENIG_LP, { handlung: "faehigkeit", name: "spucke", abstandAb: 2 }] });
+  spuckerin.kosten = { bewegen: 80 };
   assert.deepEqual(entscheiden(spiel, spuckerin), { art: "faehigkeit", faehigkeit: "spucke", ziel: { id: ninkasi.id } }, "bei vollen LP spuckt sie");
   spuckerin.werte.lp.aktuell = 2;
   assert.deepEqual(entscheiden(spiel, spuckerin), { art: "bewegen", dx: 1, dy: -1 }, "bei 20 % flieht sie");
+  spuckerin.kosten = { bewegen: 100 };
+  ninkasi.kosten = { bewegen: 100 };
+  assert.deepEqual(entscheiden(spiel, spuckerin), { art: "faehigkeit", faehigkeit: "spucke", ziel: { id: ninkasi.id } }, "gleich schnell: sie flieht nicht");
 });
 
 test("beste: die höchste Wertung gewinnt, bei Gleichstand die frühere", () => {

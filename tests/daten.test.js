@@ -370,7 +370,7 @@ test("KI mit Fähigkeiten, Ankündigung und Unterbrechbarkeit werden geprüft", 
   assert.deepEqual(mitGegner(() => ({}), { ...ohneDauer, dauer: { schritte: 2 } }), []);
 });
 
-test("Bewegungsarten, Gelände, Würfe, Unterbrechungsgründe und Regeln der Bewegung werden geprüft", () => {
+test("Bewegungsarten, Tempo, Gelände, Würfe, Unterbrechungsgründe und Regeln der Bewegung werden geprüft", () => {
   const pruefen = (aendern) => {
     const daten = rohdatenMitTesteintraegen();
     aendern(daten);
@@ -378,6 +378,10 @@ test("Bewegungsarten, Gelände, Würfe, Unterbrechungsgründe und Regeln der Bew
   };
   const erwartet = [
     [(daten) => { daten.wesen.ninkasi.bewegung = "kriechend"; }, "bewegung muss eines von"],
+    [(daten) => { daten.wesen.ninkasi.kosten = { fliegen: 50 }; }, 'Aktion "fliegen"'],
+    [(daten) => { daten.wesen.ninkasi.kosten = { bewegen: 0 }; }, "kosten.bewegen muss eine ganze Zahl > 0"],
+    [(daten) => { daten.regeln.tempo.stufen = [[100, "normal"], [50, "schnell"]]; }, "regeln.tempo.stufen"],
+    [(daten) => { daten.regeln.tempo.darueber = 5; }, "regeln.tempo.darueber"],
     [(daten) => { daten.zustaende.test = { text: "t", bewegung: "hüpfend" }; }, "bewegung muss eines von"],
     [(daten) => { daten.gelaende.testgelaende.passierbarFuer = ["tauchend"]; }, "passierbarFuer"],
     [(daten) => { daten.gelaende.testgelaende.undurchdringlich = "ja"; }, "undurchdringlich"],

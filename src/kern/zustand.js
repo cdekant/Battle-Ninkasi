@@ -171,6 +171,12 @@ export function spuerenVon(entitaet) {
   return juengsteUeberlagerung(entitaet, "spueren") ?? null;
 }
 
+// Grundkosten einer Aktionsart für eine Entität in Zeiteinheiten: ihr eigenes Tempo aus den Daten (kosten: { bewegen: 120 }),
+// sonst die Vorgabe aus daten/aktionen.js; undefined, wenn es keine gibt
+export function grundkostenVon(spiel, entitaet, aktion) {
+  return entitaet?.kosten?.[aktion] ?? spiel.daten.aktionen[aktion];
+}
+
 // Die eigenen Angriffsprofile ohne Waffen; alle Profile liefert angriffeVon in systeme/kampf.js
 export function eigeneAngriffeVon(entitaet) {
   return juengsteUeberlagerung(entitaet, "angriffe") ?? [];

@@ -4,7 +4,8 @@
 // Angriffsprofile in den Daten: angriffe: [{ name, genauigkeit, effekt, kosten?, chance?, tags?, kritchance?, muster?, trifft? }]
 //   Eine Angriffsaktion führt die Profile nacheinander in der Reihenfolge der Daten aus, jedes mit eigenem Wurf;
 //   ein Profil mit chance (Prozent) wird nur so oft mitgenommen, kommt keines zum Zug, das erste.
-//   kosten: Zeitkosten des Profils (Vorgabe aktionen.nahkampf); die Aktion kostet so viel wie ihr langsamstes Profil,
+//   kosten: Zeitkosten des Profils (Vorgabe kosten.nahkampf des Wesens, sonst aktionen.nahkampf); die Aktion kostet so
+//   viel wie ihr langsamstes Profil,
 //   Modifikatoren auf kosten.nahkampf und kosten.alle wirken darauf.
 //   muster (siehe systeme/zielauswahl.js) vom Angreifer in Richtung des Ziels, z.B. Rundumschlag
 //   { art: "angrenzend" } oder Speer { art: "linie", laenge: 2 }; jedes getroffene Wesen bekommt einen
@@ -27,7 +28,7 @@ import { effektAnwenden, beteiligteAus } from "../kern/effekte.js";
 import { bausteinAnmelden } from "../kern/bausteine.js";
 import { anmelden } from "../kern/register.js";
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
-import { fraktionVon, istWesen, eigeneAngriffeVon } from "../kern/zustand.js";
+import { fraktionVon, istWesen, eigeneAngriffeVon, grundkostenVon } from "../kern/zustand.js";
 
 export { istWesen };
 import { musterFelder, entitaetenAufFeldern } from "./zielauswahl.js";
@@ -104,9 +105,15 @@ export function kannAngreifen(spiel, wesen) {
   return angriffeVon(spiel, wesen).length > 0;
 }
 
-// Grundkosten eines Profils in Zeiteinheiten
-export function kostenDesProfils(spiel, profil) {
-  return profil.kosten ?? spiel.daten.aktionen.nahkampf;
+// Grundkosten eines Profils in Zeiteinheiten für den Angreifer
+export function kostenDesProfils(spiel, angreifer, profil) {
+  return profil.kosten ?? grundkostenVon(spiel, angreifer, "nahkampf");
+}
+
+// Grundkosten eines Angriffs mit allen Profilen ohne Wurf (das langsamste), null ohne Profile; für die Anzeige
+export function angriffskosten(spiel, angreifer) {
+  const profile = angriffeVon(spiel, angreifer);
+  return profile.length === 0 ? null : Math.max(...profile.map((profil) => kostenDesProfils(spiel, angreifer, profil)));
 }
 
 // Welche Profile eine Aktion ausführt: ohne chance immer, sonst nach Wurf; kommt keines zum Zug, das erste
@@ -139,10 +146,10 @@ function profileAusfuehren(spiel, angreifer, ziel, ausgefuehrt, kettentiefe) {
 // Angriffsaktion gegen ein Ziel mit allen Profilen; gibt die Grundkosten zurück (das langsamste ausgeführte Profil)
 export function nahkampf(spiel, angreifer, ziel) {
   const profile = angriffeVon(spiel, angreifer);
-  if (profile.length === 0) return spiel.daten.aktionen.nahkampf;
+  if (profile.length === 0) return grundkostenVon(spiel, angreifer, "nahkampf");
   const ausgefuehrt = profileDerAktion(spiel, profile);
   profileAusfuehren(spiel, angreifer, ziel, ausgefuehrt, 0);
-  return Math.max(...ausgefuehrt.map((profil) => kostenDesProfils(spiel, profil)));
+  return Math.max(...ausgefuehrt.map((profil) => kostenDesProfils(spiel, angreifer, profil)));
 }
 
 function einzelangriff(spiel, angreifer, profil, ziel, kettentiefe = 0) {

@@ -11,7 +11,7 @@ import "../systeme/index.js";
 import "../ki/index.js";
 import VERSION from "../version.js";
 import { vorbereiten, Datenfehler } from "./daten.js";
-import { neuerZustand, entitaetMitId, alleEntitaeten, spielerin, gesteuerteEntitaet, kiVon, ausDatenErzeugen } from "./zustand.js";
+import { neuerZustand, entitaetMitId, alleEntitaeten, spielerin, gesteuerteEntitaet, kiVon, ausDatenErzeugen, grundkostenVon } from "./zustand.js";
 import { zufallErzeugen, startwertAbleiten } from "./zufall.js";
 import { WELTTICK, einreihen, ersterEintrag, ersterEintragEntnehmen, akteurEinreihen } from "./zeit.js";
 import { holen, hat, alle as alleImRegister } from "./register.js";
@@ -71,9 +71,9 @@ export function neuesSpiel(daten, startwert, optionen = {}) {
 }
 
 // Zeitkosten einer Aktion für eine Entität, mit Modifikatoren für die Aktion und für alle; umstaende siehe kern/werte.js
-// grundkosten: abweichende Grundkosten (z.B. eines Angriffsprofils), Vorgabe aus daten/aktionen.js
+// grundkosten: abweichende Grundkosten (z.B. eines Angriffsprofils), Vorgabe das Tempo der Entität (grundkostenVon)
 // Überladung (systeme/inventar.js lastZuschlag) verteuert das Bewegen danach um ihre Prozent.
-export function zeitkosten(spiel, entitaet, aktion, umstaende = {}, grundkosten = spiel.daten.aktionen[aktion]) {
+export function zeitkosten(spiel, entitaet, aktion, umstaende = {}, grundkosten = grundkostenVon(spiel, entitaet, aktion)) {
   if (grundkosten === undefined) throw new Error(`Keine Kosten für Aktion "${aktion}" in daten/aktionen.js`);
   const kosten = modifiziert(spiel, entitaet, [`kosten.${aktion}`, "kosten.alle"], grundkosten, umstaende);
   const zuschlag = aktion === "bewegen" ? lastZuschlag(spiel, entitaet) : 0;

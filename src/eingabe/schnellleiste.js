@@ -13,7 +13,7 @@
 
 import { gesteuerteEntitaet, entitaetMitId } from "../kern/zustand.js";
 import { anzahlVon } from "../systeme/inventar.js";
-import { faehigkeitPruefen, faehigkeitenVon, zuegeBisBereit } from "../systeme/faehigkeiten.js";
+import { faehigkeitPruefen, faehigkeitenVon, zeitBisBereit } from "../systeme/faehigkeiten.js";
 import { PLAETZE_DER_LEISTE } from "./aktionskatalog.js";
 
 export const ANZAHL_LEISTEN = 5;
@@ -129,7 +129,7 @@ export function platzZustand(spiel, platz) {
     const anzahl = gepaeck(spiel).filter((gegenstand) => gegenstand.typ === platz.typ).reduce((summe, gegenstand) => summe + anzahlVon(gegenstand), 0);
     return { platz, anzahl, ...(anzahl === 0 && { grund: "nichts_mehr_davon" }) };
   }
-  const abklingend = zuegeBisBereit(gesteuerte, platz.faehigkeit);
+  const abklingend = zeitBisBereit(spiel, gesteuerte, platz.faehigkeit);
   const grund = faehigkeitPruefen(spiel, gesteuerte, platz.faehigkeit, undefined);
   return { platz, abklingend, ...(grund && !GRUENDE_DES_ZIELS.includes(grund) && { grund }) };
 }

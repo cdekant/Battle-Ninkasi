@@ -3,8 +3,9 @@
 // Ein unbekanntes Feld gibt nichts preis, ein bekanntes, das sie gerade nicht sieht, nur, woran sie sich erinnert
 // (Gelände, Oberfläche, Gegenstände und Fallen als Aussehen, systeme/erinnerung.js), ein sichtbares alles: Gelände,
 // Feldschichten, Gegenstände, bekannte Fallen und Wesen. Gespürte Wesen (systeme/sinne.js) zählt es nur, ohne ihre Art.
-// Wesen: LP, Zustände mit Restdauer in Zügen, Wachzustand, laufende Aktion, Trefferchance in beide Richtungen
-// (erstes Angriffsprofil, systeme/vorschau.js). Ninkasi selbst dazu mit der Aufschlüsselung ihrer Werte.
+// Wesen: LP, Zustände mit Restdauer in Zeiteinheiten, Wachzustand, laufende Aktion, Tempo in Stufen, Trefferchance in
+// beide Richtungen (erstes Angriffsprofil, systeme/vorschau.js). Ninkasi selbst dazu mit der Aufschlüsselung ihrer
+// Werte und ihren eigenen Kosten für Bewegen und Angriff.
 
 import { gesteuerteEntitaet, entitaetenAuf, istWesen, sichtVon, spuerenVon } from "../kern/zustand.js";
 import { aufDerKarte, feldBekannt, feldIndex, gelaendeName, bekannterGelaendeName } from "../welt/karte.js";
@@ -16,24 +17,47 @@ import { istBekannt } from "./fallen.js";
 import { erinnerteDingeAuf } from "./erinnerung.js";
 import { istUnbekannt } from "./kennen.js";
 import { wachzustandVon } from "./wahrnehmung.js";
-import { KAMPFWERTE, angriffeVon } from "./kampf.js";
+import { KAMPFWERTE, angriffeVon, angriffskosten } from "./kampf.js";
+import { zeitkosten } from "../kern/spiel.js";
 import { nahkampfchanceVorschau } from "./vorschau.js";
 
 // Höchstwerte, die die Aufschlüsselung zeigt, sofern das Wesen sie hat
 const HOECHSTWERTE = ["lp", "mp", "pp"];
 
-// Länge eines Zugs in Zeiteinheiten (Warten), für Restdauern
-const zuglaenge = (spiel) => spiel.daten.aktionen?.warten ?? 100;
-
-// Zustände eines Wesens: [{ nummer, name, staerke, zuege }], zuege null bei unbegrenzter Dauer, sonst mindestens 1
+// Zustände eines Wesens: [{ nummer, name, staerke, restzeit }], restzeit in Zeiteinheiten, mindestens 1; null bei
+// unbegrenzter Dauer und bei Zuständen anderer Wesen, die die gesteuerte Entität nicht zugefügt hat (die Oberfläche zeigt
+// nur die eigenen genau, siehe docs/Grundlagen.md, Zeit und Tempo)
 export function zustaendeVon(spiel, wesen) {
   const jetzt = spiel.zustand.zeit;
-  return (wesen.zustaende || []).map((instanz) => ({
-    nummer: instanz.nummer,
-    name: instanz.name,
-    staerke: instanz.staerke,
-    zuege: instanz.ende === null || instanz.ende === undefined ? null : Math.max(1, Math.ceil((instanz.ende - jetzt) / zuglaenge(spiel))),
-  }));
+  const gesteuerteId = gesteuerteEntitaet(spiel.zustand)?.id;
+  return (wesen.zustaende || []).map((instanz) => {
+    const begrenzt = instanz.ende !== null && instanz.ende !== undefined;
+    const bekannt = wesen.id === gesteuerteId || instanz.urheberId === gesteuerteId;
+    return {
+      nummer: instanz.nummer,
+      name: instanz.name,
+      staerke: instanz.staerke,
+      restzeit: begrenzt && bekannt ? Math.max(1, instanz.ende - jetzt) : null,
+    };
+  });
+}
+
+// Eigene Kosten in Zeiteinheiten mit allen Modifikatoren: { bewegen, angriff }, angriff null ohne Angriffsprofil
+export function kostenVon(spiel, wesen) {
+  const angriff = angriffskosten(spiel, wesen);
+  return { bewegen: zeitkosten(spiel, wesen, "bewegen"), angriff: angriff === null ? null : zeitkosten(spiel, wesen, "nahkampf", {}, angriff) };
+}
+
+// Stufe des Tempos zu Kosten in Zeiteinheiten nach regeln.tempo (stufen [[bis, name]] aufsteigend, sonst darueber)
+export function tempostufe(spiel, kosten) {
+  const { stufen, darueber } = spiel.daten.regeln.tempo;
+  return stufen.find(([bis]) => kosten <= bis)?.[1] ?? darueber;
+}
+
+// Tempo eines Wesens in Stufen: { bewegen, angriff }, angriff null ohne Angriffsprofil
+export function tempoVon(spiel, wesen) {
+  const kosten = kostenVon(spiel, wesen);
+  return { bewegen: tempostufe(spiel, kosten.bewegen), angriff: kosten.angriff === null ? null : tempostufe(spiel, kosten.angriff) };
 }
 
 // Laufende Aktion eines Wesens: { art, faehigkeit?, erledigt, gesamt, unterbrochen } oder null
@@ -53,6 +77,7 @@ export function wesenBeschreiben(spiel, wesen) {
     zustaende: zustaendeVon(spiel, wesen),
     laufendeAktion: laufendeAktionVon(wesen),
     wachzustand: wesen.ki && !istGesteuerte ? wachzustandVon(wesen) : null,
+    tempo: istGesteuerte ? null : tempoVon(spiel, wesen),
     chanceNinkasi: istGesteuerte ? null : nahkampfchanceVorschau(spiel, gesteuerte, wesen),
     chanceGegen: istGesteuerte ? null : nahkampfchanceVorschau(spiel, wesen, gesteuerte),
   };

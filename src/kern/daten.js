@@ -124,6 +124,14 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
       }
     }
   }
+  // Tempo: Grundkosten je Aktionsart (kern/zustand.js grundkostenVon)
+  if (wesen.kosten !== undefined) {
+    if (!istObjekt(wesen.kosten)) fehler.push(`${ort}: kosten muss ein Objekt { aktion: Zeiteinheiten } sein`);
+    else for (const [aktion, kosten] of Object.entries(wesen.kosten)) {
+      if (daten.aktionen[aktion] === undefined) fehler.push(`${ort}.kosten: Aktion "${aktion}" steht nicht in daten/aktionen.js`);
+      else if (!istGanzzahl(kosten) || kosten <= 0) fehler.push(`${ort}.kosten.${aktion} muss eine ganze Zahl > 0 sein`);
+    }
+  }
   if (wesen.plaetze !== undefined) {
     const plaetze = daten.regeln?.ausruestung?.plaetze || [];
     if (!istObjekt(wesen.plaetze)) fehler.push(`${ort}: plaetze muss ein Objekt { platz: anzahl } sein`);
@@ -350,6 +358,19 @@ function pruefeLicht(licht, ort, fehler) {
 }
 
 // Stufen des Lichts, siehe systeme/licht.js
+// Stufen des Tempos in Worten (systeme/untersuchen.js tempostufe), mit Texten für Bewegen und Angriff
+function pruefeTemporegeln(tempo, sprache, fehler) {
+  const stufen = tempo?.stufen;
+  if (!Array.isArray(stufen) || stufen.length === 0 || !stufen.every((stufe, nummer) => Array.isArray(stufe) && stufe.length === 2
+    && istGanzzahl(stufe[0]) && stufe[0] > 0 && typeof stufe[1] === "string" && (nummer === 0 || stufe[0] > stufen[nummer - 1][0]))) {
+    return fehler.push("regeln.tempo.stufen muss eine Liste [[bis, name]] mit aufsteigendem bis sein");
+  }
+  if (typeof tempo.darueber !== "string") return fehler.push("regeln.tempo.darueber muss der Name einer Stufe sein");
+  for (const name of [...stufen.map(([, stufe]) => stufe), tempo.darueber]) {
+    for (const aktion of ["bewegen", "angriff"]) pruefeText(sprache.texte, `tempo.${aktion}.${name}`, "regeln.tempo", fehler);
+  }
+}
+
 function pruefeLichtregeln(licht, sprache, fehler) {
   if (!istObjekt(licht)) return fehler.push("regeln.licht fehlt");
   if (!istZahlAbNull(licht.imDunkeln)) fehler.push("regeln.licht.imDunkeln muss eine ganze Zahl >= 0 sein");
@@ -1322,6 +1343,7 @@ export function vorbereiten(rohdaten, sprache = {}) {
   }
   pruefeRegeln(daten, daten.regeln, fehler);
   pruefeLichtregeln(daten.regeln?.licht, sprache, fehler);
+  pruefeTemporegeln(daten.regeln?.tempo, sprache, fehler);
   pruefeLicht(daten.regeln?.feuer?.licht, "regeln.feuer", fehler);
   if (!daten.wesen.ninkasi) fehler.push("wesen.ninkasi fehlt");
   return { daten, fehler };

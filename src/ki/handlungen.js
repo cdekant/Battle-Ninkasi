@@ -33,6 +33,7 @@ import { abwarten } from "./abwarten.js";
 import { schrittWeg } from "./schritte.js";
 import { faehigkeitsbefehl } from "./faehigkeitenwahl.js";
 import { nutzbefehl } from "./nutzen.js";
+import { zeitkosten } from "../kern/spiel.js";
 
 export const VERFOLGEN = Object.freeze({ verfolgen: true });
 export const WAHLREGELN = ["erste", "beste", "gewichtet"];
@@ -54,7 +55,9 @@ handlungAnmelden("abstand_halten", { abstand: "ganzzahl" }, (spiel, wesen, beute
   const richtung = schrittWeg(spiel, wesen, beute.position);
   return richtung ? { art: "bewegen", ...richtung } : null;
 });
+// Fliehen nur vor Langsameren (siehe docs/Grundlagen.md, Zeit und Tempo): wer nicht schneller ist, nimmt die nächste Handlung
 handlungAnmelden("fliehen", {}, (spiel, wesen, beute) => {
+  if (zeitkosten(spiel, wesen, "bewegen") >= zeitkosten(spiel, beute, "bewegen")) return null;
   const richtung = schrittWeg(spiel, wesen, beute.position);
   return richtung ? { art: "bewegen", ...richtung } : null;
 });

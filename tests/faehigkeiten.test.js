@@ -6,7 +6,7 @@ import { holen } from "../src/kern/register.js";
 import { werteAusDaten, modifikatorHinzufuegen } from "../src/kern/werte.js";
 import { effektAnwenden } from "../src/kern/effekte.js";
 import { zustandSetzen } from "../src/systeme/zustaende.js";
-import { zuegeBisBereit, risikoWuerfeln, faehigkeitenVon, herkunftDer } from "../src/systeme/faehigkeiten.js";
+import { zeitBisBereit, risikoWuerfeln, faehigkeitenVon, herkunftDer } from "../src/systeme/faehigkeiten.js";
 import { rohdatenMitTesteintraegen, spielerinSetzen, allesSichtbar } from "./hilfen.js";
 import { befehlGeben } from "../src/kern/spiel.js";
 import { akteurEinreihen } from "../src/kern/zeit.js";
@@ -30,7 +30,7 @@ const EFFEKTE = {
 const FAEHIGKEITEN = {
   spucke: { text: "f.spucke", tags: ["magie"], verbrauch: { mp: 10 }, zeit: 150, ziel: { art: "geschoss", reichweite: 5 }, wirkung: "spritzer" },
   flaeche: { text: "f.flaeche", ziel: { art: "feld", reichweite: 6, muster: { art: "kreis", radius: 1 }, trifft: "feinde" }, wirkung: "spritzer" },
-  langsam: { text: "f.langsam", abklingzeit: 2, ziel: { art: "wesen", reichweite: 5 }, wirkung: "spritzer" },
+  langsam: { text: "f.langsam", abklingzeit: 200, ziel: { art: "wesen", reichweite: 5 }, wirkung: "spritzer" },
   nuechtern: { text: "f.nuechtern", voraussetzungen: [{ bedingung: "pegel_unter", wert: 50 }], ziel: { art: "selbst" }, wirkung: "spritzer" },
   hopfenzauber: { text: "f.hopfen", material: [{ typ: "hopfen", anzahl: 2 }], ziel: { art: "selbst" }, wirkung: "spritzer" },
   gedanke: { text: "f.gedanke", tags: ["psi"], verbrauch: { pp: 5 }, risiko: "psi", ziel: { art: "wesen", reichweite: 5 }, wirkung: "spritzer" },
@@ -94,18 +94,22 @@ test("Fähigkeit: Gründe der Ablehnung", () => {
   assert.equal(pruefen(spiel, hexe, benutzen("nuechtern")), null);
 });
 
-test("Abklingzeit zählt eigene Züge der Wirkenden", () => {
+test("Abklingzeit läuft in Weltzeit ab dem Wirken, eigene Züge beschleunigen sie nicht", () => {
   const { spiel, hexe, feind } = aufstellen();
+  const beginn = spiel.zustand.zeit;
   befehlAusfuehren(spiel, hexe, benutzen("langsam", { id: feind.id }));
-  assert.equal(zuegeBisBereit(hexe, "langsam"), 2);
+  assert.equal(zeitBisBereit(spiel, hexe, "langsam"), 200);
   assert.equal(pruefen(spiel, hexe, benutzen("langsam", { id: feind.id })), "abklingend");
   befehlAusfuehren(spiel, hexe, { art: "warten" });
-  assert.equal(pruefen(spiel, hexe, benutzen("langsam", { id: feind.id })), "abklingend");
   befehlAusfuehren(spiel, hexe, { art: "warten" });
+  assert.equal(pruefen(spiel, hexe, benutzen("langsam", { id: feind.id })), "abklingend", "Züge ohne vergangene Weltzeit zählen nicht");
+  spiel.zustand.zeit = beginn + 199;
+  assert.equal(zeitBisBereit(spiel, hexe, "langsam"), 1);
+  spiel.zustand.zeit = beginn + 200;
   assert.equal(pruefen(spiel, hexe, benutzen("langsam", { id: feind.id })), null);
-  modifikatorHinzufuegen(hexe, { ziel: "abklingzeit", art: "plus", betrag: -2, quelle: "test" });
+  modifikatorHinzufuegen(hexe, { ziel: "abklingzeit", art: "plus", betrag: -200, quelle: "test" });
   befehlAusfuehren(spiel, hexe, benutzen("langsam", { id: feind.id }));
-  assert.equal(zuegeBisBereit(hexe, "langsam"), 0);
+  assert.equal(zeitBisBereit(spiel, hexe, "langsam"), 0);
 });
 
 test("Material wird aus dem Inventar verbraucht", () => {
@@ -189,7 +193,7 @@ test("auf: quelle lässt einen Schritt auf die Quelle wirken (Vampirbiss)", () =
 
 const GEWAEHRT = {
   effekte: { ...EFFEKTE, gabe: { schritte: [{ baustein: "wert_aendern", wertName: "mp", menge: 1 }] }, spucke_lehren: { schritte: [{ baustein: "faehigkeit_lehren", faehigkeit: "spucke" }] } },
-  faehigkeiten: { ...FAEHIGKEITEN, langsam: { ...FAEHIGKEITEN.langsam, abklingzeit: 5 }, eingebung: { text: "f.eingebung", zeit: 100, dauer: { schritte: 3 }, ziel: { art: "selbst" }, wirkung: "gabe" } },
+  faehigkeiten: { ...FAEHIGKEITEN, langsam: { ...FAEHIGKEITEN.langsam, abklingzeit: 500 }, eingebung: { text: "f.eingebung", zeit: 100, dauer: { schritte: 3 }, ziel: { art: "selbst" }, wirkung: "gabe" } },
   zustaende: { ...ZUSTAENDE, erleuchtet: { text: "z.erleuchtet", dauer: 150, faehigkeiten: ["eingebung", "langsam"] } },
   risiken: RISIKEN,
 };

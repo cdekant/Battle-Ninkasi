@@ -44,7 +44,7 @@ Schnittstellen (`src/kern/spiel.js`):
 + Befehle gehen an die gesteuerte Entität (siehe Entitäten und Komponenten), Befehlsarten mit `ohneZeit` an Ninkasi selbst
 + Ist die gesteuerte Entität handlungsunfähig, wird jede Eingabe angenommen, aufgezeichnet und als `warten` ausgeführt (Meldung `handlungsunfaehig`, Rückgabe mit `handlungsunfaehig: true`)
 + Befehlsarten mit `ohneZeit: true` (bisher `lernen`, siehe [Wesen.md](Wesen.md), Skills und Lernen) sind Entscheidungen ohne Spielzeit: geprüft, aufgezeichnet und ausgeführt, aber ohne Zug, Zugzähler, `vor_befehl`, `zug_ende` und ohne eine laufende Aktion abzubrechen
-+ `zeitkosten(spiel, entitaet, aktion, umstaende, grundkosten)`: Grundkosten aus `daten/aktionen.js` oder dem Angriffsprofil, Modifikatoren `kosten.<aktion>` und `kosten.alle`, Zuschlag bei Überlast (siehe [Gegenstaende.md](Gegenstaende.md), Inventar)
++ `zeitkosten(spiel, entitaet, aktion, umstaende, grundkosten)`: Grundkosten aus dem Angriffsprofil oder der Fähigkeit, sonst das Tempo der Entität (`grundkostenVon` in `src/kern/zustand.js`), Modifikatoren `kosten.<aktion>` und `kosten.alle`, Zuschlag bei Überlast (siehe [Gegenstaende.md](Gegenstaende.md), Inventar)
 
 Regeln:
 
@@ -88,7 +88,8 @@ Daten (`src/kern/zeit.js`):
 
 + Ein einziger Zeitstrahl in ganzzahligen Zeiteinheiten; Dauern werden in Zeiteinheiten angegeben, nicht in Ticks
 + Die Warteschlange enthält drei Arten von Einträgen: Akteure (`art: "akteur"`, Ninkasi, Gegner, Verbündete), die nach dem Handeln mit ihren Aktionskosten wieder eingereiht werden; die Weltuhr (`art: "weltuhr"`) alle `WELTTICK` = 100 Einheiten; Zeitereignisse (`art: "ereignis"`, z.B. "Status endet bei T=4350"), optional an eine Entität gebunden (`gebundenAn`), dann entfallen sie mit ihr
-+ Kosten je Aktionsart in `daten/aktionen.js` (Standard 100; Bewegen, Nahkampf, Warten, Aufheben, Trinken, Lesen, Werfen, Benutzen, Treppe, Anlegen, Ablegen, Fallenlassen und die Vorgabe für Fähigkeiten); Modifikatoren zielen auf eine Aktionsart oder auf alle
++ Kosten je Aktionsart in `daten/aktionen.js` (Standard 100, die Norm eines normal schnellen Wesens; Bewegen, Nahkampf, Warten, Aufheben, Trinken, Lesen, Werfen, Benutzen, Treppe, Anlegen, Ablegen, Fallenlassen und die Vorgabe für Fähigkeiten); Modifikatoren zielen auf eine Aktionsart oder auf alle
++ Tempo je Wesen: `kosten: { bewegen: 120 }` in den Daten des Wesens ersetzt die Vorgabe für diese Aktionsarten (Ninkasi bewegt sich zu Beginn mit 120); das Tempo des Angriffs tragen die Angriffsprofile (siehe [Wesen.md](Wesen.md), Kampfwerte), ein Profil ohne `kosten` nimmt `kosten.nahkampf` des Wesens
 
 Schnittstellen:
 
@@ -101,7 +102,7 @@ Regeln:
 + Aktionskosten statt Runden: Jede Aktion kostet Zeit; wer an der Reihe ist, bestimmt die Warteschlange nach Zeitpunkt
 + Gleichstand wird fest aufgelöst: zuerst die Weltuhr, dann Zeitereignisse, dann Akteure nach Reihenfolge der Einreihung; die Ordnung ist vollständig, die Reihenfolge der Entnahme hängt also nicht vom Aufbau des Heaps ab
 + Die Warteschlange ist ein binärer Heap im Array (bleibt JSON); Entfernen filtert und baut den Heap neu auf
-+ Zugzähler: Jede ausgeführte Aktion erhöht `zuege` der Akteurin um eins, gleich wie viel Zeit sie kostet; daran misst sich die Abklingzeit der Fähigkeiten, wer schneller handelt, hat sie in Weltzeit früher zurück
++ Zugzähler: Jede ausgeführte Aktion erhöht `zuege` der Akteurin um eins, gleich wie viel Zeit sie kostet; er zählt nur für Bilanz, Log und Speicherplätze; Abklingzeiten und Restdauern laufen in Weltzeit (siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten)
 + Prozentuale Änderungen werden einheitlich gerundet; Rundungsfehler liegen bei etwa 1 % und werden hingenommen
 + Bruchteile (z.B. 0,3 LP pro Tick) laufen über ganzzahlige Speicher in Hundertsteln, ein voller Punkt wird gutgeschrieben, der Rest bleibt stehen
 + Lange Aktionen laufen in Schritten und lassen sich unterbrechen (siehe [Wirkungen.md](Wirkungen.md), Lange Aktionen)

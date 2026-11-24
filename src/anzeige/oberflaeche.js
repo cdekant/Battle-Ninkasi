@@ -18,7 +18,7 @@ import { promilleText, leistenanteil, TEILSTRICHE } from "./pegelanzeige.js";
 
 import { faehigkeitVon } from "../systeme/faehigkeiten.js";
 import { lastText } from "./fenster.js";
-import { feldBeschreiben, zustaendeVon, laufendeAktionVon, werteAufschluesseln, wesenBeschreiben } from "../systeme/untersuchen.js";
+import { feldBeschreiben, zustaendeVon, laufendeAktionVon, werteAufschluesseln, wesenBeschreiben, kostenVon } from "../systeme/untersuchen.js";
 import { heimlichkeitsweite } from "../systeme/wahrnehmung.js";
 import { lichtWirkt, lichtstufeAuf } from "../systeme/licht.js";
 
@@ -97,7 +97,7 @@ export class Oberflaeche {
     const schluessel = spiel.daten.zustaende?.[eintrag.name]?.text;
     const name = schluessel && hatSchluessel(schluessel) ? text(schluessel) : eintrag.name;
     const staerke = eintrag.staerke > 1 ? ` ${eintrag.staerke}` : "";
-    const dauer = eintrag.zuege === null ? "" : ` <span class="leise">(${text("ui.abklingend", { zuege: eintrag.zuege })})</span>`;
+    const dauer = eintrag.restzeit === null ? "" : ` <span class="leise">(${text("ui.abklingend", { zeit: eintrag.restzeit })})</span>`;
     return `${name}${staerke}${dauer}`;
   }
 
@@ -133,6 +133,7 @@ export class Oberflaeche {
     const zeilen = [`<li class="gewaehlt">${nomenForm(wesen, "nom", "ohne")}${lp}${wach}</li>`];
     if (!ausfuehrlich) return zeilen;
     for (const eintrag of beschreibung.zustaende) zeilen.push(`<li>${this.zustandText(spiel, eintrag)}</li>`);
+    if (beschreibung.tempo) zeilen.push(`<li>${this.tempoText(beschreibung.tempo)}</li>`);
     if (beschreibung.laufendeAktion) zeilen.push(`<li>${this.aktionText(spiel, beschreibung.laufendeAktion)}</li>`);
     if (beschreibung.chanceNinkasi) zeilen.push(`<li>${text("ui.chance_ninkasi")} <span class="chance">${this.chanceText(beschreibung.chanceNinkasi)}</span></li>`);
     if (beschreibung.chanceGegen) zeilen.push(`<li>${text("ui.chance_gegen")} <span class="chance">${this.chanceText(beschreibung.chanceGegen)}</span></li>`);
@@ -147,7 +148,7 @@ export class Oberflaeche {
         const gegenstand = entitaetMitId(spiel.zustand, herkunft.id);
         return gegenstand ? nomenForm(gegenstand, "nom", "ohne") : text("ui.herkunft.sonstige");
       }
-      if (herkunft.art === "zustand" && herkunft.name) return this.zustandText(spiel, { name: herkunft.name, staerke: 1, zuege: null });
+      if (herkunft.art === "zustand" && herkunft.name) return this.zustandText(spiel, { name: herkunft.name, staerke: 1, restzeit: null });
       return text(`ui.herkunft.${herkunft.art === "zustand" ? "sonstige" : herkunft.art}`);
     };
     return werteAufschluesseln(spiel, wesen).flatMap((eintrag) => {
@@ -193,13 +194,27 @@ export class Oberflaeche {
       <ul class="untersuchen offen">${this.feldZeilen(spiel, beschreibung, true).join("")}${werte.join("")}<li class="hinweis">${text("ui.untersuchen_hinweis")}</li></ul>`;
   }
 
+  // Tempo eines Wesens in Worten: "bewegt sich flink, holt bedächtig aus"
+  tempoText(tempo) {
+    const { text } = this.texte;
+    const bewegen = text(`tempo.bewegen.${tempo.bewegen}`);
+    return tempo.angriff === null ? bewegen : text("ui.tempo", { bewegen, angriff: text(`tempo.angriff.${tempo.angriff}`) });
+  }
+
+  // Eigene Kosten für Bewegen und Angriff in Zeiteinheiten
+  kostenHtml(spiel, gesteuerte) {
+    const { text } = this.texte;
+    const kosten = kostenVon(spiel, gesteuerte);
+    return `<div class="leise">${kosten.angriff === null ? text("ui.kosten_ohne_angriff", kosten) : text("ui.kosten", kosten)}</div>`;
+  }
+
   // Kurzfassung eines Feldes für den Tooltip, leer bei unbekanntem Feld
   tooltipHtml(spiel, feld) {
     const beschreibung = feldBeschreiben(spiel, feld);
     return beschreibung ? `<ul>${this.feldZeilen(spiel, beschreibung, false).join("")}</ul>` : "";
   }
 
-  // Heimlichkeitsweite, Licht auf ihrem Feld (nur, wo Licht wirkt), laufende Aktion und Zustände Ninkasis unter den Balken
+  // Eigene Kosten, Heimlichkeitsweite, Licht auf ihrem Feld (nur, wo Licht wirkt), laufende Aktion und Zustände Ninkasis unter den Balken
   lageHtml(spiel, gesteuerte) {
     const { text } = this.texte;
     const zustaende = zustaendeVon(spiel, gesteuerte);
@@ -212,16 +227,16 @@ export class Oberflaeche {
     const zustaendeHtml = zustaende.length
       ? `<h2>${text("ui.zustaende")}</h2><ul class="zustaende">${zustaende.map((eintrag) => `<li>${this.zustandText(spiel, eintrag)}</li>`).join("")}</ul>`
       : "";
-    return `${heimlichkeit}${aktionHtml}${zustaendeHtml}`;
+    return `${this.kostenHtml(spiel, gesteuerte)}${heimlichkeit}${aktionHtml}${zustaendeHtml}`;
   }
 
-  // Zusatz in der Gegnerliste: Wachzustand außer "jagt", Zustände, laufende Aktion
+  // Zusatz in der Gegnerliste: Wachzustand außer "jagt", Zustände (Restdauer nur, wenn Ninkasi sie zugefügt hat), laufende Aktion
   gegnerZusatz(spiel, gegner) {
     const { text } = this.texte;
     const beschreibung = wesenBeschreiben(spiel, gegner);
     const teile = [];
     if (beschreibung.wachzustand && beschreibung.wachzustand !== "jagt") teile.push(text(`ui.wachzustand.${beschreibung.wachzustand}`));
-    for (const eintrag of beschreibung.zustaende) teile.push(this.zustandText(spiel, { ...eintrag, zuege: null }));
+    for (const eintrag of beschreibung.zustaende) teile.push(this.zustandText(spiel, eintrag));
     if (beschreibung.laufendeAktion) teile.push(text("ui.wirkt"));
     return teile.length ? `<div class="leise zusatz">${teile.join(", ")}</div>` : "";
   }

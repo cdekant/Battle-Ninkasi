@@ -137,11 +137,11 @@ test("Zielmodus aus der Leiste: dieselbe Taste bestätigt, eine andere Ziffer ni
   assert.deepEqual(bestaetigt.befehl, { art: "faehigkeit", faehigkeit: "blick", ziel: { id: nah.id } });
 });
 
-test("Zustand: Abklingzeit in Zügen, Grund nur, wenn es nicht am Ziel liegt", () => {
+test("Zustand: Abklingzeit in Zeiteinheiten, Grund nur, wenn es nicht am Ziel liegt", () => {
   const { spiel, ninkasi } = aufstellen();
   assert.deepEqual(platzZustand(spiel, { art: "faehigkeit", faehigkeit: "blick" }), { platz: { art: "faehigkeit", faehigkeit: "blick" }, abklingend: 0 });
-  ninkasi.abklingendBis = { blick: (ninkasi.zuege ?? 0) + 2 };
+  ninkasi.abklingendBis = { blick: spiel.zustand.zeit + 250 };
   const zustand = platzZustand(spiel, { art: "faehigkeit", faehigkeit: "blick" });
-  assert.equal(zustand.abklingend, 2);
+  assert.equal(zustand.abklingend, 250);
   assert.equal(zustand.grund, "abklingend");
 });

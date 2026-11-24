@@ -230,7 +230,7 @@ Daten:
   + `verbrauch: { mp, pp, pegel, ... }` aus den Vorräten; `material: [{ typ, anzahl }]` aus dem Inventar, wird verbraucht
   + `zeit`: Grundkosten, Vorgabe `aktionen.faehigkeit`
   + `zweck: [name]`: wozu die KI sie mit der Handlung `nutzen` wählt (siehe [Wesen.md](Wesen.md), KI)
-  + `abklingzeit`: eigene Züge der Wirkenden (Zugzähler, siehe [Architektur.md](Architektur.md), Zeitmodell); am Wesen `abklingendBis: { name: zugnummer }`
+  + `abklingzeit`: Zeiteinheiten Weltzeit ab dem Wirken (siehe [Architektur.md](Architektur.md), Zeitmodell); schnelles Handeln beschleunigt sie nicht; am Wesen `abklingendBis: { name: zeitpunkt }`, `zeitBisBereit(spiel, wesen, name)` sagt, wie lange noch
   + `voraussetzungen`: Bedingungen aus dem Register `modifikatorbedingungen`, z.B. `pegel_unter` (nüchtern), `pegel_ab`, `skill_ab`, `eigenschaft_ab`
   + `ziel`: Zielart wie in `zielAufloesen` (siehe Zielauswahl); `zielvorgabe` ("feind", "gefaehrte", "selbst") belegt den Cursor im Zielmodus vor (siehe [Bedienung.md](Bedienung.md), Zielmodus)
   + `wirkung`: benannter Effekt mit Ursache `faehigkeit` und Mittel `{ art: "faehigkeit", name }`

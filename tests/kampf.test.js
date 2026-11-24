@@ -182,6 +182,17 @@ test("Zeitkosten: die Aktion kostet so viel wie ihr langsamstes Profil, Modifika
   assert.equal(nahkampf(ohneKosten.spiel, ohneKosten.quelle, ohneKosten.ziel), ohneKosten.spiel.daten.aktionen.nahkampf);
 });
 
+test("Tempo je Wesen: kosten am Wesen ersetzen die Vorgabe, ein Profil mit eigenen kosten geht vor", () => {
+  const { spiel, quelle, ziel } = aufstellen({ angreifer: { angriffe: [BISS], kosten: { bewegen: 120, nahkampf: 80 } } });
+  assert.equal(zeitkosten(spiel, quelle, "bewegen"), 120);
+  assert.equal(zeitkosten(spiel, quelle, "warten"), spiel.daten.aktionen.warten, "ohne Angabe die Vorgabe");
+  assert.equal(nahkampf(spiel, quelle, ziel), 80, "Profil ohne kosten: kosten.nahkampf des Wesens");
+  quelle.angriffe = [{ ...BISS, kosten: 50 }];
+  assert.equal(nahkampf(spiel, quelle, ziel), 50);
+  modifikatorHinzufuegen(quelle, { ziel: "kosten.bewegen", art: "prozent", betrag: -50, quelle: "test" });
+  assert.equal(zeitkosten(spiel, quelle, "bewegen"), 60, "Modifikatoren wirken auf das eigene Tempo");
+});
+
 test("Weitere Profile lassen ein Ziel ohne Lebenswert aus", () => {
   const { spiel, quelle, ziel } = aufstellen({ angreifer: { angriffe: [{ ...STOSS, effekt: "hieb" }, BISS] } });
   ziel.werte.lp.aktuell = 10;
