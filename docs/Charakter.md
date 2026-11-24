@@ -70,10 +70,11 @@ Umsetzung: siehe [Entwicklung.md](Entwicklung.md), Grundgerüst
 ### Magie und Psi
 
 + Getrennte Systeme, siehe [Grundlagen.md](Grundlagen.md): Magie gebunden an Ritual, Schrift und Alchemie (MP), Psi sofort und rein geistig (PP)
++ Alchemie stellt nichts her: Getränke, Tränke und Gifte entstehen allein beim Brauen, die Alchemie steigert ihre Wirkung (siehe [Skills.md](Skills.md), Brauen)
 + Psi: primär Sinnlichkeit
 + Vorschlag, noch nicht bestätigt: Magie gehört keiner einzelnen Eigenschaft, die Paarung prägt ihren Charakter
   + Zauber als Formel (Schriftrollen, HACCP-Aushänge): primär Klugheit, sekundär Braukunde
-  + Alchemie (Tränke, Gärung, Gifte): primär Braukunde, sekundär Klugheit
+  + Alchemie (steigert die Wirkung von Tränken und Giften): primär Braukunde, sekundär Klugheit; die Paarung folgt mit der Kategorie Magie in [Skills.md](Skills.md)
   + Göttliche Gabe (Altäre, Nebengottheiten): primär Braukunde, sekundär Sinnlichkeit
 + Vorschlag, noch nicht bestätigt: Psi sekundär Klugheit
 
@@ -142,7 +143,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Neuv
 + Je Quelle festgelegt, ob sie lehrt oder nur gewährt: ein Lehrstück lehrt dauerhaft und ist meist verbraucht, ein Braubuch bleibt; angelegte Ausrüstung gewährt, solange sie angelegt ist (siehe [Grundlagen.md](Grundlagen.md), Spielkern)
 + Der Zufall prägt den Build
 + Fundstück ohne passenden Skill: nutzbar, aber mit hohem Fehlschlagrisiko über eine Risikotabelle nach dem fehlenden Skill (Vorbild DCSS)
-+ Angeboren sind nur wenige Grundfähigkeiten, mit Vorsicht gewählt: körperliche, die jede Ninkasi kann (Faustschlag, Werfen, siehe [Skills.md](Skills.md), Kampf), und höchstens eine je Vorrat; die erste solche ist der Sprint, den jede Ninkasi hat, wie wirksam und sparsam sie ihn einsetzt, bestimmen ihre Skills (siehe [Grundlagen.md](Grundlagen.md), Zeit und Tempo); eine spätere Fähigkeit aus der Welt kann ihn erweitern, etwa aus einer Betäubung heraus loszusprinten
++ Angeboren sind nur wenige Grundfähigkeiten, mit Vorsicht gewählt: körperliche, die jede Ninkasi kann (Faustschlag, Werfen, siehe [Skills.md](Skills.md), Kampf), die Gaben der Göttin, die Zeit und Material statt eines Vorrats kosten (Brauen und Mälzen, siehe [Skills.md](Skills.md), Brauen), und höchstens eine je Vorrat; die erste solche ist der Sprint, den jede Ninkasi hat, wie wirksam und sparsam sie ihn einsetzt, bestimmen ihre Skills (siehe [Grundlagen.md](Grundlagen.md), Zeit und Tempo); eine spätere Fähigkeit aus der Welt kann ihn erweitern, etwa aus einer Betäubung heraus loszusprinten
 
 Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skillkatalog, siehe [Systemausbau.md](Systemausbau.md), Punkt 20
 
@@ -160,7 +161,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skil
 
 ### Gebundene EP
 
-+ Gebundene EP gibt nur Bewältigtes, das es je Ebene endlich oft gibt: besiegte Gegner, entschärfte Fallen, geöffnete Schlösser, ein Rezept beim ersten Gelingen, ein Hinterhalt; jedes davon trägt in den Daten einen festen Wert `ep`
++ Gebundene EP gibt nur Bewältigtes, das es je Ebene endlich oft gibt: besiegte Gegner, entschärfte Fallen, geöffnete Schlösser, ein gefundenes Rezept beim ersten Gelingen (Hausrezepte nicht, siehe [Skills.md](Skills.md), Brauen), ein Hinterhalt; jedes davon trägt in den Daten einen festen Wert `ep`
 + Die Anwendung selbst bringt keine EP, sie bestimmt, wohin die EP fließen; so bleibt die Menge je Ebene begrenzt und Farmen an harmlosen Zielen bringt nichts
 + Jedes Wesen führt ein Beitragsbuch: welche Lernanlässe Ninkasi an ihm hatte (Wirkung mit den Tags von Angriff, Fähigkeit und Effekt, dazu Ausweichen, Blocken, Rüstung nach ihrer Art und erlittener Schaden für passive Skills, Entkommen für die Skills der Bewegung, Berauscht für die Skills des Stoffwechsels, Erspäht nach der Art des Wahrnehmens und Hinterhalt für die Skills der Wahrnehmung, Kritisch für die Präzision)
 + Gewichtung vorerst nach der ersten erfolgreichen Anwendung: Jeder Lernanlass zählt je Gegner einmal; als Regelwert `regeln.lernen.gewichtung` (`erste`, später zum Vergleich `anteil` nach Schadensanteil)

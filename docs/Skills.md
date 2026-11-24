@@ -403,16 +403,91 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Kampfwerte (Profile mit Tags, 
 
 ## Brauen
 
-### Bierbrauen
+Brauen ist die einzige Herstellung: Bier, Wein, Met, Kvas, Kefir, Kombucha, auch Tränke und Gifte entstehen beim Brauen; Magie hat keine eigene Alchemie, die etwas herstellt, sie steigert die Wirkung des Gebrauten (siehe Magie). Brauen und Mälzen sind Gaben der Göttin, angeborene Fähigkeiten jeder Ninkasi wie das Werfen (siehe [Charakter.md](Charakter.md), Fähigkeiten); die Skills heben Gelingen, Ausbeute und Güte und erweitern die Fähigkeiten in Ausbaustufen. Die Sets folgen den Schritten des Brauens und dem, was ein Sud ergibt, damit sie tragen, wie immer das Brausystem im Einzelnen aussieht (offen in [Grundlagen.md](Grundlagen.md), Spielkern). Vorbilder: EVE Online (Industry macht die Fertigung schneller), RimWorld (die Fertigkeit senkt die Gefahr verdorbener Speisen, die Sauberkeit wirkt daneben), Caves of Qud (Baupläne finden sich unterwegs, die Skills machen sie baubar).
 
-+ Grundfähigkeiten: Brauen, Wissen Rohstoffe (Effizienz beim Brauen)
-+ Expertenfähigkeiten: Hygiene, Extrakt, Fehlschläge minimieren, Rezepte
+Muster der Tiers: Grund Gelingen, Experte Ausbeute, Meister Güte; einzelne Sets weichen ab. Die Schulen schließen sich so wenig aus wie die Waffengattungen. Die Kessel aufzustellen, zu bauen und zu pflegen gehört zu Anlagen und Fallen.
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
+### Rezepte
+
++ Bierrezepte folgen den Stilvorgaben, ihre Kennzahlen (Stammwürze, Bittere, Farbe, Alkohol) sind die Ziele eines Suds (siehe [Systemausbau.md](Systemausbau.md), Punkt 17)
++ Andere Rezepte findet Ninkasi unterwegs: Kvas, Kefir, Kombucha, Weine, Met, Cider; ihre Wirkung folgt den Zutaten
++ Ein Rezept nennt die Arten seiner Zutaten, seine Kultur und seine Schule als Tags, über die die Sets wirken und lernen
++ Gebrautes stapelt sich nach Rezept und Güte
++ Ein freier Sud ohne Rezept wird beim ersten Gelingen ein Hausrezept im Rezeptbuch, mit erzeugtem Namen, und stapelt sich danach wie jedes andere
++ Lernanlass ist das erste Gelingen jedes gefundenen Rezepts (siehe [Charakter.md](Charakter.md), Gebundene EP); seine EP teilen sich nach den Tags des Rezepts auf die Sets; Hausrezepte bringen keine gebundenen EP, weil es endlos viele gäbe
+
+### Brauen allgemein
+
++ Eigenschaften: Braukunde, sekundär Klugheit
++ Lernt aus: jedem Rezept
++ Grund: der Sud gelingt öfter
++ Experte: mehr Ausbeute
++ Meister: höhere Güte
++ Voraussetzung für alle anderen Sets der Kategorie; Querlernen zum Schnellsud
+
+### Schnellsud
+
++ Eigenschaften: Braukunde, sekundär Gewandtheit
++ Lernt aus: freien EP und quer von Brauen allgemein
++ Brauen beginnt sonst nur außerhalb eines Kampfes (siehe [Grundlagen.md](Grundlagen.md), Zeit und Tempo); der Schnellsud verschiebt diese Grenze Tier für Tier
++ Grund: kürzere Brauzeit
++ Experte: Brauen beginnt auch, wenn Feinde in der Nähe sind, solange noch kein Kampf läuft
++ Meister: Feldsud, im Kampf am mobilen Kessel eine kleine Menge in wenigen Zügen, etwa so schnell wie ein Kampfzauber
++ Göttlich: ein Treffer unterbricht den Sud nicht mehr
+
+### Hygiene
+
++ Eigenschaften: Klugheit, sekundär Braukunde
++ Lernt aus: jedem Rezept
++ Zwei Tiers: Grund seltener verdorbene Sude, Experte ein misslungener Sud bleibt öfter nur minderwertig, statt zu verderben
++ Gilt beim Brauen; was im Gepäck verdirbt, pflegt die Kennerschaft (siehe Wahrnehmung)
++ Querlernen zur Abhärtung gegen Ätzendes (siehe Kampf, Verteidigung)
+
+### Rohstoffe
+
+Ein Set je Art von Rohstoffen, je zwei bis drei Tiers: Ohne Skill gibt eine Art weniger Ausbeute und Güte, ihr Set macht sie konkurrenzfähig, höhere Tiers holen mehr aus ihr heraus. Jedes lernt aus den Rezepten mit seiner Art.
+
++ Getreide: Gerste, Emmer, Weizen, Brot (Kvas, Bappir); Braukunde, sekundär Klugheit; die Grundlage, schon ohne Skill brauchbar; macht auch das Mälzen wirksamer
++ Früchte: Datteln, Feigen, Trauben, Granatäpfel, Äpfel; Braukunde, sekundär Sinnlichkeit
++ Honig und Zucker: Braukunde, sekundär Trinkfestigkeit
++ Kräuter und Würze: Gruit, die Würze vor dem Hopfen; Braukunde, sekundär Sinnlichkeit
++ Milch: Braukunde, sekundär Trinkfestigkeit
++ Tee: Braukunde, sekundär Klugheit
++ Hopfen: Bittere und Haltbarkeit; Braukunde, sekundär Sinnlichkeit; erst mit dem ersten Hopfenfund lernbar (`freischaltung`); das Aroma gehört der Schule Hopfenstopfen
+
+### Hefen und Kulturen
+
++ Eigenschaften: Braukunde, sekundär Sinnlichkeit
++ Lernt aus: den Rezepten, nach dem Tag ihrer Kultur
++ Kulturen: Bierhefe, Weinhefe, wilde Hefe, Kefirknollen, Teepilz, Sauerteig
++ Grund: höherer Vergärungsgrad, mehr Alkohol
++ Experte: Kulturen werden ein lebender Vorrat, der sich weiterführen lässt, statt verbraucht zu werden, und eingehen kann
++ Meister: höhere Güte der Gärung
++ Die Hefe als Wesen gehört nicht hierher (siehe Offen)
+
+### Brauschulen
+
+Je Schule ein Set nach dem Muster der Kategorie, wirksam nur für Rezepte mit ihrem Tag, dazu ein Kniff je Schule:
+
++ Sumerische Tradition: Bappir, Datteln, Honig, Tonkrug, die Brauweise Ninkasis; Braukunde, sekundär Sinnlichkeit
++ Spontane Gärung: wilde Hefen aus der Luft, riskant, mit starken Ausreißern nach oben und unten und seltsamen Wirkungen; Braukunde, sekundär Trinkfestigkeit
++ Reinheitsgebot: nur Wasser, Malz, Hopfen und Hefe, verlässlich und von hoher Güte; Braukunde, sekundär Klugheit; mit dem ersten Hopfen lernbar
++ Hopfenstopfen: Hopfen kalt in den fertigen Sud, Aroma statt Bittere, späte Epoche; Braukunde, sekundär Sinnlichkeit; mit dem ersten Hopfen lernbar
+
+### Rezeptur
+
++ Eigenschaften: Klugheit, sekundär Braukunde
++ Lernt aus: jedem Rezept
++ Grund: der Sud trifft die Kennzahlen seines Stils genauer, das gibt Güte
++ Experte: Rezepte abwandeln, eine Zutat gegen eine verwandte tauschen, ohne das Rezept zu verlassen
++ Meister: freie Sude gelingen verlässlicher und werden leichter zum Hausrezept
+
+Umsetzung: offen, braucht das Brausystem und die Bierstile ([Systemausbau.md](Systemausbau.md), Punkte 10 und 17), Arbeit in Punkt 20
 
 ## Anlagen und Fallen
 
 + Fallenstellen und Entschärfen als eigene Sets, quer verwandt mit der Reaktion (siehe Kampf, Verteidigung); erweist sich das Thema als ergiebig, gern mehr Sets rund um Fallen
++ Kessel als Anlage: aufstellen, bauen und pflegen, feste Altäre und mobile Kessel (siehe Brauen)
 
 Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
@@ -426,6 +501,7 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 ## Magie
 
 + Buffs, Schaden, Effekte von Tränken werden gesteigert
++ Alchemie stellt nichts her, das tut allein das Brauen; sie steigert über Modifikatoren die Wirkung des Gebrauten (siehe Brauen)
 + Abwehr gegen Magie; die Kurve der MP gehört zu Stoffwechsel und Pegel (Klarer Kopf)
 
 Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
@@ -439,3 +515,5 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 ## Offen
 
 + Bier- und Brandfontäne (Getrunkenes im Kegel speien, kostet Pegel): eher Fähigkeit als Skill, vielleicht zu Stoffwechsel und Pegel oder zu Magie, wo die Fontäne beschworen wird
++ Hefe als Wesen, die Kulturhefe als Verbündete (siehe [Grundlagen.md](Grundlagen.md), Gegner): eher zu Magie (Beschwörung) oder Soziales (befreunden) als zu Hefen und Kulturen
++ Mehrere Kessel zugleich (Vorbild Mass Production in EVE Online), nur als Konzept: ein späterer Tier von Brauen allgemein, wenn das Brausystem es trägt; nebeneinander stehende Kessel widersprechen dem Bleiben am Kessel nicht

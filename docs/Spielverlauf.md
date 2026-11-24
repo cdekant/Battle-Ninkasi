@@ -97,7 +97,6 @@ Einzelfragen:
 
 + Welche Systeme tieferen Kapiteln vorbehalten bleiben
 + Welche Figuren in den Hub ziehen können, wodurch sie es tun und was eine Stufe des Hubs ausmacht
-+ Wann der Hopfen ins Spiel kommt: Skills wie HopHead und Reinheitsgebot erst mit dem ersten Hopfenfund freischalten oder höher im Skillbaum aufhängen
 + Wie die Erzählung den Wechsel von drinnen und draußen und die Reise durch die Zeit begründet
 + Weitere Rohstoffe Sumers (Emmer, Datteln, Feigen, Granatäpfel, Äpfel, Honig), mit Quellen zu prüfen
 + Kernskills der Archetypen

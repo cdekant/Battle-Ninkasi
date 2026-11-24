@@ -50,6 +50,7 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Kapitel, Dienste 
 + Bestimmte Aktionen sind nur mit einem bestimmten Pegel durchführbar
 + Pegel bringt Risiko
 + Brausystem mit Zutaten und Rezepten
++ Brauen ist die einzige Herstellung: Getränke, Tränke und Gifte entstehen beim Brauen, Magie steigert nur ihre Wirkung; Brauen und Mälzen kann jede Ninkasi von Anfang an (siehe [Skills.md](Skills.md), Brauen)
 + Gebraut wird an festen Altären (Braukessel) oder in mobilen Kesseln
 + Ninkasi muss beim Brauen am Kessel bleiben, damit das Bier gut wird; eine Gärung, die ohne sie weiterläuft, gibt es nicht
 + Kessel in Tiers nach Material: Kupfer, Eisen, Edelstahl, Silber, Gold
