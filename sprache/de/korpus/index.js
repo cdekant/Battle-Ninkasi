@@ -5,6 +5,7 @@ export default [
   "gilgamesch-tafel-02.md",
   "gilgamesch-tafel-03.md",
   "gilgamesch-tafel-04.md",
+  "gilgamesch-tafel-05.md",
   "istar-unterwelt.md",
   "ninkasi-hymne.md",
   "ninkasi-hymne-b.md",
