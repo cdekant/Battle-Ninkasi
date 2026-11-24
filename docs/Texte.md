@@ -21,7 +21,7 @@ Grobskizze, auszuarbeiten.
 + Schadensarten stehen als einfache Wörter unter `schaden.<art>` (z.B. `schaden.saeure`: "Säure"); das Log setzt sie als `{art}` ein
 + Etiketten unbekannter Gegenstände (`datenproben/etiketten.js`, siehe Unbekanntes in [Gegenstaende.md](Gegenstaende.md)) sind Hauptwörter unter `etikett.<name>`; ein unbekannter Gegenstand nennt sein Etikett statt seines Namens (Bezug mit `etikett`)
 + Ein Satz, dessen Verb der Zahl folgt, hat eine zweite Fassung `<schluessel>.mehrzahl` ("Hier liegen 3 Biere"); `textNachZahl(schluessel, anzahl, werte)` wählt sie, wenn die Anzahl größer als 1 ist und es sie gibt
-+ Prüfung: die Datenprüfung meldet Textschlüssel aus den Daten, die in der deutschen Sprachdatei fehlen, unvollständige Hauptwörter und Verweise auf Adjektive, die keine sind; `tests/sprachen.test.js` prüft beide Sprachen nach ihrer Grammatik, dieselben Platzhalter je Schlüssel und dieselben Schlüssel im Grundgerüst; fehlende Schlüssel aus dem Code erscheinen als `[schluessel]` und als Warnung in der Konsole
++ Prüfung: die Datenprüfung meldet Textschlüssel aus den Daten, die in der deutschen Sprachdatei fehlen, unvollständige Hauptwörter und Verweise auf Adjektive, die keine sind; `tests/sprachen.test.js` prüft beide Sprachen nach ihrer Grammatik, dieselben Platzhalter je Schlüssel, dieselben Schlüssel im Grundgerüst und dass kein Schlüssel in einer Sprachdatei doppelt steht (im Objekt gewönne still der letzte); fehlende Schlüssel aus dem Code erscheinen als `[schluessel]` und als Warnung in der Konsole
 
 ## Grammatik
 

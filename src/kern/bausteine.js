@@ -5,7 +5,7 @@
 //   eine Liste nennt die erlaubten Werte (freiwillig); "wuerfel|menge" siehe mengeBestimmen
 // brauchtZiel: der Baustein wirkt auf ein Wesen und wird ohne Ziel übersprungen.
 // vorab (freiwillig): (spiel, kontext, parameter) => Grund oder null; sagt vor dem Benutzen, dass der Schritt jetzt
-//   nichts bewirken würde (z.B. beschwoeren: "kein_platz"); gefragt von wirkungVorab
+//   nichts bewirken würde (z.B. beschwoeren: "kein_freies_feld"); gefragt von wirkungVorab
 // Bausteine mit Zielauswahl (fuer_jedes_ziel, auf_feld, geschoss, springen) stehen in systeme/zielbausteine.js,
 // zustand_setzen und zustand_entfernen in systeme/zustaende.js.
 

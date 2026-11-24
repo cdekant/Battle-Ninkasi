@@ -8,7 +8,8 @@
 //                 entsteht nichts und es kommt die Meldung "population_voll";
 //                 abstammung: true (Zellteilung) gibt dem neuen Wesen den EP-Topf der Quelle (systeme/lernen.js);
 //                 lebt die Urheberin nicht mehr (Auslöser an nach_tod, Zerfall), bekommen sie kein beschworenVon,
-//                 aber ihre Fraktion; Vorabprüfung: "kein_platz", wenn kein Feld frei oder die Population voll ist
+//                 aber ihre Fraktion; Vorabprüfung: "population_voll" an der Obergrenze, sonst "kein_freies_feld",
+//                 wenn kein Feld des Musters frei ist (dieselben Gründe wie beim Erschaffen, systeme/allmacht.js)
 //   verschwinden: entfernt das Ziel ohne Tod: keine Meldung "tod", kein nach_tod, keine Hinterlassenschaft;
 //                 Zustände, die an das Ziel als Quelle gebunden sind, enden; wirkt nicht auf Ninkasi
 
@@ -33,7 +34,8 @@ function freieFelderFuer(spiel, kontext, parameter) {
 const platzInDerPopulation = (spiel) => Math.max(0, spiel.daten.regeln.population.hoechstWesen - anzahlWesen(spiel.zustand));
 
 function keinPlatz(spiel, kontext, parameter) {
-  if (!kontext.ursprung || platzInDerPopulation(spiel) === 0 || freieFelderFuer(spiel, kontext, parameter).length === 0) return "kein_platz";
+  if (platzInDerPopulation(spiel) === 0) return "population_voll";
+  if (!kontext.ursprung || freieFelderFuer(spiel, kontext, parameter).length === 0) return "kein_freies_feld";
   return null;
 }
 

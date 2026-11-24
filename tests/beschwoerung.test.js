@@ -59,7 +59,7 @@ test("Beschwören: auf freien Feldern um die Beschwörerin, mit ihrer Fraktion, 
   }
 });
 
-test("Vorabprüfung: ohne freies Feld oder an der Obergrenze lehnt die Fähigkeit mit kein_platz ab, ohne Zeit zu kosten", () => {
+test("Vorabprüfung: ohne freies Feld oder an der Obergrenze lehnt die Fähigkeit mit kein_freies_feld bzw. population_voll ab, ohne Zeit zu kosten", () => {
   const spiel = spielBauen({ regeln: { population: { hoechstWesen: 3 } } });
   const ninkasi = spielerinSetzen(spiel, 2, 2);
   ninkasi.faehigkeiten = ["hefe_rufen", "hefe_und_hieb"];
@@ -68,22 +68,22 @@ test("Vorabprüfung: ohne freies Feld oder an der Obergrenze lehnt die Fähigkei
   const feind = wesen(spiel, 5, 2, "verderber");
   assert.equal(faehigkeitPruefen(spiel, ninkasi, "hefe_rufen"), null, "Platz für eine dritte");
   wesen(spiel, 6, 2, "verderber");
-  assert.equal(faehigkeitPruefen(spiel, ninkasi, "hefe_rufen"), "kein_platz", "Population voll");
+  assert.equal(faehigkeitPruefen(spiel, ninkasi, "hefe_rufen"), "population_voll", "Population voll");
   assert.equal(faehigkeitPruefen(spiel, ninkasi, "hefe_und_hieb", { id: feind.id }), null, "ein anderer Schritt wirkt noch");
   const zeit = spiel.zustand.zeit;
   const meldungen = meldungenMitschneiden(spiel);
   befehlGeben(spiel, { art: "faehigkeit", faehigkeit: "hefe_rufen" });
   assert.equal(spiel.zustand.zeit, zeit);
-  assert.ok(meldungen.some((meldung) => meldung.art === "abgelehnt" && meldung.grund === "kein_platz"));
+  assert.ok(meldungen.some((meldung) => meldung.art === "abgelehnt" && meldung.grund === "population_voll"));
 });
 
-test("Vorabprüfung: ringsum besetzt heißt kein_platz, wirkungVorab fragt nur Schritte mit Vorabprüfung", () => {
+test("Vorabprüfung: ringsum besetzt heißt kein_freies_feld, wirkungVorab fragt nur Schritte mit Vorabprüfung", () => {
   const spiel = spielBauen();
   const ninkasi = spielerinSetzen(spiel, 1, 1);
   ninkasi.faehigkeiten = ["hefe_rufen"];
   for (const [x, y] of [[2, 1], [1, 2], [2, 2]]) wesen(spiel, x, y, "verderber");
-  assert.equal(faehigkeitPruefen(spiel, ninkasi, "hefe_rufen"), "kein_platz");
-  assert.equal(wirkungVorab(spiel, "hefe_rufen", { quelleId: ninkasi.id }), "kein_platz");
+  assert.equal(faehigkeitPruefen(spiel, ninkasi, "hefe_rufen"), "kein_freies_feld");
+  assert.equal(wirkungVorab(spiel, "hefe_rufen", { quelleId: ninkasi.id }), "kein_freies_feld");
   assert.equal(wirkungVorab(spiel, "toedlich", { quelleId: ninkasi.id }), null);
 });
 
