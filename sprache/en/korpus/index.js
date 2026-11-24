@@ -2,6 +2,7 @@
 // deshalb steht hier jede Datei; ein Test prüft, dass die Liste zum Ordner passt. Ein neuer Text braucht nur seine Zeile.
 export default [
   "gilgamesch-tafel-01.md",
+  "gilgamesch-tafel-02.md",
   "istar-unterwelt.md",
   "ninkasi-hymne.md",
   "ninkasi-hymne-b.md",
