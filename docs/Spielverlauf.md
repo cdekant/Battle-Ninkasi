@@ -2,7 +2,7 @@
 
 Stand: 2026-11-24
 
-Mitprüfen bei Änderungen: [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md), [Ausblick.md](Ausblick.md)
+Mitprüfen bei Änderungen: [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md), [Ausblick.md](Ausblick.md), [Fundus.md](Fundus.md)
 
 Wie ein Lauf in die Tiefe verläuft und wie der Inhalt sich darauf verteilt: Kapitel, Hub, Epochen, Ebenenbilder, Bosse und was zwei Läufe unterscheidet. Das Spiel im Ganzen steht in [Grundlagen.md](Grundlagen.md), Breite und Spezialisierung der Skills in [Charakter.md](Charakter.md), Skills.
 

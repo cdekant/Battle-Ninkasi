@@ -62,6 +62,7 @@ Spieldesign:
 + [docs/Animationen.md](docs/Animationen.md): Effektschicht, Kampfanimation, Kamera (zurückgestellt)
 + [docs/Texte.md](docs/Texte.md): Sprachdateien, Textkorpus, Literaturverzeichnis (`sprache/literatur.json`, Originale in `sprache/Literatur/` nicht im Repo)
 + [docs/Tileset.md](docs/Tileset.md): Artstyle-Fibel, Pixeldaten, Varianten; neue Tiles folgen der Fibel
++ [docs/Fundus.md](docs/Fundus.md): Namen, Berufe, Götter, Tiere, Pflanzen und Orte aus dem babylonischen Korpus als Stoff für Inhalte
 + [docs/Ausblick.md](docs/Ausblick.md): Ideen ohne Entscheidung, ihre Folgen für den Kern und Vorkehrungen, Recherche
 
 Technik:

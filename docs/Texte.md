@@ -4,7 +4,7 @@ Stand: 2026-11-24
 
 Zuständig für: `sprache/*`, `src/anzeige/texte.js`, `src/anzeige/grammatik.js`, `src/anzeige/korpus.js`, `src/anzeige/glossar.js`, `daten/glossar.js`
 
-Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Architektur.md](Architektur.md), [Entwicklung.md](Entwicklung.md)
+Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Architektur.md](Architektur.md), [Entwicklung.md](Entwicklung.md), [Fundus.md](Fundus.md)
 
 Grobskizze, auszuarbeiten.
 
@@ -91,6 +91,7 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 + Gilgamesch-Epos ganz nachgedichtet aus der eBL-Fassung (`george2022gilgamesch`), eine Datei je Tafel (`gilgamesch-tafel-<nn>.md`, Tafel I bis XII); Lücken der jungbabylonischen Fassung sind aus den altbabylonischen Stücken ergänzt, reine Bruchstücke ausgelassen, wörtliche Wiederholungen der Vorlage stehen beim ersten Mal ganz und danach in Kurzform, weil sie Titelsprüche und Markow-Ketten gleichförmig machen; jede Abweichung von der Vorlage steht im Kopf unter `vorlage`
 + Aus Maqlû (`abusch2024maqlu`) sind 24 der stärksten Beschwörungen gegen Hexen ausgewählt, je eine Datei `maqlu-<nn>-<kurzname>.md` mit Tafel und Anfangsvers unter `vorlage`; lange, gleichförmige Anrufungen (etwa Tafel II, "Girra, vollkommener Herr", und Tafel IV, "Brenne, lodere") fehlen bewusst
 + Omen der Schenke (`omen-der-schenke.md`): eigene Omen über Bier, Schenke und Brauen im Bau von Šumma ālu (`mittermayer2021summaalu`), "Wenn …: …" mit der Lösung "Damit es nicht naht: …"; weitere Omen für Spielinhalte (Fundstücke, Vorzeichen auf einer Ebene) folgen demselben Bau
++ Namen, Berufe, Tiere, Pflanzen und Orte aus dem Korpus als Stoff für Inhalte: siehe [Fundus.md](Fundus.md); die Rohliste mit Fundstellen je Werk liegt in `sprache/Literatur/ebl/fundus.txt`
 + Kandidaten aus dem eBL-Korpus: keine offen; weitere Werke nach Bedarf aus `sprache/Literatur/ebl/`
 + Weitere Kandidaten, zu prüfen: weitere alte Übersetzungen des Gilgamesch-Epos, mittelalterliche Brauanleitungen, Brauordnungen, Bibelstellen und antike Autoren zu Bier und Wein
 

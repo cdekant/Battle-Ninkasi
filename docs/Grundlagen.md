@@ -2,7 +2,7 @@
 
 Stand: 2026-11-24
 
-Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Architektur.md](Architektur.md), [Wesen.md](Wesen.md), [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md), [Tileset.md](Tileset.md), [Entwicklung.md](Entwicklung.md), [Ausblick.md](Ausblick.md), [Spielverlauf.md](Spielverlauf.md)
+Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Architektur.md](Architektur.md), [Wesen.md](Wesen.md), [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md), [Tileset.md](Tileset.md), [Entwicklung.md](Entwicklung.md), [Ausblick.md](Ausblick.md), [Spielverlauf.md](Spielverlauf.md), [Fundus.md](Fundus.md)
 
 ## Spiel
 
@@ -99,6 +99,7 @@ Umsetzung: siehe [Wesen.md](Wesen.md), Skills und Lernen
 + Betriebskontrolleure
 + Abstinenzler
 + Bosse am Ende jedes Kapitels, Sobrietas am Ende größerer Bögen: siehe [Spielverlauf.md](Spielverlauf.md), Bosse
++ Stoff für Bosse, Figuren und lästige Kleingegner aus der babylonischen Literatur (Ḫumbaba, Skorpionmenschen, Dämonen, Ungeziefer im Keller): siehe [Fundus.md](Fundus.md)
 + Vorschlag, noch nicht bestätigt: Hefen ambivalent, Milchsäurebakterien, Essigbakterien und Schimmel als Verderber
 + Idee, noch nicht bestätigt: Mikroorganismen teilen sich, ausgehend von einer Mutterzelle
 + Ideen, auszuarbeiten: jede Gruppe der Mikroorganismen mit eigener Mechanik
