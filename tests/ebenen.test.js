@@ -151,7 +151,7 @@ test("Datenprüfung: Abfolge, Starttiefe, feste Karte, Population und Tabellen",
 // den dunklen Keller in Tiefe 2, die Laterne und sicht.imDunkeln an Ninkasi (mit der alten Abfolge, ohne Laterne und
 // ohne imDunkeln blieben die Werte gleich).
 test("Erzeugung in Schritten: dieselben Ebenen wie vorher", () => {
-  const erwartet = { 1: "5a9e288d8433cbb6", 2: "a67da0e260ab5e47", 3: "a67aa2c0b8704a96", 42: "cf3621f3e1d82c11", 4711: "3955eb456b94b8ac" };
+  const erwartet = { 1: "a1b6cdeba9dbab2c", 2: "8eb1a5e5a290d17e", 3: "db13688b32da3b40", 42: "81796eaeecc928c3", 4711: "0d999a4de173741c" };
   for (const [startwert, fingerabdruck] of Object.entries(erwartet)) {
     const spiel = neuesSpiel(DATEN, Number(startwert));
     for (const tiefe of [2, 3, 0]) ebeneWechseln(spiel, tiefe);

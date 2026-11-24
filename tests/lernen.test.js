@@ -3,7 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import "../src/kern/spiel.js"; // meldet Bausteine, Systeme und Verhaltensmodule an
-import { miniSpiel, wesen, spielerinSetzen, lernendeSpielerin, meldungenMitschneiden } from "./hilfen.js";
+import { miniSpiel, wesen, spielerinSetzen, lernendeSpielerin, meldungenMitschneiden, gegenstandTragen } from "./hilfen.js";
 import { effektAnwenden } from "../src/kern/effekte.js";
 import { vorgangAbschliessen } from "../src/kern/vorgang.js";
 import { nahkampf } from "../src/systeme/kampf.js";
@@ -100,6 +100,16 @@ test("Passive Anlässe: ausweichen, blocken, Rüstung und erlittener Schaden ste
   ninkasi.kampfwerte = { blocken: 1_000_000_000 };
   nahkampf(spiel, geblockt, ninkasi);
   assert.deepEqual(geblockt.beitraege, [{ anlass: "geblockt", tags: [] }]);
+});
+
+test("Anlass Rüstung: Tags der angelegten Stücke, die Rüstung geben, stehen im Eintrag", () => {
+  const { spiel, ninkasi } = aufstellen();
+  const schuerze = gegenstandTragen(spiel, ninkasi, { tags: ["ruestung_leicht"], ausruestung: { platz: "brust", modifikatoren: [{ ziel: "ruestung", art: "plus", betrag: 1 }] } });
+  const ring = gegenstandTragen(spiel, ninkasi, { tags: ["kupfer"], ausruestung: { platz: "finger", modifikatoren: [{ ziel: "willenskraft", art: "plus", betrag: 5 }] } });
+  ninkasi.ausgeruestet = [schuerze.id, ring.id];
+  const beisser = wesen(spiel, 1, 1, "feinde", 50, { angriffe: [{ name: "biss", genauigkeit: 100, effekt: "stoss", tags: ["biss"] }] });
+  nahkampf(spiel, beisser, ninkasi);
+  assert.deepEqual(beisser.beitraege[0], { anlass: "ruestung", tags: ["biss", "ruestung_leicht", "stumpf"] }, "ohne den Tag des Rings");
 });
 
 test("Aufteilung: gleich je Bucheintrag, dann je passendem Skill; Querlernen zusätzlich; Reste und Unpassendes frei", () => {

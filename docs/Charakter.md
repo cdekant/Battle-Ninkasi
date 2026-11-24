@@ -86,7 +86,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Neuv
 
 ### Aufbau
 
-+ Skill-Sets (z.B. Zähigkeit für LP) mit vier Tiers: Grund-, Experten-, Meister-Skill, göttliches Skill-Niveau; jeder Tier ist ein eigener Skill mit eigener Wirkung
++ Skill-Sets (z.B. Zähigkeit für LP) mit bis zu vier Tiers: Grund-, Experten-, Meister-Skill, göttliches Skill-Niveau; jeder Tier ist ein eigener Skill mit eigener Wirkung; ein Set darf schon nach drei, zwei oder einem Tier enden
 + Stufen 0 bis 5 je Skill
 + Voraussetzungen innerhalb eines Sets ergeben sich aus der Regel: Experten-Skill verlangt Grundskill 3, Meister-Skill Grundskill 4 und Experte 3, göttliches Niveau Grundskill 5, Experte 4 und Meister 3
 + Darüber hinaus kann jeder Skill beliebige andere Skills voraussetzen, auch aus anderen Sets, z.B. Zweihandspezialisierung die allgemeine Waffenfertigkeit, Anstürmen die körperliche Grundfertigkeit, Schildschlag-Schaden die Schildgrundfertigkeit; alle Voraussetzungen müssen erfüllt sein (eine Oder-Gruppe ist später möglich)
@@ -161,7 +161,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skil
 
 + Gebundene EP gibt nur Bewältigtes, das es je Ebene endlich oft gibt: besiegte Gegner, entschärfte Fallen, geöffnete Schlösser, ein Rezept beim ersten Gelingen, ein Hinterhalt; jedes davon trägt in den Daten einen festen Wert `ep`
 + Die Anwendung selbst bringt keine EP, sie bestimmt, wohin die EP fließen; so bleibt die Menge je Ebene begrenzt und Farmen an harmlosen Zielen bringt nichts
-+ Jedes Wesen führt ein Beitragsbuch: welche Lernanlässe Ninkasi an ihm hatte (Wirkung mit den Tags von Angriff, Fähigkeit und Effekt, dazu Ausweichen, Blocken, Rüstung und erlittener Schaden für passive Skills)
++ Jedes Wesen führt ein Beitragsbuch: welche Lernanlässe Ninkasi an ihm hatte (Wirkung mit den Tags von Angriff, Fähigkeit und Effekt, dazu Ausweichen, Blocken, Rüstung nach ihrer Art und erlittener Schaden für passive Skills, Entkommen für die Skills der Bewegung)
 + Gewichtung vorerst nach der ersten erfolgreichen Anwendung: Jeder Lernanlass zählt je Gegner einmal; als Regelwert `regeln.lernen.gewichtung` (`erste`, später zum Vergleich `anteil` nach Schadensanteil)
 + Beim Tod des Gegners teilen sich seine EP auf die Skills auf, deren Lernanlässe im Buch stehen; passen mehrere Skills zum selben Anlass, wird gleich geteilt
 + Stirbt der Gegner durch eine Falle oder eine Verbündete, zählt das Buch trotzdem, sobald Ninkasi beigetragen hat
@@ -182,7 +182,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skil
 + Nachrückende Gegner sind nicht ausgeschlossen, mit eigenem EP-Faktor (Idee in [Ausblick.md](Ausblick.md), Nachrückende Gegner)
 + Vorschlag, noch nicht bestätigt: Varianten durch Affixe vervielfachen die Gegnertypen
 
-Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: nachrückende Gegner, Rätsel
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Entkommen, nachrückende Gegner, Rätsel
 
 ## Offen
 

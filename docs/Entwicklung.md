@@ -1,6 +1,6 @@
 # Battle Ninkasi - Entwicklung
 
-Stand: 2026-11-23
+Stand: 2026-11-24
 
 Zuständig für: `starten.py`, `starten.bat`, `tests/*`, `werkzeuge/bot.js`, `werkzeuge/messung.js`, `werkzeuge/arena.js`, `werkzeuge/kompendium.js`, `werkzeuge/kompendium.html`, `werkzeuge/luecken.js`, `werkzeuge/namensbuch.js`, `datenproben/*`
 
@@ -152,7 +152,7 @@ Inhalt:
 + Fallen: Säuredüse (Tarnung 40, 2W4 Säure, nutzt 2 ab, hinterlässt Säure, die 1W3 je Tick verätzt und trocknet) und Klappergeschirr (Tarnung 20, Lärm 14, weckt die Nachbarschaft)
 + Feldschichten: Gärbottiche geben CO2 ab, das sich hinter geschlossenen Türen sammelt (ab 30 benommen, ab 70 Ersticken, vorläufig Giftschaden statt Zuständen); Brandflaschen zerspringen beim Wurf zu Hochprozentigem und entzünden es; Feuer 1W6, Rauch ab 40 undurchsichtig, ab 60 Husten
 + Getränke: Bier (+20 LP, Pegel +0,5 ‰, 900 g, stapelbar) wird zur leeren Flasche (400 g, Hauptwort mit festem Adjektiv) und verdirbt nach 50000 Zeiteinheiten zu Sauerbier (LP +5, Pegel +0,3 ‰); Bierfass mit 20 Schlucken zu einer Halben (2 kg Holz und 500 g je Schluck, voll 12 kg), wird zum Fass und verdirbt nicht; Bier und Bierfass dienen dem Zweck `heilen`; Brandflasche (900 g, stapelbar) dem Zweck `angriff`; Riechwasser (300 g, stapelbar) setzt den Zustand `witterung` (Spüren +5 für 200 Züge), zum Ausprobieren über die Testkammer
-+ Ausrüstung von 20 g bis 6 kg: Schöpfkelle (Hand, flink), Fasshammer (beide Hände, langsam, Ausweichen -5), Lederschürze (Brust, Rüstung 2, Ausweichen -5), Kupferhelm (Kopf), Lederhose (Beine), Hopfenkette (Hals, LP-Regeneration +20 %), Kupferring (Finger), Laterne (Hand, Licht mit Reichweite 4 und Stärke 80, leuchtet angelegt und am Boden); Kupferhelm und Kupferringe bilden ein Set (Willenskraft); Lederschürze und Lederhose (Haltbarkeit 20, werden zu Lederfetzen) und Kupferhelm (30, wird zu Kupferschrott) nutzen sich unter Säure ab
++ Ausrüstung von 20 g bis 6 kg: Schöpfkelle (Hand, flink), Fasshammer (beide Hände, langsam, Ausweichen -5), Lederschürze (Brust, Rüstung 2, Ausweichen -5), Kupferhelm (Kopf), Lederhose (Beine), Hopfenkette (Hals, LP-Regeneration +20 %), Kupferring (Finger), Laterne (Hand, Licht mit Reichweite 4 und Stärke 80, leuchtet angelegt und am Boden); Kupferhelm und Kupferringe bilden ein Set (Willenskraft); Lederschürze und Lederhose sind leichte Rüstung, der Kupferhelm schwere (Tags `ruestung_leicht`, `ruestung_schwer`); Lederschürze und Lederhose (Haltbarkeit 20, werden zu Lederfetzen) und Kupferhelm (30, wird zu Kupferschrott) nutzen sich unter Säure ab
 + Unbekanntes: noch kein unbekannter Gegenstand; die Gruppe `biere` (Tonkrug, Steinkrug, Bügelflasche, Henkelflasche, Bocksbeutel) wartet auf die Biersorten
 + Skills: Zähigkeit (Grund und Expertin, LP), Nahkampf (Genauigkeit mit Tag `nahkampf`), Ausweichen
 + Arenen (`datenproben/arenen.js`): Essigbakterien (drei, mit Varianten Ninkasi nackt, gerüstet, geübt und Gegner drei, fünf oder drei gereizte, ein Affix mit dem Zustand `gereizt`, Ausweichen -1, als Probe für Adjektive), Fernkämpfer in zwei Wellen (mit zwei Bier), Rudel im Engpass (sechs Essigbakterien vor dem Gang), Reihe aus dem Keller (sechs Rudel aus Tiefe 1, mit Bier und Brandflaschen, Taktik `fernkampf`), alle Gegner des Kellers; Befund siehe Messwerte

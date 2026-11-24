@@ -10,7 +10,8 @@
 //                       Angriffs, der Fähigkeit und des Effekts, dazu die Schadensart bzw. die Tags des Zustands und
 //                       "beschworen", wenn eine Beschworene Ninkasis gewirkt hat
 //     ausgewichen, geblockt  das Wesen verfehlt Ninkasi
-//     ruestung          Ninkasis Rüstung fängt Schaden des Wesens ab
+//     ruestung          Ninkasis Rüstung fängt Schaden des Wesens ab; Tags des Angriffs, die Schadensart und die Tags
+//                       der angelegten Stücke, die Rüstung geben (z.B. ruestung_leicht, ruestung_schwer)
 //     schaden_erlitten  das Wesen fügt Ninkasi Schaden zu
 //   Beim Tod (Haken nach_tod) teilen sich die EP zu gleichen Teilen auf die Bucheinträge, je Eintrag zu gleichen Teilen
 //   auf die Skills, deren lernt passt (gleicher Anlass, ihre Tags sind im Eintrag); verwandt gibt zusätzlich Anteile an
@@ -25,6 +26,7 @@ import { spielerin } from "../kern/zustand.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { RANG_RUESTUNG } from "../kern/hakenkatalog.js";
 import { eigenschaftenPruefen, epAufSkill } from "./skills.js";
+import { ausgeruestete } from "./ausruestung.js";
 
 const lernregeln = (spiel) => spiel.daten.regeln.lernen;
 
@@ -96,10 +98,16 @@ anmelden("haken", "verfehlt", (spiel, kontext) => {
   beitragEintragen(spiel, kontext.urheberId, kontext.grund, kontext.tags || []);
 });
 
+// Tags der angelegten Stücke mit einem Modifikator auf ruestung oder ruestung.<art>, damit Skills nach der Art der
+// Rüstung lernen; Stücke ohne Rüstung (Ring, Waffe) bleiben außen vor
+const gibtRuestung = (gegenstand) => (gegenstand.ausruestung.modifikatoren || []).some(({ ziel }) => ziel === "ruestung" || ziel?.startsWith?.("ruestung."));
+const tagsDerRuestung = (spiel, wesen) => ausgeruestete(spiel, wesen).filter(gibtRuestung).flatMap((gegenstand) => gegenstand.tags || []);
+
 // Nach der Rüstung (systeme/kampf.js), damit ruestungAbzug feststeht
 anmelden("haken", "vor_schaden", (spiel, kontext) => {
   if (kontext.zielId !== spiel.zustand.spielerinId || !((kontext.ruestungAbzug ?? 0) > 0)) return;
-  beitragEintragen(spiel, kontext.urheberId, "ruestung", [...(kontext.tags || []), kontext.schadensart]);
+  const ninkasi = spiel.zustand.entitaeten[kontext.zielId];
+  beitragEintragen(spiel, kontext.urheberId, "ruestung", [...(kontext.tags || []), kontext.schadensart, ...tagsDerRuestung(spiel, ninkasi)]);
 }, { rang: RANG_RUESTUNG + 1 });
 
 // Topf der Abstammungslinie eines Wesens; eröffnet ihn, wenn es noch keinen hat

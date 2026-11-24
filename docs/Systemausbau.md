@@ -22,7 +22,7 @@ Stand 2026-11-24, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer W
 4. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
 5. Danach der Inhalt (Punkt 14)
 
-Daneben, ohne festen Platz: Skills für Anhänger (Punkt 21, geprüft in der Sitzung zu Punkt 20, umgesetzt mit den Begleitern bzw. den Geistern früherer Läufe), kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12), Korpustexte aus dem Gilgamesch-Epos (Punkt 18), Auszeichnung in Texten (Punkt 19, spätestens mit dem Fenster des Glossars); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 3 (Licht, Wahrnehmungsarten, Spüren und Duft), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen), Punkt 9 (Englisch, Mehrzahl und Glossar) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
+Daneben, ohne festen Platz: Skills für Anhänger (Punkt 21, Umbaurisiko gering, umgesetzt mit den Begleitern bzw. den Geistern früherer Läufe), kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12), Korpustexte aus dem Gilgamesch-Epos (Punkt 18), Auszeichnung in Texten (Punkt 19, spätestens mit dem Fenster des Glossars); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 3 (Licht, Wahrnehmungsarten, Spüren und Duft), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen), Punkt 9 (Englisch, Mehrzahl und Glossar) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
 
 Die Proben des Probedurchstichs stehen in `tests/probedurchstich.test.js`; jede Lücke dort ist ein Test mit `todo` und dem Punkt, der sie schließt, mit einem Entwurf der Daten (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing). Wer einen Punkt umsetzt, nimmt dort das `todo` weg.
 
@@ -174,18 +174,18 @@ Status: offen
 
 ## 20. Skillkatalog
 
-Status: offen, als erste eigene Sitzung zu [Skills.md](Skills.md); das Dokument ist der rudimentäre Skillkatalog und gehört zu den Grundfesten des Spieldesigns
+Status: in Arbeit, Kategorie für Kategorie in [Skills.md](Skills.md); das Dokument ist der Skillkatalog im Entwurf und gehört zu den Grundfesten des Spieldesigns
 
-+ Form klären: Wirkungen in Worten und Verhältnissen statt Zahlen, die geratenen Zahlen als Probeinhalt in `datenproben/skills.js` (siehe [Dokumentation.md](Dokumentation.md), Arten der Dokumente)
-+ Sets nach Kategorien (Körper und Bewegung, Kampf, Brauen, Soziales, Magie, Psi) mit Tier, primärer und sekundärer Eigenschaft
-+ Rüstungsskills für leichte und schwere Rüstung (gefühltes Gewicht und Verlangsamung), Bewegung und Sprint, waffenloser Kampf (siehe [Grundlagen.md](Grundlagen.md), Zeit und Tempo)
++ Kategorien abwandern: Körper und Bewegung entworfen; weiter mit Stoffwechsel und Pegel, Wahrnehmung, Kampf (darin waffenloser Kampf), Brauen, Anlagen und Fallen, Soziales, Magie, Psi
 + Höchstens eine angeborene Grundfähigkeit je Vorrat; die erste ist der Sprint, die anderen beiden bleiben offen (siehe [Charakter.md](Charakter.md), Skills)
-+ Prüfen, ob die Skills auch für Gegner und Verbündete taugen (siehe Punkt 21)
++ Lernanlass `entkommen` für Laufen und Sprint: zählt, wenn ein Wesen Ninkasi aus dem Kampf verliert, während sie läuft oder sprintet, je Wesen einmal wie alle Anlässe (siehe [Wesen.md](Wesen.md), Skills und Lernen)
++ Laufen, Sprint und Rüstungsskills brauchen die Zeitskala aus Punkt 10 (Tempo je Wesen, Sprint, Verlangsamung durch Rüstung)
++ Probewerte aus dem Entwurf, bis die Skills umgesetzt sind: Zähigkeit LP von 100 auf 300 über vier Tiers, Regeneration der LP von 0 auf 1 je Tick, Laufen Kosten fürs Bewegen von 120 auf 80 über vier Tiers, Tragkraft von 20 kg auf 40 kg, Bremsen durch die Last von 100 % auf 50 %
 
 ## 21. Skills für Anhänger
 
 Status: offen, ohne festen Platz; nach dem Umbaurisiko eingeordnet
 
 + Vorschlag: Gegner bekommen feste Werte in ihren Daten, Verbündete (Begleiter, das Tier der Jägerin) und die Geister früherer Läufe tragen Skills; die Geister brauchen das, weil sie den Build einer früheren Ninkasi tragen (siehe [Ausblick.md](Ausblick.md), Geister früherer Läufe)
-+ Zuerst prüfen, ob die Modifikatorquelle `skills` und der Lernstand nur bei Ninkasi gelesen werden (siehe [Wesen.md](Wesen.md), Skills und Lernen); das ist wenig Aufwand und entscheidet über das Umbaurisiko, darum in der Sitzung zu Punkt 20
++ Umbaurisiko gering: Modifikator- und Auslöserquelle `skills`, die Bedingung `skill_ab` und der Ausbau der Fähigkeiten lesen den Lernstand an jedem Wesen; an Ninkasi gebunden sind nur das Einrichten, das Gewinnen von EP mit dem Beitragsbuch, die Datenprüfung der Startskills und die Arena (siehe [Wesen.md](Wesen.md), Skills und Lernen)
 + Umsetzung mit den Begleitern bzw. den Geistern früherer Läufe

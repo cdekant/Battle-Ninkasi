@@ -1,5 +1,6 @@
 // Ausrüstung (Aufbau siehe src/systeme/ausruestung.js); alle Zahlen vorläufig.
 // Waffen in den Händen ersetzen die Faust; Kupferteile bilden ein Set (traegt_tag kupfer, anzahl 2).
+// Rüstung trägt den Tag ruestung_leicht oder ruestung_schwer, danach lernen die Rüstungsskills (src/systeme/lernen.js).
 // Haltbarkeit (src/systeme/verschleiss.js): Säure frisst an Rüstung, angefressen schützt sie weniger, bei 0 bleiben Reste.
 const KUPFERSET = { ziel: "willenskraft", art: "plus", betrag: 10, wenn: [{ bedingung: "traegt_tag", tag: "kupfer", anzahl: 2 }] };
 
@@ -19,7 +20,7 @@ export default {
     },
   },
   lederschuerze: {
-    text: "gegenstand.lederschuerze", aufhebbar: true, gewicht: 2000, haltbarkeit: { hoechstens: 20, wirdZu: "lederfetzen" },
+    text: "gegenstand.lederschuerze", aufhebbar: true, gewicht: 2000, tags: ["ruestung_leicht"], haltbarkeit: { hoechstens: 20, wirdZu: "lederfetzen" },
     ausruestung: { platz: "brust", modifikatoren: [{ ziel: "ruestung", art: "plus", betrag: 2 }, { ziel: "ausweichen", art: "plus", betrag: -5 }] },
   },
   // leuchtet angelegt vom Feld der Trägerin aus, am Boden auch, im Gepäck nicht (src/systeme/licht.js)
@@ -29,11 +30,11 @@ export default {
     ausruestung: { platz: "hand" },
   },
   kupferhelm: {
-    text: "gegenstand.kupferhelm", aufhebbar: true, gewicht: 1500, tags: ["kupfer"], haltbarkeit: { hoechstens: 30, wirdZu: "kupferschrott" },
+    text: "gegenstand.kupferhelm", aufhebbar: true, gewicht: 1500, tags: ["kupfer", "ruestung_schwer"], haltbarkeit: { hoechstens: 30, wirdZu: "kupferschrott" },
     ausruestung: { platz: "kopf", modifikatoren: [{ ziel: "ruestung", art: "plus", betrag: 1 }, KUPFERSET] },
   },
   lederhose: {
-    text: "gegenstand.lederhose", aufhebbar: true, gewicht: 1500, haltbarkeit: { hoechstens: 20, wirdZu: "lederfetzen" },
+    text: "gegenstand.lederhose", aufhebbar: true, gewicht: 1500, tags: ["ruestung_leicht"], haltbarkeit: { hoechstens: 20, wirdZu: "lederfetzen" },
     ausruestung: { platz: "beine", modifikatoren: [{ ziel: "ruestung", art: "plus", betrag: 1 }] },
   },
   hopfenkette: {

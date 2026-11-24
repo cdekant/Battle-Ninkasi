@@ -1,6 +1,6 @@
 # Battle Ninkasi - Gegenstände
 
-Stand: 2026-11-23
+Stand: 2026-11-24
 
 Zuständig für: `src/systeme/inventar.js`, `src/systeme/ausruestung.js`, `src/systeme/verschleiss.js`, `src/systeme/kennen.js`
 
@@ -48,7 +48,7 @@ Vorbilder: Brogue (wenige Plätze), DCSS (Tauschen in einem Befehl), NetHack (Fl
 Daten:
 
 + Plätze am Wesen: `plaetze: { hand: 2, kopf: 1, brust: 1, beine: 1, hals: 1, finger: 2 }` (Ninkasi); die Namen stehen in `regeln.ausruestung.plaetze`
-+ Gegenstand (`datenproben/ausruestung.js`): `ausruestung: { platz, belegt?, angriffe?, modifikatoren?, ausloeser?, faehigkeiten?, anforderung?, abzugJePunkt? }` und `tags`; `faehigkeiten: [name]` gewährt diese Fähigkeiten, solange der Gegenstand angelegt ist (z.B. ein Zauberstab in der Hand); `belegt` (Vorgabe 1) zählt die Stellen, ein Zweihänder belegt beide Hände; Anforderungen siehe [Wesen.md](Wesen.md), Skills und Lernen
++ Gegenstand (`datenproben/ausruestung.js`): `ausruestung: { platz, belegt?, angriffe?, modifikatoren?, ausloeser?, faehigkeiten?, anforderung?, abzugJePunkt? }` und `tags` (Sets, Art der Rüstung für die Rüstungsskills, siehe [Wesen.md](Wesen.md), Skills und Lernen); `faehigkeiten: [name]` gewährt diese Fähigkeiten, solange der Gegenstand angelegt ist (z.B. ein Zauberstab in der Hand); `belegt` (Vorgabe 1) zählt die Stellen, ein Zweihänder belegt beide Hände; Anforderungen siehe [Wesen.md](Wesen.md), Skills und Lernen
 + `verflucht: true` am Gegenstand, `fluchBekannt` nach dem Anlegen
 + Angelegt ist, was in `ausgeruestet: [IDs]` am Wesen steht; der Gegenstand bleibt im Inventar
 + `licht` am Gegenstand (etwa eine Laterne): leuchtet angelegt vom Feld der Trägerin aus und am Boden, im Gepäck nicht (siehe [Welt.md](Welt.md), Licht)
