@@ -2,7 +2,7 @@
 
 Stand: 2026-11-24, Entwurf; entsteht Kategorie für Kategorie ([Systemausbau.md](Systemausbau.md), Punkt 20)
 
-Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Wesen.md](Wesen.md)
+Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Wesen.md](Wesen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md)
 
 Dieses Designdokument ist der Skillkatalog im Entwurf, die Vision eines tiefen Skillsystems für Ninkasi. Die Regeln des Systems (Aufbau, Kosten, Wirkung, Fähigkeiten) stehen in [Charakter.md](Charakter.md), Skills.
 
@@ -100,7 +100,81 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Wahrnehmung
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
+Die Kategorie hält die eigenen Sinne der Göttin: Sehen, Spüren und Hören in der Nähe, nie durch Wände, dazu Fallen entdecken, Unbekanntes erkennen und als Gegenstück das Schleichen. Orten über Entfernung und durch Wände, Hellsicht und Telepathie sind Fähigkeiten aus der Welt und gehören zu Magie und Psi. Wer Gefahr früh wahrnimmt, lernt daraus (Lernanlass Erspäht: ein Wesen wahrgenommen, bevor es Ninkasi bemerkt hat; die Art des Wahrnehmens entscheidet, welcher Skill lernt).
+
+### Fernsicht
+
++ Eigenschaften: Sinnlichkeit, sekundär Gewandtheit
++ Lernt aus: Erspäht in der Ferne
++ Ninkasi beginnt knapp unter der Sichtweite eines gewöhnlichen Gegners und wird zuerst gesehen; schon wenige Grundstufen drehen das um, mit vertretbarem Aufwand sieht sie etwa doppelt so weit wie ein gewöhnlicher Gegner (siehe [Grundlagen.md](Grundlagen.md), Licht und Wahrnehmung)
++ Darüber bringt mehr Reichweite wenig, weil nur Beleuchtetes zu sehen ist; der göttliche Tier spezialisiert anders: Werte und Ausrüstung eines Wesens auf volle Sichtweite erkennen, weniger Abzug im Fernkampf auf große Entfernung
++ Querlernen zum Fernkampf
+
+### Nachtsicht
+
++ Eigenschaften: Sinnlichkeit, sekundär Trinkfestigkeit
++ Lernt aus: Erspäht im Finstern
++ Ninkasi sieht im Finstern weiter, auf dem göttlichen Tier etwa halb so weit wie im Licht, nie ganz; das Licht behält seinen Wert
+
+### Dämmersicht
+
++ Eigenschaften: Sinnlichkeit, sekundär Klugheit
++ Lernt aus: Erspäht im Dunkeln
++ Ninkasi sieht auf dämmrigen und dunklen Feldern weiter, bis sie sie wie helle sieht
++ Setzt voraus, dass auch diese Lichtstufen die Sichtweite begrenzen; heute verbirgt nur die finstere (offen in [Systemausbau.md](Systemausbau.md), Punkt 20)
+
+### Gespür für Wesen
+
++ Eigenschaften: Sinnlichkeit, sekundär Braukunde
++ Lernt aus: Erspäht durch Spüren
++ Ninkasi spürt Wesen in der Nähe ohne Licht und durch Rauch, entlang von allem, was offen ist, wie die Wesen, die schon spüren
++ Zwei Tiers
+
+### Gespür für Schätze
+
++ Eigenschaften: Sinnlichkeit, sekundär Klugheit
++ Lernt aus: nur freien EP, ein gespürter Gegenstand ist nichts Bewältigtes
++ Ninkasi spürt Gegenstände in der Nähe, entlang von allem, was offen ist
++ Ein oder zwei Tiers
+
+### Gespür für Magie
+
++ Eigenschaften: Sinnlichkeit, sekundär Braukunde
++ Lernt aus: nur freien EP
++ Ninkasi spürt Gegenstände und Wesen mit magischen Wirkungen in der Nähe, entlang von allem, was offen ist
++ Ein oder zwei Tiers
+
+### Lauschen
+
++ Eigenschaften: Sinnlichkeit, sekundär Gewandtheit
++ Lernt aus: Erspäht durch Hören
++ Die Richtung eines Geräuschs kennt Ninkasi ohne Skill; die Tiers machen das Hören genauer: weiter hören, die Art erkennen ("ein Ork"), die Anzahl ("zwei Orks"), zuletzt gehörte Wesen kurz auf der Karte
++ Lohnt erst, wenn auch Schritte leisen Lärm machen
+
+### Fallengespür
+
++ Eigenschaften: Sinnlichkeit, sekundär Klugheit
++ Lernt aus: entdeckten Fallen; das Entdecken bringt einen Teil der EP einer Falle, das Entschärfen den Rest (siehe Anlagen und Fallen)
++ Fallen werden öfter und aus größerer Entfernung entdeckt
+
+### Kennerschaft
+
++ Eigenschaften: Sinnlichkeit, sekundär Braukunde
++ Lernt aus: jedem erkannten Typ, je Typ einmal, auch beim Erkennen durch Trinken und Benutzen
++ Unbekanntes wird schneller erkannt; ein höherer Tier erkennt beim Aufheben schon die Art ("ein Fluch liegt darauf"), bevor der Typ bekannt ist
++ Sehen, was in einem Stück steckt: Verschleiß, Haltbarkeit, verborgene Eigenschaften und Affixe genauer
++ Pflegen: Waffen und Rüstung nutzen sich langsamer ab, Gegenstände verderben langsamer; einer der wirksamen Wege, Ausrüstung in Schuss zu halten (siehe [Grundlagen.md](Grundlagen.md), Spielkern)
++ Die Wirksamkeit im Gebrauch hebt Kennerschaft nicht, sie gehört den Skills der Waffen und Rüstungen; ein höherer Tier darf verborgene Stärken eines Stücks wecken, die erst wirken, wenn es erkannt ist
++ Später auch für Anlagen: unbekannte Anlagen tragen ein Etikett, Kennerschaft senkt das Risiko des ersten Inbetriebnehmens (mit Anlagen und Fallen)
+
+### Schleichen
+
++ Eigenschaften: Gewandtheit, sekundär Sinnlichkeit
++ Lernt aus: Hinterhalt
++ Ninkasi wird später bemerkt (Heimlichkeit); ein höherer Tier hinterlässt weniger Duft, Jäger verlieren ihre Spur früher
++ Heimlichkeit ist ein Wert jedes Wesens, Gegner tragen ihn fest in ihren Daten; Fähigkeiten wie "im Schatten verstecken" kommen aus der Welt, Schleichen ist ihre Voraussetzung und macht sie wirksamer
+
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Wahrnehmung (Sichtweite, Sicht im Finstern, Spüren, Heimlichkeit als Werte mit Modifikatoren), [Welt.md](Welt.md), Gelände (Entdecken) und [Gegenstaende.md](Gegenstaende.md), Unbekanntes (Kennerschaft); offen: alle Skills, Lernanlässe Erspäht und Hinterhalt, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Kampf
 
