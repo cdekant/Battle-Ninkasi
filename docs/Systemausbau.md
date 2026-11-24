@@ -10,14 +10,14 @@ Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und wäh
 
 + Jeder Punkt wird vor der Umsetzung als Vorschlag ausgearbeitet und freigegeben
 + Status je Punkt: offen oder in Arbeit
-+ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 3 bis 11, 16, 17 und 20 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
++ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 3 bis 11, 16, 17, 20 und 22 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
 
 ## Reihenfolge
 
 Stand 2026-11-24, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer Wirkung auf den Inhalt, das Kleine und Breite zuerst:
 
 1. Skillkatalog, erste eigene Sitzung zu [Skills.md](Skills.md) (Punkt 20), weil Normierung, Regeneration, Pegel und Brausystem an den Skills hängen
-2. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10): Umsetzung der Zeitskala als eigene Version, Normierung, Regeneration und Kampfespegel, Pegelschwellen, die Bierstile (Punkt 17) vor dem Brausystem, Machtkurve
+2. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10): Umsetzung der Zeitskala als eigene Version, Normierung, Regeneration und Kampfespegel, Pegelschwellen, die Bierstile (Punkt 17) vor dem Brausystem, Machtkurve; die Fernwaffen (Punkt 22) nach der Zeitskala, weil Spannen und Nachladen Zeit kosten
 3. Ebenenbau: Ebenenbilder, Übergänge und feste Strukturen (Punkt 16)
 4. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
 5. Danach der Inhalt (Punkt 14)
@@ -182,8 +182,8 @@ Status: offen
 
 Status: in Arbeit, Kategorie für Kategorie in [Skills.md](Skills.md); das Dokument ist der Skillkatalog im Entwurf und gehört zu den Grundfesten des Spieldesigns
 
-+ Kategorien abwandern: Körper und Bewegung, Stoffwechsel und Pegel, Wahrnehmung entworfen, Kampf als Gerüst, darin Verteidigung, waffenloser Kampf, Nahkampf mit Waffen und Handhabung (weiter mit Fernkampf); weiter mit Kampf (darin waffenloser Kampf), Brauen, Anlagen und Fallen, Soziales, Magie, Psi
-+ Höchstens eine angeborene Grundfähigkeit je Vorrat; die erste ist der Sprint, die anderen beiden bleiben offen (siehe [Charakter.md](Charakter.md), Skills)
++ Kategorien abwandern: Körper und Bewegung, Stoffwechsel und Pegel, Wahrnehmung entworfen, Kampf als Gerüst, darin Verteidigung, waffenloser Kampf, Nahkampf mit Waffen, Handhabung und Fernkampf (weiter mit Schilden und Präzision); weiter mit Kampf (darin waffenloser Kampf), Brauen, Anlagen und Fallen, Soziales, Magie, Psi
++ Angeborene Grundfähigkeiten: körperliche ohne Vorrat (Faustschlag, Werfen) und höchstens eine je Vorrat; die erste je Vorrat ist der Sprint, die anderen beiden bleiben offen (siehe [Charakter.md](Charakter.md), Skills)
 + Lernanlass `entkommen` für Laufen und Sprint: zählt, wenn ein Wesen Ninkasi aus dem Kampf verliert, während sie läuft oder sprintet, je Wesen einmal wie alle Anlässe (siehe [Wesen.md](Wesen.md), Skills und Lernen)
 + Lernanlass `berauscht` für die Skills des Stoffwechsels: zählt, wenn Ninkasi an einem Wesen wirkt, während ihr Pegel über einer Schwelle liegt (mit den Tags der Wirkung, damit etwa die Trunkene Faust nur aus waffenlosem Kampf im Rausch lernt) (welche, mit den Pegelschwellen aus Punkt 10), je Wesen einmal
 + Lernanlass `erspaeht` für die Skills der Wahrnehmung: zählt, wenn Ninkasi ein Wesen wahrnimmt, das sie noch nicht bemerkt hat, je Wesen einmal; Tags nach der Art: `fern` jenseits der halben Sichtweite, `finster` und `dunkel` nach der Lichtstufe auf dem Feld des Wesens, `gespuert`, `gehoert`
@@ -211,3 +211,14 @@ Status: offen, ohne festen Platz; nach dem Umbaurisiko eingeordnet
 + Vorschlag: Gegner bekommen feste Werte in ihren Daten, Verbündete (Begleiter, das Tier der Jägerin) und die Geister früherer Läufe tragen Skills; die Geister brauchen das, weil sie den Build einer früheren Ninkasi tragen (siehe [Ausblick.md](Ausblick.md), Geister früherer Läufe)
 + Umbaurisiko gering: Modifikator- und Auslöserquelle `skills`, die Bedingung `skill_ab` und der Ausbau der Fähigkeiten lesen den Lernstand an jedem Wesen; an Ninkasi gebunden sind nur das Einrichten, das Gewinnen von EP mit dem Beitragsbuch, die Datenprüfung der Startskills und die Arena (siehe [Wesen.md](Wesen.md), Skills und Lernen)
 + Umsetzung mit den Begleitern bzw. den Geistern früherer Läufe
+
+## 22. Fernwaffen
+
+Status: offen, ein neues System von Grund auf; nach der Zeitskala aus Punkt 10, vor dem Inhalt, weil die Jägerin es braucht (Spieldesign in [Skills.md](Skills.md), Kampf, Fernkampf)
+
++ Heute gibt es nur das Werfen (siehe [Wesen.md](Wesen.md), Bewegung) und Fernangriffe der Gegner über Fähigkeiten mit Abklingzeit; Fernwaffen für Ninkasi fehlen ganz
++ Waffe mit einem Profil auf Entfernung (Reichweite, Zielart `geschoss` oder `strahl`, Tag der Gattung), Schießen über den Zielmodus wie das Werfen
++ Munition je Gattung: Pfeile und Bolzen als Stapel im Gepäck, landen nach dem Schuss mit einer Chance zu brechen; Kugeln verbraucht, Nachladen als Aktion mit Zeit; Druck, der sich in der Waffe mit der Zeit aufbaut; Ladungen wie beim Zauberstab (Punkt 8) und Hitze je Schuss, die abklingt
++ Lärm je Schuss als Wert der Waffe, Feuerwaffen weit hörbar, aber nicht auf der ganzen Ebene
++ Werfen nachziehen: Reichweite nach dem Gewicht des Gegenstands (Kurve als Regelwert, `wurf.reichweite` bleibt als Vorgabe des Gegenstands), Modifikator auf die Reichweite für den Skill; Streuung beim Wurf auf ein Feld (ein Fehlwurf landet ein, zwei Felder daneben, der Skill verkleinert sie)
++ KI und Taktik der gesteuerten Entität für Ninkasi mit Fernwaffe (Abstand halten, nachladen)

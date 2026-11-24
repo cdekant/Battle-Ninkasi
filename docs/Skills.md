@@ -321,11 +321,58 @@ Quer zu den Gattungen: Eine Waffe lernt beide Seiten, das Braupaddel als Wuchtwa
 
 ### Fernkampf
 
-+ Werfen: Gewandtheit, sekundär Körperlichkeit; Treffen, Weite und Tempo des Wurfs, auch für Tränke und Brandflaschen; was ein Trank bewirkt, gehört zu Magie bzw. Brauen
-+ Spannwaffen: Gewandtheit, sekundär Körperlichkeit; Schleuder, Bogen, Armbrust, mit Munition; die Jägerin
-+ Feuerwaffen: Gewandtheit, sekundär Klugheit; von der Muskete bis zum Maschinengewehr, mit Munition und Nachladen
-+ Druckwaffen (Steampunk): Klugheit, sekundär Braukunde; Dampf, Druckluft, die CO2-Kanone aus dem Gärkessel, Druck baut sich auf; Ninkasis Brücke zwischen Brauen und Kampf
-+ Energiewaffen: Klugheit, sekundär Sinnlichkeit; Laser und Plasma, mit Ladung und Überhitzen
+Werfen ist eine angeborene Grundfähigkeit wie der Sprint: Jede Ninkasi wirft, der Skill macht es besser. Was ein Wurf oder Schuss trifft, sagt seine Zielart: ein Geschoss das erste Wesen auf der Bahn, ein Strahl alles in einer Linie, Zerplatzendes (Tränke, Flaschen) eine Fläche um den Aufschlag. Bei Flächen kommt es auf genaues Zielen weniger an: Ein Fehlwurf landet ein, zwei Felder daneben und trifft trotzdem das meiste; das Werfen macht die Streuung kleiner. Die Reichweite eines Wurfs folgt dem Gewicht des Gegenstands und wächst mit dem Skill. Jede Gattung braucht ihre Munition anders, das macht sie auch im Gebrauch verschieden. Das System der Fernwaffen entsteht von Grund auf ([Systemausbau.md](Systemausbau.md), Punkt 22).
+
+#### Fernkampf allgemein
+
++ Eigenschaften: Gewandtheit, sekundär Sinnlichkeit
++ Lernt aus: Wirkung mit dem Tag `fernkampf`
++ Zwei Tiers wie Nahkampf allgemein: Genauigkeit auf Entfernung, dann etwas Schaden
++ Voraussetzung für die Schusswaffen, nicht für das Werfen
+
+#### Werfen
+
++ Eigenschaften: Gewandtheit, sekundär Körperlichkeit
++ Lernt aus: Wirkung mit dem Tag `wurf`
++ Steht allein: auch die Brau-Magierin ohne Fernkampf wirft ihre Tränke, ein wenig Werfen reicht ihr, weil Flächen verzeihen
++ Grund: Genauigkeit und weniger Streuung
++ Experte: Reichweite
++ Meister: Tempo
++ Göttlich: Zerspringendes wirkt in größerem Umkreis
++ Wurfwaffen: Wurfmesser, Speer, Bumerang, später Granaten
+
+#### Spannwaffen
+
++ Eigenschaften: Gewandtheit, sekundär Körperlichkeit
++ Schleuder, Bogen, Armbrust; die Jägerin
++ Munition: Pfeile und Bolzen landen und lassen sich aufheben, mit einer Chance zu brechen (Vorbild Brogue)
++ Grund Genauigkeit, Experte Schaden, Meister Tempo des Spannens, göttlich Durchschuss (der Pfeil fliegt durch das erste Ziel weiter)
+
+#### Feuerwaffen
+
++ Eigenschaften: Gewandtheit, sekundär Klugheit
++ Von der Muskete bis zum Maschinengewehr
++ Munition: Kugeln sind verbraucht; Nachladen kostet Zeit
++ Laut: Ein Schuss ist weit zu hören, viel weiter als ein Nahkampf, aber nicht auf der ganzen Ebene; Wände dämpfen ihn, ein Schalldämpfer ist ein Gegenstand
++ Grund Genauigkeit, Experte schneller nachladen, Meister Schaden, göttlich Salve (mehrere Schüsse in einer Aktion, wo die Waffe es kann)
+
+#### Druckwaffen
+
++ Eigenschaften: Klugheit, sekundär Braukunde
++ Steampunk: Dampf, Druckluft, die CO2-Kanone aus dem Gärkessel; Ninkasis Brücke zwischen Brauen und Kampf
++ Munition: Der Druck baut sich mit der Zeit in der Waffe auf, ein Schuss leert ihn; vielleicht tankt die Waffe CO2 aus der Luft über Gärbottichen
++ Tiers: schnellerer Druckaufbau, höherer Höchstdruck, Rückstoß stößt das Ziel, göttlich Überdruck, der am Ziel platzt
+
+#### Energiewaffen
+
++ Eigenschaften: Klugheit, sekundär Sinnlichkeit
++ Laser und Plasma
++ Munition: Ladungen wie beim Zauberstab, dazu Hitze je Schuss, die über die Zeit abklingt; zu heiß, und die Waffe schießt nicht
++ Tiers: Überhitzen langsamer, Ladung sparsamer, Schaden, göttlich ein Strahl durch alle Ziele in einer Linie
+
+#### Spezialisierungen im Fernkampf
+
++ Je Waffentyp nach dem Muster des Nahkampfs: Bogen, Schleuder, Muskete und weitere mit dem Inhalt
 + Fernsicht lernt quer zum Fernkampf (siehe Wahrnehmung)
 
 ### Schilde
@@ -375,5 +422,5 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Offen
 
-+ Kategorie Kampf Unterkategorie für Unterkategorie ausarbeiten, Verteidigung, waffenloser Kampf, Nahkampf mit Waffen und Handhabung entworfen, weiter mit Fernkampf
++ Kategorie Kampf Unterkategorie für Unterkategorie ausarbeiten, Verteidigung, waffenloser Kampf, Nahkampf mit Waffen, Handhabung und Fernkampf entworfen, weiter mit Schilden und Präzision
 + Bier- und Brandfontäne (Getrunkenes im Kegel speien, kostet Pegel): eher Fähigkeit als Skill, vielleicht zu Stoffwechsel und Pegel oder zu Magie, wo die Fontäne beschworen wird

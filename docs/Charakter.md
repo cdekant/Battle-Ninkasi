@@ -142,7 +142,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Neuv
 + Je Quelle festgelegt, ob sie lehrt oder nur gewährt: ein Lehrstück lehrt dauerhaft und ist meist verbraucht, ein Braubuch bleibt; angelegte Ausrüstung gewährt, solange sie angelegt ist (siehe [Grundlagen.md](Grundlagen.md), Spielkern)
 + Der Zufall prägt den Build
 + Fundstück ohne passenden Skill: nutzbar, aber mit hohem Fehlschlagrisiko über eine Risikotabelle nach dem fehlenden Skill (Vorbild DCSS)
-+ Angeboren sind nur wenige Grundfähigkeiten, höchstens eine je Vorrat und mit Vorsicht gewählt; die erste ist der Sprint, den jede Ninkasi hat, wie wirksam und sparsam sie ihn einsetzt, bestimmen ihre Skills (siehe [Grundlagen.md](Grundlagen.md), Zeit und Tempo); eine spätere Fähigkeit aus der Welt kann ihn erweitern, etwa aus einer Betäubung heraus loszusprinten
++ Angeboren sind nur wenige Grundfähigkeiten, mit Vorsicht gewählt: körperliche, die jede Ninkasi kann (Faustschlag, Werfen, siehe [Skills.md](Skills.md), Kampf), und höchstens eine je Vorrat; die erste solche ist der Sprint, den jede Ninkasi hat, wie wirksam und sparsam sie ihn einsetzt, bestimmen ihre Skills (siehe [Grundlagen.md](Grundlagen.md), Zeit und Tempo); eine spätere Fähigkeit aus der Welt kann ihn erweitern, etwa aus einer Betäubung heraus loszusprinten
 
 Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skillkatalog, siehe [Systemausbau.md](Systemausbau.md), Punkt 20
 
