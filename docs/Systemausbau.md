@@ -157,7 +157,7 @@ Status: offen, als eigene Sitzung vor dem Brausystem (Punkt 10)
 Status: in Arbeit; das Epos ist ganz nachgedichtet (siehe [Texte.md](Texte.md), Korpus)
 
 + `ungnad1911gilgamesch` (gemeinfrei) aus `sprache/Literatur/` einlesen und an ausgewählten Stellen Varianten (`-b`) mit seiner Lesart gewinnen, in beiden Sprachen
-+ Weitere Werke aus dem eBL-Korpus nach der Kandidatenliste in [Texte.md](Texte.md), Korpus
++ Weitere Werke aus dem eBL-Korpus nach Bedarf (umgesetzt: Ištar, Gilgamesch, Dattelpalme und Weinstock, Maqlû, Omen der Schenke; siehe [Texte.md](Texte.md), Korpus)
 
 ## 19. Auszeichnung in Texten
 

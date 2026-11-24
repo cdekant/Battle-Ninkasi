@@ -209,5 +209,22 @@
     "language": "en",
     "keyword": "akkadisch, Streitgespräch, Bier, Wein, Dattelpalme",
     "note": "Nur Fachquelle: Edition und englische Übersetzung unter CC BY-NC-SA 4.0 (nicht kommerziell), daher kein Wortlaut; nachgedichtet aus der akkadischen Fassung. Grundlage von sprache/de/korpus/palme-und-rebe.md. Rohtext in sprache/Literatur/ebl/."
+  },
+  {
+    "id": "mittermayer2021summaalu",
+    "type": "webpage",
+    "author": [{ "literal": "Projekt Edition of the Omen Series Šumma Alu, Universität Genf" }],
+    "editor": [{ "family": "Mittermayer", "given": "Catherine" }],
+    "title": "Šumma ālu",
+    "container-title": "electronic Babylonian Library (eBL), Corpus",
+    "publisher": "Ludwig-Maximilians-Universität München",
+    "publisher-place": "München",
+    "issued": { "date-parts": [[2021]] },
+    "accessed": { "date-parts": [[2026, 11, 24]] },
+    "number": "D II.1-6",
+    "URL": "https://www.ebl.lmu.de/corpus/D/2/6",
+    "language": "en",
+    "keyword": "akkadisch, Omen, Divination, Schenke, Bier",
+    "note": "Nur Fachquelle: Edition und englische Übersetzung unter CC BY-NC-SA 4.0 (nicht kommerziell), daher kein Wortlaut; Jahr nach dem Ende der Projektlaufzeit (2017-2021), die Kapitel nennen keine einzelnen Bearbeiter. Vorbild der eigenen Omen in sprache/de/korpus/omen-der-schenke.md. Rohtext in sprache/Literatur/ebl/."
   }
 ]

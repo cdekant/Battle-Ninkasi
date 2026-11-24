@@ -90,7 +90,8 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 + eBL-Korpus (electronic Babylonian Library, LMU München, `https://www.ebl.lmu.de/corpus`): akkadische Literatur (L), Magie (Mag) und Divination (D) mit Normalisierung und englischer Übersetzung; lokal als Rohtext in `sprache/Literatur/ebl/` (`text/` je Kapitel eine Zeile mit Nummer, Akkadisch und Englisch, `json/` die Antworten der Schnittstelle `https://www.ebl.lmu.de/api/texts`, `treffer-<gruppe>.txt` Fundstellen je Suchbegriff); ein Werk bekommt seinen Eintrag im Literaturverzeichnis, sobald daraus nachgedichtet wird oder es als Kandidat feststeht
 + Gilgamesch-Epos ganz nachgedichtet aus der eBL-Fassung (`george2022gilgamesch`), eine Datei je Tafel (`gilgamesch-tafel-<nn>.md`, Tafel I bis XII); Lücken der jungbabylonischen Fassung sind aus den altbabylonischen Stücken ergänzt, reine Bruchstücke ausgelassen, wörtliche Wiederholungen der Vorlage stehen beim ersten Mal ganz und danach in Kurzform, weil sie Titelsprüche und Markow-Ketten gleichförmig machen; jede Abweichung von der Vorlage steht im Kopf unter `vorlage`
 + Aus Maqlû (`abusch2024maqlu`) sind 24 der stärksten Beschwörungen gegen Hexen ausgewählt, je eine Datei `maqlu-<nn>-<kurzname>.md` mit Tafel und Anfangsvers unter `vorlage`; lange, gleichförmige Anrufungen (etwa Tafel II, "Girra, vollkommener Herr", und Tafel IV, "Brenne, lodere") fehlen bewusst
-+ Kandidaten aus dem eBL-Korpus: Omen aus Šumma ālu zu Schenke und Bier als Vorbild eigener Omen
++ Omen der Schenke (`omen-der-schenke.md`): eigene Omen über Bier, Schenke und Brauen im Bau von Šumma ālu (`mittermayer2021summaalu`), "Wenn …: …" mit der Lösung "Damit es nicht naht: …"; weitere Omen für Spielinhalte (Fundstücke, Vorzeichen auf einer Ebene) folgen demselben Bau
++ Kandidaten aus dem eBL-Korpus: keine offen; weitere Werke nach Bedarf aus `sprache/Literatur/ebl/`
 + Weitere Kandidaten, zu prüfen: weitere alte Übersetzungen des Gilgamesch-Epos, mittelalterliche Brauanleitungen, Brauordnungen, Bibelstellen und antike Autoren zu Bier und Wein
 
 ### Ablage und Format
@@ -144,6 +145,8 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 | `en/korpus/palme-und-rebe.md` | Nachdichtung, aus der deutschen übertragen | `jimenez2021palmeundrebe` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
 | `de/korpus/maqlu-01-goetter-der-nacht.md` bis `maqlu-24-als-die-hexe-den-fluss-ueberquerte.md` | Nachdichtung aus der akkadischen Normalisierung, 24 ausgewählte Beschwörungen, je eine Datei | `abusch2024maqlu` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
 | `en/korpus/maqlu-01-goetter-der-nacht.md` bis `maqlu-24-als-die-hexe-den-fluss-ueberquerte.md` | Nachdichtung, aus der deutschen übertragen | `abusch2024maqlu` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
+| `de/korpus/omen-der-schenke.md` | eigen, im Bau der Omen aus Šumma ālu, zwei Omen nachgedichtet | `mittermayer2021summaalu` | eigener Text, CC BY-NC-SA 4.0; akkadisches Vorbild gemeinfrei |
+| `en/korpus/omen-der-schenke.md` | eigen, aus der deutschen übertragen | `mittermayer2021summaalu` | eigener Text, CC BY-NC-SA 4.0; akkadisches Vorbild gemeinfrei |
 
 + Varianten desselben Originals tragen die Endung `-b`, `-c` usw.; sie folgen einer anderen Lesart oder anderen Bildern und erweitern so den Wortschatz der Markow-Ketten
 + Die englischen Korpustexte sind aus unseren deutschen Nachdichtungen übertragen, im selben altertümlichen Ton (thou, hath) und mit denselben Dateinamen; aus den modernen Übersetzungen der Fachquellen stammt kein Wortlaut

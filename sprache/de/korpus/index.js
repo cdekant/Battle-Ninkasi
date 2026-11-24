@@ -40,6 +40,7 @@ export default [
   "maqlu-24-als-die-hexe-den-fluss-ueberquerte.md",
   "ninkasi-hymne.md",
   "ninkasi-hymne-b.md",
+  "omen-der-schenke.md",
   "palme-und-rebe.md",
   "trinklied.md",
   "trinklied-b.md",
