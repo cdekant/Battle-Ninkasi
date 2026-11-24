@@ -134,6 +134,8 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 | `en/korpus/gilgamesch-tafel-09.md` | Nachdichtung, aus der deutschen übertragen | `george2022gilgamesch` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
 | `de/korpus/gilgamesch-tafel-10.md` | Nachdichtung aus der akkadischen Normalisierung, jungbabylonische Tafel X, Šiduris Rat aus der altbabylonischen Tafel VA+BM, Wiederholungen gekürzt | `george2022gilgamesch` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
 | `en/korpus/gilgamesch-tafel-10.md` | Nachdichtung, aus der deutschen übertragen | `george2022gilgamesch` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
+| `de/korpus/gilgamesch-tafel-11.md` | Nachdichtung aus der akkadischen Normalisierung, jungbabylonische Tafel XI, Wiederholungen gekürzt | `george2022gilgamesch` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
+| `en/korpus/gilgamesch-tafel-11.md` | Nachdichtung, aus der deutschen übertragen | `george2022gilgamesch` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
 
 + Varianten desselben Originals tragen die Endung `-b`, `-c` usw.; sie folgen einer anderen Lesart oder anderen Bildern und erweitern so den Wortschatz der Markow-Ketten
 + Die englischen Korpustexte sind aus unseren deutschen Nachdichtungen übertragen, im selben altertümlichen Ton (thou, hath) und mit denselben Dateinamen; aus den modernen Übersetzungen der Fachquellen stammt kein Wortlaut
