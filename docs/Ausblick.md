@@ -44,6 +44,7 @@ Abgrenzung: [Systemausbau.md](Systemausbau.md) ist die Arbeitsliste beschlossene
 | Erzeugte Geschichte | ungeklärt | gering | nein |
 | Speichern im Hub | ungeklärt | gering | nein |
 | Geister früherer Läufe | hoch | gering | nein |
+| Kennzeichen in Sicht | ungeklärt | gering | nein |
 
 Umsetzung: keine
 
@@ -435,6 +436,18 @@ Umsetzung: offen
 + Vorkehrung: keine; der Weg über die Startoptionen steht
 
 Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 10
+
+## Kennzeichen in Sicht
+
++ Wichtigkeit: ungeklärt, "vielleicht wert festzuhalten" (2026-11-24)
++ Vorbilder: Brogue (Seitenleiste mit Zuständen der Wesen in Sicht), DCSS (beim Untersuchen "schnell" oder "langsam" in Worten)
++ Idee: kleine Zeichen bei den Wesen in Sicht, zuerst für "schneller als Ninkasi", also wovor sie nicht davonlaufen kann; später auch für "schießt", "zaubert" oder "ruft Hilfe"; ein eigenes kleines System der Anzeige, die Zahlen bleiben verborgen (siehe [Grundlagen.md](Grundlagen.md), Zeit und Tempo)
++ Braucht: eine Lesefunktion, die Merkmale eines Wesens im Vergleich zu Ninkasi liefert; Zeichen nach der Fibel der Tiles
++ Berührt: Seitenleiste (siehe [Oberflaeche.md](Oberflaeche.md), Seitenleiste), Untersuchen, Tileset
++ Umbaurisiko: gering
++ Vorkehrung: keine
+
+Umsetzung: offen
 
 ## Recherche
 

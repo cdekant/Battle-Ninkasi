@@ -1,6 +1,6 @@
 # Battle Ninkasi - Animationen
 
-Stand: 2026-11-20, Entwurf, zurückgestellt
+Stand: 2026-11-24, Entwurf, zurückgestellt
 
 Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Oberflaeche.md](Oberflaeche.md), [Bedienung.md](Bedienung.md)
 
@@ -31,6 +31,7 @@ Der ganze Bereich ist zurückgestellt (Stand 2026-11-20); festgehalten ist, was 
 
 + Animationen halten die Eingabe auf (Vorbild Brogue): Alle Animationen aus den Meldungen seit Ninkasis letzter Aktion laufen vollständig ab, bevor sie wieder handeln kann; auch wenn mehrere Wesen in der Weltzeit dicht hintereinander handeln (die Weltuhr rechnet in Hundertsteln einer Aktion), geht nichts verloren
 + Vorgabe: alles nacheinander in der Reihenfolge der Meldungen; Gleichzeitiges zusammenzufassen wäre eine spätere Einstellung
++ Kaskaden als Schauspiel (Vorbild Caves of Qud): Handeln nach einer Aktion Ninkasis mehrere Wesen dicht hintereinander, etwa ein flinker Gegner zweimal, zeigt die Animation jede Aktion kurz für sich, sodass man Reihenfolge und Ursache sieht (siehe [Grundlagen.md](Grundlagen.md), Zeit und Tempo)
 + Reise, Rasten und Erkunden: Vorgabe ist anhalten und alles nacheinander abspielen; das Gerüst stellt dafür Schalter bereit (z.B. Animationen unterwegs verkürzen oder überspringen)
 + Bewegte Tiles und Umgebungseffekte (lodernde Kesselfeuer, blubbernde Bottiche, wogendes Gas) laufen im Bildtakt auch dann, wenn keine Spielzeit vergeht; sie halten die Eingabe nie auf, nur Animationen aus Meldungen tun das; ihr Takt und Flackern kommen aus dem kosmetischen Zufall, die Logik bleibt unberührt
 + Reihenfolge: Gerüst, Kampfanimation, bewegte Tiles (alle drei brauchen den Bildtakt des Gerüsts); Varianten von Boden und Wand hängen nicht daran und sind gesondert zurückgestellt (siehe [Tileset.md](Tileset.md))
@@ -39,4 +40,4 @@ Umsetzung: offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 13
 
 ## Recherche
 
-Noch offen: Vorbilder für Kampfanimation und Rückmeldung (Brogue, DCSS, Cogmind, Into the Breach), danach ein Plan mit Datenformaten und Versionen.
+Noch offen: Vorbilder für Kampfanimation und Rückmeldung (Brogue, DCSS, Caves of Qud, Cogmind, Into the Breach), danach ein Plan mit Datenformaten und Versionen.

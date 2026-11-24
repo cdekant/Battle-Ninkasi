@@ -10,18 +10,19 @@ Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und wäh
 
 + Jeder Punkt wird vor der Umsetzung als Vorschlag ausgearbeitet und freigegeben
 + Status je Punkt: offen oder in Arbeit
-+ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 3 bis 11, 16 und 17 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
++ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 3 bis 11, 16, 17 und 20 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
 
 ## Reihenfolge
 
-Stand 2026-11-23, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer Wirkung auf den Inhalt, das Kleine und Breite zuerst:
+Stand 2026-11-24, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer Wirkung auf den Inhalt, das Kleine und Breite zuerst:
 
-1. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10), darin die Bierstile vor dem Brausystem (Punkt 17)
-2. Ebenenbau: Ebenenbilder, Übergänge und feste Strukturen (Punkt 16)
-3. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
-4. Danach der Inhalt (Punkt 14)
+1. Skillkatalog, erste eigene Sitzung zu [Skills.md](Skills.md) (Punkt 20), weil Normierung, Regeneration, Pegel und Brausystem an den Skills hängen
+2. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10): Umsetzung der Zeitskala als eigene Version, Normierung, Regeneration und Kampfespegel, Pegelschwellen, die Bierstile (Punkt 17) vor dem Brausystem, Machtkurve
+3. Ebenenbau: Ebenenbilder, Übergänge und feste Strukturen (Punkt 16)
+4. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
+5. Danach der Inhalt (Punkt 14)
 
-Daneben, ohne festen Platz: kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12), Korpustexte aus dem Gilgamesch-Epos (Punkt 18), Auszeichnung in Texten (Punkt 19, spätestens mit dem Fenster des Glossars); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 3 (Licht, Wahrnehmungsarten, Spüren und Duft), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen), Punkt 9 (Englisch, Mehrzahl und Glossar) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
+Daneben, ohne festen Platz: Skills für Anhänger (Punkt 21, geprüft in der Sitzung zu Punkt 20, umgesetzt mit den Begleitern bzw. den Geistern früherer Läufe), kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12), Korpustexte aus dem Gilgamesch-Epos (Punkt 18), Auszeichnung in Texten (Punkt 19, spätestens mit dem Fenster des Glossars); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 3 (Licht, Wahrnehmungsarten, Spüren und Duft), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen), Punkt 9 (Englisch, Mehrzahl und Glossar) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
 
 Die Proben des Probedurchstichs stehen in `tests/probedurchstich.test.js`; jede Lücke dort ist ein Test mit `todo` und dem Punkt, der sie schließt, mit einem Entwurf der Daten (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing). Wer einen Punkt umsetzt, nimmt dort das `todo` weg.
 
@@ -53,10 +54,21 @@ Status: offen, jeweils mit dem ersten Bedarf
 
 Status: in Arbeit; jeweils zuerst in [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md) oder [Spielverlauf.md](Spielverlauf.md) entscheiden, mit Recherche bei anderen Spielen; der Rahmen (offene Tiefe in Kapiteln, erstes Kapitel, Epochen, Bosse, was Läufe unterscheidet) steht in [Spielverlauf.md](Spielverlauf.md), Breite und Spezialisierung in [Charakter.md](Charakter.md), Skills
 
-+ Zeitskala: Maßstab für schnell und langsam bei Wesen, Waffen und Aktionen; Idee: Ninkasi ist von Haus aus etwas langsamer als der Standard, erst Bewegungsskills machen sie schneller, Alternative: Skills senken die Kosten nur für Nahkampf oder nur für Zauber; die Anzeige der Restdauer in Zügen hängt daran (siehe [Bedienung.md](Bedienung.md), Untersuchen)
++ Zeitskala: entschieden in [Grundlagen.md](Grundlagen.md), Zeit und Tempo; Umsetzung als eigene Version mit Freigabe, die Zahlen als Probewerte:
+  + Abklingzeiten in Weltzeit statt über den Zugzähler (`src/systeme/faehigkeiten.js`, Werte im Probeinhalt von Zügen in Zeiteinheiten; [Architektur.md](Architektur.md), Zeitmodell und [Wirkungen.md](Wirkungen.md), Fähigkeiten nachführen)
+  + Anzeige auf eine Zeiteinheit genau: Restdauer der Zustände (heute angefangene Züge zu 100, siehe [Bedienung.md](Bedienung.md), Untersuchen), Abklingzeiten, Ninkasis Kosten für Bewegen und Angriff in der Seitenleiste, Zustände, die Ninkasi zugefügt hat; Tempo anderer Wesen in Worten beim Untersuchen (siehe [Oberflaeche.md](Oberflaeche.md), Seitenleiste)
+  + Tempo je Wesen für Bewegen und Angriff in den Daten; Ninkasi bewegt sich zu Beginn mit 120, Fäuste 50, Zweihänder 100, Werfen und Trinken 100
+  + Sprint als angeborene Fähigkeit ohne Zeit, Dauer etwa 750, mit Abklingzeit und Mehrverbrauch des Stoffwechsels, solange er wirkt; höchstens eine Aktion ohne Zeit zwischen zwei mit Zeit
+  + Betäubung als Verschiebung der nächsten Aktion in der Warteschlange; abnehmende Wirkung wiederholter Kontrolle, zurückgesetzt nach einer Weile ohne
+  + Rüstung: gefühltes Gewicht über Skills, Verlangsamung aller Aktionen als Modifikator, Rüstungsskills mindern sie (bei voller Spezialisierung leicht nahe 0 %, schwer nahe 15 %)
+  + Türen mit Aufschlag auf die eigenen Kosten fürs Bewegen (25 bis 50 %), Waffenwechsel aus Ab- und Anlegen der Stücke (etwa 50 bis 400)
+  + KI: `fliehen` vergleicht das Tempo; Fernkämpfer mit Abklingzeit oder Munition wechseln zwischen Schießen und Ausweichen
+  + Rituale beginnen nur außerhalb des Kampfes (`imKampf`, siehe [Wesen.md](Wesen.md), Kampfzustand)
++ Normierung vor der Machtkurve: ein Normwesen der ersten Tiefe mit Tempo 100 als Maßstab, als Testdaten in fünf Stärken 1 bis 5, daran Arenatests für Regeneration, Tempo und Rüstung; zu normieren sind der Standardangriff (Treffer bis zum Tod in beide Richtungen), die Trefferchance zu Beginn, LP, MP und PP zu Beginn mit den Kosten eines Standardzaubers und einer Psi-Fähigkeit, die Regeneration (Ticks bis zur vollen Leiste nüchtern, im Optimum, im Rausch), die Dauer von Kontrollwirkungen und die Stufen der Abklingzeiten, Tragkraft und Gewicht, die EP je Normwesen
++ Regeneration und Kampfespegel als eigene Sitzung, zurückgestellt bis nach Punkt 20; Vorschläge: LP regenerieren von Haus aus sehr langsam und ruhen im Kampf (`imKampf`), ein Skill erlaubt Regeneration im Kampf; MP ruhen im Kampf; PP regenerieren im Kampf und sinken außerhalb (Vorbild: die Wut des Kriegers in World of Warcraft), daraus Berserker-Builds aus Psi und Nahkampf; das widerspricht heute [Grundlagen.md](Grundlagen.md), Spielkern (PP nur bei hohem Pegel, unter einer Schwelle Schwund) und ist dort zu klären; dazu Rasten als Weg zu heilen gegen den Zeitdruck, was der Sprint verbraucht (Hunger, Pegelabbau) und der Verbrauch je Ebene mit Ninkasis Anfangstempo als Maßstab
 + Pegelschwellen mit Wirkung, darin Torkeln aus dem Pegel und die Folgen von Rückschlag und Glimmer (offen in [Grundlagen.md](Grundlagen.md), Spielkern); darin die Geister früherer Läufe als Psi-Jägerinnen, angelockt von Pegel und Psi (siehe [Ausblick.md](Ausblick.md), Geister früherer Läufe)
 + Brausystem: Kern des Spiels, bestimmt Zutaten, Gegenstände, Beute, Orte und Rezepte; Brauen danach als eigene Art langer Aktion (offen in [Grundlagen.md](Grundlagen.md), Spielkern)
-+ Machtkurve: Budget je Tiefe für alle Arten von Inhalt als Regelwerte, ein Werkzeug warnt bei Ausreißern; braucht Zeitskala, Pegel und Brausystem; darin:
++ Machtkurve: Budget je Tiefe für alle Arten von Inhalt als Regelwerte, ein Werkzeug warnt bei Ausreißern; braucht Normierung, Pegel und Brausystem; darin:
   + Ziel der Anfangsbalance am Ende des ersten Kapitels für eine ausgewogene und eine spezialisierte Ninkasi (siehe [Charakter.md](Charakter.md), Skills)
   + Kernskills der Archetypen als Prüfsteine für Arena und Simulation (siehe [Spielverlauf.md](Spielverlauf.md), Was zwei Läufe unterscheidet)
   + Fundstücke, die mit der Tiefe wachsen, und einfache Waffen jeder Art, die verlässlich zu bekommen sind
@@ -115,7 +127,7 @@ Status: zurückgestellt, Entwurf in [Animationen.md](Animationen.md) und [Tilese
 
 Status: offen; was der Inhalt abdecken muss, damit keine Mechanik ungenutzt bleibt; jeweils mit dem Spieldesign in den Design-Dokumenten
 
-+ Skillkatalog als eigene Sitzung, darin Kennerschaft, Nachtsicht und Fernsicht als Skills, ein Skill gegen den Psi-Rückschlag (Modifikatoren auf Psi-Schaden verstärken auch den Rückschlag, siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten), Kampfwerte aus Skills (Ausweichen aus Gewandtheit, Widerstand gegen Gift aus Trinkfestigkeit), Tragkraft; Makel und Vorzüge in der Charaktererstellung mit ihrem Katalog (siehe [Charakter.md](Charakter.md), Charaktererstellung)
++ Skillkatalog nach dem Entwurf aus Punkt 20, darin Kennerschaft, Nachtsicht und Fernsicht als Skills, ein Skill gegen den Psi-Rückschlag (Modifikatoren auf Psi-Schaden verstärken auch den Rückschlag, siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten), Kampfwerte aus Skills (Ausweichen aus Gewandtheit, Widerstand gegen Gift aus Trinkfestigkeit), Tragkraft; Makel und Vorzüge in der Charaktererstellung mit ihrem Katalog (siehe [Charakter.md](Charakter.md), Charaktererstellung)
 + Ninkasis eigene Fähigkeiten statt der `testfaehigkeit`
 + Zustände im Inhalt, darunter Benommenheit und Ersticken statt Giftschaden
 + Erster Auslöser im Inhalt (z.B. Säurespritzer des Essigbakteriums beim Tod)
@@ -159,3 +171,21 @@ Status: offen
 + Eine Funktion in `src/anzeige/texte.js` maskiert den Text und setzt danach die Auszeichnung in HTML um; wo kein HTML entsteht (Log, Tooltips), entfernt sie nur die Zeichen
 + Alle Fenster zeigen Texte über diese Funktion; heute maskieren Log, Titel und Systemfenster, während Hilfe und Einstellungen Texte roh als HTML einsetzen (z.B. `src/anzeige/einstellungsanzeige.js`)
 + `tests/sprachen.test.js` prüft, dass jede Auszeichnung geschlossen ist; das Kompendium zeigt die Auszeichnung ebenso
+
+## 20. Skillkatalog
+
+Status: offen, als erste eigene Sitzung zu [Skills.md](Skills.md); das Dokument ist der rudimentäre Skillkatalog und gehört zu den Grundfesten des Spieldesigns
+
++ Form klären: Wirkungen in Worten und Verhältnissen statt Zahlen, die geratenen Zahlen als Probeinhalt in `datenproben/skills.js` (siehe [Dokumentation.md](Dokumentation.md), Arten der Dokumente)
++ Sets nach Kategorien (Körper und Bewegung, Kampf, Brauen, Soziales, Magie, Psi) mit Tier, primärer und sekundärer Eigenschaft
++ Rüstungsskills für leichte und schwere Rüstung (gefühltes Gewicht und Verlangsamung), Bewegung und Sprint, waffenloser Kampf (siehe [Grundlagen.md](Grundlagen.md), Zeit und Tempo)
++ Höchstens eine angeborene Grundfähigkeit je Vorrat; die erste ist der Sprint, die anderen beiden bleiben offen (siehe [Charakter.md](Charakter.md), Skills)
++ Prüfen, ob die Skills auch für Gegner und Verbündete taugen (siehe Punkt 21)
+
+## 21. Skills für Anhänger
+
+Status: offen, ohne festen Platz; nach dem Umbaurisiko eingeordnet
+
++ Vorschlag: Gegner bekommen feste Werte in ihren Daten, Verbündete (Begleiter, das Tier der Jägerin) und die Geister früherer Läufe tragen Skills; die Geister brauchen das, weil sie den Build einer früheren Ninkasi tragen (siehe [Ausblick.md](Ausblick.md), Geister früherer Läufe)
++ Zuerst prüfen, ob die Modifikatorquelle `skills` und der Lernstand nur bei Ninkasi gelesen werden (siehe [Wesen.md](Wesen.md), Skills und Lernen); das ist wenig Aufwand und entscheidet über das Umbaurisiko, darum in der Sitzung zu Punkt 20
++ Umsetzung mit den Begleitern bzw. den Geistern früherer Läufe

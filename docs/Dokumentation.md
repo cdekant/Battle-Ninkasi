@@ -1,6 +1,6 @@
 # Battle Ninkasi - Dokumentation
 
-Stand: 2026-11-23
+Stand: 2026-11-24
 
 Zuständig für: `CLAUDE.md`
 
@@ -17,7 +17,7 @@ Die Dokumente bilden eine Kaskade von allgemein nach speziell; jede Stufe verwei
 1. CLAUDE.md: Axiome, Designprinzipien, Ordner, Grundbegriffe als Wegweiser, Liste der Dokumente
 2. Dokumentation.md: Regeln für alle Dokumente (dieses Dokument)
 3. Grundlagen.md: das Spiel im Ganzen, Spielkern, offene Fragen des Spieldesigns
-4. Design-Dokumente je Thema: Charakter, Spielverlauf, Oberflaeche, Titelbildschirm, Animationen, Ausblick (Ideen)
+4. Design-Dokumente je Thema: Charakter, Skills, Spielverlauf, Oberflaeche, Titelbildschirm, Animationen, Ausblick (Ideen)
 5. Technische Dokumente je System: Architektur (Kern), dann Wirkungen, Wesen, Welt, Gegenstaende, Anzeige, Bedienung, Texte, Tileset, Entwicklung
 6. Kommentare im Code: was die Datei tut, mit Verweis auf ihren Abschnitt im technischen Dokument
 

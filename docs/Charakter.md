@@ -2,9 +2,9 @@
 
 Stand: 2026-11-24
 
-Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Bedienung.md](Bedienung.md), [Grundlagen.md](Grundlagen.md), [Entwicklung.md](Entwicklung.md), [Ausblick.md](Ausblick.md), [Spielverlauf.md](Spielverlauf.md)
+Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Bedienung.md](Bedienung.md), [Grundlagen.md](Grundlagen.md), [Entwicklung.md](Entwicklung.md), [Ausblick.md](Ausblick.md), [Spielverlauf.md](Spielverlauf.md), [Skills.md](Skills.md)
 
-Vorbilder: EVE Online (Rang als Kostenfaktor, primäre und sekundäre Eigenschaft, Skillpunkte unabhängig vom späteren Lerntempo), DCSS (EP fließen in die benutzten Skills, Kosten anzeigen statt Formel), Caves of Qud (Eigenschaften dauerhaft und vorübergehend veränderbar), Tales of Maj'Eyal und Path of Exile (Skills wirken über Tags auch auf künftige Fähigkeiten). Die Mechanik ist umgesetzt und mit ihren vorläufigen Zahlen in [Wesen.md](Wesen.md) (Skills und Lernen) beschrieben; offen sind Skillkatalog, Makel und Vorzüge (Punkt 14 in [Systemausbau.md](Systemausbau.md)).
+Vorbilder: EVE Online als primäres Vorbild (Rang als Kostenfaktor, primäre und sekundäre Eigenschaft, Skillpunkte unabhängig vom späteren Lerntempo, Skills geben keine Fähigkeiten, sondern erlauben und verbessern, was aus Gegenständen kommt), Skyrim (klassenlos, Skills öffnen Perks, der Sprint ist angeboren), D&D und andere Tabletops (Talente und Merkmale), DCSS (EP fließen in die benutzten Skills, Kosten anzeigen statt Formel), Caves of Qud (Eigenschaften dauerhaft und vorübergehend veränderbar), Tales of Maj'Eyal und Path of Exile (Skills wirken über Tags auch auf künftige Fähigkeiten). Die Mechanik ist umgesetzt und mit ihren vorläufigen Zahlen in [Wesen.md](Wesen.md) (Skills und Lernen) beschrieben; offen sind Skillkatalog (Entwurf in [Skills.md](Skills.md), Punkt 20 in [Systemausbau.md](Systemausbau.md)), Makel und Vorzüge (Punkt 14).
 
 ## Charaktererstellung
 
@@ -136,14 +136,14 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Neuv
 
 ### Fähigkeiten
 
-+ Skills geben keine Fähigkeiten direkt: Sie sind Voraussetzung für Fähigkeiten, die Fähigkeit selbst kommt aus dem Dungeon
-+ Quellen für Fähigkeiten (auch Psi und Magie): Schriftrollen, HACCP-Aushänge, Loot, Rezepte, Altäre (Braukessel), Händler (wandernd im Dungeon oder im Hub), Nebengottheiten
++ Skills geben nie Fähigkeiten (entschieden 2026-11-24): Sie sind Voraussetzung für Fähigkeiten, machen sie wirksamer und erweitern sie in Ausbaustufen; die Fähigkeit selbst kommt aus der Welt
++ Quellen für Fähigkeiten (auch Psi und Magie): Lehrer, Schriftrollen, Keilschrifttafeln, HACCP-Aushänge, Loot, Rezepte, Altäre (Braukessel), Händler (wandernd im Dungeon oder im Hub), Nebengottheiten
 + Je Quelle festgelegt, ob sie lehrt oder nur gewährt: ein Lehrstück lehrt dauerhaft und ist meist verbraucht, ein Braubuch bleibt; angelegte Ausrüstung gewährt, solange sie angelegt ist (siehe [Grundlagen.md](Grundlagen.md), Spielkern)
 + Der Zufall prägt den Build
 + Fundstück ohne passenden Skill: nutzbar, aber mit hohem Fehlschlagrisiko über eine Risikotabelle nach dem fehlenden Skill (Vorbild DCSS)
-+ Vorschlag, noch nicht bestätigt: Ausnahmen nur für körpereigene Fähigkeiten ohne mögliches Fundstück (Kopfstoß, Bierfontäne, Rülpser)
++ Angeboren sind nur wenige Grundfähigkeiten, höchstens eine je Vorrat und mit Vorsicht gewählt; die erste ist der Sprint, den jede Ninkasi hat, wie wirksam und sparsam sie ihn einsetzt, bestimmen ihre Skills (siehe [Grundlagen.md](Grundlagen.md), Zeit und Tempo); eine spätere Fähigkeit aus der Welt kann ihn erweitern, etwa aus einer Betäubung heraus loszusprinten
 
-Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skillkatalog, siehe [Systemausbau.md](Systemausbau.md), Punkt 14
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skillkatalog, siehe [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Erfahrungspunkte (EP)
 
@@ -186,11 +186,10 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: nach
 
 ## Offen
 
-+ Ausnahmen von der Regel "keine Fähigkeiten direkt durch Skills"
 + Übersicht der Skills in der Oberfläche: Liste nach Set und Tier mit Voraussetzungen und "ermöglicht" (siehe Fenster in [Bedienung.md](Bedienung.md)); offen sind Filter, Suche und ein Graph der Abhängigkeiten, wenn der Katalog groß ist
 + Idee, noch nicht bestätigt: zufällige besondere Skills mit zufälligen Kombinationen, als Fundstück freigeschaltet
 + Idee, noch nicht bestätigt: Zielstufe je Skill wie in DCSS, eingehende freie EP fließen von selbst dorthin (Mechanik, nicht Oberfläche)
-+ Skillkatalog: alle Skills mit Set, Tier, Rang, primärer und sekundärer Eigenschaft, Wirkung, Lernanlässen und Abhängigkeiten, als eigene Sitzung
++ Skillkatalog: alle Skills mit Set, Tier, Rang, primärer und sekundärer Eigenschaft, Wirkung, Lernanlässen und Abhängigkeiten, als eigene Sitzung; Entwurf in [Skills.md](Skills.md)
 + Höhe des Abzugs je fehlendem Punkt einer Anforderung (vorläufiger Wert in [Wesen.md](Wesen.md), Skills und Lernen)
 + Katalog der Makel und ihr Punktwert
 + Eingeschränkte Neuverteilung der Eigenschaften im Lauf

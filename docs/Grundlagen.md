@@ -41,8 +41,8 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Kapitel, Dienste 
 + Wein füllt MP sofort, bremst über den Pegel aber die MP-Regeneration
 + Pegel klingt über die Zeit ab
 + Vorschlag, noch nicht bestätigt: linearer Abbau mit dem Tempo der Wirklichkeit, Trinkfestigkeit beschleunigt ihn; ein hoher Pegel hält so lange an
-+ Option, noch nicht entschieden: Ausdauer als vierter Vorrat
-  + Kosten nur für körperliche Sonderaktionen (Kopfstoß, Bierfontäne, Sprint, Ringen, Werfen), nie für Bewegen und normales Angreifen
++ Option, zurückgestellt (2026-11-24): Ausdauer als vierter Vorrat; der Sprint kommt ohne sie aus (siehe Zeit und Tempo)
+  + Kosten nur für körperliche Sonderaktionen (Kopfstoß, Bierfontäne, Ringen, Werfen), nie für Bewegen und normales Angreifen
   + Regeneriert schnell und unabhängig vom Pegel, der einzige Vorrat, der auch nüchtern verlässlich zurückkommt
   + Name vielleicht "Puste"
   + Kater: Sinkt der Pegel nach einem Rausch, sinkt vorübergehend die höchste Ausdauer; Ansatzpunkt für den Makel Aldehyd-Dehydrogenase-Mangel
@@ -57,6 +57,27 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Kapitel, Dienste 
 + Vorschlag, noch nicht bestätigt: über einer Schwelle drohen Torkeln, Fehlschläge, Filmriss
 
 Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Stoffwechsel; siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten; siehe [Gegenstaende.md](Gegenstaende.md), Inventar; offen: Brausystem, Ausdauer, Schwellen und Risiken des Pegels, Ladungen der Zauberstäbe, Lesen mit Ziel
+
+## Zeit und Tempo
+
++ Ein Tick der Weltuhr ist die Norm: So lange dauert ein Schritt oder ein Angriff eines normal schnellen Wesens
++ Jedes Wesen hat ein eigenes Tempo für Bewegen und für Kampfaktionen; daran hängt, wer wem davonlaufen kann
++ Ninkasi ist zu Beginn zu Fuß etwa ein Fünftel langsamer als ein normal schnelles Wesen und im Kampf gleich schnell: Einem normal schnellen Gegner kann sie anfangs nicht davonlaufen, einem sehr langsamen schon; Skills machen sie schneller, bis sie spät auch normal schnellen Wesen davonläuft
++ Die Waffe bestimmt das Tempo des Angriffs: schnelle wie die Fäuste brauchen etwa die halbe Zeit, Zweihänder die Norm; mehr Schläge heißt mehr Würfe und mehr Wirkungen beim Treffer, ein einzelner Schlag wiegt dafür weniger
++ Sprint: Jede Ninkasi hat ihn von Anfang an als angeborene Fähigkeit (siehe [Charakter.md](Charakter.md), Skills); er beginnt ohne Zeit, macht für eine Weile das Bewegen schneller und hat eine Abklingzeit; solange er wirkt, steigt der Stoffwechsel, eine Ausdauer braucht er nicht; er hilft gegen viele Gegner, nicht gegen alle
++ Der Sprint ist vorerst die einzige Aktion ohne Zeit; zwischen zwei Aktionen mit Zeit gibt es höchstens eine ohne
++ Alle anderen Aktionen kosten Zeit: Trinken und Werfen etwa die Norm, der Waffenwechsel nach den Stücken, die ab- und angelegt werden (vom Tausch zweier Dolche bis zum Wechsel vom Zweihänder auf Schwert und Schild), eine Tür etwas mehr als der Schritt; diagonale Schritte kosten so viel wie gerade, das ist taktisch nutzbar
++ Manche Aktionen beginnen nur außerhalb eines Kampfes
++ Abklingzeiten laufen in Weltzeit, nicht in eigenen Aktionen: Schnelle Waffen beschleunigen nicht nebenbei alle Fähigkeiten
++ Betäubung schiebt die nächste Aktion des Ziels hinaus; Kontrollwirkungen wirken bei Wiederholung schwächer, bis eine Weile ohne sie vergangen ist, damit niemand dauerhaft festgehalten wird
++ Rüstung bremst doppelt: Ihr Gewicht zählt zur Last, und sie verlangsamt alle Aktionen gleichmäßig; Skills für leichte und schwere Rüstung mindern beides, das Gewicht fühlt sich leichter an, und bei voller Spezialisierung bremst leichte Rüstung kaum noch, schwere spürbar weniger, aber nie gar nicht
++ Magie in zwei Arten: Kampfzauber etwa so schnell wie ein Wurf; Rituale sind lange Aktionen, die nur außerhalb des Kampfes beginnen und dafür mächtig oder lange wirken
++ Fernkämpfer bewegen sich oder schießen, nie beides zugleich; ihr Fernangriff hat eine Abklingzeit oder begrenzte Munition, bei Schützen beides; so wechseln sie zwischen Schießen und Ausweichen und halten Ninkasi nicht dauerhaft auf Abstand
++ Wesen fliehen nur vor Langsameren
++ Durchschaubar: Ninkasis eigene Kosten, Restdauern und Abklingzeiten zeigt die Oberfläche auf eine Zeiteinheit genau, ebenso Zustände, die sie anderen zugefügt hat; das Tempo anderer Wesen steht in Worten in ihrer Beschreibung (siehe [Oberflaeche.md](Oberflaeche.md), Seitenleiste)
++ Handeln mehrere Wesen dicht hintereinander, zeigt die Animation sie nacheinander (siehe [Animationen.md](Animationen.md), Entschieden)
+
+Umsetzung: teilweise, siehe [Architektur.md](Architektur.md), Zeitmodell; offen: Tempo je Wesen, Sprint, Abklingzeit in Weltzeit, Betäubung und abnehmende Kontrolle, Verlangsamung durch Rüstung, Anzeige auf eine Zeiteinheit genau, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 10
 
 ## Charakter
 

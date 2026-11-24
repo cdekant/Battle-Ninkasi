@@ -1,6 +1,6 @@
 # Battle Ninkasi - Wesen
 
-Stand: 2026-11-23
+Stand: 2026-11-24
 
 Zuständig für: `src/systeme/kampf.js`, `src/systeme/kampfzustand.js`, `src/systeme/fraktionen.js`, `src/systeme/wahrnehmung.js`, `src/systeme/sinne.js`, `src/systeme/bewegung.js`, `src/systeme/verschieben.js`, `src/systeme/werfen.js`, `src/systeme/skills.js`, `src/systeme/lernen.js`, `src/systeme/stoffwechsel.js`, `src/ki/*`, `daten/ninkasi.js`, `daten/fraktionen.js`, `daten/schadensarten.js`, `daten/eigenschaften.js`, `daten/taktiken.js`
 
@@ -270,6 +270,6 @@ Regeln:
 ## Verweise
 
 + Spieldesign: Gegner und Pegel in [Grundlagen.md](Grundlagen.md), Eigenschaften, Skills und EP in [Charakter.md](Charakter.md)
-+ Offene Reste in [Systemausbau.md](Systemausbau.md): Punkt 10 (Zeitskala, Machtkurve, Anfangsbalance), Punkt 14 (Skillkatalog, Makel und Vorzüge, Kampfwerte aus Skills)
++ Offene Reste in [Systemausbau.md](Systemausbau.md): Punkt 10 (Zeitskala, Machtkurve, Anfangsbalance), Punkt 14 (Makel und Vorzüge, Kampfwerte aus Skills), Punkt 20 (Skillkatalog), Punkt 21 (Skills für Anhänger)
 
 Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

@@ -1,6 +1,6 @@
 # Battle Ninkasi - Oberfläche
 
-Stand: 2026-11-23, teilweise umgesetzt (siehe die Zeilen "Umsetzung")
+Stand: 2026-11-24, teilweise umgesetzt (siehe die Zeilen "Umsetzung")
 
 Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Bedienung.md](Bedienung.md), [Animationen.md](Animationen.md), [Titelbildschirm.md](Titelbildschirm.md)
 
@@ -140,13 +140,14 @@ Umsetzung: siehe [Anzeige.md](Anzeige.md), Oberfläche
 
 + Kopf: Ort und Zeit (Tiefe, Ebene, Zug)
 + Minikarte (Variante A, in B oben in der linken Spalte): bekannte Felder, Ninkasi, Treppen, bekannte Wesen; Klick reist dorthin; die große Übersichtskarte (Taste m) zeichnet derselbe Renderer
-+ Ninkasi: LP, MP, PP als Balken, Platz für einen vierten Vorrat (Ausdauer, falls sie kommt), Pegel logarithmisch mit Schwellen, Zustände mit Stärke und Restdauer, laufende Aktion, Heimlichkeit, Helligkeit des eigenen Feldes (Licht, nur wo es wirkt)
++ Ninkasi: LP, MP, PP als Balken, Platz für einen vierten Vorrat (Ausdauer, falls sie kommt), Pegel logarithmisch mit Schwellen, Zustände mit Stärke und Restdauer, laufende Aktion, Heimlichkeit, Helligkeit des eigenen Feldes (Licht, nur wo es wirkt); ihre eigenen Kosten für Bewegen und Angriff, Restdauern und Abklingzeiten auf eine Zeiteinheit genau (siehe [Grundlagen.md](Grundlagen.md), Zeit und Tempo)
 + Zielen und Untersuchen: nur sichtbar, solange der Zielmodus offen ist
-+ In Sicht: Wesen nach Abstand mit Wachzustand und Zuständen, "wirkt etwas" bei laufender Aktion; darüber Gefährten (Beschworene, Verbündete) mit LP
++ In Sicht: Wesen nach Abstand mit Wachzustand und Zuständen, "wirkt etwas" bei laufender Aktion; darüber Gefährten (Beschworene, Verbündete) mit LP; Zustände, die Ninkasi einem Wesen zugefügt hat, mit Restdauer auf eine Zeiteinheit genau
++ Tempo anderer Wesen ohne Zahlen, in Worten in ihrer Beschreibung beim Untersuchen ("unglaublich flink, aber zerbrechlich"); kleine Kennzeichen in Sicht als Idee in [Ausblick.md](Ausblick.md), Kennzeichen in Sicht
 + Seitenleiste und Karte heben sich beim Darüberfahren und beim Untersuchen gegenseitig hervor (Brogue)
 + Gepäck und Fähigkeitenliste stehen nicht mehr in der Seitenleiste, sondern in Fenstern; die Schnellleiste zeigt das Wichtigste davon
 
-Umsetzung: teilweise, siehe [Anzeige.md](Anzeige.md), Oberfläche; offen: Ausdauer, Helligkeit des eigenen Feldes
+Umsetzung: teilweise, siehe [Anzeige.md](Anzeige.md), Oberfläche; offen: Ausdauer, Helligkeit des eigenen Feldes, Kosten und Abklingzeiten auf eine Zeiteinheit genau, Tempo in Worten
 
 ## Schnellleiste
 
