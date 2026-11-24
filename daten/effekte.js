@@ -13,4 +13,9 @@ export default {
   eingeklemmt: {
     schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "2W6" }],
   },
+  // Filmriss im Vollrausch (src/systeme/stoffwechsel.js): die Karte der Ebene ist vergessen bis auf das Sichtbare, dann
+  // eine Weile ohne eigenes Handeln (Zustand filmriss in daten/zustaende.js)
+  filmriss: {
+    schritte: [{ baustein: "vergessen" }, { baustein: "zustand_setzen", zustand: "filmriss" }],
+  },
 };

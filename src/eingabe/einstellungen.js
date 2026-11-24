@@ -11,6 +11,10 @@ export default {
   zoomstufen: [16, 32, 48, 64],
   reisePause: 30,             // Millisekunden zwischen zwei Schritten einer Reise (nur Anzeige)
   geschossPause: 30,          // Millisekunden je Feld einer Geschossbahn (nur Anzeige), 0 zeigt keine Bahn
+  // Züge der gesteuerten Entität unter einer KI (Filmriss, Furcht, Kontrolle): Pause dazwischen in Millisekunden, 0 ohne
+  // Halt bis zum Ende; mit gefuehrteZuegeBestaetigen wartet jeder solche Zug auf eine Taste (nur Anzeige)
+  fuehrungPause: 300,
+  gefuehrteZuegeBestaetigen: false,
   // true: Reise, Laufen und Erkunden beginnen auch mit Feinden in Sicht und halten nur bei einem neuen Feind
   // (Prüfung gegner_in_sicht; wer aus der Sicht gerät und wieder auftaucht, zählt als neu); false: kein Beginn
   reiseTrotzFeinden: true,

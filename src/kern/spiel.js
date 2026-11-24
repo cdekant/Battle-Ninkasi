@@ -96,6 +96,26 @@ export function spielerinAmZug(spiel) {
   return !zustand.vorbei && wartetAufEingabe(zustand, ersterEintrag(zustand));
 }
 
+// Geführter Zug: die gesteuerte Entität ist am Zug, und ein Zustand gibt ihr eine KI (Filmriss, Furcht, Kontrolle)
+function istGefuehrterZug(zustand, eintrag) {
+  const gesteuerte = gesteuerteEntitaet(zustand);
+  if (!eintrag || eintrag.art !== "akteur" || !gesteuerte || eintrag.akteurId !== gesteuerte.id) return false;
+  return Boolean(kiVon(gesteuerte)) && !(gesteuerte.laufendeAktion && !gesteuerte.laufendeAktion.unterbrochen);
+}
+
+// Mit spiel.fuehrungZeigen (nur die Anzeige setzt es, src/main.js) hält die Warteschlange vor jedem geführten Zug an,
+// damit die Spielerin ihn miterlebt; ohne (Tests, Bot, Nachspielen) läuft sie durch. Die Reihenfolge bleibt dieselbe.
+export function gefuehrterZugSteht(spiel) {
+  return Boolean(spiel.fuehrungZeigen) && !spiel.zustand.vorbei && istGefuehrterZug(spiel.zustand, ersterEintrag(spiel.zustand));
+}
+
+// Führt den anstehenden geführten Zug aus und arbeitet weiter bis zum nächsten Halt; false, wenn keiner ansteht
+export function gefuehrtenZugAusfuehren(spiel) {
+  if (!gefuehrterZugSteht(spiel)) return false;
+  warteschlangeAbarbeiten(spiel, { gefuehrteZuege: 1 });
+  return true;
+}
+
 // Gibt null zurück, wenn der Befehl gültig ist, sonst den Grund der Ablehnung
 function befehlPruefen(spiel, akteur, befehl) {
   if (!befehl || typeof befehl.art !== "string" || !hat("befehle", befehl.art)) return "unbekannt";
@@ -193,9 +213,11 @@ export function befehlGeben(spiel, befehl) {
   return { ok: true };
 }
 
-// Arbeitet die Warteschlange ab, bis die gesteuerte Entität am Zug ist oder das Spiel vorbei ist (exportiert für Tests)
-export function warteschlangeAbarbeiten(spiel) {
+// Arbeitet die Warteschlange ab, bis die gesteuerte Entität am Zug ist oder das Spiel vorbei ist (exportiert für Tests);
+// mit spiel.fuehrungZeigen auch vor einem geführten Zug, außer gefuehrteZuege erlaubt noch so viele
+export function warteschlangeAbarbeiten(spiel, { gefuehrteZuege = 0 } = {}) {
   const zustand = spiel.zustand;
+  let erlaubteGefuehrte = gefuehrteZuege;
   let schleifenschutz = 0;
   while (!zustand.vorbei) {
     const eintrag = ersterEintrag(zustand);
@@ -214,6 +236,10 @@ export function warteschlangeAbarbeiten(spiel) {
       }
     }
     if (wartetAufEingabe(zustand, eintrag)) return;
+    if (spiel.fuehrungZeigen && istGefuehrterZug(zustand, eintrag)) {
+      if (erlaubteGefuehrte <= 0) return;
+      erlaubteGefuehrte--;
+    }
     ersterEintragEntnehmen(zustand);
     if (eintrag.art === "weltuhr") {
       for (const [, handler] of alleImRegister("welttick")) {

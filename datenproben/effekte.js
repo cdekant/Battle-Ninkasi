@@ -11,6 +11,9 @@ export default {
   normschlag_1: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "2W3" }] },
   normschlag_2: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "1W6+2" }] },
   normschlag_3: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "2W6+1" }] },
+  // Angriff der Psi-Jägerin, Stärke 3 mit Psi statt stumpf; Gedankenstich Ninkasis, eine Psi-Fähigkeit nach der Norm
+  gedankenpeitsche: { schritte: [{ baustein: "schaden", art: "psi", wuerfel: "2W6+1" }] },
+  gedankenstich: { schritte: [{ baustein: "schaden", art: "psi", wuerfel: "2W6" }] },
   normschlag_4: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "2W8+2" }] },
   normschlag_5: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "3W8+3" }] },
   // Vorläufige Fähigkeit Ninkasis (daten/faehigkeiten.js)

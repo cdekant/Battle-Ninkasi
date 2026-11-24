@@ -15,7 +15,7 @@
 //   entsteht danach neu. Meldung "ebene_gewechselt". Die Weltuhr läuft weiter, sie gehört keiner Ebene.
 
 import { anmelden, alle } from "../kern/register.js";
-import { melden, bezugAuf } from "../kern/ereignisse.js";
+import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
 import { spielerin, entitaetenAuf, entitaetenMitPosition, istWesen, kiVon, bewegungVon, fraktionVon } from "../kern/zustand.js";
 import { indexVerwerfen } from "../kern/raumindex.js";
 import { akteurEinreihen, eintraegeHerausnehmen, eintraegeEinfuegen } from "../kern/zeit.js";
@@ -186,6 +186,7 @@ export function ebeneWechseln(spiel, zieltiefe) {
   sichtfeldAktualisieren(spiel);
   melden(spiel, "ebene_gewechselt", { wer: bezugAuf(ninkasi), tiefe: zieltiefe, ebene: zustand.ebene.name, richtung: hinab ? "ab" : "auf" });
   for (const id of angekommen) melden(spiel, "gefolgt", { wer: bezugAuf(zustand.entitaeten[id]), wem: bezugAuf(ninkasi) });
+  hakenAusloesen(spiel, "ebene_betreten", { quelleId: ninkasi.id, urheberId: ninkasi.id, zielId: ninkasi.id, ursache: "bewegung", kettentiefe: 0, tiefe: zieltiefe });
 }
 
 anmelden("befehle", "treppe", {

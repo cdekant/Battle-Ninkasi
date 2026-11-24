@@ -26,7 +26,7 @@ export default {
   },
   zustaende: {
     fest: [],
-    vorlaeufig: [],
+    vorlaeufig: ["filmriss"],
   },
   fallen: {
     fest: [],

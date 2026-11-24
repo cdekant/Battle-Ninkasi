@@ -165,7 +165,7 @@ function invariantenPruefen(spiel) {
       if (wert.aktuell > hoechstwert(spiel, entitaet, wertName)) throw new Error(`#${entitaet.id} ${wertName} über dem Höchstwert: ${wert.aktuell}`);
     }
     if (entitaet.position) {
-      if (!passierbar(spiel, entitaet.position.x, entitaet.position.y)) throw new Error(`#${entitaet.id} steht in der Wand`);
+      if (!passierbar(spiel, entitaet.position.x, entitaet.position.y)) throw new Error(`#${entitaet.id} (${entitaet.typ}) steht in der Wand (${spiel.zustand.ebene.felder[entitaet.position.y][entitaet.position.x]} auf ${entitaet.position.x},${entitaet.position.y})`);
       if (entitaet.fraktion !== undefined) {
         const feldSchluessel = `${entitaet.position.x},${entitaet.position.y}`;
         if (belegteFelder.has(feldSchluessel)) throw new Error(`Zwei Wesen auf ${feldSchluessel}`);
@@ -438,6 +438,10 @@ function ablaufWaehlen(botZufall, spiel) {
 }
 
 let anzahlTode = 0, anzahlFehler = 0, anzahlGeladen = 0;
+// Läufe, die die Chronik zählt, und wie viele davon eine Wesenart gesehen haben (Prüfung über alle Läufe am Ende)
+let laeufeGezaehlt = 0, laeufeMitSichtung = 0;
+// Psi-Jägerinnen und Filmrisse (systeme/glimmer.js, systeme/stoffwechsel.js)
+let anzahlJaegerinnen = 0, anzahlFilmrisse = 0;
 const reisenNachHaltegrund = {};
 // Fähigkeiten der Gegner: gewirkt, lange Aktionen begonnen und abgebrochen
 const gegnerfaehigkeiten = { gewirkt: 0, begonnen: 0, abgebrochen: 0, getrunken: 0, geworfen: 0 };
@@ -493,6 +497,8 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
       if (meldung.art === "geworfen" && vonNinkasi) anzahlWuerfe++;
       if (meldung.art === "angelegt") anzahlAngelegt++;
       if (meldung.art === "allmacht_bewahrt") anzahlBewahrt++;
+      if (meldung.art === "jaegerin_naht") anzahlJaegerinnen++;
+      if (meldung.art === "zustand_beginnt" && meldung.zustand === "filmriss") anzahlFilmrisse++;
       if (meldung.art === "faehigkeit" && meldung.wer.id === spiel.zustand.spielerinId) ninkasisFaehigkeiten++;
       if (meldung.wer?.id === spiel.zustand.spielerinId) return;
       if (meldung.art === "faehigkeit") gegnerfaehigkeiten.gewirkt++;
@@ -549,7 +555,11 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
     laufEintragen(botChronik, spiel, { ergebnis: spiel.zustand.ergebnis ?? (spiel.zustand.vorbei ? "tod" : "aufgegeben"), datum: 0, version: "bot" });
     if (JSON.stringify(chronikGueltig(JSON.parse(JSON.stringify(botChronik)))) !== JSON.stringify(botChronik)) throw new Error("Chronik übersteht JSON nicht");
     if (zaehlerstand(botChronik, "tode") !== (zaehltMit(spiel) && spiel.zustand.vorbei ? 1 : 0)) throw new Error("Chronik zählt die Tode falsch");
-    if (zaehltMit(spiel) && !gesehen.size) throw new Error("Chronik hat keine Wesenart gesehen");
+    // ein einzelner Lauf darf ohne Sichtung bleiben (pendelt er zwischen Hub und Treppe), alle zusammen nicht
+    if (zaehltMit(spiel)) {
+      laeufeGezaehlt++;
+      if (gesehen.size) laeufeMitSichtung++;
+    }
     if (!zaehltMit(spiel) && Object.keys(botChronik.zaehler).length) throw new Error("Chronik zählt im allmächtigen Lauf oder in der Arena mit");
     if (istArena(spiel)) {
       arenaAusgaenge[spiel.zustand.ergebnis === "sieg" ? "sieg" : spiel.zustand.vorbei ? "tod" : "offen"]++;
@@ -589,6 +599,10 @@ console.log(`\nAbläufe nach Haltegrund: ${haltegruende}`);
 console.log(`Fähigkeiten der Gegner: ${gegnerfaehigkeiten.gewirkt} gewirkt, ${gegnerfaehigkeiten.begonnen} lange Aktionen begonnen, ${gegnerfaehigkeiten.abgebrochen} abgebrochen, ${gegnerfaehigkeiten.getrunken} Mal getrunken, ${gegnerfaehigkeiten.geworfen} Mal geworfen; ${anzahlAngelegt} Mal angelegt, ${anzahlWuerfe} Würfe Ninkasis, ${ninkasisFaehigkeiten} Fähigkeiten Ninkasis`);
 console.log(`Meldungen für Ninkasi: ${meldungenFuerNinkasi.gezeigt} gezeigt, ${meldungenFuerNinkasi.verborgen} verborgen, ${meldungenFuerNinkasi.gehoert} gehört`);
 console.log(`Lernen: ${anzahlLernbefehle} Lernbefehle (${anzahlUeberFenster} über das Skillfenster), ${anzahlGelernt} angenommen, ${anzahlSkillstufen} Skillstufen erreicht`);
+if (laeufeGezaehlt && !laeufeMitSichtung) {
+  console.log("Chronik hat in keinem Lauf eine Wesenart gesehen");
+  anzahlFehler++;
+}
 if (fehlendeTexte.size) {
   console.log(`Fehlende Texte in den Fenstern: ${[...fehlendeTexte].join("; ")}`);
   anzahlFehler++;
@@ -599,6 +613,7 @@ const budget = Object.entries(epJeTiefe).sort(([links], [rechts]) => links - rec
   .join("; ");
 console.log(`EP je Lauf: ${budget}`);
 console.log(`Speichern: ${anzahlGeladen} Läufe mitten im Lauf gespeichert und geladen`);
+console.log(`Glimmer: ${anzahlJaegerinnen} Psi-Jägerinnen erschienen, ${anzahlFilmrisse} Filmrisse`);
 console.log(`Testkammer: ${anzahlErzeugt} Mal erzeugt, ${anzahlTiefenwahl} Mal Tiefe gewählt, ${anzahlBewahrt} Mal vor dem Tod bewahrt`);
 console.log(`Arena: ${arenaAusgaenge.sieg} Siege, ${arenaAusgaenge.tod} Tode, ${arenaAusgaenge.offen} offen, ${arenaWellen} Wellen geschafft`);
 console.log(`${anzahlLaeufe} Läufe, ${anzahlTode} tot, ${anzahlFehler} Fehler`);

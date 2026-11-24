@@ -92,6 +92,19 @@ test("Werfen nimmt einen vom Stapel, Fallenlassen den ganzen Stapel, Angelegtes 
   assert.equal(befehlGeben(spiel, { art: "fallenlassen", gegenstandId: ring.id }).grund, "nicht_im_gepaeck");
 });
 
+test("Werfen auf ein durchsichtiges, nicht passierbares Feld: der Gegenstand bleibt davor liegen", () => {
+  const spiel = miniSpiel(["#######", "#...O.#", "#######"], { effekte: EFFEKTE, gegenstaende: GEGENSTAENDE, gelaende: { bottich: { text: "g.bottich", kennung: "O", passierbar: false, durchsichtig: true } } });
+  const ninkasi = spielerinSetzen(spiel, 1, 1);
+  ninkasi.inventar = [];
+  akteurEinreihen(spiel.zustand, ninkasi.id, 0);
+  allesSichtbar(spiel);
+  hinlegen(spiel, 1, 1, "testbier");
+  befehlGeben(spiel, { art: "aufheben" });
+  assert.equal(befehlGeben(spiel, { art: "werfen", gegenstandId: ninkasi.inventar[0], ziel: { x: 4, y: 1 } }).ok, true);
+  const liegtAuf = (x) => entitaetenAuf(spiel.zustand, x, 1).filter((entitaet) => entitaet.typ === "testbier").length;
+  assert.deepEqual([liegtAuf(4), liegtAuf(3)], [0, 1]);
+});
+
 test("Überladung verteuert das Bewegen in Stufen; mehr Tragkraft hebt sie auf", () => {
   const { spiel, ninkasi } = aufstellen();
   ninkasi.tragkraft = 10000;

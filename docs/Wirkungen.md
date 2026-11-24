@@ -2,7 +2,7 @@
 
 Stand: 2026-11-24
 
-Zuständig für: `src/kern/effekte.js`, `src/kern/bausteine.js`, `src/kern/ausloeser.js`, `src/kern/vorgang.js`, `src/kern/werte.js`, `src/systeme/modifikatoren.js`, `src/systeme/zustaende.js`, `src/systeme/betaeubung.js`, `src/systeme/befehlsveraenderer.js`, `src/systeme/beschwoerung.js`, `src/systeme/zielauswahl.js`, `src/systeme/zielbausteine.js`, `src/systeme/faehigkeiten.js`, `src/systeme/laufendeAktionen.js`, `src/systeme/tod.js`, `src/systeme/ersatz.js`, `src/welt/geometrie.js`, `daten/effekte.js`
+Zuständig für: `src/kern/effekte.js`, `src/kern/bausteine.js`, `src/kern/ausloeser.js`, `src/kern/vorgang.js`, `src/kern/werte.js`, `src/systeme/modifikatoren.js`, `src/systeme/zustaende.js`, `src/systeme/betaeubung.js`, `src/systeme/befehlsveraenderer.js`, `src/systeme/beschwoerung.js`, `src/systeme/zielauswahl.js`, `src/systeme/zielbausteine.js`, `src/systeme/faehigkeiten.js`, `src/systeme/laufendeAktionen.js`, `src/systeme/tod.js`, `src/systeme/ersatz.js`, `src/welt/geometrie.js`, `daten/effekte.js`, `daten/zustaende.js`
 
 Mitprüfen bei Änderungen: [Architektur.md](Architektur.md), [Wesen.md](Wesen.md), [Gegenstaende.md](Gegenstaende.md), [Grundlagen.md](Grundlagen.md), [Skills.md](Skills.md)
 
@@ -288,7 +288,7 @@ Regeln:
 + Vorläufige Tabelle `psi` über Ninkasis Skala: Fehlschlag nüchtern 30 %, bei 6 ‰ am seltensten (5 %), darüber wieder steigend; Rückschlag ab 12 ‰ bis 20 % bei 32 ‰ (Effekt `psi_rueckschlag`), Kontrollverlust ab 20 ‰ bis 10 % bei 32 ‰ (Effekt `psi_kontrollverlust`: Psi-Schaden und der Zustand `verwirrt`); dass Psi mit dem Pegel stärker wirkt, geht über Modifikatoren mit `pegel_ab` und dem Tag `psi`; Tabelle `magie`: verpatzt ab 8 ‰, 10 % bei 12 ‰, 25 % bei 20 ‰, 50 % bei 32 ‰, an Fähigkeiten der Magie mit `risiko: "magie"`; dazu `ohne_skill` (1 fehlende Stufe 25 %, 3: 60 %, 5: 85 %) und `anforderung` (1 fehlender Punkt 5 %, 10: 50 %), beide vorläufig
 + Der Rückschlag ist Psi-Schaden: Modifikatoren auf Schaden mit dem Tag `psi` (z.B. mit `pegel_ab`) verstärken auch ihn, gewollt; ein Skill kann ihn gezielt dämpfen (Selbstbeherrschung, siehe [Skills.md](Skills.md), Psi)
 + Ohne Zeit: die Wirkende kommt sofort wieder an die Reihe, ohne Zug und ohne neue letzte Aktion; zwischen zwei Aktionen mit Zeit ist höchstens eine ohne erlaubt (Merker `ohneZeitGenutzt`, siehe [Architektur.md](Architektur.md), Befehle); die Abklingzeit begrenzt sie zusätzlich
-+ Glimmer (Psi lockt Gegner an) wäre ein Wert `glimmer`, den Psi-Fähigkeiten über `wert_aendern` erhöhen; seine Folgen sind Spieldesign ([Grundlagen.md](Grundlagen.md))
++ Nach dem Bezahlen und vor Risiko und Wirkung löst jede Fähigkeit den Haken `faehigkeit_gewirkt` aus (mit `faehigkeit`, den Tags und dem bezahlten `verbrauch`), auch wenn sie danach fehlschlägt: gewirkt ist, was bezahlt ist; daran hängt der Glimmer (siehe [Wesen.md](Wesen.md), Glimmer)
 
 ## Lange Aktionen
 

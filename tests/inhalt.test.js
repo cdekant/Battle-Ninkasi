@@ -61,7 +61,7 @@ test("Grundgerüst: lädt allein ohne Fehler, ein Lauf beginnt im Hub", () => {
 
 test("Inhalt: Grundgerüst und Probeinhalt zusammen, Ninkasi mit den Fähigkeiten des Probeinhalts", () => {
   assert.deepEqual(rohdaten.abfolge, probeinhalt.abfolge);
-  assert.deepEqual(rohdaten.wesen.ninkasi.faehigkeiten, ["testfaehigkeit", "sprint"]);
+  assert.deepEqual(rohdaten.wesen.ninkasi.faehigkeiten, ["testfaehigkeit", "sprint", "gedankenstich"]);
   assert.deepEqual(grundgeruest.wesen.ninkasi.faehigkeiten, [], "das Grundgerüst bleibt ohne Probe");
   assert.ok(probenamen.wesen.includes("essigbakterium"));
   assert.ok(probentexte.includes("wesen.essigbakterium") && "wesen.essigbakterium" in texteDe);

@@ -10,7 +10,8 @@
 // Nachgeführt wird bei jeder Neuberechnung der Sicht (systeme/sicht.js) für die Felder, die bis dahin sichtbar waren,
 // und für die jetzt sichtbaren: so hält die Erinnerung den letzten Stand fest, den Ninkasi gesehen hat.
 
-import { entitaetenAuf, istWesen } from "../kern/zustand.js";
+import { entitaetenAuf, istWesen, istGesteuert } from "../kern/zustand.js";
+import { bausteinAnmelden } from "../kern/bausteine.js";
 import { feldVonIndex } from "../welt/schichten.js";
 import { anzahlVon } from "./inventar.js";
 import { istBekannt } from "./fallen.js";
@@ -74,6 +75,18 @@ export function vergessen(spiel, feldIndizes) {
     delete ebene.erinnerteDinge[index];
   }
 }
+
+// Baustein vergessen {} auf das Ziel (Filmriss): ist es die gesteuerte Entität, vergisst sie die ganze Karte der Ebene
+// bis auf die Felder, die sie gerade sieht; bei jedem anderen Ziel geschieht nichts, die Karte ist ihr Wissen
+bausteinAnmelden("vergessen", {}, (spiel, kontext) => {
+  const ziel = spiel.zustand.entitaeten[kontext.zielId];
+  if (!istGesteuert(spiel.zustand, ziel)) return;
+  const ebene = spiel.zustand.ebene;
+  const sichtbar = new Set(spiel.zustand.sichtbareFelder || []);
+  const vergessene = [];
+  for (let index = 0; index < ebene.breite * ebene.hoehe; index++) if (!sichtbar.has(index)) vergessene.push(index);
+  vergessen(spiel, vergessene);
+}, { brauchtZiel: true });
 
 // Erinnerte Dinge auf einem Feld: { oberflaeche, gegenstaende, fallen } (leere Listen und null, wenn nichts)
 export function erinnerteDingeAuf(ebene, index) {

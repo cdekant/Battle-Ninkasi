@@ -74,6 +74,15 @@ Regeln:
 + Automatischer Kampf (Aktion `autokampf`, Taste a): nur in der Arena (sonst "keine_arena"); jeder Schritt ist der Befehl der Taktik aus der Aufstellung (`optionen.arena.taktik`, siehe [Wesen.md](Wesen.md), KI), handlungsunfähig wartet Ninkasi; hält, wenn der Lauf vorbei ist, und wie jeder Ablauf bei jeder Taste; a beginnt wieder, so lässt sich jederzeit zwischen Hand und Automatik wechseln; im Takt `reisePause`; beginnt die Arena automatisch (siehe [Titelbildschirm.md](Titelbildschirm.md), Arena), läuft er gleich nach dem Start
 + Im Zielmodus setzt die Maus den Cursor, ein Klick bestätigt; der Tooltip zeigt beim Darüberfahren die Kurzfassung des Feldes (siehe Untersuchen)
 
+## Geführte Züge
+
+Handelt Ninkasi nicht selbst, weil ein Zustand ihr eine KI gibt (Filmriss, Furcht, Kontrolle), soll die Spielerin die Züge miterleben statt nur das Ende zu sehen.
+
++ `src/main.js` setzt `spiel.fuehrungZeigen`; die Logik hält dann vor jedem geführten Zug an (siehe [Architektur.md](Architektur.md), Befehle)
++ Einstellungen: `fuehrungPause` (Vorgabe 300 ms zwischen zwei geführten Zügen, 0 führt alle sofort aus) und `gefuehrteZuegeBestaetigen` (Vorgabe aus: jeder geführte Zug wartet auf eine Taste)
++ Jede Taste ohne offenes Fenster führt den anstehenden Zug sofort aus; Befehle der Spielerin gibt es solange nicht (`nicht_am_zug`); ein offenes Fenster bleibt bedienbar
++ Ein laufender Ablauf (Reise, Rasten, Erkunden) endet still, wenn ein geführter Zug ansteht
+
 ## Fenster
 
 Daten:
@@ -198,7 +207,7 @@ Regeln:
 
 Daten:
 
-+ Vorgaben (`src/eingabe/einstellungen.js`): `sprache` ("browser", "de", "en"), `layout` ("a", "b", "kompakt"), `oberflaecheGroesse` (15), `logZeilen` (8), `minikarte`, `zoom` (16) mit `zoomstufen` (16, 32, 48, 64), `reisePause` und `geschossPause` (je 30 ms), `reiseTrotzFeinden`, `reiseHalt`, `rastenBis`, `rastenTrotzFeinden`, `rastenHalt`, `rastenHoechstens`, `sofortAusloesen`, `neustartNachfragen`, `bewegungReduzieren`, `hoherKontrast`, `farbenblind`
++ Vorgaben (`src/eingabe/einstellungen.js`): `sprache` ("browser", "de", "en"), `layout` ("a", "b", "kompakt"), `oberflaecheGroesse` (15), `logZeilen` (8), `minikarte`, `zoom` (16) mit `zoomstufen` (16, 32, 48, 64), `reisePause` und `geschossPause` (je 30 ms), `fuehrungPause` (300 ms), `gefuehrteZuegeBestaetigen`, `reiseTrotzFeinden`, `reiseHalt`, `rastenBis`, `rastenTrotzFeinden`, `rastenHalt`, `rastenHoechstens`, `sofortAusloesen`, `neustartNachfragen`, `bewegungReduzieren`, `hoherKontrast`, `farbenblind`
 + Gespeichert werden nur Abweichungen, unter `battle-ninkasi.einstellungen`; Einstellungen sind keine Befehle und kommen nicht in den Spielstand
 + Einstellungskatalog (`EINSTELLUNGEN` in `src/eingabe/einstellungskatalog.js`): jede Einstellung einmal mit Reiter (`REITER`: anzeige, spiel, tasten, barrierefreiheit) und Art: `schalter`, `auswahl` (feste Werte), `zahl` (min, max, schritt, einheit), `listenschalter` (ein Eintrag einer Liste, z.B. `gegenstand` in `reiseHalt`), `knopf` (Aktion ohne gespeicherten Wert, z.B. Vollbild)
 + Texte `einstellung.<id>` und `.erklaerung`, Werte einer Auswahl `einstellung.<id>.wert.<wert>`, die Null einer Zahl darf eigenen Text haben (`.null`, z.B. "aus")
@@ -212,7 +221,7 @@ Schnittstellen:
 
 Regeln:
 
-+ Reiter Anzeige: Layout (A, B, kompakt), Größe der Oberfläche (Schriftgröße von `:root` in px, 12 bis 22, alle Maße in `rem` folgen), Zoom, Logzeilen (Layout A), Minikarte, Vollbild, Sprache (automatisch, Deutsch, English; ein Wechsel lädt die Seite neu, siehe [Texte.md](Texte.md), Sprachdateien); Spiel: Reisetempo (auch für Laufen, Rasten, Erkunden), Geschossbahn (0 aus), Reisen und Rasten trotz Feinden, Halt bei Gegenständen, Schnellleiste sofort auslösen, Neustart nachfragen; Barrierefreiheit: Bewegung reduzieren (Geschossbahn, Effekte des Titelbilds), hoher Kontrast, Palette für Farbenblinde (Blau und Orange statt Grün und Rot)
++ Reiter Anzeige: Layout (A, B, kompakt), Größe der Oberfläche (Schriftgröße von `:root` in px, 12 bis 22, alle Maße in `rem` folgen), Zoom, Logzeilen (Layout A), Minikarte, Vollbild, Sprache (automatisch, Deutsch, English; ein Wechsel lädt die Seite neu, siehe [Texte.md](Texte.md), Sprachdateien); Spiel: Reisetempo (auch für Laufen, Rasten, Erkunden), Geschossbahn (0 aus), Tempo geführter Züge, geführte Züge bestätigen, Reisen und Rasten trotz Feinden, Halt bei Gegenständen, Schnellleiste sofort auslösen, Neustart nachfragen; Barrierefreiheit: Bewegung reduzieren (Geschossbahn, Effekte des Titelbilds), hoher Kontrast, Palette für Farbenblinde (Blau und Orange statt Grün und Rot)
 + Layout kompakt ist A mit 3 Logzeilen, Seitenleiste 20rem und kleineren Knöpfen, nur von Hand einstellbar
 + Sofort auslösen: ein Platz der Schnellleiste mit vorbelegtem, gültigem Ziel wirkt ohne zweiten Tastendruck; sonst bleibt der Zielmodus offen
 + Einstellungsfenster: die Kopfzeile nennt alle Reiter, Tab und Umschalt+Tab wechseln; Buchstabe oder Pfeile wählen, links und rechts oder - und + ändern, Enter schaltet um bzw. löst aus, Entf stellt die Vorgabe her; die Einzelheiten nennen Erklärung und Vorgabe; jede Änderung wirkt sofort und wird gespeichert

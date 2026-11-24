@@ -77,7 +77,7 @@ Die Kategorie hält alle Skills, die den Stoffwechsel verändern: Abbau des Pege
 + Eigenschaften: Trinkfestigkeit, sekundär Gewandtheit
 + Lernt aus: Berauscht
 + Mildert die Strafen des Rauschs (Torkeln, Fehlschläge, Filmriss), ohne die Schwellen zu verschieben; so bleibt, was an den Schwellen hängt (Mindestpegel, Regeneration der PP), wo es ist, und der Rausch wird nur weniger gefährlich
-+ Die Hebel stehen: die Chancen von Torkeln, Danebenschlagen und Fehlschlägen lassen sich senken (siehe [Wesen.md](Wesen.md), Stoffwechsel, und [Wirkungen.md](Wirkungen.md), Fähigkeiten); der Filmriss folgt ([Systemausbau.md](Systemausbau.md), Punkt 10)
++ Die Hebel stehen: die Chancen von Torkeln, Danebenschlagen und Fehlschlägen lassen sich senken (siehe [Wesen.md](Wesen.md), Stoffwechsel, und [Wirkungen.md](Wirkungen.md), Fähigkeiten), die des Filmrisses ebenso
 + Tiers: je eine Strafe des Rauschs, Grund Torkeln milder, Experte seltener Fehlschläge, Meister seltener Filmriss
 
 ### Rauschheilung
@@ -792,7 +792,7 @@ Die angeborene Fähigkeit des PP-Vorrats (siehe [Charakter.md](Charakter.md), F�
 + Hebt die Verteidigung `willenskraft` gegen Psi und den Widerstand gegen die Schadensart `psi`, mit der Obergrenze aller Widerstände (siehe Kampf, Verteidigung)
 + Tiers: Grund Verteidigung, Experte Widerstand gegen Psi, Meister geistige Kontrolle hält kürzer
 
-Umsetzung: teilweise, siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten (Risikotabelle `psi` mit Fehlschlag und Rückschlag, Glimmer als vorbereiteter Wert, Kontrolle über die Fraktion, Springen) und [Wesen.md](Wesen.md), Kampfwerte (`willenskraft`, Schadensart `psi`); offen: alle Sets, Ekstase, Zeitblinzeln, Glimmer, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
+Umsetzung: teilweise, siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten (Risikotabelle `psi` mit Fehlschlag und Rückschlag, Glimmer als vorbereiteter Wert, Kontrolle über die Fraktion, Springen) und [Wesen.md](Wesen.md), Kampfwerte (`willenskraft`, Schadensart `psi`); Glimmer und Psi-Jägerinnen in [Wesen.md](Wesen.md), Glimmer; offen: alle Sets, Ekstase, Zeitblinzeln, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Offen
 

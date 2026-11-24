@@ -151,6 +151,10 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
   }
   if (wesen.ki) pruefeKi(daten, wesen.ki, `${ort}.ki`, fehler, istTextliste(wesen.faehigkeiten) ? wesen.faehigkeiten : []);
   if (wesen.stoffwechsel) pruefeStoffwechsel(daten, sprache, wesen, ort, fehler);
+  // Psi-Jägerin, siehe systeme/glimmer.js
+  if (wesen.psiJaegerin !== undefined && !(istObjekt(wesen.psiJaegerin) && istZahlAbNull(wesen.psiJaegerin.glimmerAb))) {
+    fehler.push(`${ort}: psiJaegerin muss { glimmerAb } mit einer ganzen Zahl >= 0 sein`);
+  }
   if (wesen.sicht && !istGanzzahl(wesen.sicht.reichweite)) fehler.push(`${ort}: sicht.reichweite muss eine ganze Zahl sein`);
   if (wesen.sicht?.imDunkeln !== undefined) fehler.push(`${ort}: sicht.imDunkeln heißt jetzt sicht.imFinstern`);
   if (wesen.sicht?.imFinstern !== undefined && !istZahlAbNull(wesen.sicht.imFinstern)) fehler.push(`${ort}: sicht.imFinstern muss eine ganze Zahl >= 0 sein`);
@@ -284,6 +288,7 @@ function pruefeRegeln(daten, regeln, fehler) {
   // abnehmende Kontrolle, siehe systeme/zustaende.js kontrollDauer
   if (!Array.isArray(regeln.kontrolle?.stufen) || !regeln.kontrolle.stufen.every((stufe) => istZahlAbNull(stufe))) fehler.push("regeln.kontrolle.stufen muss eine Liste von Prozenten >= 0 sein");
   if (!istZahlAbNull(regeln.kontrolle?.erholung)) fehler.push("regeln.kontrolle.erholung muss eine ganze Zahl >= 0 sein");
+  pruefeGlimmerregeln(regeln.glimmer, fehler);
   const wahrnehmung = regeln.wahrnehmung;
   if (!wahrnehmung) fehler.push("regeln.wahrnehmung fehlt");
   else {
@@ -379,6 +384,28 @@ function pruefeStoffwechsel(daten, sprache, wesen, ort, fehler) {
     if (!istGanzzahl(gewinn?.jeTreffer) || gewinn.jeTreffer < 0) fehler.push(`${ort}: stoffwechsel.kampfgewinn.${wertName}.jeTreffer muss eine ganze Zahl >= 0 sein`);
     fehler.push(...kurvenfehler(gewinn?.kurve, `${ort}.stoffwechsel.kampfgewinn.${wertName}.kurve`));
   }
+  // Filmriss: { alleTicks > 0, chance: kurve, effekt }
+  const filmriss = stoffwechsel.filmriss;
+  if (filmriss !== undefined) {
+    if (!istObjekt(filmriss) || !istGanzzahl(filmriss.alleTicks) || filmriss.alleTicks <= 0) fehler.push(`${ort}: stoffwechsel.filmriss muss { alleTicks > 0, chance, effekt } sein`);
+    else {
+      fehler.push(...kurvenfehler(filmriss.chance, `${ort}.stoffwechsel.filmriss.chance`));
+      pruefeEffektVerweis(daten, filmriss.effekt, `${ort}.stoffwechsel.filmriss`, fehler);
+    }
+  }
+}
+
+// Glimmer und Psi-Jägerinnen (systeme/glimmer.js): regeln.glimmer { zuwachs, betreten, psi, eintreffen, abstand,
+// senkenBeimAuftreten }
+function pruefeGlimmerregeln(glimmer, fehler) {
+  if (!istObjekt(glimmer)) return fehler.push("regeln.glimmer fehlt");
+  for (const feld of ["zuwachs", "betreten", "psi"]) fehler.push(...kurvenfehler(glimmer[feld], `regeln.glimmer.${feld}`));
+  const eintreffen = glimmer.eintreffen;
+  if (!Array.isArray(eintreffen) || eintreffen.length !== 2 || !eintreffen.every(istZahlAbNull) || eintreffen[0] > eintreffen[1]) {
+    fehler.push("regeln.glimmer.eintreffen muss [von, bis] mit ganzen Zahlen 0 <= von <= bis sein");
+  }
+  if (!istZahlAbNull(glimmer.abstand)) fehler.push("regeln.glimmer.abstand muss eine ganze Zahl >= 0 sein");
+  if (!istProzent(glimmer.senkenBeimAuftreten)) fehler.push("regeln.glimmer.senkenBeimAuftreten muss eine ganze Zahl von 0 bis 100 sein");
 }
 
 // Strafen des Rauschs: { befehle?: [{ veraenderer, chance: kurve, ...parameter }], modifikatoren? } (systeme/stoffwechsel.js)

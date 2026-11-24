@@ -51,7 +51,7 @@ import { anmelden, alle } from "../kern/register.js";
 import { bausteinAnmelden, wirkungVorab } from "../kern/bausteine.js";
 import { modifiziert, hatWert, bedingungenErfuellt } from "../kern/werte.js";
 import { effektAnwenden, wertAendern } from "../kern/effekte.js";
-import { melden, bezugAuf } from "../kern/ereignisse.js";
+import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
 import { entitaetMitId, entitaetEntfernen, fraktionVon, grundkostenVon } from "../kern/zustand.js";
 import { traegerinnenIds } from "../kern/raumindex.js";
 import { wurfGanzzahl } from "../kern/wurf.js";
@@ -181,14 +181,19 @@ export function faehigkeitPruefen(spiel, wesen, name, zielangabe) {
   return null;
 }
 
+// Bezahlt Verbrauch und Material; gibt den bezahlten Verbrauch zurück ({ wert: menge })
 function kostenBezahlen(spiel, wesen, name, definition) {
   const ursprung = { urheberId: wesen.id, ursache: "faehigkeit", mittel: { art: "faehigkeit", name }, kettentiefe: 0 };
+  const bezahlt = {};
   for (const [wertName, menge] of Object.entries(verbrauchVon(spiel, wesen, definition))) {
-    if (menge > 0) wertAendern(spiel, wesen, wertName, -menge, ursprung);
+    if (menge <= 0) continue;
+    wertAendern(spiel, wesen, wertName, -menge, ursprung);
+    bezahlt[wertName] = menge;
   }
   for (const { id, stueck } of materialAuswaehlen(spiel, wesen, definition)) {
     for (let i = 0; i < stueck; i++) entitaetEntfernen(spiel.zustand, einenAbnehmen(spiel, wesen, entitaetMitId(spiel.zustand, id)).id);
   }
+  return bezahlt;
 }
 
 // Chance eines Ausgangs in Prozent bei x, mit dem Modifikator risiko.<ausgang> (Standfestigkeit, Selbstbeherrschung)
@@ -308,8 +313,10 @@ function faehigkeitAusfuehren(spiel, wesen, name, zielangabe) {
       return ergebnis;
     }
   }
-  kostenBezahlen(spiel, wesen, name, definition);
+  const verbrauch = kostenBezahlen(spiel, wesen, name, definition);
   abklingenLassen(spiel, wesen, name, definition);
+  // gewirkt ist, was bezahlt ist: der Glimmer (systeme/glimmer.js) steigt auch bei einem Fehlschlag
+  hakenAusloesen(spiel, "faehigkeit_gewirkt", { quelleId: wesen.id, urheberId: wesen.id, zielId: wesen.id, ursache: "faehigkeit", kettentiefe: 0, mittel: { art: "faehigkeit", name }, tags: [...tagsVon(definition)], faehigkeit: name, verbrauch });
   if (definition.dauer) {
     const ziel = zielangabe === undefined ? null : structuredClone(zielangabe);
     const aufloesung = definition.ziel ? zielAufloesen(spiel, wesen, definition.ziel, zielangabe) : null;

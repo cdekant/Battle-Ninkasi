@@ -285,6 +285,7 @@ export class Oberflaeche {
         ${balken(text("ui.mp"), werte.mp.aktuell, hoechstwert(spiel, gesteuerte, "mp"), "mp")}
         ${balken(text("ui.pp"), werte.pp.aktuell, hoechstwert(spiel, gesteuerte, "pp"), "pp")}
         ${pegelLeiste(text("ui.promille"), werte.pegel.aktuell, (gesteuerte.stoffwechsel.stufen || []).map((stufe) => stufe.ab), optimalerPegel(spiel, gesteuerte, "lp"), text(`rausch.${rauschstufe(gesteuerte)}`))}
+        ${(werte.glimmer?.aktuell ?? 0) > 0 ? `<div class="glimmer">${text("ui.glimmer")}: <b>${werte.glimmer.aktuell}</b></div>` : ""}
         <div class="freie-ep">${text("ui.freie_ep")}: <b>${spielerin(zustand).freieEp ?? 0}</b> <span class="leise">${text("ui.freie_ep_hinweis")}</span></div>
         ${this.lageHtml(spiel, gesteuerte)}
         <div class="leise last">${lastText(spiel, this.texte, gesteuerte)}</div>

@@ -12,6 +12,11 @@ export default {
     einzahl: { nom: "Fernkämpfer-Test", gen: "Fernkämpfer-Tests", dat: "Fernkämpfer-Test", akk: "Fernkämpfer-Test" },
     mehrzahl: { nom: "Fernkämpfer-Tests", gen: "Fernkämpfer-Tests", dat: "Fernkämpfer-Tests", akk: "Fernkämpfer-Tests" },
   },
+  "wesen.psi_jaegerin": {
+    geschlecht: "f",
+    einzahl: { nom: "Psi-Jägerin", gen: "Psi-Jägerin", dat: "Psi-Jägerin", akk: "Psi-Jägerin" },
+    mehrzahl: { nom: "Psi-Jägerinnen", gen: "Psi-Jägerinnen", dat: "Psi-Jägerinnen", akk: "Psi-Jägerinnen" },
+  },
   "wesen.normwesen_1": {
     geschlecht: "n",
     einzahl: { nom: "Normwesen 1", gen: "Normwesens 1", dat: "Normwesen 1", akk: "Normwesen 1" },
@@ -178,6 +183,7 @@ export default {
   "gelaende.gaerbottich": "Gärbottich",
   "gelaende.wandfackel": "Wandfackel",
   "faehigkeit.saeurespucke": "Säurespucke",
+  "faehigkeit.gedankenstich": "Gedankenstich",
   "faehigkeit.saeureschwall": "Säureschwall",
   "faehigkeit.saeureschwall.ankuendigung": "{wer.nom} bläht sich auf und zielt. Gleich kommt ein Schwall.",
   "oberflaeche.saeure": "Säure",
@@ -185,6 +191,7 @@ export default {
   "oberflaeche.asche": "Asche",
   "gas.co2": "CO2",
   "fraktion.verderber": "Verderber",
+  "fraktion.jaegerinnen": "Jägerinnen",
   "arena.essigbakterien": "Essigbakterien",
   "arena.fernkaempfer": "Fernkämpfer in zwei Wellen",
   "arena.engpass": "Rudel im Engpass",

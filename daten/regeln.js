@@ -137,6 +137,18 @@ export default {
   // Kontrolle in Folge in Prozent der Dauer, danach immun; die Folge beginnt neu, wenn so lange nach dem Ende der
   // letzten keine mehr kam; Zahlen vorläufig
   kontrolle: { stufen: [100, 50, 25], erholung: 1000 },
+  // Glimmer und Psi-Jägerinnen, siehe src/systeme/glimmer.js; alle Zahlen vorläufig. Zuwachs je Psi-Fähigkeit: die
+  // bezahlten PP, nüchtern mal 1, ab 32 ‰ mal 2; ab Glimmer 30 (etwa drei Psi-Fähigkeiten) kann eine Jägerin kommen:
+  // beim Betreten einer Ebene 25 % bis 75 % bei 200, sie trifft 100 bis 1000 Weltticks später ein; bei jeder
+  // Psi-Fähigkeit 2 % bis 10 %, sie erscheint sofort; mindestens 20 Schritte entfernt; ihr Auftreten senkt den Glimmer um ein Drittel
+  glimmer: {
+    zuwachs: [[0, 100], [3200, 200]],
+    betreten: [[29, 0], [30, 25], [200, 75]],
+    psi: [[29, 0], [30, 2], [200, 10]],
+    eintreffen: [10000, 100000],
+    abstand: 20,
+    senkenBeimAuftreten: 33,
+  },
   // Normierung, siehe werkzeuge/normierung.js und docs/Wesen.md, Normierung: Zielwerte gegen Ninkasi zu Beginn (Faust,
   // ohne Skills und Ausrüstung); Treffer bis zum Tod in beide Richtungen und EP je Stärke 1 bis 5, Trefferchancen in
   // Prozent, toleranz in Prozent der Treffer; dazu die Stufen von Kontrolldauer und Abklingzeit und der Verbrauch eines

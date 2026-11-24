@@ -15,7 +15,7 @@ import { einstellungsfensterOeffnen } from "./eingabe/einstellungsfenster.js";
 import { befehlszeileOeffnen } from "./eingabe/befehlszeile.js";
 import "./anzeige/einstellungsanzeige.js";
 import vorgaben from "./eingabe/einstellungen.js";
-import { datenLaden, neuesSpiel, befehlGeben, SPIELARTEN } from "./kern/spiel.js";
+import { datenLaden, neuesSpiel, befehlGeben, SPIELARTEN, gefuehrterZugSteht, gefuehrtenZugAusfuehren } from "./kern/spiel.js";
 import { entitaetenAuf, istWesen } from "./kern/zustand.js";
 import { hoererAnmelden } from "./kern/ereignisse.js";
 import { startwertAbleiten } from "./kern/zufall.js";
@@ -265,6 +265,9 @@ let feldUnterZeiger = null;
 // Laufender Ablauf aus Einzelbefehlen (Reise, Rasten, Erkunden): { zustand, naechsterSchritt }
 let laufenderAblauf = null;
 let ablaufZeitgeber = null;
+// Geführte Züge (Filmriss, Furcht, Kontrolle): die Logik hält davor an (kern/spiel.js gefuehrterZugSteht), die Anzeige
+// führt sie im Takt fuehrungPause aus oder mit gefuehrteZuegeBestaetigen auf eine Taste
+let fuehrungZeitgeber = null;
 let letzterRadZoom = 0;
 // Fensterstapel (eingabe/fenster.js): [{ art, zustand }], reine Anzeige, nicht im Spielzustand
 let fensterStapel = [];
@@ -313,6 +316,7 @@ function zeichnen() {
   if (spiel && !titelOffen) {
     uebersichtskarteZeichnen();
     tooltipZeigen();
+    fuehrungPlanen();
   }
 }
 
@@ -423,6 +427,25 @@ function chronikMelden(meldung) {
 
 // Nach jedem angenommenen Befehl: Schnellleiste nachführen, Sichtungen zählen, speichern; nach dem Tod Ninkasis oder dem
 // Sieg in der Arena das Fenster "ende"
+// Plant den nächsten geführten Zug ein, wenn einer ansteht und keiner geplant ist; mit Pause 0 laufen alle sofort
+function fuehrungPlanen() {
+  if (fuehrungZeitgeber || !spiel || !gefuehrterZugSteht(spiel) || einstellungen.gefuehrteZuegeBestaetigen) return;
+  if (einstellungen.fuehrungPause <= 0) {
+    while (gefuehrtenZugAusfuehren(spiel)) nachDemBefehl();
+    return zeichnen();
+  }
+  fuehrungZeitgeber = setTimeout(fuehrungTakt, einstellungen.fuehrungPause);
+}
+
+function fuehrungTakt() {
+  clearTimeout(fuehrungZeitgeber);
+  fuehrungZeitgeber = null;
+  if (!spiel || !gefuehrtenZugAusfuehren(spiel)) return;
+  nachDemBefehl();
+  zeichnen();
+  animationStarten();
+}
+
 function nachDemBefehl() {
   leisten = leistenNachfuehren(spiel, leisten);
   sichtungenZaehlen(chronik, spiel, gesehenImLauf);
@@ -519,6 +542,8 @@ function ablaufBeenden(grund) {
 function ablaufTakt() {
   ablaufZeitgeber = null;
   if (!laufenderAblauf) return;
+  // ein geführter Zug (Filmriss im Gehen) beendet den Ablauf still, die Führung übernimmt
+  if (gefuehrterZugSteht(spiel)) return ablaufBeenden(null);
   const schritt = laufenderAblauf.naechsterSchritt(spiel, laufenderAblauf.zustand, einstellungen);
   if (schritt.halt) return ablaufBeenden(schritt.halt);
   if (!befehlGeben(spiel, schritt.befehl).ok) return ablaufBeenden("abgelehnt");
@@ -557,7 +582,10 @@ function spielEinsetzen(neuesSpielObjekt, neueLeistenStand, gesehen = []) {
   letztesZielId = null;
   seitenleisteWesenId = null;
   animationUeberspringen();
+  clearTimeout(fuehrungZeitgeber);
+  fuehrungZeitgeber = null;
   spiel = neuesSpielObjekt;
+  spiel.fuehrungZeigen = true; // geführte Züge zum Miterleben (kern/spiel.js), nur in der Anzeige
   window.spiel = spiel; // zum Nachsehen in der Konsole
   kamera = neueKamera();
   log.leeren(spiel);
@@ -800,6 +828,11 @@ window.addEventListener("keydown", (tastenereignis) => {
   if (laufenderAblauf) {
     tastenereignis.preventDefault();
     return ablaufBeenden("abgebrochen");
+  }
+  // Geführter Zug ohne offenes Fenster: jede Taste führt ihn sofort aus (statt der Pause oder als Bestätigung)
+  if (spiel && !fensterStapel.length && gefuehrterZugSteht(spiel)) {
+    tastenereignis.preventDefault();
+    return fuehrungTakt();
   }
   // Offene Fenster bekommen jede Taste (eingabe/fenster.js); ? legt die Hilfe zum obersten Fenster obenauf
   if (fensterStapel.length) {

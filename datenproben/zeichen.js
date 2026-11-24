@@ -7,6 +7,7 @@ export default {
   wesen: {
     essigbakterium: { zeichen: "e", farbe: "#b4bd62" },
     fernkaempfer_test: { zeichen: "F", farbe: "#d2763a" },
+    psi_jaegerin: { zeichen: "J", farbe: "#b07ad8" },
     normwesen_1: { zeichen: "1", farbe: "#9a9a9a" },
     normwesen_2: { zeichen: "2", farbe: "#9a9a9a" },
     normwesen_3: { zeichen: "3", farbe: "#9a9a9a" },

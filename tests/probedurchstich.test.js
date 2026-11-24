@@ -49,7 +49,7 @@ const EFFEKTE = {
   segen_setzen: { schritte: [{ baustein: "zustand_setzen", zustand: "gesegnet" }] },
   ritual_patzer: { schritte: [{ baustein: "schaden", art: "magie", menge: 5 }] },
   // 4. Psi
-  gedankenstoss: { schritte: [{ baustein: "schaden", art: "psi", menge: 4 }, { baustein: "wert_aendern", wertName: "glimmer", menge: 10, auf: "quelle" }] },
+  gedankenstoss: { schritte: [{ baustein: "schaden", art: "psi", menge: 4 }] }, // den Glimmer hebt jede Psi-Fähigkeit (systeme/glimmer.js)
   psi_rueckschlag_probe: { schritte: [{ baustein: "schaden", art: "psi", menge: 3 }] },
   // 7. Heiler
   heilspruch: { schritte: [{ baustein: "heilen", menge: 5 }] },
@@ -335,7 +335,7 @@ test("Psi: stärker mit Pegel, Glimmer steigt bei der Wirkenden, ab 3 ‰ schlä
   modifikatorHinzufuegen(ninkasi, { ziel: "schaden", tag: "psi", art: "prozent", betrag: 50, wenn: [{ bedingung: "pegel_ab", wert: 100 }], quelle: "probe" });
   befehlAusfuehren(spiel, ninkasi, { art: "faehigkeit", faehigkeit: "gedankenstoss", ziel: { id: feind.id } });
   assert.equal(feind.werte.lp.aktuell, 26, "nüchtern 4");
-  assert.equal(ninkasi.werte.glimmer.aktuell, 10);
+  assert.equal(ninkasi.werte.glimmer.aktuell, 5, "Glimmer um die bezahlten PP, nüchtern mal 1");
   ninkasi.werte.pegel.aktuell = 150;
   befehlAusfuehren(spiel, ninkasi, { art: "faehigkeit", faehigkeit: "gedankenstoss", ziel: { id: feind.id } });
   assert.equal(feind.werte.lp.aktuell, 20, "mit 1,5 ‰ 6");

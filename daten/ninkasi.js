@@ -8,6 +8,7 @@ export default {
       mp: { grundwert: 100 },
       pp: { grundwert: 100, anfangswert: 0 }, // Psi-Punkte; Start- und Höchstwert vorläufig
       pegel: { anfangswert: 0 }, // in Hundertstel Promille (100 = 1 ‰), ohne Grundwert nach oben offen
+      glimmer: { anfangswert: 0 }, // Psi lockt Jägerinnen an (src/systeme/glimmer.js), ohne Grundwert, sinkt nie von selbst
     },
     // Grundwerte der Eigenschaften (src/systeme/skills.js); vorläufige Verteilung, bis die Charaktererstellung sie wählt
     eigenschaften: { koerperlichkeit: 14, trinkfestigkeit: 14, gewandtheit: 13, sinnlichkeit: 13, klugheit: 13, braukunde: 13 },
@@ -46,6 +47,8 @@ export default {
         ],
         modifikatoren: [800, 1200, 2000, 3200].map((wert) => ({ ziel: "genauigkeit", art: "plus", betrag: -5, wenn: [{ bedingung: "pegel_ab", wert }] })),
       },
+      // Filmriss im Vollrausch: alle 100 Weltticks außerhalb des Kampfes 3 % ab 32 ‰, 10 % bei 48 ‰, 25 % ab 64 ‰
+      filmriss: { alleTicks: 100, chance: [[3199, 0], [3200, 3], [4800, 10], [6400, 25]], effekt: "filmriss" },
     },
   },
 };

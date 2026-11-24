@@ -28,6 +28,7 @@ import "./modifikatoren.js";
 import "./laufendeAktionen.js";
 import "./betaeubung.js";
 import "./faehigkeiten.js";
+import "./glimmer.js";
 import "./verschleiss.js";
 import "./kennen.js";
 import "./skills.js";

@@ -23,6 +23,8 @@ export const EINSTELLUNGEN = {
   sprache: { reiter: "anzeige", art: "auswahl", werte: ["browser", ...SPRACHEN] },
   reisePause: { reiter: "spiel", art: "zahl", min: 0, max: 200, schritt: 10, einheit: "einheit.ms" },
   geschossPause: { reiter: "spiel", art: "zahl", min: 0, max: 100, schritt: 10, einheit: "einheit.ms" },
+  fuehrungPause: { reiter: "spiel", art: "zahl", min: 0, max: 1000, schritt: 50, einheit: "einheit.ms" },
+  gefuehrteZuegeBestaetigen: { reiter: "spiel", art: "schalter" },
   reiseTrotzFeinden: { reiter: "spiel", art: "schalter" },
   rastenTrotzFeinden: { reiter: "spiel", art: "schalter" },
   haltBeiGegenstand: { reiter: "spiel", art: "listenschalter", liste: "reiseHalt", eintrag: "gegenstand" },

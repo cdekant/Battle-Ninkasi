@@ -42,7 +42,7 @@ Abgrenzung: [Systemausbau.md](Systemausbau.md) ist die Arbeitsliste beschlossene
 | Mutationen | ungeklärt | gering | nein |
 | Erzeugte Geschichte | ungeklärt | gering | nein |
 | Speichern im Hub | ungeklärt | gering | nein |
-| Geister früherer Läufe | hoch | gering | nein |
+| Geister früherer Läufe | hoch | gering | erledigt (Glimmer und Psi-Jägerin) |
 | Kennzeichen in Sicht | ungeklärt | gering | nein |
 
 Umsetzung: keine
@@ -413,16 +413,17 @@ Umsetzung: offen
 + Wichtigkeit: hoch, "eine bisher in Spielen noch wenig aufgetauchte Mechanik" (2026-11-24)
 + Vorbilder: NetHack (Bones: die Ebene, auf der eine Figur starb, kann in einem späteren Spiel mit ihrem Geist und ihrer verfluchten Habe wieder auftauchen); Dungeon Crawl Stone Soup (Geister toter Figuren mit Name, Stufe und Zaubern aus Bones-Dateien); Middle-earth: Shadow of Mordor (Nemesis-System: Gegner erinnern sich an frühere Begegnungen); neu gegenüber diesen: die Geister jagen Psi und Rausch
 + Idee: Jeder Tod legt eine Geist-Ninkasi in eine wachsende Bibliothek, mit ihren Skills, Fähigkeiten und Gegenständen; in späteren Läufen erscheinen Geister als Psi-Jägerinnen, angelockt von hohem Pegel und vom Einsatz von Psi; die Bibliothek erzählt so die Geschichte der eigenen Läufe ("Ninkasi die Dritte, ertrunken im Gärbottich auf Level 7"); ein gleicher Startwert ist nicht nötig, weil nur der Geist mitkommt, nicht die Ebene
-+ Zusammenhang: entschieden ist, dass der Glimmer Psi-Jägerinnen anlockt (siehe [Grundlagen.md](Grundlagen.md), Spielkern); die Geister wären ihr Inhalt, zuerst kommt eine Jägerin im Probeinhalt (siehe [Systemausbau.md](Systemausbau.md), Punkt 10)
++ Zusammenhang: entschieden ist, dass der Glimmer Psi-Jägerinnen anlockt (siehe [Grundlagen.md](Grundlagen.md), Spielkern); die Geister wären ihr Inhalt; heute kommt eine Jägerin aus dem Probeinhalt (siehe [Wesen.md](Wesen.md), Glimmer)
 + Braucht: beim Tod einen Eintrag in der Bibliothek außerhalb des Laufs (Name, Todestiefe und Ursache, Skillstufen, Fähigkeiten, Ausrüstung), nur aus Spielarten, die zählen; beim Start übernimmt die Oberfläche eine Auswahl als Startoption wie das Vorwissen (siehe [Architektur.md](Architektur.md), Speichern), so bleibt der Lauf wiederholbar; ein Auslöser über Pegel und Psi ruft einen Geist herbei; die KI des Geists handelt mit ihren Fähigkeiten nach der Taktik der gesteuerten Entität (siehe [Wesen.md](Wesen.md), KI)
 + Machtkurve: Es erscheinen nur Geister aus ähnlicher Tiefe oder mit ähnlichen EP wie Ninkasi; bis die Bibliothek gefüllt ist, wird ein Geist auf die heutige Tiefe skaliert
++ EP: Ein Geist gibt gebundene EP nach seiner Stärke wie jeder Gegner, eingeordnet über die Machtkurve
 + Beute: Der Geist hinterlässt keine Ausrüstung, höchstens einen Gegenstand, der für Psi nützlich ist und den Pegel hebt (Arbeitsnamen "reiner Alkohol", "Ninkasis Essenz"); so bleibt die Regel gewahrt, dass zwischen Läufen nur Wissen bleibt ([Grundlagen.md](Grundlagen.md), Spiel)
 + Taktik: Ausgangspunkt ist die Bewertung der Handlungen, nach der schon die Taktik der gesteuerten Entität den Bot führt; als Ausbau kann der Geist die Spielweise der toten Ninkasi nachahmen, aus der Häufigkeit ihrer Fähigkeiten und Befehle im Lauf
 + Berührt: Chronik und Todesbericht (Quelle der Einträge), Schutz der Ablagen, Arena und Bot (füllen die Bibliothek nicht)
 + Umbaurisiko: gering
-+ Vorkehrung: keine; der Weg über die Startoptionen steht
++ Vorkehrung (erledigt): der Weg über die Startoptionen steht; Glimmer, Würfe und Auftreten der Jägerin stehen, ein Geist muss nur ein Wesen mit `psiJaegerin` werden (siehe [Wesen.md](Wesen.md), Glimmer)
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 10
+Umsetzung: offen
 
 ## Kennzeichen in Sicht
 

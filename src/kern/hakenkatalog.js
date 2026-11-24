@@ -24,6 +24,11 @@ export const HAKENKATALOG = {
   zug_ende: { inBetrieb: true, ausloeserErlaubt: true },         // { akteurId }, Quelle und Ziel die Akteurin; nach ihrer Aktion
   // + gegenstandId, art ("trinken" | "werfen" | "anlegen" | "ablegen"); Quelle und Ziel die Benutzerin
   gegenstand_benutzt: { inBetrieb: true, ausloeserErlaubt: true },
+  // + faehigkeit (Name), verbrauch ({ wert: menge }, bezahlt); Quelle und Ziel die Wirkende; nach dem Bezahlen, vor Risiko
+  // und Wirkung (auch wenn sie dann fehlschlägt), systeme/faehigkeiten.js
+  faehigkeit_gewirkt: { inBetrieb: true, ausloeserErlaubt: true },
+  // + tiefe; Quelle und Ziel die Spielerin; nach jedem Wechsel der Ebene, wenn sie angekommen ist (systeme/ebenen.js)
+  ebene_betreten: { inBetrieb: true, ausloeserErlaubt: true },
   // reserviert, siehe docs/Systemausbau.md
   zug_beginn: { inBetrieb: false, ausloeserErlaubt: true },
 };

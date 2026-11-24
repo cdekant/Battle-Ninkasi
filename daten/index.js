@@ -14,6 +14,7 @@ import schichten from "./schichten.js";
 import eigenschaften from "./eigenschaften.js";
 import taktiken from "./taktiken.js";
 import glossar from "./glossar.js";
+import zustaende from "./zustaende.js";
 
 export default {
   wesen: { ...ninkasi },
@@ -22,7 +23,7 @@ export default {
   fallen: {},
   effekte,
   schadensarten,
-  zustaende: {},
+  zustaende,
   faehigkeiten: {},
   risiken: {},
   fraktionen,

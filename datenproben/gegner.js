@@ -39,6 +39,19 @@ export default {
     },
   },
 
+  // Psi-Jägerin (src/systeme/glimmer.js): kommt ab Glimmer 30, kennt Ninkasis Ort; Stärke 3 der Normierung mit
+  // Psi-Schaden; in keiner Population, später werden die Geister früherer Läufe zu Jägerinnen; vorläufig
+  psi_jaegerin: {
+    text: "wesen.psi_jaegerin",
+    fraktion: "jaegerinnen",
+    psiJaegerin: { glimmerAb: 30 },
+    werte: { lp: { grundwert: 22 } },
+    ep: 20,
+    angriffe: [{ name: "gedankenpeitsche", genauigkeit: 47, effekt: "gedankenpeitsche" }],
+    ki: { modul: "jagen", letzteBekanntePosition: null },
+    sicht: { reichweite: 7 },
+  },
+
   // Normwesen der Stärken 1 bis 5 (siehe docs/Wesen.md, Normierung): Maßstab für Arena und Werkzeug, in keiner
   // Population; Tempo 100, Trefferchance gegen Ninkasi zu Beginn 70 %, Schaden stumpf
   normwesen: {

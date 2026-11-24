@@ -14,6 +14,8 @@
 //                                         // mit der Chance in Prozent nach der Kurve über dem Pegel
 //       modifikatoren: [{ ziel, art, betrag, wenn? }],  // gelten immer, Schwellen über pegel_ab (Quelle "rausch")
 //     },
+//     filmriss: { alleTicks: 100, chance: kurve, effekt },  // alle alleTicks Weltticks, nur außerhalb des Kampfes,
+//                                         // mit der Chance in Prozent über dem Pegel der Effekt auf sich selbst
 //   }                                     // wie erlitten, mal Prozent der Kurve über dem Pegel
 // Negative Kurvenwerte sind Schwund. Modifikatoren (siehe kern/werte.js):
 //   "regeneration.<wert>"       Plus oder Prozent auf eine positive Rate
@@ -23,12 +25,15 @@
 //   "imKampf.<wert>"            Plus in Prozentpunkten auf den Anteil der Rate im Kampf (z.B. Regeneration im Kampf)
 //   "kampfgewinn.<wert>"        Plus oder Prozent auf den Gewinn je Treffer
 //   "rausch.<veraenderer>"      Plus oder Prozent auf die Chance eines Befehlsveränderers aus dem Rausch (Standfestigkeit)
+//   "rausch.filmriss"           Plus oder Prozent auf die Chance des Filmrisses
 
 import { anmelden, holen } from "../kern/register.js";
 import { alleEntitaeten, istWesen } from "../kern/zustand.js";
+import { WELTTICK } from "../kern/zeit.js";
+import { wurfProzent } from "../kern/wurf.js";
 import { modifiziert, hatWert, prozentVon } from "../kern/werte.js";
 import { wertAufKurve, stelleDesHoechstwerts } from "../kern/kurven.js";
-import { wertAendernInHundertsteln } from "../kern/effekte.js";
+import { wertAendernInHundertsteln, effektAnwenden } from "../kern/effekte.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { imKampf } from "./kampfzustand.js";
 
@@ -84,6 +89,24 @@ export function rauschchance(spiel, entitaet, eintrag) {
   return Math.min(100, Math.max(0, modifiziert(spiel, entitaet, `rausch.${eintrag.veraenderer}`, grundchance)));
 }
 
+// Chance des Filmrisses in Prozent beim aktuellen Pegel, mit Modifikatoren, 0 bis 100; 0 ohne filmriss
+export function filmrisschance(spiel, entitaet) {
+  const filmriss = entitaet.stoffwechsel?.filmriss;
+  if (!filmriss) return 0;
+  const grundchance = wertAufKurve(filmriss.chance, entitaet.werte.pegel.aktuell);
+  return grundchance <= 0 ? 0 : Math.min(100, Math.max(0, modifiziert(spiel, entitaet, "rausch.filmriss", grundchance)));
+}
+
+// Filmriss: alle alleTicks Weltticks ein Wurf, nur außerhalb des Kampfes und nur mit einer Chance über 0
+function filmrissWuerfeln(spiel, entitaet) {
+  const filmriss = entitaet.stoffwechsel.filmriss;
+  if (!filmriss || Math.floor(spiel.zustand.zeit / WELTTICK) % filmriss.alleTicks !== 0 || imKampf(spiel, entitaet)) return;
+  const chance = filmrisschance(spiel, entitaet);
+  if (chance <= 0 || !wurfProzent(spiel, "filmriss", chance)) return;
+  const position = { x: entitaet.position.x, y: entitaet.position.y };
+  effektAnwenden(spiel, filmriss.effekt, { quelleId: entitaet.id, zielId: entitaet.id, ursprung: position, zielfeld: position, ursache: "zustand", kettentiefe: 0, mittel: { art: "filmriss" } });
+}
+
 // Pegel mit der schnellsten Regeneration eines Werts, z.B. für die Anzeige des LP-Optimums
 export function optimalerPegel(spiel, entitaet, wertName) {
   const kurve = entitaet.stoffwechsel?.regeneration?.[wertName];
@@ -104,6 +127,7 @@ anmelden("welttick", "stoffwechsel", (spiel) => {
     }
     const abbau = Math.max(0, modifiziert(spiel, entitaet, "abbau.pegel", stoffwechsel.abbauHundertstel || 0));
     if (abbau > 0) wertAendernInHundertsteln(spiel, entitaet, "pegel", -abbau);
+    if (spiel.zustand.entitaeten[entitaet.id]) filmrissWuerfeln(spiel, entitaet);
   }
 });
 

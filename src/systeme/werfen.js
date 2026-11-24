@@ -5,7 +5,8 @@
 // Daten am Gegenstand: wurf: { effekt?, reichweite? }
 //   mit effekt zerbricht der Gegenstand am Aufschlag (Meldung "zerbrochen") und der Effekt wirkt dort: Ziel ist das
 //   getroffene Wesen, sonst wirkt er nur aufs Feld (Ursache "wurf"); ob er treffen muss, sagen seine Daten (trefferwurf)
-//   ohne effekt landet der Gegenstand auf dem Aufschlagfeld (Meldung "gelandet")
+//   ohne effekt landet der Gegenstand auf dem Aufschlagfeld (Meldung "gelandet"), ist es nicht passierbar, auf dem letzten
+//   passierbaren Feld der Bahn davor
 // Nutzung für die KI (Register "nutzungen", ki/nutzen.js): wurf.zweck sagt, wozu ein Wesen den Gegenstand auf seine Beute
 //   wirft; nur wenn die Bahn die Beute als erstes Wesen trifft (kein Verbündeter davor)
 // Am Aufschlag entsteht Lärm (regeln.wahrnehmung.laermWurf): Wache gehen ihm nach, so taugt ein Wurf als Ablenkung.
@@ -18,10 +19,19 @@ import { effektAnwenden } from "../kern/effekte.js";
 import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
 import { zielAufloesen } from "./zielauswahl.js";
 import { laermMachen } from "./wahrnehmung.js";
+import { passierbar } from "../welt/karte.js";
 
 function geworfenerGegenstand(spiel, akteur, befehl) {
   if (!Number.isInteger(befehl.gegenstandId) || !(akteur.inventar || []).includes(befehl.gegenstandId)) return null;
   return entitaetMitId(spiel.zustand, befehl.gegenstandId);
+}
+
+// Wo ein ganzer Gegenstand liegen bleibt: am Aufschlag, ist das Feld nicht passierbar (ein Gärbottich ist durchsichtig
+// und lässt Geschosse durch), auf dem letzten passierbaren Feld der Bahn davor, sonst bei der Werferin
+function landefeld(spiel, akteur, bahn) {
+  const felder = [akteur.position, ...bahn.felder, bahn.aufschlag];
+  for (let i = felder.length - 1; i >= 0; i--) if (passierbar(spiel, felder[i].x, felder[i].y)) return { x: felder[i].x, y: felder[i].y };
+  return { x: akteur.position.x, y: akteur.position.y };
 }
 
 export function wurfbahn(spiel, akteur, gegenstand, zielangabe) {
@@ -56,8 +66,9 @@ anmelden("befehle", "werfen", {
         ursache: "wurf", mittel: { art: "gegenstand", name: gegenstand.typ },
       });
     } else {
-      positionSetzen(spiel.zustand, gegenstand, aufschlag);
-      melden(spiel, "gelandet", { was: bezugAuf(gegenstand), feld: aufschlag });
+      const feld = landefeld(spiel, akteur, bahn);
+      positionSetzen(spiel.zustand, gegenstand, feld);
+      melden(spiel, "gelandet", { was: bezugAuf(gegenstand), feld });
     }
     laermMachen(spiel, aufschlag, spiel.daten.regeln.wahrnehmung.laermWurf, akteur.id, "aufschlag");
     return "werfen";

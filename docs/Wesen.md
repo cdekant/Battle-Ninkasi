@@ -2,7 +2,7 @@
 
 Stand: 2026-11-24
 
-Zuständig für: `src/systeme/kampf.js`, `src/systeme/kampfzustand.js`, `src/systeme/fraktionen.js`, `src/systeme/wahrnehmung.js`, `src/systeme/sinne.js`, `src/systeme/bewegung.js`, `src/systeme/verschieben.js`, `src/systeme/werfen.js`, `src/systeme/skills.js`, `src/systeme/lernen.js`, `src/systeme/stoffwechsel.js`, `src/ki/*`, `daten/ninkasi.js`, `daten/fraktionen.js`, `daten/schadensarten.js`, `daten/eigenschaften.js`, `daten/taktiken.js`
+Zuständig für: `src/systeme/kampf.js`, `src/systeme/kampfzustand.js`, `src/systeme/fraktionen.js`, `src/systeme/wahrnehmung.js`, `src/systeme/sinne.js`, `src/systeme/bewegung.js`, `src/systeme/verschieben.js`, `src/systeme/werfen.js`, `src/systeme/skills.js`, `src/systeme/lernen.js`, `src/systeme/stoffwechsel.js`, `src/systeme/glimmer.js`, `src/ki/*`, `daten/ninkasi.js`, `daten/fraktionen.js`, `daten/schadensarten.js`, `daten/eigenschaften.js`, `daten/taktiken.js`
 
 Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Charakter.md](Charakter.md), [Grundlagen.md](Grundlagen.md), [Ausblick.md](Ausblick.md), [Gegenstaende.md](Gegenstaende.md), [Skills.md](Skills.md)
 
@@ -236,34 +236,59 @@ Regeln:
 + Gelände, das das Ziel nicht betreten kann, aber nicht fest ist (Abgrund, Wasser), hält beim Stoßen nicht auf: das Ziel landet darin, die Lageprüfung folgt
 + Teleportieren: ist das Zielfeld besetzt oder nicht betretbar, aufs nächste freie (Breitensuche); gezogen wird aus einer festen Reihenfolge
 + Lage: steht ein lebendes Wesen auf einem Feld, das es mit seiner wirksamen Bewegungsart nicht betreten kann (Phasen endet in der Wand, Levitation über dem Abgrund, hineingestoßen), wirkt `beimFestsitzen` des Geländes, sonst `regeln.bewegung.beimFestsitzen`; lebt es danach, wird es aufs nächste freie Feld gedrückt; ein Sturz in einen Abgrund auf die Ebene darunter ist noch nicht umgesetzt
-+ Werfen entlang der Bahn eines Geschosses (bis zum ersten Wesen oder vor die Wand), Reichweite `wurf.reichweite` am Gegenstand, sonst `regeln.werfen.reichweite`; mit `wurf.effekt` zerbricht der Gegenstand am Aufschlag und der Effekt wirkt dort (Ziel das getroffene Wesen, Ursache `wurf`), sonst landet er auf dem Feld; am Aufschlag entsteht Lärm (`laermWurf`), dem Wache nachgehen; im Browser über das Inventarfenster (w) und den Zielmodus (siehe [Bedienung.md](Bedienung.md), Zielmodus)
++ Werfen entlang der Bahn eines Geschosses (bis zum ersten Wesen oder vor die Wand), Reichweite `wurf.reichweite` am Gegenstand, sonst `regeln.werfen.reichweite`; mit `wurf.effekt` zerbricht der Gegenstand am Aufschlag und der Effekt wirkt dort (Ziel das getroffene Wesen, Ursache `wurf`), sonst landet er auf dem Feld, ist es nicht passierbar (ein Gärbottich ist durchsichtig und lässt Geschosse durch), auf dem letzten passierbaren Feld der Bahn davor; am Aufschlag entsteht Lärm (`laermWurf`), dem Wache nachgehen; im Browser über das Inventarfenster (w) und den Zielmodus (siehe [Bedienung.md](Bedienung.md), Zielmodus)
 
 ## Stoffwechsel
 
 Daten:
 
 + Der Pegel ist ein Wert in Hundertsteln Promille (100 entsprechen 1 ‰), ohne Grundwert und damit nach oben offen
-+ Komponente `stoffwechsel` (`src/systeme/stoffwechsel.js`, Werte für Ninkasi in `daten/ninkasi.js`): Abbau des Pegels, Stufen und Strafen des Rauschs und je Wert eine Kurve der Regeneration über dem Pegel (Hundertstel je Welttick, Kurven siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); `imKampf: { <wert>: prozent }` Anteil der Rate im Kampf (0 bis 100, fehlt ein Wert: 100, nur für Werte mit Kurve); `kampfgewinn: { <wert>: { jeTreffer, kurve } }` Gewinn je Treffer in Hundertsteln mal Prozent der Kurve über dem Pegel (Kampfespegel)
++ Komponente `stoffwechsel` (`src/systeme/stoffwechsel.js`, `src/systeme/glimmer.js`, Werte für Ninkasi in `daten/ninkasi.js`): Abbau des Pegels, Stufen und Strafen des Rauschs und je Wert eine Kurve der Regeneration über dem Pegel (Hundertstel je Welttick, Kurven siehe [Architektur.md](Architektur.md), Entitäten und Komponenten); `imKampf: { <wert>: prozent }` Anteil der Rate im Kampf (0 bis 100, fehlt ein Wert: 100, nur für Werte mit Kurve); `kampfgewinn: { <wert>: { jeTreffer, kurve } }` Gewinn je Treffer in Hundertsteln mal Prozent der Kurve über dem Pegel (Kampfespegel)
 + `stufen: [{ name, ab }]` aufsteigend, darunter gilt `nuechtern`; Texte `rausch.<name>` in den Sprachdateien
 + `rausch: { befehle?, modifikatoren? }`: `befehle: [{ veraenderer, chance: kurve, ...parameter }]` Befehlsveränderer (siehe [Wirkungen.md](Wirkungen.md), Zustände) mit der Chance in Prozent nach der Kurve über dem Pegel; `modifikatoren` gelten immer, mit der Quelle `rausch`, Schwellen über `pegel_ab`
 + Ninkasis Skala liegt viermal so hoch wie die der Sterblichen (Entscheidung in [Grundlagen.md](Grundlagen.md), Spielkern); die Getränke heben den Pegel mit Werten für Sterbliche
 + Ninkasi (vorläufig): Abbau 0,02 ‰ je Welttick; Stufen angeheitert ab 2 ‰, beschwipst ab 4, berauscht ab 8, `im_rausch` ab 12, sturzbetrunken ab 20, Vollrausch ab 32 ‰; LP `[[0, 25], [600, 67], [1200, 25], [3200, 0]]`, MP `[[0, 50], [400, 25], [1200, 0]]` nach der Norm `regeln.normierung.regeneration` (siehe Normierung); PP außerhalb des Kampfes nur Schwund `[[0, -30], [600, -10], [1600, 0]]`; im Kampf ruhen alle drei (`imKampf` je 0); `kampfgewinn.pp` 200 je Treffer mal `[[200, 0], [600, 100], [1600, 200]]`, also nichts unter 2 ‰, 2 PP bei 6 ‰ und 4 PP ab 16 ‰; ein gewöhnlicher Kampf (rund 3 Treffer ausgeteilt, 1 bis 2 erlitten) reicht bei 6 ‰ für eine Psi-Fähigkeit nach der Norm `verbrauch.psi`
 + Strafen des Rauschs für Ninkasi (vorläufig): ab 8 ‰ Genauigkeit -5 je Schwelle bei 8, 12, 20 und 32 ‰; ab 12 ‰ `abweichen` (Torkeln) und `daneben_schlagen` mit je 5 %, 15 % bei 20 ‰ und 30 % ab 32 ‰
++ `filmriss: { alleTicks, chance: kurve, effekt }`: alle `alleTicks` Weltticks außerhalb des Kampfes ein Wurf (`filmriss`) mit der Chance in Prozent nach der Kurve über dem Pegel, der Effekt wirkt auf die Trägerin
++ Filmriss für Ninkasi (vorläufig): alle 100 Weltticks 3 % ab 32 ‰, 10 % bei 48 ‰, 25 % ab 64 ‰; Effekt `filmriss` (`daten/effekte.js`): Baustein `vergessen` (siehe [Welt.md](Welt.md), Sicht und Erinnerung), dann der Zustand `filmriss` (`daten/zustaende.js`, 5000 Zeiteinheiten, `ki: { modul: "abwarten" }`), in dem die KI für sie wartet; miterleben lässt ihn die Anzeige (siehe [Bedienung.md](Bedienung.md), Geführte Züge)
 
 Schnittstellen:
 
-+ Handler der Weltuhr (Register `welttick`): je Welttick Regeneration oder Schwund nach den Kurven, im Kampf (`imKampf`, siehe Kampfzustand) mal dem Anteil aus `imKampf`, danach Abbau des Pegels
++ Handler der Weltuhr (Register `welttick`): je Welttick Regeneration oder Schwund nach den Kurven, im Kampf (`imKampf`, siehe Kampfzustand) mal dem Anteil aus `imKampf`, danach Abbau des Pegels und der Wurf auf den Filmriss
 + Haken `nach_treffer`: jeder Treffer zwischen zwei verschiedenen Wesen bringt beiden ihren `kampfgewinn`, der Angreiferin (`quelleId`) wie dem Ziel
-+ `rateBeimPegel`, `anteilImKampf`, `wirksameRate` und `gewinnJeTreffer` für Anzeige und Tests; `rauschstufe(entitaet)` (Name der Stufe, sonst `nuechtern`) und `rauschchance(spiel, entitaet, eintrag)` (Chance eines Veränderers aus dem Rausch, 0 bis 100)
++ `rateBeimPegel`, `anteilImKampf`, `wirksameRate` und `gewinnJeTreffer` für Anzeige und Tests; `rauschstufe(entitaet)` (Name der Stufe, sonst `nuechtern`) und `rauschchance(spiel, entitaet, eintrag)` (Chance eines Veränderers aus dem Rausch, 0 bis 100), `filmrisschance(spiel, entitaet)`
 + Haken `nach_wertaenderung`: Meldungen `pegel_steigt` und `pegel_sinkt` mit `schwelle` und `stufe` (beim Steigen die beginnende Stufe, beim Sinken die danach geltende), je überschrittene Schwelle eine; `nuechtern`, wenn der Pegel ganz abgebaut ist
 + Haken `vor_befehl`: die Veränderer aus `rausch.befehle` in ihrer Reihenfolge, nur mit einer Chance über 0 (nüchtern bleibt die Zahlenfolge des Zufalls ungestört); Modifikatorquelle `rausch`
-+ Modifikatoren: `regeneration.<wert>` auf positive Raten, `schwund.<wert>` auf den Betrag negativer Raten, `kurvenverschiebung.<wert>` verschiebt die Kurve nach rechts (z.B. Optimum der LP nach oben), `abbau.pegel` auf den Abbau, `imKampf.<wert>` in Prozentpunkten auf den Anteil im Kampf (bis 100, z.B. Regeneration der LP im Kampf), `kampfgewinn.<wert>` auf den Gewinn je Treffer, `rausch.<veraenderer>` auf die Chance eines Veränderers aus dem Rausch (Standfestigkeit, ohne die Schwellen zu verschieben); Quellen sind Skills, Schriftrollen, Items und Zustände
++ Modifikatoren: `regeneration.<wert>` auf positive Raten, `schwund.<wert>` auf den Betrag negativer Raten, `kurvenverschiebung.<wert>` verschiebt die Kurve nach rechts (z.B. Optimum der LP nach oben), `abbau.pegel` auf den Abbau, `imKampf.<wert>` in Prozentpunkten auf den Anteil im Kampf (bis 100, z.B. Regeneration der LP im Kampf), `kampfgewinn.<wert>` auf den Gewinn je Treffer, `rausch.<veraenderer>` auf die Chance eines Veränderers aus dem Rausch und `rausch.filmriss` auf die des Filmrisses (Standfestigkeit, ohne die Schwellen zu verschieben); Quellen sind Skills, Schriftrollen, Items und Zustände
 
 Regeln:
 
 + Negative Kurvenwerte sind Schwund, für jeden Wert möglich; Schwund der LP kann töten (Ursache `schwund.<wert>`); der Anteil im Kampf gilt für Regeneration wie Schwund
 + Gewinn nur aus Treffern mit Trefferwurf (Angriffe und der Baustein `trefferwurf`), nicht aus Schaden ohne Wurf, Fallen oder Treffern an sich selbst; je Treffer statt nach dem Schaden (Vorbild: die Wut in World of Warcraft seit 8.0.1, siehe [Grundlagen.md](Grundlagen.md), Spielkern)
 + Bruchteile laufen über Speicher in Hundertsteln (siehe [Architektur.md](Architektur.md), Zeitmodell)
+
+## Glimmer
+
+Spieldesign in [Grundlagen.md](Grundlagen.md), Spielkern; Vorbild Caves of Qud. Alle Zahlen vorläufig.
+
+Daten:
+
++ Wert `glimmer` ohne Grundwert an Ninkasi (`daten/ninkasi.js`), sinkt nie von selbst
++ `regeln.glimmer` (`daten/regeln.js`, umgesetzt in `src/systeme/glimmer.js`): `zuwachs` Kurve [Pegel, Prozent] (nüchtern 100, ab 32 ‰ 200), `betreten` und `psi` Kurven [Glimmer, Prozent] (ab 30: 25 % bzw. 2 %, bei 200: 75 % bzw. 10 %), `eintreffen` [von, bis] in Zeiteinheiten (10000 bis 100000, also 100 bis 1000 Weltticks), `abstand` (20 Schritte), `senkenBeimAuftreten` (33 %)
++ Psi-Jägerin: ein Wesen mit `psiJaegerin: { glimmerAb }`; im Probeinhalt `psi_jaegerin` ab 30 (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
+
+Schnittstellen:
+
++ Haken `faehigkeit_gewirkt` (siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten): eine Fähigkeit mit dem Tag `psi` hebt den Glimmer der Wirkenden um die bezahlten PP mal `zuwachs` beim Pegel (`glimmerZuwachs`), Modifikator `glimmer` auf den Zuwachs (Abschirmen); bei der Spielerin danach der Wurf `jaegerin` nach `psi`, bei Erfolg erscheint die Jägerin sofort
++ Haken `ebene_betreten` (`src/systeme/ebenen.js`): merkt den Besuch in `zustand.ebeneBetretenUm` und würfelt nach `betreten`; bei Erfolg kommt das Zeitereignis `jaegerin_eintreffen` nach `eintreffen` (Wurf `jaegerin_eintreffen`), es verfällt, wenn der Besuch inzwischen ein anderer ist
++ `jaegerinErscheinen(spiel)`, `jaegerinFuer(spiel, glimmer)` (die höchste erreichte Schwelle, bei Gleichstand die erste in den Daten), `istJaegerin`; Meldung `jaegerin_naht`
+
+Regeln:
+
++ Eine Jägerin kommt nur, wenn die Spielerin einen Glimmer hat, nicht im Hub (Tiefe 0), nicht in der Arena und solange keine lebende Jägerin auf der Ebene ist
++ Sie erscheint auf einem zufälligen freien Feld außer Sicht, auf dem sie stehen kann (keine geschlossene Tür) und von dem aus sie Ninkasi erreicht, mindestens `abstand` Schritte entlang des Wegs entfernt (`abstandskarte`, Wurf `jaegerin_feld`); gibt es keins, kommt sie nicht und der Glimmer bleibt
++ Sie kennt den Ort der Spielerin (Vorrangbefehl `angreifen`, siehe KI) und jagt sofort; ihr Auftreten senkt den Glimmer um `senkenBeimAuftreten` Prozent (abgerundet)
++ Sie gibt gebundene EP wie jedes Wesen ihrer Stärke
 
 ## Skills und Lernen
 
@@ -308,7 +333,7 @@ Regeln:
 
 ## Tests
 
-+ `tests/kampf.test.js` (Trefferwurf, Blocken, Krit, Schadensrechnung, Profile), `tests/zeitskala.test.js` (wehrlos, Kampfzustand als Bedingung), `tests/normierung.test.js` (Normwesen, Einordnung, Datenprüfung), `tests/fraktionen.test.js` (Beziehungen, Zorn, Ruf, Kampfzustand, Beistand), `tests/wahrnehmung.test.js` (Wachzustand, Bemerken, Lärm, Hinterhalt), `tests/sinne.test.js` (Arten der Wahrnehmung, Spüren entlang offener Felder, Bemerken und Jagen nach Gespürtem), `tests/faehigkeitenwahl.test.js`, `tests/verhalten.test.js`, `tests/handlungen.test.js` (auch Ziele unter Verbündeten), `tests/nutzen.test.js` und `tests/arena.test.js` (KI, Taktik), `tests/umherziehen.test.js` (Wegpunkte, Wachzustand der Population, Umherziehen, Rudel, Abstandskarte), `tests/verschieben.test.js` (Bewegungsarten, Stoßen, Ziehen, Tauschen, Teleportieren, Lage, Werfen), `tests/wege.test.js`, `tests/stoffwechsel.test.js`, `tests/rausch.test.js` (Strafen des Rauschs, Danebenschlagen, Schlag ins Leere, `risiko.<ausgang>`, Ninkasis Skala), `tests/skills.test.js` und `tests/lernen.test.js`
++ `tests/kampf.test.js` (Trefferwurf, Blocken, Krit, Schadensrechnung, Profile), `tests/zeitskala.test.js` (wehrlos, Kampfzustand als Bedingung), `tests/normierung.test.js` (Normwesen, Einordnung, Datenprüfung), `tests/fraktionen.test.js` (Beziehungen, Zorn, Ruf, Kampfzustand, Beistand), `tests/wahrnehmung.test.js` (Wachzustand, Bemerken, Lärm, Hinterhalt), `tests/sinne.test.js` (Arten der Wahrnehmung, Spüren entlang offener Felder, Bemerken und Jagen nach Gespürtem), `tests/faehigkeitenwahl.test.js`, `tests/verhalten.test.js`, `tests/handlungen.test.js` (auch Ziele unter Verbündeten), `tests/nutzen.test.js` und `tests/arena.test.js` (KI, Taktik), `tests/umherziehen.test.js` (Wegpunkte, Wachzustand der Population, Umherziehen, Rudel, Abstandskarte), `tests/verschieben.test.js` (Bewegungsarten, Stoßen, Ziehen, Tauschen, Teleportieren, Lage, Werfen), `tests/wege.test.js`, `tests/stoffwechsel.test.js`, `tests/rausch.test.js` (Strafen des Rauschs, Danebenschlagen, Schlag ins Leere, `risiko.<ausgang>`, Ninkasis Skala), `tests/glimmer.test.js` (Glimmer, Psi-Jägerin, Filmriss, geführte Züge), `tests/skills.test.js` und `tests/lernen.test.js`
 
 ## Verweise
 
