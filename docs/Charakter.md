@@ -161,11 +161,11 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skil
 
 ### Gebundene EP
 
-+ Gebundene EP gibt nur Bewältigtes, das es je Ebene endlich oft gibt: besiegte Gegner, entschärfte Fallen, geöffnete Schlösser, ein gefundenes Rezept beim ersten Gelingen (Hausrezepte nicht, siehe [Skills.md](Skills.md), Brauen), ein Hinterhalt; jedes davon trägt in den Daten einen festen Wert `ep`
++ Gebundene EP gibt nur Bewältigtes, das es je Ebene endlich oft gibt: besiegte Gegner, kampflos bewältigte Wesen (überredet, eingeschüchtert, verführt, unter den Tisch getrunken, gezähmt, bekehrt; je Wesen einmal, siehe [Skills.md](Skills.md), Soziales), entschärfte Fallen, geöffnete Schlösser, ein gefundenes Rezept beim ersten Gelingen (Hausrezepte nicht, siehe [Skills.md](Skills.md), Brauen), ein Hinterhalt; jedes davon trägt in den Daten einen festen Wert `ep`
 + Die Anwendung selbst bringt keine EP, sie bestimmt, wohin die EP fließen; so bleibt die Menge je Ebene begrenzt und Farmen an harmlosen Zielen bringt nichts
 + Jedes Wesen führt ein Beitragsbuch: welche Lernanlässe Ninkasi an ihm hatte (Wirkung mit den Tags von Angriff, Fähigkeit und Effekt, dazu Ausweichen, Blocken, Rüstung nach ihrer Art und erlittener Schaden für passive Skills, Entkommen für die Skills der Bewegung, Berauscht für die Skills des Stoffwechsels, Erspäht nach der Art des Wahrnehmens und Hinterhalt für die Skills der Wahrnehmung, Kritisch für die Präzision)
 + Gewichtung vorerst nach der ersten erfolgreichen Anwendung: Jeder Lernanlass zählt je Gegner einmal; als Regelwert `regeln.lernen.gewichtung` (`erste`, später zum Vergleich `anteil` nach Schadensanteil)
-+ Beim Tod des Gegners teilen sich seine EP auf die Skills auf, deren Lernanlässe im Buch stehen; passen mehrere Skills zum selben Anlass, wird gleich geteilt
++ Beim Tod des Gegners oder wenn Ninkasi ihn kampflos bewältigt, teilen sich seine EP auf die Skills auf, deren Lernanlässe im Buch stehen; passen mehrere Skills zum selben Anlass, wird gleich geteilt
 + Stirbt der Gegner durch eine Falle oder eine Verbündete, zählt das Buch trotzdem, sobald Ninkasi beigetragen hat
 + Beschworene Ninkasis lernen für sie: Ihre Wirkung zählt wie Ninkasis eigene, mit dem Tag `beschworen`, über den ein Skill der Beschwörung lernt
 + Die EP teilen sich zu gleichen Teilen auf die Einträge im Buch, je Eintrag zu gleichen Teilen auf die passenden Skills; so verdrängen viele passive Anlässe einen Angriff nicht und umgekehrt

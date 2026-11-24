@@ -463,7 +463,7 @@ Ein Set je Art von Rohstoffen, je zwei bis drei Tiers: Ohne Skill gibt eine Art 
 + Grund: höherer Vergärungsgrad, mehr Alkohol
 + Experte: Kulturen werden ein lebender Vorrat, der sich weiterführen lässt, statt verbraucht zu werden, und eingehen kann
 + Meister: höhere Güte der Gärung
-+ Die Hefe als Wesen gehört nicht hierher (siehe Offen)
++ Die Hefe als Wesen gehört nicht hierher (siehe Soziales, Wesenskunde)
 
 ### Brauschulen
 
@@ -543,10 +543,88 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Gelände (Fallen mit Tarnung und
 
 ## Soziales
 
-+ handeln
-+ interagieren mit Wesen, beschwören, befreunden, verhandeln, Fraktionen
+Die Kategorie der Sinnlichkeit im sozialen Sinn: Gespräch, Handel, Ruf, Täuschung, Zechen, dazu Verbündete führen und ausbilden und Wesen zähmen. Gespräch und Täuschung wirken nur auf Wesen, die verstehen (Händler, Kontrolleure, Abstinenzler, Figuren); Tiere und Mikroorganismen gehören der Wesenskunde. Psi wirkt dagegen auf jeden Geist, sofort und riskant; Soziales ist langsamer und ohne Gefahr für Ninkasis Verstand. Die Gunst der Nebengottheiten und die Beschwörung selbst gehören zur Magie. Vorbilder: Caves of Qud (Überreden in Arten mit Ego gegen die geistige Abwehr; Bekehren macht ein Wesen zum Begleiter, ein Fehlschlag macht es nicht feindlich, beim Betören schon; ein eigener Skill für Preise), Brogue (Verbündete lernen Fähigkeiten besiegter Gegner).
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
+Kampflos bewältigt: Ein Wesen, das Ninkasi überredet, einschüchtert, verführt, unter den Tisch trinkt, zähmt oder bekehrt, bringt seine EP wie beim Tod, je Wesen einmal; sie teilen sich über das Beitragsbuch auf die Sets seiner Lernanlässe (siehe [Charakter.md](Charakter.md), Gebundene EP). Stirbt es später, bringt es nichts mehr.
+
+### Gespräch
+
+Das Gespräch ist eine Grundaktion wie das Entschärfen, keine Fähigkeit: Jede Ninkasi kann mit Wesen sprechen, die verstehen, und dabei überreden, einschüchtern oder verführen, als Wahlen im Gespräch. Ohne Skill gelingt das kaum, außer gegen die Schwächsten; die Skills machen die Probe stärker und schalten weitere Wahlen frei (Bedingung Skillstufe). Besondere Fähigkeiten wie Bekehren, Bestechen oder eine Befehlsstimme kommen aus der Welt, die Skills sind ihre Voraussetzung. Aufbau wie im Nahkampf: ein allgemeines Set und drei Arten wie Gattungen, Muster der Arten Grund Probe, Experte Wirkung, Meister stärkste Wirkung.
+
++ Gespräch allgemein: Sinnlichkeit, sekundär Klugheit; zwei Tiers, Grund Proben im Gespräch, Experte Neutrale umstimmen, das hebt den Ruf; Voraussetzung für die Arten
++ Überreden: Sinnlichkeit, sekundär Klugheit; die Art der Vernunft, zuletzt zieht ein Feind ab; ein Fehlschlag schadet nicht; Voraussetzung für Bekehren
++ Einschüchtern: Sinnlichkeit, sekundär Körperlichkeit; die Art der Drohung, Schwächere fliehen, zuletzt ergibt sich ein Ziel und ist wehrlos oder lässt sich ausplündern
++ Verführen: Sinnlichkeit, sekundär Gewandtheit; die Art des Begehrens, ein Wesen hilft, solange der Reiz hält, zuletzt lässt es sich ausnutzen (Ware, Wissen, Schlüssel); ein Fehlschlag macht wütend
++ Lernt aus: Wirkung im Gespräch mit dem Tag der Art, je Wesen einmal
+
+### Handeln
+
++ Eigenschaften: Sinnlichkeit, sekundär Klugheit
++ Lernt aus: dem ersten Handel mit jedem Händler, ein fester Betrag, je Händler einmal
++ Grund: bessere Preise
++ Experte: Händler zeigen mehr und seltenere Ware
++ Meister: Händler nehmen Gebrautes zu seinem vollen Wert an
++ Göttlich: Händler ziehen leichter in den Hub (siehe [Spielverlauf.md](Spielverlauf.md), Hub)
+
+### Ruf
+
++ Eigenschaften: Sinnlichkeit, sekundär Klugheit
++ Lernt aus: jeder Schwelle, die Ninkasi bei einer Fraktion zum ersten Mal erreicht
++ Grund: gute Taten heben den Ruf stärker, schlechte senken ihn schwächer
++ Experte: Beistand öfter
++ Meister: Zorn verraucht schneller
++ Göttlich: Gesandte, verfeindete Fraktionen hören zuerst zu, bevor sie angreifen
+
+### Täuschung
+
++ Eigenschaften: Sinnlichkeit, sekundär Gewandtheit
++ Lernt aus: Wirkung unter Verkleidung und Lügen im Gespräch, je Wesen einmal
++ Grund: Verkleidungen halten länger und fliegen später auf
++ Experte: Lügen als Wahl im Gespräch
++ Meister: Zeugen erkennen Ninkasi nicht, ihre Taten verschieben den Ruf nicht
++ Passt zur Meuchelmörderin, quer verwandt mit dem Schleichen (siehe Wahrnehmung)
+
+### Zechen
+
++ Eigenschaften: Trinkfestigkeit, sekundär Sinnlichkeit
++ Lernt aus: jedem gewonnenen Wettrinken, je Wesen einmal
++ Das Wettrinken ist eine lange Aktion mit dem Pegel, kein eigenes Minispiel: Beide trinken Runde um Runde, wer zuerst über eine Schwelle kommt, verliert; wer Ninkasi unterliegt, wird Freund, verrät etwas oder gibt Rabatt
++ Grund: mehr Pegel im Wettstreit verkraften
++ Experte: die Gegnerin trinkt schneller, Ninkasi schenkt nach
++ Meister: ein unterlegenes Wesen bleibt Ninkasis Freund
++ Die Fähigkeit kommt aus der Welt, etwa von einem Wirt; Orte sind Tavernen als feste Strukturen oder Themenräume (siehe [Ausblick.md](Ausblick.md), Feste Strukturen) und der Wirt im Hub; wie das als Inhalt einzieht, entscheidet sich mit dem Inhalt
+
+### Führung
+
++ Eigenschaften: Sinnlichkeit, sekundär Klugheit
++ Lernt aus: Wirkung mit den Tags `begleiter` und `beschworen`; neben dem Skill der Beschwörung in Magie, die EP teilen sich gleich
++ Gilt für alle unter Ninkasis Befehl: Begleiter, Gezähmte, Bekehrte, Beschworene
++ Grund: mehr Verbündete zugleich
++ Experte: Verbündete werden stärker
++ Meister: Vorrangbefehle wirken auch über Entfernung
++ Göttlich: Verbündete fliehen nie und halten bis zuletzt
+
+### Ausbildung
+
++ Eigenschaften: Sinnlichkeit, sekundär Braukunde
++ Lernt aus: Wirkung mit dem Tag `begleiter`
++ Grund: Verbündete lernen mit, ein Teil von Ninkasis EP fließt in ihre eigenen Skills (siehe [Systemausbau.md](Systemausbau.md), Punkt 21)
++ Experte: sie lernen Fähigkeiten besiegter Gegner
++ Meister: sie heilen nach dem Kampf schneller
+
+### Wesenskunde
+
+Aufbau wie im Nahkampf: ein allgemeines Set und Gattungen, das "Kreaturen verstehen" der Braukunde. Gezähmte lernen über den Tag `begleiter` mit dem Tag ihrer Gattung; die Gattungen lernen quer zu Führung und Ausbildung, was Gezähmte tun, stärkt so beide Seiten.
+
++ Wesenskunde allgemein: Braukunde, sekundär Sinnlichkeit; zwei Tiers, Grund Tiere und Kleinstwesen bleiben öfter neutral, Experte Zähmen gelingt öfter (die Fähigkeit kommt aus der Welt, etwa mit Futter oder Würze); Voraussetzung für die Gattungen
++ Muster der Gattungen: Grund Zähmen dieser Gattung, Experte Gezähmte stärker, Meister mehr dieser Gattung zugleich, göttlich je Gattung eigen, an ihrer Mechanik (siehe [Grundlagen.md](Grundlagen.md), Gegner)
++ Hefen: Braukunde, sekundär Sinnlichkeit; göttlich sprosst eine verbündete Hefe für Ninkasi, die Kulturhefe als Verbündete
++ Bakterien: Braukunde, sekundär Klugheit; göttlich teilen sich Gezähmte für Ninkasi, als eigene Abstammungslinie
++ Schimmel: Braukunde, sekundär Körperlichkeit; göttlich wächst ein gezähmtes Myzel zum Schutzwall
++ Tiere: Braukunde, sekundär Gewandtheit; göttlich wächst das Tier der Jägerin mit ihr
++ Automaten aus späteren Epochen: Klugheit, sekundär Braukunde; mit `freischaltung` beim ersten Fund
+
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Fraktionen (Ruf, Zorn, Beistand) und KI (Vorrangbefehle); offen: alle Sets, Gespräch, Handel, Begleiter, Zähmen, kampflos Bewältigtes, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Magie
 
@@ -565,5 +643,4 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 ## Offen
 
 + Bier- und Brandfontäne (Getrunkenes im Kegel speien, kostet Pegel): eher Fähigkeit als Skill, vielleicht zu Stoffwechsel und Pegel oder zu Magie, wo die Fontäne beschworen wird
-+ Hefe als Wesen, die Kulturhefe als Verbündete (siehe [Grundlagen.md](Grundlagen.md), Gegner): eher zu Magie (Beschwörung) oder Soziales (befreunden) als zu Hefen und Kulturen
 + Mehrere Kessel zugleich (Vorbild Mass Production in EVE Online), nur als Konzept: ein späterer Tier von Brauen allgemein, wenn das Brausystem es trägt; nebeneinander stehende Kessel widersprechen dem Bleiben am Kessel nicht
