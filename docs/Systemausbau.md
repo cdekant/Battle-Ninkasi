@@ -50,6 +50,7 @@ Status: offen, jeweils mit dem ersten Bedarf
 + Skills der Arena in EP statt in Stufen (`skills: { name: ep }` in `datenproben/arenen.js`), die EP fließen mit den Eigenschaften der Arena-Ninkasi in Lernpunkte wie beim Verteilen freier EP; so vergleicht die Arena Builds mit gleichem Budget; später vielleicht ein Budget `ep` mit Verteilregel; alle Inhaltsdaten nennen EP, nur Unittests setzen Stufen direkt
 + Leiser Lärm für Schritte, damit Lauschen mehr hört als Kämpfe; mit einer Prüfung der Leistung bei vielen Wesen; ändert die Fingerabdrücke in `tests/ebenen.test.js`
 + Verschleiß durch Gebrauch für Waffen und Rüstung (heute nur über `abnutzen`, siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß), zusammen mit wirksamen Wegen zur Pflege und Reparatur (Entscheidung in [Grundlagen.md](Grundlagen.md), Spielkern); braucht die Auslöser mit Filter auf den Grund
++ Wehrlos: Zustände mit dem Tag `wehrlos` (betäubt, gefesselt, umgeworfen, festgehalten) machen Treffer sicher und unblockbar, ohne Krit; ahnungslos bleibt wehrlos mit Krit; Bedingung `gegenueber_wehrlos`; mit der Betäubung aus Punkt 10 (Entscheidung in [Skills.md](Skills.md), Kampf)
 + Gewichtung `anteil` der gebundenen EP zum Vergleich mit `erste`; Ortsbindung des Verteilens (`regeln.lernen.ort`), falls gewünscht
 + Leistung, wenn viele Wesen zugleich jagen (etwa nach Teilungen um Ninkasi): 389 Wesen etwa 12 ms je Befehl gegen das Ziel 2 ms für 300 (siehe [Entwicklung.md](Entwicklung.md), Messwerte); mit dem ersten Inhalt, der so viele Teilende bringt, Zielwahl der Handlungen und Umkreissuche verbessern, dazu einen Zähler je Typ für `anzahl_unter`
 
@@ -106,6 +107,7 @@ Status: offen, ohne festen Platz in der Reihenfolge
 + Automatisches Erkunden über eine Dijkstra-Karte (Vorbild Brogue): Ziele mit Gewichten (unentdeckte Felder, erinnerte Gegenstände zum Aufheben), Gefahren und später Kosten je Gelände; heute geht es zum nächsten Rand (Quellen in [Ausblick.md](Ausblick.md), Recherche)
 + Gehörten Lärm nachprüfen, sobald Gegner untereinander kämpfen, Beschworene und Fallen Lärm machen (im Probeinhalt kommt er kaum vor)
 + Reise und Erkunden halten mit `kein_weg`, wenn eine entdeckte Falle den einzigen Weg versperrt; später vielleicht mit Nachfrage
++ Skillfenster umschaltbar für Anfänger, etwa alle Skills oder nur die gerade lernbaren (siehe [Charakter.md](Charakter.md), Skills)
 + Treppe per Maus (Reise zur Treppe und hinüber)
 + Fallenlassen einer Teilmenge (Abfrage der Anzahl)
 + Gefahreneinschätzung beim Untersuchen
@@ -179,7 +181,7 @@ Status: offen
 
 Status: in Arbeit, Kategorie für Kategorie in [Skills.md](Skills.md); das Dokument ist der Skillkatalog im Entwurf und gehört zu den Grundfesten des Spieldesigns
 
-+ Kategorien abwandern: Körper und Bewegung, Stoffwechsel und Pegel, Wahrnehmung entworfen; weiter mit Kampf (darin waffenloser Kampf), Brauen, Anlagen und Fallen, Soziales, Magie, Psi
++ Kategorien abwandern: Körper und Bewegung, Stoffwechsel und Pegel, Wahrnehmung entworfen, Kampf als Gerüst (Unterkategorien einzeln ab Verteidigung); weiter mit Kampf (darin waffenloser Kampf), Brauen, Anlagen und Fallen, Soziales, Magie, Psi
 + Höchstens eine angeborene Grundfähigkeit je Vorrat; die erste ist der Sprint, die anderen beiden bleiben offen (siehe [Charakter.md](Charakter.md), Skills)
 + Lernanlass `entkommen` für Laufen und Sprint: zählt, wenn ein Wesen Ninkasi aus dem Kampf verliert, während sie läuft oder sprintet, je Wesen einmal wie alle Anlässe (siehe [Wesen.md](Wesen.md), Skills und Lernen)
 + Lernanlass `berauscht` für die Skills des Stoffwechsels: zählt, wenn Ninkasi an einem Wesen wirkt, während ihr Pegel über einer Schwelle liegt (welche, mit den Pegelschwellen aus Punkt 10), je Wesen einmal
@@ -190,6 +192,8 @@ Status: in Arbeit, Kategorie für Kategorie in [Skills.md](Skills.md); das Dokum
 + Lauschen braucht einen Modifikator auf die Reichweite, mit der Lärm Ninkasi erreicht, die Nennung von Art und Anzahl im Log (Lärm eines Zugs gebündelt) und die Art der Wahrnehmung `gehoert` für die Anzeige auf der Karte
 + Dämmersicht braucht eine Grenze der Sichtweite je Lichtstufe (etwa dunkel und dämmrig mit einem Anteil der Sichtweite); heute verbirgt nur `finster` (siehe [Welt.md](Welt.md), Licht); das ändert das Spiel auf allen dunklen Ebenen und gehört zur Normierung in Punkt 10
 + Sichtweite zu Beginn knapp unter der eines Standardgegners (heute Ninkasi 8, Probegegner 7), mit der Normierung in Punkt 10 umzusetzen, weil sie Erkundung, EP je Ebene und Tode im Bot verschiebt
++ Kampf: Tags für Gattung und Handhabung an den Angriffsprofilen (`klinge`, `wucht`, `stange`, `zweihand`, `waffenlos`, `wurf`, `spann`, `feuer`, `druck`, `energie`), zugleich Lernanlass; im Probeinhalt ein kleiner Schritt in den Daten; Gattungen späterer Epochen mit `freischaltung` beim ersten Fund
++ Trunkene Faust: Torkeln über `pegel_ab` (steht), Tritt als zweites Profil mit `chance` am angeborenen Angriff und Stoßen (steht), Gegenwurf als Auslöser am Skill bei `ausgewichen` (braucht den Auslöser mit Filter auf den Grund, Punkt 8) und einen Zustand "umgeworfen" mit `wehrlos`
 + Standfestigkeit braucht Strafen des Rauschs, die sich über Modifikatoren mildern lassen (mit den Pegelschwellen aus Punkt 10); Rauschgeist braucht die Verschiebung der Kurve zu niedrigerem Pegel (negatives `kurvenverschiebung.pp`, rechnerisch möglich, ungetestet)
 + Abwehr nach Kategorien: innere Schadensarten (Gift, Alkohol, Infektion) bei Stoffwechsel und Pegel, äußere (Feuer, Säure, Lauge, Elektrisch) bei Kampf, Verteidigung, Magie und Psi in ihren Kategorien
 + Laufen, Sprint und Rüstungsskills brauchen die Zeitskala aus Punkt 10 (Tempo je Wesen, Sprint, Verlangsamung durch Rüstung)

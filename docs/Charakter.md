@@ -93,6 +93,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Neuv
 + Die Skills bilden so einen Graphen; die Datenprüfung erkennt Kreise und unbekannte Namen, das Skillfenster zeigt die Abhängigkeiten
 + Optional `freischaltung`: Ein besonderer Skill, den man unterwegs findet, wird erst durch das Fundstück lernbar; bis dahin zeigt ihn das Skillfenster nicht. Braubücher und Rezepturen lehren eher Rezepte und Fähigkeiten als Skills
 + Alle gewöhnlichen Skills sind im Skillfenster immer sichtbar, solche mit fehlenden Voraussetzungen ausgegraut: Der Katalog ist die Grundlage zum Planen von Builds
++ Für Anfänger lässt sich das Skillfenster umschalten, etwa auf das, was gerade lernbar ist; Skills späterer Epochen sind erst mit dem ersten Fund freigeschaltet (siehe [Skills.md](Skills.md), Kampf)
 + Keine künstliche Begrenzung göttlicher Niveaus: Weil die Tiefe offen ist (siehe [Spielverlauf.md](Spielverlauf.md), Kapitel), begrenzt das Balancing nicht, was ein Lauf erreicht, sondern was je Kapitel zu erwarten ist (siehe Anfangsbalance)
 
 ### Kosten

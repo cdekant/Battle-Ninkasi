@@ -178,22 +178,62 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Wahrnehmung (Sichtweite, Sicht
 
 ## Kampf
 
+Die breiteste Kategorie, in sechs Unterkategorien: Verteidigung, waffenloser Kampf, Nahkampf mit Waffen, Handhabung, Fernkampf, Schilde, dazu Präzision für alles, was trifft. Vorbilder: DCSS (ein Skill je Waffengattung), EVE Online (Grundskill, Waffensystem, Spezialisierung je Typ), Tales of Maj'Eyal (Kampfstile wie Zweihand oder Schild). Rüstung gehört zu Körper und Bewegung, Willenskraft zu Psi.
+
+Gattungen ordnen nach ihrem Prinzip, nicht nach der Epoche: Spätere Waffen (Steampunk, Motoren, Schusswaffen, Science-Fiction, siehe [Spielverlauf.md](Spielverlauf.md), Epochen und Wertschöpfungskette) passen im Nahkampf in dieselben Gattungen und zeigen ihre Epoche über Schadensart und Spezialisierung; im Fernkampf ändert die Epoche die Mechanik und bekommt eigene Gattungen. Gattungen späterer Epochen werden erst mit dem ersten Fund einer solchen Waffe lernbar, damit ein Lauf in Sumer keine Laser-Skills zeigt.
+
+Muster der Tiers einer Gattung, einzelne Sets weichen ab: Grund Genauigkeit, Experte Schaden, Meister Tempo (geringere Kosten des Angriffs), göttlich qualitativ und je Gattung eigen. Waffen tragen Tags für Gattung und Handhabung, über die sie wirken und lernen. Fähigkeiten wie Kopfstoß, Ringen, Bierfontäne, Anstürmen, Rundumschlag oder Schildschlag kommen aus der Welt; die Skills sind ihre Voraussetzung und machen sie wirksamer.
+
+Wehrlos: Ein Gegner, der betäubt, gefesselt, umgeworfen oder festgehalten ist, wird sicher und ohne Blocken getroffen, aber nicht von selbst kritisch; der Hinterhalt gegen Ahnungslose bleibt wehrlos und kritisch. Skills dürfen gegen Wehrlose stärker machen.
+
 ### Verteidigung
 
-+ Ausweichen
-+ Abhärtung gegen äußere Schadensarten (Feuer, Säure, Lauge, Elektrisch), lernt aus erlittenem Schaden der Art
++ Ausweichen: Gewandtheit, sekundär Sinnlichkeit; lernt aus jedem Angriff, dem Ninkasi ausweicht
++ Abhärtung gegen äußere Schadensarten (Feuer, Säure, Lauge, Elektrisch), je Art oder Paar ein Set; lernt aus erlittenem Schaden der Art
 
 ### Waffenloser Kampf
 
-### Kampf mit Waffen
++ Faustkampf: Körperlichkeit, sekundär Gewandtheit; genauer, mehr Schaden, schneller mit den Fäusten; Voraussetzung für Kopfstoß, Ringen und Bierfontäne
++ Trunkene Faust: Gewandtheit, sekundär Trinkfestigkeit; was der Pegel sonst bestraft, wird im waffenlosen Kampf zum Vorteil, Gegenstück zur Standfestigkeit
+  + Grund: Torkeln gibt Ausweichen, je höher der Pegel, desto mehr
+  + Experte: Tritt, der waffenlose Angriff bekommt mit einer Chance einen zweiten, der zurückstößt; der Skill baut den angeborenen Angriff aus, er gibt keine Fähigkeit
+  + Meister: Gegenwurf, weicht Ninkasi einem Nahkampfangriff aus, wirft sie den Angreifer mit einer Chance um, er ist dann wehrlos
+  + Göttlich: im Rausch wird die Strafe des Pegels für waffenlose Angriffe zum Bonus
 
-+ Grundfähigkeiten
-+ Expertenfähigkeiten
-+ Waffenspezialisierungen
+### Nahkampf mit Waffen
 
-### Kampf mit Schilden
++ Drei Schichten: Nahkampf allgemein (Genauigkeit mit allem im Nahkampf, Voraussetzung für alles darunter), Gattungen bis vier Tiers, Spezialisierungen je Waffentyp mit ein oder zwei Tiers für prägende Waffen
++ Klingen: Schnitt, schnell, Krit; Dolch, Sichel, Schwert, Säbel, später Kettensäge und Vibroklinge; göttlich etwa Krits auch gegen Wachsame
++ Wuchtwaffen: stumpf, langsam, viel Schaden, schlägt sich durch Rüstung; Fasshammer, Schöpfkelle, Streitkolben, später Dampfhammer und Elektroschlagstock; göttlich etwa ein Teil der Rüstung ignoriert oder ein Krit betäubt
++ Stangenwaffen: Reichweite und Abstand halten; Maischegabel, Hellebarde, später Bajonett und Energielanze; göttlich etwa wer heranrückt, wird zuerst getroffen
++ Spezialisierungen entstehen mit den Waffen des Inhalts, etwa Dolch (Hinterhalt, die Meuchelmörderin) oder Braupaddel (die Brauserkerin)
++ Hinterhalt: Schleichen bringt Ninkasi ungesehen heran (siehe Wahrnehmung), die Waffe bestimmt, was er anrichtet (Klingen, Spezialisierung Dolch); kein eigenes Set
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
+### Handhabung
+
++ Quer zu den Gattungen: eine Waffe lernt beide Seiten, das Braupaddel als Wuchtwaffe und als Zweihand
++ Zweihand: Voraussetzung für Rundumschlag und Anstürmen
++ Einhand mit Schild
++ Zwei Waffen, wenn die Plätze es hergeben
+
+### Fernkampf
+
++ Werfen: Gewandtheit, sekundär Körperlichkeit; Treffen, Weite und Tempo des Wurfs, auch für Tränke und Brandflaschen; was ein Trank bewirkt, gehört zu Magie bzw. Brauen
++ Spannwaffen: Gewandtheit, sekundär Körperlichkeit; Schleuder, Bogen, Armbrust, mit Munition; die Jägerin
++ Feuerwaffen: Gewandtheit, sekundär Klugheit; von der Muskete bis zum Maschinengewehr, mit Munition und Nachladen
++ Druckwaffen (Steampunk): Klugheit, sekundär Braukunde; Dampf, Druckluft, die CO2-Kanone aus dem Gärkessel, Druck baut sich auf; Ninkasis Brücke zwischen Brauen und Kampf
++ Energiewaffen: Klugheit, sekundär Sinnlichkeit; Laser und Plasma, mit Ladung und Überhitzen
++ Fernsicht lernt quer zum Fernkampf (siehe Wahrnehmung)
+
+### Schilde
+
++ Blocken und Schildschlag; Schildschlag-Schaden setzt die Grundfertigkeit voraus
+
+### Präzision
+
++ Kritchance und Kritfaktor für alles, was trifft
+
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Kampfwerte (Profile mit Tags, Kampfwerte, Bedingungen `gegenueber_ahnungslos` und `pegel_ab`) und Skills und Lernen; im Probeinhalt Nahkampf und Ausweichen als Grundskills; offen: Gerüst der Gattungen, Tags der Waffen, Wehrlos, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Brauen
 
@@ -230,4 +270,4 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Offen
 
-+ Weitwurf: als Skill zu Magie (Tränke) oder zu Körper und Bewegung?
++ Kategorie Kampf Unterkategorie für Unterkategorie ausarbeiten, ab Verteidigung
