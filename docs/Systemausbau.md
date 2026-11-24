@@ -10,19 +10,18 @@ Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und wäh
 
 + Jeder Punkt wird vor der Umsetzung als Vorschlag ausgearbeitet und freigegeben
 + Status je Punkt: offen oder in Arbeit
-+ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 3 bis 11, 16, 17, 20 und 22 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
++ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 8, 10, 11, 16, 17, 20 und 22 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
 
 ## Reihenfolge
 
 Stand 2026-11-24, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer Wirkung auf den Inhalt, das Kleine und Breite zuerst:
 
-1. Skillkatalog, erste eigene Sitzung zu [Skills.md](Skills.md) (Punkt 20), weil Normierung, Regeneration, Pegel und Brausystem an den Skills hängen
-2. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10): Regeneration und Kampfespegel, Pegelschwellen, die Bierstile (Punkt 17) vor dem Brausystem, Machtkurve; die Fernwaffen (Punkt 22) nach der Zeitskala, weil Spannen und Nachladen Zeit kosten
-3. Ebenenbau: Ebenenbilder, Übergänge und feste Strukturen (Punkt 16)
-4. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
-5. Danach der Inhalt (Punkt 14)
+1. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10): Regeneration und Kampfespegel, Pegelschwellen, die Bierstile (Punkt 17) vor dem Brausystem, Machtkurve; die Fernwaffen (Punkt 22)
+2. Ebenenbau: Ebenenbilder, Übergänge und feste Strukturen (Punkt 16)
+3. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
+4. Danach der Inhalt (Punkt 14)
 
-Daneben, ohne festen Platz: Skills für Anhänger (Punkt 21, Umbaurisiko gering, umgesetzt mit den Begleitern bzw. den Geistern früherer Läufe), kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12), Korpustexte aus dem Gilgamesch-Epos (Punkt 18), Auszeichnung in Texten (Punkt 19, spätestens mit dem Fenster des Glossars); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 3 (Licht, Wahrnehmungsarten, Spüren und Duft), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen), Punkt 9 (Englisch, Mehrzahl und Glossar) und Punkt 15 (Reste des Effektsystems), die Nummern der übrigen bleiben.
+Daneben, ohne festen Platz: Skills für Anhänger (Punkt 21, Umbaurisiko gering, umgesetzt mit den Begleitern bzw. den Geistern früherer Läufe), kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12), Korpustexte aus dem Gilgamesch-Epos (Punkt 18), Auszeichnung in Texten (Punkt 19, spätestens mit dem Fenster des Glossars); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 3 (Licht, Wahrnehmungsarten, Spüren und Duft), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen), Punkt 9 (Englisch, Mehrzahl und Glossar), Punkt 15 (Reste des Effektsystems) und der Entwurf des Skillkatalogs in [Skills.md](Skills.md) (Grundlage von Punkt 20), die Nummern der übrigen bleiben.
 
 Die Proben des Probedurchstichs stehen in `tests/probedurchstich.test.js`; jede Lücke dort ist ein Test mit `todo` und dem Punkt, der sie schließt, mit einem Entwurf der Daten (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing). Wer einen Punkt umsetzt, nimmt dort das `todo` weg.
 
@@ -169,7 +168,7 @@ Status: offen
 + Alle Fenster zeigen Texte über diese Funktion; heute maskieren Log, Titel und Systemfenster, während Hilfe und Einstellungen Texte roh als HTML einsetzen (z.B. `src/anzeige/einstellungsanzeige.js`)
 + `tests/sprachen.test.js` prüft, dass jede Auszeichnung geschlossen ist; das Kompendium zeigt die Auszeichnung ebenso
 
-## 20. Skillkatalog
+## 20. Umsetzung der Skills
 
 Status: Entwurf aller Kategorien steht in [Skills.md](Skills.md), offen ist die Umsetzung; das Dokument ist der Skillkatalog im Entwurf und gehört zu den Grundfesten des Spieldesigns
 
@@ -199,7 +198,6 @@ Status: Entwurf aller Kategorien steht in [Skills.md](Skills.md), offen ist die 
 + Magie: Tags der Schulen (`zerstoerung`, `bann`, `segen`, `fluch`, `beschworen`, `hellsicht`), der Wege (`formel`, `alchemie`, `gabe`, ein eigener für die Zauber des Braupaddels) und `ritual` an Fähigkeiten, zugleich Lernanlass; Lernanlass Kritisch mit dem Tag `magie` für den Fokus; Meditieren als angeborene Fähigkeit: Beginn nur außerhalb des Kampfes, ein Zustand "Sammlung", der mit der Zeit bis zu einer Obergrenze wächst und mit einer Kurve über den Pegel (Optimum bei leichtem Pegel, siehe [Wesen.md](Wesen.md), Stoffwechsel), Ende beim ersten eigenen Schaden genommen oder ausgeteilt (Haken `nach_schaden`), Entladung je Art als Buff oder als Verstärkung des ersten Angriffs, MP schneller während der Sammlung; ein Modifikator, der den Kampfzustand früher enden lässt; das verzauberte Braupaddel als Waffe mit gewährtem Zauber und Ladungen, zwei Skills mit gleichem Namen und eigener Kennung; Schriftrollen schreiben als Befehl, nur nüchtern; Magieabwehr als Widerstand gegen `magie` und gegen Zustände mit dem Tag `magie`
 + Psi: Tags der Disziplinen (`telepathie`, `furcht`, `kontrolle`, `ortswechsel`, `psychokinese`, `vorahnung`) an Fähigkeiten, zugleich Lernanlass; Lernanlass Kritisch mit dem Tag `psi` für die Schärfe, Fehlschlag und Rückschlag als Lernanlass der Selbstbeherrschung; der Rückschlag auf das Ziel statt auf Ninkasi als Ausgang der Risikotabelle; Glimmer als Wert mit Folgen (Psi-Jägerinnen, Geister) und ein Modifikator, der sein Wachsen bremst; Ekstase als passiver Zustand, der ab einem Pegel im Kampf mit Schaden genommen und ausgeteilt wächst (mit der Sitzung zu Regeneration und Kampfespegel in Punkt 10)
 + Zeitblinzeln (Spieldesign in [Skills.md](Skills.md), Psi): Haltepunkte als Kopien des Zustands vor den letzten eigenen Zügen (der Schnappschuss existiert, siehe [Architektur.md](Architektur.md), Speichern); die Umkehr ist selbst ein Befehl, beim Nachspielen entstehen dieselben Haltepunkte von selbst; der Zufallszustand kehrt mit zurück; nach der Umkehr übertragen: Erinnerung der Karte, Kosten und Abklingzeit des Blinzelns, Glimmer; verworfen: EP und Meldungen der verworfenen Zeit, das Log vermerkt die Vorahnung; zu klären: ob Haltepunkte in den Spielstand gehören; Vorkehrung weiter: alles außerhalb des Zustands ableitbar halten (räumlicher Index, Zwischenspeicher) und nichts Laufbezogenes in die Chronik schreiben, bevor der Lauf endet; Umbaurisiko mittel; die Vision des göttlichen Tiers braucht einen Lauf auf einer Kopie des Zustands (siehe [Ausblick.md](Ausblick.md), Vorschau durch Simulation)
-+ Laufen, Sprint und Rüstungsskills setzen auf die Zeitskala (Tempo je Wesen, `ohneZeit`, `verlangsamung.<tag>` und `gewicht.<tag>`, siehe [Gegenstaende.md](Gegenstaende.md), Ausrüstung)
 + Probewerte aus dem Entwurf, bis die Skills umgesetzt sind: Zähigkeit LP von 100 auf 300 über vier Tiers, Regeneration der LP von 0 auf 1 je Tick, Laufen Kosten fürs Bewegen von 120 auf 80 über vier Tiers, Tragkraft von 20 kg auf 40 kg, Bremsen durch die Last von 100 % auf 50 %; Leber Abbau des Pegels von 100 auf 200 Hundertstel je Welttick über zwei Tiers, Rauschheilung Optimum der LP von 1,5 ‰ auf 3 ‰, Klarer Kopf Kurve der MP um 1 ‰ nach rechts, Rauschgeist Schwund der PP von 100 % auf 25 %, Abwehr Widerstand gegen Gift und Alkohol bis 50 %; Fernsicht Sichtweite von 6 leicht bis 10 (Grundtier), mit Experte und Meister bis 20; Dämmersicht `sichtAnteil.daemmrig` +25 (Grundtier), `sichtAnteil.dunkel` +50 (Experte); Nachtsicht Sicht im Finstern von 2 bis zur halben Sichtweite; Gespür für Wesen Reichweite von 0 auf 3; Fallengespür Entdecken von 30 auf 90; Kennerschaft von 0 auf 60, Verschleiß und Verderben bis 50 % langsamer; Ausweichen +4 je Stufe im Grundtier (wie heute im Probeinhalt); Abhärtung Widerstand bis 50 % aus Skills allein; Riposte 5 % je Stufe ab Meister; Faustkampf Schaden +10 % je Stufe im Experten-Tier, Kombination 5 % je Stufe, Faustwaffen bis Kosten 30 gegen 50 der bloßen Faust
 
 ## 21. Skills für Anhänger

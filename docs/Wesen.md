@@ -302,6 +302,6 @@ Regeln:
 ## Verweise
 
 + Spieldesign: Gegner und Pegel in [Grundlagen.md](Grundlagen.md), Eigenschaften, Skills und EP in [Charakter.md](Charakter.md)
-+ Offene Reste in [Systemausbau.md](Systemausbau.md): Punkt 10 (Normierung, Machtkurve, Anfangsbalance), Punkt 14 (Makel und Vorzüge, Kampfwerte aus Skills), Punkt 20 (Skillkatalog), Punkt 21 (Skills für Anhänger)
++ Offene Reste in [Systemausbau.md](Systemausbau.md): Punkt 10 (Normierung, Machtkurve, Anfangsbalance), Punkt 14 (Makel und Vorzüge, Kampfwerte aus Skills), Punkt 20 (Umsetzung der Skills), Punkt 21 (Skills für Anhänger)
 
 Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.
