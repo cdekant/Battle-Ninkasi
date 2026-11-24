@@ -88,7 +88,8 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 + Eine Nachdichtung geht vom Original aus (Umschrift oder Normalisierung), die moderne Übersetzung dient dem Verständnis; eigene Wortwahl, eigene Bilder und wo möglich eine eigene Lesart, damit sie keine Bearbeitung der Übersetzung ist; gemeinfreie alte Übersetzungen dürfen zum Abgleich dienen
 + Gilgamesch-Epos in der gemeinfreien Übersetzung `ungnad1911gilgamesch`, einzulesen mit [Systemausbau.md](Systemausbau.md), Punkt 18
 + eBL-Korpus (electronic Babylonian Library, LMU München, `https://www.ebl.lmu.de/corpus`): akkadische Literatur (L), Magie (Mag) und Divination (D) mit Normalisierung und englischer Übersetzung; lokal als Rohtext in `sprache/Literatur/ebl/` (`text/` je Kapitel eine Zeile mit Nummer, Akkadisch und Englisch, `json/` die Antworten der Schnittstelle `https://www.ebl.lmu.de/api/texts`, `treffer-<gruppe>.txt` Fundstellen je Suchbegriff); ein Werk bekommt seinen Eintrag im Literaturverzeichnis, sobald daraus nachgedichtet wird oder es als Kandidat feststeht
-+ Kandidaten aus dem eBL-Korpus: Gilgameš (`george2022gilgamesch`, ganz, Tafel für Tafel), Maqlû (`abusch2024maqlu`, Beschwörungen gegen Hexen), Dattelpalme und Weinstock (`jimenez2021palmeundrebe`, Bier und Wein im Streit), Omen aus Šumma ālu zu Schenke und Bier als Vorbild eigener Omen
++ Gilgamesch-Epos ganz nachgedichtet aus der eBL-Fassung (`george2022gilgamesch`), eine Datei je Tafel (`gilgamesch-tafel-<nn>.md`, Tafel I bis XII); Lücken der jungbabylonischen Fassung sind aus den altbabylonischen Stücken ergänzt, reine Bruchstücke ausgelassen, wörtliche Wiederholungen der Vorlage stehen beim ersten Mal ganz und danach in Kurzform, weil sie Titelsprüche und Markow-Ketten gleichförmig machen; jede Abweichung von der Vorlage steht im Kopf unter `vorlage`
++ Kandidaten aus dem eBL-Korpus: Maqlû (`abusch2024maqlu`, Beschwörungen gegen Hexen), Dattelpalme und Weinstock (`jimenez2021palmeundrebe`, Bier und Wein im Streit), Omen aus Šumma ālu zu Schenke und Bier als Vorbild eigener Omen
 + Weitere Kandidaten, zu prüfen: weitere alte Übersetzungen des Gilgamesch-Epos, mittelalterliche Brauanleitungen, Brauordnungen, Bibelstellen und antike Autoren zu Bier und Wein
 
 ### Ablage und Format
@@ -136,6 +137,8 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 | `en/korpus/gilgamesch-tafel-10.md` | Nachdichtung, aus der deutschen übertragen | `george2022gilgamesch` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
 | `de/korpus/gilgamesch-tafel-11.md` | Nachdichtung aus der akkadischen Normalisierung, jungbabylonische Tafel XI, Wiederholungen gekürzt | `george2022gilgamesch` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
 | `en/korpus/gilgamesch-tafel-11.md` | Nachdichtung, aus der deutschen übertragen | `george2022gilgamesch` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
+| `de/korpus/gilgamesch-tafel-12.md` | Nachdichtung aus der akkadischen Normalisierung, jungbabylonische Tafel XII, Wiederholungen gekürzt | `george2022gilgamesch` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
+| `en/korpus/gilgamesch-tafel-12.md` | Nachdichtung, aus der deutschen übertragen | `george2022gilgamesch` | eigener Text, CC BY-NC-SA 4.0; akkadisches Original gemeinfrei |
 
 + Varianten desselben Originals tragen die Endung `-b`, `-c` usw.; sie folgen einer anderen Lesart oder anderen Bildern und erweitern so den Wortschatz der Markow-Ketten
 + Die englischen Korpustexte sind aus unseren deutschen Nachdichtungen übertragen, im selben altertümlichen Ton (thou, hath) und mit denselben Dateinamen; aus den modernen Übersetzungen der Fachquellen stammt kein Wortlaut
