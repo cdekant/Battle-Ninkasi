@@ -230,3 +230,18 @@ test("Werfen mit wurf.effekt: zerbricht am ersten Wesen und wirkt auf es; Gründ
   assert.equal(spiel.zustand.entitaeten[getragen.id], undefined);
   assert.ok(meldungen.some((meldung) => meldung.art === "zerbrochen"));
 });
+
+test("Werfen mit wurf.bleibt: die Wurfwaffe wirkt auf das erste Wesen und landet dort, vom Stapel nur eine", () => {
+  const { spiel, meldungen } = spielBauen();
+  const { ninkasi, getragen } = werferin(spiel, { stapelbar: true, anzahl: 2, wurf: { effekt: "splitter", reichweite: 4, bleibt: true } });
+  const getroffen = wesen(spiel, 4, 2, "feinde", 20);
+  assert.equal(befehlGeben(spiel, { art: "werfen", gegenstandId: getragen.id, ziel: { id: getroffen.id } }).ok, true);
+  assert.equal(getroffen.werte.lp.aktuell, 15);
+  assert.ok(!meldungen.some((meldung) => meldung.art === "zerbrochen"), "eine Wurfwaffe zerbricht nicht");
+  const gelandet = meldungen.find((meldung) => meldung.art === "gelandet");
+  const amBoden = spiel.zustand.entitaeten[gelandet.was.id];
+  assert.deepEqual(amBoden.position, { x: 4, y: 2 });
+  assert.equal(amBoden.getragenVon, undefined);
+  assert.equal(spiel.zustand.entitaeten[getragen.id].anzahl ?? 1, 1, "eine bleibt im Gepäck");
+  assert.ok(ninkasi.inventar.includes(getragen.id));
+});

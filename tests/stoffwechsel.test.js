@@ -163,4 +163,6 @@ test("Ninkasis Regeneration erfüllt die Norm in Weltticks bis zur vollen Leiste
   assert.equal(ticksBisVoll("lp", stelleDesHoechstwerts(ninkasi.stoffwechsel.regeneration.lp)), norm.lp.optimum);
   assert.equal(ticksBisVoll("lp", norm.pegelRausch), norm.lp.rausch);
   assert.equal(ticksBisVoll("mp", 0), norm.mp.nuechtern);
+  assert.equal(ticksBisVoll("mp", stelleDesHoechstwerts(ninkasi.stoffwechsel.regeneration.mp)), norm.mp.optimum);
+  assert.ok(stelleDesHoechstwerts(ninkasi.stoffwechsel.regeneration.mp) < stelleDesHoechstwerts(ninkasi.stoffwechsel.regeneration.lp), "das Optimum der MP liegt bei leichterem Pegel als das der LP");
 });

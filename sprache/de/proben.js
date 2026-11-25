@@ -97,6 +97,56 @@ export default {
     einzahl: { nom: "Kupferring", gen: "Kupferrings", dat: "Kupferring", akk: "Kupferring" },
     mehrzahl: { nom: "Kupferringe", gen: "Kupferringe", dat: "Kupferringen", akk: "Kupferringe" },
   },
+  "gegenstand.pruefdolch": {
+    geschlecht: "m",
+    einzahl: { nom: "Prüfdolch", gen: "Prüfdolchs", dat: "Prüfdolch", akk: "Prüfdolch" },
+    mehrzahl: { nom: "Prüfdolche", gen: "Prüfdolche", dat: "Prüfdolchen", akk: "Prüfdolche" },
+  },
+  "gegenstand.pruefschwert": {
+    geschlecht: "n",
+    einzahl: { nom: "Prüfschwert", gen: "Prüfschwerts", dat: "Prüfschwert", akk: "Prüfschwert" },
+    mehrzahl: { nom: "Prüfschwerter", gen: "Prüfschwerter", dat: "Prüfschwertern", akk: "Prüfschwerter" },
+  },
+  "gegenstand.pruefspeer": {
+    geschlecht: "m",
+    einzahl: { nom: "Prüfspeer", gen: "Prüfspeers", dat: "Prüfspeer", akk: "Prüfspeer" },
+    mehrzahl: { nom: "Prüfspeere", gen: "Prüfspeere", dat: "Prüfspeeren", akk: "Prüfspeere" },
+  },
+  "gegenstand.pruefzweihaender": {
+    geschlecht: "m",
+    einzahl: { nom: "Prüfzweihänder", gen: "Prüfzweihänders", dat: "Prüfzweihänder", akk: "Prüfzweihänder" },
+    mehrzahl: { nom: "Prüfzweihänder", gen: "Prüfzweihänder", dat: "Prüfzweihändern", akk: "Prüfzweihänder" },
+  },
+  "gegenstand.lederwams": {
+    geschlecht: "n",
+    einzahl: { nom: "Lederwams", gen: "Lederwamses", dat: "Lederwams", akk: "Lederwams" },
+    mehrzahl: { nom: "Lederwämser", gen: "Lederwämser", dat: "Lederwämsern", akk: "Lederwämser" },
+  },
+  "gegenstand.polsterrock": {
+    geschlecht: "m",
+    einzahl: { nom: "Polsterrock", gen: "Polsterrocks", dat: "Polsterrock", akk: "Polsterrock" },
+    mehrzahl: { nom: "Polsterröcke", gen: "Polsterröcke", dat: "Polsterröcken", akk: "Polsterröcke" },
+  },
+  "gegenstand.schuppenhemd": {
+    geschlecht: "n",
+    einzahl: { nom: "Schuppenhemd", gen: "Schuppenhemds", dat: "Schuppenhemd", akk: "Schuppenhemd" },
+    mehrzahl: { nom: "Schuppenhemden", gen: "Schuppenhemden", dat: "Schuppenhemden", akk: "Schuppenhemden" },
+  },
+  "gegenstand.plattenharnisch": {
+    geschlecht: "m",
+    einzahl: { nom: "Plattenharnisch", gen: "Plattenharnischs", dat: "Plattenharnisch", akk: "Plattenharnisch" },
+    mehrzahl: { nom: "Plattenharnische", gen: "Plattenharnische", dat: "Plattenharnischen", akk: "Plattenharnische" },
+  },
+  "gegenstand.wurfmesser": {
+    geschlecht: "n",
+    einzahl: { nom: "Wurfmesser", gen: "Wurfmessers", dat: "Wurfmesser", akk: "Wurfmesser" },
+    mehrzahl: { nom: "Wurfmesser", gen: "Wurfmesser", dat: "Wurfmessern", akk: "Wurfmesser" },
+  },
+  "gegenstand.wurfspeer": {
+    geschlecht: "m",
+    einzahl: { nom: "Wurfspeer", gen: "Wurfspeers", dat: "Wurfspeer", akk: "Wurfspeer" },
+    mehrzahl: { nom: "Wurfspeere", gen: "Wurfspeere", dat: "Wurfspeeren", akk: "Wurfspeere" },
+  },
   "gegenstand.bierfass": {
     geschlecht: "n",
     einzahl: { nom: "Bierfass", gen: "Bierfasses", dat: "Bierfass", akk: "Bierfass" },
@@ -199,6 +249,11 @@ export default {
   "arena.normwesen": "Normwesen der Stärken 1 bis 5",
   "arena.normwesen_drei": "Drei Normwesen derselben Stärke",
   "arena.keller_alle": "Alle Gegner des Kellers, Tiefe 1",
+  "arena.pruefwaffen": "Prüfwaffen gegen ein Normwesen",
+  "arena.pruefwaffen_drei": "Prüfwaffen gegen drei Normwesen",
+  "arena.pruefruestung": "Prüfrüstungen mit dem Prüfschwert",
+  "arena.kette": "Fünf Wellen ohne Erholung",
+  "arena.wurfwaffen": "Wurfwaffen auf Abstand",
   "skillset.zaehigkeit": "Zähigkeit",
   "skillset.nahkampf": "Nahkampf",
   "skillset.ausweichen": "Ausweichen",

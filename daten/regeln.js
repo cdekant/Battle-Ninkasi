@@ -158,18 +158,19 @@ export default {
     trefferchance: { ninkasi: 80, wesen: 70 },
     sicht: { ninkasi: 6, wesen: 7 }, // Sichtweite zu Beginn und eines gewöhnlichen Wesens, je Lichtstufe nach regeln.licht
     staerken: [
-      { ninkasiTreffer: 2, wesenTreffer: 25, ep: 5 }, // Futter
-      { ninkasiTreffer: 3, wesenTreffer: 18, ep: 10 }, // gewöhnlich
-      { ninkasiTreffer: 4, wesenTreffer: 12, ep: 20 }, // zäh
-      { ninkasiTreffer: 6, wesenTreffer: 9, ep: 40 }, // gefährlich
-      { ninkasiTreffer: 8, wesenTreffer: 6, ep: 80 }, // Elite, ein Duell
+      { ninkasiTreffer: 2, wesenTreffer: 25, ep: 35 }, // Futter
+      { ninkasiTreffer: 3, wesenTreffer: 18, ep: 70 }, // gewöhnlich
+      { ninkasiTreffer: 4, wesenTreffer: 12, ep: 140 }, // zäh
+      { ninkasiTreffer: 6, wesenTreffer: 9, ep: 280 }, // gefährlich
+      { ninkasiTreffer: 8, wesenTreffer: 6, ep: 560 }, // Elite, ein Duell
     ],
     kontrolle: { kurz: 100, mittel: 200, lang: 400 },
     abklingzeit: { kurz: 300, mittel: 1000, lang: 3000 },
     verbrauch: { zauber: { mp: 10 }, psi: { pp: 10 } },
     // Weltticks von leer bis voll außerhalb des Kampfes für Ninkasi zu Beginn (tests/stoffwechsel.test.js): nüchtern,
-    // im Optimum der Kurve und im Rausch bei pegelRausch (12 ‰, Ninkasis Stufe im_rausch)
-    regeneration: { pegelRausch: 1200, lp: { nuechtern: 400, optimum: 150, rausch: 400 }, mp: { nuechtern: 200 } },
+    // im Optimum der Kurve und im Rausch bei pegelRausch (12 ‰, Ninkasis Stufe im_rausch); das Optimum der MP liegt
+    // bei leichtem Pegel (docs/Grundlagen.md, Spielkern)
+    regeneration: { pegelRausch: 1200, lp: { nuechtern: 400, optimum: 150, rausch: 400 }, mp: { nuechtern: 200, optimum: 150 } },
   },
   // Tempo in Worten beim Untersuchen (src/systeme/untersuchen.js): stufen [bis Zeiteinheiten, Stufe] aufsteigend, darüber
   // die Stufe darueber; Texte tempo.bewegen.<stufe> und tempo.angriff.<stufe>; Norm 100, Ninkasi bewegt sich anfangs mit 120

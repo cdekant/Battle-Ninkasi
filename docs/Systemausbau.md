@@ -47,6 +47,7 @@ Status: offen, jeweils mit dem ersten Bedarf
 + Index im `zwischenspeicher`, welche Entitäten Auslöser für einen Haken tragen (Vorbild "WantEvent" in Caves of Qud), erst wenn mehr als die Beteiligten gefragt werden
 + Nach dem Anspielen prüfen, ob die Sichtlinie Ersatzlinien oder einen symmetrischen Schattenwurf braucht (siehe [Wirkungen.md](Wirkungen.md), Zielauswahl)
 + Skills der Arena in EP statt in Stufen (`skills: { name: ep }` in `datenproben/arenen.js`), die EP fließen mit den Eigenschaften der Arena-Ninkasi in Lernpunkte wie beim Verteilen freier EP; so vergleicht die Arena Builds mit gleichem Budget; später vielleicht ein Budget `ep` mit Verteilregel; alle Inhaltsdaten nennen EP, nur Unittests setzen Stufen direkt
++ Verzauberungen und Anstriche an Gegenständen: mehrere zugleich an einem Stück, erster Fall der Säureschutz aus einem häufigen Rezept des Absuds (Spieldesign in [Grundlagen.md](Grundlagen.md), Spielkern, und [Brauen.md](Brauen.md), Absud)
 + Leiser Lärm für Schritte, damit Lauschen mehr hört als Kämpfe; mit einer Prüfung der Leistung bei vielen Wesen; ändert die Fingerabdrücke in `tests/ebenen.test.js`
 + Verschleiß durch Gebrauch für Waffen und Rüstung (heute nur über `abnutzen`, siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß), zusammen mit wirksamen Wegen zur Pflege und Reparatur (Entscheidung in [Grundlagen.md](Grundlagen.md), Spielkern); braucht die Auslöser mit Filter auf den Grund
 + Abzug der zweiten Hand: die Profile der zweiten Waffe tragen in `angriffeVon` den Tag `zweite_hand`, der Abzug wirkt als Modifikator darauf (Entwurf `regeln.kampf.zweiteHand: { genauigkeit: -20, schaden: -25, kostenAufschlag: 20 }` in Prozent, der Aufschlag auf die Kosten der langsameren Waffe); heute sind zwei Waffen ohne Nachteil (Entscheidung in [Skills.md](Skills.md), Kampf, Handhabung)
@@ -58,15 +59,18 @@ Status: offen, jeweils mit dem ersten Bedarf
 
 Status: in Arbeit; jeweils zuerst in [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md) oder [Spielverlauf.md](Spielverlauf.md) entscheiden, mit Recherche bei anderen Spielen; der Rahmen (offene Tiefe in Kapiteln, erstes Kapitel, Epochen, Bosse, was Läufe unterscheidet) steht in [Spielverlauf.md](Spielverlauf.md), Breite und Spezialisierung in [Charakter.md](Charakter.md), Skills
 
-+ Brausystem: das Spieldesign steht in [Brauen.md](Brauen.md), die Umsetzung in Punkt 23; im Spieldesign noch zu klären (dort unter Offen): Nebel über den Zielgebieten, Sud im Kampf, Säure als gewollte Richtung, die Achsen und ihre Wirkungen, weitere Familien von Zielgebieten (sumerisch nach `sallaberger2012bierbrauen`, ägyptisch, mittelalterlich) und ihre Zuordnung zu den Epochen (siehe [Spielverlauf.md](Spielverlauf.md), Epochen und Wertschöpfungskette)
++ Brausystem: das Spieldesign steht in [Brauen.md](Brauen.md), die Umsetzung in Punkt 23; im Spieldesign noch zu klären (dort unter Offen): die Achsen und ihre Wirkungen, weitere Familien von Zielgebieten nach den antiken (ägyptisch, mittelalterlich) und ihre Zuordnung zu den Epochen (siehe [Spielverlauf.md](Spielverlauf.md), Epochen und Wertschöpfungskette)
 + Machtkurve: Budget je Tiefe für alle Arten von Inhalt als Regelwerte, ein Werkzeug warnt bei Ausreißern (Vorläufer `werkzeuge/normierung.js`, siehe [Wesen.md](Wesen.md), Normierung); braucht Pegel und Brausystem; darin:
   + Ziel der Anfangsbalance am Ende des ersten Kapitels für eine ausgewogene und eine spezialisierte Ninkasi (siehe [Charakter.md](Charakter.md), Skills)
   + Kernskills der Archetypen als Prüfsteine für Arena und Simulation (siehe [Spielverlauf.md](Spielverlauf.md), Was zwei Läufe unterscheidet)
   + Fundstücke, die mit der Tiefe wachsen, und einfache Waffen jeder Art, die verlässlich zu bekommen sind
-  + Ninkasis Grundausstattung als Bezug: was sie ohne Skills auf der ersten Tiefe kann
+  + Ninkasis Grundausstattung als Bezug: was sie ohne Skills auf der ersten Tiefe kann; entschieden ist Dolch und Wurfwaffen ohne Rüstung (siehe [Charakter.md](Charakter.md), Startwerte), damit ändert sich der Bezug der Normierung von der Faust zum Dolch
+  + Prüfen, ob die erste Ebene mit den Gegnern des Probeinhalts (siehe [Wesen.md](Wesen.md), Normierung) das Ziel der Anfangsbalance trifft, mit einem Bot, der eine Ebene räumt; der Zufallsbot stirbt mit den vielen Gegnern öfter (siehe [Entwicklung.md](Entwicklung.md), Messwerte)
+  + Grundausstattung umsetzen (Dolch und Wurfmesser zu Beginn, siehe [Charakter.md](Charakter.md), Startwerte), danach die Normierung vom Dolch aus neu messen
+  + Ziele für Skills in der Arena, sobald es Waffenskills gibt (Punkt 20), mit Skills in EP (Punkt 8)
   + Ökonomie der Vorräte als ein Kreislauf mit Skill- und Brausystem: Rasten und Regeneration, Bier als Heilung, Brauen als Quelle, Skills als Hebel, Druck gegen endloses Rasten, Ausdauer und Nahrung (siehe [Ausblick.md](Ausblick.md), Druck gegen endloses Rasten); darin Rasten als Weg zu heilen gegen den Zeitdruck, was der Sprint verbraucht (heute nur doppelter Pegelabbau) und der Verbrauch je Ebene mit Ninkasis Anfangstempo als Maßstab
   + EP aus Erkundung gegen EP aus Gegnern, bezogen auf die zu erwartenden Skillstufen je Ebene und die Builds, die daraus folgen (Messwerte in [Entwicklung.md](Entwicklung.md), Messwerte)
-  + der Befund der Arena, dass Ausrüstung und Skills bisher wenig ändern, gerüstet mit dem Fasshammer sogar schaden (siehe [Entwicklung.md](Entwicklung.md), Messwerte)
+  + der Befund der Arena: die Prüfstücke zeigen, dass Ausrüstung mit passenden Werten deutlich wirkt (siehe [Entwicklung.md](Entwicklung.md), Messwerte); offen bleiben die Skills und die Gegner mit Säure, gegen die Rüstung kaum schützt
   + Die Norm der Regeneration (siehe [Wesen.md](Wesen.md), Normierung) und der Gewinn der PP im Kampf mit der Arena prüfen, sobald es Psi-Fähigkeiten gibt
 + Flüssigkeiten und Gase in einer eigenen Sitzung: tiefes Wasser, Strömung und Schwimmen, Fließen, Verdunsten zu Gas, Schwere des Gases (siehe [Ausblick.md](Ausblick.md), Flüssigkeiten und Gase); entschieden ist, dass Lachen sich nicht mischen (siehe [Brauen.md](Brauen.md), Grundsätze)
 + Die Ebenen des Spieldesigns nach dem Rahmen, im Gespräch zu klären (siehe [Spielverlauf.md](Spielverlauf.md), Offen): Kreisläufe auf drei Zeitskalen (Zug, Ebene, Lauf), Spannungen, Ökonomie, Machtkurve, Inhaltsplan grob; die Unterpunkte dieses Punkts gehören dazu
@@ -113,6 +117,7 @@ Status: zurückgestellt, Entwurf in [Animationen.md](Animationen.md) und [Tilese
 + Kampfanimation: schwebende Zahlen für Schaden, Krit und Heilung, Aufblitzen bei Treffern, Explosion und Schwall aus der Meldung `flaeche`, Geschosse
 + Varianten und Schmuck für Boden und Wand, Vorderseite der Wand
 + Bewegte Tiles
++ Rüstung und Schmuck verändern das Aussehen von Ninkasis Tile: je Platz am Körper eine eigene Pixelschicht über dem Grundtile (siehe [Tileset.md](Tileset.md))
 + Metaeffekte des Pegels und der LP (siehe [Oberflaeche.md](Oberflaeche.md), Klassen der Elemente)
 + Weiches Scrollen der Kamera (siehe [Anzeige.md](Anzeige.md), Kamera)
 + Licht: leuchtende Pixel (Augen, Glut) nach der Abdunklung neu zeichnen, mit einer Maske je Tile; Flackern über den kosmetischen Zufall; dieselbe Abdunklung auch für erinnerte Felder (siehe [Anzeige.md](Anzeige.md), Anzeige und [Tileset.md](Tileset.md))
@@ -221,6 +226,8 @@ Status: offen, ein neues System von Grund auf; vor dem Inhalt, weil Getränke, Z
 + Wirkung des Getränks als Effekt aus Budget, Achsen, Zielgebiet, Zusätzen, Kulturen und Fähigkeiten
 + Absud ohne Kultur für Tränke und Gifte; Mälzen; Brennblase für Brand
 + Kessel als Gelände und als Gegenstand, Tiers nach Material; ein Kessel im Hub
++ Trockenbier: Abfüllen eines Suds als Trockenbier, Anrühren mit Wasser, Gefäß und Kultur, im Kampf über den Schnellsud, Kveik und Hitze in der Nähe
++ Nebel über den Zielgebieten, aufgedeckte Zielgebiete als Wissen über Läufe hinweg
 + Verderben in Stufen mit Reifen über die Kette `verdirbt`, Dauer nach Alkohol, Gewürzen, Säure und Güte
 + Rezeptbuch, Hausrezepte, Kulturen als Proben ohne Gewicht
 + Stapeln nach Rezept, gerundeten Stufen, Güte und Stufe des Verderbens

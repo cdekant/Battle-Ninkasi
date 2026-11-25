@@ -158,9 +158,12 @@ test("Datenprüfung: Abfolge, Starttiefe, feste Karte, Population und Tabellen",
 // neu mit 0.62.0 für Ninkasis Stoffwechsel (Kurven nach der Norm, imKampf, kampfgewinn; mit den alten Daten des
 // Stoffwechsels blieben die Werte gleich); neu mit 0.63.0 für Ninkasis Skala des Pegels (Kurven mal 4, Stufen,
 // Strafen des Rauschs; mit dem alten Stoffwechsel blieben die Werte gleich); neu mit 0.64.0 für Glimmer, Filmriss und
-// Gedankenstich an Ninkasi (ohne die drei blieben die Werte gleich).
+// Gedankenstich an Ninkasi (ohne die drei blieben die Werte gleich); neu mit 0.67.0 für mehr Gegner in größeren
+// Rudeln, EP mal 7 und die MP-Kurve mit Optimum bei leichtem Pegel (mit den alten Werten blieben die Werte gleich);
+// dazu mit 0.67.0 für Leder gegen Säure (unempfindlich, ruestung.saeure) und die Haltbarkeit 40 des Kupferhelms (mit
+// den alten Werten blieben die Werte gleich, die Prüfstücke der Arenen ändern nichts).
 test("Erzeugung in Schritten: dieselben Ebenen wie vorher", () => {
-  const erwartet = { 1: "c43e9cb4980380e9", 2: "5955fbee3864f1cf", 3: "7926aaecf08ce239", 42: "b96e1c54aec0623f", 4711: "3607faa30fd80e8c" };
+  const erwartet = { 1: "bcea025c4f3f99e0", 2: "a89d2815c1155ae9", 3: "9101cac85f53ed8b", 42: "b5b0ee064c4b7384", 4711: "c5210e29ad6bfd8c" };
   for (const [startwert, fingerabdruck] of Object.entries(erwartet)) {
     const spiel = neuesSpiel(DATEN, Number(startwert));
     for (const tiefe of [2, 3, 0]) ebeneWechseln(spiel, tiefe);

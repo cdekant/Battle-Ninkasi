@@ -3,7 +3,7 @@
 // es mehr Gegner gibt: Essigbakterien in Rudeln, Fernkämpfer werden nach unten häufiger.
 export default {
   keller: [
-    { typ: "essigbakterium", gewicht: 10, tiefe: [1, 3], rudel: [1, 3] },
+    { typ: "essigbakterium", gewicht: 10, tiefe: [1, 3], rudel: [2, 5] },
     { typ: "fernkaempfer_test", gewicht: 2, tiefe: [1, 1] },
     { typ: "fernkaempfer_test", gewicht: 5, tiefe: [2, 3] },
   ],

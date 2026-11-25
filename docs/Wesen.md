@@ -1,6 +1,6 @@
 # Battle Ninkasi - Wesen
 
-Stand: 2026-11-24
+Stand: 2026-11-25
 
 Zuständig für: `src/systeme/kampf.js`, `src/systeme/kampfzustand.js`, `src/systeme/fraktionen.js`, `src/systeme/wahrnehmung.js`, `src/systeme/sinne.js`, `src/systeme/bewegung.js`, `src/systeme/verschieben.js`, `src/systeme/werfen.js`, `src/systeme/skills.js`, `src/systeme/lernen.js`, `src/systeme/stoffwechsel.js`, `src/systeme/glimmer.js`, `src/ki/*`, `daten/ninkasi.js`, `daten/fraktionen.js`, `daten/schadensarten.js`, `daten/eigenschaften.js`, `daten/taktiken.js`
 
@@ -71,13 +71,14 @@ Daten:
 
 | Stärke | Rolle | Ninkasi braucht | Wesen braucht | EP |
 |---|---|---|---|---|
-| 1 | Futter | 2 | 25 | 5 |
-| 2 | gewöhnlich | 3 | 18 | 10 |
-| 3 | zäh | 4 | 12 | 20 |
-| 4 | gefährlich | 6 | 9 | 40 |
-| 5 | Elite, ein Duell | 8 | 6 | 80 |
+| 1 | Futter | 2 | 25 | 35 |
+| 2 | gewöhnlich | 3 | 18 | 70 |
+| 3 | zäh | 4 | 12 | 140 |
+| 4 | gefährlich | 6 | 9 | 280 |
+| 5 | Elite, ein Duell | 8 | 6 | 560 |
 
-+ `regeneration`: Weltticks von leer bis voll außerhalb des Kampfes für Ninkasi zu Beginn, LP nüchtern 400, im Optimum der Kurve 150 und bei `pegelRausch` (12 ‰, Ninkasis Stufe `im_rausch`) 400, MP nüchtern 200; `tests/stoffwechsel.test.js` prüft Ninkasis Kurven dagegen
++ `regeneration`: Weltticks von leer bis voll außerhalb des Kampfes für Ninkasi zu Beginn, LP nüchtern 400, im Optimum der Kurve 150 und bei `pegelRausch` (12 ‰, Ninkasis Stufe `im_rausch`) 400, MP nüchtern 200 und im Optimum der Kurve 150, das bei leichterem Pegel liegt als das der LP (bei Ninkasi 3 ‰, angeheitert); `tests/stoffwechsel.test.js` prüft Ninkasis Kurven dagegen
++ Die EP der Stärken sind so bemessen, dass die erste Ebene das Ziel in [Charakter.md](Charakter.md), Anfangsbalance erreicht: rund 35 Wesen der Stärken 1 und 2 bringen geräumt rund 1300 EP, mit Erkundung und Startguthaben genug für zwei Grundskills auf Stufe 5
 + Weitere Normen, nach denen sich Inhalt richtet: `kontrolle` kurz 100, mittel 200, lang 400 Zeiteinheiten; `abklingzeit` kurz 300, mittel 1000, lang 3000; `verbrauch` Standardzauber 10 MP, Psi-Fähigkeit 10 PP; Bezug fürs Tragen ist `regeln.tragen.tragkraft` (20 kg)
 + Normwesen (`datenproben/gegner.js`, Vorlage `normwesen`, in keiner Population, Sichtweite 7): `normwesen_1` bis `normwesen_5` mit 11, 16, 22, 33 und 44 LP, Genauigkeit 47, stumpfer Schlag mit 2W3, 1W6+2, 2W6+1, 2W8+2 und 3W8+3 (Mittel 4, 5,5, 8, 11, 16,5), Tempo 100; Arenen `normwesen` und `normwesen_drei` mit den Varianten `s1` bis `s5`
 
@@ -212,7 +213,7 @@ Daten:
 + Bewegungsarten am Wesen: `bewegung`, Vorgabe `laufend`, sonst `fliegend`, `schwebend`, `phasend`, `unbeweglich`; ein Zustand überlagert sie mit `bewegung` (Levitation, Phasen)
 + Gelände: `passierbar: true` gilt für alle, `passierbarFuer: [Arten]` für einzelne (Abgrund für `fliegend`, Wasser für `fliegend` und `schwebend`), `undurchdringlich: true` hält auch `phasend` auf, `beimFestsitzen` (Effekt)
 + Arten des Versetzens (`VERSETZARTEN`): `schritt`, `stoss`, `zug`, `tausch`, `teleport`, `herausgedrueckt`
-+ Werfen: am Gegenstand `wurf: { reichweite?, effekt? }`; Regelwerte `regeln.werfen.reichweite` (6), `regeln.bewegung.beimFestsitzen` (`eingeklemmt`, 2W6 stumpf, vorläufig), Zeitkosten `aktionen.werfen`
++ Werfen: am Gegenstand `wurf: { reichweite?, effekt?, bleibt? }`, mit `bleibt` (nur mit `effekt`) ist er eine Wurfwaffe: der Effekt wirkt wie sonst, der Gegenstand zerbricht aber nicht, sondern landet wie ohne Effekt (Meldung `gelandet`), vom Stapel nur das geworfene Stück; Regelwerte `regeln.werfen.reichweite` (6), `regeln.bewegung.beimFestsitzen` (`eingeklemmt`, 2W6 stumpf, vorläufig), Zeitkosten `aktionen.werfen`
 
 Schnittstellen:
 

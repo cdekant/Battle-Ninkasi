@@ -173,7 +173,7 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 
 + Varianten desselben Originals tragen die Endung `-b`, `-c` usw.; sie folgen einer anderen Lesart oder anderen Bildern und erweitern so den Wortschatz der Markow-Ketten
 + Die englischen Korpustexte sind aus unseren deutschen Nachdichtungen übertragen, im selben altertümlichen Ton (thou, hath) und mit denselben Dateinamen; aus den modernen Übersetzungen der Fachquellen stammt kein Wortlaut
-+ Weitere Fachquellen ohne eigene Nachdichtung: `sallaberger2012bierbrauen` (auf ZORA nicht gefunden, keine freie Lizenz bekannt, daher keine wörtlichen Zitate); für die Bierstile `bjcp2021styleguidelines`, `ba2025styleguidelines`, `ba2016worldbeercup` und `ebs2025kategorien` (keine freie Lizenz, Merkmale und Kennzahlen nur eigenständig zusammengefasst, siehe Bierstile)
++ Weitere Fachquellen ohne eigene Nachdichtung: `sallaberger2012bierbrauen` (lokal als PDF, frei auf der Seite des Autors, aber ohne freie Lizenz, daher keine wörtlichen Zitate); für die Bierstile `bjcp2021styleguidelines`, `ba2025styleguidelines`, `ba2016worldbeercup` und `ebs2025kategorien` (keine freie Lizenz, Merkmale und Kennzahlen nur eigenständig zusammengefasst, siehe Bierstile)
 
 ## Offen
 

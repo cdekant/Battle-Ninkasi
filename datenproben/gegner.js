@@ -14,7 +14,7 @@ export default {
     vorlage: "bakterium",
     text: "wesen.essigbakterium",
     werte: { lp: { grundwert: 11 } },
-    ep: 5, // gebundene EP beim Tod (src/systeme/lernen.js), vorläufig
+    ep: 35, // gebundene EP beim Tod (src/systeme/lernen.js), vorläufig
     angriffe: [{ name: "biss", genauigkeit: 47, effekt: "biss_klein" }],
   },
 
@@ -24,7 +24,7 @@ export default {
     vorlage: "bakterium",
     text: "wesen.fernkaempfer_test",
     werte: { lp: { grundwert: 16 } },
-    ep: 10,
+    ep: 70,
     angriffe: [{ name: "biss", genauigkeit: 47, effekt: "biss_mittel" }], // Stärke 2 der Normierung, dazu die Fernangriffe
     faehigkeiten: ["saeurespucke", "saeureschwall"],
     ausstattung: [{ typ: "bier" }],
@@ -46,7 +46,7 @@ export default {
     fraktion: "jaegerinnen",
     psiJaegerin: { glimmerAb: 30 },
     werte: { lp: { grundwert: 22 } },
-    ep: 20,
+    ep: 140,
     angriffe: [{ name: "gedankenpeitsche", genauigkeit: 47, effekt: "gedankenpeitsche" }],
     ki: { modul: "jagen", letzteBekanntePosition: null },
     sicht: { reichweite: 7 },
@@ -60,9 +60,9 @@ export default {
     ki: { modul: "jagen", letzteBekanntePosition: null },
     sicht: { reichweite: 7 },
   },
-  normwesen_1: { vorlage: "normwesen", text: "wesen.normwesen_1", werte: { lp: { grundwert: 11 } }, ep: 5, angriffe: [{ name: "normschlag", genauigkeit: 47, effekt: "normschlag_1" }] },
-  normwesen_2: { vorlage: "normwesen", text: "wesen.normwesen_2", werte: { lp: { grundwert: 16 } }, ep: 10, angriffe: [{ name: "normschlag", genauigkeit: 47, effekt: "normschlag_2" }] },
-  normwesen_3: { vorlage: "normwesen", text: "wesen.normwesen_3", werte: { lp: { grundwert: 22 } }, ep: 20, angriffe: [{ name: "normschlag", genauigkeit: 47, effekt: "normschlag_3" }] },
-  normwesen_4: { vorlage: "normwesen", text: "wesen.normwesen_4", werte: { lp: { grundwert: 33 } }, ep: 40, angriffe: [{ name: "normschlag", genauigkeit: 47, effekt: "normschlag_4" }] },
-  normwesen_5: { vorlage: "normwesen", text: "wesen.normwesen_5", werte: { lp: { grundwert: 44 } }, ep: 80, angriffe: [{ name: "normschlag", genauigkeit: 47, effekt: "normschlag_5" }] },
+  normwesen_1: { vorlage: "normwesen", text: "wesen.normwesen_1", werte: { lp: { grundwert: 11 } }, ep: 35, angriffe: [{ name: "normschlag", genauigkeit: 47, effekt: "normschlag_1" }] },
+  normwesen_2: { vorlage: "normwesen", text: "wesen.normwesen_2", werte: { lp: { grundwert: 16 } }, ep: 70, angriffe: [{ name: "normschlag", genauigkeit: 47, effekt: "normschlag_2" }] },
+  normwesen_3: { vorlage: "normwesen", text: "wesen.normwesen_3", werte: { lp: { grundwert: 22 } }, ep: 140, angriffe: [{ name: "normschlag", genauigkeit: 47, effekt: "normschlag_3" }] },
+  normwesen_4: { vorlage: "normwesen", text: "wesen.normwesen_4", werte: { lp: { grundwert: 33 } }, ep: 280, angriffe: [{ name: "normschlag", genauigkeit: 47, effekt: "normschlag_4" }] },
+  normwesen_5: { vorlage: "normwesen", text: "wesen.normwesen_5", werte: { lp: { grundwert: 44 } }, ep: 560, angriffe: [{ name: "normschlag", genauigkeit: 47, effekt: "normschlag_5" }] },
 };

@@ -4,7 +4,7 @@ const keller = {
   hoehe: 40,
   gelaende: { wand: "wand", boden: "boden" },
   digger: { dugPercentage: 0.35, roomWidth: [4, 12], roomHeight: [3, 7], corridorLength: [3, 10] },
-  population: { tabelle: "keller", anzahl: [16, 20] }, // Wesen je Ebene, nach Tiefe gezogen (datenproben/populationen.js)
+  population: { tabelle: "keller", anzahl: [32, 40] }, // Wesen je Ebene, nach Tiefe gezogen (datenproben/populationen.js)
   gegenstaende: [
     { typ: "bier", anzahl: 10 }, { typ: "bierfass", anzahl: 1 }, { typ: "brandflasche", anzahl: 3 },
     { typ: "schoepfkelle", anzahl: 1 }, { typ: "fasshammer", anzahl: 1 }, { typ: "lederschuerze", anzahl: 1 },

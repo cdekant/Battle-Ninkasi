@@ -583,10 +583,11 @@ function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
   if (gegenstand.ersatz !== undefined) pruefeErsatz(daten, gegenstand.ersatz, ort, fehler);
   // Werfen, siehe systeme/werfen.js
   if (gegenstand.wurf !== undefined) {
-    if (!istObjekt(gegenstand.wurf)) fehler.push(`${ort}: wurf muss ein Objekt { effekt?, reichweite? } sein`);
+    if (!istObjekt(gegenstand.wurf)) fehler.push(`${ort}: wurf muss ein Objekt { effekt?, reichweite?, bleibt? } sein`);
     else {
-      pruefeParameter(daten, { effekt: "effekt?", reichweite: "ganzzahl?" }, gegenstand.wurf, `${ort}.wurf`, fehler);
+      pruefeParameter(daten, { effekt: "effekt?", reichweite: "ganzzahl?", bleibt: "wahrheitswert?" }, gegenstand.wurf, `${ort}.wurf`, fehler);
       if (gegenstand.wurf.reichweite === 0) fehler.push(`${ort}.wurf: reichweite muss eine ganze Zahl >= 1 sein`);
+      if (gegenstand.wurf.bleibt && !gegenstand.wurf.effekt) fehler.push(`${ort}.wurf: bleibt braucht einen effekt (ohne effekt bleibt jeder Wurf liegen)`);
     }
   }
   pruefeVerschleiss(daten, gegenstand, ort, fehler);
@@ -620,6 +621,14 @@ function pruefeVerschleiss(daten, gegenstand, ort, fehler) {
     }
     if (!gegenstand.ausruestung) fehler.push(`${ort}: haltbarkeit nutzt sich nur an Ausrüstung ab`);
     if (gegenstand.stapelbar) fehler.push(`${ort}: ein Gegenstand mit haltbarkeit ist nicht stapelbar`);
+    // unempfindlich: { <schadensart>: prozent 1 bis 100 }, siehe Baustein abnutzen in systeme/verschleiss.js
+    if (istObjekt(haltbarkeit) && haltbarkeit.unempfindlich !== undefined) {
+      if (!istObjekt(haltbarkeit.unempfindlich)) fehler.push(`${ort}: haltbarkeit.unempfindlich muss { <schadensart>: prozent } sein`);
+      else for (const [art, prozent] of Object.entries(haltbarkeit.unempfindlich)) {
+        if (!daten.schadensarten?.[art]) fehler.push(`${ort}: haltbarkeit.unempfindlich.${art}: Schadensart gibt es nicht`);
+        if (!(istGanzzahl(prozent) && prozent >= 1 && prozent <= 100)) fehler.push(`${ort}: haltbarkeit.unempfindlich.${art} muss eine ganze Zahl von 1 bis 100 sein`);
+      }
+    }
   }
 }
 

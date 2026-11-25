@@ -83,12 +83,12 @@ Vorbilder: NetHack (Säure frisst in Stufen, angefressen schützt weniger), Brog
 Daten:
 
 + Verderben: `verdirbt: { nach, wird }` am Gegenstand; an der Entität `verdirbtUm`
-+ Haltbarkeit: `haltbarkeit: { hoechstens, wirdZu }` an Ausrüstung (beides Pflicht, nicht stapelbar), der Stand in `haltbarkeit.aktuell` (Vorgabe `hoechstens`)
++ Haltbarkeit: `haltbarkeit: { hoechstens, wirdZu, unempfindlich? }` an Ausrüstung (`hoechstens` und `wirdZu` Pflicht, nicht stapelbar), der Stand in `haltbarkeit.aktuell` (Vorgabe `hoechstens`); `unempfindlich: { <schadensart>: prozent }` (1 bis 100) ist die Chance, dass ein Abnutzen dieser Art dem Stück nichts tut
 
 Schnittstellen (`src/systeme/verschleiss.js`):
 
 + Zeitereignis `verderben`, gebunden an den Gegenstand, eingeplant über das Register `beimErzeugen` (`verderbenEinplanen` in `src/systeme/inventar.js`); `gegenstandErsetzen` macht den Gegenstand zum neuen Typ; Meldung `verdorben`
-+ Baustein `abnutzen { platz?, wuerfel | menge }`: trifft einen angelegten Gegenstand des Ziels mit Haltbarkeit, mit `platz` nur dort, sonst zufällig einen davon; Meldung `abgenutzt`; `haltbarkeitVon`
++ Baustein `abnutzen { platz?, art?, wuerfel | menge }`: trifft einen angelegten Gegenstand des Ziels mit Haltbarkeit, mit `platz` nur dort, sonst zufällig einen davon (Wurf `abnutzen_wohin`); mit `art` (Schadensart) schützt `haltbarkeit.unempfindlich` des getroffenen Stücks mit seiner Chance (Wurf `abnutzen_unempfindlich`), ohne `art` nie; Meldung `abgenutzt`; `haltbarkeitVon`
 + Zustandsprüfung `kaputt` (Register `zustandspruefungen`, nach Tod und Lage, siehe [Wirkungen.md](Wirkungen.md), Tod und Zustandsprüfung); Meldung `kaputt`
 
 Regeln:
@@ -97,6 +97,7 @@ Regeln:
 + Stapel: fließen zwei zusammen, gilt der nach Anzahl gewichtete Durchschnitt beider Zeitpunkte, abgerundet; die Restzeit aller Stücke bleibt so in Summe gleich, dafür verdirbt der Stapel auf einmal; ein abgespaltenes Stück behält den Zeitpunkt und bekommt sein eigenes Zeitereignis; die Datenprüfung verlangt, dass ein stapelbarer Gegenstand zu einem stapelbaren verdirbt
 + Auf verlassenen Ebenen ruht das Verderben mit (`verdirbtUm` rückt wie die Zeitereignisse nach), was Ninkasi trägt, verdirbt weiter
 + Abgenutzt wird nur über den Baustein `abnutzen`, nicht durch Gebrauch (Zuschlagen, Getroffenwerden)
++ Säure trifft Ausrüstung nur mäßig (Spieldesign in [Grundlagen.md](Grundlagen.md), Spielkern): Leder ist gegen sie unempfindlich, Metall wird angefressen und hält dafür länger; was Säure abnutzt, nennt `art: "saeure"`
 + Eine Waffe mit Haltbarkeit geht kaputt wie jede Ausrüstung, angefressen wird sie aber noch nicht schwächer, weil das Ausdünnen nur Modifikatoren trifft, nicht die Angriffsprofile (offen, siehe [Systemausbau.md](Systemausbau.md), Punkt 8)
 + Bei 0 ist der Gegenstand kaputt: er wird zu `wirdZu`, abgelegt und ins Gepäck der Trägerin; er verschwindet also nie ganz
 + Anzeige im Gepäck: unter 75 % "angefressen", unter 50 % "stark angefressen", unter 25 % "zerfressen", jeweils mit dem Prozentwert

@@ -473,9 +473,10 @@ Muster der Tiers: Grund Gelingen, Experte Ausbeute, Meister Güte; einzelne Sets
 + Lernt aus: freien EP und quer von Brauen allgemein
 + Gebraut wird sonst nur außerhalb eines Kampfes (siehe [Brauen.md](Brauen.md), Grundsätze); der Schnellsud verschiebt diese Grenze Tier für Tier
 + Grund: Brauen auch, wenn Feinde in der Nähe sind, solange noch kein Kampf läuft
-+ Experte: Feldsud, im Kampf am mobilen Kessel eine kleine Menge, langsamer als eine gewöhnliche Aktion
++ Experte: Feldsud, im Kampf Trockenbier anrühren, langsamer als eine gewöhnliche Aktion (siehe [Brauen.md](Brauen.md), Trockenbier und Sud im Kampf)
 + Meister: der Feldsud ist etwa so schnell wie ein Kampfzauber
-+ Göttlich: der Feldsud in voller Menge
++ Göttlich: der Feldsud gibt die volle Menge und die volle Güte des Suds
++ Kveik zählt den Schnellsud einen Tier höher, auch über den eigenen hinaus
 
 ### Hygiene
 
@@ -735,7 +736,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Kampfwerte (Schadensart und Ta
 
 Psi wirkt sofort und rein geistig auf Einzelziele, mit hohem Risiko und hohem Ertrag; Wirksamkeit und Risiko steigen mit dem Pegel (siehe [Grundlagen.md](Grundlagen.md), Spielkern). Psi-Fähigkeiten kommen aus der Welt, ohne Skill mit hohem Risiko (Risikotabelle nach den fehlenden Stufen). Aufbau wie bei der Magie: Psi allgemein, Disziplinen nach der Wirkung wie die Gattungen, dazu Sets quer zu ihnen für Risiko, Krits, Glimmer und Abwehr. Muster der Disziplinen: Grund Wirkung, Experte geringere Kosten, Meister qualitativ, göttlich je Disziplin eigen; Tiers für Fläche gibt es nicht. Die Kurve der PP gehört zu Stoffwechsel und Pegel (Rauschgeist). Vorbild Caves of Qud (Glimmer als Summe geistiger Macht, ab einer Schwelle jagen Psi-Jäger die Spielerin, häufiger und stärker mit wachsendem Glimmer; Präkognition als Vision, aus der man zurückkehrt).
 
-Drei Wege zu den Vorräten des Geistes: Die Meditation ist aktiv und nüchtern vor dem Kampf (siehe Magie), die Ekstase passiv und im Rausch während des Kampfes, das Zeitblinzeln die Rettung im Moment.
+Drei Wege zu den Vorräten des Geistes: Die Meditation ist aktiv und bei leichtem Pegel vor dem Kampf (siehe Magie), die Ekstase passiv und im Rausch während des Kampfes, das Zeitblinzeln die Rettung im Moment.
 
 ### Psi allgemein
 

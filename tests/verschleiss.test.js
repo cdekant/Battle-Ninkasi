@@ -19,6 +19,8 @@ const EFFEKTE = {
   schluck: { schritte: [{ baustein: "heilen", wertName: "lp", menge: 1 }] },
   aetzen: { schritte: [{ baustein: "abnutzen", menge: 3 }] },
   aetzen_brust: { schritte: [{ baustein: "abnutzen", platz: "brust", menge: 3 }] },
+  saeure_frisst: { schritte: [{ baustein: "abnutzen", art: "saeure", menge: 2 }] },
+  feuer_frisst: { schritte: [{ baustein: "abnutzen", art: "feuer", menge: 2 }] },
 };
 const GEGENSTAENDE = {
   testbier: { text: "g.testbier", aufhebbar: true, stapelbar: true, trinkbar: { effekt: "schluck" }, verdirbt: { nach: 1000, wird: "testsauer" } },
@@ -121,6 +123,39 @@ test("Haltbarkeit: abnutzen trifft angelegte Ausrüstung mit Haltbarkeit, nur au
   assert.equal(helm.haltbarkeit.aktuell, undefined, "der Helm bleibt heil");
   const meldung = meldungen.find((eintrag) => eintrag.art === "abgenutzt");
   assert.deepEqual([meldung.was.id, meldung.menge, meldung.prozent], [platte.id, 3, 70]);
+});
+
+test("Haltbarkeit: unempfindlich schützt nur gegen das Abnutzen seiner Art, gewürfelt nach der Chance", () => {
+  const { spiel, ninkasi } = aufstellen();
+  const leder = gegenstandTragen(spiel, ninkasi, { ...structuredClone(PLATTE), haltbarkeit: { hoechstens: 10, wirdZu: "testreste", unempfindlich: { saeure: 100 } } });
+  befehlGeben(spiel, { art: "anlegen", gegenstandId: leder.id });
+  effektAnwenden(spiel, "saeure_frisst", { quelleId: ninkasi.id, zielId: ninkasi.id });
+  assert.equal(leder.haltbarkeit.aktuell, undefined, "gegen Säure zu 100 % unempfindlich");
+  effektAnwenden(spiel, "feuer_frisst", { quelleId: ninkasi.id, zielId: ninkasi.id });
+  assert.equal(leder.haltbarkeit.aktuell, 8, "Feuer frisst weiter");
+  effektAnwenden(spiel, "aetzen", { quelleId: ninkasi.id, zielId: ninkasi.id });
+  assert.equal(leder.haltbarkeit.aktuell, 5, "ohne Art gilt keine Unempfindlichkeit");
+  // mit 50 % über viele Würfe: manche fressen, manche nicht
+  leder.haltbarkeit = { hoechstens: 1000, wirdZu: "testreste", unempfindlich: { saeure: 50 } };
+  for (let i = 0; i < 40; i++) effektAnwenden(spiel, "saeure_frisst", { quelleId: ninkasi.id, zielId: ninkasi.id });
+  const gefressen = (1000 - leder.haltbarkeit.aktuell) / 2;
+  assert.ok(gefressen > 5 && gefressen < 35, `${gefressen} von 40 gefressen`);
+});
+
+test("Datenprüfung: haltbarkeit.unempfindlich und wurf.bleibt", () => {
+  const roh = rohdatenMitTesteintraegen();
+  const fehlerMit = (zusatz, teil) => {
+    const daten = structuredClone(roh);
+    Object.assign(daten.gegenstaende.testgegenstand, zusatz);
+    return vorbereiten(daten).fehler.some((meldung) => meldung.includes("testgegenstand") && meldung.includes(teil));
+  };
+  const ruestung = (unempfindlich) => ({ haltbarkeit: { hoechstens: 5, wirdZu: "lederfetzen", unempfindlich }, ausruestung: { platz: "brust" } });
+  assert.ok(fehlerMit(ruestung({ saeuer: 50 }), "Schadensart gibt es nicht"));
+  assert.ok(fehlerMit(ruestung({ saeure: 0 }), "von 1 bis 100"));
+  assert.ok(fehlerMit(ruestung([]), "unempfindlich"));
+  assert.ok(!fehlerMit(ruestung({ saeure: 75 }), "unempfindlich"));
+  assert.ok(fehlerMit({ wurf: { bleibt: true } }, "bleibt braucht einen effekt"));
+  assert.ok(!fehlerMit({ wurf: { effekt: "wurfmesser_flug", bleibt: true } }, "wurf"));
 });
 
 test("Angefressen wirkt schwächer: Vorteile sinken mit der Haltbarkeit, Nachteile bleiben", () => {

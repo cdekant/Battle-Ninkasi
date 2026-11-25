@@ -3,7 +3,8 @@
 //   gebundenes Zeitereignis (systeme/inventar.js verderbenEinplanen). Ist es so weit, wird er zum Typ wird, am selben
 //   Ort oder im selben Gepäck, mit derselben Anzahl (Meldung verdorben). Auf verlassenen Ebenen ruht das Verderben
 //   mit (systeme/ebenen.js), was Ninkasi trägt, verdirbt weiter.
-// Haltbarkeit: haltbarkeit: { hoechstens, wirdZu } am Gegenstand, der Stand in haltbarkeit.aktuell (Vorgabe hoechstens).
+// Haltbarkeit: haltbarkeit: { hoechstens, wirdZu, unempfindlich?: { <schadensart>: prozent } } am Gegenstand, der Stand
+//   in haltbarkeit.aktuell (Vorgabe hoechstens).
 //   Abgenutzt wird nur über den Baustein abnutzen, nicht durch Gebrauch; angefressen wirkt ein Gegenstand schwächer
 //   (systeme/ausruestung.js haltbarkeitProzent). Bei 0 ist er kaputt: die Zustandsprüfung kaputt (nach Tod und Lage,
 //   nur für Vorgemerktes) macht ihn zu wirdZu, abgelegt und ins Gepäck (Meldung kaputt).
@@ -13,7 +14,7 @@ import { bausteinAnmelden, mengeBestimmen } from "../kern/bausteine.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { entitaetMitId, entitaetEntfernen, entitaetAusDatensatz, ausDemInventarNehmen } from "../kern/zustand.js";
 import { kaputtVormerken, kaputtOffenEntnehmen } from "../kern/raumindex.js";
-import { wurfAuswahl } from "../kern/wurf.js";
+import { wurfAuswahl, wurfProzent } from "../kern/wurf.js";
 import { anzahlVon, insInventar } from "./inventar.js";
 import { ausgeruestete, haltbarkeitProzent } from "./ausruestung.js";
 
@@ -44,8 +45,10 @@ anmelden("zeitereignisse", "verderben", (spiel, { gegenstandId }) => {
 });
 
 // Nutzt einen angelegten Gegenstand des Ziels mit Haltbarkeit ab (Säure frisst an der Rüstung);
-// platz: nur dort (Vorgabe: unter allen angelegten mit Haltbarkeit zufällig), Menge siehe mengeBestimmen
-bausteinAnmelden("abnutzen", { platz: "text?", wuerfel: "wuerfel|menge" }, (spiel, kontext, parameter) => {
+// platz: nur dort (Vorgabe: unter allen angelegten mit Haltbarkeit zufällig), Menge siehe mengeBestimmen;
+// art: Schadensart des Abnutzens; haltbarkeit.unempfindlich: { <art>: prozent } am Gegenstand ist die Chance, dass ihm
+// ein Abnutzen dieser Art nichts tut (Leder gegen Säure), gewürfelt mit "abnutzen_unempfindlich"
+bausteinAnmelden("abnutzen", { platz: "text?", art: "schadensart?", wuerfel: "wuerfel|menge" }, (spiel, kontext, parameter) => {
   const zustand = spiel.zustand;
   const ziel = entitaetMitId(zustand, kontext.zielId);
   if (!ziel) return;
@@ -53,6 +56,8 @@ bausteinAnmelden("abnutzen", { platz: "text?", wuerfel: "wuerfel|menge" }, (spie
     .filter((gegenstand) => haltbarkeitVon(gegenstand) > 0 && (parameter.platz === undefined || gegenstand.ausruestung.platz === parameter.platz));
   if (!kandidaten.length) return;
   const getroffen = wurfAuswahl(spiel, "abnutzen_wohin", kandidaten);
+  const unempfindlich = parameter.art === undefined ? 0 : getroffen.haltbarkeit.unempfindlich?.[parameter.art] ?? 0;
+  if (unempfindlich > 0 && wurfProzent(spiel, "abnutzen_unempfindlich", unempfindlich)) return;
   const menge = Math.max(0, mengeBestimmen(spiel, kontext, parameter));
   if (menge === 0) return;
   const vorher = haltbarkeitVon(getroffen);

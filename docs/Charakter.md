@@ -1,6 +1,6 @@
 # Battle Ninkasi - Charakter und Lernen
 
-Stand: 2026-11-24
+Stand: 2026-11-25
 
 Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Bedienung.md](Bedienung.md), [Grundlagen.md](Grundlagen.md), [Entwicklung.md](Entwicklung.md), [Ausblick.md](Ausblick.md), [Spielverlauf.md](Spielverlauf.md), [Skills.md](Skills.md)
 
@@ -24,11 +24,12 @@ Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Fenster; siehe [Wesen.
 ## Startwerte
 
 + LP und MP beginnen voll, mit runden Grundwerten, damit Boni in Prozent vom Grundwert glatte ganze Zahlen ergeben
-+ Ninkasi startet nüchtern: LP regenerieren langsam, MP am schnellsten, PP schwinden (Verläufe in [Grundlagen.md](Grundlagen.md))
++ Ninkasi startet nüchtern: LP regenerieren langsam, MP etwas unter ihrem Optimum bei leichtem Pegel, PP schwinden (Verläufe in [Grundlagen.md](Grundlagen.md))
++ Grundausstattung in jedem Lauf gleich (Vorbild Brogue): ein Dolch und ein paar Wurfwaffen, keine Rüstung; sie ist der Bezug der Machtkurve (siehe [Spielverlauf.md](Spielverlauf.md), Offen)
 + PP beginnen leer, Start- und Höchstwert noch offen
 + Der Pegel ist nach oben offen
 
-Umsetzung: siehe [Entwicklung.md](Entwicklung.md), Grundgerüst
+Umsetzung: teilweise, siehe [Entwicklung.md](Entwicklung.md), Grundgerüst; offen: Grundausstattung, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 10
 
 ## Eigenschaften
 
@@ -114,6 +115,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Neuv
 
 ### Anfangsbalance
 
++ Ziel der ersten Ebene: Startguthaben, Erkundung und Bewältigtes zusammen reichen für zwei Grundskills auf Stufe 5, die Erkundung allein etwa für einen auf Stufe 4 bis 5; den größeren Teil bringen die Gegner; mit der Tiefe sinkt der Anteil der Erkundung von selbst, weil die EP der Gegner mit ihrer Stärke wachsen
 + Ziel festlegen: was eine ausgewogene und eine spezialisierte Ninkasi am Ende des ersten Kapitels erreicht haben sollen (siehe [Spielverlauf.md](Spielverlauf.md), Erstes Kapitel), z.B. zwei Sets bis Meister und ein göttliches Niveau; danach je weiteres Kapitel
 + EP-Budget messen: Der Bot zählt die EP je Ebene aus Erkundung und Bewältigtem (Messwerte in [Entwicklung.md](Entwicklung.md), Messwerte); das Verhältnis ist noch festzulegen; vorgesehen sind zwei bis drei Strategien des Bots für das Erkunden (nächster Rand als Obergrenze, zielstrebig zur Treppe als Untergrenze, später die Dijkstra-Karte), damit die Spanne zwischen gründlichem und eiligem Spiel sichtbar wird
 + Die Stufentabelle danach ausrichten, dass Budget und Ziel zusammenpassen
@@ -151,6 +153,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skil
 + Erkundung: EP für jedes Feld, das zum ersten Mal wirklich gesehen wird
 + Magisch kartierte Felder gelten als bekannt, bringen EP aber erst beim wirklichen Sehen; vergessene Felder (Filmriss) bringen beim Wiedersehen keine EP mehr
 + Offen, ob EP je Feld die beste Form ist: Ein Ablaufen jeder Ecke wird belohnt; Abwägung in [Ausblick.md](Ausblick.md), EP für Erkundung
++ Vorschlag, noch nicht bestätigt: ein festes Budget an EP für die Erkundung je Ebene, verteilt auf ihre Felder; große Karten bringen so nicht mehr als kleine, und das Budget je Tiefe steht ausdrücklich in den Regelwerten
 + Jedes Rätsel bringt seine EP nur einmal; Rätsel löst die Spielerin, kein Skill löst sie für sie (siehe [Skills.md](Skills.md), Anlagen und Fallen)
 + Freie EP lassen sich sparen, etwa bis entscheidende Fundstücke auftauchen
 + Freie EP lassen sich jederzeit verteilen, das Lernen kostet keine Spielzeit; Orte, an die das Verteilen gebunden ist (Altar, Hub), kommen vielleicht später, ein Schalter in den Regeln hält das offen

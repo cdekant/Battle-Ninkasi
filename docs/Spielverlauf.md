@@ -98,6 +98,6 @@ Einzelfragen:
 + Welche Systeme tieferen Kapiteln vorbehalten bleiben
 + Welche Figuren in den Hub ziehen können, wodurch sie es tun und was eine Stufe des Hubs ausmacht
 + Wie die Erzählung den Wechsel von drinnen und draußen und die Reise durch die Zeit begründet
-+ Weitere Rohstoffe Sumers (Emmer, Datteln, Feigen, Granatäpfel, Äpfel, Honig), mit Quellen zu prüfen
++ Weitere Rohstoffe Sumers: Emmer und Dattelbier sind belegt (`sallaberger2012bierbrauen`), Feigen, Granatäpfel, Äpfel und Honig noch zu prüfen; streng historisch muss es nicht sein (siehe [Brauen.md](Brauen.md), Grundsätze)
 + Kernskills der Archetypen
 + Der Boss des ersten Kapitels

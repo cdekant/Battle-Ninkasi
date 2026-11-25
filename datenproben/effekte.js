@@ -2,10 +2,10 @@
 export default {
   // Säure frisst an angelegter Rüstung (Baustein abnutzen, src/systeme/verschleiss.js)
   biss_klein: {
-    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "2W3" }, { baustein: "abnutzen", menge: 1 }],
+    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "2W3" }, { baustein: "abnutzen", art: "saeure", menge: 1 }],
   },
   biss_mittel: {
-    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "1W6+2" }, { baustein: "abnutzen", menge: 1 }],
+    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "1W6+2" }, { baustein: "abnutzen", art: "saeure", menge: 1 }],
   },
   // Normwesen (datenproben/gegner.js): mittlerer Schaden 4, 5,5, 8, 11 und 16,5 gegen 100 LP
   normschlag_1: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "2W3" }] },
@@ -28,10 +28,10 @@ export default {
     schritte: [{ baustein: "trefferwurf", genauigkeit: 70, effekt: "saeurespritzer_treffer" }],
   },
   saeurespritzer_treffer: {
-    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "1W4+1" }, { baustein: "abnutzen", menge: 1 }],
+    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "1W4+1" }, { baustein: "abnutzen", art: "saeure", menge: 1 }],
   },
   saeureschwall: {
-    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "2W4" }, { baustein: "abnutzen", menge: 2 }],
+    schritte: [{ baustein: "schaden", art: "saeure", wuerfel: "2W4" }, { baustein: "abnutzen", art: "saeure", menge: 2 }],
   },
   // Waffen (daten/ausruestung.js); vorläufig
   kellenschlag: {
@@ -44,6 +44,16 @@ export default {
   betaeubender_schlag: {
     schritte: [{ baustein: "betaeuben", dauer: 100, zustand: "betaeubt" }],
   },
+  // Prüfwaffen für die Arena (datenproben/ausruestung.js, docs/Entwicklung.md, Messwerte); vorläufig
+  pruefdolch_stich: { schritte: [{ baustein: "schaden", art: "schnitt", wuerfel: "1W6+4" }] },
+  pruefschwert_hieb: { schritte: [{ baustein: "schaden", art: "schnitt", wuerfel: "1W6+10" }] },
+  pruefspeer_stoss: { schritte: [{ baustein: "schaden", art: "schnitt", wuerfel: "1W8+7" }] },
+  pruefzweihaender_schlag: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "3W6+10" }] },
+  // Wurfwaffen (datenproben/wurfgegenstaende.js): erst der Trefferwurf, dann der Schaden; die Waffe bleibt liegen
+  wurfmesser_flug: { schritte: [{ baustein: "trefferwurf", genauigkeit: 80, effekt: "wurfmesser_treffer" }] },
+  wurfmesser_treffer: { schritte: [{ baustein: "schaden", art: "schnitt", wuerfel: "1W6+2" }] },
+  wurfspeer_flug: { schritte: [{ baustein: "trefferwurf", genauigkeit: 75, effekt: "wurfspeer_treffer" }] },
+  wurfspeer_treffer: { schritte: [{ baustein: "schaden", art: "schnitt", wuerfel: "2W6+3" }] },
   // Sprint (datenproben/faehigkeiten.js): der Zustand macht das Bewegen schneller
   sprint: {
     schritte: [{ baustein: "zustand_setzen", zustand: "sprint" }],
@@ -52,7 +62,7 @@ export default {
   saeureduese: {
     schritte: [
       { baustein: "schaden", art: "saeure", wuerfel: "2W4" },
-      { baustein: "abnutzen", menge: 2 },
+      { baustein: "abnutzen", art: "saeure", menge: 2 },
       { baustein: "oberflaeche_setzen", art: "saeure", menge: 4, muster: { art: "kreis", radius: 1 } },
     ],
   },

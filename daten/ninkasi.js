@@ -32,7 +32,7 @@ export default {
       ],
       regeneration: {
         lp: [[0, 25], [600, 67], [1200, 25], [3200, 0]], // voll nüchtern in 400 Ticks, im Optimum bei 6 ‰ in 150, bei 12 ‰ in 400
-        mp: [[0, 50], [400, 25], [1200, 0]], // nüchtern am schnellsten, voll in 200 Ticks
+        mp: [[0, 50], [300, 67], [800, 25], [1200, 0]], // voll nüchtern in 200 Ticks, im Optimum bei 3 ‰ (angeheitert) in 150, bei 8 ‰ in 400
         pp: [[0, -30], [600, -10], [1600, 0]], // außerhalb des Kampfes nur Schwund, bei hohem Pegel kaum
       },
       imKampf: { lp: 0, mp: 0, pp: 0 }, // im Kampf ruhen alle drei; Regeneration im Kampf später über Skills (imKampf.lp)

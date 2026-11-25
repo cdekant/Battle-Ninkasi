@@ -2,9 +2,10 @@
 // Befehl: { art: "werfen", gegenstandId, ziel: { x, y } | { id } }
 // Die Bahn ist die eines Geschosses (zielAufloesen mit Zielart geschoss): sie endet am ersten Wesen oder vor der Wand.
 // Reichweite: wurf.reichweite am Gegenstand, sonst regeln.werfen.reichweite. Zeitkosten: aktionen.werfen.
-// Daten am Gegenstand: wurf: { effekt?, reichweite? }
+// Daten am Gegenstand: wurf: { effekt?, reichweite?, bleibt? }
 //   mit effekt zerbricht der Gegenstand am Aufschlag (Meldung "zerbrochen") und der Effekt wirkt dort: Ziel ist das
 //   getroffene Wesen, sonst wirkt er nur aufs Feld (Ursache "wurf"); ob er treffen muss, sagen seine Daten (trefferwurf)
+//   mit effekt und bleibt (Wurfwaffe) wirkt der Effekt ebenso, der Gegenstand zerbricht aber nicht, sondern landet
 //   ohne effekt landet der Gegenstand auf dem Aufschlagfeld (Meldung "gelandet"), ist es nicht passierbar, auf dem letzten
 //   passierbaren Feld der Bahn davor
 // Nutzung für die KI (Register "nutzungen", ki/nutzen.js): wurf.zweck sagt, wozu ein Wesen den Gegenstand auf seine Beute
@@ -57,7 +58,17 @@ anmelden("befehle", "werfen", {
     melden(spiel, "geworfen", { wer: bezugAuf(akteur), was: bezugAuf(gegenstand) });
     hakenAusloesen(spiel, "gegenstand_benutzt", { quelleId: akteur.id, zielId: akteur.id, gegenstandId: gegenstand.id, art: "werfen", kettentiefe: 0 });
     melden(spiel, "geschoss", { quelle: bezugAuf(akteur), bahn: bahn.felder, aufschlag });
-    if (gegenstand.wurf?.effekt) {
+    if (gegenstand.wurf?.effekt && gegenstand.wurf.bleibt) {
+      // eine Wurfwaffe: der Effekt wirkt auf das getroffene Wesen (oder das Feld), danach landet sie wie ohne Effekt;
+      // während der Wirkung liegt sie noch nirgends, so trifft ihre Wirkung sie nicht selbst
+      effektAnwenden(spiel, gegenstand.wurf.effekt, {
+        quelleId: akteur.id, zielId: getroffenId, ursprung: aufschlag, zielfeld: aufschlag,
+        ursache: "wurf", mittel: { art: "gegenstand", name: gegenstand.typ },
+      });
+      const feld = landefeld(spiel, akteur, bahn);
+      positionSetzen(spiel.zustand, gegenstand, feld);
+      melden(spiel, "gelandet", { was: bezugAuf(gegenstand), feld });
+    } else if (gegenstand.wurf?.effekt) {
       // erst entfernen, damit der Gegenstand nicht von seiner eigenen Wirkung getroffen wird
       entitaetEntfernen(spiel.zustand, gegenstand.id);
       melden(spiel, "zerbrochen", { was: bezugAuf(gegenstand), feld: aufschlag });
