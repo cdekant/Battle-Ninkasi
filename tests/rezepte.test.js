@@ -48,7 +48,7 @@ function spielBauen({ unschaerfe = 0 } = {}) {
   const kessel = { kessel: { text: "g.kessel", kennung: "u", passierbar: false, durchsichtig: true, kessel: { portionen: 4, unschaerfe } } };
   const spiel = miniSpiel(RAUM, {
     gelaende: kessel, effekte: TEST_EFFEKTE, zustaende, gegenstaende: GEGENSTAENDE, zielgebiete: ZIELGEBIETE,
-    kulturen: { hefe: { text: "k.hefe", vergaerung: 75, vertraegt: 90 } }, regeln: { brauen: { verderben: 0 } },
+    kulturen: { hefe: { text: "k.hefe", vergaerung: 75, vertraegt: 90 } }, regeln: { brauen: { verderben: 0, schwach: { chance: 0, plus: 20 } } },
   });
   spiel.daten.rezepte = REZEPTE;
   const ninkasi = lernendeSpielerin(spiel, 2, 1);

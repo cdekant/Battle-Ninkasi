@@ -32,7 +32,7 @@ export const VERWEISBEREICHE = {
 export const VOM_CODE_VERWENDET = { wesen: ["ninkasi"] };
 
 // Tiles des Grundgerüsts, die noch gezeichnet werden (docs/Systemausbau.md, Punkt 11); bis dahin nur eine Warnung
-export const TILES_AUSSTEHEND = ["gelaende.tuer_zu", "gelaende.tuer_offen", "gelaende.treppe_ab", "gelaende.treppe_auf", "schichten.feuer", "gegenstaende.sud", "gegenstaende.sud_verdorben"];
+export const TILES_AUSSTEHEND = ["gelaende.tuer_zu", "gelaende.tuer_offen", "gelaende.treppe_ab", "gelaende.treppe_auf", "schichten.feuer", "gegenstaende.sud", "gegenstaende.sud_verdorben", "gegenstaende.essig"];
 
 // Sammlung der Namen in probenamen (src/inhalt.js) je Bereich der Tiles und Verweise
 const PROBENSAMMLUNG = { oberflaechen: "schichten.oberflaechen", gase: "schichten.gase" };

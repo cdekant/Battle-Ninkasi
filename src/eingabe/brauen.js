@@ -6,7 +6,8 @@
 //   Portionen stehen zu Beginn auf so vielen, wie Kessel und leere Gefäße erlauben (mindestens 1)
 //   + und - ändern die Portionen zwischen 1 und dem, was der Kessel hergibt
 //   a bis z gibt ein Stück der Zutat an dieser Stelle in den Kessel, mit Umschalt nimmt sie eines heraus
-//   1 wechselt die Maische, 2 die Gabe des Gewürzes, 3 die Kultur (ohne, dann die Kulturen Ninkasis)
+//   1 wechselt die Maische, 2 die Gabe des Gewürzes, 3 die Kultur (ohne, spontan, wo die Ebene eine Flora hat, dann die
+//   Kulturen Ninkasis)
 //   Tab wechselt die Liste zwischen Zutaten und Rezepten (rezepteImBuch); in den Rezepten wählt a bis z ein Rezept:
 //   es setzt Verfahren und Kultur und verteilt die Zutaten aus dem Gepäck (rezeptVerteilen), dann zurück zu den Zutaten
 //   Rücktaste leert den Kessel, Enter braut (schließt und gibt den Befehl brauen), Esc schließt
@@ -14,6 +15,7 @@
 
 import { gesteuerteEntitaet } from "../kern/zustand.js";
 import { kesselBei, zutatenIm, gefaesseIm } from "../systeme/brauen.js";
+import { SPONTAN } from "../systeme/sud.js";
 import { anzahlVon } from "../systeme/inventar.js";
 import { BUCHSTABEN, buchstabeDerTaste } from "./inventar.js";
 import { fensterartAnmelden } from "./fenster.js";
@@ -91,7 +93,7 @@ export function brauTaste(zustand, taste, spiel) {
   if (taste.code === "Digit1") return { zustand: { ...zustand, maische: naechster(Object.keys(regeln.maische), zustand.maische) } };
   if (taste.code === "Digit2") return { zustand: { ...zustand, gewuerz: naechster(Object.keys(regeln.gewuerz), zustand.gewuerz) } };
   if (taste.code === "Digit3") {
-    const kulturen = [null, ...(gesteuerteEntitaet(spiel.zustand).kulturen || [])];
+    const kulturen = [null, ...(spiel.zustand.ebene?.flora ? [SPONTAN] : []), ...(gesteuerteEntitaet(spiel.zustand).kulturen || [])];
     return { zustand: { ...zustand, kultur: naechster(kulturen, zustand.kultur) } };
   }
   const buchstabe = buchstabeDerTaste(taste.code, taste.zeichen);

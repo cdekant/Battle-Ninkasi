@@ -171,9 +171,10 @@ test("Datenprüfung: Abfolge, Starttiefe, feste Karte, Population und Tabellen",
 // an Ninkasi; ohne diese drei blieben die Werte gleich); neu mit 0.73.0 für das Volumen des Suds (Zutaten je Stück und
 // Portion), die wilde Hefe als Startkultur und die Kulturproben im Keller (mit den alten Zahlen der Zutaten, den alten
 // Kulturen und ohne die Krüge blieben die Werte gleich); neu mit 0.74.0 für die Tontafel mit dem Rezept im Keller (ohne
-// sie blieben die Werte gleich).
+// sie blieben die Werte gleich); neu mit 0.75.0 für die wilde Flora jeder Ebene (ohne den Ebenenschritt flora blieben die
+// Werte gleich).
 test("Erzeugung in Schritten: dieselben Ebenen wie vorher", () => {
-  const erwartet = { 1: "f7501fb9fa10e401", 2: "a73b2332cc00791d", 3: "91f276656e21ce00", 42: "28042d87d1141bb5", 4711: "41c60a484555f598" };
+  const erwartet = { 1: "f5c7ae48af26504d", 2: "54365c1867dd38de", 3: "ab4f7e78a1c4495e", 42: "f990c4364788ae30", 4711: "64aeff1755861e1b" };
   for (const [startwert, fingerabdruck] of Object.entries(erwartet)) {
     const spiel = neuesSpiel(DATEN, Number(startwert));
     for (const tiefe of [2, 3, 0]) ebeneWechseln(spiel, tiefe);

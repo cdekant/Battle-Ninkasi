@@ -6,8 +6,8 @@
 // Liest den Zustand nur; die Vorschau ist dieselbe Rechnung wie der Befehl (sudVorbereiten, systeme/brauen.js).
 
 import { gesteuerteEntitaet } from "../kern/zustand.js";
-import { zutatenIm, sudVorbereiten, verderbenChance } from "../systeme/brauen.js";
-import { KENNZAHLEN, zielgebietFinden } from "../systeme/sud.js";
+import { zutatenIm, sudVorbereiten, verderbenChance, sauerChance } from "../systeme/brauen.js";
+import { KENNZAHLEN, zielgebietFinden, SPONTAN } from "../systeme/sud.js";
 import { aufgedeckteZielgebiete } from "../systeme/rezepte.js";
 import { braubefehl, rezepteImBuch } from "../eingabe/brauen.js";
 import { fensterinhaltAnmelden, buchstabeHtml, zielAttribut } from "./fenster.js";
@@ -49,6 +49,7 @@ function vorschauHtml(spiel, texte, ninkasi, vorbereitet) {
     ${gefaesse}
     <li>${text("ui.brauen.restzucker", { wert: achsenwertText("stammwuerze", vorbereitet.gaerung.restzucker) })}</li>
     <li>${text("ui.brauen.verderben", { prozent: verderbenChance(spiel, ninkasi, vorbereitet) })}</li>
+    <li>${text("ui.brauen.sauer", { prozent: sauerChance(spiel, ninkasi, vorbereitet) })}</li>
     <li>${text("ui.brauen.erreichbar")}: ${erreichbar.length ? erreichbar.join(", ") : text("ui.nichts")}</li>
   </ul>`;
 }
@@ -81,7 +82,7 @@ fensterinhaltAnmelden("brauen", ({ spiel, texte }, zustand) => {
   const fassen = zustand.portionen * spiel.daten.regeln.brauen.stueckeJePortion;
   const fuellung = zutatenIm(spiel, ninkasi).reduce((summe, zutat) => summe + (zustand.mengen[zutat.id] ?? 0), 0);
   const vorbereitet = sudVorbereiten(spiel, ninkasi, braubefehl(spiel, zustand));
-  const kultur = zustand.kultur ? text(spiel.daten.kulturen[zustand.kultur].text) : text("ui.brauen.ohne_kultur");
+  const kultur = zustand.kultur === SPONTAN ? text("ui.brauen.spontan") : zustand.kultur ? text(spiel.daten.kulturen[zustand.kultur].text) : text("ui.brauen.ohne_kultur");
   const rezept = vorbereitet.rezept ? spiel.zustand.rezepte[vorbereitet.rezept] : null;
   const kopf = [
     textNachZahl("ui.brauen.portionen", zustand.portionen, { anzahl: zustand.portionen }),

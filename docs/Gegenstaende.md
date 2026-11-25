@@ -84,12 +84,13 @@ Vorbilder: NetHack (Säure frisst in Stufen, angefressen schützt weniger), Brog
 
 Daten:
 
-+ Verderben: `verdirbt: { nach, wird }` am Gegenstand; an der Entität `verdirbtUm`
++ Verderben: `verdirbt: { nach, wird }` am Gegenstand; an der Entität `verdirbtUm`; eine eigene Art des Verderbens (Register `verderben`) braucht kein `wird`, etwa die Stufen eines Suds (siehe [Sude.md](Sude.md), Reifen und Verderben)
++ Komponente `adjektive: [Textschlüssel]` am Gegenstand: Adjektive vor dem Namen (die Stufe eines Suds), mit denen der Zustände (`adjektiveVon` in `src/kern/ereignisse.js`)
 + Haltbarkeit: `haltbarkeit: { hoechstens, wirdZu, unempfindlich? }` an Ausrüstung (`hoechstens` und `wirdZu` Pflicht, nicht stapelbar), der Stand in `haltbarkeit.aktuell` (Vorgabe `hoechstens`); `unempfindlich: { <schadensart>: prozent }` (1 bis 100) ist die Chance, dass ein Abnutzen dieser Art dem Stück nichts tut
 
 Schnittstellen (`src/systeme/verschleiss.js`):
 
-+ Zeitereignis `verderben`, gebunden an den Gegenstand, eingeplant über das Register `beimErzeugen` (`verderbenEinplanen` in `src/systeme/inventar.js`); `gegenstandErsetzen` macht den Gegenstand zum neuen Typ; Meldung `verdorben`
++ Zeitereignis `verderben`, gebunden an den Gegenstand, eingeplant über das Register `beimErzeugen` (`verderbenEinplanen` in `src/systeme/inventar.js`); `gegenstandErsetzen` macht den Gegenstand zum neuen Typ; Meldung `verdorben`; Register `verderben` (`(spiel, gegenstand) => true`, wenn ein Eintrag das Verderben selbst übernimmt; die Einträge haben Vorrang vor dem Wechsel des Typs)
 + Baustein `abnutzen { platz?, art?, wuerfel | menge }`: trifft einen angelegten Gegenstand des Ziels mit Haltbarkeit, mit `platz` nur dort, sonst zufällig einen davon (Wurf `abnutzen_wohin`); mit `art` (Schadensart) schützt `haltbarkeit.unempfindlich` des getroffenen Stücks mit seiner Chance (Wurf `abnutzen_unempfindlich`), ohne `art` nie; Meldung `abgenutzt`; `haltbarkeitVon`
 + Zustandsprüfung `kaputt` (Register `zustandspruefungen`, nach Tod und Lage, siehe [Wirkungen.md](Wirkungen.md), Tod und Zustandsprüfung); Meldung `kaputt`
 

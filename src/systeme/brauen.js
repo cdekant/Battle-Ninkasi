@@ -6,11 +6,15 @@
 //   portionen: wie viele Gefäße der Sud füllt, sein Volumen; höchstens portionen des Kessels, Vorgabe so viele, wie
 //              Kessel und leere Gefäße erlauben; je Portion höchstens regeln.brauen.stueckeJePortion Stück Zutaten
 //   verfahren: Schlüssel aus regeln.brauen.maische und regeln.brauen.gewuerz, Vorgabe regeln.brauen.verfahren
-//   kultur:    eine Kultur der Brauerin (wesen.kulturen), ohne sie gärt der Sud nicht (kein Alkohol)
+//   kultur:    eine Kultur der Brauerin (wesen.kulturen) oder "spontan" (die Flora der Ebene, systeme/flora.js); ohne
+//              Kultur gärt der Sud nicht (kein Alkohol)
 //   Ablehnungen: im_kampf, kein_kessel, keine_zutaten, keine_zutat, zu_viel, kessel_voll, zu_viele_portionen,
-//                kultur_unbekannt, keine_gefaesse (weniger leere Gefäße als Portionen), ungueltig
-// Ablauf: der Wurf "brauen" setzt je Achse den Punkt im Bereich der Vorschau, der Wurf "verderben" entscheidet über das
-// Verderben; Zutaten und Gefäße sind verbraucht, die Portionen kommen ins Gepäck (sie stapeln nach gerundetem Profil).
+//                kultur_unbekannt, keine_flora (spontan auf einer Ebene ohne Flora), keine_gefaesse (weniger leere Gefäße
+//                als Portionen), ungueltig
+// Ablauf: der Wurf "brauen" setzt je Achse den Punkt im Bereich der Vorschau, der Wurf "verderben" (1 bis 100)
+// entscheidet: bis zur Chance des Verderbens verdorben (dann vielleicht ein Verderber, systeme/reifen.js), bis zu ihr plus
+// regeln.brauen.schwach.chance sauer (die Säure steigt um schwach.plus), sonst gelungen; Zutaten und Gefäße sind
+// verbraucht, die Portionen kommen ins Gepäck und beginnen zu reifen (systeme/reifen.js).
 // Meldungen: gebraut (ohne Zielgebiet), gebraut_getroffen (mit zielgebiet), gebraut_verdorben, je mit wer, was, anzahl
 // Baustein sud_wirken: wirkt beim Trinken den Sud aus der Ablage (kontext.werte.sud, gesetzt von trinken in
 // systeme/inventar.js): Heilung je Wert, Zustände über die Zeit, Pegel, Effekt des Zielgebiets.
@@ -25,14 +29,15 @@ import { effektAnwenden } from "../kern/effekte.js";
 import { bausteinAnmelden } from "../kern/bausteine.js";
 import { modifiziert } from "../kern/werte.js";
 import { WELTTICK } from "../kern/zeit.js";
-import { wurfGanzzahl, wurfProzent } from "../kern/wurf.js";
+import { wurfGanzzahl } from "../kern/wurf.js";
 import { gelaendeAuf } from "../welt/karte.js";
 import { imKampf } from "./kampfzustand.js";
 import { insInventar, anzahlVon } from "./inventar.js";
 import { kulturGebucht, zutatGebucht } from "./wissen.js";
 import { aufgedeckteZielgebiete, rezeptFinden, nachDemSud } from "./rezepte.js";
+import { stufenBeginnen, verderberWuerfeln } from "./reifen.js";
 import {
-  brauregeln, achsenVon, sudRechnen, unschaerfeBerechnen, bereichBerechnen, zielgebietFinden, erreichbareZielgebiete,
+  brauregeln, achsenVon, sudRechnen, unschaerfeBerechnen, kulturdatenVon, SPONTAN, bereichBerechnen, zielgebietFinden, erreichbareZielgebiete,
   profilRunden, gueteRunden, wirkungBerechnen,
 } from "./sud.js";
 
@@ -71,7 +76,9 @@ export function sudVorbereiten(spiel, wesen, befehl) {
   const verfahren = { ...regeln.verfahren, ...befehl.verfahren };
   if (!regeln.maische[verfahren.maische] || !regeln.gewuerz[verfahren.gewuerz]) return { grund: "ungueltig" };
   const kultur = befehl.kultur ?? null;
-  if (kultur !== null && !(wesen.kulturen || []).includes(kultur)) return { grund: "kultur_unbekannt" };
+  const flora = spiel.zustand.ebene?.flora ?? null;
+  if (kultur === SPONTAN && !flora) return { grund: "keine_flora" };
+  if (kultur !== null && kultur !== SPONTAN && !(wesen.kulturen || []).includes(kultur)) return { grund: "kultur_unbekannt" };
   if (!Array.isArray(befehl.zutaten) || befehl.zutaten.length === 0) return { grund: "keine_zutaten" };
   const zutaten = [], gesehen = new Set();
   let fuellung = 0;
@@ -90,21 +97,24 @@ export function sudVorbereiten(spiel, wesen, befehl) {
   if (portionen > kessel.kessel.portionen) return { grund: "zu_viele_portionen" };
   const fassen = portionen * regeln.stueckeJePortion;
   if (fuellung > fassen) return { grund: "kessel_voll" };
-  const vertraegt = kultur === null ? undefined : modifiziert(spiel, wesen, "brauen.vertraegt", spiel.daten.kulturen[kultur].vertraegt);
-  const eingabe = { zutaten, verfahren, kultur, portionen, vertraegt };
+  const kulturdaten = kulturdatenVon(spiel.daten, kultur, flora);
+  const vertraegt = kulturdaten ? modifiziert(spiel, wesen, "brauen.vertraegt", kulturdaten.vertraegt) : undefined;
+  const eingabe = { zutaten, verfahren, kultur, portionen, vertraegt, ...(kultur === SPONTAN && { flora }) };
   const { profil: mitte, gaerung } = sudRechnen(spiel.daten, eingabe);
   // nach Rezept wird die Vorschau eng (regeln.brauen.rezeptUnschaerfe Prozent)
   const rezept = rezeptFinden(spiel, eingabe);
-  const grundUnschaerfe = Math.floor(((kessel.kessel.unschaerfe ?? 100) * (rezept ? regeln.rezeptUnschaerfe : 100)) / 100);
+  const spontan = kultur === SPONTAN ? regeln.spontan.unschaerfe : 100;
+  const grundUnschaerfe = Math.floor(((kessel.kessel.unschaerfe ?? 100) * (rezept ? regeln.rezeptUnschaerfe : 100) * spontan) / 10000);
   const unschaerfe = unschaerfeBerechnen(spiel.daten, modifiziert(spiel, wesen, "brauen.unschaerfe", grundUnschaerfe));
   const bereich = bereichBerechnen(spiel.daten, mitte, unschaerfe);
   const erreichbar = erreichbareZielgebiete(spiel.daten, bereich, aufgedeckteZielgebiete(spiel));
   return { kessel, eingabe, mitte, gaerung, unschaerfe, bereich, erreichbar, fuellung, fassen, portionen, gefaesse, rezept };
 }
 
-// Chance in Prozent, dass ein Sud verdirbt: Regelwert plus Kessel plus Kultur, mit Modifikatoren auf brauen.verderben
+// Chance in Prozent, dass ein Sud verdirbt: Regelwert plus Kessel plus Kultur (oder Flora), mit Modifikatoren auf
+// brauen.verderben
 export function verderbenChance(spiel, wesen, vorbereitet) {
-  const kultur = vorbereitet.eingabe.kultur ? spiel.daten.kulturen[vorbereitet.eingabe.kultur] : null;
+  const kultur = kulturdatenVon(spiel.daten, vorbereitet.eingabe.kultur, vorbereitet.eingabe.flora);
   const grund = brauregeln(spiel.daten).verderben + (vorbereitet.kessel.kessel.verderben ?? 0) + (kultur?.verderben ?? 0);
   return Math.max(0, Math.min(100, modifiziert(spiel, wesen, "brauen.verderben", grund)));
 }
@@ -129,14 +139,25 @@ function punktWuerfeln(spiel, vorbereitet) {
   return punkt;
 }
 
-// Ergebnis eines Suds: { typ, sud, text? } für die Portionen
+// Chance in Prozent, dass ein Sud nicht verdirbt, aber sauer wird (nach der Chance des Verderbens gewürfelt)
+export function sauerChance(spiel, wesen, vorbereitet) {
+  return Math.max(0, Math.min(100 - verderbenChance(spiel, wesen, vorbereitet), brauregeln(spiel.daten).schwach.chance));
+}
+
+// Ergebnis eines Suds: { typ, sud, text?, verdorben } für die Portionen
 function ergebnisBestimmen(spiel, wesen, vorbereitet) {
   const daten = spiel.daten, regeln = brauregeln(daten);
   const punkt = punktWuerfeln(spiel, vorbereitet);
-  if (wurfProzent(spiel, "verderben", verderbenChance(spiel, wesen, vorbereitet))) {
+  const wurf = wurfGanzzahl(spiel, "verderben", 1, 100), verderben = verderbenChance(spiel, wesen, vorbereitet);
+  if (wurf <= verderben) {
     const { achse, plus, guete, getraenk } = regeln.verdorben;
     punkt[achse] = Math.min(regeln.achsen[achse].hoechstens, punkt[achse] + plus);
-    return { typ: getraenk, sud: { profil: profilRunden(daten, punkt), zielgebiet: null, guete } };
+    return { typ: getraenk, sud: { profil: profilRunden(daten, punkt), zielgebiet: null, guete }, verdorben: true };
+  }
+  // ein schwacher Wurf schiebt den Sud Richtung Säure, vor der Suche nach dem Zielgebiet
+  if (wurf <= verderben + sauerChance(spiel, wesen, vorbereitet)) {
+    const achse = regeln.verdorben.achse;
+    punkt[achse] = Math.min(regeln.achsen[achse].hoechstens, punkt[achse] + regeln.schwach.plus);
   }
   const treffer = zielgebietFinden(daten, punkt);
   const sud = { profil: profilRunden(daten, punkt), zielgebiet: treffer?.name ?? null, guete: treffer ? gueteRunden(daten, treffer.guete) : regeln.gueteFrei };
@@ -168,11 +189,13 @@ anmelden("befehle", "brauen", {
       if (ergebnis.text) getraenk.text = ergebnis.text;
       getraenk.wirdZu = gefaessTyp;
       getraenk.gewicht = gefaessGewicht + brauregeln(spiel.daten).gewichtJePortion;
+      stufenBeginnen(spiel, akteur, getraenk, ergebnis.verdorben);
       portion = insInventar(spiel, akteur, getraenk);
     }
     const art = ergebnis.typ !== brauregeln(spiel.daten).getraenk ? "gebraut_verdorben" : ergebnis.sud.zielgebiet ? "gebraut_getroffen" : "gebraut";
     melden(spiel, art, { wer: bezugAuf(akteur), was: { ...bezugAuf(portion), anzahl: vorbereitet.portionen }, anzahl: vorbereitet.portionen, zielgebiet: ergebnis.sud.zielgebiet });
     if (art === "gebraut_getroffen") nachDemSud(spiel, akteur, vorbereitet, ergebnis.sud.zielgebiet);
+    if (ergebnis.verdorben) verderberWuerfeln(spiel, vorbereitet.kessel, kulturdatenVon(spiel.daten, vorbereitet.eingabe.kultur, vorbereitet.eingabe.flora));
     return "brauen";
   },
 });

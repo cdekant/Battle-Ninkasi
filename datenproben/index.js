@@ -54,6 +54,8 @@ export default {
   // Grundausstattung (docs/Charakter.md, Startwerte): den Dolch angelegt und Wurfmesser im Gepäck; als Göttin des Biers
   // trägt sie wilde Hefe (docs/Sude.md, Profil), Bierhefe und Milchsäure liegen als Krüge im Keller
   ergaenzen: {
+    // Verderber aus dem Kessel (src/systeme/reifen.js): das Essigbakterium
+    regeln: { brauen: { verderber: { chance: 30, wesen: "essigbakterium" } } },
     wesen: {
       ninkasi: {
         faehigkeiten: ["testfaehigkeit", "sprint", "gedankenstich"],

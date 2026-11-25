@@ -2,14 +2,15 @@
 // Verderben: verdirbt: { nach, wird } am Gegenstand; beim Erzeugen bekommt er den Zeitpunkt verdirbtUm und ein
 //   gebundenes Zeitereignis (systeme/inventar.js verderbenEinplanen). Ist es so weit, wird er zum Typ wird, am selben
 //   Ort oder im selben Gepäck, mit derselben Anzahl (Meldung verdorben). Auf verlassenen Ebenen ruht das Verderben
-//   mit (systeme/ebenen.js), was Ninkasi trägt, verdirbt weiter.
+//   mit (systeme/ebenen.js), was Ninkasi trägt, verdirbt weiter. Eigene Arten des Verderbens melden sich im Register
+//   "verderben" an und haben Vorrang (ein Sud rückt eine Stufe weiter, systeme/reifen.js); verdirbt braucht dann kein wird.
 // Haltbarkeit: haltbarkeit: { hoechstens, wirdZu, unempfindlich?: { <schadensart>: prozent } } am Gegenstand, der Stand
 //   in haltbarkeit.aktuell (Vorgabe hoechstens).
 //   Abgenutzt wird nur über den Baustein abnutzen, nicht durch Gebrauch; angefressen wirkt ein Gegenstand schwächer
 //   (systeme/ausruestung.js haltbarkeitProzent). Bei 0 ist er kaputt: die Zustandsprüfung kaputt (nach Tod und Lage,
 //   nur für Vorgemerktes) macht ihn zu wirdZu, abgelegt und ins Gepäck (Meldung kaputt).
 
-import { anmelden } from "../kern/register.js";
+import { anmelden, alle } from "../kern/register.js";
 import { bausteinAnmelden, mengeBestimmen } from "../kern/bausteine.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { entitaetMitId, entitaetEntfernen, entitaetAusDatensatz, ausDemInventarNehmen } from "../kern/zustand.js";
@@ -39,6 +40,7 @@ export function gegenstandErsetzen(spiel, alt, typ) {
 anmelden("zeitereignisse", "verderben", (spiel, { gegenstandId }) => {
   const gegenstand = entitaetMitId(spiel.zustand, gegenstandId);
   if (!gegenstand?.verdirbt) return;
+  for (const [, behandeln] of alle("verderben")) if (behandeln(spiel, gegenstand)) return;
   const vorher = bezugAuf(gegenstand), anzahl = anzahlVon(gegenstand);
   const { neu, traegerin } = gegenstandErsetzen(spiel, gegenstand, gegenstand.verdirbt.wird);
   melden(spiel, "verdorben", { was: vorher, wird: bezugAuf(neu), traegerin: traegerin ? bezugAuf(traegerin) : null, anzahl });

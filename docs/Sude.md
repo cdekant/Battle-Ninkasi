@@ -2,13 +2,13 @@
 
 Stand: 2026-11-25
 
-Zuständig für: `src/systeme/sud.js`, `src/systeme/brauen.js`, `src/systeme/rezepte.js`, `daten/sude.js`
+Zuständig für: `src/systeme/sud.js`, `src/systeme/brauen.js`, `src/systeme/rezepte.js`, `src/systeme/reifen.js`, `src/systeme/flora.js`, `daten/sude.js`
 
-Mitprüfen bei Änderungen: [Brauen.md](Brauen.md), [Gegenstaende.md](Gegenstaende.md), [Bedienung.md](Bedienung.md), [Wesen.md](Wesen.md), [Architektur.md](Architektur.md)
+Mitprüfen bei Änderungen: [Brauen.md](Brauen.md), [Gegenstaende.md](Gegenstaende.md), [Bedienung.md](Bedienung.md), [Wesen.md](Wesen.md), [Architektur.md](Architektur.md), [Welt.md](Welt.md)
 
 ## Zweck
 
-Das Brausystem in der Logik: wie aus Zutaten, Verfahren und Kultur das Profil eines Suds wird, wann er ein Zielgebiet trifft, wie der Befehl am Kessel abläuft, was das Getränk beim Trinken wirkt und wie Nebel und Rezeptbuch das Wissen Ninkasis halten. Das Spieldesign steht in [Brauen.md](Brauen.md), das Fenster zum Brauen in [Bedienung.md](Bedienung.md), Fenster. Jeder Abschnitt nennt Daten, Schnittstellen und Regeln.
+Das Brausystem in der Logik: wie aus Zutaten, Verfahren und Kultur das Profil eines Suds wird, wann er ein Zielgebiet trifft, wie der Befehl am Kessel abläuft, was das Getränk beim Trinken wirkt, wie es im Gepäck reift und verdirbt, wie die wilde Flora spontan gärt und wie Nebel und Rezeptbuch das Wissen Ninkasis halten. Das Spieldesign steht in [Brauen.md](Brauen.md), das Fenster zum Brauen in [Bedienung.md](Bedienung.md), Fenster. Jeder Abschnitt nennt Daten, Schnittstellen und Regeln.
 
 ## Profil
 
@@ -20,11 +20,12 @@ Daten:
 + Gärung: `regeln.brauen.alkoholJeStammwuerze` (Prozent der vergorenen Stammwürze, die Alkohol werden), `suesseJeRestzucker` (Punkte der Süße je Zehntel °Plato Restzucker, in Prozent)
 + Kultur in `kulturen`: `{ text, vergaerung, vertraegt, aromen?, verderben? }`; `vergaerung` in Prozent, `vertraegt` ist der höchste Alkohol in Zehnteln Vol.-%, `aromen` kommen zum Profil dazu, `verderben` sind Punkte auf die Chance des Verderbens; die Kulturen eines Wesens stehen in `kulturen: [name]` (Proben ohne Gewicht, siehe [Brauen.md](Brauen.md), Kulturen)
 + Probe einer Kultur am Gegenstand: `kultur: name`; wer ihn aufhebt, gewinnt die Kultur (siehe Befehl)
++ Die Kultur `spontan` (`SPONTAN` in `src/systeme/sud.js`) ist keine Kultur der Daten, sondern die wilde Flora der Ebene (siehe Spontane Gärung); `kulturdatenVon(daten, kultur, flora)` gibt die Daten der einen oder der anderen; eine Kultur der Daten darf nicht so heißen
 
 Schnittstellen (`src/systeme/sud.js`, reine Rechnung ohne Zustand):
 
-+ `profilBerechnen(daten, { zutaten: [{ typ, menge }], verfahren, kultur, portionen, vertraegt? })` gibt die Mitte des Profils, `sudRechnen` mit denselben Angaben `{ profil, gaerung }`; `vertraegt` ist der höchste Alkohol der Kultur nach Modifikatoren (Vorgabe der Wert der Kultur)
-+ `gaerungBerechnen(daten, { stammwuerze, verfahren, kultur, vertraegt? })` gibt `{ vergaerung, vergoren, restzucker, alkohol }`
++ `profilBerechnen(daten, { zutaten: [{ typ, menge }], verfahren, kultur, portionen, vertraegt?, flora? })` gibt die Mitte des Profils, `sudRechnen` mit denselben Angaben `{ profil, gaerung }`; `vertraegt` ist der höchste Alkohol der Kultur nach Modifikatoren (Vorgabe der Wert der Kultur)
++ `gaerungBerechnen(daten, { stammwuerze, verfahren, kultur, vertraegt?, flora? })` gibt `{ vergaerung, vergoren, restzucker, alkohol }`
 + `unschaerfeBerechnen(daten, prozent)`, `bereichBerechnen(daten, mitte, unschaerfe)` (je Achse `[unten, oben]`), `profilRunden`, `gueteRunden`, `achsenVon`, `aromaachsenVon`, `KENNZAHLEN`
 
 Regeln:
@@ -58,37 +59,69 @@ Daten:
 + Kessel am Gelände: `kessel: { portionen, verderben?, unschaerfe? }`; `portionen` gibt der Kessel höchstens her, `verderben` sind Punkte auf die Chance, `unschaerfe` Prozent der Unschärfe (Vorgabe 100)
 + `regeln.brauen.stueckeJePortion`: so viele Stück Zutaten nimmt der Kessel je Portion höchstens
 + Gefäß am Gegenstand: `gefaess: true` (die leere Flasche)
-+ `regeln.brauen.verderben` (Chance vor Kessel und Kultur), `regeln.brauen.getraenk` und `regeln.brauen.verdorben: { getraenk, achse, plus, guete }`, `gewichtJePortion`; Zeitkosten `aktionen.brauen`
++ `regeln.brauen.verderben` (Chance vor Kessel und Kultur), `schwach: { chance, plus }`, `verderber: { chance, wesen }` (`wesen` null: keiner; das Grundgerüst hat keine Wesen, der Probeinhalt setzt das Essigbakterium über `ergaenzen`), `regeln.brauen.getraenk` und `regeln.brauen.verdorben: { getraenk, achse, plus, guete, stufe }`, `gewichtJePortion`; Zeitkosten `aktionen.brauen`
++ Kultur mit `verderber: name`: dieses Wesen entsteht statt `regeln.brauen.verderber.wesen`
 
 Schnittstellen (`src/systeme/brauen.js`):
 
 + Befehl `brauen { kessel?: { x, y }, portionen?, zutaten: [{ gegenstandId, menge }], verfahren?: { maische, gewuerz }, kultur? }`; ohne `kessel` der erste Kessel neben oder unter der Brauerin (eigenes Feld, dann die Nachbarn zeilenweise); ohne `portionen` so viele, wie Kessel und leere Gefäße erlauben, mindestens 1
-+ Ablehnungen: `im_kampf`, `kein_kessel`, `keine_zutaten`, `keine_zutat`, `zu_viel` (mehr, als der Stapel hat), `kessel_voll` (mehr Stück als Portionen x `stueckeJePortion`), `zu_viele_portionen` (mehr, als der Kessel hergibt), `kultur_unbekannt`, `keine_gefaesse` (weniger leere Gefäße als Portionen), `ungueltig` (Menge oder Portionen unter 1, dieselbe Zutat zweimal, unbekanntes Verfahren)
-+ Meldungen: `gebraut`, `gebraut_getroffen` (mit `zielgebiet`), `gebraut_verdorben`, je mit `wer`, `was` und `anzahl`; `kultur_gewonnen` und `kultur_bekannt` mit `wer` und `kultur`
-+ `sudVorbereiten(spiel, wesen, befehl)` prüft und rechnet die Vorschau (`{ grund }` oder `{ kessel, eingabe, mitte, gaerung, unschaerfe, bereich, erreichbar, fuellung, fassen, portionen, gefaesse }`), ohne Kampf und Gefäße zu prüfen; `fassen` ist die höchste Füllung für diese Portionen, `erreichbar` nennt nur aufgedeckte Zielgebiete, `rezept` den Schlüssel des Rezepts, nach dem gebraut wird, oder null; `verderbenChance`, `kesselBei`, `zutatenIm`, `gefaesseIm`
++ Ablehnungen: `im_kampf`, `kein_kessel`, `keine_zutaten`, `keine_zutat`, `zu_viel` (mehr, als der Stapel hat), `kessel_voll` (mehr Stück als Portionen x `stueckeJePortion`), `zu_viele_portionen` (mehr, als der Kessel hergibt), `kultur_unbekannt`, `keine_flora` (spontan auf einer Ebene ohne Flora), `keine_gefaesse` (weniger leere Gefäße als Portionen), `ungueltig` (Menge oder Portionen unter 1, dieselbe Zutat zweimal, unbekanntes Verfahren)
++ Meldungen: `gebraut`, `gebraut_getroffen` (mit `zielgebiet`), `gebraut_verdorben`, je mit `wer`, `was` und `anzahl`; `kultur_gewonnen` und `kultur_bekannt` mit `wer` und `kultur`; `verderber_entsteht` mit `was` und `kessel` (dazu `beschworen` ohne `wer`)
++ `sudVorbereiten(spiel, wesen, befehl)` prüft und rechnet die Vorschau (`{ grund }` oder `{ kessel, eingabe, mitte, gaerung, unschaerfe, bereich, erreichbar, fuellung, fassen, portionen, gefaesse }`), ohne Kampf und Gefäße zu prüfen; `fassen` ist die höchste Füllung für diese Portionen, `erreichbar` nennt nur aufgedeckte Zielgebiete, `rezept` den Schlüssel des Rezepts, nach dem gebraut wird, oder null; `verderbenChance`, `sauerChance`, `kesselBei`, `zutatenIm`, `gefaesseIm`
 + Haken `aufgehoben` (siehe [Gegenstaende.md](Gegenstaende.md), Inventar): ein Gegenstand mit `kultur` gibt seine Kultur an das Wesen, das ihn aufhebt, und vergeht; die Wissens-EP für Zutaten und Kulturen bucht `src/systeme/wissen.js` (siehe [Wesen.md](Wesen.md), Skills und Lernen)
 
 Regeln:
 
 + Vorschau und Befehl rechnen dasselbe; die Unschärfe ist die der Achsen mal `unschaerfe` des Kessels, nach Rezept mal `regeln.brauen.rezeptUnschaerfe` Prozent, mit Modifikatoren auf `brauen.unschaerfe`; `vertraegt` der Kultur mit Modifikatoren auf `brauen.vertraegt`
-+ Der Wurf `brauen` setzt je Achse in fester Reihenfolge den Punkt gleichverteilt im Bereich (ohne Wurf, wenn der Bereich ein Punkt ist); danach entscheidet der Wurf `verderben` mit `regeln.brauen.verderben` plus Kessel plus Kultur, mit Modifikatoren auf `brauen.verderben`, zwischen 0 und 100
-+ Ein verdorbener Sud wird `verdorben.getraenk`, seine Achse `verdorben.achse` steigt um `plus`, er hat die Güte `verdorben.guete` und kein Zielgebiet
++ Der Wurf `brauen` setzt je Achse in fester Reihenfolge den Punkt gleichverteilt im Bereich (ohne Wurf, wenn der Bereich ein Punkt ist); danach würfelt `verderben` 1 bis 100: bis zur Chance des Verderbens (`regeln.brauen.verderben` plus Kessel plus Kultur oder Flora, mit Modifikatoren auf `brauen.verderben`, zwischen 0 und 100) verdirbt der Sud, bis zu ihr plus `schwach.chance` (`sauerChance`, höchstens bis 100) steigt seine Achse `verdorben.achse` um `schwach.plus`, bevor das Zielgebiet gesucht wird, darüber gelingt er
++ Spontan gegoren ist die Unschärfe zusätzlich mal `regeln.brauen.spontan.unschaerfe` Prozent
++ Ein verdorbener Sud wird `verdorben.getraenk`, seine Achse `verdorben.achse` steigt um `plus`, er hat die Güte `verdorben.guete`, kein Zielgebiet und beginnt seine Stufen bei `verdorben.stufe`; mit `verderber.chance` entsteht über den Baustein `beschwoeren` ein Verderber auf einem freien Feld neben dem Kessel (`verderberWuerfeln` in `src/systeme/reifen.js`)
 + Zutaten und je Portion ein Gefäß sind verbraucht, in der Reihenfolge des Gepäcks
 + Jede Portion ist ein Gegenstand aus `regeln.brauen.getraenk` mit dem gerundeten Profil in `sud: { profil, zielgebiet, guete, rezept? }` (`rezept`, wenn ein gefundenes Rezept sein Zielgebiet traf), dem Text des getroffenen Zielgebiets, `wirdZu` ihres Gefäßes und dem Gewicht des Gefäßes plus `gewichtJePortion`; gleiche Portionen stapeln, weil sie in allen Komponenten gleich sind (siehe [Gegenstaende.md](Gegenstaende.md), Inventar)
 + Ein Sud kostet `aktionen.brauen`, gebraut wird nur außerhalb des Kampfes (`imKampf`, siehe [Wesen.md](Wesen.md), Kampfzustand)
 
 ## Wirkung
 
-Daten: `daten/sude.js` mit `sud` und `sud_verdorben` (trinkbar mit dem Effekt `sud_trinken` aus `daten/effekte.js`), `regeln.brauen.budgetProzent`, `wirkungen` (Aromaachse zu einem Wertnamen, sofort, oder zu `{ zustand, prozent }`, über die Zeit), `wirkungOhneAroma`, `pegelProzent`; der Zustand `gestaerkt` (`daten/zustaende.js`, je Welttick 1 LP über den Effekt `gestaerkt_heilen`, jeder Schluck eine eigene Instanz, höchstens 10)
+Daten: `daten/sude.js` mit `sud` und `sud_verdorben` (trinkbar mit dem Effekt `sud_trinken` aus `daten/effekte.js`) und `essig` (eine Zutat mit Säure 100), `regeln.brauen.budgetProzent`, `wirkungen` (Aromaachse zu einem Wertnamen, sofort, oder zu `{ zustand, prozent }`, über die Zeit), `wirkungOhneAroma`, `pegelProzent`; der Zustand `gestaerkt` (`daten/zustaende.js`, je Welttick 1 LP über den Effekt `gestaerkt_heilen`, jeder Schluck eine eigene Instanz, höchstens 10)
 
 Schnittstellen: `wirkungBerechnen(daten, sud)` gibt `{ mengen: { <wert>: menge }, zustaende: [{ zustand, menge }], pegel, effekte }`; Baustein `sud_wirken` (ohne Parameter) liest den Sud aus der Ablage des Effekts, `kontext.werte.sud`, die das Trinken setzt (siehe [Gegenstaende.md](Gegenstaende.md), Inventar)
 
 Regeln:
 
-+ Budget = Stammwürze x `budgetProzent` x Güte x (`bonus` des Zielgebiets plus `kniff.bonus` des Rezepts in `sud.rezept`), abgerundet
++ Budget = Stammwürze x `budgetProzent` x Güte x (`bonus` des Zielgebiets plus `kniff.bonus` des Rezepts in `sud.rezept`) x `wirkung` der Stufe in `sud.stufe`, abgerundet
 + Das Budget verteilt sich anteilig nach den Aromen auf die Wirkungen aus `wirkungen` (Malz heilt LP sofort, Frucht und Säure füllen MP, Kräuter PP); Aromen ohne Eintrag (Röst) wirken noch nichts; ein Sud ohne Aroma gibt alles an `wirkungOhneAroma`
 + Eine Wirkung über die Zeit: der Anteil mal `prozent` ist die Menge (Süße: 150 %); beim Trinken setzt `sud_wirken` den Zustand für genau so viele Weltticks (Dauer Menge x 100 + 1, damit auch der letzte Takt wirkt, wann immer getrunken wird)
 + Geheilt wird über den Baustein `heilen`, Zustände über `zustand_setzen`, der Pegel steigt über `wert_aendern` um Alkohol x `pegelProzent`; danach wirken der Effekt des Zielgebiets und der des Kniffs mit demselben Kontext
+
+## Reifen und Verderben
+
+Daten:
+
++ `regeln.brauen.stufen`: `[{ name, wirkung, abStammwuerze?, saeure?, adjektiv? }]` in ihrer Reihenfolge (Probe: frisch 100, reif 110 ab 16 °P, schal 80, sauer 60 mit +20 Säure); `wirkung` in Prozent des Budgets, `adjektiv` steht am Getränk
++ `regeln.brauen.essig`: der Gegenstand nach der letzten Stufe
++ `regeln.brauen.reifen: { grund, gewichte: { <achse>: gewicht }, guete, hoechstens }`
++ Am Getränk: `sud.stufe`, `verdirbt: { nach }` (Dauer jeder Stufe), `verdirbtUm` und die Komponente `adjektive` (siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß)
+
+Schnittstellen (`src/systeme/reifen.js`): `dauerDerStufen(spiel, wesen, sud)`, `stufenBeginnen(spiel, wesen, getraenk, verdorben)`, `stufeVon(daten, name)`, `verderberWuerfeln(spiel, kessel, kultur)`; Eintrag `sud` im Register `verderben`; Meldung `verdorben` mit `was` (vorher) und `wird` (nachher)
+
+Regeln:
+
++ Dauer jeder Stufe = `grund` x (100 + Zuschlag) Prozent, höchstens `hoechstens` Prozent; Zuschlag = Summe über `gewichte` von Wert der Achse x Gewicht / 100, dazu Güte x `guete` / 100; Modifikatoren auf `brauen.haltbarkeit` an der Brauerin; einmal beim Brauen gerechnet
++ Ein gelungener Sud beginnt bei der ersten Stufe, ein verdorbener bei `verdorben.stufe`; zur Zeit `verdirbtUm` rückt er zur nächsten Stufe, die er erreicht (eine Stufe mit `abStammwuerze` überspringt ein schwächerer Sud), bekommt deren Säure und Adjektiv und eine neue Dauer; im Gepäck wird er neu einsortiert und fließt in einen gleichen Stapel
++ Nach der letzten Stufe wird er zu `essig`, mit derselben Anzahl
++ Stapeln, Abspalten und das Ruhen auf verlassenen Ebenen folgen dem Verderben der Gegenstände; Portionen stapeln nur in derselben Stufe
+
+## Spontane Gärung
+
+Daten: `regeln.brauen.spontan: { vergaerung, vertraegt, verderben, aromen: { <achse>: spanne }, unschaerfe }`, je Wert eine Spanne `[unten, oben]`; an der Ebene `ebene.flora: { vergaerung, vertraegt, verderben, aromen }`, aufgebaut wie eine Kultur
+
+Schnittstellen (`src/systeme/flora.js`): Ebenenschritt `flora` (in `regeln.ebenen.schritteErzeugt`, siehe [Welt.md](Welt.md), Ebenen), `floraWuerfeln(spontan, zufall)`
+
+Regeln:
+
++ Jede erzeugte Ebene würfelt ihre Flora aus den Spannen, mit dem Zufall `flora` des Baus, wiederholbar je Startwert und Tiefe; Ebenen mit fester Karte (Hub, Testkammer, Arenen) haben keine
++ Mit der Kultur `spontan` gärt der Sud mit der Flora wie mit einer Kultur (Vergärung, Verträglichkeit, Aromen, Punkte auf das Verderben); die Vorschau ist um `unschaerfe` Prozent breiter
++ Zufallseffekte der Flora folgen mit dem Absud (siehe [Systemausbau.md](Systemausbau.md), Punkt 23)
 
 ## Nebel und Rezepte
 
@@ -120,6 +153,7 @@ Regeln:
 ## Tests
 
 + `tests/brauen.test.js` (Profil je Portion, Gärung und Restzucker, Zielgebiete, Güte, Runden, Wirkung sofort und über die Zeit, Befehl, Wurf und Verderben, Ablehnungen, Kulturen und Zutaten aufheben, Braufenster mit Portionen und Klickregel, Spinnennetz, Datenprüfung)
++ `tests/reifen.test.js` (Dauer der Stufen, Stufen bis zum Essig, Reife nur für starke Sude, Stapeln je Stufe, Wirkung je Stufe, die drei Ausgänge des Wurfs, Verderber neben dem Kessel, Flora je Ebene, spontane Gärung im Befehl und im Fenster, Datenprüfung)
 + `tests/rezepte.test.js` (Vorwissen und Nebel, Zählregel, Rezept lernen über die Tontafel, Erkennen nach dem Verhältnis, enge Vorschau, Kniff nur beim Treffer, EP beim ersten Gelingen, Hausrezepte, Rezeptliste im Braufenster, Datenprüfung)
 
 ## Verweise

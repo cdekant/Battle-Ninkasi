@@ -35,6 +35,7 @@ const ARTEN = [
   "nutzungen",          // wie die KI einen Gegenstand nutzt (ki/nutzen.js): { feld, ziel, befehl(spiel, wesen, ziel, gegenstand) }
   "munitionsarten",     // wie eine Fernwaffe ihre Munition hält (systeme/fernkampf.js): { bereit, entnehmen, vorrat }
   "nachSicht",          // nach jeder Aktualisierung des Sichtfelds (systeme/sicht.js): (spiel) => void, z.B. Wissens-EP (systeme/wissen.js)
+  "verderben",          // eigene Arten des Verderbens (systeme/verschleiss.js): (spiel, gegenstand) => true, wenn behandelt, z.B. Stufen eines Suds (systeme/reifen.js)
   "sinne",              // Arten der Wahrnehmung (systeme/sinne.js): { art, reichweite(spiel, betrachter), nimmtWahr(spiel, betrachter, ziel) }; die Anmeldereihenfolge ist der Vorrang
 ];
 

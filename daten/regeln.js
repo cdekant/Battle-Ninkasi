@@ -83,7 +83,7 @@ export default {
   // Erzeugung der Ebenen in Schritten, siehe src/welt/ebene.js und src/welt/ebenenschritte.js; eine Ebene in
   // daten/ebenen.js kann mit schritte eine eigene Folge nennen
   ebenen: {
-    schritteErzeugt: ["karte_digger", "tueren", "treppen", "gelaende_objekte", "wand_objekte", "erreichbarkeit", "ebene_anlegen", "wegpunkte", "freie_felder", "population", "gegenstaende", "fallen"],
+    schritteErzeugt: ["karte_digger", "tueren", "treppen", "gelaende_objekte", "wand_objekte", "erreichbarkeit", "ebene_anlegen", "wegpunkte", "freie_felder", "population", "gegenstaende", "fallen", "flora"],
     schritteFest: ["karte_fest", "erreichbarkeit", "ebene_anlegen"], // Ebenen mit fester karte, z.B. der Hub
     versuche: 10, // so viele Versuche mit neuem Zufall, wenn ein Schritt die Karte verwirft (z.B. Erreichbarkeit)
     folgen: { abstand: 1 }, // so nah muss ein Verfolger bei Ninkasi stehen, um über die Treppe mitzukommen (src/systeme/ebenen.js)
@@ -245,7 +245,30 @@ export default {
     rezeptUnschaerfe: 30, // nach Rezept gebraut ist die Unschärfe so viele Prozent (src/systeme/rezepte.js)
     verderben: 10, // Chance in Prozent, dass ein Sud verdirbt, vor Kessel und Kultur
     // ein verdorbener Sud: dieser Gegenstand, die Achse steigt um plus, feste Güte, kein Zielgebiet
-    verdorben: { getraenk: "sud_verdorben", achse: "saeure", plus: 40, guete: 30 },
+    verdorben: { getraenk: "sud_verdorben", achse: "saeure", plus: 40, guete: 30, stufe: "sauer" },
+    // ein schwacher Wurf (nach der Chance des Verderbens) hebt die Säure um plus, ohne dass der Sud verdirbt
+    schwach: { chance: 15, plus: 20 },
+    // verdirbt ein Sud, entsteht mit chance Prozent neben dem Kessel ein Verderber (verderber der Kultur, sonst wesen;
+    // null: keiner); das Grundgerüst hat keine Wesen, der Inhalt setzt sie (datenproben/index.js)
+    verderber: { chance: 30, wesen: null },
+    // Stufen des Reifens und Verderbens im Gepäck (src/systeme/reifen.js): wirkung in Prozent des Budgets; reif nur für
+    // Sude ab abStammwuerze; saeure kommt beim Erreichen dazu; adjektiv steht am Getränk; danach wird es zu essig
+    stufen: [
+      { name: "frisch", wirkung: 100 },
+      { name: "reif", wirkung: 110, abStammwuerze: 160, adjektiv: "adjektiv.reif" },
+      { name: "schal", wirkung: 80, adjektiv: "adjektiv.schal" },
+      { name: "sauer", wirkung: 60, saeure: 20, adjektiv: "adjektiv.sauer" },
+    ],
+    essig: "essig",
+    // Dauer jeder Stufe: grund mal (100 + Zuschlag) Prozent, höchstens hoechstens Prozent; Zuschlag je Achse Wert mal
+    // Gewicht durch 100, dazu Güte mal guete durch 100
+    reifen: { grund: 30000, gewichte: { alkohol: 100, bittere: 100, kraeuter: 50, saeure: 100 }, guete: 30, hoechstens: 200 },
+    // spontane Gärung (src/systeme/flora.js): Spannen der wilden Flora je Ebene, gewürfelt beim Erzeugen; unschaerfe in
+    // Prozent der Vorschau
+    spontan: {
+      vergaerung: [40, 80], vertraegt: [30, 90], verderben: [5, 20], unschaerfe: 150,
+      aromen: { frucht: [0, 30], saeure: [5, 40], kraeuter: [0, 20] },
+    },
     getraenk: "sud", // Gegenstand eines gelungenen Suds
     gueteAmRand: 70, // Güte am Rand eines Zielgebiets, in der Mitte 100
     gueteStufe: 10, // die Güte wird darauf abgerundet

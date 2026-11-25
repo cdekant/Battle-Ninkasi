@@ -5,6 +5,7 @@
 //              farbe und bitter gelten für ein Stück auf eine Portion
 //   portionen: das Volumen des Suds; dieselben Zutaten auf weniger Portionen geben einen stärkeren Sud
 //   vertraegt: höchster Alkohol der Kultur nach Modifikatoren (Vorgabe vertraegt der Kultur)
+//   flora:     die wilde Flora der Ebene für die Kultur "spontan" (systeme/flora.js), wie eine Kultur aufgebaut
 // Profil: { <achse>: wert } in der Reihenfolge von regeln.brauen.achsen, je Achse zwischen 0 und ihrem hoechstens
 
 const begrenzt = (wert, unten, oben) => Math.max(unten, Math.min(oben, wert));
@@ -14,12 +15,17 @@ export const achsenVon = (daten) => Object.keys(brauregeln(daten).achsen);
 export const KENNZAHLEN = ["stammwuerze", "alkohol", "bittere", "farbe"];
 export const aromaachsenVon = (daten) => achsenVon(daten).filter((achse) => !KENNZAHLEN.includes(achse));
 
+// Die Kultur "spontan" gärt mit der wilden Flora der Ebene (systeme/flora.js)
+export const SPONTAN = "spontan";
+// Daten der Kultur eines Suds: eine Kultur der Daten, bei "spontan" die Flora, ohne Kultur null
+export const kulturdatenVon = (daten, kultur, flora = null) => (kultur === SPONTAN ? flora : kultur ? daten.kulturen[kultur] : null);
+
 // Gärung nach Balling, vereinfacht: die Kultur vergärt ihren Anteil der Stammwürze, höchstens bis sie vertraegt; was
 // sie vergären könnte, aber nicht mehr verträgt, bleibt als Restzucker (Zehntel °Plato). Ohne Kultur gärt nichts.
 // Gibt { vergaerung, vergoren, restzucker, alkohol }
-export function gaerungBerechnen(daten, { stammwuerze, verfahren, kultur, vertraegt }) {
+export function gaerungBerechnen(daten, { stammwuerze, verfahren, kultur, vertraegt, flora }) {
   const regeln = brauregeln(daten);
-  const kulturdaten = kultur ? daten.kulturen[kultur] : null;
+  const kulturdaten = kulturdatenVon(daten, kultur, flora);
   if (!kulturdaten) return { vergaerung: 0, vergoren: 0, restzucker: 0, alkohol: 0 };
   const vergaerung = begrenzt(kulturdaten.vergaerung + regeln.maische[verfahren.maische].vergaerung, 0, 100);
   const vergaerbar = Math.floor((stammwuerze * vergaerung) / 100);
@@ -36,7 +42,7 @@ export function sudRechnen(daten, eingabe) {
   const { zutaten, verfahren, kultur, portionen } = eingabe;
   const regeln = brauregeln(daten);
   const maische = regeln.maische[verfahren.maische], gewuerz = regeln.gewuerz[verfahren.gewuerz];
-  const kulturdaten = kultur ? daten.kulturen[kultur] : null;
+  const kulturdaten = kulturdatenVon(daten, kultur, eingabe.flora);
   const summen = { stammwuerze: 0, bittere: 0, farbe: 0 };
   const aromasummen = Object.fromEntries(aromaachsenVon(daten).map((achse) => [achse, 0]));
   let einheiten = 0;
@@ -53,7 +59,7 @@ export function sudRechnen(daten, eingabe) {
   }
   const profil = {};
   const stammwuerze = Math.floor(summen.stammwuerze / portionen);
-  const gaerung = gaerungBerechnen(daten, { stammwuerze, verfahren, kultur, vertraegt: eingabe.vertraegt });
+  const gaerung = gaerungBerechnen(daten, { stammwuerze, verfahren, kultur, vertraegt: eingabe.vertraegt, flora: eingabe.flora });
   const kennzahlen = { stammwuerze, alkohol: gaerung.alkohol, bittere: Math.floor(summen.bittere / portionen), farbe: Math.floor(summen.farbe / portionen) };
   // der Restzucker macht den Sud süß (regeln.brauen.suesseJeRestzucker Prozent: Punkte der Süße je Zehntel °Plato)
   const ausRestzucker = { suesse: Math.floor((gaerung.restzucker * regeln.suesseJeRestzucker) / 100) };
@@ -134,9 +140,10 @@ export function profilRunden(daten, profil) {
 
 export const gueteRunden = (daten, guete) => Math.floor(guete / brauregeln(daten).gueteStufe) * brauregeln(daten).gueteStufe;
 
-// Wirkung eines Suds { sud: { profil, zielgebiet, guete, rezept? } } beim Trinken: Mengen je Wert in der Reihenfolge der
+// Wirkung eines Suds { sud: { profil, zielgebiet, guete, rezept?, stufe? } } beim Trinken: Mengen je Wert in der Reihenfolge der
 // Achsen, Zustände über die Zeit, dazu der Pegel aus dem Alkohol und die Effekte von Zielgebiet und Kniff.
 //   rezept: ein gefundenes Rezept (daten.rezepte), nach dem der Sud gelang; sein kniff { bonus?, effekt? } kommt dazu
+//   stufe: Stufe des Reifens und Verderbens (regeln.brauen.stufen, systeme/reifen.js), ihre wirkung in Prozent
 //   Budget = Stammwürze x budgetProzent x Güte (x Bonus des Zielgebiets plus Bonus des Kniffs), verteilt anteilig auf die Aromaachsen mit einer
 //   Wirkung in regeln.brauen.wirkungen; ohne Aroma geht es ganz an regeln.brauen.wirkungOhneAroma
 //   Eine Wirkung ist ein Wertname (sofort) oder { zustand, prozent }: der Anteil mal prozent wird die Menge des Zustands
@@ -146,7 +153,8 @@ export function wirkungBerechnen(daten, sud) {
   const zielgebiet = sud.zielgebiet ? daten.zielgebiete[sud.zielgebiet] : null;
   const kniff = sud.rezept ? daten.rezepte?.[sud.rezept]?.kniff ?? {} : {};
   const bonus = (zielgebiet?.bonus ?? 100) + (kniff.bonus ?? 0);
-  const budget = Math.floor((((sud.profil.stammwuerze * regeln.budgetProzent) / 100) * sud.guete * bonus) / 10000);
+  const stufe = sud.stufe ? regeln.stufen.find((eintrag) => eintrag.name === sud.stufe) : null;
+  const budget = Math.floor((Math.floor((((sud.profil.stammwuerze * regeln.budgetProzent) / 100) * sud.guete * bonus) / 10000) * (stufe?.wirkung ?? 100)) / 100);
   const mengen = {}, ueberZeit = {};
   const hinzu = (wirkung, menge) => {
     if (typeof wirkung === "string") { if (menge > 0) mengen[wirkung] = (mengen[wirkung] ?? 0) + menge; return; }

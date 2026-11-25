@@ -31,9 +31,10 @@ export function melden(spiel, art, daten = {}) {
 // Kurzbezug auf eine Entität für Meldungen, bleibt gültig, auch wenn die Entität entfernt wird;
 // ein unbekannter Gegenstand trägt sein Etikett mit (systeme/kennen.js), die Anzeige nennt dann dieses;
 // ort ist die Position zur Zeit der Meldung (für die Wahrnehmbarkeit im Log, systeme/wahrnehmbar.js); adjektive sind
-// die Textschlüssel der Adjektive aus den Zuständen (systeme/zustaende.js), die Anzeige beugt sie
+// die Textschlüssel der Adjektive aus der Komponente adjektive (z.B. die Stufe eines Suds, systeme/reifen.js) und aus
+// den Zuständen (systeme/zustaende.js), die Anzeige beugt sie
 export function adjektiveVon(entitaet) {
-  return [...new Set((entitaet.zustaende ?? []).map((instanz) => instanz.adjektiv).filter(Boolean))];
+  return [...new Set([...(entitaet.adjektive ?? []), ...(entitaet.zustaende ?? []).map((instanz) => instanz.adjektiv)].filter(Boolean))];
 }
 
 export function bezugAuf(entitaet) {

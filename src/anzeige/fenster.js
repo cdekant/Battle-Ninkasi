@@ -120,6 +120,7 @@ fensterinhaltAnmelden("inventar", ({ spiel, texte, leisten }, zustand) => {
   const details = gewaehlt
     ? `<h2>${nomenForm({ ...gewaehlt, anzahl: 1 }, "nom", "ohne")}</h2>${gewaehlt.sud ? sudNetzHtml(spiel, text, gewaehlt.sud) : ""}<ul>
         ${gewaehlt.sud ? `<li>${text("ui.guete")}: ${gewaehlt.sud.guete} %</li>` : ""}
+        ${gewaehlt.sud?.stufe ? `<li>${text("ui.stufe")}: ${text(`stufe.${gewaehlt.sud.stufe}`)}</li>` : ""}
         ${anzahlVon(gewaehlt) > 1 ? `<li>${text("ui.anzahl")}: ${anzahlVon(gewaehlt)}</li>` : ""}
         ${gewaehlt.ladungen ? `<li>${text("ui.ladungen")}: ${ladungenVon(gewaehlt)} / ${gewaehlt.ladungen.hoechstens}</li>` : ""}
         ${gewaehlt.haltbarkeit ? `<li>${text("ui.haltbarkeit")}: ${haltbarkeitProzent(gewaehlt)} %</li>` : ""}

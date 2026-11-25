@@ -99,7 +99,7 @@ Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil; offen: Primär- und Seku
 + Kulturen verbessern sich durch Gebrauch (siehe [Skills.md](Skills.md), Brauen)
 + Ideen für die Rollen: übervergärende Hefe (trocken, viel Alkohol, für den Pegel), Brettanomyces (weniger Alkohol, verstärkt die MP), untergärige Hefe (sauber, enge Vorschau), Kveik (gärt heiß und schnell, der Weg zum Sud im Kampf), Milchsäurebakterien (Säure ohne Alkohol), Essigbakterien (Essig), Koji (verzuckert Reis ohne Mälzen), Kefirknollen und Teepilz (Säure, wenig Alkohol, Kombucha senkt den Pegel), wilde Hefe
 
-Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil (Proben zum Aufheben); offen: Kulturen gewinnen, spontane Gärung, Verbessern durch Gebrauch, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil (Proben zum Aufheben) und Spontane Gärung; offen: Kulturen gewinnen, Zufallseffekte der spontanen Gärung, Verbessern durch Gebrauch, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Absud
 
@@ -130,7 +130,7 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 + Alkohol, Gewürze, Säure, Güte und Skills verlängern jede Stufe; ein Stapel kippt als Ganzes in die nächste
 + Essig ist kein Abfall, sondern Zutat (Posca, Oxymel)
 
-Umsetzung: teilweise, siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß, und [Sude.md](Sude.md), Befehl; offen: Stufen mit Reifen, Dauer nach dem Sud, schwacher Wurf Richtung Säure, Verderber aus dem Kessel
+Umsetzung: teilweise, siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß, und [Sude.md](Sude.md), Befehl und Reifen und Verderben; offen: Hygiene, Skills verlängern die Stufen, Essig als Zutat für Posca und Oxymel
 
 ## Rezepte
 

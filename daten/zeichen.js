@@ -16,6 +16,7 @@ export default {
   gegenstaende: {
     sud: { zeichen: "!", farbe: "#d9a441" },
     sud_verdorben: { zeichen: "!", farbe: "#a8a04a" },
+    essig: { zeichen: "!", farbe: "#c9c08a" },
   },
   // Feldschichten: Farbe der Überlagerung, bei Gas mit der Menge zunehmend deckend (src/anzeige/renderer.js)
   schichten: {

@@ -47,7 +47,7 @@ const ZIELGEBIETE = {
 const KESSEL = { kessel: { text: "g.kessel", kennung: "u", passierbar: false, durchsichtig: true, kessel: { portionen: 4, unschaerfe: 0 } } };
 
 function spielBauen({ regeln = {}, kessel = KESSEL, x = 2, y = 1 } = {}) {
-  const spiel = miniSpiel(RAUM, { gelaende: kessel, effekte, zustaende, gegenstaende: GEGENSTAENDE, kulturen: KULTUREN, zielgebiete: ZIELGEBIETE, regeln: { brauen: { verderben: 0, ...regeln } } });
+  const spiel = miniSpiel(RAUM, { gelaende: kessel, effekte, zustaende, gegenstaende: GEGENSTAENDE, kulturen: KULTUREN, zielgebiete: ZIELGEBIETE, regeln: { brauen: { verderben: 0, schwach: { chance: 0, plus: 20 }, ...regeln } } });
   const ninkasi = wesen(spiel, x, y, "ninkasi", 100, {
     werte: werteAusDaten({ lp: { grundwert: 100, anfangswert: 50 }, mp: { grundwert: 100, anfangswert: 50 }, pegel: { anfangswert: 0 } }),
     kulturen: ["hefe"], inventar: [],

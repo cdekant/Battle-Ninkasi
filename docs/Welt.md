@@ -4,7 +4,7 @@ Stand: 2026-11-25
 
 Zuständig für: `src/welt/ebene.js`, `src/welt/ebenenschritte.js`, `src/welt/plan.js`, `src/welt/population.js`, `src/welt/karte.js`, `src/welt/schichten.js`, `src/welt/wege.js`, `src/systeme/gelaende.js`, `src/systeme/fallen.js`, `src/systeme/schichten.js`, `src/systeme/ebenen.js`, `src/systeme/sicht.js`, `src/systeme/licht.js`, `src/systeme/duft.js`, `src/systeme/erinnerung.js`, `src/systeme/gefahr.js`, `daten/gelaende.js`, `daten/schichten.js`, `daten/ebenen.js`
 
-Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Anzeige.md](Anzeige.md), [Grundlagen.md](Grundlagen.md), [Bedienung.md](Bedienung.md), [Ausblick.md](Ausblick.md), [Architektur.md](Architektur.md), [Skills.md](Skills.md)
+Mitprüfen bei Änderungen: [Wesen.md](Wesen.md), [Anzeige.md](Anzeige.md), [Grundlagen.md](Grundlagen.md), [Bedienung.md](Bedienung.md), [Ausblick.md](Ausblick.md), [Architektur.md](Architektur.md), [Skills.md](Skills.md), [Sude.md](Sude.md)
 
 ## Zweck
 
@@ -99,7 +99,7 @@ Daten:
 
 + Abfolge der Tiefen in `daten/index.js`: `abfolge`, im Probeinhalt `["hub", "keller", "keller_dunkel", "keller"]` (Tiefe 0 ist der Hub), `starttiefe: 1`; mehrere Tiefen dürfen dieselbe Vorlage aus `daten/ebenen.js` nutzen; der Plan des Laufs übernimmt sie
 + Ebene (`daten/ebenen.js`): feste `karte` (Zeilen aus Geländekennungen, z.B. der Hub) oder `breite`, `hoehe` und Parameter für den Digger von rot.js (`digger`), dazu `gelaende` (Rollen `wand`, `boden`, `tuer`, `treppeAuf`, `treppeAb`; Vorgaben `wand`, `boden`, `tuer_zu`, `treppe_auf`, `treppe_ab`), `gelaendeObjekte` (z.B. Gärbottiche), `wandObjekte` (z.B. Wandfackeln), `licht: { grundhelligkeit }` (siehe Licht), `tuerChance`, `fallen`, `gegenstaende` (`[{ typ, anzahl, stapel? }]`, mit `stapel` liegen je Platz so viele Stück eines stapelbaren Gegenstands als ein Stapel, etwa Pfeile) und `population: { tabelle, anzahl: [min, max] }` oder eine feste Liste `gegner`; wahlweise `schritte`, die Folge der Ebenenschritte
-+ Vorgaben der Schritte in `regeln.ebenen`: `schritteErzeugt` (`karte_digger`, `tueren`, `treppen`, `gelaende_objekte`, `wand_objekte`, `erreichbarkeit`, `ebene_anlegen`, `wegpunkte`, `freie_felder`, `population`, `gegenstaende`, `fallen`), `schritteFest` für Ebenen mit `karte` (`karte_fest`, `erreichbarkeit`, `ebene_anlegen`), `versuche` 10, `folgen.abstand` 1 (siehe Verfolger unter Regeln)
++ Vorgaben der Schritte in `regeln.ebenen`: `schritteErzeugt` (`karte_digger`, `tueren`, `treppen`, `gelaende_objekte`, `wand_objekte`, `erreichbarkeit`, `ebene_anlegen`, `wegpunkte`, `freie_felder`, `population`, `gegenstaende`, `fallen`, `flora`), `schritteFest` für Ebenen mit `karte` (`karte_fest`, `erreichbarkeit`, `ebene_anlegen`), `versuche` 10, `folgen.abstand` 1 (siehe Verfolger unter Regeln)
 + Population (`datenproben/populationen.js`): Einträge `{ typ, gewicht, tiefe: [von, bis], rudel?: [min, max], affixe?: [{ zustand, chance }] }`; Regelwerte `regeln.population` (`tieferChance` 10, `tieferBis` 2, `hoechstWesen` 500, `schlafChance` 50)
 + Wegpunkte: `ebene.wegpunkte: [{ x, y }]`, Ziele umherziehender Wesen (siehe [Wesen.md](Wesen.md), KI); Regelwert `regeln.ki.wegpunktSicht` (7)
 + Im Zustand: `ebene` (die aktuelle), `tiefe`, `abgelegteEbenen[tiefe]` (verlassene Ebenen mit ihren Entitäten und Einträgen der Warteschlange samt Zeitpunkt)
@@ -109,6 +109,7 @@ Schnittstellen:
 
 + `ebeneErzeugen(spiel, tiefe)` (`src/welt/ebene.js`) gibt die Treppen zurück (`{ treppeAuf, treppeAb }`); `schritteDerEbene(daten, ebenendaten)`
 + Register `ebenenschritte` (`src/welt/ebenenschritte.js`): `{ braucht: [teil], liefert: [teil], verwirft?, ausfuehren(spiel, bau) }`, Teile sind `karte`, `raeume`, `treppen`, `ebene`, `freie_felder`; ein Schritt mit `verwirft` darf `NEUER_VERSUCH` zurückgeben; `unerreichbareFelder(spiel, zeilen, start)`, `kennungFuer(spiel, bau, rolle)`
++ Ebenenschritt `flora` aus `src/systeme/flora.js` (braucht `ebene`): die wilde Flora der Ebene für die spontane Gärung (siehe [Sude.md](Sude.md), Spontane Gärung)
 + `eintraegeFuerTiefe`, `populationSetzen`, `freiesFeldZiehen` (`src/welt/population.js`)
 + Befehl `{ art: "treppe" }` (Taste `<` oder `>`), nur für Ninkasi, Ablehnung `keine_treppe`, Zeitkosten `aktionen.treppe`; Meldung `ebene_gewechselt` mit `tiefe` und `richtung`
 + `ebeneWechseln` (`src/systeme/ebenen.js`)

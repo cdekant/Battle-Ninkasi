@@ -83,7 +83,7 @@ Status: in Arbeit; jeweils zuerst in [Grundlagen.md](Grundlagen.md), [Charakter.
 Status: offen
 
 + Anleitungen zum Anlegen von Inhalten, je Art eine (Gegner, Gegenstand, Effekt, Skill, Fähigkeit, Ritual, Quest, Raumstruktur): Datenformat, Einordnung in die Machtkurve, Tile nach der Fibel, Texte in beiden Sprachen, Tests; Form: Claude-Code-Skills unter `.claude/skills/`; Beispiel Gegner: Tiefe und Rolle geben das Budget, daraus Werte, Angriffe, Fähigkeiten und EP, dann Thema, Verhalten, Tile, Texte; braucht die Machtkurve (Punkt 10)
-+ Tiles für das Grundgerüst vor dem ersten echten Inhalt: Tür offen und zu, Treppe hinauf und hinab, Feuer; danach `TILES_AUSSTEHEND` in `werkzeuge/luecken.js` leeren (siehe [Tileset.md](Tileset.md), Ablauf)
++ Tiles für das Grundgerüst vor dem ersten echten Inhalt: Tür offen und zu, Treppe hinauf und hinab, Feuer, die Getränke aus dem Brauen und der Essig; danach `TILES_AUSSTEHEND` in `werkzeuge/luecken.js` leeren (siehe [Tileset.md](Tileset.md), Ablauf)
 + Testkammer: ein Feld zum Erzeugen über den Zielmodus wählen, Wesen und Gegenstände entfernen (siehe [Architektur.md](Architektur.md), Spielarten)
 + Arena: eigene Aufstellungen im Browser (siehe [Titelbildschirm.md](Titelbildschirm.md), Ideen für später), bessere Taktiken (Abstand halten, Engpass suchen), Statistiken über erzeugte Dungeons (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing)
 + Kompendium: Abdeckung der Texte je Eintrag (siehe [Texte.md](Texte.md), Offen)
@@ -207,17 +207,17 @@ Status: offen, ohne festen Platz; nach dem Umbaurisiko eingeordnet
 
 ## 23. Brausystem
 
-Status: in Arbeit; der Kern steht in [Sude.md](Sude.md) (Profil je Portion mit Restzucker, Zielgebiete, Befehl am Kessel, Wirkung sofort und über die Zeit, Kulturproben zum Aufheben, Nebel und Rezeptbuch), das Braufenster mit Spinnennetz in [Bedienung.md](Bedienung.md), Fenster, Spieldesign in [Brauen.md](Brauen.md)
+Status: in Arbeit; der Kern steht in [Sude.md](Sude.md) (Profil je Portion mit Restzucker, Zielgebiete, Befehl am Kessel, Wirkung sofort und über die Zeit, Kulturproben zum Aufheben, Nebel und Rezeptbuch, Reifen und Verderben, Verderber, spontane Gärung), das Braufenster mit Spinnennetz in [Bedienung.md](Bedienung.md), Fenster, Spieldesign in [Brauen.md](Brauen.md)
 
-Schnitt der Versionen: als Nächstes Verderben in Stufen, Verderber und spontane Gärung, danach Absud, Mälzen und Kulturen gewinnen, danach Trockenbier, Kessel als Gegenstand und moderne Stile
+Schnitt der Versionen: als Nächstes Absud, Mälzen und Kulturen gewinnen, danach Trockenbier, Kessel als Gegenstand und moderne Stile
 
 + Reiter für Getränke und Kulturen im Inventar
 + Rezepte: die EP beim ersten Gelingen eines gefundenen Rezepts gebunden statt frei, mit den Tags der Rezepte und den Brauskills (Punkt 20); eigene kleine Zielgebiete gefundener Rezepte, nur mit ihrem Kniff erreichbar; ein eigenes Fenster des Rezeptbuchs außerhalb des Kessels; der Punkt des Rezepts im Spinnennetz
 + Zielgebiete der modernen Stile aus `daten/bierstile.js`, Hopfen; dafür die Achse der Stammwürze bis 30 °P (die stärksten Stile reichen bis 28 °P), die Gärungsart der Stile (untergärig, obergärig, gemischt, spontan) als Eigenschaft der Kulturen und Spannen auf den Aromaachsen von Hand
 + Wirkung: Röst, Rauch, Schutz durch Säure als Zustände; Zusätze, Kulturen und Fähigkeiten als weitere Quellen der Wirkung; Potenzen und Exponenten der Brauwirklichkeit als Kurven, wenn die linearen Formeln nicht tragen
-+ Verderben in Stufen mit Reifen über die Kette `verdirbt`, Dauer nach Alkohol, Gewürzen, Säure und Güte; ein schwacher Wurf schiebt den Sud Richtung Säure; ein verdorbener Sud bringt mit einer Chance einen Verderber hervor
-+ Absud ohne Kultur für Tränke und Gifte (heute gärt ein Sud ohne Kultur nur nicht); Mälzen; Brennblase für Brand
-+ Kulturen gewinnen (Beute, aus einem gefundenen Bier, Fundorte; heute nur Krüge als Probe zum Aufheben), spontane Gärung mit der Flora der Ebene, unbekannte Zutaten; Skills heben `vertraegt` über `brauen.vertraegt`
++ Verderben: Hygiene als Einfluss auf die Chance, Skills auf `brauen.haltbarkeit`; die Zahlen der Stufen, des Reifens, des schwachen Wurfs und des Verderbers nachregeln
++ Absud ohne Kultur für Tränke und Gifte (heute gärt ein Sud ohne Kultur nur nicht), mit Essig für Posca und Oxymel; Zufallseffekte der spontanen Gärung; Mälzen; Brennblase für Brand
++ Kulturen gewinnen (Beute, aus einem gefundenen Bier, Fundorte; heute nur Krüge als Probe zum Aufheben), unbekannte Zutaten; Skills heben `vertraegt` über `brauen.vertraegt`
 + Kessel als Gegenstand, Tiers nach Material; ein Kessel im Hub
 + Trockenbier: Abfüllen eines Suds als Trockenbier, Anrühren mit Wasser, Gefäß und Kultur, im Kampf über den Schnellsud, Kveik und Hitze in der Nähe
 + Stapeln nach Stufe des Verderbens; freie Sude als Einzelstücke, bis sie Hausrezept werden (heute nach gerundetem Profil, Zielgebiet, Güte und gefundenem Rezept)

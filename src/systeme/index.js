@@ -22,6 +22,8 @@ import "./verschieben.js";
 import "./werfen.js";
 import "./fernkampf.js";
 import "./rezepte.js";
+import "./reifen.js";
+import "./flora.js";
 import "./brauen.js";
 import "./gelaende.js";
 import "./fallen.js";

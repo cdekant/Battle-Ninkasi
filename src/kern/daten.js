@@ -1321,6 +1321,7 @@ function pruefeBrauregeln(daten, regeln, achsen, aromaachsen, fehler) {
     if (!achsen.includes(verdorben.achse)) fehler.push(`regeln.brauen.verdorben.achse: Achse "${verdorben.achse}" gibt es nicht`);
     if (!istZahlAbNull(verdorben.plus) || !istProzent(verdorben.guete)) fehler.push("regeln.brauen.verdorben: plus >= 0 und guete von 0 bis 100");
   }
+  pruefeReifen(daten, regeln, achsen, aromaachsen, fehler);
   for (const [achse, wirkung] of Object.entries(istObjekt(regeln.wirkungen) ? regeln.wirkungen : {})) {
     if (!aromaachsen.includes(achse)) fehler.push(`regeln.brauen.wirkungen: Aromaachse "${achse}" gibt es nicht`);
     const ueberZeit = istObjekt(wirkung) && daten.zustaende?.[wirkung.zustand] && istZahlAbNull(wirkung.prozent);
@@ -1329,12 +1330,52 @@ function pruefeBrauregeln(daten, regeln, achsen, aromaachsen, fehler) {
   if (typeof regeln.wirkungOhneAroma !== "string") fehler.push("regeln.brauen.wirkungOhneAroma muss ein Wertname sein");
 }
 
+// Stufen, Reifen, schwacher Wurf, Verderber, Essig und spontane Gärung (src/systeme/reifen.js, src/systeme/flora.js)
+function pruefeReifen(daten, regeln, achsen, aromaachsen, fehler) {
+  const stufen = Array.isArray(regeln.stufen) ? regeln.stufen : [];
+  if (!stufen.length) fehler.push("regeln.brauen.stufen muss mindestens eine Stufe nennen");
+  const namen = new Set();
+  for (const [stelle, stufe] of stufen.entries()) {
+    const ort = `regeln.brauen.stufen[${stelle}]`;
+    if (!istObjekt(stufe) || typeof stufe.name !== "string" || !istZahlAbNull(stufe.wirkung)) { fehler.push(`${ort} muss { name, wirkung, abStammwuerze?, saeure?, adjektiv? } sein`); continue; }
+    if (namen.has(stufe.name)) fehler.push(`${ort}: Stufe "${stufe.name}" steht zweimal da`);
+    namen.add(stufe.name);
+    for (const feld of ["abStammwuerze", "saeure"]) if (stufe[feld] !== undefined && !istZahlAbNull(stufe[feld])) fehler.push(`${ort}.${feld} muss eine ganze Zahl >= 0 sein`);
+  }
+  if (stufen[0]?.abStammwuerze !== undefined) fehler.push("regeln.brauen.stufen: die erste Stufe gilt für jeden Sud, ohne abStammwuerze");
+  if (regeln.verdorben && !namen.has(regeln.verdorben.stufe)) fehler.push(`regeln.brauen.verdorben.stufe: Stufe "${regeln.verdorben.stufe}" gibt es nicht`);
+  const essig = daten.gegenstaende[regeln.essig];
+  if (!essig?.zutat || !essig.stapelbar) fehler.push(`regeln.brauen.essig: "${regeln.essig}" muss eine stapelbare Zutat sein`);
+  const reifen = regeln.reifen;
+  if (!istObjekt(reifen) || !(istGanzzahl(reifen.grund) && reifen.grund > 0) || !istZahlAbNull(reifen.guete) || !(istGanzzahl(reifen.hoechstens) && reifen.hoechstens >= 100) || !istObjekt(reifen.gewichte)) {
+    fehler.push("regeln.brauen.reifen muss { grund > 0, gewichte, guete, hoechstens >= 100 } sein");
+  } else {
+    for (const [achse, gewicht] of Object.entries(reifen.gewichte)) {
+      if (!achsen.includes(achse)) fehler.push(`regeln.brauen.reifen.gewichte: Achse "${achse}" gibt es nicht`);
+      if (!istZahlAbNull(gewicht)) fehler.push(`regeln.brauen.reifen.gewichte.${achse} muss eine ganze Zahl >= 0 sein`);
+    }
+  }
+  if (!istObjekt(regeln.schwach) || !istProzent(regeln.schwach.chance) || !istZahlAbNull(regeln.schwach.plus)) fehler.push("regeln.brauen.schwach muss { chance (0 bis 100), plus >= 0 } sein");
+  const verderber = regeln.verderber;
+  if (!istObjekt(verderber) || !istProzent(verderber.chance)) fehler.push("regeln.brauen.verderber muss { chance (0 bis 100), wesen } sein");
+  else if (verderber.wesen !== null && (!daten.wesen?.[verderber.wesen] || daten.wesen[verderber.wesen].abstrakt)) fehler.push(`regeln.brauen.verderber.wesen: Wesen "${verderber.wesen}" gibt es nicht`);
+  const spontan = regeln.spontan;
+  const istSpanne = (spanne, oben) => Array.isArray(spanne) && spanne.length === 2 && spanne.every((wert) => istGanzzahl(wert) && wert >= 0 && wert <= oben) && spanne[0] <= spanne[1];
+  if (!istObjekt(spontan) || !istZahlAbNull(spontan.unschaerfe)) return fehler.push("regeln.brauen.spontan muss { vergaerung, vertraegt, verderben, aromen, unschaerfe } sein");
+  if (!istSpanne(spontan.vergaerung, 100)) fehler.push("regeln.brauen.spontan.vergaerung muss [unten, oben] von 0 bis 100 sein");
+  for (const feld of ["vertraegt", "verderben"]) if (!istSpanne(spontan[feld], Infinity)) fehler.push(`regeln.brauen.spontan.${feld} muss [unten, oben] mit 0 <= unten <= oben sein`);
+  for (const [achse, spanne] of Object.entries(istObjekt(spontan.aromen) ? spontan.aromen : {})) {
+    if (!aromaachsen.includes(achse)) fehler.push(`regeln.brauen.spontan.aromen: Aromaachse "${achse}" gibt es nicht`);
+    else if (!istSpanne(spanne, regeln.achsen[achse].hoechstens)) fehler.push(`regeln.brauen.spontan.aromen.${achse} muss [unten, oben] innerhalb der Achse sein`);
+  }
+}
+
 // Gefundenes Rezept: { text, zielgebiet, portionen, zutaten: [{ typ, menge }], verfahren, kultur, kniff?, ep }
 function pruefeRezept(daten, regeln, sprache, name, rezept, fehler) {
   const ort = `rezepte.${name}`;
   pruefeText(sprache.texte, rezept.text, ort, fehler);
   if (!daten.zielgebiete?.[rezept.zielgebiet]) fehler.push(`${ort}: Zielgebiet "${rezept.zielgebiet}" gibt es nicht`);
-  if (!daten.kulturen?.[rezept.kultur]) fehler.push(`${ort}: Kultur "${rezept.kultur}" gibt es nicht`);
+  if (!daten.kulturen?.[rezept.kultur] && rezept.kultur !== "spontan") fehler.push(`${ort}: Kultur "${rezept.kultur}" gibt es nicht`);
   if (!istGanzzahl(rezept.portionen) || rezept.portionen < 1) fehler.push(`${ort}: portionen muss eine ganze Zahl >= 1 sein`);
   if (!regeln.maische?.[rezept.verfahren?.maische] || !regeln.gewuerz?.[rezept.verfahren?.gewuerz]) fehler.push(`${ort}: verfahren muss eine Maische und eine Gewürzgabe aus regeln.brauen nennen`);
   const zutaten = Array.isArray(rezept.zutaten) ? rezept.zutaten : [];
@@ -1365,6 +1406,8 @@ function pruefeBrauen(daten, sprache, fehler) {
     pruefeText(sprache.texte, kultur.text, ort, fehler);
     if (!istProzent(kultur.vergaerung) || !istZahlAbNull(kultur.vertraegt)) fehler.push(`${ort}: vergaerung (0 bis 100) und vertraegt (>= 0) müssen ganze Zahlen sein`);
     if (kultur.verderben !== undefined && !istGanzzahl(kultur.verderben)) fehler.push(`${ort}: verderben muss eine ganze Zahl sein`);
+    if (name === "spontan") fehler.push(`${ort}: der Name "spontan" steht für die wilde Flora der Ebene`);
+    if (kultur.verderber !== undefined && (!daten.wesen?.[kultur.verderber] || daten.wesen[kultur.verderber].abstrakt)) fehler.push(`${ort}: Verderber "${kultur.verderber}" gibt es nicht`);
     pruefeAromen(kultur.aromen, aromaachsen, ort, fehler, false);
   }
   for (const [name, zielgebiet] of Object.entries(daten.zielgebiete ?? {})) {
