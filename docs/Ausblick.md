@@ -36,7 +36,6 @@ Abgrenzung: [Systemausbau.md](Systemausbau.md) ist die Arbeitsliste beschlossene
 | Druck gegen endloses Rasten | ungeklärt | gering | nein |
 | Gunst der Nebengottheiten | ungeklärt | gering | nein |
 | Filmriss | ungeklärt | gering | erledigt (Erinnerung der Karte) |
-| EP für Erkundung | ungeklärt | gering | erledigt (gesehen getrennt von bekannt) |
 | Mechaniken aus Pen-and-Paper | teils | gering | nein |
 | Licht im Wandel | ungeklärt | gering | erledigt (Licht als Abfrage) |
 | Mutationen | ungeklärt | gering | nein |
@@ -128,7 +127,7 @@ Umsetzung: offen
 + Wichtigkeit: hoch, durch Wände sehen, Schätze und Gegner spüren "sehr interessant" (2026-11-22)
 + Vorbilder: Rogue und NetHack (Rolle der Kartierung zeigt die ganze Karte ohne Gegenstände; Erkennen von Wesen, von Magie); Brogue (Telepathie zeigt Wesen durch Wände, Kartierung; Brogue CE beschreibt magisch erkannte Felder als "erinnert"); gBrogue (ein geworfener Telepathietrank knüpft ein dauerhaftes Band zu einem Wesen); Caves of Qud (Hellsicht zeigt ein fernes Gebiet für einige Runden, ab hoher Stufe die ganze Karte; manches bleibt ohne Sichtlinie unsichtbar)
 + Braucht: Arten der Wahrnehmung neben dem Sehen: gesehen, gespürt (Ort bekannt, Art vielleicht nicht), kartiert (Gelände bekannt, nie gesehen); Unsichtbarkeit als Gegenstück; Anzeige je Art (z.B. Umriss für Gespürtes)
-+ Berührt: `sieht` in `src/systeme/sicht.js` (für Ninkasi heißt Sehen heute "im Sichtfeld"), der Filter des Logs (`src/systeme/wahrnehmbar.js`), der Renderer, die Wegfindung mit `nurBekannt`, EP für Erkundung (ein kartiertes Feld zählt erst beim Sehen, siehe EP für Erkundung)
++ Berührt: `sieht` in `src/systeme/sicht.js` (für Ninkasi heißt Sehen heute "im Sichtfeld"), der Filter des Logs (`src/systeme/wahrnehmbar.js`), der Renderer, die Wegfindung mit `nurBekannt`, die Wissens-EP (eine Wesenart zählt erst beim Sehen, siehe [Charakter.md](Charakter.md), Freie EP)
 + Umbaurisiko: mittel
 + Ideen (2026-11-23): Telepathie als Skill (Wesen durch Wände, ein Sinn mit eigener Reichweite), Schätze orten (Gegenstände statt Wesen), Magie orten (Gegenstände und Wesen mit magischen Wirkungen)
 + Vorkehrung (erledigt): Sinne im Register `sinne` mit der Abfrage `wahrnehmungsart` (gesehen, gespürt, siehe [Wesen.md](Wesen.md), Wahrnehmung), neue Sinne hängen sich dort ein; Orten von Dingen geht über die Erinnerung (`kartieren`, auf Wunsch mit Schätzen, siehe [Welt.md](Welt.md), Sicht und Erinnerung); Gegner erinnert die Karte nie, sie spüren oder folgen dem Duft
@@ -348,17 +347,6 @@ Umsetzung: offen
 + Vorkehrung: keine; die Erzeugung der Population für eine Ebene als Funktion halten, die auch später einzelne Horden setzen kann
 
 Umsetzung: offen
-
-## EP für Erkundung
-
-+ Wichtigkeit: ungeklärt, Frage gestellt am 2026-11-22
-+ Inhalt: heute EP je Feld, das Ninkasi zum ersten Mal wirklich sieht (siehe [Charakter.md](Charakter.md), Freie EP); laut Bot kommt fast alles aus der Erkundung (Messwerte in [Entwicklung.md](Entwicklung.md), Messwerte)
-+ Wege: a) nur Gesehenes zählt, Kartierung zeigt den Weg und die EP kommen beim Hingehen (gilt); b) jede Erkundung zählt, ein mächtiger Trank der Kartierung brächte alle EP der Ebene auf einmal und wäre die größte EP-Quelle; c) EP je Ort (Raum, Fundort) statt je Feld, das Ablaufen jeder Ecke lohnt dann nicht mehr
-+ Berührt: `epFuerErkundung` (`src/systeme/lernen.js`) und das Balancing der EP
-+ Umbaurisiko: gering
-+ Vorkehrung (erledigt): `erkundet` (einmal gesehen, EP) ist von der Erinnerung (bekannt) getrennt; jeder der drei Wege ist damit eine kleine Änderung, ein Filmriss bringt unter keinem doppelte EP
-
-Umsetzung: teilweise, siehe [Welt.md](Welt.md), Sicht und Erinnerung; offen: ob c) die bessere Form ist
 
 ## Licht im Wandel
 

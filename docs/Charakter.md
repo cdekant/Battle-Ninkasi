@@ -115,7 +115,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Neuv
 
 ### Anfangsbalance
 
-+ Ziel der ersten Ebene: Startguthaben, Erkundung und Bewältigtes zusammen reichen für zwei Grundskills auf Stufe 5, die Erkundung allein etwa für einen auf Stufe 4 bis 5; den größeren Teil bringen die Gegner; mit der Tiefe sinkt der Anteil der Erkundung von selbst, weil die EP der Gegner mit ihrer Stärke wachsen
++ Ziel der ersten Ebene: Startguthaben, Bewältigtes, Wissen und die Tiefen-EP beim Abstieg in die zweite Tiefe reichen zusammen für zwei Grundskills auf Stufe 5; etwa drei Viertel davon sind frei verteilbar
 + Ziel festlegen: was eine ausgewogene und eine spezialisierte Ninkasi am Ende des ersten Kapitels erreicht haben sollen (siehe [Spielverlauf.md](Spielverlauf.md), Erstes Kapitel), z.B. zwei Sets bis Meister und ein göttliches Niveau; danach je weiteres Kapitel
 + EP-Budget messen: Der Bot zählt die EP je Ebene aus Erkundung und Bewältigtem (Messwerte in [Entwicklung.md](Entwicklung.md), Messwerte); das Verhältnis ist noch festzulegen; der räumende Bot misst das gründliche Spiel (alles erkundet, alle Gegner besiegt) als Obergrenze; vorgesehen ist dazu eine eilige Strategie (zielstrebig zur Treppe) als Untergrenze, damit die Spanne zwischen gründlichem und eiligem Spiel sichtbar wird
 + Die Stufentabelle danach ausrichten, dass Budget und Ziel zusammenpassen
@@ -149,12 +149,11 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skil
 
 ### Freie EP
 
-+ Freie EP aus Erkundung und Rätseln, die Spielerin verteilt sie selbst
-+ Erkundung: EP für jedes Feld, das zum ersten Mal wirklich gesehen wird
-+ Magisch kartierte Felder gelten als bekannt, bringen EP aber erst beim wirklichen Sehen; vergessene Felder (Filmriss) bringen beim Wiedersehen keine EP mehr
-+ Offen, ob EP je Feld die beste Form ist: Ein Ablaufen jeder Ecke wird belohnt; Abwägung in [Ausblick.md](Ausblick.md), EP für Erkundung
-+ Vorschlag, noch nicht bestätigt: ein festes Budget an EP für die Erkundung je Ebene, verteilt auf ihre Felder; große Karten bringen so nicht mehr als kleine, und das Budget je Tiefe steht ausdrücklich in den Regelwerten
-+ Jedes Rätsel bringt seine EP nur einmal; Rätsel löst die Spielerin, kein Skill löst sie für sie (siehe [Skills.md](Skills.md), Anlagen und Fallen)
++ Freie EP aus Fortschritt und Wissen, die Spielerin verteilt sie selbst; dazu der freie Anteil der EP aus Bewältigtem (siehe Gebundene EP); Vorbilder Sil (Erfahrung für den Abstieg, die erste Begegnung mit einer Gegnerart und das Erkennen von Gegenständen) und Caves of Qud (Erfahrung für entdeckte Orte)
++ Tiefe: das erste Betreten einer neuen Tiefe bringt einen festen Betrag, der mit der Tiefe wächst; es zählt das Betreten, nicht der Weg dorthin, auch ein Sturz
++ Wissen: das erste Mal im Lauf bringt EP, wenn Ninkasi eine Wesenart sieht, einen Gegenstand erkennt, eine Zutat oder Kultur kennt oder einen besonderen Ort findet (Brauraum, Schrein, Geheimtür); jede Sache einmal
++ Rätsel: jedes Rätsel bringt seine EP nur einmal; Rätsel löst die Spielerin, kein Skill löst sie für sie (siehe [Skills.md](Skills.md), Anlagen und Fallen)
++ Das Erkunden selbst bringt keine EP: mit dem Auto-Erkunden wäre das Ablaufen jeder Ecke Pflicht statt Entscheidung, und die Menge hinge an der Größe der Karte; so lohnt das gründliche Spiel über Gegner, Wissen und Funde, das eilige über die Tiefe
 + Freie EP lassen sich sparen, etwa bis entscheidende Fundstücke auftauchen
 + Freie EP lassen sich jederzeit verteilen, das Lernen kostet keine Spielzeit; Orte, an die das Verteilen gebunden ist (Altar, Hub), kommen vielleicht später, ein Schalter in den Regeln hält das offen
 
@@ -162,6 +161,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skil
 
 + Gebundene EP gibt nur Bewältigtes, das es je Ebene endlich oft gibt: besiegte Gegner, kampflos bewältigte Wesen (überredet, eingeschüchtert, verführt, unter den Tisch getrunken, gezähmt, bekehrt; je Wesen einmal, siehe [Skills.md](Skills.md), Soziales), entschärfte Fallen, geöffnete Schlösser, ein gefundenes Rezept beim ersten Gelingen (Hausrezepte nicht, siehe [Skills.md](Skills.md), Brauen), ein Hinterhalt; jedes davon trägt in den Daten einen festen Wert `ep`
 + Die Anwendung selbst bringt keine EP, sie bestimmt, wohin die EP fließen; so bleibt die Menge je Ebene begrenzt und Farmen an harmlosen Zielen bringt nichts
++ Nur ein Anteil der EP eines Bewältigten ist gebunden, der Rest kommt sofort als freie EP: die Anwendung lenkt, aber eine neue Richtung des Builds bleibt machbar; der Anteil ist ein Regelwert (siehe [Wesen.md](Wesen.md), Skills und Lernen)
 + Jedes Wesen führt ein Beitragsbuch: welche Lernanlässe Ninkasi an ihm hatte (Wirkung mit den Tags von Angriff, Fähigkeit und Effekt, dazu Ausweichen, Blocken, Rüstung nach ihrer Art und erlittener Schaden für passive Skills, Entkommen für die Skills der Bewegung, Berauscht für die Skills des Stoffwechsels, Erspäht nach der Art des Wahrnehmens und Hinterhalt für die Skills der Wahrnehmung, Kritisch für die Präzision)
 + Gewichtung vorerst nach der ersten erfolgreichen Anwendung: Jeder Lernanlass zählt je Gegner einmal; als Regelwert `regeln.lernen.gewichtung` (`erste`, später zum Vergleich `anteil` nach Schadensanteil)
 + Beim Tod des Gegners oder wenn Ninkasi ihn kampflos bewältigt, teilen sich seine EP auf die Skills auf, deren Lernanlässe im Buch stehen; passen mehrere Skills zum selben Anlass, wird gleich geteilt
@@ -183,7 +183,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skil
 + Nachrückende Gegner sind nicht ausgeschlossen, mit eigenem EP-Faktor (Idee in [Ausblick.md](Ausblick.md), Nachrückende Gegner)
 + Vorschlag, noch nicht bestätigt: Varianten durch Affixe vervielfachen die Gegnertypen
 
-Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Entkommen, Berauscht, Erspäht, Hinterhalt, Kritisch, erkannte Typen, entdeckte Fallen, nachrückende Gegner, Rätsel
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Tiefen-EP und Wissens-EP statt EP je Feld, der gebundene Anteil (Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 10), Entkommen, Berauscht, Erspäht, Hinterhalt, Kritisch, erkannte Typen, entdeckte Fallen, nachrückende Gegner, Rätsel
 
 ## Offen
 
