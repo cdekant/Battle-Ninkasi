@@ -57,10 +57,12 @@ anmelden("nutzungen", "trinken", { feld: "trinkbar", ziel: "selbst", befehl: (sp
 export const anzahlVon = (gegenstand) => gegenstand.anzahl ?? 1;
 export const ladungenVon = (gegenstand) => (gegenstand.ladungen ? gegenstand.ladungen.aktuell ?? gegenstand.ladungen.hoechstens : null);
 
-// Gewicht eines einzelnen Gegenstands (ohne den Stapel) in Gramm
+// Gewicht eines einzelnen Gegenstands (ohne den Stapel) in Gramm, mit Ladungen und der Munition im Magazin
+// (geladen: { anzahl, gewichtJe? }, systeme/fernkampf.js)
 export function einzelgewicht(gegenstand) {
   const ladungen = ladungenVon(gegenstand);
-  return (gegenstand.gewicht ?? 0) + (ladungen ? ladungen * (gegenstand.ladungen.gewichtJe ?? 0) : 0);
+  const magazin = gegenstand.geladen ? (gegenstand.geladen.anzahl ?? 0) * (gegenstand.geladen.gewichtJe ?? 0) : 0;
+  return (gegenstand.gewicht ?? 0) + (ladungen ? ladungen * (gegenstand.ladungen.gewichtJe ?? 0) : 0) + magazin;
 }
 
 // Last einer Trägerin in Gramm: alles im Gepäck, auch das Angelegte, dieses mit seinem gefühlten Gewicht

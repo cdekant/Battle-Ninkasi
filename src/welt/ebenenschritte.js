@@ -265,13 +265,16 @@ anmelden("ebenenschritte", "population", {
   },
 });
 
-// Einträge [{ typ, anzahl }] einer Liste der Ebene als Entitäten aus einem Teil der Daten auf freie Felder
+// Einträge [{ typ, anzahl, stapel? }] einer Liste der Ebene als Entitäten aus einem Teil der Daten auf freie Felder;
+// mit stapel liegen je Feld so viele Stück als ein Stapel (etwa Pfeile)
 function aufFreieFelderSetzen(spiel, bau, eintraege, datenteil) {
   const zufall = bau.zufall("inhalt");
   for (const eintrag of eintraege || []) {
     for (let i = 0; i < eintrag.anzahl; i++) {
       const feld = freiesFeldZiehen(bau, zufall);
-      if (feld) ausDatenErzeugen(spiel, datenteil, eintrag.typ, feld);
+      if (!feld) continue;
+      const entitaet = ausDatenErzeugen(spiel, datenteil, eintrag.typ, feld);
+      if (eintrag.stapel > 1) entitaet.anzahl = eintrag.stapel;
     }
   }
 }

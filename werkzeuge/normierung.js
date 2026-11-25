@@ -8,6 +8,7 @@
 //   einem trefferwurf; Fernangriffe aus Fähigkeiten zählen nicht mit
 //   Treffer bis zum Tod: LP / mittlerer Schaden, ohne Rüstung und Widerstand (beide fehlen zu Beginn)
 //   Zeit bis zum Tod: Treffer / Trefferchance x Kosten des Profils, in Zeiteinheiten
+//   Dazu eine Tabelle der Waffen (waffenwerte): Nahkampf, Wurf und Schuss mit Schaden und Zeit je Treffer
 
 import { pathToFileURL } from "node:url";
 import { rohdaten, texteDe as texte } from "../src/inhalt.js";
@@ -91,6 +92,39 @@ export function abweichungenVon(daten, zeile, staerke = zeile.staerke) {
   return funde;
 }
 
+// Waffen im Vergleich (siehe docs/Wesen.md, Normierung): je Gegenstand mit Angriffsprofil, Schuss oder Wurfwaffe
+// [{ typ, art: "nahkampf" | "schuss" | "wurf", schaden, zeit, schadenJe100 }] ohne Trefferchance; schaden ist der
+// mittlere Schaden je Treffer (ohne die Wirkung der Munition), zeit die Zeit je Treffer über einen ganzen Zyklus:
+// Nahkampf die Kosten des ersten Profils, Wurf wurf.kosten, Schuss mit Magazin (Kosten je Aktion mal Aktionen je
+// Magazin plus Nachladen) durch fasst, ein Magazin, das sich selbst füllt, nie schneller als ein Schuss je je
+export function waffenwerte(daten) {
+  const aktionen = daten.aktionen;
+  const zeilen = [];
+  for (const [typ, gegenstand] of Object.entries(daten.gegenstaende)) {
+    if (gegenstand.abstrakt) continue;
+    const profil = gegenstand.ausruestung?.angriffe?.[0], schuss = gegenstand.ausruestung?.schuss;
+    let art, schaden, zeit;
+    if (schuss) {
+      const schuesse = schuss.schuesse ?? 1, kosten = schuss.kosten ?? aktionen.schiessen, magazin = schuss.magazin;
+      art = "schuss";
+      schaden = mittlererSchaden(daten, schuss.effekt);
+      if (!magazin) zeit = kosten / schuesse;
+      else if (magazin.auffuellen) zeit = Math.max(kosten / schuesse, magazin.auffuellen.je);
+      else zeit = (Math.ceil(magazin.fasst / schuesse) * kosten + (magazin.nachladen ?? aktionen.nachladen)) / magazin.fasst;
+    } else if (gegenstand.wurf?.genauigkeit !== undefined) {
+      art = "wurf";
+      schaden = mittlererSchaden(daten, gegenstand.wurf.effekt);
+      zeit = gegenstand.wurf.kosten ?? aktionen.werfen;
+    } else if (profil) {
+      art = "nahkampf";
+      schaden = mittlererSchaden(daten, profil.effekt);
+      zeit = profil.kosten ?? aktionen.nahkampf;
+    } else continue;
+    zeilen.push({ typ, art, schaden, zeit, schadenJe100: (schaden * 100) / zeit });
+  }
+  return zeilen;
+}
+
 function hauptprogramm() {
   const daten = datenLaden(rohdaten, texte);
   const zahl = (wert, stellen = 1) => (Number.isFinite(wert) ? wert.toFixed(stellen).replace(".", ",") : "-");
@@ -102,6 +136,12 @@ function hauptprogramm() {
       + `${(zeile.wesen.trefferchance + " %").padStart(14)}${zahl(zeile.wesen.treffer).padStart(8)}${zahl(zeile.wesen.zeit, 0).padStart(6)}    ${funde.join("; ") || "passt"}`);
   }
   console.log("Treffer bis zum Tod gegen Ninkasi zu Beginn (Grundausstattung), Zeit in Zeiteinheiten; Stärke ist die nächste aus regeln.normierung");
+  console.log("");
+  console.log("Waffe                 Art       Schaden  Zeit  je 100");
+  for (const zeile of waffenwerte(daten)) {
+    console.log(`${zeile.typ.padEnd(22)}${zeile.art.padEnd(10)}${zahl(zeile.schaden).padStart(7)}${zahl(zeile.zeit, 0).padStart(6)}${zahl(zeile.schadenJe100).padStart(8)}`);
+  }
+  console.log("Schaden je Treffer im Mittel, Zeit je Treffer über einen ganzen Zyklus aus Magazin und Nachladen, ohne Trefferchance");
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) hauptprogramm();

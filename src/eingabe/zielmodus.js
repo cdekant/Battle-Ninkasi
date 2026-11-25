@@ -1,13 +1,14 @@
 // Zielmodus (siehe docs/Bedienung.md, Zielmodus): reine Tasten- und Mauslogik ohne DOM, damit sie testbar ist.
 // Anzeige-Zustand, nicht im Spielzustand: null oder { auswahl, zielart, cursor: { x, y }, platz? }
-//   auswahl wie in systeme/vorschau.js: { zweck: "werfen", gegenstandId } oder { zweck: "faehigkeit", faehigkeit },
+//   auswahl wie in systeme/vorschau.js: { zweck: "werfen", gegenstandId }, { zweck: "schiessen", waffeId } oder
+//   { zweck: "faehigkeit", faehigkeit },
 //   dazu { zweck: "untersuchen" } (Taste X): derselbe Cursor ohne Befehl, Enter tut nichts, Esc oder X schließt;
 //   was der Cursor zeigt, beschreibt systeme/untersuchen.js
 //   Bewegungstasten der Belegung verschieben den Cursor, die Maus setzt ihn; Tab springt zum nächsten Ziel in Sicht,
 //   Enter bestätigt (nur, wenn die Vorschau keinen Grund dagegen nennt), Esc bricht ab.
 //   platz: aus der Schnellleiste begonnen (eingabe/schnellleiste.js); dieselbe Taste noch einmal bestätigt (wie DCSS).
 // Vorbelegung des Cursors nach der zielvorgabe der Fähigkeit ("feind", "gefaehrte", "selbst"); ohne Angabe
-// "gefaehrte" bei den Tags heilung oder nuetzlich der Wirkung, sonst "feind"; Werfen zielt auf Feinde. Lebt das zuletzt
+// "gefaehrte" bei den Tags heilung oder nuetzlich der Wirkung, sonst "feind"; Werfen und Schießen zielen auf Feinde. Lebt das zuletzt
 // gewählte Ziel und ist in Sicht, gewinnt es (letztesZielId, Anzeige-Zustand in src/main.js).
 // Fähigkeiten ohne Ziel oder mit Zielart selbst brauchen keinen Zielmodus, sie werden sofort zum Befehl.
 
@@ -17,6 +18,9 @@ import { istSichtbar } from "../systeme/sicht.js";
 import { beziehungZwischen, urheberVon } from "../systeme/fraktionen.js";
 import { faehigkeitFuer, faehigkeitPruefen } from "../systeme/faehigkeiten.js";
 import { zielvorschau } from "../systeme/vorschau.js";
+import { wurfReichweite } from "../systeme/werfen.js";
+import { fernwaffeVon, schussZielart } from "../systeme/fernkampf.js";
+import { holen } from "../kern/register.js";
 import { hoechstwert } from "../kern/werte.js";
 import { AKTIONEN, aktionDerTaste, befehlDerAktion } from "./aktionskatalog.js";
 
@@ -85,7 +89,14 @@ export function zielmodusBeginnen(spiel, auswahl, { platz, letztesZielId } = {})
   } else if (auswahl.zweck === "werfen") {
     const gegenstand = (gesteuerte.inventar || []).includes(auswahl.gegenstandId) ? entitaetMitId(spiel.zustand, auswahl.gegenstandId) : null;
     if (!gegenstand) return { grund: "nichts_zu_werfen" };
-    zielart = { art: "geschoss", reichweite: gegenstand.wurf?.reichweite ?? spiel.daten.regeln.werfen.reichweite };
+    zielart = { art: "geschoss", reichweite: wurfReichweite(spiel, gesteuerte, gegenstand) };
+  } else if (auswahl.zweck === "schiessen") {
+    const waffe = fernwaffeVon(spiel, gesteuerte, auswahl.waffeId);
+    if (!waffe) return { grund: "keine_fernwaffe" };
+    // eine leere Waffe oder fehlende Munition hindert schon den Beginn
+    const grund = holen("befehle", "schiessen").pruefen(spiel, gesteuerte, { art: "schiessen", waffeId: waffe.id, ziel: undefined });
+    if (grund && !GRUENDE_DES_ZIELS.includes(grund)) return { grund };
+    zielart = schussZielart(spiel, gesteuerte, waffe);
   } else {
     const definition = faehigkeitFuer(spiel, gesteuerte, auswahl.faehigkeit);
     const befehl = { art: "faehigkeit", faehigkeit: auswahl.faehigkeit };

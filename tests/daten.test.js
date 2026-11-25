@@ -413,7 +413,10 @@ test("Bewegungsarten, Tempo, Gelände, Würfe, Unterbrechungsgründe und Regeln 
     [(daten) => { daten.gegenstaende.testgegenstand.wurf = { reichweite: 0 }; }, "reichweite"],
     [(daten) => { daten.faehigkeiten.testritual.unterbrechbar = ["husten"]; }, "unterbrechbar"],
     [(daten) => { delete daten.regeln.bewegung; }, "regeln.bewegung"],
-    [(daten) => { daten.regeln.werfen = { reichweite: 0 }; }, "regeln.werfen.reichweite"],
+    [(daten) => { daten.regeln.werfen = { reichweite: 0 }; }, "regeln.werfen.reichweiteNachGewicht"],
+    [(daten) => { daten.regeln.werfen.streuung = { chance: 120, weite: 2 }; }, "regeln.werfen.streuung"],
+    [(daten) => { delete daten.regeln.fernkampf; }, "regeln.fernkampf.bruchchance"],
+    [(daten) => { delete daten.regeln.wahrnehmung.laermSchuss; }, "laermSchuss"],
     [(daten) => { delete daten.regeln.wahrnehmung.laermWurf; }, "laermWurf"],
   ];
   for (const [aendern, teilDerMeldung] of erwartet) {

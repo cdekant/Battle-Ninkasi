@@ -25,7 +25,6 @@ Abgrenzung: [Systemausbau.md](Systemausbau.md) ist die Arbeitsliste beschlossene
 | Bestiarium, Glossar, Rezeptbuch | hoch | gering | erledigt (Regel für Wissen über Läufe) |
 | Erfolge | hoch | gering | nein |
 | Ausrüstung und Effekte am Tile | hoch | gering | ja (Daten fürs Aussehen) |
-| Wurfweite nach Skill und Gewicht | ungeklärt | gering | nein |
 | Krankheiten | ungeklärt | gering | nein |
 | Questsystem | hoch | gering bis mittel | teils erledigt (Plan des Laufs), offen: Ziele über Haken |
 | Feste Strukturen | ungeklärt | gering bis mittel | erledigt (Erzeugung in Schritten) |
@@ -299,16 +298,6 @@ Umsetzung: offen
 + Berührt: Renderer und Tilebilder (`src/anzeige/`), Artstyle-Fibel (Schichten müssen im kleinen Raster lesbar bleiben), Verwandlung (eine Gestalt tauscht das Grundtile, Schichten auf fehlenden Plätzen entfallen), Unsichtbarkeit und Hellsicht (Darstellung des nur Gespürten), Effektschicht ([Animationen.md](Animationen.md))
 + Umbaurisiko: gering, reine Anzeige
 + Vorkehrung: Aussehen als Daten am Gegenstand und am Zustand, nie aus dem Namen abgeleitet; Werte fürs Aussehen gehören nicht in die Logik
-
-Umsetzung: offen
-
-## Wurfweite nach Skill und Gewicht
-
-+ Wichtigkeit: ungeklärt, Prüfung gewünscht (2026-11-22): Reichweite von Tränken und Wurfwaffen, verändert durch Skills und durch das Gewicht
-+ Vorhanden: `wurf.reichweite` am Gegenstand, sonst `regeln.werfen.reichweite` (6), fest und ohne Modifikatoren (`src/systeme/werfen.js`, siehe [Wesen.md](Wesen.md), Bewegung); Gewicht in Gramm an jedem Gegenstand (siehe [Gegenstaende.md](Gegenstaende.md), Inventar); Skills wirken über Modifikatoren, die Sichtweite macht es mit dem Ziel `reichweiteSicht` schon vor
-+ Braucht: ein Modifikatorziel `reichweiteWurf` an der Werfenden, mit den Tags des Gegenstands (z.B. `trank`, `wurfwaffe`), damit ein Skill nur Tränke weiter werfen lässt; eine Regel für das Gewicht, z.B. Grundweite minus eine Stufe je angefangene Gewichtsklasse aus `daten/regeln.js`, mit Mindestweite 1; die Vorschau im Zielmodus zeigt die Weite schon an
-+ Umbaurisiko: gering, eine Stelle in `src/systeme/werfen.js`
-+ Vorkehrung: keine; die Systeme bilden es fast ab, es fehlen nur das Modifikatorziel und die Gewichtsregel
 
 Umsetzung: offen
 

@@ -66,6 +66,7 @@ import "./anzeige/systemfenster.js";
 import { Bedienzeile } from "./anzeige/bedienzeile.js";
 import { minikartenBild, zeichnen as minikarteZeichnen, feldgroesseFuer, feldAmPunkt } from "./anzeige/minikarte.js";
 import { zielmodusBeginnen, zielmodusTaste, zielmodusVorschau, zielmodusBestaetigen, cursorSetzen } from "./eingabe/zielmodus.js";
+import { fernangriffAuswahl, geworfeneWurfwaffe } from "./eingabe/fernangriff.js";
 import { istSichtbar } from "./systeme/sicht.js";
 import { neueAnimation, geschossEinreihen, laeuftAnimation, aktuellesGeschoss, animationWeiter, animationLeeren } from "./anzeige/animation.js";
 
@@ -277,6 +278,8 @@ let fensterStapel = [];
 let zielModus = null;
 // Zuletzt gewähltes Ziel (ID eines Wesens) für die Vorbelegung des Cursors (eingabe/zielmodus.js)
 let letztesZielId = null;
+// Typ der zuletzt geworfenen Wurfwaffe für den Fernangriff ohne Fernwaffe (eingabe/fernangriff.js)
+let letzteWurfwaffe = null;
 // Schnellleiste (eingabe/schnellleiste.js), gespeichert im Teil oberflaeche des Speicherstands
 let leisten = neueLeisten();
 // Wesen, über dem in der Seitenleiste der Zeiger steht (Hervorheben auf der Karte)
@@ -335,6 +338,7 @@ function spielZeichnen() {
     ok: zielvorschau.ok,
     bahn: zielvorschau.aufloesung?.bahn?.felder ?? [],
     felder: zielvorschau.aufloesung?.ok && !zielvorschau.aufloesung.bahn ? zielvorschau.aufloesung.felder : [],
+    streuung: zielvorschau.streuung,
     betroffene: zielvorschau.betroffene.map(({ id }) => spiel.zustand.entitaeten[id].position),
   };
   // Untersuchen: nur der Cursor, ohne Bahn und Fläche
@@ -753,8 +757,10 @@ function zoomen(richtung) {
 }
 
 function befehlGebenUndZeichnen(befehl) {
+  const wurfwaffe = geworfeneWurfwaffe(spiel, befehl);
   const ergebnis = befehlGeben(spiel, befehl);
   if (ergebnis.ok && befehl.ziel?.id != null) letztesZielId = befehl.ziel.id;
+  if (ergebnis.ok && wurfwaffe) letzteWurfwaffe = wurfwaffe;
   if (ergebnis.ok) nachDemBefehl();
   if (spiel.zustand.vorbei) zielModus = null;
   zeichnen();
@@ -877,6 +883,15 @@ function aktionAusfuehren(ergebnis) {
   }
   if (aktion === "fallenlassen_waehlen") return fensterAuf("inventar", { gewaehlt: null, absicht: "fallenlassen" });
   if (aktion === "werfen_waehlen") return fensterAuf("inventar", { gewaehlt: null, absicht: "werfen" });
+  if (aktion === "fernangriff") {
+    if (spiel.zustand.vorbei) return;
+    const fernangriff = fernangriffAuswahl(spiel, letzteWurfwaffe);
+    if (fernangriff.grund) {
+      ablehnungMelden(fernangriff.grund);
+      return zeichnen();
+    }
+    return auswahlStarten(fernangriff.auswahl);
+  }
   if (aktion === "karte") return fensterAuf("karte", {});
   if (aktion === "befehlszeile") return fensterAuf("befehlszeile", befehlszeileOeffnen());
   if (aktion === "einstellungen") return fensterAuf("einstellungen", einstellungsfensterOeffnen());

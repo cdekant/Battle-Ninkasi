@@ -7,6 +7,71 @@ export default {
     einzahl: { nom: "Essigbakterium", gen: "Essigbakteriums", dat: "Essigbakterium", akk: "Essigbakterium" },
     mehrzahl: { nom: "Essigbakterien", gen: "Essigbakterien", dat: "Essigbakterien", akk: "Essigbakterien" },
   },
+  "wesen.schuetzin_test": {
+    geschlecht: "f",
+    einzahl: { nom: "Schützin-Test", gen: "Schützin-Tests", dat: "Schützin-Test", akk: "Schützin-Test" },
+    mehrzahl: { nom: "Schützin-Tests", gen: "Schützin-Tests", dat: "Schützin-Tests", akk: "Schützin-Tests" },
+  },
+  "gegenstand.schleuder": {
+    geschlecht: "f",
+    einzahl: { nom: "Schleuder", gen: "Schleuder", dat: "Schleuder", akk: "Schleuder" },
+    mehrzahl: { nom: "Schleudern", gen: "Schleudern", dat: "Schleudern", akk: "Schleudern" },
+  },
+  "gegenstand.kurzbogen": {
+    geschlecht: "m",
+    einzahl: { nom: "Kurzbogen", gen: "Kurzbogens", dat: "Kurzbogen", akk: "Kurzbogen" },
+    mehrzahl: { nom: "Kurzbögen", gen: "Kurzbögen", dat: "Kurzbögen", akk: "Kurzbögen" },
+  },
+  "gegenstand.armbrust": {
+    geschlecht: "f",
+    einzahl: { nom: "Armbrust", gen: "Armbrust", dat: "Armbrust", akk: "Armbrust" },
+    mehrzahl: { nom: "Armbrüste", gen: "Armbrüste", dat: "Armbrüsten", akk: "Armbrüste" },
+  },
+  "gegenstand.pistole": {
+    geschlecht: "f",
+    einzahl: { nom: "Pistole", gen: "Pistole", dat: "Pistole", akk: "Pistole" },
+    mehrzahl: { nom: "Pistolen", gen: "Pistolen", dat: "Pistolen", akk: "Pistolen" },
+  },
+  "gegenstand.druckkanone": {
+    geschlecht: "f",
+    einzahl: { nom: "Druckkanone", gen: "Druckkanone", dat: "Druckkanone", akk: "Druckkanone" },
+    mehrzahl: { nom: "Druckkanonen", gen: "Druckkanonen", dat: "Druckkanonen", akk: "Druckkanonen" },
+  },
+  "gegenstand.laser": {
+    geschlecht: "m",
+    einzahl: { nom: "Laser", gen: "Lasers", dat: "Laser", akk: "Laser" },
+    mehrzahl: { nom: "Laser", gen: "Laser", dat: "Lasern", akk: "Laser" },
+  },
+  "gegenstand.schleuderstein": {
+    geschlecht: "m",
+    einzahl: { nom: "Schleuderstein", gen: "Schleudersteins", dat: "Schleuderstein", akk: "Schleuderstein" },
+    mehrzahl: { nom: "Schleudersteine", gen: "Schleudersteine", dat: "Schleudersteinen", akk: "Schleudersteine" },
+  },
+  "gegenstand.pfeil": {
+    geschlecht: "m",
+    einzahl: { nom: "Pfeil", gen: "Pfeils", dat: "Pfeil", akk: "Pfeil" },
+    mehrzahl: { nom: "Pfeile", gen: "Pfeile", dat: "Pfeilen", akk: "Pfeile" },
+  },
+  "gegenstand.brandpfeil": {
+    geschlecht: "m",
+    einzahl: { nom: "Brandpfeil", gen: "Brandpfeils", dat: "Brandpfeil", akk: "Brandpfeil" },
+    mehrzahl: { nom: "Brandpfeile", gen: "Brandpfeile", dat: "Brandpfeilen", akk: "Brandpfeile" },
+  },
+  "gegenstand.bolzen": {
+    geschlecht: "m",
+    einzahl: { nom: "Bolzen", gen: "Bolzens", dat: "Bolzen", akk: "Bolzen" },
+    mehrzahl: { nom: "Bolzen", gen: "Bolzen", dat: "Bolzen", akk: "Bolzen" },
+  },
+  "gegenstand.kugel": {
+    geschlecht: "f",
+    einzahl: { nom: "Kugel", gen: "Kugel", dat: "Kugel", akk: "Kugel" },
+    mehrzahl: { nom: "Kugeln", gen: "Kugeln", dat: "Kugeln", akk: "Kugeln" },
+  },
+  "gegenstand.zelle": {
+    geschlecht: "f",
+    einzahl: { nom: "Energiezelle", gen: "Energiezelle", dat: "Energiezelle", akk: "Energiezelle" },
+    mehrzahl: { nom: "Energiezellen", gen: "Energiezellen", dat: "Energiezellen", akk: "Energiezellen" },
+  },
   "wesen.fernkaempfer_test": {
     geschlecht: "m",
     einzahl: { nom: "Fernkämpfer-Test", gen: "Fernkämpfer-Tests", dat: "Fernkämpfer-Test", akk: "Fernkämpfer-Test" },
@@ -254,6 +319,8 @@ export default {
   "arena.pruefruestung": "Prüfrüstungen mit dem Prüfschwert",
   "arena.kette": "Fünf Wellen ohne Erholung",
   "arena.wurfwaffen": "Wurfwaffen auf Abstand",
+  "arena.fernwaffen": "Fernwaffen auf Abstand",
+  "arena.schuetzin": "Gegen eine Schützin",
   "skillset.zaehigkeit": "Zähigkeit",
   "skillset.nahkampf": "Nahkampf",
   "skillset.ausweichen": "Ausweichen",

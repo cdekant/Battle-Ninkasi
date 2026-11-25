@@ -276,6 +276,13 @@ function zufallsbefehl(botZufall, spiel) {
     return { art: "werfen", gegenstandId: gesteuerte.inventar[0], ziel };
   }
   if (wurf >= 18 && wurf <= 20 && faehigkeitenVon(spiel, gesteuerte).length) return faehigkeitUeberZielmodus(botZufall, spiel, gesteuerte);
+  // Fernwaffe (src/systeme/fernkampf.js): Schuss auf ein Feld in der Nähe oder Nachladen, auch ohne Fernwaffe, so werden
+  // die Ablehnungen mitgeprüft
+  if (wurf === 23) {
+    const ziel = { x: gesteuerte.position.x + zufallsGanzzahl(botZufall, -6, 6), y: gesteuerte.position.y + zufallsGanzzahl(botZufall, -6, 6) };
+    return { art: "schiessen", ziel };
+  }
+  if (wurf === 24) return { art: "nachladen" };
   if (wurf === 22 && gesteuerte.freieEp > 0) {
     const befehl = lernenUeberSkillfenster(botZufall, spiel);
     if (befehl) return befehl;

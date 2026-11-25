@@ -366,7 +366,18 @@ Quer zu den Gattungen: Eine Waffe lernt beide Seiten, das Braupaddel als Wuchtwa
 
 ### Fernkampf
 
-Werfen ist eine angeborene Grundfähigkeit wie der Sprint: Jede Ninkasi wirft, der Skill macht es besser. Was ein Wurf oder Schuss trifft, sagt seine Zielart: ein Geschoss das erste Wesen auf der Bahn, ein Strahl alles in einer Linie, Zerplatzendes (Tränke, Flaschen) eine Fläche um den Aufschlag. Bei Flächen kommt es auf genaues Zielen weniger an: Ein Fehlwurf landet ein, zwei Felder daneben und trifft trotzdem das meiste; das Werfen macht die Streuung kleiner. Die Reichweite eines Wurfs folgt dem Gewicht des Gegenstands und wächst mit dem Skill. Jede Gattung braucht ihre Munition anders, das macht sie auch im Gebrauch verschieden. Das System der Fernwaffen entsteht von Grund auf ([Systemausbau.md](Systemausbau.md), Punkt 22).
+Werfen ist eine angeborene Grundfähigkeit wie der Sprint: Jede Ninkasi wirft, der Skill macht es besser. Was ein Wurf oder Schuss trifft, sagt seine Zielart: ein Geschoss das erste Wesen auf der Bahn, ein Strahl alles in einer Linie, Zerplatzendes (Tränke, Flaschen) eine Fläche um den Aufschlag. Bei Flächen kommt es auf genaues Zielen weniger an: Ein Fehlwurf landet ein, zwei Felder daneben und trifft trotzdem das meiste; das Werfen macht die Streuung kleiner. Die Reichweite eines Wurfs folgt dem Gewicht des Gegenstands und wächst mit dem Skill.
+
+Alle Fernwaffen folgen einem Modell, von der Schleuder bis zum Laser; was sie unterscheidet, sind ihre Werte, nicht ihre Regeln:
+
++ Waffen ohne Magazin (Schleuder, Bogen) nehmen für jeden Schuss ein Stück Munition aus dem Gepäck und laden es vor dem Schuss selbst; das Laden steckt in der Zeit des Schusses, deshalb sind sie langsam
++ Waffen mit Magazin (Armbrust, Feuer-, Druck- und Energiewaffen) lassen sich vorladen und geladen mitnehmen; geladen schießen sie normal schnell bis eher schnell
++ Nachladen ist eine eigene, lange Aktion, die immer das ganze Magazin füllt; nachgeladen wird nie von selbst, denn steht der Feind schon daneben, nutzt die Spielerin die Zeit lieber für den Nahkampf
++ Automatische Waffen schießen Salven; Magazin und Nachladen halten sie im Zaum, damit das automatische Gewehr nicht alles schlägt
++ Munition wiegt; Pfeile, Bolzen und Steine landen nach dem Schuss und lassen sich aufheben, mit einer kleinen Chance zu brechen, Kugeln und Zellen sind verbraucht; besondere Munition bringt eine eigene Wirkung mit (Feuerpfeil)
++ Lärm ist ein Wert der Waffe; Fernwaffen verschleißen nicht durch Gebrauch, eine Waffe überhitzt nicht (siehe [Grundlagen.md](Grundlagen.md), Spielkern)
++ Das Werfen folgt denselben Regeln für Treffer, Landen und Bruch, eine Wurfwaffe ist ihre eigene Munition; geworfen wird alles, auch eine Bierflasche
++ Verhältnisse für die Balance: eine Wurfwaffe macht etwa drei Viertel des Schadens eines Dolchs je Treffer; ein Bogen trifft deutlich härter als ein Schwerthieb, braucht dafür aber etwa doppelt so lange
 
 #### Fernkampf allgemein
 
@@ -390,14 +401,15 @@ Werfen ist eine angeborene Grundfähigkeit wie der Sprint: Jede Ninkasi wirft, d
 
 + Eigenschaften: Gewandtheit, sekundär Körperlichkeit
 + Schleuder, Bogen, Armbrust; die Jägerin
-+ Munition: Pfeile und Bolzen landen und lassen sich aufheben, mit einer Chance zu brechen (Vorbild Brogue)
++ Munition: Pfeile, Bolzen und Steine landen und lassen sich aufheben, mit einer Chance zu brechen (Vorbild Brogue)
++ Schleuder und Bogen ohne Magazin, die Armbrust lässt sich vorladen und lädt lange nach wie eine Feuerwaffe
 + Grund Genauigkeit, Experte Schaden, Meister Tempo des Spannens, göttlich Durchschuss (der Pfeil fliegt durch das erste Ziel weiter)
 
 #### Feuerwaffen
 
 + Eigenschaften: Gewandtheit, sekundär Klugheit
 + Von der Muskete bis zum Maschinengewehr
-+ Munition: Kugeln sind verbraucht; Nachladen kostet Zeit
++ Munition: Kugeln sind verbraucht; Lauf oder Magazin sind voll, angebrochen oder leer und lassen sich vorladen, Nachladen kostet viel Zeit
 + Laut: Ein Schuss ist weit zu hören, viel weiter als ein Nahkampf, aber nicht auf der ganzen Ebene; Wände dämpfen ihn, ein Schalldämpfer ist ein Gegenstand
 + Grund Genauigkeit, Experte schneller nachladen, Meister Schaden, göttlich Salve (mehrere Schüsse in einer Aktion, wo die Waffe es kann)
 
@@ -405,15 +417,15 @@ Werfen ist eine angeborene Grundfähigkeit wie der Sprint: Jede Ninkasi wirft, d
 
 + Eigenschaften: Klugheit, sekundär Braukunde
 + Steampunk: Dampf, Druckluft, die CO2-Kanone aus dem Gärkessel; Ninkasis Brücke zwischen Brauen und Kampf
-+ Munition: Der Druck baut sich mit der Zeit in der Waffe auf, ein Schuss leert ihn; vielleicht tankt die Waffe CO2 aus der Luft über Gärbottichen
++ Munition: Der Druck baut sich mit der Zeit in der Waffe auf, ein Magazin, das sich ohne Munition selbst füllt; jeder Schuss verbraucht davon; vielleicht tankt die Waffe CO2 aus der Luft über Gärbottichen schneller
 + Tiers: schnellerer Druckaufbau, höherer Höchstdruck, Rückstoß stößt das Ziel, göttlich Überdruck, der am Ziel platzt
 
 #### Energiewaffen
 
 + Eigenschaften: Klugheit, sekundär Sinnlichkeit
 + Laser und Plasma
-+ Munition: Ladungen wie beim Zauberstab, dazu Hitze je Schuss, die über die Zeit abklingt; zu heiß, und die Waffe schießt nicht
-+ Tiers: Überhitzen langsamer, Ladung sparsamer, Schaden, göttlich ein Strahl durch alle Ziele in einer Linie
++ Munition: Zellen im Magazin; Hitze und Überhitzen gibt es nicht
++ Tiers: schneller nachladen, Ladung sparsamer, Schaden, göttlich ein Strahl durch alle Ziele in einer Linie
 
 #### Spezialisierungen im Fernkampf
 
@@ -444,7 +456,7 @@ Werfen ist eine angeborene Grundfähigkeit wie der Sprint: Jede Ninkasi wirft, d
 + Meister: gezielter Treffer, ein Teil des Ausweichens des Ziels zählt nicht
 + Göttlich: Schwachstelle, ein Krit macht das Ziel für kurze Zeit verwundbar (weniger Rüstung), auch für Verbündete
 
-Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Kampfwerte (Profile mit Tags, Kampfwerte, Wehrlos, Bedingungen `gegenueber_ahnungslos`, `gegenueber_wehrlos` und `pegel_ab`) und Skills und Lernen; im Probeinhalt Nahkampf und Ausweichen als Grundskills; offen: alle Sets, Tags der Waffen, Abzug der zweiten Hand, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20, Fernwaffen in Punkt 22
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Kampfwerte (Profile mit Tags, Kampfwerte, Wehrlos, Bedingungen `gegenueber_ahnungslos`, `gegenueber_wehrlos` und `pegel_ab`), Skills und Lernen, Fernkampf (das Modell der Fernwaffen mit Munition, Magazin, Salve und Strahl) und Bewegung (Werfen mit Reichweite nach Gewicht und Streuung); im Probeinhalt Nahkampf und Ausweichen als Grundskills, je Gattung eine Fernwaffe; offen: alle Sets, Tags der Waffen als Lernanlass, Abzug der zweiten Hand, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 20
 
 ## Brauen
 

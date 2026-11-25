@@ -52,6 +52,15 @@ export default {
   // Wurfwaffen (datenproben/wurfgegenstaende.js): der Schaden beim Treffer, den Trefferwurf macht das Werfen
   wurfmesser_treffer: { schritte: [{ baustein: "schaden", art: "schnitt", wuerfel: "1W6+2" }] },
   wurfspeer_treffer: { schritte: [{ baustein: "schaden", art: "schnitt", wuerfel: "2W6+3" }] },
+  stein_wurf: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "1W4+1" }] },
+  // Fernwaffen (datenproben/fernwaffen.js): der Schaden beim Treffer, den Trefferwurf macht der Schuss
+  schleuderstein_treffer: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "1W6+6" }] },
+  pfeil_treffer: { schritte: [{ baustein: "schaden", art: "schnitt", wuerfel: "2W6+17" }] },
+  bolzen_treffer: { schritte: [{ baustein: "schaden", art: "schnitt", wuerfel: "2W8+16" }] },
+  kugel_treffer: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "2W6+10" }] },
+  druckstoss: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "2W6+8" }, { baustein: "stossen", weite: 2, menge: 3 }] },
+  laserstrahl: { schritte: [{ baustein: "schaden", art: "feuer", wuerfel: "2W6+12" }] },
+  brandpfeil_glut: { schritte: [{ baustein: "schaden", art: "feuer", wuerfel: "1W6" }] },
   // Sprint (datenproben/faehigkeiten.js): der Zustand macht das Bewegen schneller
   sprint: {
     schritte: [{ baustein: "zustand_setzen", zustand: "sprint" }],

@@ -7,7 +7,9 @@ export default {
   aufheben: 100,
   trinken: 100,
   lesen: 100,
-  werfen: 100,
+  werfen: 100, // Vorgabe, wenn ein Gegenstand keine eigenen wurf.kosten nennt
+  schiessen: 100, // Vorgabe, wenn eine Fernwaffe keine eigenen schuss.kosten nennt
+  nachladen: 100, // Vorgabe, wenn ein Magazin keine eigene Zeit fürs Nachladen nennt
   benutzen: 100,
   treppe: 100,
   anlegen: 100,

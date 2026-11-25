@@ -9,11 +9,14 @@ export default {
       { handlung: "nutzen", zweck: "heilen", bewertung: [{ eingabe: "eigeneLpProzent", kurve: [[0, 1000], [39, 1000], [40, 0]] }] },
     ],
   },
-  // trinkt unter 40 % LP, nutzt sonst aus Abstand, was dem Angriff dient (Fähigkeiten, dann Würfe), dann Nahkampf
+  // trinkt unter 40 % LP; aus Abstand schießt sie mit der Fernwaffe und lädt nach, wenn sie leer ist, sonst nutzt sie,
+  // was dem Angriff dient (Fähigkeiten, dann Würfe); steht der Feind daneben, Nahkampf (auch statt nachzuladen)
   fernkampf: {
     text: "taktik.fernkampf",
     handlungen: [
       { handlung: "nutzen", zweck: "heilen", bewertung: [{ eingabe: "eigeneLpProzent", kurve: [[0, 1000], [39, 1000], [40, 0]] }] },
+      { handlung: "schiessen", abstandAb: 2 },
+      { handlung: "nachladen", abstandAb: 2 },
       { handlung: "nutzen", zweck: "angriff", abstandAb: 2 },
     ],
   },

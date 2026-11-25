@@ -17,6 +17,7 @@ import { optimalerPegel, rauschstufe } from "../systeme/stoffwechsel.js";
 import { promilleText, leistenanteil, TEILSTRICHE } from "./pegelanzeige.js";
 
 import { faehigkeitVon } from "../systeme/faehigkeiten.js";
+import { fernwaffeVon, munitionsvorrat } from "../systeme/fernkampf.js";
 import { lastText } from "./fenster.js";
 import { feldBeschreiben, zustaendeVon, laufendeAktionVon, werteAufschluesseln, wesenBeschreiben, kostenVon } from "../systeme/untersuchen.js";
 import { heimlichkeitsweite } from "../systeme/wahrnehmung.js";
@@ -79,7 +80,10 @@ export class Oberflaeche {
     const zustand = spiel.zustand;
     const { auswahl } = ziel.modus, vorschau = ziel.vorschau;
     const gegenstand = auswahl.zweck === "werfen" ? entitaetMitId(zustand, auswahl.gegenstandId) : null;
-    const was = gegenstand ? `${text("ui.werfen")}: ${nomenForm({ ...gegenstand, anzahl: 1 }, "akk", "bestimmt")}` : text(faehigkeitVon(spiel, auswahl.faehigkeit)?.text ?? "ui.zielen");
+    const waffe = auswahl.zweck === "schiessen" ? entitaetMitId(zustand, auswahl.waffeId) : null;
+    const was = gegenstand ? `${text("ui.werfen")}: ${nomenForm({ ...gegenstand, anzahl: 1 }, "akk", "bestimmt")}`
+      : waffe ? `${text("ui.schiessen")}: ${nomenForm(waffe, "dat", "bestimmt")}`
+        : text(faehigkeitVon(spiel, auswahl.faehigkeit)?.text ?? "ui.zielen");
     const grundSchluessel = `log.abgelehnt.${vorschau.grund}`;
     const grund = vorschau.ok ? "" : `<li class="schlimm">${hatSchluessel(grundSchluessel) ? text(grundSchluessel) : vorschau.grund}</li>`;
     const betroffene = vorschau.betroffene.map(({ id, chance }) => {
@@ -227,7 +231,19 @@ export class Oberflaeche {
     const zustaendeHtml = zustaende.length
       ? `<h2>${text("ui.zustaende")}</h2><ul class="zustaende">${zustaende.map((eintrag) => `<li>${this.zustandText(spiel, eintrag)}</li>`).join("")}</ul>`
       : "";
-    return `${this.kostenHtml(spiel, gesteuerte)}${heimlichkeit}${aktionHtml}${zustaendeHtml}`;
+    return `${this.kostenHtml(spiel, gesteuerte)}${heimlichkeit}${this.fernwaffeHtml(spiel, gesteuerte)}${aktionHtml}${zustaendeHtml}`;
+  }
+
+  // Vorrat der angelegten Fernwaffe: Magazin (geladen von fasst) und passende Munition im Gepäck; leer ohne Fernwaffe
+  fernwaffeHtml(spiel, gesteuerte) {
+    const waffe = fernwaffeVon(spiel, gesteuerte);
+    if (!waffe) return "";
+    const { text, nomenForm } = this.texte;
+    const vorrat = munitionsvorrat(spiel, gesteuerte, waffe);
+    const teile = [];
+    if (vorrat.fasst !== null) teile.push(text("ui.magazin", { geladen: vorrat.geladen, fasst: vorrat.fasst }));
+    if (vorrat.imGepaeck !== null) teile.push(text("ui.munition_im_gepaeck", { anzahl: vorrat.imGepaeck }));
+    return `<div class="leise">${nomenForm(waffe, "nom", "ohne")}: ${teile.join(", ")}</div>`;
   }
 
   // Zusatz in der Gegnerliste: Wachzustand außer "jagt", Zustände (Restdauer nur, wenn Ninkasi sie zugefügt hat), laufende Aktion

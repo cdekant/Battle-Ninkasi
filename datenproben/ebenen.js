@@ -9,6 +9,7 @@ const keller = {
     { typ: "bier", anzahl: 10 }, { typ: "bierfass", anzahl: 1 }, { typ: "brandflasche", anzahl: 3 },
     { typ: "schoepfkelle", anzahl: 1 }, { typ: "fasshammer", anzahl: 1 }, { typ: "lederschuerze", anzahl: 1 },
     { typ: "kupferhelm", anzahl: 1 }, { typ: "lederhose", anzahl: 1 }, { typ: "hopfenkette", anzahl: 1 }, { typ: "kupferring", anzahl: 2 },
+    { typ: "schleuder", anzahl: 1 }, { typ: "kurzbogen", anzahl: 1 }, { typ: "schleuderstein", anzahl: 4, stapel: 5 }, { typ: "pfeil", anzahl: 2, stapel: 10 },
     { typ: "laterne", anzahl: 1 },
   ],
   fallen: [{ typ: "saeureduese", anzahl: 6 }, { typ: "klappergeschirr", anzahl: 6 }],

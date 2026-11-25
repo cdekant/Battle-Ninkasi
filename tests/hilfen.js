@@ -38,6 +38,7 @@ export function miniSpiel(kartenzeilen, { gelaende: testgelaende = {}, schichten
     wahrnehmung: { ...regeln.wahrnehmung, ...regelAbweichungen.wahrnehmung },
     bewegung: { ...regeln.bewegung, ...regelAbweichungen.bewegung },
     werfen: { ...regeln.werfen, ...regelAbweichungen.werfen },
+    fernkampf: { ...regeln.fernkampf, ...regelAbweichungen.fernkampf },
     population: { ...regeln.population, ...regelAbweichungen.population },
     fallen: { ...regeln.fallen, ...regelAbweichungen.fallen },
     tragen: { ...regeln.tragen, ...regelAbweichungen.tragen },

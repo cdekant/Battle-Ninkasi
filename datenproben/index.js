@@ -7,6 +7,7 @@
 import gegner from "./gegner.js";
 import getraenke from "./getraenke.js";
 import wurfgegenstaende from "./wurfgegenstaende.js";
+import fernwaffen from "./fernwaffen.js";
 import ausruestung from "./ausruestung.js";
 import effekte from "./effekte.js";
 import schichten from "./schichten.js";
@@ -26,7 +27,7 @@ import zeichen from "./zeichen.js";
 export default {
   eintraege: {
     wesen: gegner,
-    gegenstaende: { ...getraenke, ...wurfgegenstaende, ...ausruestung },
+    gegenstaende: { ...getraenke, ...wurfgegenstaende, ...fernwaffen, ...ausruestung },
     schichten,
     fallen,
     effekte,

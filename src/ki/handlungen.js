@@ -33,6 +33,7 @@ import { abwarten } from "./abwarten.js";
 import { schrittWeg } from "./schritte.js";
 import { faehigkeitsbefehl } from "./faehigkeitenwahl.js";
 import { nutzbefehl } from "./nutzen.js";
+import { schussbefehl, nachladebefehl } from "../systeme/fernkampf.js";
 import { zeitkosten } from "../kern/spiel.js";
 
 export const VERFOLGEN = Object.freeze({ verfolgen: true });
@@ -61,6 +62,10 @@ handlungAnmelden("fliehen", {}, (spiel, wesen, beute) => {
   const richtung = schrittWeg(spiel, wesen, beute.position);
   return richtung ? { art: "bewegen", ...richtung } : null;
 });
+// Fernwaffe (systeme/fernkampf.js): schießen, wenn die Bahn die Beute als erstes trifft; nachladen, wenn das Magazin leer
+// ist (wann nicht, etwa mit einem Feind daneben, sagt abstandAb im Eintrag)
+handlungAnmelden("schiessen", {}, (spiel, wesen, beute) => schussbefehl(spiel, wesen, beute));
+handlungAnmelden("nachladen", {}, (spiel, wesen) => nachladebefehl(spiel, wesen));
 handlungAnmelden("warten", {}, () => abwarten());
 handlungAnmelden("verfolgen", {}, () => VERFOLGEN);
 

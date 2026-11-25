@@ -196,8 +196,9 @@ bausteinAnmelden("trefferwurf", { genauigkeit: "ganzzahl", effekt: "effekt", geg
   trefferwurfMitFolgen(spiel, kontext, parameter);
 }, { brauchtZiel: true });
 
-// Der Trefferwurf mit seinen Folgen (Effekt, Meldung, Haken), für den Baustein und für Wurfwaffen (systeme/werfen.js);
-// kontext ist ein vollständiger Effektkontext mit zielId, gibt das Ergebnis zurück ("treffer", "ausgewichen", "geblockt")
+// Der Trefferwurf mit seinen Folgen (Effekt, Meldung, Haken), für den Baustein, für Wurfwaffen (systeme/werfen.js) und
+// Schüsse (systeme/fernkampf.js); kontext ist ein vollständiger Effektkontext mit zielId, gibt das Ergebnis zurück
+// ("treffer", "ausgewichen", "geblockt"); parameter.dazu wirkt bei einem Treffer nach effekt (die Wirkung der Munition)
 export function trefferwurfMitFolgen(spiel, kontext, parameter) {
   const entitaeten = spiel.zustand.entitaeten;
   const ziel = entitaeten[kontext.zielId];
@@ -207,6 +208,7 @@ export function trefferwurfMitFolgen(spiel, kontext, parameter) {
   const { ergebnis, kritisch, trefferchance } = trefferwurf(spiel, { quelle, ziel, genauigkeit: parameter.genauigkeit, gegen: parameter.gegen, tags, kritchance: parameter.kritchance });
   if (ergebnis === "treffer") {
     effektAnwenden(spiel, parameter.effekt, { ...kontext, kritisch, trefferchance });
+    if (parameter.dazu && spiel.zustand.entitaeten[kontext.zielId]) effektAnwenden(spiel, parameter.dazu, { ...kontext, kritisch, trefferchance });
     hakenAusloesen(spiel, "nach_treffer", { ...beteiligteAus(kontext), kritisch });
     return ergebnis;
   }

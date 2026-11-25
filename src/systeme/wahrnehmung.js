@@ -124,7 +124,7 @@ export function laermFelder(spiel, ursprung, lautstaerke) {
 }
 
 // Arten von Geräuschen für die Meldung "laerm" (Ninkasi hört sie als vage Zeile im Log, systeme/wahrnehmbar.js)
-export const GERAEUSCHE = ["nahkampf", "aufschlag", "sonstiges"];
+export const GERAEUSCHE = ["nahkampf", "aufschlag", "schuss", "sonstiges"];
 
 // Lärm am Ursprung: Schlafende werden wach, Wache gehen ihm nach; wer jagt, bleibt dabei.
 // Die Meldung sagt mit gesteuerteHoert, ob der Lärm das Feld der gesteuerten Entität erreicht (ihr eigener zählt nicht).

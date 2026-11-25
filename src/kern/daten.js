@@ -151,6 +151,14 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
         const gegenstand = daten.gegenstaende[eintrag?.typ];
         if (!gegenstand || gegenstand.abstrakt) fehler.push(`${eintragOrt}: Gegenstand "${eintrag?.typ}" gibt es nicht`);
         if (eintrag?.anzahl !== undefined && !(istGanzzahl(eintrag.anzahl) && eintrag.anzahl > 0)) fehler.push(`${eintragOrt}: anzahl muss eine ganze Zahl > 0 sein`);
+        // geladen: das Magazin der angelegten Fernwaffe ist voll mit dieser Munition (systeme/fernkampf.js)
+        if (eintrag?.geladen !== undefined && gegenstand) {
+          const schuss = gegenstand.ausruestung?.schuss;
+          const munition = daten.gegenstaende[eintrag.geladen];
+          if (!eintrag.angelegt) fehler.push(`${eintragOrt}: geladen geht nur mit angelegt`);
+          if (!schuss?.magazin || schuss.sorte === undefined) fehler.push(`${eintragOrt}: geladen geht nur mit einer Fernwaffe, die aus Munition nachlädt`);
+          else if (!munition || munition.geschoss?.sorte !== schuss.sorte) fehler.push(`${eintragOrt}: geladen muss eine Munition der sorte "${schuss.sorte}" sein`);
+        }
         if (eintrag?.angelegt === undefined || !gegenstand) return;
         if (typeof eintrag.angelegt !== "boolean") return fehler.push(`${eintragOrt}: angelegt muss true oder false sein`);
         if (!eintrag.angelegt) return;
@@ -305,7 +313,7 @@ function pruefeRegeln(daten, regeln, fehler) {
   const wahrnehmung = regeln.wahrnehmung;
   if (!wahrnehmung) fehler.push("regeln.wahrnehmung fehlt");
   else {
-    for (const feld of ["heimlichkeitVorgabe", "heimlichkeitMindestens", "spurFaktor", "laermNahkampf", "laermWurf"]) {
+    for (const feld of ["heimlichkeitVorgabe", "heimlichkeitMindestens", "spurFaktor", "laermNahkampf", "laermWurf", "laermSchuss"]) {
       if (!istZahlAbNull(wahrnehmung[feld])) fehler.push(`regeln.wahrnehmung.${feld} muss eine ganze Zahl >= 0 sein`);
     }
     if (!istProzent(wahrnehmung.bemerkenChance)) fehler.push("regeln.wahrnehmung.bemerkenChance muss eine ganze Zahl von 0 bis 100 sein");
@@ -315,7 +323,12 @@ function pruefeRegeln(daten, regeln, fehler) {
   }
   if (!istObjekt(regeln.bewegung)) fehler.push("regeln.bewegung fehlt");
   else pruefeParameter(daten, { beimFestsitzen: "effekt", umwegHoechstens: "ganzzahl?" }, regeln.bewegung, "regeln.bewegung", fehler);
-  if (!istGanzzahl(regeln.werfen?.reichweite) || regeln.werfen.reichweite < 1) fehler.push("regeln.werfen.reichweite muss eine ganze Zahl >= 1 sein");
+  // Werfen und Fernkampf, siehe systeme/werfen.js und systeme/fernkampf.js
+  fehler.push(...kurvenfehler(regeln.werfen?.reichweiteNachGewicht, "regeln.werfen.reichweiteNachGewicht"));
+  if (!istObjekt(regeln.werfen?.streuung) || !istProzent(regeln.werfen.streuung.chance) || !istZahlAbNull(regeln.werfen.streuung.weite)) {
+    fehler.push("regeln.werfen.streuung muss { chance: 0 bis 100, weite >= 0 } sein");
+  }
+  if (!istProzent(regeln.fernkampf?.bruchchance)) fehler.push("regeln.fernkampf.bruchchance muss eine ganze Zahl von 0 bis 100 sein");
   if (!istGanzzahl(regeln.population?.hoechstWesen) || regeln.population.hoechstWesen < 1) fehler.push("regeln.population.hoechstWesen muss eine ganze Zahl >= 1 sein");
   if (!istProzent(regeln.population?.tieferChance)) fehler.push("regeln.population.tieferChance muss eine ganze Zahl von 0 bis 100 sein");
   if (!istZahlAbNull(regeln.population?.tieferBis)) fehler.push("regeln.population.tieferBis muss eine ganze Zahl >= 0 sein");
@@ -596,15 +609,19 @@ function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
   if (gegenstand.ersatz !== undefined) pruefeErsatz(daten, gegenstand.ersatz, ort, fehler);
   // Werfen, siehe systeme/werfen.js
   if (gegenstand.wurf !== undefined) {
-    if (!istObjekt(gegenstand.wurf)) fehler.push(`${ort}: wurf muss ein Objekt { effekt?, reichweite?, genauigkeit?, kritchance? } sein`);
+    if (!istObjekt(gegenstand.wurf)) fehler.push(`${ort}: wurf muss ein Objekt { effekt?, reichweite?, genauigkeit?, kritchance?, kosten?, bruchchance? } sein`);
     else {
-      pruefeParameter(daten, { effekt: "effekt?", reichweite: "ganzzahl?", genauigkeit: "ganzzahl?", kritchance: "ganzzahl?" }, gegenstand.wurf, `${ort}.wurf`, fehler);
+      pruefeParameter(daten, { effekt: "effekt?", reichweite: "ganzzahl?", genauigkeit: "ganzzahl?", kritchance: "ganzzahl?", kosten: "ganzzahl?" }, gegenstand.wurf, `${ort}.wurf`, fehler);
       if (gegenstand.wurf.reichweite === 0) fehler.push(`${ort}.wurf: reichweite muss eine ganze Zahl >= 1 sein`);
+      if (gegenstand.wurf.kosten === 0) fehler.push(`${ort}.wurf: kosten muss eine ganze Zahl > 0 sein`);
+      if (gegenstand.wurf.bruchchance !== undefined && !istProzent(gegenstand.wurf.bruchchance)) fehler.push(`${ort}.wurf: bruchchance muss eine ganze Zahl von 0 bis 100 sein`);
+      if (gegenstand.wurf.bruchchance !== undefined && gegenstand.wurf.genauigkeit === undefined) fehler.push(`${ort}.wurf: bruchchance gilt nur mit genauigkeit (eine Wurfwaffe)`);
       // eine Wurfwaffe: genauigkeit macht den Trefferwurf, effekt wirkt beim Treffer (systeme/werfen.js)
       if (gegenstand.wurf.genauigkeit !== undefined && !gegenstand.wurf.effekt) fehler.push(`${ort}.wurf: genauigkeit braucht einen effekt (die Wirkung beim Treffer)`);
       if (gegenstand.wurf.kritchance !== undefined && gegenstand.wurf.genauigkeit === undefined) fehler.push(`${ort}.wurf: kritchance gilt nur mit genauigkeit`);
     }
   }
+  pruefeFernkampf(daten, gegenstand, ort, fehler);
   pruefeVerschleiss(daten, gegenstand, ort, fehler);
   // Licht: leuchtet am Boden und angelegt, siehe systeme/licht.js
   pruefeLicht(gegenstand.licht, ort, fehler);
@@ -617,6 +634,40 @@ function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
     else if (!istZahlAbNull(unbekannt.schwierigkeit)) fehler.push(`${ort}.unbekannt: schwierigkeit muss eine ganze Zahl >= 0 sein`);
   }
   if (!daten.zeichen.gegenstaende[name]) fehler.push(`${ort}: kein Zeichen in daten/zeichen.js`);
+}
+
+// Fernwaffen und Munition, siehe systeme/fernkampf.js
+const SCHUSS_ZIELARTEN = ["geschoss", "strahl"];
+const munitionssorten = (daten) => new Set(Object.values(daten.gegenstaende).map((gegenstand) => gegenstand.geschoss?.sorte).filter(Boolean));
+function pruefeFernkampf(daten, gegenstand, ort, fehler) {
+  if (gegenstand.geschoss !== undefined) {
+    const geschoss = gegenstand.geschoss;
+    if (!istObjekt(geschoss)) fehler.push(`${ort}: geschoss muss ein Objekt { sorte, bruchchance?, effekt?, genauigkeit?, kritchance? } sein`);
+    else {
+      pruefeParameter(daten, { sorte: "text", effekt: "effekt?", genauigkeit: "ganzzahl?", kritchance: "ganzzahl?" }, geschoss, `${ort}.geschoss`, fehler);
+      if (geschoss.bruchchance !== undefined && !istProzent(geschoss.bruchchance)) fehler.push(`${ort}.geschoss: bruchchance muss eine ganze Zahl von 0 bis 100 sein`);
+    }
+  }
+  const schuss = gegenstand.ausruestung?.schuss;
+  if (schuss === undefined) return;
+  const stelle = `${ort}.ausruestung.schuss`;
+  if (!istObjekt(schuss)) return fehler.push(`${stelle}: schuss muss ein Objekt { name, genauigkeit, effekt, reichweite, ... } sein`);
+  pruefeParameter(daten, { name: "text", genauigkeit: "ganzzahl", effekt: "effekt", reichweite: "ganzzahl", sorte: "text?", kritchance: "ganzzahl?", laerm: "ganzzahl?", zielart: SCHUSS_ZIELARTEN }, schuss, stelle, fehler);
+  for (const feld of ["reichweite", "kosten", "schuesse"]) {
+    if (schuss[feld] !== undefined && !(istGanzzahl(schuss[feld]) && schuss[feld] > 0)) fehler.push(`${stelle}: ${feld} muss eine ganze Zahl > 0 sein`);
+  }
+  if (schuss.tags !== undefined && !istTextliste(schuss.tags)) fehler.push(`${stelle}: tags muss eine Liste von Texten sein`);
+  if (schuss.sorte !== undefined && !munitionssorten(daten).has(schuss.sorte)) fehler.push(`${stelle}: keine Munition mit geschoss.sorte "${schuss.sorte}"`);
+  const magazin = schuss.magazin;
+  if (magazin === undefined) {
+    if (schuss.sorte === undefined) fehler.push(`${stelle}: ohne magazin braucht der Schuss eine sorte (Munition aus dem Gepäck)`);
+    return;
+  }
+  if (!istObjekt(magazin) || !(istGanzzahl(magazin.fasst) && magazin.fasst > 0)) return fehler.push(`${stelle}.magazin: magazin muss { fasst > 0, nachladen?, auffuellen? } sein`);
+  if (magazin.nachladen !== undefined && !(istGanzzahl(magazin.nachladen) && magazin.nachladen > 0)) fehler.push(`${stelle}.magazin: nachladen muss eine ganze Zahl > 0 sein`);
+  if (magazin.auffuellen !== undefined && !(istObjekt(magazin.auffuellen) && istGanzzahl(magazin.auffuellen.je) && magazin.auffuellen.je > 0)) fehler.push(`${stelle}.magazin: auffuellen muss { je > 0 } sein`);
+  if (schuss.sorte === undefined && magazin.auffuellen === undefined) fehler.push(`${stelle}: ein Magazin ohne sorte muss sich über auffuellen selbst füllen`);
+  if (schuss.sorte !== undefined && magazin.auffuellen !== undefined) fehler.push(`${stelle}: ein Magazin füllt sich entweder aus Munition (sorte) oder von selbst (auffuellen)`);
 }
 
 // Verderben und Haltbarkeit, siehe systeme/verschleiss.js
@@ -1286,6 +1337,10 @@ function pruefeEbene(daten, name, ebene, fehler) {
   if (ebene.tuerChance !== undefined && !istProzent(ebene.tuerChance)) fehler.push(`${ort}: tuerChance muss eine ganze Zahl von 0 bis 100 sein`);
   for (const gegenstand of ebene.gegenstaende || []) {
     if (!daten.gegenstaende[gegenstand.typ]) fehler.push(`${ort}: Gegenstand "${gegenstand.typ}" gibt es nicht`);
+    // stapel: so viele Stück liegen je Platz als ein Stapel (welt/ebenenschritte.js)
+    else if (gegenstand.stapel !== undefined && !(istGanzzahl(gegenstand.stapel) && gegenstand.stapel > 0 && daten.gegenstaende[gegenstand.typ].stapelbar)) {
+      fehler.push(`${ort}: stapel von "${gegenstand.typ}" muss eine ganze Zahl > 0 an einem stapelbaren Gegenstand sein`);
+    }
   }
   if (ebene.karte === undefined) for (const rolle of ["wand", "boden"]) {
     if (!daten.gelaende[ebene.gelaende?.[rolle]]) fehler.push(`${ort}: gelaende.${rolle} verweist auf unbekanntes Gelände`);

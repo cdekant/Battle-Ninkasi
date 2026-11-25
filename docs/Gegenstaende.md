@@ -18,10 +18,11 @@ Daten:
 
 + Am Gegenstand: `stapelbar: true`, `ladungen: { hoechstens, gewichtJe? }` (Stand in `ladungen.aktuell`, Vorgabe `hoechstens`), `wirdZu: Typ` (Behälter nach dem letzten Gebrauch), `gewicht` in Gramm, `lesbar: { effekt, bleibt? }` (Schriftrolle, Braubuch), `ersatz` (passive Ersatzwirkung aus dem Gepäck, siehe [Wirkungen.md](Wirkungen.md), Ersatzwirkungen); an der Entität `anzahl` (Vorgabe 1) und `getragenVon`
 + Am Wesen: `inventar: [IDs]`, `tragkraft` (sonst `regeln.tragen.tragkraft`, 20000 g)
-+ Ausstattung in den Daten eines Wesens: `ausstattung: [{ typ, anzahl?, angelegt? }]` (Vorgabe `anzahl` 1), keine Komponente; beim Erzeugen aus Daten liegt sie im Gepäck, mit `angelegt: true` ist das Stück schon angelegt (ohne Zeit, Meldung und Haken, `anlegenOhneZeit` in `src/systeme/ausruestung.js`); die Datenprüfung verlangt dafür Ausrüstung, `anzahl` 1 und genug freie Stellen am Platz des Wesens, ohne etwas zu verdrängen
++ Ausstattung in den Daten eines Wesens: `ausstattung: [{ typ, anzahl?, angelegt?, geladen? }]` (Vorgabe `anzahl` 1), keine Komponente; beim Erzeugen aus Daten liegt sie im Gepäck, mit `angelegt: true` ist das Stück schon angelegt (ohne Zeit, Meldung und Haken, `anlegenOhneZeit` in `src/systeme/ausruestung.js`); die Datenprüfung verlangt dafür Ausrüstung, `anzahl` 1 und genug freie Stellen am Platz des Wesens, ohne etwas zu verdrängen; mit `geladen: munitionstyp` hat eine angelegte Fernwaffe mit Magazin ein volles Magazin dieser Munition, ohne sie aus dem Gepäck zu nehmen (Handler `ausstattung_geladen` in `src/systeme/fernkampf.js`, siehe [Wesen.md](Wesen.md), Fernkampf)
++ Munition: `geschoss: { sorte, bruchchance?, effekt?, genauigkeit?, kritchance? }` an einem stapelbaren Gegenstand; an einer Fernwaffe mit Magazin der Inhalt `geladen: { typ, anzahl, gewichtJe }` (siehe [Wesen.md](Wesen.md), Fernkampf)
 + Zweck für die KI: `zweck: [name]` an `trinkbar` (und an `wurf`, siehe [Wesen.md](Wesen.md), KI)
 + Regelwert `regeln.tragen.stufen`: ab 100 % der Tragkraft kostet Bewegen 25 % mehr, ab 150 % 100 % mehr
-+ Getränke in `datenproben/getraenke.js`, Wurfgegenstände in `datenproben/wurfgegenstaende.js`
++ Getränke in `datenproben/getraenke.js`, Wurfgegenstände in `datenproben/wurfgegenstaende.js`, Fernwaffen und Munition in `datenproben/fernwaffen.js`
 
 Schnittstellen (`src/systeme/inventar.js`):
 
@@ -34,10 +35,10 @@ Regeln:
 
 + Beim Aufheben fließt ein Gegenstand in einen Stapel, der in allen übrigen Komponenten gleich ist, so stapeln sich z.B. Sauerbier und Bier nicht; nur der Zeitpunkt des Verderbens zählt nicht, er wird gemittelt (siehe Verschleiß); auf dem Boden fließt nichts zusammen
 + Lesen wendet `lesbar.effekt` auf die Leserin an (Ursache `lesen`) und erkennt den Gegenstand vorher wie das Trinken; ohne `bleibt` ist ein Stück verbraucht, mit `bleibt: true` bleibt er; was er tut, sagt allein der Effekt: lehren mit `faehigkeit_lehren` (siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten) oder einmal wirken wie ein Verbrauchsgegenstand
-+ Trinken, Lesen, Werfen und Material für Fähigkeiten nehmen ein Stück, Fallenlassen den ganzen Stapel; Trinken nimmt bei Ladungen eine Ladung; ein Gegenstand mit Ladungen stapelt sich nicht
++ Trinken, Lesen, Werfen, Schießen ohne Magazin und Material für Fähigkeiten nehmen ein Stück, Nachladen so viele, wie ins Magazin passen, Fallenlassen den ganzen Stapel; Trinken nimmt bei Ladungen eine Ladung; ein Gegenstand mit Ladungen stapelt sich nicht
 + Ausstattung geht über `insInventar`, stapelbare fließen also zu einem Stapel zusammen; ein Wesen lässt sie beim Tod fallen wie alles im Gepäck (siehe [Wirkungen.md](Wirkungen.md), Tod und Zustandsprüfung)
 + Nach dem letzten Gebrauch kommt `wirdZu` ins Gepäck (Bier zu leerer Flasche, Bierfass zu Fass), Grundlage für das Brauen; der Ballast ist gewollt
-+ Gewicht mit Ladungen zuzüglich `gewichtJe` je Ladung; die Last ist die Summe über das Gepäck, Angelegtes eingeschlossen, dieses mit seinem gefühlten Gewicht (siehe Ausrüstung)
++ Gewicht mit Ladungen zuzüglich `gewichtJe` je Ladung, eine Fernwaffe zuzüglich `geladen.gewichtJe` je Schuss im Magazin; die Last ist die Summe über das Gepäck, Angelegtes eingeschlossen, dieses mit seinem gefühlten Gewicht (siehe Ausrüstung)
 + Tragkraft mit Modifikatoren auf `tragkraft` (Skills folgen); verboten ist nichts, Überladung verteuert nur das Bewegen, nach allen Modifikatoren
 + Anzeige: das Inventarfenster zeigt Stapel (x 3), Ladungen (19/20), Angelegtes und die Last (Last 3,2 / 20 kg, rot "überladen"), die Seitenleiste nur die Last
 

@@ -39,6 +39,25 @@ export default {
     },
   },
 
+  // Schützin mit Schleuder (src/systeme/fernkampf.js): Stärke 2 der Normierung im Nahkampf, dazu der Schuss; schießt aus
+  // Abstand, hält ihn, wenn sie kann, und schlägt zu, wenn Ninkasi daneben steht; in keiner Population, nur in der Arena
+  schuetzin_test: {
+    vorlage: "normwesen",
+    text: "wesen.schuetzin_test",
+    werte: { lp: { grundwert: 22 } },
+    ep: 70,
+    plaetze: { hand: 2 },
+    angriffe: [{ name: "normschlag", genauigkeit: 47, effekt: "normschlag_2" }],
+    ausstattung: [{ typ: "schleuder", angelegt: true }, { typ: "schleuderstein", anzahl: 12 }],
+    ki: {
+      modul: "jagen", letzteBekanntePosition: null,
+      handlungen: [
+        { handlung: "schiessen", abstandAb: 2 },
+        { handlung: "abstand_halten", abstand: 4 },
+      ],
+    },
+  },
+
   // Psi-Jägerin (src/systeme/glimmer.js): kommt ab Glimmer 30, kennt Ninkasis Ort; Stärke 3 der Normierung mit
   // Psi-Schaden; in keiner Population, später werden die Geister früherer Läufe zu Jägerinnen; vorläufig
   psi_jaegerin: {

@@ -152,6 +152,32 @@ export default {
       },
     },
   },
+  // Fernwaffen auf Abstand, je Gattung eine Probe; leer gefunden, also lädt sie vor dem ersten Schuss nach
+  fernwaffen: {
+    text: "arena.fernwaffen", karte: "arena_offen", taktik: "fernkampf", abstand: 8,
+    ninkasi: { grundausstattung: false, ausruestung: ["kurzbogen"], gepaeck: [{ typ: "pfeil", anzahl: 20 }] },
+    wellen: [[{ typ: "normwesen_3" }]],
+    varianten: {
+      ninkasi: {
+        schleuder: { ausruestung: ["schleuder"], gepaeck: [{ typ: "schleuderstein", anzahl: 20 }] },
+        kurzbogen: { ausruestung: ["kurzbogen"], gepaeck: [{ typ: "pfeil", anzahl: 20 }] },
+        armbrust: { ausruestung: ["armbrust"], gepaeck: [{ typ: "bolzen", anzahl: 20 }] },
+        pistole: { ausruestung: ["pistole"], gepaeck: [{ typ: "kugel", anzahl: 24 }] },
+        druckkanone: { ausruestung: ["druckkanone"], gepaeck: [] },
+        laser: { ausruestung: ["laser"], gepaeck: [{ typ: "zelle", anzahl: 40 }] },
+      },
+      gegner: {
+        s2: { wellen: [[{ typ: "normwesen_2" }]] },
+        s3: { wellen: [[{ typ: "normwesen_3" }]] },
+        drei_s2: { wellen: [[{ typ: "normwesen_2", anzahl: 3 }]] },
+      },
+    },
+  },
+  // Ninkasi mit der Grundausstattung gegen eine Schützin, die Abstand hält
+  schuetzin: {
+    text: "arena.schuetzin", karte: "arena_offen", taktik: "fernkampf", abstand: 6,
+    wellen: [[{ typ: "schuetzin_test" }]],
+  },
   normwesen_drei: {
     text: "arena.normwesen_drei", karte: "arena_offen", taktik: "nahkampf",
     wellen: [[{ typ: "normwesen_1", anzahl: 3 }]],

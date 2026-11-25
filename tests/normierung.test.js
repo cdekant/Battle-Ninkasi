@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { rohdaten, texteDe as texte } from "../src/inhalt.js";
 import { datenLaden } from "../src/kern/spiel.js";
 import { vorbereiten } from "../src/kern/daten.js";
-import { normwerte, abweichungenVon, mittlererSchaden } from "../werkzeuge/normierung.js";
+import { normwerte, abweichungenVon, mittlererSchaden, waffenwerte } from "../werkzeuge/normierung.js";
 import { rohdatenMitTesteintraegen } from "./hilfen.js";
 
 const DATEN = datenLaden(rohdaten, texte);
@@ -64,4 +64,15 @@ test("Datenprüfung: Zielwerte der Normierung", () => {
     [(daten) => { daten.regeln.normierung.verbrauch = { zauber: 10 }; }, "regeln.normierung.verbrauch"],
   ];
   for (const [aendern, teilDerMeldung] of erwartet) assert.ok(pruefen(aendern).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
+});
+
+test("Waffen: Wurfwaffe drei Viertel des Dolchs je Treffer, Bogen das 1,3-Fache eines Schwerthiebs bei etwa doppelter Zeit", () => {
+  const werte = Object.fromEntries(waffenwerte(DATEN).map((zeile) => [zeile.typ, zeile]));
+  const nahe = (wert, ziel, toleranzProzent) => Math.abs(wert - ziel) * 100 <= ziel * toleranzProzent;
+  assert.ok(nahe(werte.wurfmesser.schaden / werte.dolch.schaden, 0.75, 10), "Wurfmesser gegen Dolch");
+  assert.ok(nahe(werte.kurzbogen.schaden / werte.pruefschwert.schaden, 1.3, 10), "Bogen gegen Schwert je Treffer");
+  assert.ok(nahe(werte.kurzbogen.zeit / werte.pruefschwert.zeit, 2, 15), "Bogen gegen Schwert in der Zeit");
+  // Magazin: Zeit je Treffer über den Zyklus, Pistole 3 Aktionen zu 100 für 6 Schuss plus 200 Nachladen
+  assert.equal(werte.pistole.zeit, 500 / 6);
+  assert.equal(werte.druckkanone.zeit, 300, "nie schneller als das Auffüllen");
 });

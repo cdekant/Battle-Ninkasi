@@ -1,6 +1,9 @@
 // Vorschau für den Zielmodus (siehe docs/Bedienung.md, Zielmodus): reine Lesefunktionen, ändern nichts und würfeln nicht.
 // Eine Auswahl sagt, womit gezielt wird:
 //   { zweck: "werfen", gegenstandId }       ein Gegenstand aus dem Gepäck (systeme/werfen.js)
+//   { zweck: "schiessen", waffeId }         eine angelegte Fernwaffe (systeme/fernkampf.js)
+// Wurfwaffen und Schüsse zeigen die Chance ihres eigenen Trefferwurfs; ein zerspringender Wurf zeigt die Felder, auf die
+// er streuen kann (streuung).
 //   { zweck: "faehigkeit", faehigkeit }     eine Fähigkeit der Akteurin (systeme/faehigkeiten.js)
 // Trefferchance: nur, wenn die Wirkung unmittelbar mit einem Baustein trefferwurf beginnt; ein Trefferwurf, der erst
 // verschachtelt kommt (z.B. in fuer_jedes_ziel), ist ohne Simulation nicht vorherzusagen, die Chance bleibt dann offen.
@@ -13,7 +16,8 @@ import { istWehrlos } from "./zustaende.js";
 import { istSichtbar } from "./sicht.js";
 import { zielAufloesen } from "./zielauswahl.js";
 import { faehigkeitFuer, faehigkeitPruefen, wirkungsziele } from "./faehigkeiten.js";
-import { wurfbahn } from "./werfen.js";
+import { wurfbahn, streufelder } from "./werfen.js";
+import { fernwaffeVon, schussbahn, schussZiele, schusswerte, naechsteMunition } from "./fernkampf.js";
 
 const ohneDoppelte = (liste) => [...new Set(liste)];
 const tagsDesEffekts = (spiel, effektName) => spiel.daten.effekte?.[effektName]?.tags || [];
@@ -68,6 +72,23 @@ function betroffeneMitChance(spiel, akteur, zielIds, effektName, tags) {
     .map((entitaet) => ({ id: entitaet.id, chance: trefferchanceVorschau(spiel, akteur, entitaet, effektName, tags) }));
 }
 
+// Chance eines eigenen Trefferwurfs mit dieser Genauigkeit (Wurfwaffe, Schuss): { prozent, hinterhalt? }
+function chanceMitGenauigkeit(spiel, quelle, ziel, genauigkeit, effektName, tags) {
+  if (istAhnungslos(ziel)) return { prozent: 100, hinterhalt: true };
+  if (istWehrlos(spiel, ziel)) return { prozent: 100 };
+  const { zaehler, nenner } = trefferanteil(spiel, { quelle, ziel, genauigkeit, tags: ohneDoppelte([...tags, ...tagsDesEffekts(spiel, effektName)]) });
+  return { prozent: anteilInProzent(zaehler, nenner) };
+}
+
+// Sichtbare Wesen unter den Zielen mit der Chance eines eigenen Trefferwurfs
+function betroffeneMitGenauigkeit(spiel, akteur, zielIds, genauigkeit, effektName, tags) {
+  const zustand = spiel.zustand;
+  return zielIds.map((id) => entitaetMitId(zustand, id))
+    .filter((entitaet) => entitaet && istWesen(entitaet) && entitaet.position)
+    .filter((entitaet) => !istGesteuert(zustand, akteur) || istSichtbar(zustand, entitaet.position.x, entitaet.position.y))
+    .map((entitaet) => ({ id: entitaet.id, chance: chanceMitGenauigkeit(spiel, akteur, entitaet, genauigkeit, effektName, tags) }));
+}
+
 function wurfVorschau(spiel, akteur, auswahl, zielangabe) {
   const befehl = { art: "werfen", gegenstandId: auswahl.gegenstandId, ziel: zielangabe };
   const grund = holen("befehle", "werfen").pruefen(spiel, akteur, befehl);
@@ -75,7 +96,23 @@ function wurfVorschau(spiel, akteur, auswahl, zielangabe) {
   const aufloesung = gegenstand ? wurfbahn(spiel, akteur, gegenstand, zielangabe) : { ok: false, grund: "nichts_zu_werfen" };
   // ohne effekt landet der Gegenstand nur, es trifft niemanden
   const getroffen = aufloesung.ok && gegenstand.wurf?.effekt ? aufloesung.bahn.getroffene.slice(0, 1) : [];
-  return { grund, aufloesung, betroffene: betroffeneMitChance(spiel, akteur, getroffen, gegenstand?.wurf?.effekt, []), befehl };
+  const streuung = aufloesung.ok ? streufelder(spiel, akteur, gegenstand, aufloesung.bahn) : [];
+  const betroffene = gegenstand?.wurf?.genauigkeit !== undefined
+    ? betroffeneMitGenauigkeit(spiel, akteur, getroffen, gegenstand.wurf.genauigkeit, gegenstand.wurf.effekt, ["wurf"])
+    : betroffeneMitChance(spiel, akteur, getroffen, gegenstand?.wurf?.effekt, []);
+  return { grund, aufloesung, betroffene, befehl, streuung };
+}
+
+function schussVorschau(spiel, akteur, auswahl, zielangabe) {
+  const befehl = { art: "schiessen", waffeId: auswahl.waffeId, ziel: zielangabe };
+  const grund = holen("befehle", "schiessen").pruefen(spiel, akteur, befehl);
+  const waffe = fernwaffeVon(spiel, akteur, auswahl.waffeId);
+  if (!waffe) return { grund, aufloesung: { ok: false, grund }, betroffene: [], befehl };
+  const aufloesung = schussbahn(spiel, akteur, waffe, zielangabe);
+  const schuss = waffe.ausruestung.schuss;
+  const { genauigkeit } = schusswerte(waffe, naechsteMunition(spiel, akteur, waffe));
+  const zielIds = aufloesung.ok ? schussZiele(waffe, aufloesung.bahn) : [];
+  return { grund, aufloesung, betroffene: betroffeneMitGenauigkeit(spiel, akteur, zielIds, genauigkeit, schuss.effekt, schuss.tags || []), befehl };
 }
 
 function faehigkeitVorschau(spiel, akteur, auswahl, zielangabe) {
@@ -89,8 +126,10 @@ function faehigkeitVorschau(spiel, akteur, auswahl, zielangabe) {
 }
 
 // Vorschau einer Auswahl auf eine Zielangabe ({ x, y } | { id } | { dx, dy }):
-// { ok, grund (null, wenn der Befehl ginge), aufloesung (aus zielAufloesen, mit felder und bahn), betroffene: [{ id, chance }], befehl }
+// { ok, grund (null, wenn der Befehl ginge), aufloesung (aus zielAufloesen, mit felder und bahn), betroffene: [{ id, chance }],
+// befehl, streuung: [{ x, y }] }
+const VORSCHAUEN = { werfen: wurfVorschau, schiessen: schussVorschau, faehigkeit: faehigkeitVorschau };
 export function zielvorschau(spiel, akteur, auswahl, zielangabe) {
-  const vorschau = auswahl.zweck === "werfen" ? wurfVorschau(spiel, akteur, auswahl, zielangabe) : faehigkeitVorschau(spiel, akteur, auswahl, zielangabe);
-  return { ok: vorschau.grund === null, ...vorschau };
+  const vorschau = VORSCHAUEN[auswahl.zweck](spiel, akteur, auswahl, zielangabe);
+  return { ok: vorschau.grund === null, streuung: [], ...vorschau };
 }

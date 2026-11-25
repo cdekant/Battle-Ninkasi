@@ -35,11 +35,12 @@ export default {
     heimlichkeitVorgabe: 7, // Heimlichkeitsweite ohne eigenen Kampfwert heimlichkeit
     heimlichkeitMindestens: 2,
     // nach der letzten eigenen Aktion, in Prozent: Kämpfen verdoppelt, Warten (Rasten) halbiert
-    heimlichkeitNachAktion: { nahkampf: 200, faehigkeit: 200, warten: 50 },
+    heimlichkeitNachAktion: { nahkampf: 200, faehigkeit: 200, schiessen: 200, warten: 50 },
     bemerkenChance: 25, // Prozent je Zug für ein Wesen innerhalb der Weite, das noch nichts bemerkt hat
     spurFaktor: 3, // ein jagendes Wesen verliert die Spur jenseits dieses Vielfachen der Weite
     laermNahkampf: 6, // Lautstärke eines Nahkampfs (Kosten der Ausbreitung, freies Feld 1)
     laermWurf: 4, // Lautstärke am Aufschlag eines geworfenen Gegenstands
+    laermSchuss: 2, // Lautstärke am Abschuss, ohne schuss.laerm an der Waffe
   },
   // Spur als Duft, siehe src/systeme/duft.js; Vorbild Brogue, alle Zahlen vorläufig
   duft: {
@@ -115,7 +116,14 @@ export default {
   },
   // Werfen, siehe src/systeme/werfen.js
   werfen: {
-    reichweite: 6, // ohne wurf.reichweite am Gegenstand
+    // Reichweite in Feldern nach dem Gewicht in Gramm, ohne wurf.reichweite am Gegenstand
+    reichweiteNachGewicht: [[0, 8], [500, 6], [1500, 4], [5000, 2]],
+    // ein zerspringender Wurf (ohne wurf.genauigkeit) geht mit chance Prozent 1 bis weite Felder daneben
+    streuung: { chance: 40, weite: 2 },
+  },
+  // Fernkampf, siehe src/systeme/fernkampf.js; alle Zahlen vorläufig
+  fernkampf: {
+    bruchchance: 15, // Prozent, mit der ein Geschoss oder eine Wurfwaffe nach dem Flug zerbricht, ohne eigene bruchchance
   },
   // Lange Aktionen (Rituale, Brauen), siehe src/systeme/laufendeAktionen.js:
   // Gefahrenprüfungen (Register "gefahren"), die Ninkasi unterbrechen und fragen

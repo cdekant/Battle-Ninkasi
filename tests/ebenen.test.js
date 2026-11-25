@@ -164,9 +164,11 @@ test("Datenprüfung: Abfolge, Starttiefe, feste Karte, Population und Tabellen",
 // den alten Werten blieben die Werte gleich, die Prüfstücke der Arenen ändern nichts); neu mit 0.68.0 für Ninkasis
 // Grundausstattung (Dolch angelegt, Wurfmesser) und die LP der Gegner mal 1,36 (ohne Ausstattung und mit den alten LP
 // blieben die Werte gleich); neu mit 0.70.0 für die EP aus Tiefe und Wissen statt je Feld (freieEp, tiefsteTiefe an
-// Ninkasi; ohne diese beiden Felder blieben die Werte gleich).
+// Ninkasi; ohne diese beiden Felder blieben die Werte gleich); neu mit 0.71.0 für die Fernwaffen im Keller (Schleuder,
+// Kurzbogen, Steine und Pfeile) und Kosten und Bruchchance der Wurfwaffen (mit den alten Gegenständen des Kellers und
+// den alten Wurfwaffen blieben die Werte gleich).
 test("Erzeugung in Schritten: dieselben Ebenen wie vorher", () => {
-  const erwartet = { 1: "aaa26fad82323661", 2: "e4c4cd81dc9ec305", 3: "7b8ed7463e60c15a", 42: "1ac2418dd7b72c72", 4711: "2ac80c6962cbbdd6" };
+  const erwartet = { 1: "ad6c58cb6bc9cc20", 2: "21f290ca35d38b66", 3: "653846887aa8380c", 42: "bd8e130d5de7dd53", 4711: "8da4e76289e49b13" };
   for (const [startwert, fingerabdruck] of Object.entries(erwartet)) {
     const spiel = neuesSpiel(DATEN, Number(startwert));
     for (const tiefe of [2, 3, 0]) ebeneWechseln(spiel, tiefe);

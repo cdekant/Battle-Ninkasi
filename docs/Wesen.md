@@ -2,13 +2,13 @@
 
 Stand: 2026-11-25
 
-Zuständig für: `src/systeme/kampf.js`, `src/systeme/kampfzustand.js`, `src/systeme/fraktionen.js`, `src/systeme/wahrnehmung.js`, `src/systeme/sinne.js`, `src/systeme/bewegung.js`, `src/systeme/verschieben.js`, `src/systeme/werfen.js`, `src/systeme/skills.js`, `src/systeme/lernen.js`, `src/systeme/wissen.js`, `src/systeme/stoffwechsel.js`, `src/systeme/glimmer.js`, `src/ki/*`, `daten/ninkasi.js`, `daten/fraktionen.js`, `daten/schadensarten.js`, `daten/eigenschaften.js`, `daten/taktiken.js`
+Zuständig für: `src/systeme/kampf.js`, `src/systeme/kampfzustand.js`, `src/systeme/fraktionen.js`, `src/systeme/wahrnehmung.js`, `src/systeme/sinne.js`, `src/systeme/bewegung.js`, `src/systeme/verschieben.js`, `src/systeme/werfen.js`, `src/systeme/fernkampf.js`, `src/systeme/skills.js`, `src/systeme/lernen.js`, `src/systeme/wissen.js`, `src/systeme/stoffwechsel.js`, `src/systeme/glimmer.js`, `src/ki/*`, `daten/ninkasi.js`, `daten/fraktionen.js`, `daten/schadensarten.js`, `daten/eigenschaften.js`, `daten/taktiken.js`
 
 Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Charakter.md](Charakter.md), [Grundlagen.md](Grundlagen.md), [Ausblick.md](Ausblick.md), [Gegenstaende.md](Gegenstaende.md), [Skills.md](Skills.md)
 
 ## Zweck
 
-Was Wesen können und wie sie entscheiden: Kampfwerte und Schadensrechnung, Kampfzustand, Normierung, Fraktionen mit Ruf und Beistand, Wahrnehmung, KI, Bewegung samt Verschieben und Werfen, Stoffwechsel, Skills und Lernen. Jeder Abschnitt nennt, soweit vorhanden, Daten, Schnittstellen und Regeln.
+Was Wesen können und wie sie entscheiden: Kampfwerte und Schadensrechnung, Kampfzustand, Normierung, Fraktionen mit Ruf und Beistand, Wahrnehmung, KI, Bewegung samt Verschieben und Werfen, Fernkampf, Stoffwechsel, Skills und Lernen. Jeder Abschnitt nennt, soweit vorhanden, Daten, Schnittstellen und Regeln.
 
 ## Kampfwerte
 
@@ -85,11 +85,13 @@ Daten:
 Schnittstellen (`werkzeuge/normierung.js`, siehe [Entwicklung.md](Entwicklung.md), Bot und Werkzeuge):
 
 + `normwerte(daten, typen?)`: je Wesen mit Angriff `{ typ, lp, ep, ninkasi, wesen, staerke }`, `ninkasi` und `wesen` je `{ trefferchance, treffer, zeit }`; `abweichungenVon(daten, zeile, staerke?)`; `mittlererSchaden(daten, effekt)`
++ `waffenwerte(daten)`: je Gegenstand mit Angriffsprofil, Schuss oder Wurfwaffe `{ typ, art, schaden, zeit, schadenJe100 }` mit dem mittleren Schaden je Treffer (ohne die Wirkung der Munition) und der Zeit je Treffer über einen ganzen Zyklus (Magazin: Aktionen je Magazin mal Kosten plus Nachladen durch `fasst`; Auffüllen nie schneller als ein Schuss je `je`)
 
 Regeln:
 
 + Ninkasi zu Beginn ist die der Arena `normwesen`: mit der Grundausstattung (Dolch, siehe [Charakter.md](Charakter.md), Startwerte), ohne Skills, 100 LP; wechselt die Grundausstattung, ändern sich die LP aller Gegner im selben Verhältnis
 + Waffen richten sich nach dem Dolch: eine gute frühe Fundwaffe kostet Ninkasi gegen ihre Paradegegner etwa ein Viertel weniger eigene LP als der Dolch (Messwerte der Prüfwaffen in [Entwicklung.md](Entwicklung.md), Messwerte)
++ Fernwaffen: eine Wurfwaffe macht je Treffer etwa 75 % des Dolchs; ein Bogenschuss etwa das 1,3-Fache eines Hiebs des Prüfschwerts bei etwa doppelter Zeit; Waffen mit Magazin werden über den ganzen Zyklus gemessen, damit automatische Waffen nicht alles schlagen (`tests/normierung.test.js`); die Werte werden nachgeregelt
 + Standardangriff ist das erste Angriffsprofil; sein mittlerer Schaden kommt aus dem ersten Baustein `schaden`, auch hinter einem `trefferwurf`; Fernangriffe aus Fähigkeiten zählen nicht mit
 + Treffer bis zum Tod sind LP durch mittleren Schaden, ohne Rüstung und Widerstand; Zeit bis zum Tod sind Treffer durch Trefferchance mal Kosten des Profils
 + Die Stärke eines Wesens ist die nächste nach der Summe der Abweichungen beider Trefferzahlen; ein Normwesen muss seine Ziele innerhalb der Toleranz treffen, seine EP genau, die Trefferchancen auf 2 Punkte (`tests/normierung.test.js`)
@@ -131,14 +133,14 @@ Daten:
 + Wachzustand in der KI-Komponente (`WACHZUSTAENDE`): `ki.wachzustand` `schlaeft`, `wach` oder `jagt` (Vorgabe `jagt`); in den Daten z.B. `ki: { modul: "jagen", wachzustand: "schlaeft" }`; dazu `letzteBekanntePosition`
 + Am Akteur `letzteAktion` (gesetzt in `befehlAusfuehren`, siehe [Architektur.md](Architektur.md), Befehle)
 + Spüren: Komponente `spueren: { reichweite }` am Wesen (Lesefunktion `spuerenVon`), Modifikatorziel `reichweiteSpueren`, ohne Komponente 0 (auch Ninkasi)
-+ Regelwerte `regeln.wahrnehmung`: `heimlichkeitVorgabe` 7, `heimlichkeitMindestens` 2, `heimlichkeitNachAktion` (Nahkampf und Fähigkeit 200 %, Warten 50 %), `bemerkenChance` 25, `spurFaktor` 3, `laermNahkampf` 6, `laermWurf` 4; Lärmdämpfung des Geländes `laermdaempfung` (Wand 8) in `daten/gelaende.js`
++ Regelwerte `regeln.wahrnehmung`: `heimlichkeitVorgabe` 7, `heimlichkeitMindestens` 2, `heimlichkeitNachAktion` (Nahkampf, Fähigkeit und Schießen 200 %, Warten 50 %), `bemerkenChance` 25, `spurFaktor` 3, `laermNahkampf` 6, `laermWurf` 4, `laermSchuss` 2 (ohne `schuss.laerm` an der Waffe, siehe Fernkampf); Lärmdämpfung des Geländes `laermdaempfung` (Wand 8) in `daten/gelaende.js`
 
 Schnittstellen:
 
 + `src/systeme/sicht.js`: `sieht` (Ninkasi sieht, was in ihrem Sichtfeld liegt; alle anderen sehen ein Ziel mit freier Sichtlinie innerhalb ihrer Sichtweite, auch Ninkasi, wenn genug Licht auf seinem Feld liegt, siehe [Welt.md](Welt.md), Licht), `reichweiteSicht`, `sichtImFinstern`, `sichtAufStufe`, `sichtJeStufe`, `hellGenug`, `sichtfeldAktualisieren` (PreciseShadowcasting aus rot.js), `istSichtbar`, `kandidatenInSicht`
 + `src/systeme/sinne.js`: Register `sinne` (`{ art, reichweite(spiel, betrachter), nimmtWahr(spiel, betrachter, ziel) }`, die Anmeldereihenfolge ist der Vorrang): `sehen` (Art `gesehen`, über `sieht`), `spueren` (Art `gespuert`, über `spuert`); `wahrnehmungsart(spiel, betrachter, ziel)` (die Art des ersten Sinns, der wahrnimmt, sonst `null`; Arten in `WAHRNEHMUNGSARTEN`), `nimmtWahr`, `kandidatenWahrnehmbar` (für die gesteuerte Entität alle mit Position, sonst der Umkreis der größten Reichweite ihrer Sinne), `wesenMitWahrnehmungsart`, `reichweiteSpueren`, `offenFuerSpueren`
 + `src/systeme/wahrnehmung.js`: `wahrnehmen` (vor dem Zug eines Wesens mit KI, aus `warteschlangeAbarbeiten`), `wachzustandVon`, `istAhnungslos`, `heimlichkeitsweite`, `spurweite`, `laermMachen`, `laermFelder`; Baustein `laerm { lautstaerke }`
-+ Meldungen `bemerkt`, `aufgewacht`, `laerm` (mit `geraeusch` aus `GERAEUSCHE`: `nahkampf`, `aufschlag`, `sonstiges`, und `gesteuerteHoert`, nicht bei eigenem Lärm; siehe [Anzeige.md](Anzeige.md), Anzeige)
++ Meldungen `bemerkt`, `aufgewacht`, `laerm` (mit `geraeusch` aus `GERAEUSCHE`: `nahkampf`, `aufschlag`, `schuss`, `sonstiges`, und `gesteuerteHoert`, nicht bei eigenem Lärm; siehe [Anzeige.md](Anzeige.md), Anzeige)
 
 Regeln:
 
@@ -179,7 +181,7 @@ Schnittstellen:
 + `src/ki/handlungen.js`: `handlungWaehlen(spiel, wesen, ki, beute)` (Befehl, `VERFOLGEN` oder `null`), `wertung(spiel, wesen, beute, eintrag, ziel?)`; Register `kihandlungen` (`{ parameter, zielwahl?, befehl(spiel, wesen, beute, eintrag, ziel) }`, ohne Nebenwirkungen, weil die Wahl alle Einträge und Ziele fragt; `zielwahl` tragen `faehigkeit` und `nutzen`) und `kieingaben` (`(spiel, wesen, beute, ziel) => ganze Zahl`)
 + `faehigkeitsbefehl(spiel, wesen, name, ziel, beute?)` (`src/ki/faehigkeitenwahl.js`): der Befehl einer Fähigkeit gegen das Ziel oder `null`
 + `umherziehbefehl(spiel, wesen, ki)` (`src/ki/umherziehen.js`): der Befehl eines wachen Wesens ohne Spur; verändert `ki`, darum nur für den gewählten Befehl
-+ `taktikbefehl(spiel, taktik)` (`src/ki/taktik.js`): der Befehl, mit dem die gesteuerte Entität nach einer Taktik aus `daten/taktiken.js` kämpft (`{ text, handlungen, wahl? }` im Format der Handlungen, geprüft wie die KI eines jagenden Wesens); Beute ist der nächste wahrgenommene Feind, die Wahl läuft über `handlungWaehlen`, kommt keine Handlung in Frage oder heißt sie `verfolgen`, setzt sie nach und greift an (`verfolgungsbefehl` mit einer Wegwerf-KI, der Zustand bleibt unberührt); nimmt sie keinen Feind wahr, geht sie zum nächsten, den es gibt, sonst wartet sie; genutzt vom automatischen Kampf in der Arena, vom Werkzeug `werkzeuge/arena.js` und vom Bot (siehe [Architektur.md](Architektur.md), Spielarten); Taktiken vorläufig `nahkampf` (trinkt unter 40 % LP, sonst Nahkampf) und `fernkampf` (dazu ab Abstand 2 `nutzen` mit Zweck `angriff`: Fähigkeiten, dann Würfe; dafür trägt die `testfaehigkeit` den Zweck `angriff`)
++ `taktikbefehl(spiel, taktik)` (`src/ki/taktik.js`): der Befehl, mit dem die gesteuerte Entität nach einer Taktik aus `daten/taktiken.js` kämpft (`{ text, handlungen, wahl? }` im Format der Handlungen, geprüft wie die KI eines jagenden Wesens); Beute ist der nächste wahrgenommene Feind, die Wahl läuft über `handlungWaehlen`, kommt keine Handlung in Frage oder heißt sie `verfolgen`, setzt sie nach und greift an (`verfolgungsbefehl` mit einer Wegwerf-KI, der Zustand bleibt unberührt); nimmt sie keinen Feind wahr, geht sie zum nächsten, den es gibt, sonst wartet sie; genutzt vom automatischen Kampf in der Arena, vom Werkzeug `werkzeuge/arena.js` und vom Bot (siehe [Architektur.md](Architektur.md), Spielarten); Taktiken vorläufig `nahkampf` (trinkt unter 40 % LP, sonst Nahkampf) und `fernkampf` (dazu ab Abstand 2 `schiessen`, `nachladen` und `nutzen` mit Zweck `angriff`: Fähigkeiten, dann Würfe; dafür trägt die `testfaehigkeit` den Zweck `angriff`; steht der Feind daneben, Nahkampf statt nachzuladen; Abstand hält die Taktik nicht)
 + `nutzbefehl(spiel, wesen, zweck, ziel, beute?)` (`src/ki/nutzen.js`): der Befehl für `nutzen` gegen das Ziel oder `null`; Register `nutzungen` (`{ feld, ziel: "selbst" | "beute", befehl(spiel, wesen, ziel, gegenstand) }`, ohne Nebenwirkungen): ein Gegenstand dient einem Zweck über eine Nutzung, wenn `gegenstand[feld].zweck` ihn enthält, und nur für das Ziel nach `ziel`; angemeldet von den Systemen, die den Befehl kennen: `trinken` (Feld `trinkbar`, Ziel `selbst`, `src/systeme/inventar.js`), `werfen` (Feld `wurf`, Ziel `beute`, `src/systeme/werfen.js`)
 + `verfolgungsbefehl`, `angriffDaneben`, `duftfolgebefehl` (siehe [Welt.md](Welt.md), Duft) (`src/ki/verfolgen.js`); `geltenderVorrang`, `vorrangBefehl` (`src/ki/vorrang.js`)
 + `kiVon` (`src/kern/zustand.js`) liefert die wirksame KI, auch eine überlagerte
@@ -201,6 +203,7 @@ Regeln:
 + Umherziehen (Vorbild Brogue): ein waches Wesen ohne Vorrang, das keinem Lärm nachgeht, zieht von Wegpunkt zu Wegpunkt (`ebene.wegpunkte`); der erste wird gewürfelt (Wurf `umherziehen`), erreicht ist einer auf höchstens einem Feld Abstand oder wenn er von hier nicht erreichbar ist, dann kommt er zu `besucht` und es geht zum nächsten unbesuchten (Schachbrett, bei Gleichstand der frühere); sind alle besucht, beginnt die Liste neu ohne den gerade erreichten; auf einer anderen Ebene beginnt die Wanderung neu; mit `umherziehen: false` oder unbeweglich wartet es wie ein Wächter
 + Schritt beim Umherziehen: über die Abstandskarte des Wegpunkts (siehe [Welt.md](Welt.md), Wegfindung) auf das freie Nachbarfeld, das ihm am nächsten ist, in fester Richtungsfolge, ohne gefährliche Felder und Fallen; ist keins frei, wartet es
 + Rudel: ein Mitglied mit `anfuehrerinId` zieht nicht selbst, sondern geht zur Anführerin (Weg um Wesen herum), wenn sie mehr als `rudelAbstand` Felder entfernt ist, sonst wartet es; ist sie fort oder tot, vergisst es sie und zieht allein weiter
++ `schiessen` und `nachladen` (siehe Fernkampf): mit der ersten angelegten Fernwaffe; geschossen wird nur, wenn die Bahn die Beute als erstes Wesen trifft, nachgeladen nur, wenn das Magazin leer ist und Munition da; wann nicht, etwa mit einem Feind daneben, sagt `abstandAb` im Eintrag
 + `abstand_halten { abstand: n }`: steht die Beute näher als n, weicht das Wesen zurück (in die Ecke gedrängt kein Befehl, dann greift es normal an), auf genau n Feldern wartet es, bei mehr kommt die Handlung nicht in Frage
 + Ungültige Befehle der KI werden zu `warten`; handlungsunfähige Wesen warten (siehe [Architektur.md](Architektur.md), Zeitmodell)
 
@@ -214,7 +217,8 @@ Daten:
 + Bewegungsarten am Wesen: `bewegung`, Vorgabe `laufend`, sonst `fliegend`, `schwebend`, `phasend`, `unbeweglich`; ein Zustand überlagert sie mit `bewegung` (Levitation, Phasen)
 + Gelände: `passierbar: true` gilt für alle, `passierbarFuer: [Arten]` für einzelne (Abgrund für `fliegend`, Wasser für `fliegend` und `schwebend`), `undurchdringlich: true` hält auch `phasend` auf, `beimFestsitzen` (Effekt)
 + Arten des Versetzens (`VERSETZARTEN`): `schritt`, `stoss`, `zug`, `tausch`, `teleport`, `herausgedrueckt`
-+ Werfen: am Gegenstand `wurf: { reichweite?, effekt?, genauigkeit?, kritchance? }`; mit `genauigkeit` (nur mit `effekt`) ist er eine Wurfwaffe (Vorbild Brogue): Trefferwurf gegen das erste Wesen der Bahn mit dem Tag `wurf` (`trefferwurfMitFolgen` in `src/systeme/kampf.js`, wie der Baustein `trefferwurf`), ein Treffer wirkt den Effekt und verbraucht das Stück (Meldung `verbraucht`), ein Fehlwurf oder ein Wurf ohne Wesen landet wie ohne Effekt (Meldung `gelandet`) und lässt sich wieder aufheben; vom Stapel fliegt nur ein Stück; Regelwerte `regeln.werfen.reichweite` (6), `regeln.bewegung.beimFestsitzen` (`eingeklemmt`, 2W6 stumpf, vorläufig), Zeitkosten `aktionen.werfen`
++ Werfen: am Gegenstand `wurf: { reichweite?, effekt?, genauigkeit?, kritchance?, kosten?, bruchchance? }`; mit `genauigkeit` (nur mit `effekt`) ist er eine Wurfwaffe (Vorbild Brogue): Trefferwurf gegen das erste Wesen der Bahn mit dem Tag `wurf` (`trefferwurfMitFolgen` in `src/systeme/kampf.js`, wie der Baustein `trefferwurf`), ein Treffer wirkt den Effekt; danach landet sie, nach einem Treffer unter dem Ziel (Meldung `gelandet`), oder zerbricht nach `bruchchance` in Prozent (Vorgabe `regeln.fernkampf.bruchchance`, Meldung `zerbrochen`, mit 100 ohne Meldung verbraucht) und lässt sich sonst wieder aufheben; vom Stapel fliegt nur ein Stück; `kosten` sind die Zeitkosten des Wurfs (Vorgabe `aktionen.werfen`); nur `bruchchance` und `kritchance` verlangen `genauigkeit`
++ Regelwerte `regeln.werfen`: `reichweiteNachGewicht` als Kurve über dem Gewicht in Gramm (8 Felder bis 0 g, 6 bei 500, 4 bei 1500, 2 ab 5000), `streuung: { chance: 40, weite: 2 }`; dazu `regeln.bewegung.beimFestsitzen` (`eingeklemmt`, 2W6 stumpf, vorläufig); alle Zahlen vorläufig
 
 Schnittstellen:
 
@@ -226,7 +230,7 @@ Schnittstellen:
   + `tauschen`: Quelle und Ziel tauschen die Plätze, wenn jedes das Feld des anderen betreten kann; Meldung `getauscht`
   + `teleportieren { wer?, muster?, zufaellig? }`: das Ziel (mit `wer: "quelle"` die Quelle, z.B. Blinzeln) aufs Zielfeld, mit `muster` auf ein zufälliges freies Feld des Musters, mit `zufaellig` auf ein zufälliges freies Feld der Ebene; Meldung `teleportiert`
 + Zustandsprüfung `lage` (Register `zustandspruefungen`, nach dem Tod), Meldungen `festgesessen` und `herausgedrueckt`
-+ Werfen (`src/systeme/werfen.js`): Meldungen `geworfen`, `geschoss`, `zerbrochen`, `verbraucht` bzw. `gelandet`; Gründe der Ablehnung `nichts_zu_werfen` und die der Zielauswahl
++ Werfen (`src/systeme/werfen.js`): Meldungen `geworfen`, `streut`, `geschoss`, `zerbrochen` bzw. `gelandet`; Gründe der Ablehnung `nichts_zu_werfen` und die der Zielauswahl; `wurfReichweite`, `wurfbahn`, `streufelder` (für die Vorschau), `landenOderBrechen` (auch für Schüsse, siehe Fernkampf)
 
 Regeln:
 
@@ -238,7 +242,42 @@ Regeln:
 + Gelände, das das Ziel nicht betreten kann, aber nicht fest ist (Abgrund, Wasser), hält beim Stoßen nicht auf: das Ziel landet darin, die Lageprüfung folgt
 + Teleportieren: ist das Zielfeld besetzt oder nicht betretbar, aufs nächste freie (Breitensuche); gezogen wird aus einer festen Reihenfolge
 + Lage: steht ein lebendes Wesen auf einem Feld, das es mit seiner wirksamen Bewegungsart nicht betreten kann (Phasen endet in der Wand, Levitation über dem Abgrund, hineingestoßen), wirkt `beimFestsitzen` des Geländes, sonst `regeln.bewegung.beimFestsitzen`; lebt es danach, wird es aufs nächste freie Feld gedrückt; ein Sturz in einen Abgrund auf die Ebene darunter ist noch nicht umgesetzt
-+ Werfen entlang der Bahn eines Geschosses (bis zum ersten Wesen oder vor die Wand), Reichweite `wurf.reichweite` am Gegenstand, sonst `regeln.werfen.reichweite`; mit `wurf.effekt` zerbricht der Gegenstand am Aufschlag und der Effekt wirkt dort (Ziel das getroffene Wesen, Ursache `wurf`), sonst landet er auf dem Feld, ist es nicht passierbar (ein Gärbottich ist durchsichtig und lässt Geschosse durch), auf dem letzten passierbaren Feld der Bahn davor; am Aufschlag entsteht Lärm (`laermWurf`), dem Wache nachgehen; im Browser über das Inventarfenster (w) und den Zielmodus (siehe [Bedienung.md](Bedienung.md), Zielmodus)
++ Werfen entlang der Bahn eines Geschosses (bis zum ersten Wesen oder vor die Wand); Reichweite `wurf.reichweite` am Gegenstand, sonst nach seinem Gewicht (mit der Ladung, `einzelgewicht`) auf der Kurve `reichweiteNachGewicht`, danach Modifikatoren auf `reichweite` mit dem Tag `wurf` und den Tags des Gegenstands (ein Skill wirft so etwa nur Tränke weiter), mindestens 1; mit `wurf.effekt` und ohne `genauigkeit` zerbricht der Gegenstand am Aufschlag und der Effekt wirkt dort (Ziel das getroffene Wesen, Ursache `wurf`), sonst landet er auf dem Feld, ist es nicht passierbar (ein Gärbottich ist durchsichtig und lässt Geschosse durch), auf dem letzten passierbaren Feld der Bahn davor; am Aufschlag entsteht Lärm (`laermWurf`), dem Wache nachgehen; im Browser über das Inventarfenster (w), den Fernangriff (s) und den Zielmodus (siehe [Bedienung.md](Bedienung.md), Zielmodus)
++ Streuung nur für Zerspringendes (mit `effekt`, ohne `genauigkeit`): mit `streuung.chance` Prozent (Modifikator `streuung.chance` mit denselben Tags, Wurf `streuung`) landet der Wurf 1 bis `streuung.weite` Felder (Modifikator `streuung.weite`, Wurf `streuung_weite`) neben dem anvisierten Aufschlag in einer der acht Richtungen (Wurf `streuung_richtung`, im Uhrzeigersinn ab Norden), am Kartenrand abgeschnitten; die neue Bahn fliegt bis zur Reichweite plus `weite` und trifft, was auf ihr liegt (Meldung `streut`); landet sie auf der Werferin selbst, gilt die anvisierte; Chance oder Weite 0 würfeln nicht; die Vorschau zeigt alle Felder bis zur Weite um den Aufschlag
+
+## Fernkampf
+
+Ein Modell für alle Fernwaffen von der Schleuder bis zum Laser, nur die Werte unterscheiden sich (Spieldesign in [Skills.md](Skills.md), Kampf, Fernkampf). Vorbilder: Angband (Werte von Werfer und Geschoss zusammen), DCSS und NetHack (Munition bricht nach dem Schuss mit einer Chance), Brogue (Wurfwaffen landen und lassen sich aufheben).
+
+Daten:
+
++ Schuss an der Waffe: `ausruestung.schuss: { name, genauigkeit, effekt, reichweite, sorte?, kosten?, kritchance?, zielart?, schuesse?, laerm?, tags?, magazin? }`; `sorte` die Munition, die sie verschießt; `kosten` die Zeit eines Schusses (Vorgabe `aktionen.schiessen`), ohne Magazin steckt das Laden darin; `zielart` `geschoss` (Vorgabe, das erste Wesen der Bahn) oder `strahl` (alle Wesen auf der Linie bis zur Reichweite, der Durchschuss); `schuesse` eine Salve (Vorgabe 1); `laerm` die Lautstärke am Abschuss (Vorgabe `regeln.wahrnehmung.laermSchuss`); `tags` mit `fernkampf` und der Gattung (`spann`, `feuer`, `druck`, `energie`); Flächen und Rückstoß kommen aus dem Effekt (Kreis am Aufschlag, Baustein `stossen`)
++ `magazin: { fasst, nachladen?, auffuellen?: { je } }`: ohne Magazin nimmt jeder Schuss ein Stück aus dem Gepäck (Munitionsart `gepaeck`: Schleuder, Bogen), mit Magazin schießt die Waffe aus ihrem Inhalt (Munitionsart `magazin`: Armbrust, Feuer-, Druck-, Energiewaffen); `nachladen` die Zeit des Nachladens (Vorgabe `aktionen.nachladen`); `auffuellen` füllt das Magazin ohne Munition mit einem Schuss je `je` Zeiteinheiten (Druck), dann ohne `sorte`
++ Munition: `geschoss: { sorte, bruchchance?, effekt?, genauigkeit?, kritchance? }` an einem stapelbaren Gegenstand mit Gewicht; Wurfwaffen tragen zusätzlich `wurf` (der Schleuderstein taugt von Hand)
++ Inhalt des Magazins am Gegenstand: `geladen: { typ, anzahl, gewichtJe }`, mit `auffuellen` `{ anzahl, seit }`; zählt zum Gewicht der Waffe (`einzelgewicht`, siehe [Gegenstaende.md](Gegenstaende.md), Inventar)
++ Ausstattung eines Wesens mit vollem Magazin: `{ typ, angelegt: true, geladen: munitionstyp }` (Ausstattung siehe [Gegenstaende.md](Gegenstaende.md), Inventar)
++ Befehle: `{ art: "schiessen", waffeId?, munitionId?, ziel: { x, y } | { id } }`, `{ art: "nachladen", waffeId?, munitionId? }`; ohne `waffeId` die erste angelegte Fernwaffe, ohne `munitionId` der erste passende Stapel im Gepäck
++ Regelwerte: `regeln.fernkampf.bruchchance` 15 (Prozent, ohne eigene `bruchchance`), `regeln.wahrnehmung.laermSchuss` 2, Zeitkosten `aktionen.schiessen` und `aktionen.nachladen` je 100; alle Zahlen vorläufig
+
+Schnittstellen (`src/systeme/fernkampf.js`):
+
++ `fernwaffen`, `fernwaffeVon(spiel, wesen, waffeId?)`, `munitionImGepaeck`, `magazinStand` (Schuss im Magazin, ohne Magazin `null`), `munitionsvorrat` (`{ geladen, fasst, imGepaeck, typ? }` für die Anzeige), `schussZielart`, `schussbahn`, `schussZiele`, `schusswerte`, `naechsteMunition`; für die KI `schussbefehl` und `nachladebefehl`
++ Register `munitionsarten` (`{ bereit, entnehmen, vorrat }`): `gepaeck` und `magazin`; eine weitere Art kommt ohne Umbau dazu
++ Meldungen `geschossen`, `geschoss`, `gelandet` bzw. `zerbrochen`, `nachgeladen`; Lärm `schuss` am Abschuss, `aufschlag`, wo ein Stück landet oder zerbricht; Haken `gegenstand_benutzt` mit `art` `schiessen` bzw. `nachladen`
++ Gründe der Ablehnung: `keine_fernwaffe`, `keine_munition`, `leer`, `nicht_nachladbar`, `schon_geladen` und die der Zielauswahl
++ Baustein-Parameter `dazu` an `trefferwurfMitFolgen` (`src/systeme/kampf.js`): ein zweiter Effekt bei einem Treffer, die Wirkung der Munition
+
+Regeln:
+
++ Eine leere Waffe schießt nicht; nachgeladen wird nie von selbst, damit die Spielerin den Zug lieber für den Nahkampf nutzen kann, wenn der Feind schon daneben steht
++ Schuss: Bahn wie beim Werfen, Reichweite `schuss.reichweite` nach Modifikatoren auf `reichweite` mit den Tags des Schusses; Trefferwurf über `trefferwurfMitFolgen` mit der Genauigkeit und dem Krit von Waffe und Munition zusammen (Ursache `schuss`, Mittel die Waffe), bei einem Treffer wirkt der Effekt der Waffe, danach der der Munition
++ Nach dem Schuss landet ein Stück Munition, nach einem Treffer unter dem Ziel, oder zerbricht nach seiner `bruchchance`; mit 100 entsteht es gar nicht erst als Stück (Kugel, Zelle)
++ Salve: jeder Schuss nimmt eigene Munition und würfelt selbst; sie endet mit dem leeren Magazin; fällt das Ziel, fliegen die übrigen Schüsse auf sein Feld
++ Nachladen füllt das ganze Magazin aus dem Gepäck, auch aus mehreren Stapeln derselben Art, und kostet einmal `nachladen`; im Magazin liegt nur eine Art, eine andere Art gibt den Rest ins Gepäck zurück; volle Waffe derselben Art: `schon_geladen`
++ Auffüllen: der Stand folgt aus der Zeit seit `seit`, nachgerechnet nur bei Bedarf; nach einem Schuss rückt `seit` um die vollen Abschnitte vor, ein volles Magazin füllt ab dem Schuss nach; eine solche Waffe beginnt beim Erzeugen leer (Register `beimErzeugen`)
++ Fundstücke liegen leer, Beute behält den Rest im Magazin
++ Lärm am Abschuss nach `schuss.laerm` und Modifikatoren auf `laerm` mit den Tags des Schusses (ein Schalldämpfer); Wände dämpfen ihn wie jeden Lärm
++ Fernwaffen verschleißen nicht durch Gebrauch (siehe [Grundlagen.md](Grundlagen.md), Spielkern)
 
 ## Stoffwechsel
 
@@ -337,7 +376,7 @@ Regeln:
 
 ## Tests
 
-+ `tests/kampf.test.js` (Trefferwurf, Blocken, Krit, Schadensrechnung, Profile), `tests/zeitskala.test.js` (wehrlos, Kampfzustand als Bedingung), `tests/normierung.test.js` (Normwesen, Einordnung, Datenprüfung), `tests/fraktionen.test.js` (Beziehungen, Zorn, Ruf, Kampfzustand, Beistand), `tests/wahrnehmung.test.js` (Wachzustand, Bemerken, Lärm, Hinterhalt), `tests/sinne.test.js` (Arten der Wahrnehmung, Spüren entlang offener Felder, Bemerken und Jagen nach Gespürtem), `tests/faehigkeitenwahl.test.js`, `tests/verhalten.test.js`, `tests/handlungen.test.js` (auch Ziele unter Verbündeten), `tests/nutzen.test.js` und `tests/arena.test.js` (KI, Taktik), `tests/umherziehen.test.js` (Wegpunkte, Wachzustand der Population, Umherziehen, Rudel, Abstandskarte), `tests/verschieben.test.js` (Bewegungsarten, Stoßen, Ziehen, Tauschen, Teleportieren, Lage, Werfen), `tests/wege.test.js`, `tests/stoffwechsel.test.js`, `tests/rausch.test.js` (Strafen des Rauschs, Danebenschlagen, Schlag ins Leere, `risiko.<ausgang>`, Ninkasis Skala), `tests/glimmer.test.js` (Glimmer, Psi-Jägerin, Filmriss, geführte Züge), `tests/skills.test.js` und `tests/lernen.test.js`
++ `tests/kampf.test.js` (Trefferwurf, Blocken, Krit, Schadensrechnung, Profile), `tests/fernkampf.test.js` (Schuss aus Gepäck und Magazin, Nachladen, Auffüllen, Salve, Strahl, Munition, KI, Reichweite nach Gewicht, Streuung, Datenprüfung), `tests/zeitskala.test.js` (wehrlos, Kampfzustand als Bedingung), `tests/normierung.test.js` (Normwesen, Einordnung, Datenprüfung), `tests/fraktionen.test.js` (Beziehungen, Zorn, Ruf, Kampfzustand, Beistand), `tests/wahrnehmung.test.js` (Wachzustand, Bemerken, Lärm, Hinterhalt), `tests/sinne.test.js` (Arten der Wahrnehmung, Spüren entlang offener Felder, Bemerken und Jagen nach Gespürtem), `tests/faehigkeitenwahl.test.js`, `tests/verhalten.test.js`, `tests/handlungen.test.js` (auch Ziele unter Verbündeten), `tests/nutzen.test.js` und `tests/arena.test.js` (KI, Taktik), `tests/umherziehen.test.js` (Wegpunkte, Wachzustand der Population, Umherziehen, Rudel, Abstandskarte), `tests/verschieben.test.js` (Bewegungsarten, Stoßen, Ziehen, Tauschen, Teleportieren, Lage, Werfen), `tests/wege.test.js`, `tests/stoffwechsel.test.js`, `tests/rausch.test.js` (Strafen des Rauschs, Danebenschlagen, Schlag ins Leere, `risiko.<ausgang>`, Ninkasis Skala), `tests/glimmer.test.js` (Glimmer, Psi-Jägerin, Filmriss, geführte Züge), `tests/skills.test.js` und `tests/lernen.test.js`
 
 ## Verweise
 

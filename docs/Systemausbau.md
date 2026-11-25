@@ -10,18 +10,18 @@ Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und wäh
 
 + Jeder Punkt wird vor der Umsetzung als Vorschlag ausgearbeitet und freigegeben
 + Status je Punkt: offen oder in Arbeit
-+ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 8, 10, 11, 16, 20, 22 und 23 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
++ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 8, 10, 11, 16, 20 und 23 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
 
 ## Reihenfolge
 
 Stand 2026-11-25, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer Wirkung auf den Inhalt, das Kleine und Breite zuerst:
 
-1. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10); das Brausystem (Punkt 23) und die Fernwaffen (Punkt 22)
+1. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10) und das Brausystem (Punkt 23)
 2. Ebenenbau: Ebenenbilder, Übergänge und feste Strukturen (Punkt 16)
 3. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
 4. Danach der Inhalt (Punkt 14)
 
-Daneben, ohne festen Platz: Skills für Anhänger (Punkt 21, Umbaurisiko gering, umgesetzt mit den Begleitern bzw. den Geistern früherer Läufe), kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12), Korpustexte aus dem Gilgamesch-Epos (Punkt 18), Auszeichnung in Texten (Punkt 19, spätestens mit dem Fenster des Glossars); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 3 (Licht, Wahrnehmungsarten, Spüren und Duft), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen), Punkt 9 (Englisch, Mehrzahl und Glossar), Punkt 15 (Reste des Effektsystems), Punkt 17 (Bierstile) und der Entwurf des Skillkatalogs in [Skills.md](Skills.md) (Grundlage von Punkt 20), die Nummern der übrigen bleiben.
+Daneben, ohne festen Platz: Skills für Anhänger (Punkt 21, Umbaurisiko gering, umgesetzt mit den Begleitern bzw. den Geistern früherer Läufe), kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12), Korpustexte aus dem Gilgamesch-Epos (Punkt 18), Auszeichnung in Texten (Punkt 19, spätestens mit dem Fenster des Glossars); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 3 (Licht, Wahrnehmungsarten, Spüren und Duft), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen), Punkt 9 (Englisch, Mehrzahl und Glossar), Punkt 15 (Reste des Effektsystems), Punkt 17 (Bierstile), Punkt 22 (Fernwaffen) und der Entwurf des Skillkatalogs in [Skills.md](Skills.md) (Grundlage von Punkt 20), die Nummern der übrigen bleiben.
 
 Die Proben des Probedurchstichs stehen in `tests/probedurchstich.test.js`; jede Lücke dort ist ein Test mit `todo` und dem Punkt, der sie schließt, mit einem Entwurf der Daten (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing). Wer einen Punkt umsetzt, nimmt dort das `todo` weg.
 
@@ -33,12 +33,12 @@ Die Proben des Probedurchstichs stehen in `tests/probedurchstich.test.js`; jede 
 
 Status: offen, jeweils mit dem ersten Bedarf
 
-+ Ladungen als Verbrauch einer gewährten Fähigkeit (Zauberstab, Regel in [Grundlagen.md](Grundlagen.md), Spielkern): Entwurf `verbrauch: { ladungen: 1 }`, bezahlt vom zuerst angelegten Gegenstand der Quelle, der noch Ladungen hat; jede gewährte Fähigkeit kennt ihre Quelle (`gegenstandId`, siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten); das Fähigkeitenfenster zeigt die Summe der Ladungen
++ Ladungen als Verbrauch einer gewährten Fähigkeit (Zauberstab, Regel in [Grundlagen.md](Grundlagen.md), Spielkern): Entwurf `verbrauch: { ladungen: 1 }`, bezahlt vom zuerst angelegten Gegenstand der Quelle, der noch Ladungen hat; jede gewährte Fähigkeit kennt ihre Quelle (`gegenstandId`, siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten); das Fähigkeitenfenster zeigt die Summe der Ladungen; prüfen, ob die Ladungen als Magazin ohne Nachladen ins Modell der Fernwaffen passen (siehe [Wesen.md](Wesen.md), Fernkampf)
 + Lesen mit Ziel: eine Rolle wirkt eine Fähigkeit einmal, ohne sie zu lehren (Entwurf `lesbar: { faehigkeit }`, Befehl `lesen { gegenstandId, ziel? }` über den Zielmodus); heute wirkt ein lesbarer Gegenstand nur auf die Leserin
 + Haken `zug_beginn` in Betrieb nehmen
 + Licht ein- und ausschalten: ein Zustand an der Quelle (Entwurf `licht.an`) und ein Befehl dafür (Lampe, Laterne, Fackel löschen), mit dem ersten Inhalt, der es braucht (siehe [Welt.md](Welt.md), Licht)
 + Ersatzwirkungen an weiteren Haken "davor" (z.B. `vor_angriff` für ein Ausweichen aus Daten) und eine Barriere als Puffer mit Fassungsvermögen statt ganzer Treffer (Entwurf `fasst`, Vorbild ToME), siehe [Wirkungen.md](Wirkungen.md), Ersatzwirkungen
-+ Auslöser mit Filter auf den Grund des Ereignisses (`verfehlt` mit `grund: "geblockt"`), etwa für Verschleiß eines Schilds beim Blocken; Verschleiß durch Gebrauch bleibt bis dahin ausgeschlossen (siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß)
++ Auslöser mit Filter auf den Grund des Ereignisses (`verfehlt` mit `grund: "geblockt"`), etwa für Gegenwurf, Riposte und Zurückwerfen (siehe Punkt 20)
 + Angefressene Waffen: wie sie schwächer werden, braucht einen Eingriff in die Schadensrechnung (siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß)
 + Sturz in einen Abgrund auf die Ebene darunter (siehe [Wesen.md](Wesen.md), Bewegung)
 + Abzug einer Anforderung nur für den Angriff mit genau dieser Waffe (über Tags der Profile)
@@ -49,7 +49,6 @@ Status: offen, jeweils mit dem ersten Bedarf
 + Skills der Arena in EP statt in Stufen (`skills: { name: ep }` in `datenproben/arenen.js`), die EP fließen mit den Eigenschaften der Arena-Ninkasi in Lernpunkte wie beim Verteilen freier EP; so vergleicht die Arena Builds mit gleichem Budget; später vielleicht ein Budget `ep` mit Verteilregel; alle Inhaltsdaten nennen EP, nur Unittests setzen Stufen direkt
 + Verzauberungen und Anstriche an Gegenständen: mehrere zugleich an einem Stück, erster Fall der Säureschutz aus einem häufigen Rezept des Absuds (Spieldesign in [Grundlagen.md](Grundlagen.md), Spielkern, und [Brauen.md](Brauen.md), Absud)
 + Leiser Lärm für Schritte, damit Lauschen mehr hört als Kämpfe; mit einer Prüfung der Leistung bei vielen Wesen; ändert die Fingerabdrücke in `tests/ebenen.test.js`
-+ Verschleiß durch Gebrauch für Waffen und Rüstung (heute nur über `abnutzen`, siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß), zusammen mit wirksamen Wegen zur Pflege und Reparatur (Entscheidung in [Grundlagen.md](Grundlagen.md), Spielkern); braucht die Auslöser mit Filter auf den Grund
 + Abzug der zweiten Hand: die Profile der zweiten Waffe tragen in `angriffeVon` den Tag `zweite_hand`, der Abzug wirkt als Modifikator darauf (Entwurf `regeln.kampf.zweiteHand: { genauigkeit: -20, schaden: -25, kostenAufschlag: 20 }` in Prozent, der Aufschlag auf die Kosten der langsameren Waffe); heute sind zwei Waffen ohne Nachteil (Entscheidung in [Skills.md](Skills.md), Kampf, Handhabung)
 + Aktionen ohne Zeit für die KI (Sprint der Gegner): eine Handlung dafür erst mit dem ersten Gegner, der sprinten soll; die Flucht nur vor Langsameren rechnet bisher ohne Sprint (Entscheidung 2026-11-24, siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten)
 + Gewichtung `anteil` der gebundenen EP zum Vergleich mit `erste`; Ortsbindung des Verteilens (`regeln.lernen.ort`), falls gewünscht
@@ -68,6 +67,7 @@ Status: in Arbeit; jeweils zuerst in [Grundlagen.md](Grundlagen.md), [Charakter.
   + Befund des räumenden Bots (siehe [Entwicklung.md](Entwicklung.md), Messwerte): die Gegner der ersten Ebene treffen ihr Ziel, die Erkundung bringt mit 1 EP je Feld etwa 3000 statt 700 bis 1000 EP, zusammen reicht es für fast vier statt zwei Grundskills auf Stufe 5; entschieden: keine EP je Feld mehr, dafür Tiefen-EP und Wissens-EP, und nur ein Anteil der EP aus Bewältigtem ist gebunden (siehe [Charakter.md](Charakter.md), Freie EP und Gebundene EP); die gründlich spielende Ninkasi überlebt die erste Ebene immer und trinkt kaum, das ist gewollt (siehe [Spielverlauf.md](Spielverlauf.md), Erstes Kapitel); offen ist, wie die Härte ab der zweiten Ebene steigt
   + Die Tiefen-EP senken, sobald echter Inhalt mehr Wissen bringt (heute 1000 für Tiefe 2, weil der Probeinhalt nur zwei Wesenarten hat); Wissens-EP für Zutaten und Kulturen mit dem Brausystem (Punkt 23), für besondere Orte mit dem Ebenenbau (Punkt 16)
   + Eine eilige Strategie für den räumenden Bot (zielstrebig zur Treppe) als Untergrenze des EP-Budgets
+  + Fernwaffen nachregeln: mit den Probewerten fällt ein Gegner der Stärke 3 auf Abstand 8 fast immer vor der Berührung (siehe [Entwicklung.md](Entwicklung.md), Messwerte); der räumende Bot legt Fernwaffen noch nicht an, die Taktik `fernkampf` hält keinen Abstand (siehe Punkt 11, Arena)
   + Ziele für Skills in der Arena, sobald es Waffenskills gibt (Punkt 20), mit Skills in EP (Punkt 8)
   + Ökonomie der Vorräte als ein Kreislauf mit Skill- und Brausystem: Rasten und Regeneration, Bier als Heilung, Brauen als Quelle, Skills als Hebel, Druck gegen endloses Rasten, Ausdauer und Nahrung (siehe [Ausblick.md](Ausblick.md), Druck gegen endloses Rasten); darin Rasten als Weg zu heilen gegen den Zeitdruck, was der Sprint verbraucht (heute nur doppelter Pegelabbau) und der Verbrauch je Ebene mit Ninkasis Anfangstempo als Maßstab
   + EP aus Erkundung gegen EP aus Gegnern, bezogen auf die zu erwartenden Skillstufen je Ebene und die Builds, die daraus folgen (Messwerte in [Entwicklung.md](Entwicklung.md), Messwerte)
@@ -204,17 +204,6 @@ Status: offen, ohne festen Platz; nach dem Umbaurisiko eingeordnet
 + Vorschlag: Gegner bekommen feste Werte in ihren Daten, Verbündete (Begleiter, das Tier der Jägerin) und die Geister früherer Läufe tragen Skills; die Geister brauchen das, weil sie den Build einer früheren Ninkasi tragen (siehe [Ausblick.md](Ausblick.md), Geister früherer Läufe)
 + Umbaurisiko gering: Modifikator- und Auslöserquelle `skills`, die Bedingung `skill_ab` und der Ausbau der Fähigkeiten lesen den Lernstand an jedem Wesen; an Ninkasi gebunden sind nur das Einrichten, das Gewinnen von EP mit dem Beitragsbuch, die Datenprüfung der Startskills und die Arena (siehe [Wesen.md](Wesen.md), Skills und Lernen)
 + Umsetzung mit den Begleitern bzw. den Geistern früherer Läufe; das Set Ausbildung braucht es, damit Verbündete mitlernen (siehe [Skills.md](Skills.md), Soziales)
-
-## 22. Fernwaffen
-
-Status: offen, ein neues System von Grund auf; die Zeitskala steht (Spannen und Nachladen kosten Zeit), vor dem Inhalt, weil die Jägerin es braucht (Spieldesign in [Skills.md](Skills.md), Kampf, Fernkampf)
-
-+ Heute gibt es nur das Werfen (siehe [Wesen.md](Wesen.md), Bewegung) und Fernangriffe der Gegner über Fähigkeiten mit Abklingzeit; Fernwaffen für Ninkasi fehlen ganz
-+ Waffe mit einem Profil auf Entfernung (Reichweite, Zielart `geschoss` oder `strahl`, Tag der Gattung), Schießen über den Zielmodus wie das Werfen
-+ Munition je Gattung: Pfeile und Bolzen als Stapel im Gepäck, landen nach dem Schuss mit einer Chance zu brechen; Kugeln verbraucht, Nachladen als Aktion mit Zeit; Druck, der sich in der Waffe mit der Zeit aufbaut; Ladungen wie beim Zauberstab (Punkt 8) und Hitze je Schuss, die abklingt
-+ Lärm je Schuss als Wert der Waffe, Feuerwaffen weit hörbar, aber nicht auf der ganzen Ebene
-+ Werfen nachziehen: Reichweite nach dem Gewicht des Gegenstands (Kurve als Regelwert, `wurf.reichweite` bleibt als Vorgabe des Gegenstands), Modifikator auf die Reichweite für den Skill; Streuung beim Wurf auf ein Feld (ein Fehlwurf landet ein, zwei Felder daneben, der Skill verkleinert sie)
-+ KI und Taktik der gesteuerten Entität für Ninkasi mit Fernwaffe (Abstand halten, nachladen)
 
 ## 23. Brausystem
 

@@ -74,7 +74,7 @@ export class Renderer {
   }
 
   // markierungen (reine Anzeige): { zeiger: {x, y} | null, weg: [{x, y}], gefahr: [{x, y}] angekündigte Zielfelder,
-  //   ziel: null | { cursor: {x, y}, ok, bahn: [{x, y}], felder: [{x, y}], betroffene: [{x, y}] } Zielmodus,
+  //   ziel: null | { cursor: {x, y}, ok, bahn: [{x, y}], felder: [{x, y}], betroffene: [{x, y}], streuung?: [{x, y}] } Zielmodus,
   //   geschoss: {x, y} | null Feld der laufenden Geschossanimation }
   zeichnen(spiel, kamera, ansicht, zoom, markierungen = {}) {
     const pinsel = this.pinsel;
@@ -276,6 +276,8 @@ export class Renderer {
     }
     // Zielmodus: Bahn, Fläche, Betroffene, Cursor grün (ginge) oder rot (Grund dagegen); er ersetzt den Zeiger
     if (ziel) {
+      // wohin ein zerspringender Wurf streuen kann, darunter die Bahn
+      flaeche(ziel.streuung || [], "rgba(229, 83, 61, 0.14)");
       flaeche(ziel.bahn, "rgba(242, 230, 200, 0.18)");
       flaeche(ziel.felder, "rgba(120, 170, 255, 0.30)");
       for (const feld of ziel.betroffene) if (imAusschnitt(feld)) this.feldRahmen(kamera, zoom, feld, "#f2c14e");
