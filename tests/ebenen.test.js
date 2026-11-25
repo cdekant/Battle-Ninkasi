@@ -161,9 +161,11 @@ test("Datenprüfung: Abfolge, Starttiefe, feste Karte, Population und Tabellen",
 // Gedankenstich an Ninkasi (ohne die drei blieben die Werte gleich); neu mit 0.67.0 für mehr Gegner in größeren
 // Rudeln, EP mal 7 und die MP-Kurve mit Optimum bei leichtem Pegel (mit den alten Werten blieben die Werte gleich);
 // dazu mit 0.67.0 für Leder gegen Säure (unempfindlich, ruestung.saeure) und die Haltbarkeit 40 des Kupferhelms (mit
-// den alten Werten blieben die Werte gleich, die Prüfstücke der Arenen ändern nichts).
+// den alten Werten blieben die Werte gleich, die Prüfstücke der Arenen ändern nichts); neu mit 0.68.0 für Ninkasis
+// Grundausstattung (Dolch angelegt, Wurfmesser) und die LP der Gegner mal 1,36 (ohne Ausstattung und mit den alten LP
+// blieben die Werte gleich).
 test("Erzeugung in Schritten: dieselben Ebenen wie vorher", () => {
-  const erwartet = { 1: "bcea025c4f3f99e0", 2: "a89d2815c1155ae9", 3: "9101cac85f53ed8b", 42: "b5b0ee064c4b7384", 4711: "c5210e29ad6bfd8c" };
+  const erwartet = { 1: "2c27f8b7d49b3f68", 2: "7a39be43d498fb21", 3: "4e4da26151a9f5fd", 42: "e8b954e438e7e903", 4711: "bbce7b298bd3700d" };
   for (const [startwert, fingerabdruck] of Object.entries(erwartet)) {
     const spiel = neuesSpiel(DATEN, Number(startwert));
     for (const tiefe of [2, 3, 0]) ebeneWechseln(spiel, tiefe);
@@ -206,7 +208,9 @@ test("Schritte aus den Daten: eine Ebene ohne Population, Gegenstände und Falle
   const roh = rohdatenMitTesteintraegen();
   roh.ebenen.keller.schritte = ["karte_digger", "tueren", "treppen", "gelaende_objekte", "erreichbarkeit", "ebene_anlegen"];
   const spiel = neuesSpiel(datenLaden(roh, {}), 3);
-  assert.deepEqual(alleEntitaeten(spiel.zustand).map((entitaet) => entitaet.id), [spiel.zustand.spielerinId]);
+  const ninkasi = spiel.zustand.entitaeten[spiel.zustand.spielerinId];
+  assert.deepEqual(alleEntitaeten(spiel.zustand).filter((entitaet) => entitaet.getragenVon === undefined).map((entitaet) => entitaet.id), [ninkasi.id], "nur Ninkasi, dazu ihre Ausstattung");
+  assert.ok(alleEntitaeten(spiel.zustand).every((entitaet) => entitaet.id === ninkasi.id || entitaet.getragenVon === ninkasi.id));
   assert.equal(treppeUnter(spiel), "auf");
 });
 

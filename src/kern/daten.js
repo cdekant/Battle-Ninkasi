@@ -142,12 +142,25 @@ function pruefeWesen(daten, sprache, name, wesen, fehler) {
   }
   // Ausstattung, siehe systeme/inventar.js
   if (wesen.ausstattung !== undefined) {
-    if (!Array.isArray(wesen.ausstattung)) fehler.push(`${ort}: ausstattung muss eine Liste [{ typ, anzahl? }] sein`);
-    else wesen.ausstattung.forEach((eintrag, nummer) => {
-      const gegenstand = daten.gegenstaende[eintrag?.typ];
-      if (!gegenstand || gegenstand.abstrakt) fehler.push(`${ort}.ausstattung[${nummer}]: Gegenstand "${eintrag?.typ}" gibt es nicht`);
-      if (eintrag?.anzahl !== undefined && !(istGanzzahl(eintrag.anzahl) && eintrag.anzahl > 0)) fehler.push(`${ort}.ausstattung[${nummer}]: anzahl muss eine ganze Zahl > 0 sein`);
-    });
+    if (!Array.isArray(wesen.ausstattung)) fehler.push(`${ort}: ausstattung muss eine Liste [{ typ, anzahl?, angelegt? }] sein`);
+    else {
+      // angelegt: das Stück ist beim Erzeugen schon angelegt; es braucht einen Platz am Wesen, ohne etwas zu verdrängen
+      const belegt = {};
+      wesen.ausstattung.forEach((eintrag, nummer) => {
+        const eintragOrt = `${ort}.ausstattung[${nummer}]`;
+        const gegenstand = daten.gegenstaende[eintrag?.typ];
+        if (!gegenstand || gegenstand.abstrakt) fehler.push(`${eintragOrt}: Gegenstand "${eintrag?.typ}" gibt es nicht`);
+        if (eintrag?.anzahl !== undefined && !(istGanzzahl(eintrag.anzahl) && eintrag.anzahl > 0)) fehler.push(`${eintragOrt}: anzahl muss eine ganze Zahl > 0 sein`);
+        if (eintrag?.angelegt === undefined || !gegenstand) return;
+        if (typeof eintrag.angelegt !== "boolean") return fehler.push(`${eintragOrt}: angelegt muss true oder false sein`);
+        if (!eintrag.angelegt) return;
+        if (!gegenstand.ausruestung) return fehler.push(`${eintragOrt}: angelegt geht nur mit Ausrüstung`);
+        if ((eintrag.anzahl ?? 1) !== 1) fehler.push(`${eintragOrt}: angelegt geht nur mit anzahl 1`);
+        const { platz, belegt: stellen = 1 } = gegenstand.ausruestung;
+        belegt[platz] = (belegt[platz] ?? 0) + stellen;
+        if (belegt[platz] > (wesen.plaetze?.[platz] ?? 0)) fehler.push(`${eintragOrt}: am Platz "${platz}" ist nicht genug frei`);
+      });
+    }
   }
   if (wesen.ki) pruefeKi(daten, wesen.ki, `${ort}.ki`, fehler, istTextliste(wesen.faehigkeiten) ? wesen.faehigkeiten : []);
   if (wesen.stoffwechsel) pruefeStoffwechsel(daten, sprache, wesen, ort, fehler);
@@ -583,11 +596,13 @@ function pruefeGegenstand(daten, sprache, name, gegenstand, fehler) {
   if (gegenstand.ersatz !== undefined) pruefeErsatz(daten, gegenstand.ersatz, ort, fehler);
   // Werfen, siehe systeme/werfen.js
   if (gegenstand.wurf !== undefined) {
-    if (!istObjekt(gegenstand.wurf)) fehler.push(`${ort}: wurf muss ein Objekt { effekt?, reichweite?, bleibt? } sein`);
+    if (!istObjekt(gegenstand.wurf)) fehler.push(`${ort}: wurf muss ein Objekt { effekt?, reichweite?, genauigkeit?, kritchance? } sein`);
     else {
-      pruefeParameter(daten, { effekt: "effekt?", reichweite: "ganzzahl?", bleibt: "wahrheitswert?" }, gegenstand.wurf, `${ort}.wurf`, fehler);
+      pruefeParameter(daten, { effekt: "effekt?", reichweite: "ganzzahl?", genauigkeit: "ganzzahl?", kritchance: "ganzzahl?" }, gegenstand.wurf, `${ort}.wurf`, fehler);
       if (gegenstand.wurf.reichweite === 0) fehler.push(`${ort}.wurf: reichweite muss eine ganze Zahl >= 1 sein`);
-      if (gegenstand.wurf.bleibt && !gegenstand.wurf.effekt) fehler.push(`${ort}.wurf: bleibt braucht einen effekt (ohne effekt bleibt jeder Wurf liegen)`);
+      // eine Wurfwaffe: genauigkeit macht den Trefferwurf, effekt wirkt beim Treffer (systeme/werfen.js)
+      if (gegenstand.wurf.genauigkeit !== undefined && !gegenstand.wurf.effekt) fehler.push(`${ort}.wurf: genauigkeit braucht einen effekt (die Wirkung beim Treffer)`);
+      if (gegenstand.wurf.kritchance !== undefined && gegenstand.wurf.genauigkeit === undefined) fehler.push(`${ort}.wurf: kritchance gilt nur mit genauigkeit`);
     }
   }
   pruefeVerschleiss(daten, gegenstand, ort, fehler);
@@ -1345,6 +1360,7 @@ function pruefeArenaNinkasi(daten, ninkasi, ort, fehler) {
     if (!daten.skills?.[name]) fehler.push(`${ort}.skills: Skill "${name}" gibt es nicht`);
     else if (!(istGanzzahl(stufe) && stufe >= 1 && stufe <= 5)) fehler.push(`${ort}.skills.${name}: Stufe muss eine ganze Zahl von 1 bis 5 sein`);
   }
+  if (ninkasi.grundausstattung !== undefined && typeof ninkasi.grundausstattung !== "boolean") fehler.push(`${ort}: grundausstattung muss true oder false sein`);
   if (ninkasi.ausruestung !== undefined && !istTextliste(ninkasi.ausruestung)) fehler.push(`${ort}: ausruestung muss eine Liste von Typen sein`);
   for (const typ of istTextliste(ninkasi.ausruestung) ? ninkasi.ausruestung : []) {
     if (!daten.gegenstaende[typ]?.ausruestung) fehler.push(`${ort}.ausruestung: "${typ}" ist kein Gegenstand zum Anlegen`);

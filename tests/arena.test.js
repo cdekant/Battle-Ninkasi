@@ -48,8 +48,11 @@ test("Arena: Aufstellung mit Start, Eigenschaften, Skills, Gepäck, Ausrüstung 
   assert.equal(stufeVon(spiel, ninkasi, "nahkampf_grund"), 2);
   assert.equal(ninkasi.werte.lp.aktuell, 40);
   const gepaeck = ninkasi.inventar.map((id) => spiel.zustand.entitaeten[id]);
-  assert.deepEqual(gepaeck.map((gegenstand) => [gegenstand.typ, gegenstand.anzahl ?? 1]), [["bier", 2], ["fasshammer", 1]]);
-  assert.deepEqual(ninkasi.ausgeruestet, [gepaeck[1].id]);
+  // die Grundausstattung bleibt (Dolch und Wurfmesser), der zweihändige Fasshammer verdrängt den Dolch
+  assert.deepEqual(gepaeck.map((gegenstand) => [gegenstand.typ, gegenstand.anzahl ?? 1]), [["dolch", 1], ["wurfmesser", 8], ["bier", 2], ["fasshammer", 1]]);
+  assert.deepEqual(ninkasi.ausgeruestet, [gepaeck[3].id]);
+  const ohne = spielerin(arena({ karte: "arena_offen", ninkasi: { grundausstattung: false, gepaeck: [{ typ: "bier" }] }, wellen: [[{ typ: "essigbakterium" }]] }).zustand);
+  assert.deepEqual([ohne.inventar.length, ohne.ausgeruestet], [1, []], "ohne Grundausstattung nur das Gepäck der Aufstellung");
   const gegner = feinde(spiel);
   assert.equal(gegner.length, 2);
   assert.ok(gegner.every((wesen) => (wesen.ki.wachzustand ?? "jagt") === "jagt"));
@@ -137,7 +140,7 @@ test("Arena: Nachspielen ergibt denselben Zustand; die Chronik trägt sie ein, z
 });
 
 test("Taktik: trinkt bei wenig LP, geht zum nächsten Feind außer Sicht, wartet ohne Feinde", () => {
-  const spiel = arena({ karte: "arena_offen", taktik: "nahkampf", ninkasi: { gepaeck: [{ typ: "bier" }] }, wellen: [[{ typ: "essigbakterium" }]] });
+  const spiel = arena({ karte: "arena_offen", taktik: "nahkampf", ninkasi: { grundausstattung: false, gepaeck: [{ typ: "bier" }] }, wellen: [[{ typ: "essigbakterium" }]] });
   const ninkasi = spielerin(spiel.zustand);
   const taktik = daten.taktiken.nahkampf;
   const nah = taktikbefehl(spiel, taktik);

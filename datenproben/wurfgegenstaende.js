@@ -6,15 +6,15 @@ export default {
     aufhebbar: true, stapelbar: true, gewicht: 900,
     wurf: { effekt: "brandflasche_zerspringt", zweck: ["angriff"] },
   },
-  // Wurfwaffen der Arena wurfwaffen (datenproben/arenen.js): treffen mit Trefferwurf und bleiben liegen (wurf.bleibt)
+  // Wurfwaffen (Vorbild Brogue): Trefferwurf nach wurf.genauigkeit, ein Treffer verbraucht sie, ein Fehlwurf bleibt liegen
   wurfmesser: {
     text: "gegenstand.wurfmesser",
     aufhebbar: true, stapelbar: true, gewicht: 300,
-    wurf: { effekt: "wurfmesser_flug", reichweite: 5, bleibt: true, zweck: ["angriff"] },
+    wurf: { effekt: "wurfmesser_treffer", genauigkeit: 80, reichweite: 5, zweck: ["angriff"] },
   },
   wurfspeer: {
     text: "gegenstand.wurfspeer",
     aufhebbar: true, stapelbar: true, gewicht: 1500,
-    wurf: { effekt: "wurfspeer_flug", reichweite: 4, bleibt: true, zweck: ["angriff"] },
+    wurf: { effekt: "wurfspeer_treffer", genauigkeit: 75, reichweite: 4, zweck: ["angriff"] },
   },
 };

@@ -2,10 +2,11 @@
 // Hand, automatisch im Browser und im Werkzeug werkzeuge/arena.js. Vorläufig, zum Ausprobieren der Systeme; die
 // Machtkurve (docs/Systemausbau.md, Punkt 10) braucht später eigene.
 
-// Ninkasi mit je einer Waffe gegen dieselben Gegner (Faust als Bezug, Fasshammer zum Vergleich)
+// Ninkasi mit je einer Waffe gegen dieselben Gegner (Faust als Bezug, Fasshammer zum Vergleich); die Arenen der
+// Prüfstücke beginnen ohne Grundausstattung, damit nicht zwei Waffen in den Händen liegen
 const WAFFEN = {
   faust: {},
-  dolch: { ausruestung: ["pruefdolch"] },
+  dolch: { ausruestung: ["dolch"] },
   schwert: { ausruestung: ["pruefschwert"] },
   speer: { ausruestung: ["pruefspeer"] },
   zweihaender: { ausruestung: ["pruefzweihaender"] },
@@ -75,6 +76,7 @@ export default {
   // Prüfwaffen und Prüfrüstungen (Ziele und Messwerte in docs/Entwicklung.md, Messwerte)
   pruefwaffen: {
     text: "arena.pruefwaffen", karte: "arena_offen", taktik: "nahkampf",
+    ninkasi: { grundausstattung: false },
     wellen: [[{ typ: "normwesen_3" }]],
     varianten: {
       ninkasi: WAFFEN,
@@ -89,6 +91,7 @@ export default {
   },
   pruefwaffen_drei: {
     text: "arena.pruefwaffen_drei", karte: "arena_offen", taktik: "nahkampf",
+    ninkasi: { grundausstattung: false },
     wellen: [[{ typ: "normwesen_2", anzahl: 3 }]],
     varianten: {
       ninkasi: WAFFEN,
@@ -103,7 +106,7 @@ export default {
   // immer mit dem Prüfschwert, damit nur die Rüstung wechselt
   pruefruestung: {
     text: "arena.pruefruestung", karte: "arena_offen", taktik: "nahkampf",
-    ninkasi: { ausruestung: ["pruefschwert"] },
+    ninkasi: { grundausstattung: false, ausruestung: ["pruefschwert"] },
     wellen: [[{ typ: "normwesen_3" }]],
     varianten: {
       ninkasi: RUESTUNGEN,
@@ -118,7 +121,7 @@ export default {
   // fünf Wellen ohne Erholung: Rüstung lohnt, wenn sich die Treffer über mehrere Kämpfe summieren
   kette: {
     text: "arena.kette", karte: "arena_offen", taktik: "nahkampf",
-    ninkasi: { ausruestung: ["pruefschwert"] },
+    ninkasi: { grundausstattung: false, ausruestung: ["pruefschwert"] },
     wellen: [
       [{ typ: "normwesen_2", anzahl: 2 }], [{ typ: "normwesen_3" }], [{ typ: "normwesen_2", anzahl: 2 }],
       [{ typ: "normwesen_3", anzahl: 2 }], [{ typ: "normwesen_4" }],
@@ -134,7 +137,7 @@ export default {
   // Wurfwaffen auf Abstand, danach Nahkampf mit der Faust
   wurfwaffen: {
     text: "arena.wurfwaffen", karte: "arena_offen", taktik: "fernkampf", abstand: 8,
-    ninkasi: { gepaeck: [{ typ: "wurfmesser", anzahl: 5 }] },
+    ninkasi: { grundausstattung: false, gepaeck: [{ typ: "wurfmesser", anzahl: 5 }] },
     wellen: [[{ typ: "normwesen_3" }]],
     varianten: {
       ninkasi: {

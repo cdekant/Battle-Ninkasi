@@ -231,17 +231,25 @@ test("Werfen mit wurf.effekt: zerbricht am ersten Wesen und wirkt auf es; Gründ
   assert.ok(meldungen.some((meldung) => meldung.art === "zerbrochen"));
 });
 
-test("Werfen mit wurf.bleibt: die Wurfwaffe wirkt auf das erste Wesen und landet dort, vom Stapel nur eine", () => {
+test("Wurfwaffe (wurf.genauigkeit): ein Treffer wirkt und verbraucht sie, ein Fehlwurf landet, vom Stapel nur eine", () => {
   const { spiel, meldungen } = spielBauen();
-  const { ninkasi, getragen } = werferin(spiel, { stapelbar: true, anzahl: 2, wurf: { effekt: "splitter", reichweite: 4, bleibt: true } });
+  const { ninkasi, getragen } = werferin(spiel, { stapelbar: true, anzahl: 3, wurf: { effekt: "splitter", genauigkeit: 100000, reichweite: 4 } });
   const getroffen = wesen(spiel, 4, 2, "feinde", 20);
   assert.equal(befehlGeben(spiel, { art: "werfen", gegenstandId: getragen.id, ziel: { id: getroffen.id } }).ok, true);
-  assert.equal(getroffen.werte.lp.aktuell, 15);
-  assert.ok(!meldungen.some((meldung) => meldung.art === "zerbrochen"), "eine Wurfwaffe zerbricht nicht");
-  const gelandet = meldungen.find((meldung) => meldung.art === "gelandet");
-  const amBoden = spiel.zustand.entitaeten[gelandet.was.id];
-  assert.deepEqual(amBoden.position, { x: 4, y: 2 });
-  assert.equal(amBoden.getragenVon, undefined);
-  assert.equal(spiel.zustand.entitaeten[getragen.id].anzahl ?? 1, 1, "eine bleibt im Gepäck");
+  assert.ok(getroffen.werte.lp.aktuell < 20, "getroffen");
+  const verbraucht = meldungen.find((meldung) => meldung.art === "verbraucht");
+  assert.ok(verbraucht, "ein Treffer verbraucht die Wurfwaffe");
+  assert.equal(spiel.zustand.entitaeten[verbraucht.was.id], undefined);
+  assert.ok(!meldungen.some((meldung) => meldung.art === "zerbrochen" || meldung.art === "gelandet"));
+  assert.equal(spiel.zustand.entitaeten[getragen.id].anzahl, 2, "zwei bleiben im Gepäck");
   assert.ok(ninkasi.inventar.includes(getragen.id));
+
+  // genauigkeit 0 verfehlt sicher: die Wurfwaffe landet beim Ziel und lässt sich aufheben
+  spiel.zustand.entitaeten[getragen.id].wurf = { effekt: "splitter", genauigkeit: 0, reichweite: 4 };
+  const vorher = getroffen.werte.lp.aktuell;
+  assert.equal(befehlGeben(spiel, { art: "werfen", gegenstandId: getragen.id, ziel: { id: getroffen.id } }).ok, true);
+  assert.equal(getroffen.werte.lp.aktuell, vorher, "verfehlt");
+  assert.ok(meldungen.some((meldung) => meldung.art === "verfehlt"));
+  const gelandet = meldungen.find((meldung) => meldung.art === "gelandet");
+  assert.deepEqual(spiel.zustand.entitaeten[gelandet.was.id].position, { x: 4, y: 2 });
 });

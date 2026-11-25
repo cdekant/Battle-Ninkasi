@@ -18,7 +18,7 @@ Daten:
 
 + Am Gegenstand: `stapelbar: true`, `ladungen: { hoechstens, gewichtJe? }` (Stand in `ladungen.aktuell`, Vorgabe `hoechstens`), `wirdZu: Typ` (Behälter nach dem letzten Gebrauch), `gewicht` in Gramm, `lesbar: { effekt, bleibt? }` (Schriftrolle, Braubuch), `ersatz` (passive Ersatzwirkung aus dem Gepäck, siehe [Wirkungen.md](Wirkungen.md), Ersatzwirkungen); an der Entität `anzahl` (Vorgabe 1) und `getragenVon`
 + Am Wesen: `inventar: [IDs]`, `tragkraft` (sonst `regeln.tragen.tragkraft`, 20000 g)
-+ Ausstattung in den Daten eines Wesens: `ausstattung: [{ typ, anzahl? }]` (Vorgabe `anzahl` 1), keine Komponente; beim Erzeugen aus Daten liegt sie im Gepäck
++ Ausstattung in den Daten eines Wesens: `ausstattung: [{ typ, anzahl?, angelegt? }]` (Vorgabe `anzahl` 1), keine Komponente; beim Erzeugen aus Daten liegt sie im Gepäck, mit `angelegt: true` ist das Stück schon angelegt (ohne Zeit, Meldung und Haken, `anlegenOhneZeit` in `src/systeme/ausruestung.js`); die Datenprüfung verlangt dafür Ausrüstung, `anzahl` 1 und genug freie Stellen am Platz des Wesens, ohne etwas zu verdrängen
 + Zweck für die KI: `zweck: [name]` an `trinkbar` (und an `wurf`, siehe [Wesen.md](Wesen.md), KI)
 + Regelwert `regeln.tragen.stufen`: ab 100 % der Tragkraft kostet Bewegen 25 % mehr, ab 150 % 100 % mehr
 + Getränke in `datenproben/getraenke.js`, Wurfgegenstände in `datenproben/wurfgegenstaende.js`

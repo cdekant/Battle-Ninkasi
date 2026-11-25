@@ -80,7 +80,7 @@ Daten:
 + `regeneration`: Weltticks von leer bis voll außerhalb des Kampfes für Ninkasi zu Beginn, LP nüchtern 400, im Optimum der Kurve 150 und bei `pegelRausch` (12 ‰, Ninkasis Stufe `im_rausch`) 400, MP nüchtern 200 und im Optimum der Kurve 150, das bei leichterem Pegel liegt als das der LP (bei Ninkasi 3 ‰, angeheitert); `tests/stoffwechsel.test.js` prüft Ninkasis Kurven dagegen
 + Die EP der Stärken sind so bemessen, dass die erste Ebene das Ziel in [Charakter.md](Charakter.md), Anfangsbalance erreicht: rund 35 Wesen der Stärken 1 und 2 bringen geräumt rund 1300 EP, mit Erkundung und Startguthaben genug für zwei Grundskills auf Stufe 5
 + Weitere Normen, nach denen sich Inhalt richtet: `kontrolle` kurz 100, mittel 200, lang 400 Zeiteinheiten; `abklingzeit` kurz 300, mittel 1000, lang 3000; `verbrauch` Standardzauber 10 MP, Psi-Fähigkeit 10 PP; Bezug fürs Tragen ist `regeln.tragen.tragkraft` (20 kg)
-+ Normwesen (`datenproben/gegner.js`, Vorlage `normwesen`, in keiner Population, Sichtweite 7): `normwesen_1` bis `normwesen_5` mit 11, 16, 22, 33 und 44 LP, Genauigkeit 47, stumpfer Schlag mit 2W3, 1W6+2, 2W6+1, 2W8+2 und 3W8+3 (Mittel 4, 5,5, 8, 11, 16,5), Tempo 100; Arenen `normwesen` und `normwesen_drei` mit den Varianten `s1` bis `s5`
++ Normwesen (`datenproben/gegner.js`, Vorlage `normwesen`, in keiner Population, Sichtweite 7): `normwesen_1` bis `normwesen_5` mit 15, 22, 30, 45 und 60 LP (die Treffer des Dolchs der Grundausstattung, Mittel 7,5), Genauigkeit 47, stumpfer Schlag mit 2W3, 1W6+2, 2W6+1, 2W8+2 und 3W8+3 (Mittel 4, 5,5, 8, 11, 16,5), Tempo 100; Arenen `normwesen` und `normwesen_drei` mit den Varianten `s1` bis `s5`
 
 Schnittstellen (`werkzeuge/normierung.js`, siehe [Entwicklung.md](Entwicklung.md), Bot und Werkzeuge):
 
@@ -88,7 +88,8 @@ Schnittstellen (`werkzeuge/normierung.js`, siehe [Entwicklung.md](Entwicklung.md
 
 Regeln:
 
-+ Ninkasi zu Beginn ist die der Arena `normwesen`: Faust, ohne Skills und Ausrüstung, 100 LP
++ Ninkasi zu Beginn ist die der Arena `normwesen`: mit der Grundausstattung (Dolch, siehe [Charakter.md](Charakter.md), Startwerte), ohne Skills, 100 LP; wechselt die Grundausstattung, ändern sich die LP aller Gegner im selben Verhältnis
++ Waffen richten sich nach dem Dolch: eine gute frühe Fundwaffe kostet Ninkasi gegen ihre Paradegegner etwa ein Viertel weniger eigene LP als der Dolch (Messwerte der Prüfwaffen in [Entwicklung.md](Entwicklung.md), Messwerte)
 + Standardangriff ist das erste Angriffsprofil; sein mittlerer Schaden kommt aus dem ersten Baustein `schaden`, auch hinter einem `trefferwurf`; Fernangriffe aus Fähigkeiten zählen nicht mit
 + Treffer bis zum Tod sind LP durch mittleren Schaden, ohne Rüstung und Widerstand; Zeit bis zum Tod sind Treffer durch Trefferchance mal Kosten des Profils
 + Die Stärke eines Wesens ist die nächste nach der Summe der Abweichungen beider Trefferzahlen; ein Normwesen muss seine Ziele innerhalb der Toleranz treffen, seine EP genau, die Trefferchancen auf 2 Punkte (`tests/normierung.test.js`)
@@ -164,7 +165,7 @@ Daten:
 + Wahl: `wahl: "erste"` (Vorgabe) | `"beste"` | `"gewichtet"` | `{ gewichtetUnterBesten: n }`
 + Eingaben der Bewertung: `abstand` (Schachbrett zur Beute), `eigeneLpProzent`, `beuteLpProzent`, `zielLpProzent` (LP des Ziels der Handlung), `feindeInSicht`, `verbuendeteInSicht`; Kurven wie überall (`src/kern/kurven.js`), Werte in Promille von 0 bis 1000; statt der Stützpunkte kann `kurve` den Namen einer Kurve aus `regeln.ki.kurven` tragen, die alle Wesen teilen (vorläufig `heilenNachLp`: dringend bis 20 % LP, ab 80 % gar nicht); Regelwerte `regeln.ki.wegpunktSicht` (7, siehe [Welt.md](Welt.md), Ebenen) und `regeln.ki.rudelAbstand` (5)
 + Zwecke: `regeln.ki.zwecke` (vorläufig `heilen`, `angriff`); `zweck: [name]` an einer Fähigkeit und an den Nutzungen eines Gegenstands (`trinkbar.zweck`, `wurf.zweck`) sagt, wozu die KI sie mit `nutzen` wählt; die Datenprüfung kennt nur Zwecke aus der Liste
-+ Ausstattung: `ausstattung: [{ typ, anzahl? }]` am Wesen legt beim Erzeugen Gegenstände ins Gepäck (siehe [Gegenstaende.md](Gegenstaende.md), Inventar)
++ Ausstattung: `ausstattung: [{ typ, anzahl?, angelegt? }]` am Wesen legt beim Erzeugen Gegenstände ins Gepäck, mit `angelegt` gleich angelegt (siehe [Gegenstaende.md](Gegenstaende.md), Inventar)
 + Beispiel: `{ handlung: "fliehen", bewertung: [{ eingabe: "eigeneLpProzent", kurve: [[0, 1000], [30, 1000], [31, 0]] }] }` vor den Angriffen: unter 31 % LP flieht das Wesen
 + Beispiel: `{ handlung: "nutzen", zweck: "heilen", chance: 50, bewertung: [{ eingabe: "eigeneLpProzent", kurve: "heilenNachLp" }] }` (mit einem Bier in der Ausstattung): unter 80 % LP trinkt es in der Hälfte der Fälle
 + Beispiel Heiler: `{ handlung: "nutzen", zweck: "heilen", bewertung: [{ eingabe: "zielLpProzent", kurve: "heilenNachLp" }] }` mit einer Fähigkeit mit Zielart `{ art: "wesen", trifft: "verbuendete" }`: heilt den bedürftigsten Verbündeten in Sicht, auch sich selbst, keinen über 80 % LP
@@ -213,7 +214,7 @@ Daten:
 + Bewegungsarten am Wesen: `bewegung`, Vorgabe `laufend`, sonst `fliegend`, `schwebend`, `phasend`, `unbeweglich`; ein Zustand überlagert sie mit `bewegung` (Levitation, Phasen)
 + Gelände: `passierbar: true` gilt für alle, `passierbarFuer: [Arten]` für einzelne (Abgrund für `fliegend`, Wasser für `fliegend` und `schwebend`), `undurchdringlich: true` hält auch `phasend` auf, `beimFestsitzen` (Effekt)
 + Arten des Versetzens (`VERSETZARTEN`): `schritt`, `stoss`, `zug`, `tausch`, `teleport`, `herausgedrueckt`
-+ Werfen: am Gegenstand `wurf: { reichweite?, effekt?, bleibt? }`, mit `bleibt` (nur mit `effekt`) ist er eine Wurfwaffe: der Effekt wirkt wie sonst, der Gegenstand zerbricht aber nicht, sondern landet wie ohne Effekt (Meldung `gelandet`), vom Stapel nur das geworfene Stück; Regelwerte `regeln.werfen.reichweite` (6), `regeln.bewegung.beimFestsitzen` (`eingeklemmt`, 2W6 stumpf, vorläufig), Zeitkosten `aktionen.werfen`
++ Werfen: am Gegenstand `wurf: { reichweite?, effekt?, genauigkeit?, kritchance? }`; mit `genauigkeit` (nur mit `effekt`) ist er eine Wurfwaffe (Vorbild Brogue): Trefferwurf gegen das erste Wesen der Bahn mit dem Tag `wurf` (`trefferwurfMitFolgen` in `src/systeme/kampf.js`, wie der Baustein `trefferwurf`), ein Treffer wirkt den Effekt und verbraucht das Stück (Meldung `verbraucht`), ein Fehlwurf oder ein Wurf ohne Wesen landet wie ohne Effekt (Meldung `gelandet`) und lässt sich wieder aufheben; vom Stapel fliegt nur ein Stück; Regelwerte `regeln.werfen.reichweite` (6), `regeln.bewegung.beimFestsitzen` (`eingeklemmt`, 2W6 stumpf, vorläufig), Zeitkosten `aktionen.werfen`
 
 Schnittstellen:
 
@@ -225,7 +226,7 @@ Schnittstellen:
   + `tauschen`: Quelle und Ziel tauschen die Plätze, wenn jedes das Feld des anderen betreten kann; Meldung `getauscht`
   + `teleportieren { wer?, muster?, zufaellig? }`: das Ziel (mit `wer: "quelle"` die Quelle, z.B. Blinzeln) aufs Zielfeld, mit `muster` auf ein zufälliges freies Feld des Musters, mit `zufaellig` auf ein zufälliges freies Feld der Ebene; Meldung `teleportiert`
 + Zustandsprüfung `lage` (Register `zustandspruefungen`, nach dem Tod), Meldungen `festgesessen` und `herausgedrueckt`
-+ Werfen (`src/systeme/werfen.js`): Meldungen `geworfen`, `geschoss`, `zerbrochen` bzw. `gelandet`; Gründe der Ablehnung `nichts_zu_werfen` und die der Zielauswahl
++ Werfen (`src/systeme/werfen.js`): Meldungen `geworfen`, `geschoss`, `zerbrochen`, `verbraucht` bzw. `gelandet`; Gründe der Ablehnung `nichts_zu_werfen` und die der Zielauswahl
 
 Regeln:
 

@@ -193,6 +193,12 @@ bausteinAnmelden("angreifen", { profil: "text?" }, (spiel, kontext, parameter) =
 //   gegen: Verteidigung des Ziels (Vorgabe "ausweichen", Psi z.B. "willenskraft");
 //   sonst: Effekt bei Fehlschlag, z.B. halber Schaden bei einer Explosion
 bausteinAnmelden("trefferwurf", { genauigkeit: "ganzzahl", effekt: "effekt", gegen: VERTEIDIGUNGEN, sonst: "effekt?", kritchance: "ganzzahl?" }, (spiel, kontext, parameter) => {
+  trefferwurfMitFolgen(spiel, kontext, parameter);
+}, { brauchtZiel: true });
+
+// Der Trefferwurf mit seinen Folgen (Effekt, Meldung, Haken), für den Baustein und für Wurfwaffen (systeme/werfen.js);
+// kontext ist ein vollständiger Effektkontext mit zielId, gibt das Ergebnis zurück ("treffer", "ausgewichen", "geblockt")
+export function trefferwurfMitFolgen(spiel, kontext, parameter) {
   const entitaeten = spiel.zustand.entitaeten;
   const ziel = entitaeten[kontext.zielId];
   const quelle = entitaeten[kontext.quelleId];
@@ -202,12 +208,13 @@ bausteinAnmelden("trefferwurf", { genauigkeit: "ganzzahl", effekt: "effekt", geg
   if (ergebnis === "treffer") {
     effektAnwenden(spiel, parameter.effekt, { ...kontext, kritisch, trefferchance });
     hakenAusloesen(spiel, "nach_treffer", { ...beteiligteAus(kontext), kritisch });
-    return;
+    return ergebnis;
   }
   melden(spiel, "verfehlt", { quelle: quelle ? bezugAuf(quelle) : null, ziel: bezugAuf(ziel), grund: ergebnis, trefferchance });
   hakenAusloesen(spiel, "verfehlt", { ...beteiligteAus(kontext), kritisch: false, grund: ergebnis });
   if (parameter.sonst) effektAnwenden(spiel, parameter.sonst, { ...kontext, kritisch: false });
-}, { brauchtZiel: true });
+  return ergebnis;
+}
 
 // Schadensrechnung am Haken vor_schaden; kontext: { quelleId, zielId, tags, kritisch, schadensart, menge }
 const umstaendeDesSchadens = (kontext, gegenueberId) => ({ gegenueberId, tags: kontext.schadensart ? [...kontext.tags, kontext.schadensart] : kontext.tags });

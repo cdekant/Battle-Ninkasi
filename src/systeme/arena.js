@@ -2,7 +2,8 @@
 // (ki/taktik.js über eingabe/arenakampf.js) oder tausendfach im Werkzeug werkzeuge/arena.js. Die Aufstellung steht in
 // den Startoptionen (optionen.arena), so folgt jeder Kampf wie jeder Lauf aus Startwert, Optionen und Befehlen.
 //   Aufstellung: { name?, varianten?, karte, taktik?, abstand?, wachzustand?, start?: { x, y },
-//     ninkasi?: { eigenschaften?, skills?: { name: stufe }, ausruestung?: [typ], gepaeck?: [{ typ, anzahl? }], werte? },
+//     ninkasi?: { grundausstattung?, eigenschaften?, skills?: { name: stufe }, ausruestung?: [typ], gepaeck?: [{ typ, anzahl? }],
+//       werte? }; grundausstattung: false nimmt Ninkasi vorher die Ausstattung aus den Daten (Vorgabe: sie behält sie),
 //     wellen?: [[{ typ, anzahl? }]], population?: { tabelle?, tiefe, wellen?, alle? } }; geprüft in kern/daten.js
 //     (arenaFehler); benannte Aufstellungen in datenproben/arenen.js, aufstellungAus löst Name und Varianten auf
 //   Planschritt "arena": der Plan hat nur die Tiefe 0 mit der Karte der Aufstellung, ohne Treppen
@@ -17,7 +18,7 @@
 // Wiederholbar: die Wellen stehen im Zustand (zustand.arena), Affixe werfen den Spiel-Zufall (Wurf "arena_affix").
 
 import { anmelden, holen } from "../kern/register.js";
-import { ausDatenErzeugen, alleEntitaeten, istWesen, spielerin, anzahlWesen, positionSetzen } from "../kern/zustand.js";
+import { ausDatenErzeugen, alleEntitaeten, istWesen, spielerin, anzahlWesen, positionSetzen, ausDemInventarNehmen, entitaetEntfernen } from "../kern/zustand.js";
 import { akteurEinreihen } from "../kern/zeit.js";
 import { melden } from "../kern/ereignisse.js";
 import { zufallErzeugen, startwertAbleiten } from "../kern/zufall.js";
@@ -94,6 +95,14 @@ function wellenFestlegen(spiel, aufstellung) {
 }
 
 function ninkasiEinrichten(spiel, ninkasi, teil) {
+  // ohne Grundausstattung: alles aus der Ausstattung der Daten wieder fort, angelegt oder im Gepäck
+  if (teil.grundausstattung === false) {
+    ninkasi.ausgeruestet = [];
+    for (const gegenstandId of [...(ninkasi.inventar ?? [])]) {
+      ausDemInventarNehmen(ninkasi, gegenstandId);
+      entitaetEntfernen(spiel.zustand, gegenstandId);
+    }
+  }
   Object.assign(ninkasi.eigenschaften ??= {}, teil.eigenschaften);
   for (const [name, stufe] of Object.entries(teil.skills ?? {})) {
     epAufSkill(spiel, ninkasi, name, epBisStufe(spiel, ninkasi, name, stufe));

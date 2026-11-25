@@ -42,9 +42,15 @@ export default {
     arenen,
     zeichen,
   },
-  // Ninkasi bekommt die vorläufige Fähigkeit für den Zielmodus, den Sprint und eine Psi-Fähigkeit
+  // Ninkasi bekommt die vorläufige Fähigkeit für den Zielmodus, den Sprint und eine Psi-Fähigkeit, dazu die
+  // Grundausstattung (docs/Charakter.md, Startwerte): den Dolch angelegt und Wurfmesser im Gepäck
   ergaenzen: {
-    wesen: { ninkasi: { faehigkeiten: ["testfaehigkeit", "sprint", "gedankenstich"] } },
+    wesen: {
+      ninkasi: {
+        faehigkeiten: ["testfaehigkeit", "sprint", "gedankenstich"],
+        ausstattung: [{ typ: "dolch", angelegt: true }, { typ: "wurfmesser", anzahl: 8 }],
+      },
+    },
   },
   // Hub, darunter drei Kellertiefen; der Lauf beginnt im ersten Keller
   abfolge: ["hub", "keller", "keller_dunkel", "keller"],

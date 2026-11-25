@@ -110,6 +110,16 @@ function benutztMelden(spiel, wesen, gegenstand, art) {
   hakenAusloesen(spiel, "gegenstand_benutzt", { quelleId: wesen.id, zielId: wesen.id, gegenstandId: gegenstand.id, art, kettentiefe: 0 });
 }
 
+// Legt einen Gegenstand aus dem Gepäck an, ohne Zeit, Meldung und Haken, und ohne etwas zu verdrängen (Ausstattung beim
+// Erzeugen, systeme/inventar.js); gibt einen Grund zurück, wenn es nicht geht, sonst null
+export function anlegenOhneZeit(spiel, wesen, gegenstand) {
+  if (!gegenstand.ausruestung) return "nicht_anlegbar";
+  const weg = zuTauschen(spiel, wesen, gegenstand);
+  if (!weg || weg.length) return "kein_platz";
+  (wesen.ausgeruestet ??= []).push(gegenstand.id);
+  return null;
+}
+
 function abnehmen(spiel, wesen, gegenstand) {
   wesen.ausgeruestet = wesen.ausgeruestet.filter((id) => id !== gegenstand.id);
   melden(spiel, "abgelegt", { wer: bezugAuf(wesen), was: bezugAuf(gegenstand) });

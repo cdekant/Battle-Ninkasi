@@ -166,12 +166,12 @@ test("Anzeige: jedes Fenster entsteht mit dem Spielinhalt ohne fehlende Texte", 
   t.mock.method(console, "warn", (meldung) => warnungen.push(meldung));
   const spiel = neuesSpiel(daten, 7);
   const ninkasi = spielerin(spiel.zustand);
-  gegenstandTragen(spiel, ninkasi, { text: "gegenstand.schoepfkelle", haltbarkeit: { aktuell: 3, hoechstens: 10 } });
+  const kelle = gegenstandTragen(spiel, ninkasi, { text: "gegenstand.schoepfkelle", haltbarkeit: { aktuell: 3, hoechstens: 10 } });
   const umgebung = { spiel, daten, texte, belegung };
   const zeigen = (art, zustand) => fensterHtml(umgebung, fensterOeffnen([], art, zustand));
   assert.equal(fensterHtml(umgebung, []), "");
   assert.match(zeigen("inventar", { gewaehlt: null }), /Inventar/);
-  assert.match(zeigen("inventar", { gewaehlt: ninkasi.inventar[0] }), /Haltbarkeit/);
+  assert.match(zeigen("inventar", { gewaehlt: kelle.id }), /Haltbarkeit/);
   assert.match(zeigen("faehigkeiten", {}), /Fähigkeiten/);
   assert.match(zeigen("hilfe", {}), /Charakter und Skills/);
   const erstellung = zeigen("erstellung", erstellungOeffnen(daten, null));

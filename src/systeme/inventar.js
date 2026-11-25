@@ -13,7 +13,8 @@
 //   gewicht           in Gramm, mit Ladungen zuzüglich gewichtJe je Ladung; die Last ist die Summe über das Gepäck
 //   verdirbt: { nach, wird }  nach so vielen Zeiteinheiten wird der Gegenstand zu wird (systeme/verschleiss.js); der
 //                     Zeitpunkt steht in verdirbtUm, fließen Stapel zusammen, gilt ihr nach Anzahl gewichteter Durchschnitt
-// Ausstattung am Wesen: ausstattung: [{ typ, anzahl? }]  was es beim Erzeugen aus Daten im Gepäck hat (Vorgabe anzahl 1),
+// Ausstattung am Wesen: ausstattung: [{ typ, anzahl?, angelegt? }]  was es beim Erzeugen aus Daten im Gepäck hat (Vorgabe
+//   anzahl 1), mit angelegt schon angelegt (ohne Zeit, systeme/ausruestung.js anlegenOhneZeit),
 //   z.B. Bier zum Heilen für einen Gegner; stapelbare fließen zu einem Stapel zusammen
 // Nutzung für die KI (Register "nutzungen", ki/nutzen.js): trinkbar.zweck sagt, wozu ein Wesen den Gegenstand selbst trinkt
 // Tragkraft: wesen.tragkraft, sonst regeln.tragen.tragkraft, mit Modifikatoren auf "tragkraft"; Überladung verteuert das
@@ -26,7 +27,7 @@ import { melden, bezugAuf, hakenAusloesen } from "../kern/ereignisse.js";
 import { modifiziert } from "../kern/werte.js";
 import { ereignisEinreihen, gebundeneEreignisseEntfernen } from "../kern/zeit.js";
 import { erkennen, beimAufhebenErkennen } from "./kennen.js";
-import { fluchHindert, gefuehltesGewicht } from "./ausruestung.js";
+import { fluchHindert, gefuehltesGewicht, anlegenOhneZeit } from "./ausruestung.js";
 
 // Verderben: ein Gegenstand mit verdirbt bekommt beim Erzeugen seinen Zeitpunkt und ein gebundenes Zeitereignis
 // (Handler in systeme/verschleiss.js); ein abgespaltener Teil eines Stapels behält den Zeitpunkt
@@ -42,8 +43,12 @@ anmelden("beimErzeugen", "verderben", (zustand, entitaet) => {
 });
 
 anmelden("ausDaten", "ausstattung", (spiel, wesen, datensatz) => {
-  for (const { typ, anzahl = 1 } of datensatz.ausstattung || []) {
-    for (let i = 0; i < anzahl; i++) insInventar(spiel, wesen, ausDatenErzeugen(spiel, "gegenstaende", typ, null));
+  for (const { typ, anzahl = 1, angelegt = false } of datensatz.ausstattung || []) {
+    for (let i = 0; i < anzahl; i++) {
+      const gegenstand = insInventar(spiel, wesen, ausDatenErzeugen(spiel, "gegenstaende", typ, null));
+      const grund = angelegt ? anlegenOhneZeit(spiel, wesen, gegenstand) : null;
+      if (grund) throw new Error(`Ausstattung: "${typ}" lässt sich nicht anlegen (${grund})`);
+    }
   }
 });
 

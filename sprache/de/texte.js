@@ -56,6 +56,7 @@ export default {
   "log.geworfen": "{wer.nom} wirft {was.akk}.",
   "log.zerbrochen": "{was.nom} zerbricht.",
   "log.gelandet": "{was.nom} landet auf dem Boden.",
+  "log.verbraucht": "{was.nom} bleibt im Ziel und ist verloren.",
   "log.population_voll": "Hinweis: Die Ebene ist voll ({hoechstWesen} Wesen), {ausgefallen} weitere entstehen nicht.",
   "log.falle_entdeckt": "{wer.nom} entdeckt {was.akk.ein}.",
   "log.falle_ausgeloest": "{wer.nom} tritt in {was.akk.ein}!",

@@ -97,10 +97,10 @@ export default {
     einzahl: { nom: "Kupferring", gen: "Kupferrings", dat: "Kupferring", akk: "Kupferring" },
     mehrzahl: { nom: "Kupferringe", gen: "Kupferringe", dat: "Kupferringen", akk: "Kupferringe" },
   },
-  "gegenstand.pruefdolch": {
+  "gegenstand.dolch": {
     geschlecht: "m",
-    einzahl: { nom: "Prüfdolch", gen: "Prüfdolchs", dat: "Prüfdolch", akk: "Prüfdolch" },
-    mehrzahl: { nom: "Prüfdolche", gen: "Prüfdolche", dat: "Prüfdolchen", akk: "Prüfdolche" },
+    einzahl: { nom: "Dolch", gen: "Dolchs", dat: "Dolch", akk: "Dolch" },
+    mehrzahl: { nom: "Dolche", gen: "Dolche", dat: "Dolchen", akk: "Dolche" },
   },
   "gegenstand.pruefschwert": {
     geschlecht: "n",

@@ -55,6 +55,7 @@ export default {
   "log.geworfen": "{wer.nom} throws {was.akk}.",
   "log.zerbrochen": "{was.nom} shatters.",
   "log.gelandet": "{was.nom} lands on the floor.",
+  "log.verbraucht": "{was.nom} stays in the target and is lost.",
   "log.population_voll": "Note: the level is full ({hoechstWesen} creatures), {ausgefallen} more will not appear.",
   "log.falle_entdeckt": "{wer.nom} spots {was.akk.ein}.",
   "log.falle_ausgeloest": "{wer.nom} steps into {was.akk.ein}!",

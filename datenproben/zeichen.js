@@ -32,7 +32,7 @@ export default {
     lederhose: { zeichen: "[", farbe: "#a07a4a" },
     hopfenkette: { zeichen: "\"", farbe: "#8fbf4a" },
     kupferring: { zeichen: "=", farbe: "#c87533" },
-    pruefdolch: { zeichen: ")", farbe: "#d0d0d0" },
+    dolch: { zeichen: ")", farbe: "#d0d0d0" },
     pruefschwert: { zeichen: ")", farbe: "#a8b8c8" },
     pruefspeer: { zeichen: "/", farbe: "#a07a4a" },
     pruefzweihaender: { zeichen: ")", farbe: "#8c8c8c" },

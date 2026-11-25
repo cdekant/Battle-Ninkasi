@@ -142,7 +142,7 @@ test("Haltbarkeit: unempfindlich schützt nur gegen das Abnutzen seiner Art, gew
   assert.ok(gefressen > 5 && gefressen < 35, `${gefressen} von 40 gefressen`);
 });
 
-test("Datenprüfung: haltbarkeit.unempfindlich und wurf.bleibt", () => {
+test("Datenprüfung: haltbarkeit.unempfindlich und Wurfwaffen", () => {
   const roh = rohdatenMitTesteintraegen();
   const fehlerMit = (zusatz, teil) => {
     const daten = structuredClone(roh);
@@ -154,8 +154,9 @@ test("Datenprüfung: haltbarkeit.unempfindlich und wurf.bleibt", () => {
   assert.ok(fehlerMit(ruestung({ saeure: 0 }), "von 1 bis 100"));
   assert.ok(fehlerMit(ruestung([]), "unempfindlich"));
   assert.ok(!fehlerMit(ruestung({ saeure: 75 }), "unempfindlich"));
-  assert.ok(fehlerMit({ wurf: { bleibt: true } }, "bleibt braucht einen effekt"));
-  assert.ok(!fehlerMit({ wurf: { effekt: "wurfmesser_flug", bleibt: true } }, "wurf"));
+  assert.ok(fehlerMit({ wurf: { genauigkeit: 80 } }, "genauigkeit braucht einen effekt"));
+  assert.ok(fehlerMit({ wurf: { effekt: "wurfmesser_treffer", kritchance: 5 } }, "kritchance gilt nur mit genauigkeit"));
+  assert.ok(!fehlerMit({ wurf: { effekt: "wurfmesser_treffer", genauigkeit: 80 } }, "wurf"));
 });
 
 test("Angefressen wirkt schwächer: Vorteile sinken mit der Haltbarkeit, Nachteile bleiben", () => {

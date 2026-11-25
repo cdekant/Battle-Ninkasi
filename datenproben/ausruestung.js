@@ -47,12 +47,12 @@ export default {
     text: "gegenstand.kupferring", aufhebbar: true, gewicht: 20, tags: ["kupfer"],
     ausruestung: { platz: "finger", zeit: 50, modifikatoren: [{ ziel: "willenskraft", art: "plus", betrag: 5 }, KUPFERSET] },
   },
-  // Prüfwaffen und Prüfrüstungen nur für die Arenen pruefwaffen, pruefruestung und kette (datenproben/arenen.js), auf
-  // keiner Ebene; Ziele und Messwerte in docs/Entwicklung.md. Gegen ein Normwesen ohne Ausweichen in Schaden je 100
+  // Ninkasis Dolch der Grundausstattung (datenproben/index.js), dazu Prüfwaffen und Prüfrüstungen nur für die Arenen
+  // pruefwaffen, pruefruestung und kette (datenproben/arenen.js), auf keiner Ebene; Ziele und Messwerte in docs/Entwicklung.md. Gegen ein Normwesen ohne Ausweichen in Schaden je 100
   // Zeiteinheiten: Faust 8,8, Dolch 10,6 (dazu Krits), Speer 10,9 (trifft zwei in Linie), Schwert 12,0, Zweihänder 14,4.
-  pruefdolch: {
-    text: "gegenstand.pruefdolch", aufhebbar: true, gewicht: 500,
-    ausruestung: { platz: "hand", zeit: 50, angriffe: [{ name: "pruefdolch", genauigkeit: 90, effekt: "pruefdolch_stich", kosten: 50, kritchance: 10, tags: ["nahkampf", "kurze_klinge"] }] },
+  dolch: {
+    text: "gegenstand.dolch", aufhebbar: true, gewicht: 500,
+    ausruestung: { platz: "hand", zeit: 50, angriffe: [{ name: "dolch", genauigkeit: 90, effekt: "dolchstich", kosten: 50, kritchance: 10, tags: ["nahkampf", "kurze_klinge"] }] },
   },
   pruefschwert: {
     text: "gegenstand.pruefschwert", aufhebbar: true, gewicht: 1500,

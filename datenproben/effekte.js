@@ -45,14 +45,12 @@ export default {
     schritte: [{ baustein: "betaeuben", dauer: 100, zustand: "betaeubt" }],
   },
   // Prüfwaffen für die Arena (datenproben/ausruestung.js, docs/Entwicklung.md, Messwerte); vorläufig
-  pruefdolch_stich: { schritte: [{ baustein: "schaden", art: "schnitt", wuerfel: "1W6+4" }] },
-  pruefschwert_hieb: { schritte: [{ baustein: "schaden", art: "schnitt", wuerfel: "1W6+10" }] },
-  pruefspeer_stoss: { schritte: [{ baustein: "schaden", art: "schnitt", wuerfel: "1W8+7" }] },
-  pruefzweihaender_schlag: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "3W6+10" }] },
-  // Wurfwaffen (datenproben/wurfgegenstaende.js): erst der Trefferwurf, dann der Schaden; die Waffe bleibt liegen
-  wurfmesser_flug: { schritte: [{ baustein: "trefferwurf", genauigkeit: 80, effekt: "wurfmesser_treffer" }] },
+  dolchstich: { schritte: [{ baustein: "schaden", art: "schnitt", wuerfel: "1W6+4" }] },
+  pruefschwert_hieb: { schritte: [{ baustein: "schaden", art: "schnitt", wuerfel: "1W6+15" }] },
+  pruefspeer_stoss: { schritte: [{ baustein: "schaden", art: "schnitt", wuerfel: "1W8+11" }] },
+  pruefzweihaender_schlag: { schritte: [{ baustein: "schaden", art: "stumpf", wuerfel: "3W6+18" }] },
+  // Wurfwaffen (datenproben/wurfgegenstaende.js): der Schaden beim Treffer, den Trefferwurf macht das Werfen
   wurfmesser_treffer: { schritte: [{ baustein: "schaden", art: "schnitt", wuerfel: "1W6+2" }] },
-  wurfspeer_flug: { schritte: [{ baustein: "trefferwurf", genauigkeit: 75, effekt: "wurfspeer_treffer" }] },
   wurfspeer_treffer: { schritte: [{ baustein: "schaden", art: "schnitt", wuerfel: "2W6+3" }] },
   // Sprint (datenproben/faehigkeiten.js): der Zustand macht das Bewegen schneller
   sprint: {

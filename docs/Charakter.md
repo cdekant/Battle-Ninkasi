@@ -29,7 +29,7 @@ Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Fenster; siehe [Wesen.
 + PP beginnen leer, Start- und Höchstwert noch offen
 + Der Pegel ist nach oben offen
 
-Umsetzung: teilweise, siehe [Entwicklung.md](Entwicklung.md), Grundgerüst; offen: Grundausstattung, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 10
+Umsetzung: teilweise, siehe [Entwicklung.md](Entwicklung.md), Grundgerüst und Probeinhalt (Grundausstattung als Probeinhalt, bis der Inhalt entsteht)
 
 ## Eigenschaften
 

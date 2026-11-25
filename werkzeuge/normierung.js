@@ -3,7 +3,7 @@
 // der Toleranz treffen (geprüft in tests/normierung.test.js). Wie Kämpfe wirklich ausgehen, misst die Arena:
 // node werkzeuge/arena.js normwesen bzw. normwesen_drei.
 // Aufruf: node werkzeuge/normierung.js
-//   Ninkasi zu Beginn: die der Arena "normwesen" (Faust, ohne Skills und Ausrüstung)
+//   Ninkasi zu Beginn: die der Arena "normwesen" (Grundausstattung, ohne Skills)
 //   Standardangriff: das erste Angriffsprofil, sein mittlerer Schaden aus dem ersten Baustein schaden, auch hinter
 //   einem trefferwurf; Fernangriffe aus Fähigkeiten zählen nicht mit
 //   Treffer bis zum Tod: LP / mittlerer Schaden, ohne Rüstung und Widerstand (beide fehlen zu Beginn)
@@ -101,7 +101,7 @@ function hauptprogramm() {
       + `${(zeile.ninkasi.trefferchance + " %").padStart(14)}${zahl(zeile.ninkasi.treffer).padStart(8)}${zahl(zeile.ninkasi.zeit, 0).padStart(6)}`
       + `${(zeile.wesen.trefferchance + " %").padStart(14)}${zahl(zeile.wesen.treffer).padStart(8)}${zahl(zeile.wesen.zeit, 0).padStart(6)}    ${funde.join("; ") || "passt"}`);
   }
-  console.log("Treffer bis zum Tod gegen Ninkasi zu Beginn (Faust), Zeit in Zeiteinheiten; Stärke ist die nächste aus regeln.normierung");
+  console.log("Treffer bis zum Tod gegen Ninkasi zu Beginn (Grundausstattung), Zeit in Zeiteinheiten; Stärke ist die nächste aus regeln.normierung");
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) hauptprogramm();

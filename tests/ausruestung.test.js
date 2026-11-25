@@ -4,12 +4,12 @@ import assert from "node:assert/strict";
 import "../src/kern/spiel.js"; // meldet Bausteine, Systeme und Verhaltensmodule an
 import { rohdaten } from "../src/inhalt.js";
 import { miniSpiel, wesen, spielerinSetzen, gegenstandTragen, meldungenMitschneiden, allesSichtbar, hakenFuerTest } from "./hilfen.js";
-import { befehlGeben, zeitkosten } from "../src/kern/spiel.js";
+import { befehlGeben, zeitkosten, neuesSpiel, datenLaden } from "../src/kern/spiel.js";
 import { akteurEinreihen } from "../src/kern/zeit.js";
 import { holen } from "../src/kern/register.js";
 import { effektAnwenden } from "../src/kern/effekte.js";
 import { vorgangAbschliessen } from "../src/kern/vorgang.js";
-import { entitaetEntfernen } from "../src/kern/zustand.js";
+import { entitaetEntfernen, spielerin } from "../src/kern/zustand.js";
 import { kampfwert, angriffeVon } from "../src/systeme/kampf.js";
 import { inventarTaste } from "../src/eingabe/inventar.js";
 import { vorbereiten } from "../src/kern/daten.js";
@@ -172,6 +172,11 @@ test("Datenprüfung: Plätze an Wesen und Gegenständen, Waffenprofile, Modifika
     [(daten, testgegenstand) => { testgegenstand.tags = "test"; }, "tags muss eine Liste"],
     [(daten) => { daten.wesen.ninkasi.plaetze = { fluegel: 2 }; }, 'Platz "fluegel"'],
     [(daten) => { delete daten.regeln.ausruestung; }, "regeln.ausruestung.plaetze"],
+    [(daten) => { daten.wesen.ninkasi.ausstattung = [{ typ: "bier", angelegt: true }]; }, "angelegt geht nur mit Ausrüstung"],
+    [(daten) => { daten.wesen.ninkasi.ausstattung = [{ typ: "testausruestung", anzahl: 2, angelegt: true }]; }, "angelegt geht nur mit anzahl 1"],
+    [(daten) => { daten.wesen.ninkasi.ausstattung = [{ typ: "testausruestung", angelegt: "ja" }]; }, "angelegt muss true oder false"],
+    [(daten) => { daten.wesen.ninkasi.ausstattung = [{ typ: "fasshammer", angelegt: true }, { typ: "testausruestung", angelegt: true }]; }, "nicht genug frei"],
+    [(daten) => { daten.wesen.essigbakterium.ausstattung = [{ typ: "testausruestung", angelegt: true }]; }, "nicht genug frei"],
   ];
   for (const [aendern, teilDerMeldung] of erwartet) assert.ok(pruefen(aendern).some((meldung) => meldung.includes(teilDerMeldung)), teilDerMeldung);
 });
@@ -183,4 +188,22 @@ test("Ein Gegenstand ohne ausruestung in ausgeruestet (kaputter Zustand) zählt 
   ninkasi.ausgeruestet = [fremdkoerper.id, schuerze.id];
   assert.equal(kampfwert(spiel, ninkasi, "ruestung"), 2, "nur die Schürze zählt");
   assert.deepEqual(angriffeVon(spiel, ninkasi).map((profil) => profil.name), ["faust"]);
+});
+
+test("Ausstattung mit angelegt: beim Erzeugen schon angelegt, ohne Zeit und ohne Meldung; die Grundausstattung", () => {
+  const spiel = miniSpiel(RAUM, { effekte: EFFEKTE, gegenstaende: { testmesser: { text: "g.testmesser", aufhebbar: true, ausruestung: { platz: "hand", angriffe: [{ name: "messer", genauigkeit: 90, effekt: "stoss" }] } } } });
+  const meldungen = meldungenMitschneiden(spiel);
+  const traegerin = wesen(spiel, 1, 1, "feinde", 10, { plaetze: { hand: 2 }, angriffe: FAUST });
+  holen("ausDaten", "ausstattung")(spiel, traegerin, { ausstattung: [{ typ: "testmesser", angelegt: true }, { typ: "testmesser" }] });
+  assert.equal(traegerin.inventar.length, 2);
+  assert.deepEqual(traegerin.ausgeruestet, [traegerin.inventar[0]], "nur das erste ist angelegt");
+  assert.deepEqual(angriffeVon(spiel, traegerin).map((profil) => profil.name), ["messer"]);
+  assert.ok(!meldungen.some((meldung) => meldung.art === "angelegt"));
+
+  // der Probeinhalt: Ninkasi beginnt mit angelegtem Dolch und Wurfmessern im Gepäck
+  const lauf = neuesSpiel(datenLaden(rohdaten, {}), 1);
+  const ninkasi = spielerin(lauf.zustand);
+  const getragen = ninkasi.inventar.map((id) => lauf.zustand.entitaeten[id]);
+  assert.deepEqual(getragen.map((gegenstand) => [gegenstand.typ, gegenstand.anzahl ?? 1]), [["dolch", 1], ["wurfmesser", 8]]);
+  assert.deepEqual(angriffeVon(lauf, ninkasi).map((profil) => profil.name), ["dolch"]);
 });
