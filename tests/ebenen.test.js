@@ -168,9 +168,11 @@ test("Datenprüfung: Abfolge, Starttiefe, feste Karte, Population und Tabellen",
 // Ninkasi; ohne diese beiden Felder blieben die Werte gleich); neu mit 0.71.0 für die Fernwaffen im Keller (Schleuder,
 // Kurzbogen, Steine und Pfeile) und Kosten und Bruchchance der Wurfwaffen (mit den alten Gegenständen des Kellers und
 // den alten Wurfwaffen blieben die Werte gleich); neu mit 0.72.0 für das Brauen (Zutaten und Tonkessel im Keller, Kulturen
-// an Ninkasi; ohne diese drei blieben die Werte gleich).
+// an Ninkasi; ohne diese drei blieben die Werte gleich); neu mit 0.73.0 für das Volumen des Suds (Zutaten je Stück und
+// Portion), die wilde Hefe als Startkultur und die Kulturproben im Keller (mit den alten Zahlen der Zutaten, den alten
+// Kulturen und ohne die Krüge blieben die Werte gleich).
 test("Erzeugung in Schritten: dieselben Ebenen wie vorher", () => {
-  const erwartet = { 1: "a998e1b77208dab4", 2: "ca76d8291f75c7aa", 3: "915c13d298623a3c", 42: "2d45da652bfadeab", 4711: "8caa28d14753c3dc" };
+  const erwartet = { 1: "54fd798f8628e7bb", 2: "5af960166703e04e", 3: "208a40c6c5dd0e6b", 42: "c24e8094f73da55a", 4711: "ea10507404280ac0" };
   for (const [startwert, fingerabdruck] of Object.entries(erwartet)) {
     const spiel = neuesSpiel(DATEN, Number(startwert));
     for (const tiefe of [2, 3, 0]) ebeneWechseln(spiel, tiefe);

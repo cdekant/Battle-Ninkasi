@@ -3,7 +3,11 @@
 //   Wesenart: Ninkasi sieht zum ersten Mal ein Wesen dieser Art (Wahrnehmungsart "gesehen", nicht gespürt oder gehört),
 //     regeln.lernen.wissenWesenart Prozent der EP der Art; nur Arten mit ep; gemerkt in zustand.wissen.gesehen
 //   Gegenstand: Ninkasi erkennt einen unbekannten Typ (Meldung "erkannt", systeme/kennen.js), regeln.lernen.wissenGegenstand
-// Später melden sich hier Zutaten, Kulturen und besondere Orte an.
+//   Zutat: Ninkasi hebt zum ersten Mal im Lauf eine Zutat dieser Art auf, regeln.lernen.wissenZutat; gemerkt in
+//     zustand.wissen.zutaten (Aufruf aus systeme/brauen.js, Haken aufgehoben)
+//   Kultur: Ninkasi gewinnt eine Kultur, die sie noch nicht hatte, regeln.lernen.wissenKultur; die Kulturen vom Start
+//     zählen nicht (gemerkt in zustand.wissen.kulturen)
+// Später melden sich hier besondere Orte an.
 
 import { anmelden } from "../kern/register.js";
 import { spielerin, entitaetenMitPosition, istWesen } from "../kern/zustand.js";
@@ -27,6 +31,24 @@ anmelden("nachSicht", "wissen_wesenart", (spiel) => {
     freieEpGeben(spiel, "wissen", ep, { typ: wesen.typ, text: wesen.text });
   }
 });
+
+// Einmal je Lauf und Sache: liste in zustand.wissen, nur für Ninkasi mit Lernstand
+function einmalBuchen(spiel, wesen, liste, name, ep, bezug) {
+  if (wesen.id !== spiel.zustand.spielerinId || wesen.freieEp === undefined) return;
+  const wissen = wissenVon(spiel.zustand);
+  wissen[liste] ??= [];
+  if (wissen[liste].includes(name)) return;
+  wissen[liste].push(name);
+  freieEpGeben(spiel, "wissen", ep, bezug);
+}
+
+export function zutatGebucht(spiel, wesen, typ) {
+  einmalBuchen(spiel, wesen, "zutaten", typ, spiel.daten.regeln.lernen.wissenZutat, { typ, text: spiel.daten.gegenstaende[typ]?.text });
+}
+
+export function kulturGebucht(spiel, wesen, kultur) {
+  einmalBuchen(spiel, wesen, "kulturen", kultur, spiel.daten.regeln.lernen.wissenKultur, { typ: kultur, text: spiel.daten.kulturen[kultur]?.text });
+}
 
 // Ein erkannter Gegenstandstyp; die Meldung "erkannt" kommt nur einmal je Typ (systeme/kennen.js erkennen)
 export function erkanntGebucht(spiel, typ) {

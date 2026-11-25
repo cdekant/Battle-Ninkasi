@@ -1,16 +1,22 @@
 // Brauen (siehe docs/Sude.md, Befehl und Wirkung; Spieldesign in docs/Brauen.md): ein Sud am Kessel aus Zutaten im
 // Gepäck, abgefüllt in leere Gefäße; die Rechnung steht in systeme/sud.js.
-// Befehl: { art: "brauen", kessel?: { x, y }, zutaten: [{ gegenstandId, menge }], verfahren?: { maische, gewuerz }, kultur? }
+// Befehl: { art: "brauen", kessel?: { x, y }, portionen?, zutaten: [{ gegenstandId, menge }], verfahren?: { maische, gewuerz },
+//           kultur? }
 //   kessel:    ein Feld mit Kessel neben oder unter der Brauerin; ohne Angabe der erste in fester Reihenfolge
+//   portionen: wie viele Gefäße der Sud füllt, sein Volumen; höchstens portionen des Kessels, Vorgabe so viele, wie
+//              Kessel und leere Gefäße erlauben; je Portion höchstens regeln.brauen.stueckeJePortion Stück Zutaten
 //   verfahren: Schlüssel aus regeln.brauen.maische und regeln.brauen.gewuerz, Vorgabe regeln.brauen.verfahren
 //   kultur:    eine Kultur der Brauerin (wesen.kulturen), ohne sie gärt der Sud nicht (kein Alkohol)
-//   Ablehnungen: im_kampf, kein_kessel, keine_zutaten, keine_zutat, zu_viel, kessel_voll, kultur_unbekannt,
-//                keine_gefaesse, ungueltig
+//   Ablehnungen: im_kampf, kein_kessel, keine_zutaten, keine_zutat, zu_viel, kessel_voll, zu_viele_portionen,
+//                kultur_unbekannt, keine_gefaesse (weniger leere Gefäße als Portionen), ungueltig
 // Ablauf: der Wurf "brauen" setzt je Achse den Punkt im Bereich der Vorschau, der Wurf "verderben" entscheidet über das
 // Verderben; Zutaten und Gefäße sind verbraucht, die Portionen kommen ins Gepäck (sie stapeln nach gerundetem Profil).
 // Meldungen: gebraut (ohne Zielgebiet), gebraut_getroffen (mit zielgebiet), gebraut_verdorben, je mit wer, was, anzahl
 // Baustein sud_wirken: wirkt beim Trinken den Sud aus der Ablage (kontext.werte.sud, gesetzt von trinken in
-// systeme/inventar.js): Heilung je Wert, Pegel, Effekt des Zielgebiets.
+// systeme/inventar.js): Heilung je Wert, Zustände über die Zeit, Pegel, Effekt des Zielgebiets.
+// Kulturen gewinnen (Haken aufgehoben): ein Gegenstand mit kultur: name gibt seine Kultur an das Wesen, das ihn aufhebt,
+// und vergeht (Meldung kultur_gewonnen, schon gehabt kultur_bekannt); Ninkasi bekommt beim ersten Gewinn einer Kultur und beim ersten
+// Aufheben einer Zutatenart im Lauf Wissens-EP (systeme/wissen.js).
 
 import { anmelden, holen } from "../kern/register.js";
 import { entitaetMitId, entitaetEntfernen, ausDatenErzeugen, ausDemInventarNehmen } from "../kern/zustand.js";
@@ -18,12 +24,14 @@ import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { effektAnwenden } from "../kern/effekte.js";
 import { bausteinAnmelden } from "../kern/bausteine.js";
 import { modifiziert } from "../kern/werte.js";
+import { WELTTICK } from "../kern/zeit.js";
 import { wurfGanzzahl, wurfProzent } from "../kern/wurf.js";
 import { gelaendeAuf } from "../welt/karte.js";
 import { imKampf } from "./kampfzustand.js";
 import { insInventar, anzahlVon } from "./inventar.js";
+import { kulturGebucht, zutatGebucht } from "./wissen.js";
 import {
-  brauregeln, achsenVon, profilBerechnen, unschaerfeBerechnen, bereichBerechnen, zielgebietFinden, erreichbareZielgebiete,
+  brauregeln, achsenVon, sudRechnen, unschaerfeBerechnen, bereichBerechnen, zielgebietFinden, erreichbareZielgebiete,
   profilRunden, gueteRunden, wirkungBerechnen,
 } from "./sud.js";
 
@@ -51,8 +59,9 @@ export const zutatenIm = (spiel, wesen) => gegenstaendeIm(spiel, wesen).filter((
 export const gefaesseIm = (spiel, wesen) => gegenstaendeIm(spiel, wesen).filter((gegenstand) => gegenstand.gefaess && !(wesen.ausgeruestet || []).includes(gegenstand.id));
 const anzahlGefaesse = (spiel, wesen) => gefaesseIm(spiel, wesen).reduce((summe, gefaess) => summe + anzahlVon(gefaess), 0);
 
-// Prüft einen Befehl und rechnet seine Vorschau; { grund } oder { kessel, eingabe, mitte, unschaerfe, bereich,
-// erreichbar, fuellung, portionen }. Die Vorschau prüft den Kampf nicht, damit das Fenster auch dann rechnet.
+// Prüft einen Befehl und rechnet seine Vorschau; { grund } oder { kessel, eingabe, mitte, gaerung, unschaerfe, bereich,
+// erreichbar, fuellung, fassen, portionen, gefaesse }. Die Vorschau prüft weder den Kampf noch die Gefäße, damit das
+// Fenster auch dann rechnet; fassen ist die höchste Füllung für diese Portionen.
 export function sudVorbereiten(spiel, wesen, befehl) {
   const regeln = brauregeln(spiel.daten);
   const kessel = kesselBei(spiel, wesen, befehl.kessel ?? null);
@@ -73,13 +82,18 @@ export function sudVorbereiten(spiel, wesen, befehl) {
     zutaten.push({ typ: gegenstand.typ, menge });
     fuellung += menge;
   }
-  if (fuellung > kessel.kessel.fasst) return { grund: "kessel_voll" };
-  const eingabe = { zutaten, verfahren, kultur, fasst: kessel.kessel.fasst };
-  const mitte = profilBerechnen(spiel.daten, eingabe);
+  const gefaesse = anzahlGefaesse(spiel, wesen);
+  const portionen = befehl.portionen ?? Math.max(1, Math.min(kessel.kessel.portionen, gefaesse));
+  if (!Number.isInteger(portionen) || portionen < 1) return { grund: "ungueltig" };
+  if (portionen > kessel.kessel.portionen) return { grund: "zu_viele_portionen" };
+  const fassen = portionen * regeln.stueckeJePortion;
+  if (fuellung > fassen) return { grund: "kessel_voll" };
+  const vertraegt = kultur === null ? undefined : modifiziert(spiel, wesen, "brauen.vertraegt", spiel.daten.kulturen[kultur].vertraegt);
+  const eingabe = { zutaten, verfahren, kultur, portionen, vertraegt };
+  const { profil: mitte, gaerung } = sudRechnen(spiel.daten, eingabe);
   const unschaerfe = unschaerfeBerechnen(spiel.daten, modifiziert(spiel, wesen, "brauen.unschaerfe", kessel.kessel.unschaerfe ?? 100));
   const bereich = bereichBerechnen(spiel.daten, mitte, unschaerfe);
-  const portionen = Math.min(kessel.kessel.portionen, anzahlGefaesse(spiel, wesen));
-  return { kessel, eingabe, mitte, unschaerfe, bereich, erreichbar: erreichbareZielgebiete(spiel.daten, bereich), fuellung, portionen };
+  return { kessel, eingabe, mitte, gaerung, unschaerfe, bereich, erreichbar: erreichbareZielgebiete(spiel.daten, bereich), fuellung, fassen, portionen, gefaesse };
 }
 
 // Chance in Prozent, dass ein Sud verdirbt: Regelwert plus Kessel plus Kultur, mit Modifikatoren auf brauen.verderben
@@ -128,7 +142,7 @@ anmelden("befehle", "brauen", {
     if (imKampf(spiel, akteur)) return "im_kampf";
     const vorbereitet = sudVorbereiten(spiel, akteur, befehl);
     if (vorbereitet.grund) return vorbereitet.grund;
-    return vorbereitet.portionen > 0 ? null : "keine_gefaesse";
+    return vorbereitet.gefaesse >= vorbereitet.portionen ? null : "keine_gefaesse";
   },
   ausfuehren(spiel, akteur, befehl) {
     const vorbereitet = sudVorbereiten(spiel, akteur, befehl);
@@ -159,6 +173,24 @@ bausteinAnmelden("sud_wirken", {}, (spiel, kontext) => {
   if (!sud) return;
   const wirkung = wirkungBerechnen(spiel.daten, sud);
   for (const [wertName, menge] of Object.entries(wirkung.mengen)) holen("bausteine", "heilen")(spiel, kontext, { wertName, menge });
+  // über die Zeit: je Menge genau ein Welttick des Zustands (Süße heilt so nach und nach, daten/zustaende.js); die
+  // Dauer endet eine Zeiteinheit nach dem letzten Takt, damit auch er wirkt, wo auch immer im Takt getrunken wird
+  for (const { zustand, menge } of wirkung.zustaende) holen("bausteine", "zustand_setzen")(spiel, kontext, { zustand, dauer: menge * WELTTICK + 1 });
   if (wirkung.pegel > 0) holen("bausteine", "wert_aendern")(spiel, kontext, { wertName: "pegel", menge: wirkung.pegel });
   if (wirkung.effekt) effektAnwenden(spiel, wirkung.effekt, kontext);
 }, { brauchtZiel: true });
+
+// Aufgehobenes: Kulturen gewinnen, Wissens-EP für Zutaten (siehe Kopf)
+anmelden("haken", "aufgehoben", (spiel, kontext) => {
+  const wesen = entitaetMitId(spiel.zustand, kontext.quelleId), gegenstand = entitaetMitId(spiel.zustand, kontext.gegenstandId);
+  if (!wesen || !gegenstand) return;
+  if (gegenstand.zutat) zutatGebucht(spiel, wesen, gegenstand.typ);
+  const kultur = gegenstand.kultur;
+  if (!kultur) return;
+  const neu = !(wesen.kulturen || []).includes(kultur);
+  if (neu) wesen.kulturen = [...(wesen.kulturen || []), kultur];
+  ausDemInventarNehmen(wesen, gegenstand.id);
+  entitaetEntfernen(spiel.zustand, gegenstand.id);
+  melden(spiel, neu ? "kultur_gewonnen" : "kultur_bekannt", { wer: bezugAuf(wesen), kultur: { name: kultur, text: spiel.daten.kulturen[kultur].text } });
+  if (neu) kulturGebucht(spiel, wesen, kultur);
+});

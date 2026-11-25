@@ -215,12 +215,21 @@ html, body {
 .fenster-rahmen .leise { color: var(--leise); }
 .fenster-rahmen .gut { color: var(--gut); }
 .fenster-rahmen .schlimm { color: var(--schlimm); }
-/* Braufenster (anzeige/braufenster.js): Bereich der Vorschau je Achse als Balken */
+/* Braufenster (anzeige/braufenster.js): Bereich der Vorschau je Achse als Zahl unter dem Spinnennetz */
 .brau-vorschau { border-collapse: collapse; width: 100%; }
 .brau-vorschau td { padding: 1px 6px 1px 0; white-space: nowrap; }
 .brau-vorschau tr.kennzahl td:first-child { color: var(--gut); }
-.brau-balken { display: inline-block; width: 120px; height: 8px; background: var(--linie); vertical-align: middle; }
-.brau-balken > span { display: block; height: 100%; background: var(--gut); }
+/* Spinnennetz (anzeige/spinnennetz.js): Ringe und Speichen leise, das Band der Vorschau grün, das Profil in Bierfarbe,
+   Umrisse der Zielgebiete in Kupfer, das hervorgehobene hell */
+.spinnennetz { display: block; width: 100%; max-width: 22rem; margin: 0 auto 0.4rem; }
+.spinnennetz .netz-ring { fill: none; stroke: var(--linie); stroke-width: 0.8; }
+.spinnennetz .netz-speiche { stroke: var(--linie); stroke-width: 0.8; }
+.spinnennetz .netz-band { fill: var(--gut); fill-opacity: 0.25; stroke: var(--gut); stroke-width: 0.8; }
+.spinnennetz .netz-profil { fill: none; stroke: var(--bier); stroke-width: 1.6; }
+.spinnennetz .netz-punkt { fill: var(--bier); }
+.spinnennetz .netz-umriss { stroke: var(--kupfer); stroke-opacity: 0.45; stroke-width: 5; stroke-linecap: round; }
+.spinnennetz .netz-umriss.hervorgehoben { stroke: var(--hinweis); stroke-opacity: 0.8; }
+.spinnennetz .netz-text { fill: var(--leise); font-size: 11px; }
 .fenster-rahmen li.set { margin-top: 10px; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--leise); }
 .fenster-rahmen li.set:first-child { margin-top: 0; }
 .fenster-rahmen li.gesperrt { opacity: 0.5; }

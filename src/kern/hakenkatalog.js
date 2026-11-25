@@ -22,6 +22,8 @@ export const HAKENKATALOG = {
   verlaesst_feld: { inBetrieb: true, ausloeserErlaubt: true },
   betritt_feld: { inBetrieb: true, ausloeserErlaubt: true },
   zug_ende: { inBetrieb: true, ausloeserErlaubt: true },         // { akteurId }, Quelle und Ziel die Akteurin; nach ihrer Aktion
+  // + gegenstandId (der Stapel im Gepäck, in den er kam); Quelle und Ziel, wer aufhebt (systeme/inventar.js)
+  aufgehoben: { inBetrieb: true, ausloeserErlaubt: true },
   // + gegenstandId, art ("trinken" | "werfen" | "anlegen" | "ablegen"); Quelle und Ziel die Benutzerin
   gegenstand_benutzt: { inBetrieb: true, ausloeserErlaubt: true },
   // + faehigkeit (Name), verbrauch ({ wert: menge }, bezahlt); Quelle und Ziel die Wirkende; nach dem Bezahlen, vor Risiko

@@ -62,7 +62,7 @@ Schnittstellen (`src/systeme/ausruestung.js`):
 + Befehle `anlegen { gegenstandId }` und `ablegen { gegenstandId }`; Ablehnungen `nicht_im_gepaeck`, `nicht_anlegbar`, `schon_angelegt`, `kein_platz`, `nicht_angelegt`, `verflucht`; Meldungen `angelegt`, `abgelegt`, `fluch_entdeckt`, `fluch_aufgehoben`
 + `ausgeruestete` (nur Gegenstände mit der Komponente `ausruestung`, ein anderer in `ausgeruestet` zählt nicht), `istAngelegt`, `zuTauschen` (Plätze aus `plaetzeVon`, siehe [Architektur.md](Architektur.md), Entitäten und Komponenten), `fluchHindert`, `waffenprofile` (für `angriffeVon` in `src/systeme/kampf.js`), `haltbarkeitProzent`, `wechselzeit(spiel, wesen, gegenstand, art)`, `verlangsamungDes` (ein Stück) und `verlangsamungVon` (Summe, wirkt in `zeitkosten`, siehe [Architektur.md](Architektur.md), Befehle), `gefuehltesGewicht` (für `lastVon`)
 + Modifikatorquelle `ausruestung` (Quelle `ausruestung:<id>`); Fähigkeitsquelle `ausruestung` (siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten); Auslöser der Ausrüstung in der Kaskade (siehe [Wirkungen.md](Wirkungen.md), Auslöser); Baustein `fluch_aufheben`
-+ Haken `gegenstand_benutzt` mit `gegenstandId` und `art` (`trinken`, `lesen`, `werfen`, `anlegen`, `ablegen`)
++ Haken `gegenstand_benutzt` mit `gegenstandId` und `art` (`trinken`, `lesen`, `werfen`, `anlegen`, `ablegen`); Haken `aufgehoben` nach dem Aufheben mit `gegenstandId` des Stapels, in den der Gegenstand kam (z.B. Kulturen gewinnen, siehe [Sude.md](Sude.md), Befehl)
 
 Regeln:
 

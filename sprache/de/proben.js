@@ -311,6 +311,16 @@ export default {
     einzahl: { nom: "Wacholderzweig", gen: "Wacholderzweigs", dat: "Wacholderzweig", akk: "Wacholderzweig" },
     mehrzahl: { nom: "Wacholderzweige", gen: "Wacholderzweige", dat: "Wacholderzweigen", akk: "Wacholderzweige" },
   },
+  "gegenstand.hefekrug": {
+    geschlecht: "m",
+    einzahl: { nom: "Hefekrug", gen: "Hefekrugs", dat: "Hefekrug", akk: "Hefekrug" },
+    mehrzahl: { nom: "Hefekrüge", gen: "Hefekrüge", dat: "Hefekrügen", akk: "Hefekrüge" },
+  },
+  "gegenstand.sauerkrug": {
+    geschlecht: "m",
+    einzahl: { nom: "Sauerkrug", gen: "Sauerkrugs", dat: "Sauerkrug", akk: "Sauerkrug" },
+    mehrzahl: { nom: "Sauerkrüge", gen: "Sauerkrüge", dat: "Sauerkrügen", akk: "Sauerkrüge" },
+  },
   "zielgebiet.gefiltertes_bier": {
     geschlecht: "n", adjektive: ["adjektiv.gefiltert"],
     einzahl: { nom: "Bier", gen: "Biers", dat: "Bier", akk: "Bier" },
@@ -341,6 +351,7 @@ export default {
   "adjektiv.suess": { adjektiv: "süß" },
   "adjektiv.roetlich": { adjektiv: "rötlich" },
   "adjektiv.stark": { adjektiv: "stark" },
+  "kultur.wilde_hefe": "wilde Hefe",
   "kultur.bierhefe": "Bierhefe",
   "kultur.milchsaeure": "Milchsäurebakterien",
   "gelaende.tonkessel": "Tonkessel",

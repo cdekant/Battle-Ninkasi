@@ -964,7 +964,7 @@ function pruefeEigenschaften(daten, sprache, fehler) {
 function pruefeLernregeln(daten, lernen, fehler) {
   if (!istObjekt(lernen)) return fehler.push("regeln.lernen fehlt");
   const ort = "regeln.lernen";
-  pruefeParameter(daten, { eigenschaftStart: "ganzzahl", eigenschaftPunkte: "ganzzahl", eigenschaftHoechstens: "ganzzahl", startEp: "ganzzahl", topfFaktor: "ganzzahl", wissenWesenart: "ganzzahl", wissenGegenstand: "ganzzahl" }, lernen, ort, fehler);
+  pruefeParameter(daten, { eigenschaftStart: "ganzzahl", eigenschaftPunkte: "ganzzahl", eigenschaftHoechstens: "ganzzahl", startEp: "ganzzahl", topfFaktor: "ganzzahl", wissenWesenart: "ganzzahl", wissenGegenstand: "ganzzahl", wissenZutat: "ganzzahl", wissenKultur: "ganzzahl" }, lernen, ort, fehler);
   if (!(istGanzzahl(lernen.anteilGebunden) && lernen.anteilGebunden >= 0 && lernen.anteilGebunden <= 100)) fehler.push(`${ort}.anteilGebunden muss eine ganze Zahl von 0 bis 100 sein`);
   fehler.push(...kurvenfehler(lernen.tiefenEp, `${ort}.tiefenEp`));
   pruefeParameter(daten, { verrechnung: ["multiplizieren", "addieren"], gewichtung: ["erste"], ort: ["jederzeit"] }, lernen, ort, fehler);
@@ -1304,7 +1304,8 @@ function pruefeBrauregeln(daten, regeln, achsen, aromaachsen, fehler) {
     if (!istObjekt(gewuerz) || !istZahlAbNull(gewuerz.bitter) || !istZahlAbNull(gewuerz.aroma)) fehler.push(`regeln.brauen.gewuerz.${name} muss { bitter, aroma } in Prozent sein`);
   }
   if (!regeln.maische?.[regeln.verfahren?.maische] || !regeln.gewuerz?.[regeln.verfahren?.gewuerz]) fehler.push("regeln.brauen.verfahren muss eine Maische und eine Gewürzgabe aus regeln.brauen nennen");
-  for (const feld of ["alkoholJeStammwuerze", "budgetProzent", "pegelProzent", "gewichtJePortion"]) {
+  if (!istGanzzahl(regeln.stueckeJePortion) || regeln.stueckeJePortion < 1) fehler.push("regeln.brauen.stueckeJePortion muss eine ganze Zahl >= 1 sein");
+  for (const feld of ["alkoholJeStammwuerze", "suesseJeRestzucker", "budgetProzent", "pegelProzent", "gewichtJePortion"]) {
     if (!istZahlAbNull(regeln[feld])) fehler.push(`regeln.brauen.${feld} muss eine ganze Zahl >= 0 sein`);
   }
   for (const feld of ["verderben", "gueteAmRand", "gueteFrei"]) if (!istProzent(regeln[feld])) fehler.push(`regeln.brauen.${feld} muss eine ganze Zahl von 0 bis 100 sein`);
@@ -1318,9 +1319,10 @@ function pruefeBrauregeln(daten, regeln, achsen, aromaachsen, fehler) {
     if (!achsen.includes(verdorben.achse)) fehler.push(`regeln.brauen.verdorben.achse: Achse "${verdorben.achse}" gibt es nicht`);
     if (!istZahlAbNull(verdorben.plus) || !istProzent(verdorben.guete)) fehler.push("regeln.brauen.verdorben: plus >= 0 und guete von 0 bis 100");
   }
-  for (const [achse, wertName] of Object.entries(istObjekt(regeln.wirkungen) ? regeln.wirkungen : {})) {
+  for (const [achse, wirkung] of Object.entries(istObjekt(regeln.wirkungen) ? regeln.wirkungen : {})) {
     if (!aromaachsen.includes(achse)) fehler.push(`regeln.brauen.wirkungen: Aromaachse "${achse}" gibt es nicht`);
-    if (typeof wertName !== "string") fehler.push(`regeln.brauen.wirkungen.${achse} muss ein Wertname sein`);
+    const ueberZeit = istObjekt(wirkung) && daten.zustaende?.[wirkung.zustand] && istZahlAbNull(wirkung.prozent);
+    if (typeof wirkung !== "string" && !ueberZeit) fehler.push(`regeln.brauen.wirkungen.${achse} muss ein Wertname oder { zustand, prozent } mit einem Zustand der Daten sein`);
   }
   if (typeof regeln.wirkungOhneAroma !== "string") fehler.push("regeln.brauen.wirkungOhneAroma muss ein Wertname sein");
 }
@@ -1356,6 +1358,7 @@ function pruefeBrauen(daten, sprache, fehler) {
   for (const [name, gegenstand] of Object.entries(daten.gegenstaende)) {
     const ort = `gegenstaende.${name}`;
     if (gegenstand.gefaess !== undefined && gegenstand.gefaess !== true) fehler.push(`${ort}: gefaess muss true sein`);
+    if (gegenstand.kultur !== undefined && !daten.kulturen?.[gegenstand.kultur]) fehler.push(`${ort}: Kultur "${gegenstand.kultur}" gibt es nicht`);
     const zutat = gegenstand.zutat;
     if (zutat === undefined) continue;
     if (!istObjekt(zutat) || !ZUTATARTEN.includes(zutat.art)) { fehler.push(`${ort}: zutat muss { art: ${ZUTATARTEN.join(" | ")}, ... } sein`); continue; }
@@ -1365,9 +1368,9 @@ function pruefeBrauen(daten, sprache, fehler) {
   for (const [name, gelaende] of Object.entries(daten.gelaende)) {
     const kessel = gelaende.kessel;
     if (kessel === undefined) continue;
-    const gueltig = istObjekt(kessel) && istGanzzahl(kessel.fasst) && kessel.fasst > 0 && istGanzzahl(kessel.portionen) && kessel.portionen > 0
+    const gueltig = istObjekt(kessel) && istGanzzahl(kessel.portionen) && kessel.portionen > 0
       && (kessel.verderben === undefined || istGanzzahl(kessel.verderben)) && (kessel.unschaerfe === undefined || istZahlAbNull(kessel.unschaerfe));
-    if (!gueltig) fehler.push(`gelaende.${name}: kessel muss { fasst > 0, portionen > 0, verderben?, unschaerfe? } sein`);
+    if (!gueltig) fehler.push(`gelaende.${name}: kessel muss { portionen > 0, verderben?, unschaerfe? } sein`);
   }
   for (const [name, wesen] of Object.entries(daten.wesen)) {
     if (wesen.kulturen === undefined) continue;

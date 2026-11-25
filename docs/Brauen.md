@@ -28,7 +28,7 @@ Umsetzung: teilweise, siehe [Sude.md](Sude.md), Befehl; offen: Trockenbier, Sud 
 
 ## Ablauf
 
-1. Zutaten wählen: am Kessel aus dem Gepäck, per Klick; dazu wenige Hebel: die Menge je Zutat, die Maischtemperatur (kühl gemaischt trocken und stärker, warm gemaischt süß und vollmundig), Gewürz früh (bitter) oder spät (Aroma), die Kultur
+1. Zutaten wählen: am Kessel zuerst, wie viele Flaschen der Sud füllen soll, dann die Rohstoffe aus dem Gepäck, per Klick; was auf wenige Flaschen kommt, gibt einen starken Sud; dazu wenige Hebel: die Menge je Zutat, die Maischtemperatur (kühl gemaischt trocken und stärker, warm gemaischt süß und vollmundig), Gewürz früh (bitter) oder spät (Aroma), die Kultur
 2. Vorschau: das Profil des Suds wandert mit jeder Wahl mit, als ungefährer Bereich statt als genauer Punkt
 3. Brauen: der Wurf setzt den genauen Punkt im Bereich und entscheidet über Gelingen und Verderben
 4. Ergebnis: der Sud wird in leere Gefäße aus dem Gepäck abgefüllt, so viele Portionen, wie Gefäße und Kessel erlauben
@@ -43,13 +43,14 @@ Umsetzung: teilweise, siehe [Sude.md](Sude.md), Befehl, und [Bedienung.md](Bedie
 
 Ein Sud hat ein Profil wie ein Aromaprofil der Verkostung, als Spinnennetz dargestellt: auf jeder Achse ein Wert, das Ziel als Spanne je Achse.
 
-+ Kennzahlen: Stärke (Stammwürze), Alkohol, Bittere, Farbe; berechnet nach vereinfachten Formeln der Brauwirklichkeit aus Schüttung, Maischtemperatur, Gewürzgabe und Kultur
++ Kennzahlen: Stärke (Stammwürze), Alkohol, Bittere, Farbe; berechnet nach vereinfachten Formeln der Brauwirklichkeit aus Schüttung je Volumen, Maischtemperatur, Gewürzgabe und Kultur
++ Jede Kultur verträgt nur so viel Alkohol; was sie darüber hinaus vergären könnte, bleibt als Zucker im Sud und macht ihn süß; so entstehen konzentrierte, süße Starkbiere, und Skills heben die Grenze der Kulturen später darüber hinaus
 + Aromen: etwa Malz, Röst, Frucht, Kräuter, Säure, Rauch, Süße, Holz; jede Zutat trägt feste Anteile bei; welche Achsen es gibt, legen die Daten fest
 + Die Unschärfe der Vorschau ist der Spielraum des Wurfs; Rezeptur verkleinert sie, ein Rezept noch mehr
 + Unbekannte Zutaten zeigen ihre Beiträge erst nach dem ersten Gebrauch oder durch Kennerschaft
 + Die Werte werden für die Wirkung auf wenige Stufen gerundet; so ergeben gleiche Rezepte meist gleiche Sude
 
-Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil; offen: Spinnennetz, Rauch und Holz, unbekannte Zutaten, Rezeptur und Rezept verkleinern die Unschärfe, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil, und [Bedienung.md](Bedienung.md), Fenster (Spinnennetz); offen: Rauch und Holz, unbekannte Zutaten, Rezeptur und Rezept verkleinern die Unschärfe, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Zielgebiete
 
@@ -75,7 +76,7 @@ Umsetzung: teilweise, siehe [Sude.md](Sude.md), Zielgebiete; offen: Nebel und Wi
 + Weitere Wirkungen kommen von Zusätzen (Kräuter und andere Zutaten mit eigenem Effekt), Kulturen, gefundenen Rezepten und Fähigkeiten, die einem Sud Wirkungen geben oder Zielgebiete verstärken; Skills verstärken das Ganze (siehe [Skills.md](Skills.md), Brauen)
 + Spezialbiere wie das Phönixbier sind Sude mit einem besonderen Zusatz
 
-Umsetzung: teilweise, siehe [Sude.md](Sude.md), Wirkung; offen: Röst, Rauch, Süße über die Zeit, Schutz durch Säure, Zusätze, Kulturen und Fähigkeiten als Quellen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Wirkung (Süße über die Zeit); offen: Röst, Rauch, Schutz durch Säure, Zusätze, Kulturen und Fähigkeiten als Quellen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Zutaten
 
@@ -91,13 +92,14 @@ Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil; offen: Primär- und Seku
 ## Kulturen
 
 + Mikroorganismen bestimmen die Gärung: wie viel der Stärke zu Alkohol wird, wie viel Alkohol sie verträgt, welche Aromen und Säure sie beitragen und welche Achse sie verstärken
++ Ninkasi beginnt mit wilder Hefe: sie vergärt schwach, verträgt wenig Alkohol und bringt etwas Frucht und Säure; alle anderen Kulturen gewinnt sie unterwegs
 + Ninkasi trägt von jeder gewonnenen Kultur eine Probe ohne Gewicht; sie verbraucht sich nicht
 + Wege zu einer Kultur: selten als Beute von Mikroorganismen, aus einem gefundenen, bekannten Bier gezogen, an Fundorten in Brauereien
 + Spontane Gärung braucht keine Probe: sie nimmt die wilde Flora der Ebene, die an jedem Ort anders ist, mit Zufallseffekten
 + Kulturen verbessern sich durch Gebrauch (siehe [Skills.md](Skills.md), Brauen)
 + Ideen für die Rollen: übervergärende Hefe (trocken, viel Alkohol, für den Pegel), Brettanomyces (weniger Alkohol, verstärkt die MP), untergärige Hefe (sauber, enge Vorschau), Kveik (gärt heiß und schnell, der Weg zum Sud im Kampf), Milchsäurebakterien (Säure ohne Alkohol), Essigbakterien (Essig), Koji (verzuckert Reis ohne Mälzen), Kefirknollen und Teepilz (Säure, wenig Alkohol, Kombucha senkt den Pegel), wilde Hefe
 
-Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil; offen: Kulturen gewinnen, spontane Gärung, Verbessern durch Gebrauch, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil (Proben zum Aufheben); offen: Kulturen gewinnen, spontane Gärung, Verbessern durch Gebrauch, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Absud
 
@@ -134,7 +136,10 @@ Umsetzung: teilweise, siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß, und
 
 + Zu Beginn kennt Ninkasi kein Rezept; sie findet sie unterwegs
 + Ein gefundenes Rezept zeigt sein Zielgebiet und einen bewährten Weg dorthin und bringt einen Kniff mit; beim ersten Gelingen gibt es gebundene EP (siehe [Skills.md](Skills.md), Brauen)
-+ Ein gelungener freier Sud wird zum Hausrezept: danach so verlässlich wie ein gefundenes Rezept, aber nicht stärker
++ Ein Rezept ist ein Punkt im Zielgebiet mit einer Güte nach seinem Abstand zur Mitte, kein eigenes Gebiet; nach Rezept gebraut liegt der Sud eng um diesen Punkt
++ Ein Rezept hält seine Zutaten im Verhältnis zur Zahl der Flaschen; nach Rezept braut, wer für die gewählten Flaschen dasselbe Verhältnis trifft
++ Ein gelungener freier Sud wird zum Hausrezept: danach so verlässlich wie ein gefundenes Rezept, aber nicht stärker; je Zielgebiet gibt es ein Hausrezept, ein späterer Treffer mit höherer Güte ersetzt es, so werden die Rezepte im Lauf besser
++ Gefundene Rezepte bleiben wertvoll, auch wenn alle Zielgebiete aufgedeckt sind: sie bringen ihren Kniff, die EP beim ersten Gelingen und manche ein eigenes kleines Zielgebiet, das nur mit ihrem Kniff erreichbar ist
 + Das Rezeptbuch hält beide, nur für den Lauf; über Läufe hinweg bleiben allein die aufgedeckten Zielgebiete (siehe Zielgebiete, Nebel)
 
 Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23

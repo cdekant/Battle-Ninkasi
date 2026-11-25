@@ -25,6 +25,7 @@ import { faehigkeitFuer, faehigkeitenVon, herkunftDer, verbrauchVon, zeitBisBere
 import { BUCHSTABEN } from "../eingabe/inventar.js";
 import { hilfeGruppen } from "../eingabe/hilfe.js";
 import { stellenVon } from "../eingabe/schnellleiste.js";
+import { spinnennetzSvg, achsenBeschriftungen } from "./spinnennetz.js";
 
 const inhalte = new Map();
 
@@ -117,7 +118,8 @@ fensterinhaltAnmelden("inventar", ({ spiel, texte, leisten }, zustand) => {
   });
   const gewaehlt = zustand.gewaehlt !== null ? entitaetMitId(spiel.zustand, zustand.gewaehlt) : null;
   const details = gewaehlt
-    ? `<h2>${nomenForm({ ...gewaehlt, anzahl: 1 }, "nom", "ohne")}</h2><ul>
+    ? `<h2>${nomenForm({ ...gewaehlt, anzahl: 1 }, "nom", "ohne")}</h2>${gewaehlt.sud ? sudNetzHtml(spiel, text, gewaehlt.sud) : ""}<ul>
+        ${gewaehlt.sud ? `<li>${text("ui.guete")}: ${gewaehlt.sud.guete} %</li>` : ""}
         ${anzahlVon(gewaehlt) > 1 ? `<li>${text("ui.anzahl")}: ${anzahlVon(gewaehlt)}</li>` : ""}
         ${gewaehlt.ladungen ? `<li>${text("ui.ladungen")}: ${ladungenVon(gewaehlt)} / ${gewaehlt.ladungen.hoechstens}</li>` : ""}
         ${gewaehlt.haltbarkeit ? `<li>${text("ui.haltbarkeit")}: ${haltbarkeitProzent(gewaehlt)} %</li>` : ""}
@@ -147,6 +149,14 @@ fensterinhaltAnmelden("inventar", ({ spiel, texte, leisten }, zustand) => {
     fuss: text(hinweis),
   };
 });
+
+// Profil eines gebrauten Getränks als Spinnennetz, mit dem Umriss seines Zielgebiets (systeme/sud.js, docs/Sude.md)
+function sudNetzHtml(spiel, text, sud) {
+  const achsen = spiel.daten.regeln.brauen.achsen;
+  const zielgebiet = sud.zielgebiet ? spiel.daten.zielgebiete?.[sud.zielgebiet] : null;
+  const umrisse = zielgebiet ? [{ spannen: zielgebiet.spannen, hervorgehoben: true }] : [];
+  return spinnennetzSvg(achsen, { punkt: sud.profil, umrisse, beschriftungen: achsenBeschriftungen(achsen, text), titel: text("ui.profil") });
+}
 
 // Fähigkeiten
 

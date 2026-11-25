@@ -201,6 +201,8 @@ export default {
     tiefenEp: [[1, 0], [2, 1000], [5, 2500]],
     wissenWesenart: 100, // freie EP beim ersten Sehen einer Wesenart, in Prozent ihrer EP (systeme/wissen.js)
     wissenGegenstand: 50, // freie EP beim Erkennen eines unbekannten Gegenstandstyps (systeme/wissen.js)
+    wissenZutat: 20, // freie EP beim ersten Aufheben einer Zutatenart im Lauf (systeme/wissen.js)
+    wissenKultur: 50, // freie EP beim Gewinn einer neuen Kultur (systeme/wissen.js)
     anteilGebunden: 50, // Prozent der EP eines Bewältigten, die über das Beitragsbuch in Skills fließen, der Rest frei
     verrechnung: "multiplizieren", // Prozente verschiedener Skills: "multiplizieren" (ein mal je Eintrag) oder "addieren"
     gewichtung: "erste", // Beitragsbuch: jeder Lernanlass zählt je Gegner einmal ("anteil" folgt später)
@@ -237,7 +239,9 @@ export default {
       spaet: { bitter: 30, aroma: 100 },
     },
     verfahren: { maische: "warm", gewuerz: "frueh" }, // Vorgabe, wenn der Befehl nichts sagt
-    alkoholJeStammwuerze: 50, // Alkohol = Stammwürze x Vergärungsgrad x so viele Prozent
+    alkoholJeStammwuerze: 50, // Alkohol = vergorene Stammwürze x so viele Prozent (nach Balling rund die Hälfte)
+    suesseJeRestzucker: 50, // Punkte der Süße je Zehntel °Plato Restzucker, in Prozent
+    stueckeJePortion: 4, // so viele Stück Zutaten nimmt der Kessel je Portion höchstens
     verderben: 10, // Chance in Prozent, dass ein Sud verdirbt, vor Kessel und Kultur
     // ein verdorbener Sud: dieser Gegenstand, die Achse steigt um plus, feste Güte, kein Zielgebiet
     verdorben: { getraenk: "sud_verdorben", achse: "saeure", plus: 40, guete: 30 },
@@ -246,7 +250,9 @@ export default {
     gueteStufe: 10, // die Güte wird darauf abgerundet
     gueteFrei: 60, // Güte eines Suds ohne Zielgebiet
     budgetProzent: 20, // Budget der Wirkung in Prozent der Stammwürze (Zehntel °Plato) bei Güte 100
-    wirkungen: { malz: "lp", suesse: "lp", frucht: "mp", saeure: "mp", kraeuter: "pp" }, // was die Aromen füllen
+    // was die Aromen füllen: ein Wertname wirkt sofort, { zustand, prozent } über die Zeit (Menge mal prozent, je
+    // Menge ein Welttick des Zustands); Süße heilt nach und nach, dafür etwas mehr
+    wirkungen: { malz: "lp", suesse: { zustand: "gestaerkt", prozent: 150 }, frucht: "mp", saeure: "mp", kraeuter: "pp" },
     wirkungOhneAroma: "lp", // wohin das Budget eines Suds ohne Aroma geht
     pegelProzent: 100, // Pegel in Promille-Hundertsteln je Zehntel Vol.-% Alkohol, wie das Bier des Probeinhalts
     gewichtJePortion: 500, // Gramm Inhalt je Portion, dazu das Gewicht des Gefäßes

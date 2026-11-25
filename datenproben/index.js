@@ -50,13 +50,13 @@ export default {
   },
   // Ninkasi bekommt die vorläufige Fähigkeit für den Zielmodus, den Sprint und eine Psi-Fähigkeit, dazu die
   // Grundausstattung (docs/Charakter.md, Startwerte): den Dolch angelegt und Wurfmesser im Gepäck; als Göttin des Biers
-  // trägt sie Proben von Bierhefe und Milchsäure (docs/Sude.md, Profil)
+  // trägt sie wilde Hefe (docs/Sude.md, Profil), Bierhefe und Milchsäure liegen als Krüge im Keller
   ergaenzen: {
     wesen: {
       ninkasi: {
         faehigkeiten: ["testfaehigkeit", "sprint", "gedankenstich"],
         ausstattung: [{ typ: "dolch", angelegt: true }, { typ: "wurfmesser", anzahl: 8 }],
-        kulturen: ["bierhefe", "milchsaeure"],
+        kulturen: ["wilde_hefe"],
       },
     },
   },

@@ -13,6 +13,7 @@ const keller = {
     { typ: "laterne", anzahl: 1 },
     { typ: "gerstenmalz", anzahl: 3, stapel: 4 }, { typ: "emmer", anzahl: 2, stapel: 3 }, { typ: "bierbrot", anzahl: 2, stapel: 2 },
     { typ: "datteln", anzahl: 2, stapel: 3 }, { typ: "honig", anzahl: 1, stapel: 2 }, { typ: "wacholder", anzahl: 2, stapel: 2 },
+    { typ: "hefekrug", anzahl: 1 }, { typ: "sauerkrug", anzahl: 1 },
   ],
   fallen: [{ typ: "saeureduese", anzahl: 6 }, { typ: "klappergeschirr", anzahl: 6 }],
   tuerChance: 50, // Prozent der Raumzugänge mit Tür

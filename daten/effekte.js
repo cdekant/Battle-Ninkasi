@@ -19,6 +19,10 @@ export default {
   sud_trinken: {
     schritte: [{ baustein: "sud_wirken" }],
   },
+  // je Welttick des Zustands gestaerkt (daten/zustaende.js)
+  gestaerkt_heilen: {
+    schritte: [{ baustein: "heilen", wertName: "lp", menge: 1, mitStaerke: true }],
+  },
   filmriss: {
     schritte: [{ baustein: "vergessen" }, { baustein: "zustand_setzen", zustand: "filmriss" }],
   },

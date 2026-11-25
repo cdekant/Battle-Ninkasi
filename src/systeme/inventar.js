@@ -178,9 +178,10 @@ anmelden("befehle", "aufheben", {
   ausfuehren(spiel, akteur) {
     const gegenstand = aufhebbarHier(spiel, akteur);
     const bezug = bezugAuf(gegenstand), anzahl = anzahlVon(gegenstand), typ = gegenstand.typ;
-    insInventar(spiel, akteur, gegenstand);
+    const imGepaeckAls = insInventar(spiel, akteur, gegenstand);
     melden(spiel, "aufgehoben", { wer: bezugAuf(akteur), was: bezug, anzahl });
     beimAufhebenErkennen(spiel, akteur, typ);
+    hakenAusloesen(spiel, "aufgehoben", { quelleId: akteur.id, zielId: akteur.id, gegenstandId: imGepaeckAls.id, kettentiefe: 0 });
     return "aufheben";
   },
 });

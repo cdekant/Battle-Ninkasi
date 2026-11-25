@@ -8,7 +8,10 @@ import grammatikDe from "../sprache/de/grammatik.js";
 import belegung from "../src/eingabe/belegung.js";
 import { miniSpiel, lernendeSpielerin, gegenstandTragen } from "./hilfen.js";
 import { datenLaden, neuesSpiel, befehlGeben } from "../src/kern/spiel.js";
-import { spielerin } from "../src/kern/zustand.js";
+import { spielerin, positionSetzen } from "../src/kern/zustand.js";
+import { gelaendeAuf } from "../src/welt/karte.js";
+import { braufensterOeffnen } from "../src/eingabe/brauen.js";
+import "../src/anzeige/braufenster.js";
 import { akteurEinreihen } from "../src/kern/zeit.js";
 import { skillUebersicht, stufeVon, eigenschaftenPruefen } from "../src/systeme/skills.js";
 import { fensterartAnmelden, fensterOeffnen, fensterTaste, oberstesFenster } from "../src/eingabe/fenster.js";
@@ -193,6 +196,23 @@ test("Anzeige: jedes Fenster entsteht mit dem Spielinhalt ohne fehlende Texte", 
   for (let gewaehlt = 0; gewaehlt < skillUebersicht(spiel, ninkasi).length; gewaehlt++) {
     assert.match(zeigen("charakter", { gewaehlt, eingabe: gewaehlt === 1 ? "30" : "" }), /Lerntempo/);
   }
+  // Braufenster am Tonkessel mit Zutaten und Flasche, danach das gebraute Getränk mit seinem Profil im Inventar
+  const ebene = spiel.zustand.ebene;
+  let kessel = null;
+  for (let y = 0; y < ebene.hoehe && !kessel; y++) for (let x = 0; x < ebene.breite && !kessel; x++) if (gelaendeAuf(spiel, x, y)?.kessel) kessel = { x, y };
+  positionSetzen(spiel.zustand, ninkasi, kessel);
+  const malz = gegenstandTragen(spiel, ninkasi, { typ: "gerstenmalz", ...structuredClone(daten.gegenstaende.gerstenmalz), anzahl: 2 });
+  gegenstandTragen(spiel, ninkasi, { typ: "leere_flasche", ...structuredClone(daten.gegenstaende.leere_flasche) });
+  const braufenster = zeigen("brauen", { ...braufensterOeffnen(spiel).zustand, mengen: { [malz.id]: 2 } });
+  assert.match(braufenster, /<svg class="spinnennetz"/, "die Vorschau als Spinnennetz");
+  assert.match(braufenster, /netz-umriss/, "mit den Umrissen der Zielgebiete");
+  assert.match(braufenster, /Restzucker/);
+  assert.match(braufenster, /1 Portion · Kessel 2\/4/);
+  befehlGeben(spiel, { art: "brauen", zutaten: [{ gegenstandId: malz.id, menge: 2 }], kultur: "wilde_hefe" });
+  const sud = ninkasi.inventar.map((id) => spiel.zustand.entitaeten[id]).find((gegenstand) => gegenstand.sud);
+  const imInventar = zeigen("inventar", { gewaehlt: sud.id });
+  assert.match(imInventar, /<svg class="spinnennetz"/, "das Profil eines Getränks als Spinnennetz");
+  assert.match(imInventar, /Güte/);
   const doppelt = fensterHtml(umgebung, fensterOeffnen(fensterOeffnen([], "charakter", charakterfensterOeffnen()), "hilfe"));
   assert.match(doppelt, /Charakter › Hilfe/, "der Titel nennt den Weg durch den Stapel");
   assert.deepEqual(warnungen, []);
