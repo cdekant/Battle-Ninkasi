@@ -40,6 +40,7 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 16
 + Zwei Ebenenbilder mit einem Übergang dazwischen, der erste Boss auf dem zwölften Level; darunter zeigen sich schon die ersten Anzeichen des zweiten Kapitels
 + Die Ebenenbilder zeigen die Rohstoffe unter freiem Himmel: Gerstenfelder und Dattelhaine Sumers
 + Das Ende des ersten Kapitels ist der Maßstab der Anfangsbalance (siehe [Charakter.md](Charakter.md), Skills)
++ Die erste Ebene überlebt Ninkasi immer, wenn sie sorgfältig spielt: Sie ist Einstieg, nicht Prüfung; gefährlich wird es erst danach (Prüfstein ist der räumende Bot, siehe [Entwicklung.md](Entwicklung.md), Messwerte)
 
 Umsetzung: offen
 
