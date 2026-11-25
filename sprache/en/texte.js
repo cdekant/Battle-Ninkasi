@@ -204,6 +204,7 @@ export default {
   "reise.voll": "Rested.",
   "reise.zu_lang": "Enough rest, nothing is happening any more.",
   "reise.alles_erkundet": "Nothing left to discover here.",
+  "reise.gefahr_im_weg": "The only way on crosses a known danger. Explore again to accept the risk.",
   "reise.keine_arena": "Ninkasi only fights on her own in the arena.",
   "reise.hindernis": "No way on from here.",
   "reise.bemerkenswert": "Ninkasi pauses, there is something here.",

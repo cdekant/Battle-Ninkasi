@@ -75,8 +75,9 @@ export function abstandskarte(spiel, ziel, { bewegung = "laufend", oeffnetTueren
 
 // Nächstes begehbares Feld (Breitensuche in Schritten, ohne den Start), für das passt(x, y) gilt; null, wenn keins.
 // Nachbarn in fester Reihenfolge, bei gleichem Abstand gewinnt das zuerst gefundene. nurBekannt und bewegung wie bei weg.
-// Die Suche geht nur über Felder, die für die Bewegungsart betretbar sind (mitStart: auch der Start selbst wird geprüft).
-export function naechstesFeldMit(spiel, start, passt, { nurBekannt = false, bewegung = "laufend", oeffnetTueren = true, mitStart = false } = {}) {
+// Die Suche geht nur über Felder, die für die Bewegungsart betretbar sind (mitStart: auch der Start selbst wird geprüft);
+// mit meiden weder über gemiedene Felder noch zu ihnen, so findet sie nur, was ein Weg mit demselben meiden erreicht.
+export function naechstesFeldMit(spiel, start, passt, { nurBekannt = false, bewegung = "laufend", oeffnetTueren = true, mitStart = false, meiden = null } = {}) {
   if (mitStart && passt(start.x, start.y)) return { x: start.x, y: start.y };
   const ebene = spiel.zustand.ebene;
   const besucht = new Set([feldIndex(ebene, start.x, start.y)]);
@@ -90,6 +91,7 @@ export function naechstesFeldMit(spiel, start, passt, { nurBekannt = false, bewe
       if (besucht.has(index)) continue;
       besucht.add(index);
       if (!betretbarNach(spiel, x, y, nurBekannt, bewegung, oeffnetTueren)) continue;
+      if (meiden && meiden(x, y)) continue;
       if (passt(x, y)) return { x, y };
       warteliste.push({ x, y });
     }

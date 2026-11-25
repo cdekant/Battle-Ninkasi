@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { miniSpiel, wesen, spielerinSetzen } from "./hilfen.js";
 import { befehlGeben } from "../src/kern/spiel.js";
 import { akteurEinreihen } from "../src/kern/zeit.js";
+import { entitaetErzeugen } from "../src/kern/zustand.js";
 import { feldIndex, passierbar } from "../src/welt/karte.js";
 import { naechstesFeldMit, amRandDesErkundeten } from "../src/welt/wege.js";
 import { sichtfeldAktualisieren } from "../src/systeme/sicht.js";
@@ -65,6 +66,32 @@ test("Auto-Erkunden läuft, bis alle erreichbaren Felder erkundet sind", () => {
     for (let x = 0; x < ebene.breite; x++) if (passierbar(spiel, x, y)) assert.equal(ebene.erkundet[feldIndex(ebene, x, y)], 1, `Feld ${x},${y}`);
   }
   assert.equal(erkundenBeginnen(spiel, vorgaben).grund, "alles_erkundet");
+});
+
+test("Auto-Erkunden meidet bekannte Fallen: nur dahinter Unerkundetes hält einmal mit gefahr_im_weg, trotzGefahr geht hinüber", () => {
+  const GANG = ["############", "#..........#", "############"];
+  const spiel = miniSpiel(GANG, { effekte: { kitzeln: { schritte: [{ baustein: "heilen", wertName: "lp", menge: 0 }] } } });
+  const ninkasi = spielerinSetzen(spiel, 1, 1);
+  ninkasi.sicht = { reichweite: 2 };
+  akteurEinreihen(spiel.zustand, ninkasi.id, 0);
+  spiel.zustand.ebene.erkundet.fill(0);
+  const falle = entitaetErzeugen(spiel.zustand, { falle: { tarnung: 10, effekt: "kitzeln" }, entdeckt: true });
+  positionSetzen(spiel.zustand, falle, { x: 4, y: 1 });
+  sichtfeldAktualisieren(spiel);
+  const meiden = (x, y) => x === 4 && y === 1;
+  assert.equal(naechstesFeldMit(spiel, { x: 1, y: 1 }, (x) => x === 6, { meiden }), null, "mit meiden nicht über das Feld");
+  assert.deepEqual(naechstesFeldMit(spiel, { x: 1, y: 1 }, (x) => x === 6), { x: 6, y: 1 });
+
+  const beginn = erkundenBeginnen(spiel, vorgaben);
+  const { halt } = beginn.ablauf ? bisZumHalt(spiel, beginn.ablauf, naechsterErkundungsschritt) : { halt: beginn.grund };
+  assert.equal(halt, "gefahr_im_weg", "nicht kein_weg");
+  assert.ok(ninkasi.position.x < 4, "vor der Falle stehen geblieben");
+  assert.equal(erkundenBeginnen(spiel, vorgaben).grund, "gefahr_im_weg");
+
+  const trotz = erkundenBeginnen(spiel, vorgaben, { trotzGefahr: true });
+  assert.ok(trotz.ablauf);
+  assert.equal(bisZumHalt(spiel, trotz.ablauf, naechsterErkundungsschritt).halt, "alles_erkundet");
+  assert.ok(ninkasi.position.x > 4, "über die Falle hinweg");
 });
 
 test("Auto-Erkunden beginnt mit bekannten Feinden in Sicht, ohne reiseTrotzFeinden nicht", () => {

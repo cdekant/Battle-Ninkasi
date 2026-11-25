@@ -265,6 +265,8 @@ let feldUnterZeiger = null;
 // Laufender Ablauf aus Einzelbefehlen (Reise, Rasten, Erkunden): { zustand, naechsterSchritt }
 let laufenderAblauf = null;
 let ablaufZeitgeber = null;
+// hielt das letzte Erkunden wegen einer bekannten Gefahr, geht das nächste über sie hinweg (eingabe/erkunden.js)
+let gefahrGemeldet = false;
 // Geführte Züge (Filmriss, Furcht, Kontrolle): die Logik hält davor an (kern/spiel.js gefuehrterZugSteht), die Anzeige
 // führt sie im Takt fuehrungPause aus oder mit gefuehrteZuegeBestaetigen auf eine Taste
 let fuehrungZeitgeber = null;
@@ -527,6 +529,7 @@ function zielergebnisAnwenden(ergebnis) {
 }
 
 function ablaufMelden(grund) {
+  gefahrGemeldet = grund === "gefahr_im_weg";
   const schluessel = `reise.${grund}`;
   if (texte.hatSchluessel(schluessel)) log.zeile(texte.text(schluessel), "hinweis");
 }
@@ -894,7 +897,11 @@ function aktionAusfuehren(ergebnis) {
   if (aktion === "zoom_rein") return zoomen(1);
   if (aktion === "zoom_raus") return zoomen(-1);
   if (aktion === "rasten") return ablaufStarten(rastenBeginnen(spiel, einstellungen), naechsterRastschritt);
-  if (aktion === "erkunden") return ablaufStarten(erkundenBeginnen(spiel, einstellungen), naechsterErkundungsschritt);
+  if (aktion === "erkunden") {
+    const trotzGefahr = gefahrGemeldet;
+    gefahrGemeldet = false;
+    return ablaufStarten(erkundenBeginnen(spiel, einstellungen, { trotzGefahr }), naechsterErkundungsschritt);
+  }
   if (aktion === "laufen") return ablaufStarten(laufenBeginnen(spiel, ergebnis.richtung, einstellungen), naechsterLaufschritt);
   if (aktion === "autokampf") return autokampfStarten();
   // nach dem Tod öffnet Enter das Fenster "ende" wieder

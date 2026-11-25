@@ -1,6 +1,6 @@
 # Battle Ninkasi - Welt
 
-Stand: 2026-11-24
+Stand: 2026-11-25
 
 Zuständig für: `src/welt/ebene.js`, `src/welt/ebenenschritte.js`, `src/welt/plan.js`, `src/welt/population.js`, `src/welt/karte.js`, `src/welt/schichten.js`, `src/welt/wege.js`, `src/systeme/gelaende.js`, `src/systeme/fallen.js`, `src/systeme/schichten.js`, `src/systeme/ebenen.js`, `src/systeme/sicht.js`, `src/systeme/licht.js`, `src/systeme/duft.js`, `src/systeme/erinnerung.js`, `src/systeme/gefahr.js`, `daten/gelaende.js`, `daten/schichten.js`, `daten/ebenen.js`
 
@@ -37,7 +37,7 @@ Regeln:
 + Die Ebene setzt Türen an die Zugänge der Räume, die rot.js meldet, mit `tuerChance` Prozent und eigenem abgeleitetem Zufall; in Türöffnungen entsteht nichts
 + Fallen lösen am Haken `betritt_feld` aus, nur für die Bewegungsarten in `ausloesenFuer` (Vorgabe `laufend`), Quelle die Falle, Ursache `falle`, eine Kettenstufe tiefer; danach gilt sie als entdeckt; Fallen wecken nicht und ziehen keinen Zorn auf sich (das gilt nur für Wesen als Urheberin)
 + Entdecken am Haken `zug_ende`, nur für Ninkasi: für jede verborgene Falle, die sie sieht und die höchstens `reichweite` entfernt ist, ein Wurf mit E / (E + Tarnung), E = Entdecken × 2 / (1 + Abstand); Entdecken ist ein Kampfwert (Vorgabe `entdeckenVorgabe`), Skills ändern ihn über Modifikatoren; Beispiel Entdecken 30 gegen Tarnung 30: daneben 50 %, auf 3 Felder 33 % je Zug
-+ Die Anzeige zeigt Fallen erst, wenn sie bekannt sind; Wesen mit KI meiden alle Fallen, Reise und Erkunden die entdeckten (Option `meiden` der Wegfindung); liegt eine entdeckte Falle in einem Gang ohne Umweg, hält die Reise mit `kein_weg`
++ Die Anzeige zeigt Fallen erst, wenn sie bekannt sind; Wesen mit KI meiden alle Fallen, Reise und Erkunden die entdeckten (Option `meiden` der Wegfindung); liegt eine entdeckte Falle in einem Gang ohne Umweg, hält die Reise mit `kein_weg`, das Erkunden mit `gefahr_im_weg` (siehe [Bedienung.md](Bedienung.md), Maus, Reise, Laufen, Rasten und Erkunden); `naechstesFeldMit` in `src/welt/wege.js` kennt dasselbe `meiden` wie der Weg und sucht weder über gemiedene Felder noch zu ihnen
 + Hebel mit Wirkung in der Ferne brauchen Themenräume (Idee in [Ausblick.md](Ausblick.md))
 
 ## Feldschichten

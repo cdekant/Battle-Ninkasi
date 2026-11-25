@@ -205,6 +205,7 @@ export default {
   "reise.voll": "Ausgeruht.",
   "reise.zu_lang": "Genug gerastet, es tut sich nichts mehr.",
   "reise.alles_erkundet": "Hier gibt es nichts mehr zu entdecken.",
+  "reise.gefahr_im_weg": "Weiter geht es nur über eine bekannte Gefahr. Noch einmal erkunden, um sie in Kauf zu nehmen.",
   "reise.keine_arena": "Automatisch kämpft Ninkasi nur in der Arena.",
   "reise.hindernis": "Weiter geht es hier nicht.",
   "reise.bemerkenswert": "Ninkasi hält inne, da ist etwas.",

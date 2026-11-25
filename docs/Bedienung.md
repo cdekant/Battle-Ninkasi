@@ -1,6 +1,6 @@
 # Battle Ninkasi - Bedienung
 
-Stand: 2026-11-24
+Stand: 2026-11-25
 
 Zuständig für: `src/eingabe/aktionskatalog.js`, `src/eingabe/befehlszeile.js`, `src/eingabe/belegung.js`, `src/eingabe/belegunganpassen.js`, `src/eingabe/charakter.js`, `src/eingabe/eingabe.js`, `src/eingabe/einstellungen.js`, `src/eingabe/einstellungsfenster.js`, `src/eingabe/einstellungskatalog.js`, `src/eingabe/erkunden.js`, `src/eingabe/arenakampf.js`, `src/eingabe/erstellung.js`, `src/eingabe/esckette.js`, `src/eingabe/faehigkeiten.js`, `src/eingabe/fenster.js`, `src/eingabe/hilfe.js`, `src/eingabe/inventar.js`, `src/eingabe/karte.js`, `src/eingabe/laufen.js`, `src/eingabe/maus.js`, `src/eingabe/menue.js`, `src/eingabe/rasten.js`, `src/eingabe/reise.js`, `src/eingabe/schnellleiste.js`, `src/eingabe/texteingabe.js`, `src/eingabe/verlauf.js`, `src/eingabe/zielmodus.js`, `src/anzeige/fenster.js`, `src/anzeige/charakterfenster.js`, `src/anzeige/systemfenster.js`, `src/anzeige/einstellungsanzeige.js`, `src/systeme/vorschau.js`, `src/systeme/untersuchen.js`
 
@@ -71,6 +71,7 @@ Regeln:
 + Laufen (Umschalt plus Richtung) geht geradeaus; beginnt nicht vor einem Hindernis (`versperrt`); hält wie die Reise, vor einem Hindernis (`hindernis`) oder Wesen (`versperrt`), vor einer bekannten Falle oder Gefahr (`gefahr_voraus`) und wenn neben Ninkasi eine Tür, eine Treppe oder ein Gegenstand neu in Reichweite kommt (`bemerkenswert`; schon Bemerktes hält nicht noch einmal); das Halten an Abzweigungen in Gängen fehlt noch
 + Rasten wartet, bis die Vorräte aus `rastenBis` voll sind; beginnt auch mit bekannten Feinden in Sicht (`rastenTrotzFeinden`), nicht aber, wenn schon alles voll ist; hält bei `rastenHalt` und nach höchstens `rastenHoechstens` Schritten, falls sich nichts mehr füllt (z.B. MP bei hohem Pegel)
 + Erkunden geht zum nächsten bekannten Feld am Rand des nie Gesehenen, nur über bekannte Felder (ein kartiertes, ungesehenes Gebiet wird also auch erkundet), nächster Rand per Breitensuche, bei jedem Schritt neu gewählt; hält wie die Reise und wenn nichts mehr zu erkunden ist
++ Erkunden meidet bekannte Fallen und Gefahren (Säure, CO2, Feuer) auch bei der Wahl des Ziels; liegt das Unerkundete nur noch hinter ihnen, hält es einmal mit `gefahr_im_weg` und sagt das; wer danach wieder erkundet, nimmt das Risiko in Kauf: `src/main.js` merkt sich den Halt (`gefahrGemeldet`) und gibt dem nächsten Erkunden `trotzGefahr` mit, dann geht es auch über die Gefahr, solange es kein sicheres Ziel gibt
 + Automatischer Kampf (Aktion `autokampf`, Taste a): nur in der Arena (sonst "keine_arena"); jeder Schritt ist der Befehl der Taktik aus der Aufstellung (`optionen.arena.taktik`, siehe [Wesen.md](Wesen.md), KI), handlungsunfähig wartet Ninkasi; hält, wenn der Lauf vorbei ist, und wie jeder Ablauf bei jeder Taste; a beginnt wieder, so lässt sich jederzeit zwischen Hand und Automatik wechseln; im Takt `reisePause`; beginnt die Arena automatisch (siehe [Titelbildschirm.md](Titelbildschirm.md), Arena), läuft er gleich nach dem Start
 + Im Zielmodus setzt die Maus den Cursor, ein Klick bestätigt; der Tooltip zeigt beim Darüberfahren die Kurzfassung des Feldes (siehe Untersuchen)
 
