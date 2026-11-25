@@ -1,6 +1,6 @@
 # Battle Ninkasi - Systemausbau
 
-Stand: 2026-11-25
+Stand: 2026-11-26
 
 Mitprüfen bei Änderungen: alle Dokumente, deren Punkte hier umgesetzt werden
 
@@ -147,7 +147,7 @@ Status: offen, in eigenen Sitzungen; das Spieldesign steht in [Spielverlauf.md](
 
 + Ebenenbilder als Daten: Bauweise, Wand- und Bodentiles, Ausstattung, Gegner
 + Übergänge über mehrere Level: der Plan des Laufs gibt jeder Tiefe einen Anteil je Bild, die Ebenenschritte lesen ihn; die Merkmale dürfen versetzt überblenden (siehe [Welt.md](Welt.md), Plan des Laufs)
-+ Feste Strukturen und Raumstrukturen in den zufälligen Ebenen (siehe [Ausblick.md](Ausblick.md), Feste Strukturen)
++ Feste Strukturen und Raumstrukturen in den zufälligen Ebenen (siehe [Ausblick.md](Ausblick.md), Feste Strukturen), darunter Fundorte von Kulturen: ein alter Kessel mit Gärrest in der ersten Ebene, alte Flaschen in Schatzkammern (siehe [Brauen.md](Brauen.md), Kulturen)
 + Ebenen unter freiem Himmel
 + Hub zwischen den Kapiteln im Plan des Laufs: der Lauf beginnt im leeren Hub, nach dem Boss führt der Weg in den Hub der nächsten Stufe, Figuren aus den Leveln seit dem letzten Boss ziehen ein (siehe [Spielverlauf.md](Spielverlauf.md), Hub); heute steht der Hub im Probeinhalt als Tiefe 0 vor dem ersten Level
 + Weiche Spielart (siehe [Spielverlauf.md](Spielverlauf.md), Hub): Eintrag in `SPIELARTEN`, bei jedem Betreten des Hubs ein Schnappschuss im Speicherstand (am Haken `ebene_betreten`, also beim Ankommen; ein späteres Betreten ersetzt ihn), nach dem Tod ein Fenster mit Aufgeben (weiter wie mit Permadeath zu `ende`, `laufAbschliessen`) oder Rückkehr (Schnappschuss einsetzen, kein Eintrag in die Chronik), Auswahl im Titel; die Rückkehr übernimmt `oberflaeche.gesehen` aus dem laufenden Stand statt aus dem Schnappschuss, sonst zählt `gesehen.<typ>` doppelt; die Aufzeichnung führt vom Schnappschuss beim Betreten des Hubs weiter, der Zweig von dort bis zum Tod fällt weg
@@ -174,7 +174,7 @@ Status: Entwurf aller Kategorien steht in [Skills.md](Skills.md), offen ist die 
 
 + Vor dem ersten festen Skillnamen im Namensbuch: eine Regel für Skills, die gestrichen werden, während alte Spielstände Lernpunkte in ihnen halten (Vorschlag: sie werden zu freien EP, wie alles, was kein Skill aufnehmen kann); umbenannte gehen schon über `daten/umbenennungen.js` (siehe [Architektur.md](Architektur.md), Inhalte als Daten)
 + Alle Kategorien entworfen: Körper und Bewegung, Stoffwechsel und Pegel, Wahrnehmung, Kampf, Brauen, Anlagen und Fallen, Soziales, Magie, Psi; offen bleibt die Umsetzung je Kategorie, wie unten aufgeführt
-+ Angeborene Grundfähigkeiten: körperliche ohne Vorrat (Faustschlag, Werfen), die Gaben der Göttin ohne Vorrat (Brauen, Mälzen) und höchstens eine je Vorrat; die erste ist der Sprint, die zweite das Meditieren für die MP, die dritte das Zeitblinzeln für die PP (siehe [Charakter.md](Charakter.md), Skills)
++ Angeborene Grundfähigkeiten: körperliche ohne Vorrat (Faustschlag, Werfen), die Gaben der Göttin ohne Vorrat (Brauen) und höchstens eine je Vorrat; die erste ist der Sprint, die zweite das Meditieren für die MP, die dritte das Zeitblinzeln für die PP (siehe [Charakter.md](Charakter.md), Skills)
 + Lernanlass `entkommen` für Laufen und Sprint: zählt, wenn ein Wesen Ninkasi aus dem Kampf verliert, während sie läuft oder sprintet, je Wesen einmal wie alle Anlässe (siehe [Wesen.md](Wesen.md), Skills und Lernen)
 + Lernanlass `berauscht` für die Skills des Stoffwechsels: zählt, wenn Ninkasi an einem Wesen wirkt, während ihr Pegel über einer Schwelle liegt (mit den Tags der Wirkung, damit etwa die Trunkene Faust nur aus waffenlosem Kampf im Rausch lernt) (welche, mit den Pegelschwellen aus Punkt 10), je Wesen einmal
 + Lernanlass `erspaeht` für die Skills der Wahrnehmung: zählt, wenn Ninkasi ein Wesen wahrnimmt, das sie noch nicht bemerkt hat, je Wesen einmal; Tags nach der Art: `fern` jenseits der halben Sichtweite, `finster` und `dunkel` nach der Lichtstufe auf dem Feld des Wesens, `gespuert`, `gehoert`
@@ -212,15 +212,15 @@ Status: offen, ohne festen Platz; nach dem Umbaurisiko eingeordnet
 
 Status: in Arbeit; der Kern steht in [Sude.md](Sude.md) (Profil je Portion mit Restzucker, Zielgebiete, Befehl am Kessel, Wirkung sofort und über die Zeit, Kulturproben zum Aufheben, Nebel und Rezeptbuch, Reifen und Verderben, Verderber, spontane Gärung), das Braufenster mit Spinnennetz in [Bedienung.md](Bedienung.md), Fenster, Spieldesign in [Brauen.md](Brauen.md)
 
-Schnitt der Versionen: als Nächstes Absud, Mälzen und Kulturen gewinnen, danach Trockenbier, Kessel als Gegenstand und moderne Stile
+Schnitt der Versionen: als Nächstes Absud und Kulturen gewinnen, danach Trockenbier, Kessel als Gegenstand und moderne Stile
 
 + Reiter für Getränke und Kulturen im Inventar
 + Rezepte: die EP beim ersten Gelingen eines gefundenen Rezepts gebunden statt frei, mit den Tags der Rezepte und den Brauskills (Punkt 20); eigene kleine Zielgebiete gefundener Rezepte, nur mit ihrem Kniff erreichbar; ein eigenes Fenster des Rezeptbuchs außerhalb des Kessels; der Punkt des Rezepts im Spinnennetz
 + Zielgebiete der modernen Stile aus `daten/bierstile.js`, Hopfen; dafür die Achse der Stammwürze bis 30 °P (die stärksten Stile reichen bis 28 °P), die Gärungsart der Stile (untergärig, obergärig, gemischt, spontan) als Eigenschaft der Kulturen und Spannen auf den Aromaachsen von Hand
 + Wirkung: Röst, Rauch, Schutz durch Säure als Zustände; Zusätze, Kulturen und Fähigkeiten als weitere Quellen der Wirkung; Potenzen und Exponenten der Brauwirklichkeit als Kurven, wenn die linearen Formeln nicht tragen
 + Verderben: Hygiene als Einfluss auf die Chance, Skills auf `brauen.haltbarkeit`; die Zahlen der Stufen, des Reifens, des schwachen Wurfs und des Verderbers nachregeln
-+ Absud ohne Kultur für Tränke und Gifte (heute gärt ein Sud ohne Kultur nur nicht), mit Essig für Posca und Oxymel; Zufallseffekte der spontanen Gärung; Mälzen; Brennblase für Brand
-+ Kulturen gewinnen (Beute, aus einem gefundenen Bier, Fundorte; heute nur Krüge als Probe zum Aufheben), unbekannte Zutaten; Skills heben `vertraegt` über `brauen.vertraegt`
++ Absud nach [Brauen.md](Brauen.md), Absud (heute gärt ein Sud ohne Kultur nur nicht): Elixiere und Gifte mit einer Wirkung je Schadensart, Mächtigkeit, Schalter der Absicht mit Chance, Anzeige als Balken; Essig für Posca und Oxymel; Malzsorten und unvermälztes Getreide als Zutaten im Probeinhalt; Brennblase für Brand
++ Kulturen gewinnen durch Erkennen eines Wesens und an Fundorten (heute nur Krüge als Probe zum Aufheben), mutierte Formen mit Merkmalen, die wilde Hefe als Wesen der ersten Ebene im Probeinhalt, unbekannte Zutaten; Skills heben `vertraegt` über `brauen.vertraegt`
 + Kessel als Gegenstand, Tiers nach Material; ein Kessel im Hub
 + Trockenbier: Abfüllen eines Suds als Trockenbier, Anrühren mit Wasser, Gefäß und Kultur, im Kampf über den Schnellsud, Kveik und Hitze in der Nähe
 + Stapeln nach Stufe des Verderbens; freie Sude als Einzelstücke, bis sie Hausrezept werden (heute nach gerundetem Profil, Zielgebiet, Güte und gefundenem Rezept)

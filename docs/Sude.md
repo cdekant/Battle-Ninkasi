@@ -1,6 +1,6 @@
 # Battle Ninkasi - Sude
 
-Stand: 2026-11-25
+Stand: 2026-11-26
 
 Zuständig für: `src/systeme/sud.js`, `src/systeme/brauen.js`, `src/systeme/rezepte.js`, `src/systeme/reifen.js`, `src/systeme/flora.js`, `daten/sude.js`
 
@@ -121,7 +121,6 @@ Regeln:
 
 + Jede erzeugte Ebene würfelt ihre Flora aus den Spannen, mit dem Zufall `flora` des Baus, wiederholbar je Startwert und Tiefe; Ebenen mit fester Karte (Hub, Testkammer, Arenen) haben keine
 + Mit der Kultur `spontan` gärt der Sud mit der Flora wie mit einer Kultur (Vergärung, Verträglichkeit, Aromen, Punkte auf das Verderben); die Vorschau ist um `unschaerfe` Prozent breiter
-+ Zufallseffekte der Flora folgen mit dem Absud (siehe [Systemausbau.md](Systemausbau.md), Punkt 23)
 
 ## Nebel und Rezepte
 

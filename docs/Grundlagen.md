@@ -1,6 +1,6 @@
 # Battle Ninkasi - Grundlagen
 
-Stand: 2026-11-25
+Stand: 2026-11-26
 
 Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Architektur.md](Architektur.md), [Wesen.md](Wesen.md), [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md), [Tileset.md](Tileset.md), [Entwicklung.md](Entwicklung.md), [Ausblick.md](Ausblick.md), [Spielverlauf.md](Spielverlauf.md), [Fundus.md](Fundus.md), [Brauen.md](Brauen.md)
 
@@ -55,7 +55,7 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen und [Architektur.md](Arch
 + Bestimmte Aktionen sind nur mit einem bestimmten Pegel durchführbar
 + Pegel bringt Risiko
 + Brausystem mit Zutaten, Kulturen und Rezepten, im Einzelnen in [Brauen.md](Brauen.md)
-+ Brauen ist die einzige Herstellung von Getränken, Tränken und Giften, Magie steigert nur ihre Wirkung; Bauen und Reparieren gehören zum Handwerk; Brauen und Mälzen kann jede Ninkasi von Anfang an (siehe [Skills.md](Skills.md), Brauen)
++ Brauen ist die einzige Herstellung von Getränken, Elixieren und Giften; Elixiere und Gifte entstehen als Absud, dessen Gärung die Magie lenkt (siehe [Brauen.md](Brauen.md), Absud); Bauen und Reparieren gehören zum Handwerk; Brauen kann jede Ninkasi von Anfang an (siehe [Skills.md](Skills.md), Brauen)
 + Gebraut wird an festen Altären (Braukessel) oder in mobilen Kesseln
 + Brauen ist ein Rätsel ohne Pflichtarbeit: ein Sud kostet so viel Zeit wie eine gewöhnliche Aktion und beginnt nur außerhalb des Kampfes, Ninkasi steht nicht wartend am Kessel
 + Kessel in Tiers nach Material, von Holz mit heißen Steinen bis Edelstahl (siehe [Brauen.md](Brauen.md), Kessel)

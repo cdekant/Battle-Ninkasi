@@ -1,6 +1,6 @@
 # Battle Ninkasi - Brauen
 
-Stand: 2026-11-25
+Stand: 2026-11-26
 
 Mitprüfen bei Änderungen: [Grundlagen.md](Grundlagen.md), [Skills.md](Skills.md), [Spielverlauf.md](Spielverlauf.md), [Ausblick.md](Ausblick.md), [Texte.md](Texte.md), [Gegenstaende.md](Gegenstaende.md), [Sude.md](Sude.md), [Bedienung.md](Bedienung.md)
 
@@ -35,13 +35,14 @@ Umsetzung: teilweise, siehe [Sude.md](Sude.md), Befehl; offen: Trockenbier, Sud 
 
 + Freies Brauen: ohne Rezept, die Vorschau ist ungefähr, dafür kann der Sud in Unbekanntes führen und dort ein Zielgebiet entdecken
 + Brauen nach Rezept: ein Klick auf ein bekanntes Rezept verteilt die vorhandenen Rohstoffe von selbst, die Vorschau ist eng
-+ Mälzen ist wie das Brauen kurz: es macht aus Rohgetreide Malz, der Röstgrad bestimmt Farbe und Röstaroma
++ Ohne Kultur wird der Sud ein Absud mit eigener Vorschau (siehe Absud)
++ Gemälzt wird nicht: Malz und anderes Zuckerhaltiges kommt als Beute (siehe Zutaten)
 
-Umsetzung: teilweise, siehe [Sude.md](Sude.md), Befehl und Nebel und Rezepte, und [Bedienung.md](Bedienung.md), Fenster; offen: Mälzen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Befehl und Nebel und Rezepte, und [Bedienung.md](Bedienung.md), Fenster; offen: Absud, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Profil des Suds
 
-Ein Sud hat ein Profil wie ein Aromaprofil der Verkostung, als Spinnennetz dargestellt: auf jeder Achse ein Wert, das Ziel als Spanne je Achse.
+Ein Sud hat ein Profil wie ein Aromaprofil der Verkostung, als Spinnennetz dargestellt: auf jeder Achse ein Wert, das Ziel als Spanne je Achse. Das gilt für Bier und alles, was eine Kultur oder die wilde Flora vergärt; der Absud zeigt sich anders (siehe Absud).
 
 + Kennzahlen: Stärke (Stammwürze), Alkohol, Bittere, Farbe; berechnet nach vereinfachten Formeln der Brauwirklichkeit aus Schüttung je Volumen, Maischtemperatur, Gewürzgabe und Kultur
 + Jede Kultur verträgt nur so viel Alkohol; was sie darüber hinaus vergären könnte, bleibt als Zucker im Sud und macht ihn süß; so entstehen konzentrierte, süße Starkbiere, und Skills heben die Grenze der Kulturen später darüber hinaus
@@ -68,8 +69,9 @@ Umsetzung: teilweise, siehe [Sude.md](Sude.md), Zielgebiete und Nebel und Rezept
 
 ## Wirkung
 
++ Bier füllt vor allem die Vorräte (LP, MP, PP), mit wenigen Schutzwirkungen seiner Aromen; Zustände, also Stärkungen und Schwächungen, kommen aus dem Absud (siehe Absud)
 + Die Achsen tragen Bedeutung, damit Wirkungen vorhersehbar bleiben: Stärke und Malz heilen LP, Frucht füllt MP, Kräuter stärken Psi und Rausch, Säure füllt MP, reinigt und schützt vor Gift und Krankheit, Röst härtet ab, Rauch schützt vor Feuer, Süße heilt über die Zeit; die Zuordnung ist ein erster Entwurf
-+ Säure ist zweischneidig: als gewollte Richtung füllt sie MP bei wenig Alkohol und ist so das Steuer der Magierin (siehe Brauen und Pegel), als Fehler eines schwachen Wurfs führt sie zu Schal und Essig (siehe Gelingen und Verderben); ein saurer Absud ätzt als Wurf oder Bestreichen Rüstung und Panzer
++ Säure ist zweischneidig: als gewollte Richtung füllt sie MP bei wenig Alkohol und ist so das Steuer der Magierin (siehe Brauen und Pegel), als Fehler eines schwachen Wurfs führt sie zu Schal und Essig (siehe Gelingen und Verderben); ein Gift der Säure ätzt als Wurf oder Bestreichen Rüstung und Panzer
 + Budget statt Summe: die Stärke des Suds ist das Budget seiner Wirkung, es verteilt sich anteilig auf die Achsen; ein Sud aus wenigen Zutaten wirkt gebündelt und stark, ein vielschichtiger breit und je Achse schwächer
 + Die Wirkung des Zielgebiets gibt es nur, wenn das ganze Profil getroffen ist; das lohnt die Vielschichtigkeit
 + Der Alkohol hebt den Pegel, wie jedes Getränk (siehe [Grundlagen.md](Grundlagen.md), Spielkern)
@@ -81,8 +83,10 @@ Umsetzung: teilweise, siehe [Sude.md](Sude.md), Wirkung (Süße über die Zeit);
 ## Zutaten
 
 + Grundstoffe liefern die Stärke: Malz, Brot (Bappir, Kwass), Reis und Mais, Honig, Frucht, Pflanzensaft, Milch, Tee mit Zucker; jeder bringt seine Aromen mit
++ Mälzen kommt nicht als eigenes System: Stärke liefern vermälzte Rohstoffe (Malzsorten, Bierbrot) und Zuckerhaltiges (Honig, Datteln, Frucht, Pflanzensaft), die Ninkasi findet, erbeutet oder kauft; den Röstgrad bringt die Malzsorte mit; unvermälztes Getreide gibt wenig Stärke und bleibt Beigabe, Koji verzuckert es als Kultur
 + Gewürze geben Bittere und Aroma, Hopfen ist eines unter vielen
 + Kräuter haben eine Primärwirkung, die immer gilt (ihre Beiträge zu den Achsen und eine feste Wirkung), und eine Sekundärwirkung, die erst mit einem passenden Partner im selben Sud oder mit der Schule Gruit erwacht; die Kennerschaft zeigt sie vorher
++ Im Absud geben Kräuter und andere Zutaten die Richtung nach Schadensarten (siehe Absud)
 + Kräuter dienen auch dem Kampf, etwa Schafgarbe gegen Blutung, Gagel für die Wut im Nahkampf, Augentrost für Sicht und Fernkampf, Baldrian für die Selbstbeherrschung bei Psi
 + Umfang: eine Handvoll Kräuter im ersten Kapitel, über alle Epochen zwei bis drei Dutzend
 + Rohstoffe werden in der Welt geerntet (Felder, Haine, Pflanzen, siehe [Spielverlauf.md](Spielverlauf.md), Erstes Kapitel); die Sets der Rohstoffe heben Menge und Güte der Ernte (siehe [Skills.md](Skills.md), Brauen)
@@ -92,20 +96,26 @@ Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil; offen: Primär- und Seku
 ## Kulturen
 
 + Mikroorganismen bestimmen die Gärung: wie viel der Stärke zu Alkohol wird, wie viel Alkohol sie verträgt, welche Aromen und Säure sie beitragen und welche Achse sie verstärken
-+ Ninkasi beginnt mit wilder Hefe: sie vergärt schwach, verträgt wenig Alkohol und bringt etwas Frucht und Säure; alle anderen Kulturen gewinnt sie unterwegs
++ Ninkasi beginnt ohne Kultur und braut zuerst spontan; die wilde Hefe trifft sie schon in der ersten Ebene: sie vergärt schwach, verträgt wenig Alkohol und bringt etwas Frucht und Säure
++ Ninkasi gewinnt eine Kultur, sobald sie ein Wesen dieser Art sieht und erkennt; töten muss sie es nicht, so bleibt Freundschaft mit Mikroorganismen möglich
++ Alle paar Ebenen treten neue Arten auf, tiefer auch mutierte Formen mit einem Merkmal (etwa alkoholtolerant, übervergärend, fruchtig, phenolisch, sauer), das die Werte der Kultur verschiebt und ihr den Namen gibt; jede Form ist eine eigene Kultur, so lohnt die Suche nach seltenen Formen
++ Fundorte sind der zweite Weg, vor allem zu seltenen Kulturen: ein alter Kessel mit Gärrest in der ersten Ebene, alte Flaschen in Schatzkammern
 + Ninkasi trägt von jeder gewonnenen Kultur eine Probe ohne Gewicht; sie verbraucht sich nicht
-+ Wege zu einer Kultur: selten als Beute von Mikroorganismen, aus einem gefundenen, bekannten Bier gezogen, an Fundorten in Brauereien
-+ Spontane Gärung braucht keine Probe: sie nimmt die wilde Flora der Ebene, die an jedem Ort anders ist, mit Zufallseffekten
++ Spontane Gärung braucht keine Probe: sie nimmt die wilde Flora der Ebene, die an jedem Ort anders ist
 + Kulturen verbessern sich durch Gebrauch (siehe [Skills.md](Skills.md), Brauen)
 + Ideen für die Rollen: übervergärende Hefe (trocken, viel Alkohol, für den Pegel), Brettanomyces (weniger Alkohol, verstärkt die MP), untergärige Hefe (sauber, enge Vorschau), Kveik (gärt heiß und schnell, der Weg zum Sud im Kampf), Milchsäurebakterien (Säure ohne Alkohol), Essigbakterien (Essig), Koji (verzuckert Reis ohne Mälzen), Kefirknollen und Teepilz (Säure, wenig Alkohol, Kombucha senkt den Pegel), wilde Hefe
 
-Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil (Proben zum Aufheben) und Spontane Gärung; offen: Kulturen gewinnen, Zufallseffekte der spontanen Gärung, Verbessern durch Gebrauch, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil (Proben zum Aufheben) und Spontane Gärung; offen: Kulturen gewinnen (Erkennen, Fundorte), mutierte Formen, Verbessern durch Gebrauch, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Absud
 
-+ Ein Sud ohne Kultur gärt nicht: kein Alkohol, kein Pegel
-+ So entstehen die Tränke der Alchemie aus Kräutern und anderen Zutaten, dazu Gifte zum Werfen und Bestreichen und Anstriche für Ausrüstung; der Säureschutz ist ein häufig zu findendes Rezept; die Magie steigert ihre Wirkung, stellt aber nichts her (siehe [Charakter.md](Charakter.md), Eigenschaften)
-+ Tränke ohne Pegel sind der Vorrat der Magie, die bei leichtem Pegel am besten wirkt: ein Trank füllt, ohne den Pegel über das Fenster der Magierin zu heben
++ Ein Sud ohne Kultur ist ein Absud: die Magie Ninkasis lenkt seine spontane Gärung, statt Alkohol entsteht Wirkung; kein Alkohol, kein Pegel
++ Bier füllt die Vorräte, der Absud gibt Zustände: Elixiere stärken (Widerstand gegen eine Schadensart, Stärkung in ihrer Richtung), Gifte schwächen und schaden über die Zeit, oft geworfen als Fläche; dazu Gifte zum Bestreichen und Anstriche für Ausrüstung; der Säureschutz ist ein häufig zu findendes Rezept
++ Mächtigkeit: Nahrung je Fläschchen (Zucker und Stärke gären stark), Güte der Zutaten und Magie; wenige Fläschchen geben einen mächtigen Absud, wie beim Bier
++ Richtung: Kräuter und andere Zutaten tragen zu Schadensarten bei; die am stärksten vertretene gibt die eine Wirkung des Absuds, bei Gleichstand die in den Daten zuerst stehende; mehr als eine Wirkung hat ein Absud nicht
++ Absicht: am Kessel wählt Ninkasi Elixier oder Gift; die Vorschau zeigt die Chance, dass die Absicht gelingt, sonst entsteht das Gegenteil mit derselben Schadensart und Mächtigkeit; Zutaten mit Neigung (Heilkräuter, Giftpflanzen) und die Skills der Alchemie verschieben die Chance
++ Anzeige: kein Spinnennetz, weil keine Mischung zählt, sondern Balken je Schadensart mit der führenden hervorgehoben, die Mächtigkeit als Balken mit Zahl und die Chance der Absicht
++ Elixiere und Gifte heben den Pegel nicht; so stützt der Absud die Magierin, die bei leichtem Pegel am besten wirkt
 
 Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
@@ -166,12 +176,12 @@ Gebräue der Welt und wie sie sich einordnen; Stoff für Zielgebiete und Rezepte
 | Sahti | Roggen, Wacholder | Kräuter, Rauch | Wärme, Schutz vor Feuer |
 | Met, Tej | Honig, Hefe; Tej mit Gesho | Süße, viel Alkohol | Heilung über die Zeit |
 | Wein, Cider | Frucht, Weinhefe | Frucht, Säure | MP |
-| Pulque, Palmwein | Pflanzensaft, wild | spontan, Säure | Zufallseffekte |
+| Pulque, Palmwein | Pflanzensaft, wild | spontan, Säure | MP, unberechenbar |
 | Kefir, Kumys | Milch, Knollen | Säure, wenig Alkohol | Regeneration, gegen Krankheit |
 | Kombucha | Tee, Zucker, Teepilz | Säure, kaum Alkohol | senkt den Pegel |
 | Posca | Essig, Wasser | Säure | gegen Gift, Ausdauer |
 | Oxymel | Essig, Honig, Absud | Säure, Süße | Heilung, endet Zustände |
-| Aufguss, Absud | Kräuter, Absud | Kräuter | Tränke und Gifte |
+| Aufguss, Absud | Nahrung und Kräuter, ohne Kultur | eine Schadensart | Elixiere und Gifte |
 | Brand | ein Getränk an der Brennblase | viel Alkohol | PP (siehe [Grundlagen.md](Grundlagen.md), Spielkern) |
 
 Umsetzung: offen
@@ -201,14 +211,15 @@ Umsetzung: offen, Auswahl in [Skills.md](Skills.md), Brauen, Umsetzung in [Syste
 + Wer auf hohen Pegel baut, findet ihn im Brauen: starke Sude aus übervergärenden Hefen, Met, Barley Wine, Eisbock (durch Ausfrieren, ohne Brennblase); Brand ist der schnellste Weg
 + Kampftrinken macht das Trinken im Kampf schneller und wirksamer, Rauschkraft und Ekstase nutzen den Pegel, Kampfrausch hebt ihn im Kampf selbst (siehe [Skills.md](Skills.md), Stoffwechsel und Pegel); so schöpft eine Psi-Kämpferin ihren Pegel auch dann aus, wenn Brand vorhanden ist
 + Im ersten Kapitel gibt es noch keinen Brand: eine Psi-Berserkerin muss dort mit ihrem Pegel besser haushalten
-+ Die Magierin fährt im Gegensatz dazu ein schmales Fenster bei leichtem Pegel (siehe [Grundlagen.md](Grundlagen.md), Spielkern): saure Getränke füllen MP mit wenig Alkohol und halten sie darin, Tränke aus dem Absud füllen ohne Pegel, Kombucha senkt den Pegel und ist der Schritt zurück
++ Die Magierin fährt im Gegensatz dazu ein schmales Fenster bei leichtem Pegel (siehe [Grundlagen.md](Grundlagen.md), Spielkern): saure Getränke füllen MP mit wenig Alkohol und halten sie darin, Elixiere aus dem Absud stärken ohne Pegel, Kombucha senkt den Pegel und ist der Schritt zurück
 
 Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkte 20 und 23
 
 ## Offen
 
 + Kessel als Gegenstände: Aufstellen, Tragen, Bauen und Pflege (Anlagen und Fallen), Tiers über Edelstahl hinaus
-+ Ob das Mälzen einen Kessel braucht
++ Ob der Absud MP kostet und wie die Magie seine Mächtigkeit hebt
++ Welche Schadensarten der Absud kennt und welche Zustände sie als Elixier und Gift ergeben
 + Flüssigkeiten und Lachen in einer eigenen Sitzung (siehe [Systemausbau.md](Systemausbau.md), Punkt 10)
 + Weitere Familien von Zielgebieten nach den antiken: ägyptisch, mittelalterlich, und ihre Zuordnung zu den Epochen
 + Die Zuordnung der Achsen zu Wirkungen und die Achsen selbst, mit dem Inhalt

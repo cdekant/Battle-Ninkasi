@@ -1,6 +1,6 @@
 # Battle Ninkasi - Skills
 
-Stand: 2026-11-25, Entwurf; alle Kategorien entworfen ([Systemausbau.md](Systemausbau.md), Punkt 20)
+Stand: 2026-11-26, Entwurf; alle Kategorien entworfen ([Systemausbau.md](Systemausbau.md), Punkt 20)
 
 Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Wesen.md](Wesen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md), [Wirkungen.md](Wirkungen.md), [Texte.md](Texte.md), [Brauen.md](Brauen.md)
 
@@ -460,7 +460,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Kampfwerte (Profile mit Tags, 
 
 ## Brauen
 
-Brauen ist die einzige Herstellung von Getränken, Tränken und Giften: Bier, Wein, Met, Kvas, Kefir, Kombucha, auch Tränke und Gifte entstehen beim Brauen; Magie hat keine eigene Alchemie, die etwas herstellt, sie steigert die Wirkung des Gebrauten (siehe Magie). Bauen und Reparieren gehören zum Handwerk (siehe Anlagen und Fallen). Brauen und Mälzen sind Gaben der Göttin, angeborene Fähigkeiten jeder Ninkasi wie das Werfen (siehe [Charakter.md](Charakter.md), Fähigkeiten); die Skills heben Gelingen, Ausbeute und Güte und erweitern die Fähigkeiten in Ausbaustufen. Die Sets folgen den Schritten des Brauens und dem, was ein Sud ergibt, das Brausystem steht in [Brauen.md](Brauen.md). Vorbilder: EVE Online (Industry macht die Fertigung schneller), RimWorld (die Fertigkeit senkt die Gefahr verdorbener Speisen, die Sauberkeit wirkt daneben), Caves of Qud (Baupläne finden sich unterwegs, die Skills machen sie baubar).
+Brauen ist die einzige Herstellung von Getränken, Tränken und Giften: Bier, Wein, Met, Kvas, Kefir, Kombucha, auch Tränke und Gifte entstehen beim Brauen; Magie hat keine eigene Alchemie neben dem Brauen: sie lenkt die Gärung des Absuds und steigert die Wirkung des Gebrauten (siehe Magie). Bauen und Reparieren gehören zum Handwerk (siehe Anlagen und Fallen). Brauen ist eine Gabe der Göttin, eine angeborene Fähigkeit jeder Ninkasi wie das Werfen (siehe [Charakter.md](Charakter.md), Fähigkeiten); die Skills heben Gelingen, Ausbeute und Güte und erweitern die Fähigkeiten in Ausbaustufen. Die Sets folgen den Schritten des Brauens und dem, was ein Sud ergibt, das Brausystem steht in [Brauen.md](Brauen.md). Vorbilder: EVE Online (Industry macht die Fertigung schneller), RimWorld (die Fertigkeit senkt die Gefahr verdorbener Speisen, die Sauberkeit wirkt daneben), Caves of Qud (Baupläne finden sich unterwegs, die Skills machen sie baubar).
 
 Muster der Tiers: Grund Gelingen, Experte Ausbeute, Meister Güte; einzelne Sets weichen ab. Die Schulen schließen sich so wenig aus wie die Waffengattungen. Die Kessel aufzustellen, zu bauen und zu pflegen gehört zu Anlagen und Fallen.
 
@@ -502,7 +502,7 @@ Muster der Tiers: Grund Gelingen, Experte Ausbeute, Meister Güte; einzelne Sets
 
 Ein Set je Art von Rohstoffen mit zwei Tiers: Ohne Skill gibt eine Art weniger Ausbeute und Güte, Grund macht sie konkurrenzfähig, Experte hebt die Güte. Jedes gilt auch für das Ernten seiner Art: Grund mehr Menge, Experte höhere Güte, ein dritter Tier erkennt und erntet Seltenes, das sonst verborgen bleibt. Jedes lernt aus den Rezepten mit seiner Art.
 
-+ Getreide: Gerste, Emmer, Weizen, Brot (Kvas, Bappir); Braukunde, sekundär Klugheit; die Grundlage, schon ohne Skill brauchbar; drei Tiers, Meister macht das Mälzen wirksamer
++ Getreide: Gerste, Emmer, Weizen, Brot (Kvas, Bappir); Braukunde, sekundär Klugheit; die Grundlage, schon ohne Skill brauchbar; drei Tiers, Meister holt mehr Stärke aus unvermälztem Getreide
 + Früchte: Datteln, Feigen, Trauben, Granatäpfel, Äpfel; Braukunde, sekundär Sinnlichkeit
 + Honig und Zucker: Braukunde, sekundär Trinkfestigkeit
 + Kräuter und Würze: Gruit, die Würze vor dem Hopfen, mit Primär- und Sekundärwirkungen (siehe [Brauen.md](Brauen.md), Zutaten); Braukunde, sekundär Sinnlichkeit
