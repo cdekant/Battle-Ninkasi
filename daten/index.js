@@ -40,9 +40,10 @@ export default {
   taktiken,
   glossar,
   bierstile,
-  // Brauen (siehe docs/Sude.md): Kulturen und Zielgebiete bringt der Inhalt mit
+  // Brauen (siehe docs/Sude.md): Kulturen, Zielgebiete und Rezepte bringt der Inhalt mit
   kulturen: {},
   zielgebiete: {},
+  rezepte: {},
   // Tiefen von oben nach unten: 0 ist der Hub, das Spiel beginnt in starttiefe; der Plan des Laufs übernimmt sie (src/welt/plan.js)
   abfolge: ["hub"],
   starttiefe: 0,

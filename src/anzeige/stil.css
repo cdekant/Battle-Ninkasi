@@ -221,7 +221,7 @@ html, body {
 .brau-vorschau tr.kennzahl td:first-child { color: var(--gut); }
 /* Spinnennetz (anzeige/spinnennetz.js): Ringe und Speichen leise, das Band der Vorschau grün, das Profil in Bierfarbe,
    Umrisse der Zielgebiete in Kupfer, das hervorgehobene hell */
-.spinnennetz { display: block; width: 100%; max-width: 22rem; margin: 0 auto 0.4rem; }
+.spinnennetz { display: block; width: 100%; max-width: 35rem; margin: 0 auto 0.4rem; }
 .spinnennetz .netz-ring { fill: none; stroke: var(--linie); stroke-width: 0.8; }
 .spinnennetz .netz-speiche { stroke: var(--linie); stroke-width: 0.8; }
 .spinnennetz .netz-band { fill: var(--gut); fill-opacity: 0.25; stroke: var(--gut); stroke-width: 0.8; }

@@ -100,6 +100,10 @@ export default {
   psi_kontrollverlust: {
     schritte: [{ baustein: "schaden", art: "psi", wuerfel: "1W6" }, { baustein: "zustand_setzen", zustand: "verwirrt", dauer: 300 }],
   },
+  // die Tontafel (datenproben/zutaten.js) lehrt das Rezept dunkles_bier (datenproben/rezepte.js)
+  rezept_dunkles_bier: {
+    schritte: [{ baustein: "rezept_lernen", rezept: "dunkles_bier" }],
+  },
   riechwasser_trinken: {
     schritte: [{ baustein: "zustand_setzen", zustand: "witterung" }],
   },

@@ -94,7 +94,7 @@ function engeVon(daten, zielgebiet) {
 }
 
 // Güte eines Treffers: in der Mitte jeder Spanne 100, am Rand regeln.brauen.gueteAmRand; die schlechteste Achse zählt
-function gueteImZielgebiet(daten, profil, zielgebiet) {
+export function gueteImZielgebiet(daten, profil, zielgebiet) {
   const amRand = brauregeln(daten).gueteAmRand;
   let guete = 100;
   for (const [achse, [unten, oben]] of Object.entries(zielgebiet.spannen)) {
@@ -116,9 +116,11 @@ export function zielgebietFinden(daten, profil) {
   return bestes ? { name: bestes.name, guete: gueteImZielgebiet(daten, profil, daten.zielgebiete[bestes.name]) } : null;
 }
 
-// Zielgebiete, die ein Bereich der Vorschau erreichen kann (jede genannte Achse überlappt), in der Reihenfolge der Daten
-export function erreichbareZielgebiete(daten, bereich) {
+// Zielgebiete, die ein Bereich der Vorschau erreichen kann (jede genannte Achse überlappt), in der Reihenfolge der Daten;
+// mit namen nur unter diesen (die aufgedeckten, systeme/rezepte.js)
+export function erreichbareZielgebiete(daten, bereich, namen = null) {
   return Object.entries(daten.zielgebiete ?? {})
+    .filter(([name]) => !namen || namen.includes(name))
     .filter(([, zielgebiet]) => Object.entries(zielgebiet.spannen).every(([achse, [unten, oben]]) => bereich[achse][1] >= unten && bereich[achse][0] <= oben))
     .map(([name]) => name);
 }
@@ -132,16 +134,18 @@ export function profilRunden(daten, profil) {
 
 export const gueteRunden = (daten, guete) => Math.floor(guete / brauregeln(daten).gueteStufe) * brauregeln(daten).gueteStufe;
 
-// Wirkung eines Suds { sud: { profil, zielgebiet, guete } } beim Trinken: Mengen je Wert in der Reihenfolge der Achsen,
-// Zustände über die Zeit, dazu der Pegel aus dem Alkohol und der Effekt des Zielgebiets.
-//   Budget = Stammwürze x budgetProzent x Güte (x Bonus des Zielgebiets), verteilt anteilig auf die Aromaachsen mit einer
+// Wirkung eines Suds { sud: { profil, zielgebiet, guete, rezept? } } beim Trinken: Mengen je Wert in der Reihenfolge der
+// Achsen, Zustände über die Zeit, dazu der Pegel aus dem Alkohol und die Effekte von Zielgebiet und Kniff.
+//   rezept: ein gefundenes Rezept (daten.rezepte), nach dem der Sud gelang; sein kniff { bonus?, effekt? } kommt dazu
+//   Budget = Stammwürze x budgetProzent x Güte (x Bonus des Zielgebiets plus Bonus des Kniffs), verteilt anteilig auf die Aromaachsen mit einer
 //   Wirkung in regeln.brauen.wirkungen; ohne Aroma geht es ganz an regeln.brauen.wirkungOhneAroma
 //   Eine Wirkung ist ein Wertname (sofort) oder { zustand, prozent }: der Anteil mal prozent wird die Menge des Zustands
 //   (zustaende: [{ zustand, menge }], je Zustand zusammengezählt, beim Trinken eine Welttick je Menge)
 export function wirkungBerechnen(daten, sud) {
   const regeln = brauregeln(daten);
   const zielgebiet = sud.zielgebiet ? daten.zielgebiete[sud.zielgebiet] : null;
-  const bonus = zielgebiet?.bonus ?? 100;
+  const kniff = sud.rezept ? daten.rezepte?.[sud.rezept]?.kniff ?? {} : {};
+  const bonus = (zielgebiet?.bonus ?? 100) + (kniff.bonus ?? 0);
   const budget = Math.floor((((sud.profil.stammwuerze * regeln.budgetProzent) / 100) * sud.guete * bonus) / 10000);
   const mengen = {}, ueberZeit = {};
   const hinzu = (wirkung, menge) => {
@@ -157,5 +161,6 @@ export function wirkungBerechnen(daten, sud) {
     if (wirkung) hinzu(wirkung, Math.floor((budget * sud.profil[achse]) / aromasumme));
   }
   const zustaende = Object.entries(ueberZeit).map(([zustand, menge]) => ({ zustand, menge }));
-  return { mengen, zustaende, pegel: Math.floor((sud.profil.alkohol * regeln.pegelProzent) / 100), effekt: zielgebiet?.effekt ?? null };
+  const effekte = [zielgebiet?.effekt, kniff.effekt].filter(Boolean);
+  return { mengen, zustaende, pegel: Math.floor((sud.profil.alkohol * regeln.pegelProzent) / 100), effekte };
 }

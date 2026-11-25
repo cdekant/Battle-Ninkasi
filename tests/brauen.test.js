@@ -101,7 +101,7 @@ test("Zielgebiet: das engste gewinnt, Güte 100 in der Mitte und gueteAmRand am 
 test("Wirkung: Budget aus Stammwürze, Güte und Bonus, anteilig auf die Aromen; Pegel aus dem Alkohol", () => {
   const profil = { stammwuerze: 160, alkohol: 50, bittere: 0, farbe: 10, malz: 80, roest: 0, frucht: 10, kraeuter: 0, saeure: 0, suesse: 30 };
   // Budget 160 x 20 % x 90 % x 150 % = 43; Malz 28 heilt LP sofort, Süße 10 x 150 % über die Zeit, Frucht 3 füllt MP
-  assert.deepEqual(wirkungBerechnen(daten(), { profil, zielgebiet: "helles", guete: 90 }), { mengen: { lp: 28, mp: 3 }, zustaende: [{ zustand: "gestaerkt", menge: 15 }], pegel: 50, effekt: null });
+  assert.deepEqual(wirkungBerechnen(daten(), { profil, zielgebiet: "helles", guete: 90 }), { mengen: { lp: 28, mp: 3 }, zustaende: [{ zustand: "gestaerkt", menge: 15 }], pegel: 50, effekte: [] });
   const ohneAroma = { ...profil, malz: 0, frucht: 0, suesse: 0 };
   assert.deepEqual(wirkungBerechnen(daten(), { profil: ohneAroma, zielgebiet: null, guete: 100 }).mengen, { lp: 32 }, "alles an wirkungOhneAroma");
 });
@@ -136,7 +136,9 @@ test("Brauen: der Wurf setzt den Punkt im Bereich der Vorschau, ein verdorbener 
   tragen(spiel, ninkasi, "flasche", 1);
   const vorschau = sudVorbereiten(spiel, ninkasi, { zutaten: [{ gegenstandId: malz.id, menge: 2 }], kultur: "hefe" });
   assert.deepEqual(vorschau.bereich.malz, [72, 88]);
-  assert.deepEqual(vorschau.erreichbar, ["weit", "helles"]);
+  assert.deepEqual(vorschau.erreichbar, [], "im Nebel ist nichts erreichbar");
+  spiel.zustand.wissen = { zielgebiete: ["helles", "weit"] };
+  assert.deepEqual(sudVorbereiten(spiel, ninkasi, { zutaten: [{ gegenstandId: malz.id, menge: 2 }], kultur: "hefe" }).erreichbar, ["weit", "helles"], "aufgedeckt, in der Reihenfolge der Daten");
   spiel.wurfquelle = { art: "grenzen", mengen: "groesste", zufallszustand: zufallErzeugen(1) };
   brauen(spiel, [{ gegenstandId: malz.id, menge: 2 }]);
   const bier = entitaetMitId(spiel.zustand, ninkasi.inventar[0]);
@@ -209,7 +211,7 @@ test("Braufenster: öffnet nur am Kessel, Portionen nach Flaschen und Kessel, Bu
   tragen(spiel, ninkasi, "kraut", 1);
   tragen(spiel, ninkasi, "flasche", 1);
   let { zustand } = braufensterOeffnen(spiel);
-  assert.deepEqual(zustand, { kessel: { x: 3, y: 1 }, portionen: 1, mengen: {}, maische: "warm", gewuerz: "frueh", kultur: "hefe" }, "so viele Portionen wie Flaschen");
+  assert.deepEqual(zustand, { kessel: { x: 3, y: 1 }, portionen: 1, mengen: {}, maische: "warm", gewuerz: "frueh", kultur: "hefe", liste: "zutaten" }, "so viele Portionen wie Flaschen");
   const taste = (code, zusatz = {}) => (zustand = brauTaste(zustand, { code, ...zusatz }, spiel).zustand);
   for (let i = 0; i < 5; i++) taste("NumpadAdd");
   assert.equal(zustand.portionen, 4, "höchstens die Portionen des Kessels");

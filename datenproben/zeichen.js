@@ -32,6 +32,7 @@ export default {
     wacholder: { zeichen: "%", farbe: "#5f8a6a" },
     hefekrug: { zeichen: "!", farbe: "#e8d9a0" },
     sauerkrug: { zeichen: "!", farbe: "#c8d07a" },
+    tontafel_dunkles_bier: { zeichen: "?", farbe: "#c9a27a" },
     leeres_fass: { zeichen: "&", farbe: "#6b5a44" },
     brandflasche: { zeichen: "!", farbe: "#e5533d" },
     schoepfkelle: { zeichen: ")", farbe: "#b8b8b8" },

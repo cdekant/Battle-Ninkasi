@@ -203,9 +203,13 @@ test("Anzeige: jedes Fenster entsteht mit dem Spielinhalt ohne fehlende Texte", 
   positionSetzen(spiel.zustand, ninkasi, kessel);
   const malz = gegenstandTragen(spiel, ninkasi, { typ: "gerstenmalz", ...structuredClone(daten.gegenstaende.gerstenmalz), anzahl: 2 });
   gegenstandTragen(spiel, ninkasi, { typ: "leere_flasche", ...structuredClone(daten.gegenstaende.leere_flasche) });
+  assert.doesNotMatch(zeigen("brauen", { ...braufensterOeffnen(spiel).zustand, mengen: { [malz.id]: 2 } }), /netz-umriss/, "im Nebel keine Umrisse");
+  spiel.zustand.wissen.zielgebiete = ["gefiltertes_bier", "dunkles_bier"];
   const braufenster = zeigen("brauen", { ...braufensterOeffnen(spiel).zustand, mengen: { [malz.id]: 2 } });
   assert.match(braufenster, /<svg class="spinnennetz"/, "die Vorschau als Spinnennetz");
-  assert.match(braufenster, /netz-umriss/, "mit den Umrissen der Zielgebiete");
+  assert.match(braufenster, /netz-umriss/, "mit den Umrissen der aufgedeckten Zielgebiete");
+  assert.match(braufenster, /frei gebraut/);
+  assert.match(zeigen("brauen", { ...braufensterOeffnen(spiel).zustand, liste: "rezepte" }), /Noch keine Rezepte im Buch/);
   assert.match(braufenster, /Restzucker/);
   assert.match(braufenster, /1 Portion · Kessel 2\/4/);
   befehlGeben(spiel, { art: "brauen", zutaten: [{ gegenstandId: malz.id, menge: 2 }], kultur: "wilde_hefe" });

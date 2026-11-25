@@ -32,4 +32,12 @@ export default {
     fest: [],
     vorlaeufig: [],
   },
+  zielgebiete: {
+    fest: [],
+    vorlaeufig: [],
+  },
+  kulturen: {
+    fest: [],
+    vorlaeufig: [],
+  },
 };

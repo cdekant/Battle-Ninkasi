@@ -29,7 +29,7 @@ export function zaehltMit(spiel) {
 export const CHRONIK_MIGRATIONEN = {};
 
 // Welche Art von Namen hinter dem Punkt eines Zählers steht, für die Umbenennungen
-export const ZAEHLER_MIT_NAMEN = { besiegt: "wesen", gesehen: "wesen" };
+export const ZAEHLER_MIT_NAMEN = { besiegt: "wesen", gesehen: "wesen", entdeckt: "zielgebiete" };
 
 export function neueChronik() {
   return { format: CHRONIK_FORMAT, laeufe: [], zaehler: {} };
@@ -71,6 +71,8 @@ export function zaehlerErhoehen(chronik, name, um = 1) {
 
 // Zählregeln je Art der Meldung: (meldung, spiel) => Name eines Zählers oder null; ein neuer Zähler ist eine Zeile hier
 export const ZAEHLREGELN = {
+  // aufgedeckte Zielgebiete: Wissen über Läufe hinweg (siehe vorwissenAusChronik)
+  zielgebiet_entdeckt: (meldung) => `entdeckt.${meldung.zielgebiet.name}`,
   tod: (meldung, spiel) => {
     const ninkasiId = spiel.zustand.spielerinId;
     if (meldung.opfer.id === ninkasiId) return "tode";
@@ -78,6 +80,13 @@ export const ZAEHLREGELN = {
     return null;
   },
 };
+
+// Vorwissen für einen neuen Lauf (Startoption optionen.vorwissen, siehe docs/Architektur.md, Speichern): die
+// Zielgebiete, die je ein Lauf aufgedeckt hat; die Logik liest es nur aus den Optionen (systeme/rezepte.js)
+export function vorwissenAusChronik(chronik) {
+  const zielgebiete = Object.keys(chronik.zaehler).filter((name) => name.startsWith("entdeckt.") && chronik.zaehler[name] > 0).map((name) => name.slice("entdeckt.".length));
+  return { zielgebiete };
+}
 
 // Eine Meldung der Logik zählen (als Hörer angemeldet in src/main.js)
 export function meldungZaehlen(chronik, spiel, meldung) {

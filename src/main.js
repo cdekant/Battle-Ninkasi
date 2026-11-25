@@ -39,7 +39,7 @@ import { arenakampfBeginnen, naechsterArenaschritt } from "./eingabe/arenakampf.
 import { aufstellungAus } from "./systeme/arena.js";
 import { neueLeisten, leistenNachfuehren, platzAusloesen, platzBelegen, platzLeeren, plaetzeTauschen, leisteWechseln, ohneSchluessel, aktivePlaetze } from "./eingabe/schnellleiste.js";
 import { ANZAHL_PLAETZE, speicherschluesselPlatz, SPEICHERSCHLUESSEL_ALTER_LAUF, SPEICHERSCHLUESSEL_LETZTER_LAUF, speicherstandText, speicherstandLesen, platzVorschau, platzFuerNeuesSpiel } from "./eingabe/speicherstand.js";
-import { SPEICHERSCHLUESSEL_CHRONIK, chronikGueltig, meldungZaehlen, sichtungenZaehlen, laufEintragen } from "./eingabe/chronik.js";
+import { SPEICHERSCHLUESSEL_CHRONIK, chronikGueltig, meldungZaehlen, sichtungenZaehlen, laufEintragen, vorwissenAusChronik } from "./eingabe/chronik.js";
 import { eigenschaftenUmbenennen } from "./eingabe/umbenennen.js";
 import umbenennungen from "../daten/umbenennungen.js";
 import "./eingabe/karte.js";
@@ -575,10 +575,10 @@ function autokampfStarten() {
 }
 
 // Ein Lauf mit Startoptionen (Charaktererstellung); dieselbe Ebene wie in der Vorschau, die Eigenschaften
-// ändern an der Erzeugung nichts
+// ändern an der Erzeugung nichts; das Vorwissen aus der Chronik gilt, wie es beim Start war
 function laufBeginnen(startwert, optionen) {
   platzLoeschen(aktuelleStelle);
-  spielEinsetzen(neuesSpiel(daten, startwert, optionen), neueLeisten());
+  spielEinsetzen(neuesSpiel(daten, startwert, { ...optionen, vorwissen: vorwissenAusChronik(chronik) }), neueLeisten());
   log.zeile(texte.text("log.willkommen"));
   zeichnen();
 }

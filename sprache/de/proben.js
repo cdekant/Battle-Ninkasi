@@ -321,6 +321,12 @@ export default {
     einzahl: { nom: "Sauerkrug", gen: "Sauerkrugs", dat: "Sauerkrug", akk: "Sauerkrug" },
     mehrzahl: { nom: "Sauerkrüge", gen: "Sauerkrüge", dat: "Sauerkrügen", akk: "Sauerkrüge" },
   },
+  "gegenstand.tontafel": {
+    geschlecht: "f",
+    einzahl: { nom: "Tontafel", gen: "Tontafel", dat: "Tontafel", akk: "Tontafel" },
+    mehrzahl: { nom: "Tontafeln", gen: "Tontafeln", dat: "Tontafeln", akk: "Tontafeln" },
+  },
+  "rezept.dunkles_bier": "Dunkles Bier nach Art des Tempels",
   "zielgebiet.gefiltertes_bier": {
     geschlecht: "n", adjektive: ["adjektiv.gefiltert"],
     einzahl: { nom: "Bier", gen: "Biers", dat: "Bier", akk: "Bier" },

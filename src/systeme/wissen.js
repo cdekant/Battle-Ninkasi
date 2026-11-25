@@ -14,7 +14,7 @@ import { spielerin, entitaetenMitPosition, istWesen } from "../kern/zustand.js";
 import { freieEpGeben } from "./lernen.js";
 import { wahrnehmungsart } from "./sinne.js";
 
-const wissenVon = (zustand) => (zustand.wissen ??= { etiketten: {}, erkannt: [], vertrautheit: {} });
+export const wissenVon = (zustand) => (zustand.wissen ??= { etiketten: {}, erkannt: [], vertrautheit: {} });
 
 // Wesenarten, die Ninkasi jetzt zum ersten Mal sieht (nach jeder Aktualisierung des Sichtfelds)
 anmelden("nachSicht", "wissen_wesenart", (spiel) => {

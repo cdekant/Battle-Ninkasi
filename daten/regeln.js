@@ -242,6 +242,7 @@ export default {
     alkoholJeStammwuerze: 50, // Alkohol = vergorene Stammwürze x so viele Prozent (nach Balling rund die Hälfte)
     suesseJeRestzucker: 50, // Punkte der Süße je Zehntel °Plato Restzucker, in Prozent
     stueckeJePortion: 4, // so viele Stück Zutaten nimmt der Kessel je Portion höchstens
+    rezeptUnschaerfe: 30, // nach Rezept gebraut ist die Unschärfe so viele Prozent (src/systeme/rezepte.js)
     verderben: 10, // Chance in Prozent, dass ein Sud verdirbt, vor Kessel und Kultur
     // ein verdorbener Sud: dieser Gegenstand, die Achse steigt um plus, feste Güte, kein Zielgebiet
     verdorben: { getraenk: "sud_verdorben", achse: "saeure", plus: 40, guete: 30 },

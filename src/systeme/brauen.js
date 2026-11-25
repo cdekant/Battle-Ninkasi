@@ -30,6 +30,7 @@ import { gelaendeAuf } from "../welt/karte.js";
 import { imKampf } from "./kampfzustand.js";
 import { insInventar, anzahlVon } from "./inventar.js";
 import { kulturGebucht, zutatGebucht } from "./wissen.js";
+import { aufgedeckteZielgebiete, rezeptFinden, nachDemSud } from "./rezepte.js";
 import {
   brauregeln, achsenVon, sudRechnen, unschaerfeBerechnen, bereichBerechnen, zielgebietFinden, erreichbareZielgebiete,
   profilRunden, gueteRunden, wirkungBerechnen,
@@ -60,7 +61,8 @@ export const gefaesseIm = (spiel, wesen) => gegenstaendeIm(spiel, wesen).filter(
 const anzahlGefaesse = (spiel, wesen) => gefaesseIm(spiel, wesen).reduce((summe, gefaess) => summe + anzahlVon(gefaess), 0);
 
 // Prüft einen Befehl und rechnet seine Vorschau; { grund } oder { kessel, eingabe, mitte, gaerung, unschaerfe, bereich,
-// erreichbar, fuellung, fassen, portionen, gefaesse }. Die Vorschau prüft weder den Kampf noch die Gefäße, damit das
+// erreichbar, fuellung, fassen, portionen, gefaesse, rezept }; erreichbar nennt nur aufgedeckte Zielgebiete, rezept ist
+// der Schlüssel des Rezepts im Buch, nach dem gebraut wird (systeme/rezepte.js), oder null. Die Vorschau prüft weder den Kampf noch die Gefäße, damit das
 // Fenster auch dann rechnet; fassen ist die höchste Füllung für diese Portionen.
 export function sudVorbereiten(spiel, wesen, befehl) {
   const regeln = brauregeln(spiel.daten);
@@ -91,9 +93,13 @@ export function sudVorbereiten(spiel, wesen, befehl) {
   const vertraegt = kultur === null ? undefined : modifiziert(spiel, wesen, "brauen.vertraegt", spiel.daten.kulturen[kultur].vertraegt);
   const eingabe = { zutaten, verfahren, kultur, portionen, vertraegt };
   const { profil: mitte, gaerung } = sudRechnen(spiel.daten, eingabe);
-  const unschaerfe = unschaerfeBerechnen(spiel.daten, modifiziert(spiel, wesen, "brauen.unschaerfe", kessel.kessel.unschaerfe ?? 100));
+  // nach Rezept wird die Vorschau eng (regeln.brauen.rezeptUnschaerfe Prozent)
+  const rezept = rezeptFinden(spiel, eingabe);
+  const grundUnschaerfe = Math.floor(((kessel.kessel.unschaerfe ?? 100) * (rezept ? regeln.rezeptUnschaerfe : 100)) / 100);
+  const unschaerfe = unschaerfeBerechnen(spiel.daten, modifiziert(spiel, wesen, "brauen.unschaerfe", grundUnschaerfe));
   const bereich = bereichBerechnen(spiel.daten, mitte, unschaerfe);
-  return { kessel, eingabe, mitte, gaerung, unschaerfe, bereich, erreichbar: erreichbareZielgebiete(spiel.daten, bereich), fuellung, fassen, portionen, gefaesse };
+  const erreichbar = erreichbareZielgebiete(spiel.daten, bereich, aufgedeckteZielgebiete(spiel));
+  return { kessel, eingabe, mitte, gaerung, unschaerfe, bereich, erreichbar, fuellung, fassen, portionen, gefaesse, rezept };
 }
 
 // Chance in Prozent, dass ein Sud verdirbt: Regelwert plus Kessel plus Kultur, mit Modifikatoren auf brauen.verderben
@@ -134,6 +140,9 @@ function ergebnisBestimmen(spiel, wesen, vorbereitet) {
   }
   const treffer = zielgebietFinden(daten, punkt);
   const sud = { profil: profilRunden(daten, punkt), zielgebiet: treffer?.name ?? null, guete: treffer ? gueteRunden(daten, treffer.guete) : regeln.gueteFrei };
+  // nach einem gefundenen Rezept, das sein Zielgebiet trifft: der Kniff wirkt (systeme/sud.js wirkungBerechnen)
+  const rezept = vorbereitet.rezept ? spiel.zustand.rezepte[vorbereitet.rezept] : null;
+  if (rezept?.art === "gefunden" && rezept.zielgebiet === treffer?.name) sud.rezept = vorbereitet.rezept;
   return { typ: regeln.getraenk, sud, ...(treffer && { text: daten.zielgebiete[treffer.name].text }) };
 }
 
@@ -163,6 +172,7 @@ anmelden("befehle", "brauen", {
     }
     const art = ergebnis.typ !== brauregeln(spiel.daten).getraenk ? "gebraut_verdorben" : ergebnis.sud.zielgebiet ? "gebraut_getroffen" : "gebraut";
     melden(spiel, art, { wer: bezugAuf(akteur), was: { ...bezugAuf(portion), anzahl: vorbereitet.portionen }, anzahl: vorbereitet.portionen, zielgebiet: ergebnis.sud.zielgebiet });
+    if (art === "gebraut_getroffen") nachDemSud(spiel, akteur, vorbereitet, ergebnis.sud.zielgebiet);
     return "brauen";
   },
 });
@@ -177,7 +187,7 @@ bausteinAnmelden("sud_wirken", {}, (spiel, kontext) => {
   // Dauer endet eine Zeiteinheit nach dem letzten Takt, damit auch er wirkt, wo auch immer im Takt getrunken wird
   for (const { zustand, menge } of wirkung.zustaende) holen("bausteine", "zustand_setzen")(spiel, kontext, { zustand, dauer: menge * WELTTICK + 1 });
   if (wirkung.pegel > 0) holen("bausteine", "wert_aendern")(spiel, kontext, { wertName: "pegel", menge: wirkung.pegel });
-  if (wirkung.effekt) effektAnwenden(spiel, wirkung.effekt, kontext);
+  for (const effekt of wirkung.effekte) effektAnwenden(spiel, effekt, kontext);
 }, { brauchtZiel: true });
 
 // Aufgehobenes: Kulturen gewinnen, Wissens-EP für Zutaten (siehe Kopf)

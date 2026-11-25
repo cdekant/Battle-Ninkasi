@@ -42,7 +42,7 @@ export function datenLaden(rohdaten, sprache) {
 // Aufstellung in optionen.arena, systeme/arena.js), weitere (weich, friedlich, eigene Regeln) kommen als Startoption
 export const SPIELARTEN = ["normal", "allmaechtig", "arena"];
 
-// optionen: { eigenschaften?, spielart?, arena? } aus der Charaktererstellung (Eigenschaften geprüft in systeme/lernen.js
+// optionen: { eigenschaften?, spielart?, arena?, vorwissen? } aus der Charaktererstellung (Eigenschaften geprüft in systeme/lernen.js
 // lernenEinrichten) und der Wahl des Laufs; sie gehören zum Spielstand, damit das Nachspielen denselben Lauf erzeugt
 export function neuesSpiel(daten, startwert, optionen = {}) {
   const startoptionen = { spielart: "normal", ...structuredClone(optionen) };

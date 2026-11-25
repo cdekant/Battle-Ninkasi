@@ -734,7 +734,7 @@ function pruefeMenge(schritt, ort, fehler) {
 const istZahlAbNull = (wert) => istGanzzahl(wert) && wert >= 0;
 
 // Parameter nach Beschreibung (siehe kern/bausteine.js): "text", "ganzzahl", "wahrheitswert", "effekt",
-// "muster", "zustand", "wesen", "schadensart", "fraktion", "gelaende", "oberflaeche", "gas", "skill", "eigenschaft", "faehigkeit", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
+// "muster", "zustand", "wesen", "schadensart", "fraktion", "gelaende", "oberflaeche", "gas", "skill", "eigenschaft", "faehigkeit", "rezept", mit "?" freiwillig; eine Liste nennt erlaubte Werte (freiwillig); "wuerfel|menge"
 function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
   for (const [feld, typ] of Object.entries(beschreibung)) {
     const wert = werte[feld];
@@ -767,6 +767,7 @@ function pruefeParameter(daten, beschreibung, werte, ort, fehler) {
     else if (grundtyp === "skill" && !daten.skills?.[wert]) fehler.push(`${ort}.${feld}: Skill "${wert}" gibt es nicht`);
     else if (grundtyp === "eigenschaft" && !daten.eigenschaften?.[wert]) fehler.push(`${ort}.${feld}: Eigenschaft "${wert}" gibt es nicht`);
     else if (grundtyp === "faehigkeit" && !daten.faehigkeiten?.[wert]) fehler.push(`${ort}.${feld}: Fähigkeit "${wert}" gibt es nicht`);
+    else if (grundtyp === "rezept" && !daten.rezepte?.[wert]) fehler.push(`${ort}.${feld}: Rezept "${wert}" gibt es nicht`);
   }
 }
 
@@ -1304,6 +1305,7 @@ function pruefeBrauregeln(daten, regeln, achsen, aromaachsen, fehler) {
     if (!istObjekt(gewuerz) || !istZahlAbNull(gewuerz.bitter) || !istZahlAbNull(gewuerz.aroma)) fehler.push(`regeln.brauen.gewuerz.${name} muss { bitter, aroma } in Prozent sein`);
   }
   if (!regeln.maische?.[regeln.verfahren?.maische] || !regeln.gewuerz?.[regeln.verfahren?.gewuerz]) fehler.push("regeln.brauen.verfahren muss eine Maische und eine Gewürzgabe aus regeln.brauen nennen");
+  if (!istProzent(regeln.rezeptUnschaerfe)) fehler.push("regeln.brauen.rezeptUnschaerfe muss eine ganze Zahl von 0 bis 100 sein");
   if (!istGanzzahl(regeln.stueckeJePortion) || regeln.stueckeJePortion < 1) fehler.push("regeln.brauen.stueckeJePortion muss eine ganze Zahl >= 1 sein");
   for (const feld of ["alkoholJeStammwuerze", "suesseJeRestzucker", "budgetProzent", "pegelProzent", "gewichtJePortion"]) {
     if (!istZahlAbNull(regeln[feld])) fehler.push(`regeln.brauen.${feld} muss eine ganze Zahl >= 0 sein`);
@@ -1325,6 +1327,31 @@ function pruefeBrauregeln(daten, regeln, achsen, aromaachsen, fehler) {
     if (typeof wirkung !== "string" && !ueberZeit) fehler.push(`regeln.brauen.wirkungen.${achse} muss ein Wertname oder { zustand, prozent } mit einem Zustand der Daten sein`);
   }
   if (typeof regeln.wirkungOhneAroma !== "string") fehler.push("regeln.brauen.wirkungOhneAroma muss ein Wertname sein");
+}
+
+// Gefundenes Rezept: { text, zielgebiet, portionen, zutaten: [{ typ, menge }], verfahren, kultur, kniff?, ep }
+function pruefeRezept(daten, regeln, sprache, name, rezept, fehler) {
+  const ort = `rezepte.${name}`;
+  pruefeText(sprache.texte, rezept.text, ort, fehler);
+  if (!daten.zielgebiete?.[rezept.zielgebiet]) fehler.push(`${ort}: Zielgebiet "${rezept.zielgebiet}" gibt es nicht`);
+  if (!daten.kulturen?.[rezept.kultur]) fehler.push(`${ort}: Kultur "${rezept.kultur}" gibt es nicht`);
+  if (!istGanzzahl(rezept.portionen) || rezept.portionen < 1) fehler.push(`${ort}: portionen muss eine ganze Zahl >= 1 sein`);
+  if (!regeln.maische?.[rezept.verfahren?.maische] || !regeln.gewuerz?.[rezept.verfahren?.gewuerz]) fehler.push(`${ort}: verfahren muss eine Maische und eine Gewürzgabe aus regeln.brauen nennen`);
+  const zutaten = Array.isArray(rezept.zutaten) ? rezept.zutaten : [];
+  if (!zutaten.length) fehler.push(`${ort}: zutaten muss mindestens eine Zutat nennen`);
+  const typen = new Set();
+  for (const zutat of zutaten) {
+    if (!daten.gegenstaende[zutat?.typ]?.zutat) fehler.push(`${ort}.zutaten: "${zutat?.typ}" ist keine Zutat`);
+    if (!istGanzzahl(zutat?.menge) || zutat.menge < 1) fehler.push(`${ort}.zutaten.${zutat?.typ}: menge muss eine ganze Zahl >= 1 sein`);
+    if (typen.has(zutat?.typ)) fehler.push(`${ort}.zutaten: "${zutat.typ}" steht zweimal da`);
+    typen.add(zutat?.typ);
+  }
+  if (!istZahlAbNull(rezept.ep)) fehler.push(`${ort}: ep muss eine ganze Zahl >= 0 sein`);
+  const kniff = rezept.kniff;
+  if (kniff !== undefined) {
+    if (!istObjekt(kniff) || (kniff.bonus !== undefined && !istZahlAbNull(kniff.bonus))) fehler.push(`${ort}: kniff muss { bonus?, effekt? } sein`);
+    else if (kniff.effekt !== undefined) pruefeEffektVerweis(daten, kniff.effekt, `${ort}.kniff`, fehler);
+  }
 }
 
 function pruefeBrauen(daten, sprache, fehler) {
@@ -1365,6 +1392,7 @@ function pruefeBrauen(daten, sprache, fehler) {
     for (const feld of ["extrakt", "farbe", "bitter"]) if (zutat[feld] !== undefined && !istZahlAbNull(zutat[feld])) fehler.push(`${ort}.zutat.${feld} muss eine ganze Zahl >= 0 sein`);
     pruefeAromen(zutat.aromen, aromaachsen, `${ort}.zutat`, fehler);
   }
+  for (const [name, rezept] of Object.entries(daten.rezepte ?? {})) pruefeRezept(daten, regeln, sprache, name, rezept, fehler);
   for (const [name, gelaende] of Object.entries(daten.gelaende)) {
     const kessel = gelaende.kessel;
     if (kessel === undefined) continue;

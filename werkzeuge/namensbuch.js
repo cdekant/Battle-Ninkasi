@@ -11,7 +11,7 @@ import namensbuch from "../daten/namensbuch.js";
 import umbenennungen from "../daten/umbenennungen.js";
 
 // Arten mit Namen, die über einen Lauf hinaus Bestand haben sollen (Chronik, Vorwissen, Bestiarium)
-export const NAMENSBUCH_ARTEN = ["wesen", "gegenstaende", "eigenschaften", "skills", "faehigkeiten", "zustaende", "fallen"];
+export const NAMENSBUCH_ARTEN = ["wesen", "gegenstaende", "eigenschaften", "skills", "faehigkeiten", "zustaende", "fallen", "zielgebiete", "kulturen"];
 
 // Namen einer Art in den Daten, ohne abstrakte Vorlagen, in der Reihenfolge der Daten
 export function namenDerDaten(daten, art) {

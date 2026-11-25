@@ -26,6 +26,7 @@ import zeichen from "./zeichen.js";
 import zutaten from "./zutaten.js";
 import kulturen from "./kulturen.js";
 import zielgebiete from "./zielgebiete.js";
+import rezepte from "./rezepte.js";
 
 export default {
   eintraege: {
@@ -47,6 +48,7 @@ export default {
     zeichen,
     kulturen,
     zielgebiete,
+    rezepte,
   },
   // Ninkasi bekommt die vorläufige Fähigkeit für den Zielmodus, den Sprint und eine Psi-Fähigkeit, dazu die
   // Grundausstattung (docs/Charakter.md, Startwerte): den Dolch angelegt und Wurfmesser im Gepäck; als Göttin des Biers

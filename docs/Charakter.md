@@ -183,7 +183,7 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Skil
 + Nachrückende Gegner sind nicht ausgeschlossen, mit eigenem EP-Faktor (Idee in [Ausblick.md](Ausblick.md), Nachrückende Gegner)
 + Vorschlag, noch nicht bestätigt: Varianten durch Affixe vervielfachen die Gegnertypen
 
-Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Wissens-EP für besondere Orte (mit dem Ebenenbau), Entkommen, Berauscht, Erspäht, Hinterhalt, Kritisch, erkannte Typen, entdeckte Fallen, nachrückende Gegner, Rätsel
+Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Skills und Lernen; offen: Wissens-EP für besondere Orte (mit dem Ebenenbau), gebundene EP für das erste Gelingen eines Rezepts (heute frei), Entkommen, Berauscht, Erspäht, Hinterhalt, Kritisch, erkannte Typen, entdeckte Fallen, nachrückende Gegner, Rätsel
 
 ## Offen
 

@@ -37,7 +37,7 @@ Umsetzung: teilweise, siehe [Sude.md](Sude.md), Befehl; offen: Trockenbier, Sud 
 + Brauen nach Rezept: ein Klick auf ein bekanntes Rezept verteilt die vorhandenen Rohstoffe von selbst, die Vorschau ist eng
 + Mälzen ist wie das Brauen kurz: es macht aus Rohgetreide Malz, der Röstgrad bestimmt Farbe und Röstaroma
 
-Umsetzung: teilweise, siehe [Sude.md](Sude.md), Befehl, und [Bedienung.md](Bedienung.md), Fenster; offen: Brauen nach Rezept, Mälzen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Befehl und Nebel und Rezepte, und [Bedienung.md](Bedienung.md), Fenster; offen: Mälzen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Profil des Suds
 
@@ -50,7 +50,7 @@ Ein Sud hat ein Profil wie ein Aromaprofil der Verkostung, als Spinnennetz darge
 + Unbekannte Zutaten zeigen ihre Beiträge erst nach dem ersten Gebrauch oder durch Kennerschaft
 + Die Werte werden für die Wirkung auf wenige Stufen gerundet; so ergeben gleiche Rezepte meist gleiche Sude
 
-Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil, und [Bedienung.md](Bedienung.md), Fenster (Spinnennetz); offen: Rauch und Holz, unbekannte Zutaten, Rezeptur und Rezept verkleinern die Unschärfe, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil, und [Bedienung.md](Bedienung.md), Fenster (Spinnennetz); offen: Rauch und Holz, unbekannte Zutaten, Rezeptur verkleinert die Unschärfe (ein Rezept tut es schon), Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Zielgebiete
 
@@ -64,7 +64,7 @@ Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil, und [Bedienung.md](Bedie
 + Die erste Familie sind die antiken Biere: ein Grundstoff (Malz, Bierbrot, Emmer, Datteln) mit spontaner Gärung oder einer Kultur, die Stellschraube ist vor allem die Säure; süß und malzig heilt schwach LP, sauer füllt schwach MP, dazwischen etwas von beidem; Gewürze geben hier keine Bierwirkung, sondern führen in den Absud
 + Die Namen der antiken Zielgebiete kommen von den sumerischen Biersorten: dunkles Bier, süßes dunkles Bier, rötliches Bier, gefiltertes Bier, starkes Bier (nach Powell 1994 bei `sallaberger2012bierbrauen`); ihre Profile sind Erfindung des Spiels
 
-Umsetzung: teilweise, siehe [Sude.md](Sude.md), Zielgebiete; offen: Nebel und Wissen über Läufe hinweg, moderne Stile, Kniffe der Rezepte, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Zielgebiete und Nebel und Rezepte; offen: moderne Stile, eigene Zielgebiete der Rezepte, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Wirkung
 
@@ -142,7 +142,7 @@ Umsetzung: teilweise, siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß, und
 + Gefundene Rezepte bleiben wertvoll, auch wenn alle Zielgebiete aufgedeckt sind: sie bringen ihren Kniff, die EP beim ersten Gelingen und manche ein eigenes kleines Zielgebiet, das nur mit ihrem Kniff erreichbar ist
 + Das Rezeptbuch hält beide, nur für den Lauf; über Läufe hinweg bleiben allein die aufgedeckten Zielgebiete (siehe Zielgebiete, Nebel)
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Nebel und Rezepte; offen: gebundene EP beim ersten Gelingen (heute frei), eigene Zielgebiete der Rezepte, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Kessel
 
@@ -183,7 +183,7 @@ Umsetzung: offen
 + Gestapelt wird nur Gleiches: die Portionen eines Suds, Sude mit gleichem Rezept, gleichen gerundeten Stufen, gleicher Güte und gleicher Stufe des Verderbens; freie Sude ohne Rezept sind Einzelstücke, bis sie Hausrezept werden
 + Ein Fass hält viele Portionen eines Suds als Ladungen
 
-Umsetzung: teilweise, siehe [Gegenstaende.md](Gegenstaende.md), Inventar, und [Sude.md](Sude.md), Befehl (gleiche Sude stapeln nach gerundetem Profil); offen: Reiter für Getränke und Kulturen, Stapeln nach Rezept, Stufe des Verderbens
+Umsetzung: teilweise, siehe [Gegenstaende.md](Gegenstaende.md), Inventar, und [Sude.md](Sude.md), Befehl (gleiche Sude stapeln nach gerundetem Profil und gefundenem Rezept); offen: Reiter für Getränke und Kulturen, freie Sude als Einzelstücke, Stufe des Verderbens
 
 ## Brauschulen
 

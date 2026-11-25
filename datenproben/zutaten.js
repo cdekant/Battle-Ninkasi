@@ -2,6 +2,7 @@
 //   extrakt: Zehntel °Plato, wenn ein Stück auf eine Portion kommt; farbe in EBC und bitter in IBU ebenso; aromen:
 //   Anteile, die sich nach Menge mitteln
 //   kultur: wer den Gegenstand aufhebt, gewinnt diese Kultur, der Gegenstand vergeht (src/systeme/brauen.js)
+// Die Tontafel lehrt beim Lesen ein Rezept (Baustein rezept_lernen, src/systeme/rezepte.js) und vergeht.
 const zutat = (text, daten) => ({ text, aufhebbar: true, stapelbar: true, gewicht: 500, zutat: daten });
 const kulturprobe = (text, kultur) => ({ text, aufhebbar: true, gewicht: 0, kultur });
 
@@ -16,4 +17,5 @@ export default {
   // Proben von Kulturen, bis Kulturen auf anderen Wegen zu gewinnen sind (docs/Systemausbau.md, Punkt 23)
   hefekrug: kulturprobe("gegenstand.hefekrug", "bierhefe"),
   sauerkrug: kulturprobe("gegenstand.sauerkrug", "milchsaeure"),
+  tontafel_dunkles_bier: { text: "gegenstand.tontafel", aufhebbar: true, gewicht: 300, lesbar: { effekt: "rezept_dunkles_bier" } },
 };
