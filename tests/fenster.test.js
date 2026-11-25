@@ -205,6 +205,11 @@ test("Anzeige: jedes Fenster entsteht mit dem Spielinhalt ohne fehlende Texte", 
   gegenstandTragen(spiel, ninkasi, { typ: "leere_flasche", ...structuredClone(daten.gegenstaende.leere_flasche) });
   assert.doesNotMatch(zeigen("brauen", { ...braufensterOeffnen(spiel).zustand, mengen: { [malz.id]: 2 } }), /netz-umriss/, "im Nebel keine Umrisse");
   spiel.zustand.wissen.zielgebiete = ["gefiltertes_bier", "dunkles_bier"];
+  const nurWasser = zeigen("brauen", braufensterOeffnen(spiel).zustand);
+  assert.match(nurWasser, /<svg class="spinnennetz"/, "das Netz auch ohne Zutaten");
+  assert.match(nurWasser, /netz-umriss/, "ohne Zutaten mit den Umrissen der aufgedeckten Zielgebiete");
+  assert.doesNotMatch(nurWasser, /netz-band|netz-profil|hervorgehoben/, "ohne Zutaten ohne Vorschau und ohne Hervorhebung");
+  assert.match(nurWasser, /<\/svg><p class="leise">Ohne Zutaten wird das nur heißes Wasser/, "unter dem Netz der Grund");
   const braufenster = zeigen("brauen", { ...braufensterOeffnen(spiel).zustand, mengen: { [malz.id]: 2 } });
   assert.match(braufenster, /<svg class="spinnennetz"/, "die Vorschau als Spinnennetz");
   assert.match(braufenster, /netz-umriss/, "mit den Umrissen der aufgedeckten Zielgebiete");

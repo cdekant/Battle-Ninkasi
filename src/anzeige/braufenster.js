@@ -2,7 +2,7 @@
 // Füllung, Maische, Gewürz, Kultur und ob nach Rezept gebraut wird, links die Zutaten im Gepäck mit der Menge im Kessel
 // oder die Rezepte im Buch (Tab), rechts die Vorschau als Spinnennetz (anzeige/spinnennetz.js) mit den Umrissen der
 // aufgedeckten Zielgebiete, darunter je Achse der Bereich als Zahl, der Restzucker, die Chance des Verderbens und die
-// erreichbaren Zielgebiete.
+// erreichbaren Zielgebiete; kann noch nicht gebraut werden, steht das Netz ohne Vorschau da, darunter der Grund.
 // Liest den Zustand nur; die Vorschau ist dieselbe Rechnung wie der Befehl (sudVorbereiten, systeme/brauen.js).
 
 import { gesteuerteEntitaet } from "../kern/zustand.js";
@@ -29,16 +29,18 @@ export function rezeptName(spiel, texte, schluessel, rezept) {
 
 function vorschauHtml(spiel, texte, ninkasi, vorbereitet) {
   const { text, nomenForm } = texte;
-  if (vorbereitet.grund) return `<h2>${text("ui.brauen.vorschau")}</h2><p class="leise">${text(`log.abgelehnt.${vorbereitet.grund}`)}</p>`;
   const zielgebiete = spiel.daten.zielgebiete ?? {};
+  const achsen = spiel.daten.regeln.brauen.achsen;
   // im Nebel nur die aufgedeckten; hervorgehoben das der Mitte, sonst das erste erreichbare
   const aufgedeckt = aufgedeckteZielgebiete(spiel);
-  const mitte = zielgebietFinden(spiel.daten, vorbereitet.mitte)?.name;
-  const imBlick = aufgedeckt.includes(mitte) ? mitte : vorbereitet.erreichbar[0] ?? null;
+  const mitte = vorbereitet.grund ? null : zielgebietFinden(spiel.daten, vorbereitet.mitte)?.name;
+  const imBlick = vorbereitet.grund ? null : aufgedeckt.includes(mitte) ? mitte : vorbereitet.erreichbar[0] ?? null;
   const umrisse = aufgedeckt.map((name) => ({ spannen: zielgebiete[name].spannen, hervorgehoben: name === imBlick }));
-  const netz = spinnennetzSvg(spiel.daten.regeln.brauen.achsen, {
-    bereich: vorbereitet.bereich, punkt: vorbereitet.mitte, umrisse, beschriftungen: achsenBeschriftungen(spiel.daten.regeln.brauen.achsen, text), titel: text("ui.brauen.vorschau"),
+  // das Netz steht immer, damit das Fenster mit der ersten Zutat nicht springt; ohne Vorschau ohne Band und Punkt
+  const netz = spinnennetzSvg(achsen, {
+    bereich: vorbereitet.bereich ?? null, punkt: vorbereitet.mitte ?? null, umrisse, beschriftungen: achsenBeschriftungen(achsen, text), titel: text("ui.brauen.vorschau"),
   });
+  if (vorbereitet.grund) return `<h2>${text("ui.brauen.vorschau")}</h2>${netz}<p class="leise">${text(`log.abgelehnt.${vorbereitet.grund}`)}</p>`;
   const zeilen = Object.entries(vorbereitet.bereich).map(([achse, [unten, oben]]) => {
     const bereich = unten === oben ? achsenwertText(achse, unten) : `${achsenwertText(achse, unten)} – ${achsenwertText(achse, oben)}`;
     return `<tr${KENNZAHLEN.includes(achse) ? ' class="kennzahl"' : ""}><td>${text(`achse.${achse}`)}</td><td>${bereich}</td></tr>`;

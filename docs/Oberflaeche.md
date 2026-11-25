@@ -1,6 +1,6 @@
 # Battle Ninkasi - Oberfläche
 
-Stand: 2026-11-24, teilweise umgesetzt (siehe die Zeilen "Umsetzung")
+Stand: 2026-11-25, teilweise umgesetzt (siehe die Zeilen "Umsetzung")
 
 Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Bedienung.md](Bedienung.md), [Animationen.md](Animationen.md), [Titelbildschirm.md](Titelbildschirm.md)
 
@@ -192,9 +192,10 @@ Umsetzung: siehe [Anzeige.md](Anzeige.md), Log
 + Spielmenü: Fortsetzen, Einstellungen, Hilfe, Neustart, Beenden
 + Einstellungen
 + Bestätigung
-+ Später: Handel und Dienste, Brauen mit Rezeptbuch, Gespräch (Händler, Nebengottheiten), Ritual und Schriftrollen schreiben, Journal (Ziel des Laufs)
++ Brauen am Kessel: Zutaten oder die Rezepte im Buch, die Vorschau als Spinnennetz
++ Später: Handel und Dienste, Rezeptbuch als eigenes Fenster außerhalb des Kessels, Gespräch (Händler, Nebengottheiten), Ritual und Schriftrollen schreiben, Journal (Ziel des Laufs)
 
-Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Fenster (Brauen als Prüfstand ohne Spinnennetz); offen: Handel, Rezeptbuch und Spinnennetz des Brauens, Gespräch, Ritual, Journal
+Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Fenster; offen: Handel, Rezeptbuch außerhalb des Kessels, Gespräch, Ritual, Journal
 
 ## Unterbrechungen
 
