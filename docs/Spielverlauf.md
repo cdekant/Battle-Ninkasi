@@ -1,8 +1,8 @@
 # Battle Ninkasi - Spielverlauf
 
-Stand: 2026-11-24
+Stand: 2026-11-25
 
-Mitprüfen bei Änderungen: [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md), [Ausblick.md](Ausblick.md), [Fundus.md](Fundus.md)
+Mitprüfen bei Änderungen: [Grundlagen.md](Grundlagen.md), [Charakter.md](Charakter.md), [Ausblick.md](Ausblick.md), [Fundus.md](Fundus.md), [Brauen.md](Brauen.md)
 
 Wie ein Lauf in die Tiefe verläuft und wie der Inhalt sich darauf verteilt: Kapitel, Hub, Epochen, Ebenenbilder, Bosse und was zwei Läufe unterscheidet. Das Spiel im Ganzen steht in [Grundlagen.md](Grundlagen.md), Breite und Spezialisierung der Skills in [Charakter.md](Charakter.md), Skills.
 
@@ -77,7 +77,7 @@ Umsetzung: offen; Bossphasen gehen aus Daten, siehe [Grundlagen.md](Grundlagen.m
 + Fundstücke verändern das Spiel, nicht nur Zahlen: Ein Braupaddel macht Rundumschlag und Anstürmen erst lohnend
 + Ein Build hängt nicht allein am Glück: Einfache Waffen jeder Art sind verlässlich zu bekommen, seltene Stücke heben den Build
 + Fundstücke wachsen mit der Tiefe, damit ein spät gefundenes sofort nützlich ist, wenn die Gegner stärker geworden sind
-+ Das Brauen ist die zweite Achse eines Builds: welche Rezepte und Rohstoffe ein Lauf bietet und welche Brauschule Ninkasi wählt, etwa Reinheitsgebot oder spontane Gärung
++ Das Brauen ist die zweite Achse eines Builds: welche Rezepte und Rohstoffe ein Lauf bietet und welche Brauschule Ninkasi wählt, etwa Reinheitsgebot oder spontane Gärung (siehe [Brauen.md](Brauen.md), Brauschulen)
 + Die Figuren, denen Ninkasi begegnet, und damit ihr Hub (siehe Hub)
 + Ideen für mehr Verschiedenheit: [Ausblick.md](Ausblick.md), Erzeugte Geschichte und Geister früherer Läufe
 

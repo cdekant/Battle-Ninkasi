@@ -1,8 +1,8 @@
 # Battle Ninkasi - Ausblick
 
-Stand: 2026-11-24
+Stand: 2026-11-25
 
-Mitprüfen bei Änderungen: [Dokumentation.md](Dokumentation.md), [Grundlagen.md](Grundlagen.md), [Architektur.md](Architektur.md), [Systemausbau.md](Systemausbau.md), [Wesen.md](Wesen.md), [Welt.md](Welt.md), [Charakter.md](Charakter.md), [Spielverlauf.md](Spielverlauf.md)
+Mitprüfen bei Änderungen: [Dokumentation.md](Dokumentation.md), [Grundlagen.md](Grundlagen.md), [Architektur.md](Architektur.md), [Systemausbau.md](Systemausbau.md), [Wesen.md](Wesen.md), [Welt.md](Welt.md), [Charakter.md](Charakter.md), [Spielverlauf.md](Spielverlauf.md), [Brauen.md](Brauen.md)
 
 Ideen für Mechaniken, über die noch nicht entschieden ist, mit dem, was sie dem Kern abverlangen. Zweck: früh erkennen, wo heutiger Code einer Idee den Weg verbaut, und dort rechtzeitig vorbauen, statt später schwer umzubauen.
 
@@ -19,7 +19,7 @@ Abgrenzung: [Systemausbau.md](Systemausbau.md) ist die Arbeitsliste beschlossene
 | Hellsicht, Spüren, Unsichtbarkeit | hoch | mittel | teils erledigt (Erinnerung, Kartieren, Arten der Wahrnehmung, Spüren), offen: Telepathie, Orten, Unsichtbarkeit |
 | Verwandlung | mittel | mittel | erledigt (Lesefunktionen) |
 | Veränderbares Gelände | hoch | mittel | erledigt (Erinnerung der Karte) |
-| Flüssigkeiten und Gase | ungeklärt | gering, Mischen mittel | ja (über das Mischen entscheiden) |
+| Flüssigkeiten und Gase | ungeklärt | gering | nein (Mischen auf Feldern verworfen) |
 | Begleiter und Befehle | hoch | gering bis mittel | teils erledigt (Treppen, Vorrang an der KI), offen: Befehl und Begleiter |
 | Handel, Währung, Gespräch | hoch | gering bis mittel | ja (Befehle) |
 | Bestiarium, Glossar, Rezeptbuch | hoch | gering | erledigt (Regel für Wissen über Läufe) |
@@ -116,11 +116,10 @@ Umsetzung: offen
   + Strömung: eine Richtung je Feld (am Gelände oder als Schicht), die mit einer Chance versetzt (`versetzen` mit eigener Art); Schwimmen als Skill senkt die Chance über ein Modifikatorziel
   + Fließen: Oberfläche verteilt sich wie Gas zu den Nachbarn, aber erst über einer Schwelle und langsamer, nach unten (Abgrund, Senke) zuerst
   + Verdunsten zu Gas: Hochprozentiges wird zu brennbarem Dampf, Gärendes zu CO2 (eine Angabe an der Oberfläche, welches Gas mit welchem Anteil entsteht)
-  + Mischen: mehrere Flüssigkeiten auf einem Feld und in Gefäßen, mit Regeln für Mischungen (Bier und Wasser, Würze und Hefe); berührt das Brausystem unmittelbar
   + Schwere des Gases: CO2 sinkt und sammelt sich in Senken, ohne echte Höhe über eine Angabe am Gelände
 + Berührt: das Format der Feldschichten (`{ art, menge }` je Feld), Wegfindung (Kosten statt nur Meiden), Ebenenerzeugung (Seen, Bäche), Brausystem, Inventar (Gefäße, Last), Licht (brennender Alkohol), Leistung (Fließen am Welttick)
-+ Umbaurisiko: gering für Tiefe, Strömung, Fließen, Verdunsten und Schwere (Register `welttick`, Haken `betritt_feld`, Daten der Schichten); mittel für das Mischen, weil dann ein Feld mehrere Arten trägt und sich das Format der Feldschichten ändert
-+ Vorkehrung: vor dem Inhalt entscheiden, ob Flüssigkeiten sich mischen sollen (siehe [Systemausbau.md](Systemausbau.md), Punkt 10); bis dahin keine Daten anlegen, die auf genau einer Art je Feld bestehen
++ Umbaurisiko: gering für Tiefe, Strömung, Fließen, Verdunsten und Schwere (Register `welttick`, Haken `betritt_feld`, Daten der Schichten)
++ Vorkehrung: keine; Lachen mischen sich nicht, auf einem Feld liegt höchstens eine Flüssigkeit, gemischt wird nur beim Brauen (siehe [Brauen.md](Brauen.md), Grundsätze)
 
 Umsetzung: offen
 
@@ -232,7 +231,7 @@ Ideen aus Rollenspielen am Tisch; jede passt nach heutigem Stand in Daten, Regis
 + Konzentration (D&D 5e): höchstens eine aufrechterhaltene Wirkung je Wirkender, Schaden erzwingt eine Probe; bei uns eine Gruppe am Unterhalt mit Höchstzahl und `unterbrechbar`
 + Reaktion (D&D 5e, Pathfinder 2e): eine Handlung außerhalb des eigenen Zugs auf einen Auslöser, eine je Runde; Gelegenheitsangriffe sind verworfen, Parade oder Gegenzauber wären Auslöser mit Verbrauch je Zug
 + Erfolgsgrade (Pathfinder 2e): um 10 über oder unter der Schwelle ist kritisch, vier Ausgänge statt zwei; bei uns gibt es den Krit, ein kritischer Fehlschlag passt zum Psi-Risiko
-+ Fortschrittsuhren (Blades in the Dark): Kreise mit Segmenten für Mühen und drohendes Unheil; Anzeige für Brauvorgang, Alarm, Nachrücken
++ Fortschrittsuhren (Blades in the Dark): Kreise mit Segmenten für Mühen und drohendes Unheil; Anzeige für Alarm, Nachrücken
 + Stress statt Wunde (Blades in the Dark): Stress ausgeben, um eine Wunde zu mildern, voller Stress hinterlässt ein Trauma; denkbar mit PP oder dem Pegel
 + Reaktionswurf und Moral (Old-School-Regelwerke): nicht jede Begegnung ist feindlich, Moral entscheidet über Flucht; passt zu Fraktionen und dem Modul `fliehen`
 + Mühle und Erschöpfung (Torchbearer, D&D 5e): Zustände in Stufen, die mit der Zeit kommen; ein Kandidat für den Druck gegen das Rasten

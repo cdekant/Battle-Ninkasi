@@ -1,10 +1,10 @@
 # Battle Ninkasi - Gegenstände
 
-Stand: 2026-11-24
+Stand: 2026-11-25
 
 Zuständig für: `src/systeme/inventar.js`, `src/systeme/ausruestung.js`, `src/systeme/verschleiss.js`, `src/systeme/kennen.js`
 
-Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Bedienung.md](Bedienung.md), [Grundlagen.md](Grundlagen.md), [Wesen.md](Wesen.md), [Skills.md](Skills.md)
+Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Bedienung.md](Bedienung.md), [Grundlagen.md](Grundlagen.md), [Wesen.md](Wesen.md), [Skills.md](Skills.md), [Brauen.md](Brauen.md)
 
 ## Zweck
 
@@ -132,7 +132,7 @@ Regeln:
 
 ## Verweise
 
-+ Spieldesign der Getränke, Biersorten und des Brauens: [Grundlagen.md](Grundlagen.md); Inventarfenster: [Bedienung.md](Bedienung.md), Fenster
++ Spieldesign der Getränke: [Grundlagen.md](Grundlagen.md), des Brauens, der Stufen des Verderbens und der Reiter im Inventar: [Brauen.md](Brauen.md); Inventarfenster: [Bedienung.md](Bedienung.md), Fenster
 + Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 8 (angefressene Waffen), Punkt 12 (Teilmenge fallen lassen, Restzeit des Verderbens), Punkt 14 (Flüche und Unbekanntes im Inhalt, Reparieren, Verderben weiterer Dinge)
 
 Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

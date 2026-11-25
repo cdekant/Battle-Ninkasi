@@ -1,6 +1,6 @@
 # Battle Ninkasi - Wirkungen
 
-Stand: 2026-11-24
+Stand: 2026-11-25
 
 Zuständig für: `src/kern/effekte.js`, `src/kern/bausteine.js`, `src/kern/ausloeser.js`, `src/kern/vorgang.js`, `src/kern/werte.js`, `src/systeme/modifikatoren.js`, `src/systeme/zustaende.js`, `src/systeme/betaeubung.js`, `src/systeme/befehlsveraenderer.js`, `src/systeme/beschwoerung.js`, `src/systeme/zielauswahl.js`, `src/systeme/zielbausteine.js`, `src/systeme/faehigkeiten.js`, `src/systeme/laufendeAktionen.js`, `src/systeme/tod.js`, `src/systeme/ersatz.js`, `src/welt/geometrie.js`, `daten/effekte.js`, `daten/zustaende.js`
 
@@ -308,12 +308,12 @@ Schnittstellen (`src/systeme/laufendeAktionen.js`):
 
 Regeln:
 
-+ Rituale, Kanalisieren und später das Brauen laufen in der Logik, weil sie einen Fortschritt und Folgen beim Abbruch haben; Rasten und Auto-Erkunden sind dagegen Abläufe der Eingabe aus gewöhnlichen Befehlen (siehe [Bedienung.md](Bedienung.md), Maus, Reise, Laufen, Rasten und Erkunden)
++ Rituale und Kanalisieren laufen in der Logik, weil sie einen Fortschritt und Folgen beim Abbruch haben; Rasten und Auto-Erkunden sind dagegen Abläufe der Eingabe aus gewöhnlichen Befehlen (siehe [Bedienung.md](Bedienung.md), Maus, Reise, Laufen, Rasten und Erkunden)
 + Der startende Befehl führt den ersten Schritt aus; ist die Akteurin wieder dran, führt die Logik den nächsten Schritt selbst aus (Befehl `fortsetzen`, nicht aufgezeichnet, das Nachspielen ergibt ihn wieder); aufgezeichnet wird nur, was die Spielerin eingibt
 + Trifft vor einem automatischen Schritt Ninkasis eine Gefahrenprüfung gegen die Lage beim letzten Schritt zu, pausiert die Aktion und Ninkasi wird gefragt; die Liste steht in den Regeln, nicht in den Einstellungen, weil sie das Nachspielen bestimmt
 + `fortsetzen` macht weiter, jeder andere Befehl bricht ab; bezahlte Kosten bleiben bezahlt, `abbrechen` der Art wirkt (bei Fähigkeiten `beimAbbruch`); Handlungsunfähigkeit und Betäubung (Grund `betaeubt`, siehe Kontrolle) brechen ebenfalls ab
 + Gegner mit langer Aktion führen ihre Schritte ohne Gefahrenprüfung aus
-+ Bei Fähigkeiten kommt `unterbrechbar` aus deren Daten, so legt jede Fähigkeit und später jedes Rezept selbst fest, wie störanfällig es ist
++ Bei Fähigkeiten kommt `unterbrechbar` aus deren Daten, so legt jede Fähigkeit selbst fest, wie störanfällig sie ist
 
 ## Tod und Zustandsprüfung
 

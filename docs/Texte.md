@@ -4,7 +4,7 @@ Stand: 2026-11-25
 
 Zuständig für: `sprache/*`, `src/anzeige/texte.js`, `src/anzeige/grammatik.js`, `src/anzeige/korpus.js`, `src/anzeige/glossar.js`, `daten/glossar.js`, `daten/bierstile.js`
 
-Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Architektur.md](Architektur.md), [Entwicklung.md](Entwicklung.md), [Fundus.md](Fundus.md), [Skills.md](Skills.md)
+Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Architektur.md](Architektur.md), [Entwicklung.md](Entwicklung.md), [Fundus.md](Fundus.md), [Skills.md](Skills.md), [Brauen.md](Brauen.md)
 
 Grobskizze, auszuarbeiten.
 
@@ -70,7 +70,7 @@ Regeln:
 
 ## Bierstile
 
-Die allgemein anerkannten Bierstile mit ihren Kennzahlen, zusammengefasst aus den Richtlinien für Bierwettbewerbe; Ziele für die Rezepte des Brausystems (siehe [Systemausbau.md](Systemausbau.md), Punkt 10).
+Die allgemein anerkannten Bierstile mit ihren Kennzahlen, zusammengefasst aus den Richtlinien für Bierwettbewerbe; Ziele für die Rezepte des Brausystems (siehe [Brauen.md](Brauen.md), Zielgebiete).
 
 Daten:
 

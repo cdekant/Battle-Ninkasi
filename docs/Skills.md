@@ -2,7 +2,7 @@
 
 Stand: 2026-11-25, Entwurf; alle Kategorien entworfen ([Systemausbau.md](Systemausbau.md), Punkt 20)
 
-Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Wesen.md](Wesen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md), [Wirkungen.md](Wirkungen.md), [Texte.md](Texte.md)
+Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Wesen.md](Wesen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md), [Wirkungen.md](Wirkungen.md), [Texte.md](Texte.md), [Brauen.md](Brauen.md)
 
 Dieses Designdokument ist der Skillkatalog im Entwurf, die Vision eines tiefen Skillsystems für Ninkasi. Die Regeln des Systems (Aufbau, Kosten, Wirkung, Fähigkeiten) stehen in [Charakter.md](Charakter.md), Skills.
 
@@ -113,8 +113,15 @@ Die Kategorie hält alle Skills, die den Stoffwechsel verändern: Abbau des Pege
 
 + Eigenschaften: Trinkfestigkeit, sekundär Gewandtheit
 + Lernt aus: Berauscht
-+ Das Trinken mitten im Kampf, das Brot der Bier-Göttin
-+ Tiers: Grund Trinken kostet weniger Zeit, Experte aus einem Gefäß in der Hand trinken, ohne es erst aus dem Gepäck zu holen, Meister ein zweiter Schluck in derselben Aktion
++ Das Trinken mitten im Kampf, das Brot der Bier-Göttin: schneller und wirksamer
++ Tiers: Grund Trinken kostet weniger Zeit, Experte aus einem Gefäß in der Hand trinken, ohne es erst aus dem Gepäck zu holen, Meister ein zweiter Schluck in derselben Aktion, Göttlich Getrunkenes wirkt im Kampf stärker
+
+### Kampfrausch
+
++ Eigenschaften: Trinkfestigkeit, sekundär Sinnlichkeit
++ Lernt aus: Berauscht
++ Die Göttin berauscht sich am Kampf selbst: jeder Treffer, ausgeteilt wie erlitten, hebt den Pegel ein wenig; für Psi-Zauberinnen und Psi-Kämpferinnen, auch wenn Brand vorhanden ist, damit sie ihren Pegel ausschöpfen und seltener in Engpässe geraten (siehe [Brauen.md](Brauen.md), Brauen und Pegel)
++ Tiers: Grund Treffer heben den Pegel, Experte mehr je Treffer, Meister im Kampf baut der Pegel nicht ab
 
 ### Rauschkraft
 
@@ -441,17 +448,14 @@ Umsetzung: teilweise, siehe [Wesen.md](Wesen.md), Kampfwerte (Profile mit Tags, 
 
 ## Brauen
 
-Brauen ist die einzige Herstellung von Getränken, Tränken und Giften: Bier, Wein, Met, Kvas, Kefir, Kombucha, auch Tränke und Gifte entstehen beim Brauen; Magie hat keine eigene Alchemie, die etwas herstellt, sie steigert die Wirkung des Gebrauten (siehe Magie). Bauen und Reparieren gehören zum Handwerk (siehe Anlagen und Fallen). Brauen und Mälzen sind Gaben der Göttin, angeborene Fähigkeiten jeder Ninkasi wie das Werfen (siehe [Charakter.md](Charakter.md), Fähigkeiten); die Skills heben Gelingen, Ausbeute und Güte und erweitern die Fähigkeiten in Ausbaustufen. Die Sets folgen den Schritten des Brauens und dem, was ein Sud ergibt, damit sie tragen, wie immer das Brausystem im Einzelnen aussieht (offen in [Grundlagen.md](Grundlagen.md), Spielkern). Vorbilder: EVE Online (Industry macht die Fertigung schneller), RimWorld (die Fertigkeit senkt die Gefahr verdorbener Speisen, die Sauberkeit wirkt daneben), Caves of Qud (Baupläne finden sich unterwegs, die Skills machen sie baubar).
+Brauen ist die einzige Herstellung von Getränken, Tränken und Giften: Bier, Wein, Met, Kvas, Kefir, Kombucha, auch Tränke und Gifte entstehen beim Brauen; Magie hat keine eigene Alchemie, die etwas herstellt, sie steigert die Wirkung des Gebrauten (siehe Magie). Bauen und Reparieren gehören zum Handwerk (siehe Anlagen und Fallen). Brauen und Mälzen sind Gaben der Göttin, angeborene Fähigkeiten jeder Ninkasi wie das Werfen (siehe [Charakter.md](Charakter.md), Fähigkeiten); die Skills heben Gelingen, Ausbeute und Güte und erweitern die Fähigkeiten in Ausbaustufen. Die Sets folgen den Schritten des Brauens und dem, was ein Sud ergibt, das Brausystem steht in [Brauen.md](Brauen.md). Vorbilder: EVE Online (Industry macht die Fertigung schneller), RimWorld (die Fertigkeit senkt die Gefahr verdorbener Speisen, die Sauberkeit wirkt daneben), Caves of Qud (Baupläne finden sich unterwegs, die Skills machen sie baubar).
 
 Muster der Tiers: Grund Gelingen, Experte Ausbeute, Meister Güte; einzelne Sets weichen ab. Die Schulen schließen sich so wenig aus wie die Waffengattungen. Die Kessel aufzustellen, zu bauen und zu pflegen gehört zu Anlagen und Fallen.
 
 ### Rezepte
 
-+ Bierrezepte folgen den Stilvorgaben, ihre Kennzahlen (Stammwürze, Bittere, Farbe, Alkohol) sind die Ziele eines Suds (siehe [Texte.md](Texte.md), Bierstile)
-+ Andere Rezepte findet Ninkasi unterwegs: Kvas, Kefir, Kombucha, Weine, Met, Cider; ihre Wirkung folgt den Zutaten
++ Was ein Rezept ist, wie Hausrezepte entstehen und was sich stapelt, steht in [Brauen.md](Brauen.md), Rezepte
 + Ein Rezept nennt die Arten seiner Zutaten, seine Kultur und seine Schule als Tags, über die die Sets wirken und lernen
-+ Gebrautes stapelt sich nach Rezept und Güte
-+ Ein freier Sud ohne Rezept wird beim ersten Gelingen ein Hausrezept im Rezeptbuch, mit erzeugtem Namen, und stapelt sich danach wie jedes andere
 + Lernanlass ist das erste Gelingen jedes gefundenen Rezepts (siehe [Charakter.md](Charakter.md), Gebundene EP); seine EP teilen sich nach den Tags des Rezepts auf die Sets; Hausrezepte bringen keine gebundenen EP, weil es endlos viele gäbe
 
 ### Brauen allgemein
@@ -467,11 +471,11 @@ Muster der Tiers: Grund Gelingen, Experte Ausbeute, Meister Güte; einzelne Sets
 
 + Eigenschaften: Braukunde, sekundär Gewandtheit
 + Lernt aus: freien EP und quer von Brauen allgemein
-+ Brauen beginnt sonst nur außerhalb eines Kampfes (siehe [Grundlagen.md](Grundlagen.md), Zeit und Tempo); der Schnellsud verschiebt diese Grenze Tier für Tier
-+ Grund: kürzere Brauzeit
-+ Experte: Brauen beginnt auch, wenn Feinde in der Nähe sind, solange noch kein Kampf läuft
-+ Meister: Feldsud, im Kampf am mobilen Kessel eine kleine Menge in wenigen Zügen, etwa so schnell wie ein Kampfzauber
-+ Göttlich: ein Treffer unterbricht den Sud nicht mehr
++ Gebraut wird sonst nur außerhalb eines Kampfes (siehe [Brauen.md](Brauen.md), Grundsätze); der Schnellsud verschiebt diese Grenze Tier für Tier
++ Grund: Brauen auch, wenn Feinde in der Nähe sind, solange noch kein Kampf läuft
++ Experte: Feldsud, im Kampf am mobilen Kessel eine kleine Menge, langsamer als eine gewöhnliche Aktion
++ Meister: der Feldsud ist etwa so schnell wie ein Kampfzauber
++ Göttlich: der Feldsud in voller Menge
 
 ### Hygiene
 
@@ -483,12 +487,12 @@ Muster der Tiers: Grund Gelingen, Experte Ausbeute, Meister Güte; einzelne Sets
 
 ### Rohstoffe
 
-Ein Set je Art von Rohstoffen mit zwei Tiers: Ohne Skill gibt eine Art weniger Ausbeute und Güte, Grund macht sie konkurrenzfähig, Experte hebt die Güte. Jedes lernt aus den Rezepten mit seiner Art.
+Ein Set je Art von Rohstoffen mit zwei Tiers: Ohne Skill gibt eine Art weniger Ausbeute und Güte, Grund macht sie konkurrenzfähig, Experte hebt die Güte. Jedes gilt auch für das Ernten seiner Art: Grund mehr Menge, Experte höhere Güte, ein dritter Tier erkennt und erntet Seltenes, das sonst verborgen bleibt. Jedes lernt aus den Rezepten mit seiner Art.
 
 + Getreide: Gerste, Emmer, Weizen, Brot (Kvas, Bappir); Braukunde, sekundär Klugheit; die Grundlage, schon ohne Skill brauchbar; drei Tiers, Meister macht das Mälzen wirksamer
 + Früchte: Datteln, Feigen, Trauben, Granatäpfel, Äpfel; Braukunde, sekundär Sinnlichkeit
 + Honig und Zucker: Braukunde, sekundär Trinkfestigkeit
-+ Kräuter und Würze: Gruit, die Würze vor dem Hopfen; Braukunde, sekundär Sinnlichkeit
++ Kräuter und Würze: Gruit, die Würze vor dem Hopfen, mit Primär- und Sekundärwirkungen (siehe [Brauen.md](Brauen.md), Zutaten); Braukunde, sekundär Sinnlichkeit
 + Milch: Braukunde, sekundär Trinkfestigkeit
 + Tee: Braukunde, sekundär Klugheit
 + Hopfen: Bittere und Haltbarkeit; Braukunde, sekundär Sinnlichkeit; erst mit dem ersten Hopfenfund lernbar (`freischaltung`); das Aroma gehört der Schule Hopfenstopfen
@@ -497,9 +501,9 @@ Ein Set je Art von Rohstoffen mit zwei Tiers: Ohne Skill gibt eine Art weniger A
 
 + Eigenschaften: Braukunde, sekundär Sinnlichkeit
 + Lernt aus: den Rezepten, nach dem Tag ihrer Kultur
-+ Kulturen: Bierhefe, Weinhefe, wilde Hefe, Kefirknollen, Teepilz, Sauerteig
++ Kulturen: Bierhefe, Weinhefe, wilde Hefe, Brettanomyces, Kveik, Milchsäure- und Essigbakterien, Koji, Kefirknollen, Teepilz, Sauerteig; wie Ninkasi sie gewinnt und trägt, steht in [Brauen.md](Brauen.md), Kulturen
 + Grund: höherer Vergärungsgrad, mehr Alkohol
-+ Experte: Kulturen werden ein lebender Vorrat, der sich weiterführen lässt, statt verbraucht zu werden, und eingehen kann
++ Experte: Stämme veredeln, eine Kultur verbessert ihre Werte, je öfter sie gebraucht wird
 + Meister: höhere Güte der Gärung
 + Die Hefe als Wesen gehört nicht hierher (siehe Soziales, Wesenskunde)
 
@@ -511,16 +515,17 @@ Je Schule ein Set nach dem Muster der Kategorie, wirksam nur für Rezepte mit ih
 + Spontane Gärung: wilde Hefen aus der Luft, riskant, mit starken Ausreißern nach oben und unten und seltsamen Wirkungen; Braukunde, sekundär Trinkfestigkeit
 + Reinheitsgebot: nur Wasser, Malz, Hopfen und Hefe, verlässlich und von hoher Güte; Braukunde, sekundär Klugheit; mit dem ersten Hopfen lernbar
 + Hopfenstopfen: Hopfen kalt in den fertigen Sud, Aroma statt Bittere, späte Epoche; Braukunde, sekundär Sinnlichkeit; mit dem ersten Hopfen lernbar
++ Weitere Kandidaten nach Epochen stehen in [Brauen.md](Brauen.md), Brauschulen
 
 ### Rezeptur
 
 + Eigenschaften: Klugheit, sekundär Braukunde
 + Lernt aus: jedem Rezept
-+ Grund: der Sud trifft die Kennzahlen seines Stils genauer, das gibt Güte
++ Grund: die Vorschau des Suds wird enger, er trifft sein Zielgebiet genauer, das gibt Güte
 + Experte: Rezepte abwandeln, eine Zutat gegen eine verwandte tauschen, ohne das Rezept zu verlassen
 + Meister: freie Sude gelingen verlässlicher und werden leichter zum Hausrezept
 
-Umsetzung: offen, braucht das Brausystem ([Systemausbau.md](Systemausbau.md), Punkt 10) und die Bierstile ([Texte.md](Texte.md), Bierstile), Arbeit in Punkt 20
+Umsetzung: offen, braucht das Brausystem (Spieldesign in [Brauen.md](Brauen.md), Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23), Arbeit in Punkt 20
 
 ## Anlagen und Fallen
 

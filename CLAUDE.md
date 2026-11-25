@@ -48,6 +48,7 @@ Taste → `eingabe/eingabe.js` (Belegung → Aktion aus dem Aktionskatalog) → 
 + Kampfwert, Angriffsprofil, Kampfzustand, Fraktion, Ruf, Beistand, Wahrnehmung, Sinn, Verhaltensmodul, Handlung, Vorrangbefehl, Bewegungsart, Skill, Lernpunkte: [docs/Wesen.md](docs/Wesen.md)
 + Gelände, Feldschicht, Licht, Lichtstufe, Duft, Plan des Laufs, Ebene, Ebenenschritt, Tiefe, Erinnerung der Karte: [docs/Welt.md](docs/Welt.md); Stapel, Ladung, Platz, Verschleiß, Etikett: [docs/Gegenstaende.md](docs/Gegenstaende.md)
 + Aktion, Belegung, Fensterart, Fensterstapel, Ablauf, Zielmodus, Schnellleiste: [docs/Bedienung.md](docs/Bedienung.md)
++ Sud, Profil, Zielgebiet, Kultur, Absud, Kessel: [docs/Brauen.md](docs/Brauen.md)
 
 ## Dokumente
 
@@ -56,6 +57,7 @@ Spieldesign:
 + [docs/Grundlagen.md](docs/Grundlagen.md): Spiel, Spielkern, Charakter, Gegner, Licht, Technik, Design, offene Fragen
 + [docs/Charakter.md](docs/Charakter.md): Eigenschaften, Skills, EP und Charaktererstellung
 + [docs/Skills.md](docs/Skills.md): Skillkatalog im Entwurf, nach Kategorien
++ [docs/Brauen.md](docs/Brauen.md): Brausystem (Ablauf, Profil, Zielgebiete, Wirkung, Zutaten, Kulturen, Kessel, Verderben)
 + [docs/Spielverlauf.md](docs/Spielverlauf.md): Kapitel, Epochen, Ebenenbilder, Bosse, was Läufe unterscheidet
 + [docs/Oberflaeche.md](docs/Oberflaeche.md): Schema der Oberfläche (Layout, Log, Fenster, Tastatur nach vi)
 + [docs/Titelbildschirm.md](docs/Titelbildschirm.md): Titel, Speicherplätze, Chronik, Ideen für später

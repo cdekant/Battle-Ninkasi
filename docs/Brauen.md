@@ -1,0 +1,205 @@
+# Battle Ninkasi - Brauen
+
+Stand: 2026-11-25
+
+Mitprüfen bei Änderungen: [Grundlagen.md](Grundlagen.md), [Skills.md](Skills.md), [Spielverlauf.md](Spielverlauf.md), [Ausblick.md](Ausblick.md), [Texte.md](Texte.md), [Gegenstaende.md](Gegenstaende.md)
+
+Das Brausystem ist der Kern des Spiels: Es bestimmt Zutaten, Gegenstände, Beute, Orte und Rezepte und ist neben den Skills die zweite Achse eines Builds (siehe [Spielverlauf.md](Spielverlauf.md), Was zwei Läufe unterscheidet). Dieses Dokument sagt, wie Brauen sich anfühlt und wie seine Teile zusammenhängen; die Skills dazu stehen in [Skills.md](Skills.md), Brauen, die Bierstile mit ihren Kennzahlen in [Texte.md](Texte.md), Bierstile.
+
+## Vorbilder
+
++ Potion Craft: jede Zutat verschiebt den Trank in eine feste Richtung, die Wirkungen sind Orte auf der Karte, wie genau er dort landet, bestimmt seine Stärke; gelungene Wege kommen ins Rezeptbuch; unbekannte Ziele zeigen sich erst beim Erreichen
++ Atelier (Rorona, Ryza): die Güte des Ergebnisses folgt aus der Güte der Zutaten und dem Können der Alchemistin, Eigenschaften der Zutaten gehen ins Ergebnis über
++ Caves of Qud: gekocht wird nur an festen Orten; eine Zutat allein gibt ihre Grundwirkung, mehrere ergeben Verbindungen aus Auslöser und Wirkung; manche Zutaten wirken zufällig
++ Brewmaster: Kennzahlen (Alkohol, Bittere, Farbe) aus den Zutaten; übernommen sind nur die Kennzahlen, nicht die Simulation jedes einzelnen Schritts
++ Die Brauwirklichkeit: Stammwürze aus der Schüttung, Alkohol aus Stammwürze und Vergärungsgrad, Bittere nach Menge und Kochzeit des Gewürzes, Farbe nach den Malzen; vereinfacht übernommen
+
+## Grundsätze
+
++ Brauen ist ein Rätsel, keine Pflichtarbeit: das Erkunden eines neuen Suds darf Mühe machen, das Wiederholen eines bekannten nicht
++ Ein Sud kostet so viel Zeit wie eine gewöhnliche Aktion; Ninkasi steht nicht wartend am Kessel, eine Gärung über viele Züge gibt es nicht, und so auch keinen Sud, der durch Weggehen oder einen Treffer verdirbt
++ Gebraut wird nur außerhalb des Kampfes; im Kampf zu brauen ist eine Fähigkeit, die erst Skills und Kulturen eröffnen (siehe [Skills.md](Skills.md), Brauen)
++ Gebraut wird nur am Kessel (siehe Kessel)
++ Gemischt wird nur beim Brauen: Lachen auf dem Boden mischen sich nicht, auf einem Feld liegt höchstens eine Flüssigkeit (siehe [Ausblick.md](Ausblick.md), Flüssigkeiten und Gase)
++ Durchschaubar: die Vorschau zeigt, wohin ein Sud geht, nicht wie gerechnet wird
+
+Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+
+## Ablauf
+
+1. Zutaten wählen: am Kessel aus dem Gepäck, per Klick; dazu wenige Hebel: die Menge je Zutat, die Maischtemperatur (kühl gemaischt trocken und stärker, warm gemaischt süß und vollmundig), Gewürz früh (bitter) oder spät (Aroma), die Kultur
+2. Vorschau: das Profil des Suds wandert mit jeder Wahl mit, als ungefährer Bereich statt als genauer Punkt
+3. Brauen: der Wurf setzt den genauen Punkt im Bereich und entscheidet über Gelingen und Verderben
+4. Ergebnis: der Sud wird in leere Gefäße aus dem Gepäck abgefüllt, so viele Portionen, wie Gefäße und Kessel erlauben
+
++ Freies Brauen: ohne Rezept, die Vorschau ist ungefähr, dafür kann der Sud in Unbekanntes führen und dort ein Zielgebiet entdecken
++ Brauen nach Rezept: ein Klick auf ein bekanntes Rezept verteilt die vorhandenen Rohstoffe von selbst, die Vorschau ist eng
++ Mälzen ist wie das Brauen kurz: es macht aus Rohgetreide Malz, der Röstgrad bestimmt Farbe und Röstaroma
+
+Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+
+## Profil des Suds
+
+Ein Sud hat ein Profil wie ein Aromaprofil der Verkostung, als Spinnennetz dargestellt: auf jeder Achse ein Wert, das Ziel als Spanne je Achse.
+
++ Kennzahlen: Stärke (Stammwürze), Alkohol, Bittere, Farbe; berechnet nach vereinfachten Formeln der Brauwirklichkeit aus Schüttung, Maischtemperatur, Gewürzgabe und Kultur
++ Aromen: etwa Malz, Röst, Frucht, Kräuter, Säure, Rauch, Süße, Holz; jede Zutat trägt feste Anteile bei; welche Achsen es gibt, legen die Daten fest
++ Die Unschärfe der Vorschau ist der Spielraum des Wurfs; Rezeptur verkleinert sie, ein Rezept noch mehr
++ Unbekannte Zutaten zeigen ihre Beiträge erst nach dem ersten Gebrauch oder durch Kennerschaft
++ Die Werte werden für die Wirkung auf wenige Stufen gerundet; so ergeben gleiche Rezepte meist gleiche Sude
+
+Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+
+## Zielgebiete
+
++ Ein Zielgebiet ist ein Stil oder ein Rezept: eine Spanne je Achse, ein Name und eine eigene Wirkung
++ Die modernen Bierstile bringen ihre Spannen aus den Kennzahlen mit (siehe [Texte.md](Texte.md), Bierstile); sie liegen fast alle zwischen Malz, Röst und Bitter
++ Darüber hinaus gibt es historische und erfundene Zielgebiete, vor allem auf den Achsen der Aromen: sumerische Biere, Kräuterbiere, Fruchtbiere, Sauerbiere
++ Alle Getränke teilen sich dieses eine Schema: Wein liegt bei Frucht und Säure, Met bei Süße, Kombucha und Kefir bei Säure mit wenig Alkohol
++ Die Epoche begrenzt sich über die Zutaten, nicht über Regeln: ohne Hopfen bleiben viele moderne Stile außer Reichweite
++ Freie Sude bleiben etwas hinter gefundenen Rezepten zurück, die einen Kniff mitbringen (eine besondere Zutat, ein Verfahren)
+
+Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+
+## Wirkung
+
++ Die Achsen tragen Bedeutung, damit Wirkungen vorhersehbar bleiben: Stärke und Malz heilen LP, Frucht füllt MP, Kräuter stärken Psi und Rausch, Säure reinigt und schützt vor Gift, Röst härtet ab, Rauch schützt vor Feuer, Süße heilt über die Zeit; die Zuordnung ist ein erster Entwurf
++ Budget statt Summe: die Stärke des Suds ist das Budget seiner Wirkung, es verteilt sich anteilig auf die Achsen; ein Sud aus wenigen Zutaten wirkt gebündelt und stark, ein vielschichtiger breit und je Achse schwächer
++ Die Wirkung des Zielgebiets gibt es nur, wenn das ganze Profil getroffen ist; das lohnt die Vielschichtigkeit
++ Der Alkohol hebt den Pegel, wie jedes Getränk (siehe [Grundlagen.md](Grundlagen.md), Spielkern)
++ Weitere Wirkungen kommen von Zusätzen (Kräuter und andere Zutaten mit eigenem Effekt), Kulturen, gefundenen Rezepten und Fähigkeiten, die einem Sud Wirkungen geben oder Zielgebiete verstärken; Skills verstärken das Ganze (siehe [Skills.md](Skills.md), Brauen)
++ Spezialbiere wie das Phönixbier sind Sude mit einem besonderen Zusatz
+
+Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+
+## Zutaten
+
++ Grundstoffe liefern die Stärke: Malz, Brot (Bappir, Kwass), Reis und Mais, Honig, Frucht, Pflanzensaft, Milch, Tee mit Zucker; jeder bringt seine Aromen mit
++ Gewürze geben Bittere und Aroma, Hopfen ist eines unter vielen
++ Kräuter haben eine Primärwirkung, die immer gilt (ihre Beiträge zu den Achsen und eine feste Wirkung), und eine Sekundärwirkung, die erst mit einem passenden Partner im selben Sud oder mit der Schule Gruit erwacht; die Kennerschaft zeigt sie vorher
++ Kräuter dienen auch dem Kampf, etwa Schafgarbe gegen Blutung, Gagel für die Wut im Nahkampf, Augentrost für Sicht und Fernkampf, Baldrian für die Selbstbeherrschung bei Psi
++ Umfang: eine Handvoll Kräuter im ersten Kapitel, über alle Epochen zwei bis drei Dutzend
++ Rohstoffe werden in der Welt geerntet (Felder, Haine, Pflanzen, siehe [Spielverlauf.md](Spielverlauf.md), Erstes Kapitel); die Sets der Rohstoffe heben Menge und Güte der Ernte (siehe [Skills.md](Skills.md), Brauen)
+
+Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+
+## Kulturen
+
++ Mikroorganismen bestimmen die Gärung: wie viel der Stärke zu Alkohol wird, wie viel Alkohol sie verträgt, welche Aromen und Säure sie beitragen und welche Achse sie verstärken
++ Ninkasi trägt von jeder gewonnenen Kultur eine Probe ohne Gewicht; sie verbraucht sich nicht
++ Wege zu einer Kultur: selten als Beute von Mikroorganismen, aus einem gefundenen, bekannten Bier gezogen, an Fundorten in Brauereien
++ Spontane Gärung braucht keine Probe: sie nimmt die wilde Flora der Ebene, die an jedem Ort anders ist, mit Zufallseffekten
++ Kulturen verbessern sich durch Gebrauch (siehe [Skills.md](Skills.md), Brauen)
++ Ideen für die Rollen: übervergärende Hefe (trocken, viel Alkohol, für den Pegel), Brettanomyces (weniger Alkohol, verstärkt die MP), untergärige Hefe (sauber, enge Vorschau), Kveik (gärt heiß und schnell, der Weg zum Sud im Kampf), Milchsäurebakterien (Säure ohne Alkohol), Essigbakterien (Essig), Koji (verzuckert Reis ohne Mälzen), Kefirknollen und Teepilz (Säure, wenig Alkohol, Kombucha senkt den Pegel), wilde Hefe
+
+Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+
+## Absud
+
++ Ein Sud ohne Kultur gärt nicht: kein Alkohol, kein Pegel
++ So entstehen die Tränke der Alchemie aus Kräutern und anderen Zutaten, dazu Gifte zum Werfen und Bestreichen; die Magie steigert ihre Wirkung, stellt aber nichts her (siehe [Charakter.md](Charakter.md), Eigenschaften)
++ Tränke ohne Pegel sind der Vorrat der Magie, die nüchtern am besten wirkt
+
+Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+
+## Gelingen und Verderben
+
++ Misslingt das Rätsel, trifft der Sud kein Zielgebiet und wird ein schwaches freies Bier
++ Ein Wurf entscheidet, ob der Sud verdirbt; Hygiene, Kessel und Kultur verschieben ihn, spontane Gärung ist riskanter; ein schwacher Wurf schiebt den Sud Richtung Säure, ein verdorbener wird Essig
++ Aus einem verdorbenen Sud kann mit einer Chance ein Gegner hervorgehen, ein Verderber aus dem eigenen Kessel
++ Im Gepäck verdirbt Gebrautes in Stufen: frisch, bei starken Suden vorher reif (die Güte steigt), dann schal, sauer und Essig; jede Stufe wirkt schwächer als die vorige
++ Alkohol, Gewürze, Säure, Güte und Skills verlängern jede Stufe; ein Stapel kippt als Ganzes in die nächste
++ Essig ist kein Abfall, sondern Zutat (Posca, Oxymel)
+
+Umsetzung: teilweise, siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß; offen: Stufen mit Reifen, Dauer nach dem Sud, Wurf und Verderber beim Brauen
+
+## Rezepte
+
++ Zu Beginn kennt Ninkasi kein Rezept; sie findet sie unterwegs
++ Ein gefundenes Rezept zeigt sein Zielgebiet und einen bewährten Weg dorthin und bringt einen Kniff mit; beim ersten Gelingen gibt es gebundene EP (siehe [Skills.md](Skills.md), Brauen)
++ Ein gelungener freier Sud wird zum Hausrezept: danach so verlässlich wie ein gefundenes Rezept, aber nicht stärker
++ Das Rezeptbuch hält beide; ob Wissen über Läufe hinweg bleibt, steht unter Offen
+
+Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+
+## Kessel
+
++ Kessel sind Orte und Gegenstände: im Hub steht immer einer, auf den Ebenen häufig feste Kessel (etwa in Brauräumen), aber nicht garantiert; ein mobiler Kessel ist früh verlässlich zu finden, aber schwer, das ist eine Abwägung zwischen Last und Freiheit
++ Tiers nach Material: Holz mit heißen Steinen (Steinbier), Ton (sumerische Tradition), Kupfer, Bronze, Eisen, Edelstahl; darüber offen
++ Ein besserer Kessel fasst mehr Zutaten und gibt mehr Portionen, verdirbt seltener und erreicht so fernere Zielgebiete
++ Brand entsteht nicht im Kessel, sondern aus einem fertigen Getränk an der Brennblase, einem eigenen Gegenstand
+
+Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+
+## Getränke
+
+Gebräue der Welt und wie sie sich einordnen; Stoff für Zielgebiete und Rezepte, die Wirkungen sind Ideen des Spiels, keine Aussagen über echte Heilkraft:
+
+| Gebräu | Grundstoff und Kultur | Profil | Idee für die Wirkung |
+|:---|:---|:---|:---|
+| Kwass, Bappir-Bier | Brot, Hefe | wenig Alkohol, Malz, Säure | Sättigung, LP |
+| Chicha, Makgeolli, Sake | Mais oder Reis, Hefe oder Koji | Stärke ohne Malz | LP, Widerstand |
+| Gruit-Ale | Malz, Kräuter | Kräuter statt Bitter | Rausch und Psi |
+| Sahti | Roggen, Wacholder | Kräuter, Rauch | Wärme, Schutz vor Feuer |
+| Met, Tej | Honig, Hefe; Tej mit Gesho | Süße, viel Alkohol | Heilung über die Zeit |
+| Wein, Cider | Frucht, Weinhefe | Frucht, Säure | MP |
+| Pulque, Palmwein | Pflanzensaft, wild | spontan, Säure | Zufallseffekte |
+| Kefir, Kumys | Milch, Knollen | Säure, wenig Alkohol | Regeneration, gegen Krankheit |
+| Kombucha | Tee, Zucker, Teepilz | Säure, kaum Alkohol | senkt den Pegel |
+| Posca | Essig, Wasser | Säure | gegen Gift, Ausdauer |
+| Oxymel | Essig, Honig, Absud | Säure, Süße | Heilung, endet Zustände |
+| Aufguss, Absud | Kräuter, Absud | Kräuter | Tränke und Gifte |
+| Brand | ein Getränk an der Brennblase | viel Alkohol | PP (siehe [Grundlagen.md](Grundlagen.md), Spielkern) |
+
+Umsetzung: offen
+
+## Inventar
+
++ Getränke und Kulturen haben eigene Reiter im Inventar, sortier- und filterbar nach Wirkung; die Schnellleiste nimmt die wichtigsten Getränke auf
++ Getränke wiegen, Kulturen nicht
++ Gestapelt wird nur Gleiches: die Portionen eines Suds, Sude mit gleichem Rezept, gleichen gerundeten Stufen, gleicher Güte und gleicher Stufe des Verderbens; freie Sude ohne Rezept sind Einzelstücke, bis sie Hausrezept werden
++ Ein Fass hält viele Portionen eines Suds als Ladungen
+
+Umsetzung: teilweise, siehe [Gegenstaende.md](Gegenstaende.md), Inventar; offen: Reiter für Getränke und Kulturen, Stapeln nach Rezept und Stufen
+
+## Brauschulen
+
+Die Schulen in [Skills.md](Skills.md), Brauen, Brauschulen sind Sumerische Tradition, Spontane Gärung, Reinheitsgebot und Hopfenstopfen. Weitere Kandidaten, je mit Grundstoff, Kultur und einem Kniff; eine Schule lohnt nur, wo ein eigener Kniff entsteht, was die Sets der Rohstoffe und Kulturen nicht schon leisten:
+
++ Antike: Steinbier (Holzkessel mit heißen Steinen, Röst und Karamell ohne Darre), ägyptisch (Brot und Datteln), Weinbau, Essig und Arznei (Posca, Oxymel, Absude)
++ Mittelalter: Klosterbrauerei (starke Ales, Reifung besser und schneller), Gruit (Kräuterwirkungen stärker, Sekundärwirkungen), Zeidlerei (Met und Braggot)
++ Neuzeit: Brennerei (Brennblase, Brand, Kräuterbitter), Lagerbier (Kälte, verdirbt langsamer), Reinzucht (Kulturen veredeln), Fassreifung (Holz als Aroma)
++ Außerhalb Europas: Koji (Sake, Makgeolli), Andenraum (Chicha), Steppe (Kumys), äthiopisches Hochland (Tej), Hirsebier
+
+Umsetzung: offen, Auswahl in [Skills.md](Skills.md), Brauen, Umsetzung in [Systemausbau.md](Systemausbau.md), Punkt 20
+
+## Brauen und Pegel
+
++ Wer auf hohen Pegel baut, findet ihn im Brauen: starke Sude aus übervergärenden Hefen, Met, Barley Wine, Eisbock (durch Ausfrieren, ohne Brennblase); Brand ist der schnellste Weg
++ Kampftrinken macht das Trinken im Kampf schneller und wirksamer, Rauschkraft und Ekstase nutzen den Pegel, Kampfrausch hebt ihn im Kampf selbst (siehe [Skills.md](Skills.md), Stoffwechsel und Pegel); so schöpft eine Psi-Kämpferin ihren Pegel auch dann aus, wenn Brand vorhanden ist
++ Im ersten Kapitel gibt es noch keinen Brand: eine Psi-Berserkerin muss dort mit ihrem Pegel besser haushalten
+
+Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkte 20 und 23
+
+## Offen
+
++ Nebel über den Zielgebieten: ob die Zielgebiete zu Beginn verborgen sind und ob Aufgedecktes als Wissen über Läufe hinweg bleibt (Regel in [Grundlagen.md](Grundlagen.md), Spiel)
++ Sud im Kampf: wie Schnellsud und Kveik zusammenwirken
++ Kessel als Gegenstände: Aufstellen, Tragen, Bauen und Pflege (Anlagen und Fallen), Tiers über Edelstahl hinaus
++ Ob das Mälzen einen Kessel braucht
++ Säure als gewollte Richtung mit eigener positiver Wirkung, mit Recherche (Sauerbiere, Kombucha, Essig in alten Arzneien)
++ Flüssigkeiten und Lachen in einer eigenen Sitzung (siehe [Systemausbau.md](Systemausbau.md), Punkt 10)
++ Weitere Familien von Zielgebieten: sumerisch (nach `sallaberger2012bierbrauen`, lokal nicht vorhanden), ägyptisch, mittelalterlich, und ihre Zuordnung zu den Epochen
++ Die Zuordnung der Achsen zu Wirkungen und die Achsen selbst, mit dem Inhalt
++ Kumys braucht noch eine Quelle
+
+## Recherche
+
++ Potion Craft: [Steam](https://store.steampowered.com/app/1210320/Potion_Craft/), [Gamezebo](https://www.gamezebo.com/walkthroughs/potion-craft-maps/)
++ Atelier: [moegamer zu Rorona](https://moegamer.net/2020/08/28/atelier-rorona-the-alchemist-of-arland-a-new-generation-of-alchemy/), [Prima zu Ryza 2](https://primagames.com/gaming/atelier-ryza-2-crafting-guide)
++ Caves of Qud: [Cooking](https://wiki.cavesofqud.com/wiki/Cooking), [Random cooking effects](https://wiki.cavesofqud.com/wiki/Random_cooking_effects)
++ Brewmaster: [Steam](https://store.steampowered.com/app/1569200/Brewmaster_Beer_Brewing_Simulator/)
++ Altern des Biers: [Review Beer Ageing](https://talcottlab.tamu.edu/wp-content/uploads/sites/108/2020/03/Review-Beer-Ageing.pdf) (vor allem Oxidation, schneller in der Wärme, die Bitterstoffe bauen ab), [All About Beer](https://allaboutbeer.com/article/beer-time/)
++ Gruit: [Wikipedia](https://en.wikipedia.org/wiki/Gruit), [Honest Food](https://honest-food.net/gruit-herbal-beer) (die Mischung ist umstritten, berauschende Wirkungen nur anekdotisch), [Zythophile](https://zythophile.co.uk/2014/02/28/was-it-ever-gruit-britain-the-herb-ale-tradition) (viel mittelalterliches Ale ohne Kräuter)
++ Essig: [Oxymel](https://en.wikipedia.org/wiki/Oxymel) (Arznei schon im hippokratischen Korpus), [Posca](https://en.wikipedia.org/wiki/Posca) (Getränk der Soldaten)
++ Weitere Gebräue: [Pulque (PMC)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4928461/), [Mead](https://en.wikipedia.org/wiki/Mead) (Tej), [Fermented Beverages other than Wine and Beer](https://encyclopedia.com/food/encyclopedias-almanacs-transcripts-and-maps/fermented-beverages-other-wine-and-beer) (Sahti, Kwass), [Wine Folly](https://winefolly.com/lifestyle/7-fermented-drinks-from-around-the-world/) und [Tasting Table](https://www.tastingtable.com/1410588/fermented-drinks-need-know/) (Überblick, populär)

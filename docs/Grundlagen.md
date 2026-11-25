@@ -1,8 +1,8 @@
 # Battle Ninkasi - Grundlagen
 
-Stand: 2026-11-24
+Stand: 2026-11-25
 
-Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Architektur.md](Architektur.md), [Wesen.md](Wesen.md), [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md), [Tileset.md](Tileset.md), [Entwicklung.md](Entwicklung.md), [Ausblick.md](Ausblick.md), [Spielverlauf.md](Spielverlauf.md), [Fundus.md](Fundus.md)
+Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Architektur.md](Architektur.md), [Wesen.md](Wesen.md), [Wirkungen.md](Wirkungen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md), [Tileset.md](Tileset.md), [Entwicklung.md](Entwicklung.md), [Ausblick.md](Ausblick.md), [Spielverlauf.md](Spielverlauf.md), [Fundus.md](Fundus.md), [Brauen.md](Brauen.md)
 
 ## Spiel
 
@@ -51,12 +51,11 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Kapitel, Dienste 
   + Kater: Sinkt der Pegel nach einem Rausch, sinkt vorübergehend die höchste Ausdauer; Ansatzpunkt für den Makel Aldehyd-Dehydrogenase-Mangel
 + Bestimmte Aktionen sind nur mit einem bestimmten Pegel durchführbar
 + Pegel bringt Risiko
-+ Brausystem mit Zutaten und Rezepten
++ Brausystem mit Zutaten, Kulturen und Rezepten, im Einzelnen in [Brauen.md](Brauen.md)
 + Brauen ist die einzige Herstellung von Getränken, Tränken und Giften, Magie steigert nur ihre Wirkung; Bauen und Reparieren gehören zum Handwerk; Brauen und Mälzen kann jede Ninkasi von Anfang an (siehe [Skills.md](Skills.md), Brauen)
 + Gebraut wird an festen Altären (Braukessel) oder in mobilen Kesseln
-+ Ninkasi muss beim Brauen am Kessel bleiben, damit das Bier gut wird; eine Gärung, die ohne sie weiterläuft, gibt es nicht
-+ Kessel in Tiers nach Material: Kupfer, Eisen, Edelstahl, Silber, Gold
-+ Vorschlag, noch nicht bestätigt: weitere Materialien wie Ton (sumerische Brautradition), Holz (Fass), Bronze
++ Brauen ist ein Rätsel ohne Pflichtarbeit: ein Sud kostet so viel Zeit wie eine gewöhnliche Aktion und beginnt nur außerhalb des Kampfes, Ninkasi steht nicht wartend am Kessel
++ Kessel in Tiers nach Material, von Holz mit heißen Steinen bis Edelstahl (siehe [Brauen.md](Brauen.md), Kessel)
 + Ninkasis Pegel misst sich nicht an Sterblichen: wo Sterbliche längst tot wären, dreht sie erst richtig auf, und bis zu einem Pegel, der Sterbliche schwer berauscht, ist sie nüchtern; Getränke wirken nach ihrem Alkoholgehalt wie bei Sterblichen, ein gewöhnliches Bier bringt ihr wenig, stärkere Gebräue aus dem Brausystem bringen sie schneller voran
 + Stufen des Rauschs mit Namen: nüchtern, angeheitert, beschwipst, berauscht, im Rausch, sturzbetrunken, Vollrausch; das Optimum der LP-Regeneration und das sicherste Psi liegen in den Stufen ohne Strafen
 + Strafen des Rauschs, mit jeder Stufe stärker: ab berauscht Fehlschläge (Nah- und Fernkampf treffen schlechter, Magie und feine Arbeit misslingen öfter); im Rausch Torkeln (ein Schritt geht auf ein anderes Feld) und Danebenschlagen (der Schlag trifft ein Feld daneben, leer, mit einem Verbündeten oder einem anderen Feind); im Vollrausch der Filmriss: nur außerhalb des Kampfes ein Zeitsprung, in dem Ninkasi nicht handelt, danach ist die Karte der Ebene vergessen bis auf das, was sie gerade sieht
@@ -174,7 +173,5 @@ Umsetzung: teilweise, siehe [Tileset.md](Tileset.md), Artstyle-Fibel; offen: Sig
 + Aktionen mit Mindestpegel
 + Ausdauer: ob überhaupt, Zuordnung zu Gewandtheit oder Körperlichkeit, Verhältnis zu einer Nahrungsuhr
 + Unterschiede der Mikroorganismen ausarbeiten (Hefen, Bakterien, Schimmel, weitere Gruppen)
-+ Brausystem im Detail: Zutaten, Rezepte, Wirkung der Kessel-Tiers, Reihenfolge der Materialien
-+ Folgen eines abgebrochenen Brauvorgangs: verdorben, minderwertig oder wieder aufnehmbar (Unterbrechung und Entscheidung per Befehl regelt [Wirkungen.md](Wirkungen.md), Lange Aktionen)
 + Dienste des Hubs im Detail
 + Ob der Pegel beeinflusst, wie weit Ninkasi im Dunkeln sieht
