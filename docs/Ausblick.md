@@ -39,9 +39,9 @@ Abgrenzung: [Systemausbau.md](Systemausbau.md) ist die Arbeitsliste beschlossene
 | Licht im Wandel | ungeklärt | gering | erledigt (Licht als Abfrage) |
 | Mutationen | ungeklärt | gering | nein |
 | Erzeugte Geschichte | ungeklärt | gering | nein |
-| Speichern im Hub | ungeklärt | gering | nein |
 | Geister früherer Läufe | hoch | gering | erledigt (Glimmer und Psi-Jägerin) |
 | Kennzeichen in Sicht | ungeklärt | gering | nein |
+| Spielstände als Dateien | ungeklärt | gering | ja (Ablage als Schnittstelle) |
 
 Umsetzung: keine
 
@@ -284,7 +284,8 @@ Umsetzung: offen
 + Vorbilder: Hades (Erfolge, auch für vollständige Einträge im Kodex); NetHack (Conducts: freiwillige Einschränkungen wie Pazifist oder Vegetarier, jederzeit abfragbar und am Ende angezeigt; wer eine bricht, verliert sie)
 + Braucht: Erfolge als Daten mit einer Bedingung über die Zähler eines Laufs oder der Chronik; Anzeige im Titel und nach dem Lauf; Einschränkungen nach NetHack als Erfolge, die man während des Laufs verlieren kann
 + Idee: wie der Todesbericht lassen sich Erfolge durch Nachspielen mit Hörern auf die Meldungen prüfen; die Logik weiß von ihnen nichts
-+ Berührt: Chronik und Ruhmeshalle ([Titelbildschirm.md](Titelbildschirm.md))
++ Entschieden ist schon, wie sie freischalten: nur mit Permadeath und in der weichen Spielart, beide zählen, die Chronik hält die Spielart fest; ein erreichter Erfolg schreibt den Zähler `erfolg.<name>`, an dem ein Titelbild hängen kann (siehe [Titelbildschirm.md](Titelbildschirm.md), Entscheidungen)
++ Berührt: Chronik, Ruhmeshalle und Titelbilder ([Titelbildschirm.md](Titelbildschirm.md))
 + Umbaurisiko: gering
 + Vorkehrung: keine
 
@@ -372,25 +373,13 @@ Umsetzung: offen
 
 Umsetzung: offen
 
-## Speichern im Hub
-
-+ Wichtigkeit: ungeklärt, "ein weicher Spielmodus" (2026-11-24)
-+ Vorbilder: Tales of Maj'Eyal (Spielarten neben dem Roguelike: Abenteuer mit wenigen zusätzlichen Leben, Erkunden ohne Permadeath)
-+ Idee: In einer eigenen weichen Spielart sichert das Betreten des Hubs den Stand; stirbt Ninkasi, geht es dort weiter (siehe [Spielverlauf.md](Spielverlauf.md), Hub)
-+ Braucht: die Spielart (vorgesehen, siehe [Architektur.md](Architektur.md), Spielarten); beim Betreten des Hubs eine Kopie des Zustands im Spielstand; nach dem Tod die Rückkehr dorthin statt des Endes; die Chronik vermerkt die Spielart
-+ Berührt: Speichern, Tod, Chronik, Todesbericht, Erfolge (ob sie in der weichen Spielart zählen)
-+ Umbaurisiko: gering, der ganze Zustand ist JSON
-+ Vorkehrung: keine
-
-Umsetzung: offen
-
 ## Geister früherer Läufe
 
 + Wichtigkeit: hoch, "eine bisher in Spielen noch wenig aufgetauchte Mechanik" (2026-11-24)
 + Vorbilder: NetHack (Bones: die Ebene, auf der eine Figur starb, kann in einem späteren Spiel mit ihrem Geist und ihrer verfluchten Habe wieder auftauchen); Dungeon Crawl Stone Soup (Geister toter Figuren mit Name, Stufe und Zaubern aus Bones-Dateien); Middle-earth: Shadow of Mordor (Nemesis-System: Gegner erinnern sich an frühere Begegnungen); neu gegenüber diesen: die Geister jagen Psi und Rausch
 + Idee: Jeder Tod legt eine Geist-Ninkasi in eine wachsende Bibliothek, mit ihren Skills, Fähigkeiten und Gegenständen; in späteren Läufen erscheinen Geister als Psi-Jägerinnen, angelockt von hohem Pegel und vom Einsatz von Psi; die Bibliothek erzählt so die Geschichte der eigenen Läufe ("Ninkasi die Dritte, ertrunken im Gärbottich auf Level 7"); ein gleicher Startwert ist nicht nötig, weil nur der Geist mitkommt, nicht die Ebene
 + Zusammenhang: entschieden ist, dass der Glimmer Psi-Jägerinnen anlockt (siehe [Grundlagen.md](Grundlagen.md), Spielkern); die Geister wären ihr Inhalt; heute kommt eine Jägerin aus dem Probeinhalt (siehe [Wesen.md](Wesen.md), Glimmer)
-+ Braucht: beim Tod einen Eintrag in der Bibliothek außerhalb des Laufs (Name, Todestiefe und Ursache, Skillstufen, Fähigkeiten, Ausrüstung), nur aus Spielarten, die zählen; beim Start übernimmt die Oberfläche eine Auswahl als Startoption wie das Vorwissen (siehe [Architektur.md](Architektur.md), Speichern), so bleibt der Lauf wiederholbar; ein Auslöser über Pegel und Psi ruft einen Geist herbei; die KI des Geists handelt mit ihren Fähigkeiten nach der Taktik der gesteuerten Entität (siehe [Wesen.md](Wesen.md), KI)
++ Braucht: beim Tod einen Eintrag in der Bibliothek außerhalb des Laufs (Name, Todestiefe und Ursache, Skillstufen, Fähigkeiten, Ausrüstung), nur aus Spielarten, die zählen, in der weichen Spielart erst beim Aufgeben (siehe [Spielverlauf.md](Spielverlauf.md), Hub); beim Start übernimmt die Oberfläche eine Auswahl als Startoption wie das Vorwissen (siehe [Architektur.md](Architektur.md), Speichern), so bleibt der Lauf wiederholbar; ein Auslöser über Pegel und Psi ruft einen Geist herbei; die KI des Geists handelt mit ihren Fähigkeiten nach der Taktik der gesteuerten Entität (siehe [Wesen.md](Wesen.md), KI)
 + Machtkurve: Es erscheinen nur Geister aus ähnlicher Tiefe oder mit ähnlichen EP wie Ninkasi; bis die Bibliothek gefüllt ist, wird ein Geist auf die heutige Tiefe skaliert
 + EP: Ein Geist gibt gebundene EP nach seiner Stärke wie jeder Gegner, eingeordnet über die Machtkurve
 + Beute: Der Geist hinterlässt keine Ausrüstung, höchstens einen Gegenstand, der für Psi nützlich ist und den Pegel hebt (Arbeitsnamen "reiner Alkohol", "Ninkasis Essenz"); so bleibt die Regel gewahrt, dass zwischen Läufen nur Wissen bleibt ([Grundlagen.md](Grundlagen.md), Spiel)
@@ -410,6 +399,18 @@ Umsetzung: offen
 + Berührt: Seitenleiste (siehe [Oberflaeche.md](Oberflaeche.md), Seitenleiste), Untersuchen, Tileset
 + Umbaurisiko: gering
 + Vorkehrung: keine
+
+Umsetzung: offen
+
+## Spielstände als Dateien
+
++ Wichtigkeit: ungeklärt, "als alleinstehendes Spiel würde man in Dateien schreiben" (2026-11-25)
++ Vorbilder: DCSS (je Figur eine Datei im Ordner der Spielstände, eigene Ordner für Todesberichte und Bones, eine Datei der Bestenliste)
++ Idee: Läufe, letzter Lauf, Chronik, später die Bibliothek der Geister und die Einstellungen als eigene Dateien auf der Platte statt nur im Browser, unabhängig von Browser und Profil
++ Braucht: einen Weg, auf dem der Browser Dateien schreiben darf: den eigenen Server von `starten.py`, der jede Speicherung zusätzlich in einen ignorierten Ordner spiegelt (nur mit diesem Server, der Browserspeicher bleibt die Hauptquelle), oder eine Hülle um das Spiel, die es auf itch.io nicht braucht
++ Berührt: Speichern (siehe [Architektur.md](Architektur.md), Speichern), Startskript; auf itch.io zu prüfen, wie lange der Browserspeicher je Spiel hält und ob er sich mit anderen Spielen eine Grenze teilt
++ Umbaurisiko: gering
++ Vorkehrung: die Ablage als Schnittstelle, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 12
 
 Umsetzung: offen
 

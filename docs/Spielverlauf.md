@@ -28,9 +28,10 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 10
 + Ein Lauf beginnt im leeren Hub
 + Der Hub liegt zwischen den Kapiteln: Nach dem Boss führt der Weg in den Hub, der um eine Stufe reicher geworden ist, und von dort beginnt das nächste Kapitel
 + Was hinzukommt, hängt davon ab, wem Ninkasi seit dem letzten Boss in den Leveln begegnet ist: Figuren ziehen in den Hub und bieten dort ihre Dienste an; so unterscheiden sich auch die Hubs zweier Läufe
-+ Über Läufe hinweg bleibt vom Hub nichts: dauerhaft ist nur Wissen (siehe [Grundlagen.md](Grundlagen.md), Spiel)
++ Über Läufe hinweg bleibt vom Hub nichts: dauerhaft sind nur Wissen und Titelbilder (siehe [Grundlagen.md](Grundlagen.md), Spiel)
 + Keine Abkürzungen in spätere Kapitel: Ninkasi bräuchte dort eine Ausstattung passend zur Tiefe
-+ Idee: der Hub als Speicherpunkt in einer weichen Spielart (siehe [Ausblick.md](Ausblick.md), Speichern im Hub)
++ Der Hub als Speicherpunkt der weichen Spielart (Vorbild Tales of Maj'Eyal mit Spielarten neben dem Roguelike): jedes Betreten des Hubs sichert den Stand von selbst, beim Ankommen vor allen Geschäften dort, die nach einer Rückkehr neu zu erledigen sind; stirbt Ninkasi, fragt ein Fenster, ob sie aufgibt oder in den Hub zurückkehrt (etwa "Aufgeben oder nach Uruk zurückkehren?"); mit Permadeath gibt es diesen Speicherpunkt nicht
++ Aufgeben beendet den Lauf wie mit Permadeath, mit Chronik, Todesbericht und Geist; die Rückkehr setzt den Lauf mit dem Stand aus dem Hub fort, der Tod davor geht in keinen Eintrag ein; so hat jeder Lauf genau einen Eintrag, und eine schwere Stelle erzeugt keine Reihe gleicher Geister; was Ninkasi seit dem Hub besiegt oder gesehen hat, bleibt gezählt, sie hat es im echten Spiel erlebt
 
 Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 16
 

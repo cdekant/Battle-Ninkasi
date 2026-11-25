@@ -1,6 +1,6 @@
 # Battle Ninkasi - Titelbildschirm
 
-Stand: 2026-11-23
+Stand: 2026-11-25
 
 Zuständig für: `src/eingabe/titel.js`, `src/eingabe/arenawahl.js`, `src/eingabe/chronik.js`, `src/anzeige/titel.js`, `src/anzeige/titelbilder.js`, `src/anzeige/titeleffekte.js`
 
@@ -33,7 +33,10 @@ Was ein Titel in anderen Spielen leistet (aus Kenntnis der Spiele, nicht im Einz
 + Der Ausschnitt folgt der Fenstergröße: so viel vom Bild wie möglich, beschnitten nur, was über die Höhe des Fensters und die freie Mitte zwischen den Spalten hinausgeht; ein Schutzbereich je Bild hält Ninkasi vom Weizen bis zu den Stiefeln im Blick und in der freien Mitte
 + "Battle Ninkasi – Die Rückkehr der Bierschlächterin" steht in der linken Spalte
 + Drei Speicherplätze für nebeneinander laufende Läufe
-+ Freischaltbare Titelbilder: Ninkasi im Kampf mit einem Wesen, sichtbar erst, wenn es einmal besiegt oder, bei freundlichen Wesen, getroffen wurde
++ Freischaltbare Titelbilder als Fortschritt über die Läufe (siehe [Grundlagen.md](Grundlagen.md), Spiel): Ninkasi im Kampf mit einem Wesen, sichtbar erst, wenn es einmal besiegt oder, bei freundlichen Wesen, getroffen wurde; ebenso ein Bild für einen besiegten Boss, ein erlebtes Ereignis und einen erreichten Erfolg
++ Freischalten können nur Läufe mit Permadeath und der weichen Spielart, nicht Testkammer, Arena oder andere Spielarten zum Prüfen oder Erleichtern; ein Erfolg aus einer der beiden zählt, die Chronik hält aber fest, in welcher Spielart er erreicht wurde
++ Ein neu freigeschaltetes Bild erscheint beim nächsten Start einmal fest, danach nimmt es an der Wahl teil; das Fenster nach dem Lauf meldet es
++ Bewegte Effekte bekommt ein Titelbild nur, wenn es sich lohnt; ein Bild ohne Effekte ist vollständig
 + Keine alten Versionen vorhalten, um Aufzeichnungen abzuspielen
 + Fortsetzen zeigt eine Vorschau aus dem gespeicherten Lauf
 + Ein wechselnder Spruch aus allen Korpustexten, ohne gepflegte Liste der Sprüche; darunter der Titel des Korpustexts
@@ -53,7 +56,7 @@ Was ein Titel in anderen Spielen leistet (aus Kenntnis der Spiele, nicht im Einz
 + Stil: das gemalte Bild bleibt Titelbild; Herunterskalieren macht keine Pixelart (bei 320x180 wird der Untertitel unlesbar, mit 32 Farben verlieren die Schleime ihr Grün); echte Pixelart müsste eigens gezeichnet werden und passt eher zum Intro-Film oder als freischaltbares Titelbild
 + Lebendigkeit durch Animation über dem Bild: gemalte Dampfschwaden steigen von den Kesseln auf und liegen hinter den Figuren, vorn steigen sie aus den Pfützen, ab und zu zischt ein Dampfstoß aus einem Ventil, Nebelbänder treiben am Boden; Ninkasi steht im Mittelpunkt der Blitze, die von den Anlagen auf Kolben, Krug und Diadem überspringen und manchmal weiter auf einen Gegner, umgeben von einer pulsierenden Aura entlang ihrer Silhouette; nach jedem Einschlag zerplatzen kleine Feuerwerke auf ihrem Umriss; die Augen der Schleime leuchten gelb, die des Lebensmittelkontrolleurs rot, jedes Wesen schwillt im eigenen Takt an und ab
 + Rücksicht auf Lichtempfindliche: nur die dünnen Blitze flackern, Aura und Lichthöfe schwellen weich, kein Aufblitzen des ganzen Bildes, höchstens etwa ein Einschlag alle zwei Sekunden; Bewegung reduzieren (Einstellung oder System) lässt nur die ruhende Aura
-+ Mehrere Titelbilder: je Start eines aus den freigeschalteten, keine Bildfolge während des Menüs
++ Mehrere Titelbilder: je Start eines aus den freigeschalteten (ein neues zuerst, siehe Entscheidungen), keine Bildfolge während des Menüs
 
 Menü der ersten Version: Fortsetzen, Neues Spiel, Läufe (ab zwei belegten Plätzen), Einstellungen, Hilfe, Beenden; keine ausgegrauten Platzhalter für Kommendes.
 
@@ -62,6 +65,7 @@ Menü der ersten Version: Fortsetzen, Neues Spiel, Läufe (ab zwei belegten Plä
 + Drei Plätze, ein Schlüssel je Platz (`battle-ninkasi.lauf.1` bis `.3`); Fortsetzen nimmt den zuletzt gespielten, Läufe zeigt alle, Neues Spiel wählt einen freien Platz oder fragt, welcher Lauf weichen soll
 + Größe: der Browserspeicher reicht für mehrere lange Läufe (Messwerte in [Entwicklung.md](Entwicklung.md), Messwerte)
 + Plätze sind nebeneinander laufende Läufe, keine Sicherungen desselben Laufs (Permadeath bleibt)
++ Gespeichert wird laufend; Speichern heißt Unterbrechen, also später an derselben Stelle weiterspielen, nie zu einem früheren Stand zurückkehren; der Stand eines Platzes verschwindet mit dem Ende des Laufs; in der weichen Spielart kommt der Stand aus dem Hub hinzu, der den Tod übersteht (siehe [Spielverlauf.md](Spielverlauf.md), Hub)
 
 ## Ideen für später
 
@@ -72,11 +76,11 @@ Festgehalten, nicht eingeplant:
 + Abspieler für Aufzeichnungen, aus dem Titel und direkt nach dem Lauf; braucht nur die vollständigen Befehle im Spielstand und den aufbewahrten letzten Lauf, beides gibt es
 + Lauf mit festem Startwert (gibt es schon als `?seed=`, fehlt nur das Eingabefeld) und Bier des Tages (Startwert aus dem Datum)
 + Bestiarium, Glossar, Rezeptbuch und Bücher (siehe [Ausblick.md](Ausblick.md), Bestiarium, Glossar, Rezeptbuch)
-+ Freischaltbare Titelbilder und Menüstile durch Errungenschaften
++ Menüstile durch Erfolge
++ Galerie der Titelbilder im Titel: die freigeschalteten zum Ansehen und Festlegen, die übrigen als Umriss mit dem Hinweis, wofür es sie gibt
 + Vorführmodus: nach einiger Zeit ohne Eingabe spielt eine eigene, sinnvolle Spielweise (erkunden, kämpfen, trinken, zur Treppe reisen, aus den Abläufen) hinter dem Titel einen echten Lauf; jede Taste kehrt zurück; der Bot ist ein Zufallsprüfer und taugt dafür nicht, die Spielweise kann auf den Taktiken aufbauen, die Browser und Werkzeuge schon teilen (`src/ki/taktik.js`, siehe [Wesen.md](Wesen.md), KI); der Hintergrund des Titels ist schon ein eigenes Element
 + Sprachknopf, die aktive Sprache ist markiert
 + Spielarten: Tutorial, Sprint, Stufen nach dem Sieg, eigene Regeln (z.B. Häufigkeit der Monster)
-+ Weicher Modus: beim Tod zurück zum letzten gesicherten Stand
 + Friedlicher Modus (keine Feinde oder keine Angriffe); der allmächtige Modus (zum Erkunden und Prüfen) ist als Testkammer umgesetzt
 + Intro-Film mit Menüeintrag "Vorgeschichte" und Einstellung (nur beim ersten Start oder nie), jederzeit nachrüstbar
 
@@ -87,9 +91,9 @@ Damit die Ideen später ohne Umbau dazukommen:
 + Spielarten und eigene Regeln laufen über die Startoptionen des Spielstands (`optionen`), die die Logik bei `neuesSpiel` bekommt; so bleiben sie Teil der Aufzeichnung und wiederholbar
 + Ruhmeshalle und Statistik lesen die Chronik: getrennt vom Lauf, Ergebnisse statt Aufzeichnungen, so übersteht sie neue Versionen
 + Aufzeichnungen lassen sich nur mit derselben Version und derselben Prüfsumme der Daten abspielen, weil Code und Daten den Lauf bestimmen (siehe [Architektur.md](Architektur.md), Zufall und Wiederholbarkeit); die Ruhmeshalle merkt sich die Version; alte Versionen werden nicht vorgehalten, wer eine alte Aufzeichnung sehen will, holt den Git-Tag der Version
-+ Freischaltbare Titelbilder, Erfolge und das Bestiarium lesen dieselben Zähler der Chronik (`gesehen.<typ>`, `besiegt.<typ>`); eine Freischaltung ist eine Bedingung `{ zaehler, mindestens }`
++ Freischaltbare Titelbilder, Erfolge und das Bestiarium lesen dieselben Zähler der Chronik (`gesehen.<typ>`, `besiegt.<typ>`, für Bosse ebenso); eine Freischaltung ist eine Bedingung `{ zaehler, mindestens }`; ein Ereignis wird ein eigener Zähler (eine Zeile in `ZAEHLREGELN`), ein erreichter Erfolg schreibt einen Zähler `erfolg.<name>`, so bleibt es bei der einen Art der Bedingung
 + Das Datum für das Bier des Tages wird außerhalb der Logik in einen Startwert verwandelt
-+ Läufe anderer Spielarten werden getrennt gewertet (siehe [Architektur.md](Architektur.md), Spielarten); auch der weiche Modus ist eine Spielart, auch wenn die Logik von ihm wenig merkt (beim Tod bietet die Oberfläche einen früheren Schnappschuss an)
++ Läufe anderer Spielarten werden getrennt gewertet (siehe [Architektur.md](Architektur.md), Spielarten); auch die weiche Spielart ist eine Spielart (siehe [Spielverlauf.md](Spielverlauf.md), Hub), sie zählt aber wie das Spiel mit Permadeath
 
 ## Titel und Plätze
 

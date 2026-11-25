@@ -7,15 +7,17 @@ Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Architektur.md](Archi
 ## Spiel
 
 + Dungeon-Crawler/Roguelike, rundenbasiert
-+ Permadeath; dauerhafter Fortschritt zwischen den Läufen höchstens als Wissen (Rezepte, Bestiarium, Glossar), nie als stärkere Werte (entschieden 2026-11-22, Ideen in [Ausblick.md](Ausblick.md))
++ Permadeath: dafür wird das Spiel entwickelt; daneben eine weiche Spielart, die den Stand im Hub sichert (siehe [Spielverlauf.md](Spielverlauf.md), Hub)
++ Dauerhafter Fortschritt zwischen den Läufen höchstens als Wissen (Rezepte, Bestiarium, Glossar) und als freischaltbare Titelbilder (für Wesen, Bosse, Ereignisse und Erfolge, siehe [Titelbildschirm.md](Titelbildschirm.md), Entscheidungen), nie als stärkere Werte (entschieden 2026-11-22, Ideen in [Ausblick.md](Ausblick.md))
++ Dauerhaften Fortschritt bringen nur die Spielarten des echten Spiels, die mit Permadeath und die weiche; Spielarten zum Prüfen oder Erleichtern (Testkammer, Arena, später etwa ein friedlicher Modus) schalten nichts frei
 + Gesteuert wird nur Ninkasi; Begleiter handeln selbst und nehmen von ihr Vorrangbefehle an (entschieden 2026-11-22, siehe Begleiter und Befehle in [Ausblick.md](Ausblick.md))
 + Zufällig erzeugte Dungeons
 + Offene Tiefe in Kapiteln, jedes mit eigenen Ebenenbildern, Gegnern und einem Boss; zwei Läufe unterscheiden sich vor allem durch den klassenlosen Build und die Fundstücke (siehe [Spielverlauf.md](Spielverlauf.md))
 + Hub: fester Ort zwischen den Kapiteln mit Diensten (Händler u.a.), der im Lauf mit jedem Kapitel reicher wird (siehe [Spielverlauf.md](Spielverlauf.md), Hub); ähnliche Dienste unterwegs durch wandernde Händler und Nebengottheiten
-+ Zielgruppe: zunächst nur privat, Steam als spätere Option, Steam Deck kein Ziel
++ Zielgruppe: zunächst nur privat; eine Veröffentlichung ist sehr fern gedacht, dann auf itch.io, wo Spiele im Browser verbreitet sind
 + Open Source: Code unter GPL-3.0-or-later, Texte und Grafik unter CC BY-NC-SA 4.0, siehe [LIZENZEN.md](../LIZENZEN.md)
 
-Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen; offen: Kapitel, Dienste des Hubs, wandernde Händler und Nebengottheiten
+Umsetzung: teilweise, siehe [Welt.md](Welt.md), Ebenen und [Architektur.md](Architektur.md), Spielarten; offen: Kapitel, Dienste des Hubs, weiche Spielart, wandernde Händler und Nebengottheiten
 
 ## Spielkern
 
@@ -132,7 +134,7 @@ Umsetzung: teilweise, siehe [Welt.md](Welt.md), Licht, [Welt.md](Welt.md), Duft 
 ## Technik
 
 + Läuft im Browser (HTML, CSS, JavaScript)
-+ Spätere Steam-Fassung durch Verpacken mit Electron oder Tauri
++ Eine Fassung auf itch.io liefe ebenso im Browser, ohne Verpacken
 + Karte auf Canvas, Oberfläche und Effekte als HTML/CSS darüber
 + Effekte wie schwebende Krit-Zahlen (größer, anders gefärbt) per CSS-Animation
 + rot.js für Dungeon-Erzeugung, Sichtfeld, Wegfindung, Zufall mit Startwert, Zugreihenfolge

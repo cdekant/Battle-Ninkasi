@@ -108,6 +108,8 @@ Status: offen, ohne festen Platz in der Reihenfolge
 + Blocken in der angezeigten Chance; Vorschau von Wirkungen innerhalb eines Effekts (siehe [Ausblick.md](Ausblick.md), Vorschau durch Simulation)
 + Mindestpegel als Kante an der Schnellleiste; Restzeit des Verderbens im Gepäck ("frisch", "bald sauer")
 + Farbpalette des Spiels festlegen: die Farben der Oberfläche (heute verstreute Variablen in `stil.css`, Farben von Gelände und Schichten in `daten/zeichen.js`, Minikarte, Effekte des Titels in `src/anzeige/titeleffekte.js`) als eine benannte Liste mit Bedeutung, abgestimmt auf die Pixel-Palette (`grafik/palette.js`, [Tileset.md](Tileset.md)) und die Signalfarben, dazu die Palette für Farbenblinde; dokumentiert an einer Stelle in [Anzeige.md](Anzeige.md)
++ Titelbilder als Fortschritt (siehe [Titelbildschirm.md](Titelbildschirm.md), Entscheidungen): die Chronik zählt nur in den Spielarten, die freischalten dürfen, als Liste der zählenden statt `SPIELARTEN_OHNE_ZAEHLER`, damit eine neue Spielart von selbst nichts freischaltet; ein neu freigeschaltetes Bild zuerst zeigen und im Fenster `ende` melden; die Bilder selbst entstehen mit dem Inhalt
++ Ablage: die Zugriffe auf `localStorage` in `src/main.js` hinter eine Schnittstelle (lesen, schreiben, löschen je Schlüssel), damit später Dateien darunter liegen können (siehe [Ausblick.md](Ausblick.md), Spielstände als Dateien); dauerhaften Speicher anfordern (`navigator.storage.persist()`); im Titel Läufe und Chronik als Datei sichern und wieder laden (Wechsel des Browsers, Sicherung von Hand); im Spielmenü "Speichern und zum Titel"
 + Offenes aus dem Schema in [Oberflaeche.md](Oberflaeche.md) und [Titelbildschirm.md](Titelbildschirm.md), Ideen für später
 
 ## 13. Darstellung
@@ -148,6 +150,7 @@ Status: offen, in eigenen Sitzungen; das Spieldesign steht in [Spielverlauf.md](
 + Feste Strukturen und Raumstrukturen in den zufälligen Ebenen (siehe [Ausblick.md](Ausblick.md), Feste Strukturen)
 + Ebenen unter freiem Himmel
 + Hub zwischen den Kapiteln im Plan des Laufs: der Lauf beginnt im leeren Hub, nach dem Boss führt der Weg in den Hub der nächsten Stufe, Figuren aus den Leveln seit dem letzten Boss ziehen ein (siehe [Spielverlauf.md](Spielverlauf.md), Hub); heute steht der Hub im Probeinhalt als Tiefe 0 vor dem ersten Level
++ Weiche Spielart (siehe [Spielverlauf.md](Spielverlauf.md), Hub): Eintrag in `SPIELARTEN`, bei jedem Betreten des Hubs ein Schnappschuss im Speicherstand (am Haken `ebene_betreten`, also beim Ankommen; ein späteres Betreten ersetzt ihn), nach dem Tod ein Fenster mit Aufgeben (weiter wie mit Permadeath zu `ende`, `laufAbschliessen`) oder Rückkehr (Schnappschuss einsetzen, kein Eintrag in die Chronik), Auswahl im Titel; die Rückkehr übernimmt `oberflaeche.gesehen` aus dem laufenden Stand statt aus dem Schnappschuss, sonst zählt `gesehen.<typ>` doppelt; die Aufzeichnung führt vom Schnappschuss beim Betreten des Hubs weiter, der Zweig von dort bis zum Tod fällt weg
 
 ## 18. Korpustexte aus dem Gilgamesch-Epos
 
