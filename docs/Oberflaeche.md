@@ -194,7 +194,7 @@ Umsetzung: siehe [Anzeige.md](Anzeige.md), Log
 + Bestätigung
 + Später: Handel und Dienste, Brauen mit Rezeptbuch, Gespräch (Händler, Nebengottheiten), Ritual und Schriftrollen schreiben, Journal (Ziel des Laufs)
 
-Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Fenster; offen: Handel, Brauen, Gespräch, Ritual, Journal
+Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Fenster (Brauen als Prüfstand ohne Spinnennetz); offen: Handel, Rezeptbuch und Spinnennetz des Brauens, Gespräch, Ritual, Journal
 
 ## Unterbrechungen
 
@@ -248,6 +248,7 @@ Vorgabe, Buchstaben nach der deutschen Aufschrift:
 | : | Befehlszeile | umgesetzt |
 | / (im Verlauf) | Suche | umgesetzt |
 | ? | Hilfe | umgesetzt |
+| p | Brauen am Kessel (Sudpfanne) | umgesetzt |
 | Esc | Kette (siehe oben) | umgesetzt |
 | + - | Zoom | umgesetzt |
 
@@ -293,7 +294,7 @@ Umsetzung: teilweise, siehe [Bedienung.md](Bedienung.md), Einstellungen; offen: 
 Die Oberfläche lässt sich jetzt durchplanen; was noch fehlt, bekommt einen vorbereiteten Platz:
 
 + Brausystem: Fenster Brauen mit Rezeptbuch, laufende Aktion in der Seitenleiste (vorhanden)
-+ Hub, Händler, Nebengottheiten: Fenster Handel und Gespräch, Klickregeln für Händler und Kessel
++ Hub, Händler, Nebengottheiten: Fenster Handel und Gespräch, Klickregel für Händler (die für den Kessel ist vorhanden)
 + Magie mit Ritual, Schrift und Material: Fähigkeitenfenster und laufende Aktion, Fenster für Schriftrollen
 + Licht: Abdunklung der Karte (Renderer) und Helligkeit des eigenen Feldes in der Seitenleiste (vorhanden)
 + Ausdauer, falls sie kommt: vierter Balken

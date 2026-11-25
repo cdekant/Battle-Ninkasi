@@ -4,7 +4,7 @@ Stand: 2026-11-25
 
 Zuständig für: `src/systeme/inventar.js`, `src/systeme/ausruestung.js`, `src/systeme/verschleiss.js`, `src/systeme/kennen.js`
 
-Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Bedienung.md](Bedienung.md), [Grundlagen.md](Grundlagen.md), [Wesen.md](Wesen.md), [Skills.md](Skills.md), [Brauen.md](Brauen.md)
+Mitprüfen bei Änderungen: [Wirkungen.md](Wirkungen.md), [Bedienung.md](Bedienung.md), [Grundlagen.md](Grundlagen.md), [Wesen.md](Wesen.md), [Skills.md](Skills.md), [Brauen.md](Brauen.md), [Sude.md](Sude.md)
 
 ## Zweck
 
@@ -16,7 +16,7 @@ Vorbilder: NetHack (Last in Stufen, jede bremst mehr), Brogue und DCSS (Stapel g
 
 Daten:
 
-+ Am Gegenstand: `stapelbar: true`, `ladungen: { hoechstens, gewichtJe? }` (Stand in `ladungen.aktuell`, Vorgabe `hoechstens`), `wirdZu: Typ` (Behälter nach dem letzten Gebrauch), `gewicht` in Gramm, `lesbar: { effekt, bleibt? }` (Schriftrolle, Braubuch), `ersatz` (passive Ersatzwirkung aus dem Gepäck, siehe [Wirkungen.md](Wirkungen.md), Ersatzwirkungen); an der Entität `anzahl` (Vorgabe 1) und `getragenVon`
++ Am Gegenstand: `stapelbar: true`, `ladungen: { hoechstens, gewichtJe? }` (Stand in `ladungen.aktuell`, Vorgabe `hoechstens`), `wirdZu: Typ` (Behälter nach dem letzten Gebrauch), `gewicht` in Gramm, `lesbar: { effekt, bleibt? }` (Schriftrolle, Braubuch), `ersatz` (passive Ersatzwirkung aus dem Gepäck, siehe [Wirkungen.md](Wirkungen.md), Ersatzwirkungen), `gefaess: true` (leeres Gefäß zum Abfüllen) und `zutat` (siehe [Sude.md](Sude.md), Profil); an der Entität `anzahl` (Vorgabe 1) und `getragenVon`, an einem gebrauten Getränk `sud` (siehe [Sude.md](Sude.md), Befehl)
 + Am Wesen: `inventar: [IDs]`, `tragkraft` (sonst `regeln.tragen.tragkraft`, 20000 g)
 + Ausstattung in den Daten eines Wesens: `ausstattung: [{ typ, anzahl?, angelegt?, geladen? }]` (Vorgabe `anzahl` 1), keine Komponente; beim Erzeugen aus Daten liegt sie im Gepäck, mit `angelegt: true` ist das Stück schon angelegt (ohne Zeit, Meldung und Haken, `anlegenOhneZeit` in `src/systeme/ausruestung.js`); die Datenprüfung verlangt dafür Ausrüstung, `anzahl` 1 und genug freie Stellen am Platz des Wesens, ohne etwas zu verdrängen; mit `geladen: munitionstyp` hat eine angelegte Fernwaffe mit Magazin ein volles Magazin dieser Munition, ohne sie aus dem Gepäck zu nehmen (Handler `ausstattung_geladen` in `src/systeme/fernkampf.js`, siehe [Wesen.md](Wesen.md), Fernkampf)
 + Munition: `geschoss: { sorte, bruchchance?, effekt?, genauigkeit?, kritchance? }` an einem stapelbaren Gegenstand; an einer Fernwaffe mit Magazin der Inhalt `geladen: { typ, anzahl, gewichtJe }` (siehe [Wesen.md](Wesen.md), Fernkampf)
@@ -35,6 +35,7 @@ Regeln:
 
 + Beim Aufheben fließt ein Gegenstand in einen Stapel, der in allen übrigen Komponenten gleich ist, so stapeln sich z.B. Sauerbier und Bier nicht; nur der Zeitpunkt des Verderbens zählt nicht, er wird gemittelt (siehe Verschleiß); auf dem Boden fließt nichts zusammen
 + Lesen wendet `lesbar.effekt` auf die Leserin an (Ursache `lesen`) und erkennt den Gegenstand vorher wie das Trinken; ohne `bleibt` ist ein Stück verbraucht, mit `bleibt: true` bleibt er; was er tut, sagt allein der Effekt: lehren mit `faehigkeit_lehren` (siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten) oder einmal wirken wie ein Verbrauchsgegenstand
++ Trinken wendet `trinkbar.effekt` auf die Trinkerin an (Ursache `trinken`); ein gebrautes Getränk gibt dabei sein Profil in die Ablage des Effekts (`werte.sud`, siehe [Sude.md](Sude.md), Wirkung)
 + Trinken, Lesen, Werfen, Schießen ohne Magazin und Material für Fähigkeiten nehmen ein Stück, Nachladen so viele, wie ins Magazin passen, Fallenlassen den ganzen Stapel; Trinken nimmt bei Ladungen eine Ladung; ein Gegenstand mit Ladungen stapelt sich nicht
 + Ausstattung geht über `insInventar`, stapelbare fließen also zu einem Stapel zusammen; ein Wesen lässt sie beim Tod fallen wie alles im Gepäck (siehe [Wirkungen.md](Wirkungen.md), Tod und Zustandsprüfung)
 + Nach dem letzten Gebrauch kommt `wirdZu` ins Gepäck (Bier zu leerer Flasche, Bierfass zu Fass), Grundlage für das Brauen; der Ballast ist gewollt
@@ -134,7 +135,7 @@ Regeln:
 
 ## Verweise
 
-+ Spieldesign der Getränke: [Grundlagen.md](Grundlagen.md), des Brauens, der Stufen des Verderbens und der Reiter im Inventar: [Brauen.md](Brauen.md); Inventarfenster: [Bedienung.md](Bedienung.md), Fenster
++ Spieldesign der Getränke: [Grundlagen.md](Grundlagen.md), des Brauens, der Stufen des Verderbens und der Reiter im Inventar: [Brauen.md](Brauen.md); Umsetzung des Brauens: [Sude.md](Sude.md); Inventarfenster: [Bedienung.md](Bedienung.md), Fenster
 + Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 8 (angefressene Waffen), Punkt 12 (Teilmenge fallen lassen, Restzeit des Verderbens), Punkt 14 (Flüche und Unbekanntes im Inhalt, Reparieren, Verderben weiterer Dinge)
 
 Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

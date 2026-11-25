@@ -51,12 +51,13 @@ test("Hinauf in den Hub und zurück: die verlassene Ebene ruht und kommt unverä
 
   for (let i = 0; i < 5; i++) befehlGeben(spiel, { art: "warten" });
   const endeVorher = spiel.zustand.abgelegteEbenen[1].entitaeten[einer.id].zustaende[0].ende;
+  // geprüft vor der Rückkehr: danach darf das Wesen gleich seinen nächsten Zug machen
+  assert.deepEqual(spiel.zustand.abgelegteEbenen[1].entitaeten[einer.id].position, positionVorher, "die Ebene hat geruht");
   const zeitVorher = spiel.zustand.zeit;
   assert.equal(befehlGeben(spiel, { art: "treppe" }).ok, true);
   assert.equal(spiel.zustand.tiefe, 1);
   assert.equal(treppeUnter(spiel), "auf");
   assert.deepEqual(gegnerIds(spiel), gegner, "dieselben Wesen");
-  assert.deepEqual(spiel.zustand.entitaeten[einer.id].position, positionVorher, "die Ebene hat geruht");
   assert.ok(spiel.zustand.entitaeten[einer.id].zustaende[0].ende > endeVorher, "das Ende des Zustands ist nachgerückt");
   assert.ok(spiel.zustand.warteschlange.every((eintrag) => eintrag.zeit >= zeitVorher), "nichts liegt in der Vergangenheit");
   assert.ok(warteschlangeGueltig(spiel.zustand));
@@ -166,9 +167,10 @@ test("Datenprüfung: Abfolge, Starttiefe, feste Karte, Population und Tabellen",
 // blieben die Werte gleich); neu mit 0.70.0 für die EP aus Tiefe und Wissen statt je Feld (freieEp, tiefsteTiefe an
 // Ninkasi; ohne diese beiden Felder blieben die Werte gleich); neu mit 0.71.0 für die Fernwaffen im Keller (Schleuder,
 // Kurzbogen, Steine und Pfeile) und Kosten und Bruchchance der Wurfwaffen (mit den alten Gegenständen des Kellers und
-// den alten Wurfwaffen blieben die Werte gleich).
+// den alten Wurfwaffen blieben die Werte gleich); neu mit 0.72.0 für das Brauen (Zutaten und Tonkessel im Keller, Kulturen
+// an Ninkasi; ohne diese drei blieben die Werte gleich).
 test("Erzeugung in Schritten: dieselben Ebenen wie vorher", () => {
-  const erwartet = { 1: "ad6c58cb6bc9cc20", 2: "21f290ca35d38b66", 3: "653846887aa8380c", 42: "bd8e130d5de7dd53", 4711: "8da4e76289e49b13" };
+  const erwartet = { 1: "a998e1b77208dab4", 2: "ca76d8291f75c7aa", 3: "915c13d298623a3c", 42: "2d45da652bfadeab", 4711: "8caa28d14753c3dc" };
   for (const [startwert, fingerabdruck] of Object.entries(erwartet)) {
     const spiel = neuesSpiel(DATEN, Number(startwert));
     for (const tiefe of [2, 3, 0]) ebeneWechseln(spiel, tiefe);

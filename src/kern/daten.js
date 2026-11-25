@@ -19,6 +19,7 @@ import { UNTERBRECHUNGSGRUENDE } from "../systeme/laufendeAktionen.js";
 import { BEWEGUNGSARTEN } from "../welt/karte.js";
 import { ERSATZ_ZIELE } from "../systeme/ersatz.js";
 import { HOECHSTE_STUFE, ANZAHL_TIERS, eigenschaftenPruefen } from "../systeme/skills.js";
+import { KENNZAHLEN } from "../systeme/sud.js";
 
 // Vorbelegung des Cursors im Zielmodus (eingabe/zielmodus.js)
 const ZIELVORGABEN = ["feind", "gefaehrte", "selbst"];
@@ -1277,6 +1278,104 @@ function pruefeBierstile(daten, sprache, fehler) {
   }
 }
 
+// Brauen, siehe systeme/sud.js und systeme/brauen.js: Regeln, Kulturen, Zielgebiete, Zutaten, Gefäße, Kessel und die
+// Kulturen der Wesen
+const ZUTATARTEN = ["grundstoff", "gewuerz"];
+function pruefeAromen(aromen, aromaachsen, ort, fehler, nurProzent = true) {
+  if (aromen === undefined) return;
+  if (!istObjekt(aromen)) return fehler.push(`${ort}: aromen muss ein Objekt { achse: anteil } sein`);
+  for (const [achse, anteil] of Object.entries(aromen)) {
+    if (!aromaachsen.includes(achse)) fehler.push(`${ort}.aromen: Aromaachse "${achse}" gibt es nicht in regeln.brauen.achsen`);
+    else if (nurProzent ? !istProzent(anteil) : !istGanzzahl(anteil)) fehler.push(`${ort}.aromen.${achse} muss eine ganze Zahl${nurProzent ? " von 0 bis 100" : ""} sein`);
+  }
+}
+
+function pruefeBrauregeln(daten, regeln, achsen, aromaachsen, fehler) {
+  for (const kennzahl of KENNZAHLEN) if (!achsen.includes(kennzahl)) fehler.push(`regeln.brauen.achsen: Kennzahl ${kennzahl} fehlt`);
+  for (const [achse, beschreibung] of Object.entries(regeln.achsen)) {
+    const gueltig = istObjekt(beschreibung) && istGanzzahl(beschreibung.hoechstens) && beschreibung.hoechstens > 0 && istGanzzahl(beschreibung.stufe) && beschreibung.stufe > 0 && istZahlAbNull(beschreibung.unschaerfe);
+    if (!gueltig) fehler.push(`regeln.brauen.achsen.${achse} muss { hoechstens > 0, stufe > 0, unschaerfe >= 0 } sein`);
+  }
+  for (const [name, maische] of Object.entries(istObjekt(regeln.maische) ? regeln.maische : {})) {
+    if (!istObjekt(maische) || !istGanzzahl(maische.vergaerung)) fehler.push(`regeln.brauen.maische.${name} muss { vergaerung, aromen? } sein`);
+    else pruefeAromen(maische.aromen, aromaachsen, `regeln.brauen.maische.${name}`, fehler, false);
+  }
+  for (const [name, gewuerz] of Object.entries(istObjekt(regeln.gewuerz) ? regeln.gewuerz : {})) {
+    if (!istObjekt(gewuerz) || !istZahlAbNull(gewuerz.bitter) || !istZahlAbNull(gewuerz.aroma)) fehler.push(`regeln.brauen.gewuerz.${name} muss { bitter, aroma } in Prozent sein`);
+  }
+  if (!regeln.maische?.[regeln.verfahren?.maische] || !regeln.gewuerz?.[regeln.verfahren?.gewuerz]) fehler.push("regeln.brauen.verfahren muss eine Maische und eine Gewürzgabe aus regeln.brauen nennen");
+  for (const feld of ["alkoholJeStammwuerze", "budgetProzent", "pegelProzent", "gewichtJePortion"]) {
+    if (!istZahlAbNull(regeln[feld])) fehler.push(`regeln.brauen.${feld} muss eine ganze Zahl >= 0 sein`);
+  }
+  for (const feld of ["verderben", "gueteAmRand", "gueteFrei"]) if (!istProzent(regeln[feld])) fehler.push(`regeln.brauen.${feld} muss eine ganze Zahl von 0 bis 100 sein`);
+  if (!istGanzzahl(regeln.gueteStufe) || regeln.gueteStufe < 1) fehler.push("regeln.brauen.gueteStufe muss eine ganze Zahl >= 1 sein");
+  const getraenkPruefen = (typ, ort) => { if (!daten.gegenstaende[typ]?.trinkbar) fehler.push(`${ort}: "${typ}" muss ein trinkbarer Gegenstand sein`); };
+  getraenkPruefen(regeln.getraenk, "regeln.brauen.getraenk");
+  const verdorben = regeln.verdorben;
+  if (!istObjekt(verdorben)) fehler.push("regeln.brauen.verdorben muss { getraenk, achse, plus, guete } sein");
+  else {
+    getraenkPruefen(verdorben.getraenk, "regeln.brauen.verdorben.getraenk");
+    if (!achsen.includes(verdorben.achse)) fehler.push(`regeln.brauen.verdorben.achse: Achse "${verdorben.achse}" gibt es nicht`);
+    if (!istZahlAbNull(verdorben.plus) || !istProzent(verdorben.guete)) fehler.push("regeln.brauen.verdorben: plus >= 0 und guete von 0 bis 100");
+  }
+  for (const [achse, wertName] of Object.entries(istObjekt(regeln.wirkungen) ? regeln.wirkungen : {})) {
+    if (!aromaachsen.includes(achse)) fehler.push(`regeln.brauen.wirkungen: Aromaachse "${achse}" gibt es nicht`);
+    if (typeof wertName !== "string") fehler.push(`regeln.brauen.wirkungen.${achse} muss ein Wertname sein`);
+  }
+  if (typeof regeln.wirkungOhneAroma !== "string") fehler.push("regeln.brauen.wirkungOhneAroma muss ein Wertname sein");
+}
+
+function pruefeBrauen(daten, sprache, fehler) {
+  const regeln = daten.regeln?.brauen;
+  if (!istObjekt(regeln) || !istObjekt(regeln.achsen)) return fehler.push("regeln.brauen.achsen fehlt");
+  const achsen = Object.keys(regeln.achsen);
+  const aromaachsen = achsen.filter((achse) => !KENNZAHLEN.includes(achse));
+  pruefeBrauregeln(daten, regeln, achsen, aromaachsen, fehler);
+  for (const [name, kultur] of Object.entries(daten.kulturen ?? {})) {
+    const ort = `kulturen.${name}`;
+    pruefeText(sprache.texte, kultur.text, ort, fehler);
+    if (!istProzent(kultur.vergaerung) || !istZahlAbNull(kultur.vertraegt)) fehler.push(`${ort}: vergaerung (0 bis 100) und vertraegt (>= 0) müssen ganze Zahlen sein`);
+    if (kultur.verderben !== undefined && !istGanzzahl(kultur.verderben)) fehler.push(`${ort}: verderben muss eine ganze Zahl sein`);
+    pruefeAromen(kultur.aromen, aromaachsen, ort, fehler, false);
+  }
+  for (const [name, zielgebiet] of Object.entries(daten.zielgebiete ?? {})) {
+    const ort = `zielgebiete.${name}`;
+    pruefeText(sprache.texte, zielgebiet.text, ort, fehler);
+    pruefeNomen(sprache, zielgebiet.text, fehler);
+    if (typeof zielgebiet.familie !== "string") fehler.push(`${ort}: familie fehlt`);
+    if (!istObjekt(zielgebiet.spannen) || !Object.keys(zielgebiet.spannen).length) { fehler.push(`${ort}: spannen muss mindestens eine Achse nennen`); continue; }
+    for (const [achse, spanne] of Object.entries(zielgebiet.spannen)) {
+      const hoechstens = regeln.achsen[achse]?.hoechstens;
+      if (hoechstens === undefined) { fehler.push(`${ort}.spannen: Achse "${achse}" gibt es nicht`); continue; }
+      const gueltig = Array.isArray(spanne) && spanne.length === 2 && spanne.every((wert) => istGanzzahl(wert) && wert >= 0 && wert <= hoechstens) && spanne[0] <= spanne[1];
+      if (!gueltig) fehler.push(`${ort}.spannen.${achse} muss [unten, oben] mit 0 <= unten <= oben <= ${hoechstens} sein`);
+    }
+    if (zielgebiet.bonus !== undefined && !istZahlAbNull(zielgebiet.bonus)) fehler.push(`${ort}: bonus muss eine ganze Zahl >= 0 sein`);
+    if (zielgebiet.effekt !== undefined) pruefeEffektVerweis(daten, zielgebiet.effekt, ort, fehler);
+  }
+  for (const [name, gegenstand] of Object.entries(daten.gegenstaende)) {
+    const ort = `gegenstaende.${name}`;
+    if (gegenstand.gefaess !== undefined && gegenstand.gefaess !== true) fehler.push(`${ort}: gefaess muss true sein`);
+    const zutat = gegenstand.zutat;
+    if (zutat === undefined) continue;
+    if (!istObjekt(zutat) || !ZUTATARTEN.includes(zutat.art)) { fehler.push(`${ort}: zutat muss { art: ${ZUTATARTEN.join(" | ")}, ... } sein`); continue; }
+    for (const feld of ["extrakt", "farbe", "bitter"]) if (zutat[feld] !== undefined && !istZahlAbNull(zutat[feld])) fehler.push(`${ort}.zutat.${feld} muss eine ganze Zahl >= 0 sein`);
+    pruefeAromen(zutat.aromen, aromaachsen, `${ort}.zutat`, fehler);
+  }
+  for (const [name, gelaende] of Object.entries(daten.gelaende)) {
+    const kessel = gelaende.kessel;
+    if (kessel === undefined) continue;
+    const gueltig = istObjekt(kessel) && istGanzzahl(kessel.fasst) && kessel.fasst > 0 && istGanzzahl(kessel.portionen) && kessel.portionen > 0
+      && (kessel.verderben === undefined || istGanzzahl(kessel.verderben)) && (kessel.unschaerfe === undefined || istZahlAbNull(kessel.unschaerfe));
+    if (!gueltig) fehler.push(`gelaende.${name}: kessel muss { fasst > 0, portionen > 0, verderben?, unschaerfe? } sein`);
+  }
+  for (const [name, wesen] of Object.entries(daten.wesen)) {
+    if (wesen.kulturen === undefined) continue;
+    if (!istTextliste(wesen.kulturen)) fehler.push(`wesen.${name}: kulturen muss eine Liste von Kulturen sein`);
+    else for (const kultur of wesen.kulturen) if (!daten.kulturen?.[kultur]) fehler.push(`wesen.${name}.kulturen: Kultur "${kultur}" gibt es nicht`);
+  }
+}
+
 // Feste Karte: gleich lange Zeilen aus Kennungen bekannter Gelände
 function pruefeKarte(daten, karte, ort, fehler) {
   if (!Array.isArray(karte) || !karte.length || !karte.every((zeile) => typeof zeile === "string" && zeile.length === karte[0].length)) {
@@ -1509,6 +1608,7 @@ export function vorbereiten(rohdaten, sprache = {}) {
   pruefeArenen(daten, sprache, fehler);
   pruefeGlossar(daten, sprache, fehler);
   pruefeBierstile(daten, sprache, fehler);
+  pruefeBrauen(daten, sprache, fehler);
   for (const [name, gelaende] of Object.entries(daten.gelaende)) {
     pruefeText(sprache.texte, gelaende.text, `gelaende.${name}`, fehler);
     if (typeof gelaende.kennung !== "string" || gelaende.kennung.length !== 1) fehler.push(`gelaende.${name}: kennung muss genau ein Zeichen sein`);

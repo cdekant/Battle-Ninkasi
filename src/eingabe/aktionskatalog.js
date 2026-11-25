@@ -40,6 +40,7 @@ export const AKTIONEN = {
   werfen_waehlen: { text: "aktion.werfen_waehlen", gruppe: "handeln" },
   fernangriff: { text: "aktion.fernangriff", gruppe: "handeln" }, // Zielmodus zum Schießen oder Werfen (eingabe/fernangriff.js)
   nachladen: { text: "aktion.nachladen", gruppe: "handeln", befehl: { art: "nachladen" } },
+  brauen: { text: "aktion.brauen", gruppe: "handeln" }, // Braufenster am Kessel (eingabe/brauen.js)
   ...Object.fromEntries(Array.from({ length: PLAETZE_DER_LEISTE }, (_, platz) => [`schnellplatz_${platz + 1}`, { text: "aktion.schnellplatz", gruppe: "schnellleiste", platz }])),
   ...Object.fromEntries(Array.from({ length: ANZAHL_LEISTEN_IM_KATALOG }, (_, leiste) => [`leiste_${leiste + 1}`, { text: "aktion.leiste", gruppe: "schnellleiste", leiste }])),
   rasten: { text: "aktion.rasten", gruppe: "ablaeufe", knopf: "knopf.rasten" },

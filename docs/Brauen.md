@@ -2,7 +2,7 @@
 
 Stand: 2026-11-25
 
-Mitprüfen bei Änderungen: [Grundlagen.md](Grundlagen.md), [Skills.md](Skills.md), [Spielverlauf.md](Spielverlauf.md), [Ausblick.md](Ausblick.md), [Texte.md](Texte.md), [Gegenstaende.md](Gegenstaende.md)
+Mitprüfen bei Änderungen: [Grundlagen.md](Grundlagen.md), [Skills.md](Skills.md), [Spielverlauf.md](Spielverlauf.md), [Ausblick.md](Ausblick.md), [Texte.md](Texte.md), [Gegenstaende.md](Gegenstaende.md), [Sude.md](Sude.md), [Bedienung.md](Bedienung.md)
 
 Das Brausystem ist der Kern des Spiels: Es bestimmt Zutaten, Gegenstände, Beute, Orte und Rezepte und ist neben den Skills die zweite Achse eines Builds (siehe [Spielverlauf.md](Spielverlauf.md), Was zwei Läufe unterscheidet). Dieses Dokument sagt, wie Brauen sich anfühlt und wie seine Teile zusammenhängen; die Skills dazu stehen in [Skills.md](Skills.md), Brauen, die Bierstile mit ihren Kennzahlen in [Texte.md](Texte.md), Bierstile.
 
@@ -24,7 +24,7 @@ Das Brausystem ist der Kern des Spiels: Es bestimmt Zutaten, Gegenstände, Beute
 + Durchschaubar: die Vorschau zeigt, wohin ein Sud geht, nicht wie gerechnet wird
 + Geschichte und Brauwirklichkeit sind Vorbild, nicht Vorschrift: das Spiel ist trashig, und längst nicht jedes alte Rezept und jede alte Praktik ist überliefert; Zutaten und Verfahren dürfen frei erfunden oder versetzt werden, wenn es dem Spiel dient
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Befehl; offen: Trockenbier, Sud im Kampf, Flüssigkeiten, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Ablauf
 
@@ -37,7 +37,7 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 + Brauen nach Rezept: ein Klick auf ein bekanntes Rezept verteilt die vorhandenen Rohstoffe von selbst, die Vorschau ist eng
 + Mälzen ist wie das Brauen kurz: es macht aus Rohgetreide Malz, der Röstgrad bestimmt Farbe und Röstaroma
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Befehl, und [Bedienung.md](Bedienung.md), Fenster; offen: Brauen nach Rezept, Mälzen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Profil des Suds
 
@@ -49,7 +49,7 @@ Ein Sud hat ein Profil wie ein Aromaprofil der Verkostung, als Spinnennetz darge
 + Unbekannte Zutaten zeigen ihre Beiträge erst nach dem ersten Gebrauch oder durch Kennerschaft
 + Die Werte werden für die Wirkung auf wenige Stufen gerundet; so ergeben gleiche Rezepte meist gleiche Sude
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil; offen: Spinnennetz, Rauch und Holz, unbekannte Zutaten, Rezeptur und Rezept verkleinern die Unschärfe, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Zielgebiete
 
@@ -63,7 +63,7 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 + Die erste Familie sind die antiken Biere: ein Grundstoff (Malz, Bierbrot, Emmer, Datteln) mit spontaner Gärung oder einer Kultur, die Stellschraube ist vor allem die Säure; süß und malzig heilt schwach LP, sauer füllt schwach MP, dazwischen etwas von beidem; Gewürze geben hier keine Bierwirkung, sondern führen in den Absud
 + Die Namen der antiken Zielgebiete kommen von den sumerischen Biersorten: dunkles Bier, süßes dunkles Bier, rötliches Bier, gefiltertes Bier, starkes Bier (nach Powell 1994 bei `sallaberger2012bierbrauen`); ihre Profile sind Erfindung des Spiels
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Zielgebiete; offen: Nebel und Wissen über Läufe hinweg, moderne Stile, Kniffe der Rezepte, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Wirkung
 
@@ -75,7 +75,7 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 + Weitere Wirkungen kommen von Zusätzen (Kräuter und andere Zutaten mit eigenem Effekt), Kulturen, gefundenen Rezepten und Fähigkeiten, die einem Sud Wirkungen geben oder Zielgebiete verstärken; Skills verstärken das Ganze (siehe [Skills.md](Skills.md), Brauen)
 + Spezialbiere wie das Phönixbier sind Sude mit einem besonderen Zusatz
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Wirkung; offen: Röst, Rauch, Süße über die Zeit, Schutz durch Säure, Zusätze, Kulturen und Fähigkeiten als Quellen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Zutaten
 
@@ -86,7 +86,7 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 + Umfang: eine Handvoll Kräuter im ersten Kapitel, über alle Epochen zwei bis drei Dutzend
 + Rohstoffe werden in der Welt geerntet (Felder, Haine, Pflanzen, siehe [Spielverlauf.md](Spielverlauf.md), Erstes Kapitel); die Sets der Rohstoffe heben Menge und Güte der Ernte (siehe [Skills.md](Skills.md), Brauen)
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil; offen: Primär- und Sekundärwirkung, Kräuter für den Kampf, Ernten, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Kulturen
 
@@ -97,7 +97,7 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 + Kulturen verbessern sich durch Gebrauch (siehe [Skills.md](Skills.md), Brauen)
 + Ideen für die Rollen: übervergärende Hefe (trocken, viel Alkohol, für den Pegel), Brettanomyces (weniger Alkohol, verstärkt die MP), untergärige Hefe (sauber, enge Vorschau), Kveik (gärt heiß und schnell, der Weg zum Sud im Kampf), Milchsäurebakterien (Säure ohne Alkohol), Essigbakterien (Essig), Koji (verzuckert Reis ohne Mälzen), Kefirknollen und Teepilz (Säure, wenig Alkohol, Kombucha senkt den Pegel), wilde Hefe
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil; offen: Kulturen gewinnen, spontane Gärung, Verbessern durch Gebrauch, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Absud
 
@@ -128,7 +128,7 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 + Alkohol, Gewürze, Säure, Güte und Skills verlängern jede Stufe; ein Stapel kippt als Ganzes in die nächste
 + Essig ist kein Abfall, sondern Zutat (Posca, Oxymel)
 
-Umsetzung: teilweise, siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß; offen: Stufen mit Reifen, Dauer nach dem Sud, Wurf und Verderber beim Brauen
+Umsetzung: teilweise, siehe [Gegenstaende.md](Gegenstaende.md), Verschleiß, und [Sude.md](Sude.md), Befehl; offen: Stufen mit Reifen, Dauer nach dem Sud, schwacher Wurf Richtung Säure, Verderber aus dem Kessel
 
 ## Rezepte
 
@@ -146,7 +146,7 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 + Ein besserer Kessel fasst mehr Zutaten und gibt mehr Portionen, verdirbt seltener und erreicht so fernere Zielgebiete
 + Brand entsteht nicht im Kessel, sondern aus einem fertigen Getränk an der Brennblase, einem eigenen Gegenstand
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Befehl; offen: Kessel als Gegenstand, Tiers nach Material, Kessel im Hub, Brennblase, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Getränke
 
@@ -178,7 +178,7 @@ Umsetzung: offen
 + Gestapelt wird nur Gleiches: die Portionen eines Suds, Sude mit gleichem Rezept, gleichen gerundeten Stufen, gleicher Güte und gleicher Stufe des Verderbens; freie Sude ohne Rezept sind Einzelstücke, bis sie Hausrezept werden
 + Ein Fass hält viele Portionen eines Suds als Ladungen
 
-Umsetzung: teilweise, siehe [Gegenstaende.md](Gegenstaende.md), Inventar; offen: Reiter für Getränke und Kulturen, Stapeln nach Rezept und Stufen
+Umsetzung: teilweise, siehe [Gegenstaende.md](Gegenstaende.md), Inventar, und [Sude.md](Sude.md), Befehl (gleiche Sude stapeln nach gerundetem Profil); offen: Reiter für Getränke und Kulturen, Stapeln nach Rezept, Stufe des Verderbens
 
 ## Brauschulen
 

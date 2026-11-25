@@ -11,10 +11,12 @@ const keller = {
     { typ: "kupferhelm", anzahl: 1 }, { typ: "lederhose", anzahl: 1 }, { typ: "hopfenkette", anzahl: 1 }, { typ: "kupferring", anzahl: 2 },
     { typ: "schleuder", anzahl: 1 }, { typ: "kurzbogen", anzahl: 1 }, { typ: "schleuderstein", anzahl: 4, stapel: 5 }, { typ: "pfeil", anzahl: 2, stapel: 10 },
     { typ: "laterne", anzahl: 1 },
+    { typ: "gerstenmalz", anzahl: 3, stapel: 4 }, { typ: "emmer", anzahl: 2, stapel: 3 }, { typ: "bierbrot", anzahl: 2, stapel: 2 },
+    { typ: "datteln", anzahl: 2, stapel: 3 }, { typ: "honig", anzahl: 1, stapel: 2 }, { typ: "wacholder", anzahl: 2, stapel: 2 },
   ],
   fallen: [{ typ: "saeureduese", anzahl: 6 }, { typ: "klappergeschirr", anzahl: 6 }],
   tuerChance: 50, // Prozent der Raumzugänge mit Tür
-  gelaendeObjekte: [{ gelaende: "gaerbottich", anzahl: 3 }], // im Inneren von Räumen, sperren keinen Durchgang
+  gelaendeObjekte: [{ gelaende: "gaerbottich", anzahl: 3 }, { gelaende: "tonkessel", anzahl: 2 }], // im Inneren von Räumen, sperren keinen Durchgang
 };
 
 export default {

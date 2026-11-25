@@ -15,5 +15,6 @@ export default {
   anlegen: 100,
   ablegen: 100,
   fallenlassen: 100,
+  brauen: 100, // ein Sud am Kessel (src/systeme/brauen.js)
   faehigkeit: 100, // Vorgabe, wenn eine Fähigkeit keine eigene zeit nennt
 };

@@ -215,6 +215,12 @@ html, body {
 .fenster-rahmen .leise { color: var(--leise); }
 .fenster-rahmen .gut { color: var(--gut); }
 .fenster-rahmen .schlimm { color: var(--schlimm); }
+/* Braufenster (anzeige/braufenster.js): Bereich der Vorschau je Achse als Balken */
+.brau-vorschau { border-collapse: collapse; width: 100%; }
+.brau-vorschau td { padding: 1px 6px 1px 0; white-space: nowrap; }
+.brau-vorschau tr.kennzahl td:first-child { color: var(--gut); }
+.brau-balken { display: inline-block; width: 120px; height: 8px; background: var(--linie); vertical-align: middle; }
+.brau-balken > span { display: block; height: 100%; background: var(--gut); }
 .fenster-rahmen li.set { margin-top: 10px; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--leise); }
 .fenster-rahmen li.set:first-child { margin-top: 0; }
 .fenster-rahmen li.gesperrt { opacity: 0.5; }

@@ -196,10 +196,12 @@ anmelden("befehle", "trinken", {
     melden(spiel, "getrunken", { wer: bezugAuf(akteur), was: bezugAuf(gegenstand) });
     benutzt(spiel, akteur, gegenstand, "trinken");
     const effekt = gegenstand.trinkbar.effekt, typ = gegenstand.typ;
+    // ein gebrauter Sud bringt sein Profil in die Ablage des Effekts (Baustein sud_wirken, systeme/brauen.js)
+    const werte = gegenstand.sud ? { sud: structuredClone(gegenstand.sud) } : {};
     einStueckVerbrauchen(spiel, akteur, gegenstand);
     // wer trinkt, merkt, was es war (Vorbild Brogue); erkannt vor der Wirkung, damit deren Meldungen den Namen tragen
     erkennen(spiel, akteur, typ);
-    effektAnwenden(spiel, effekt, { quelleId: akteur.id, zielId: akteur.id, ursache: "trinken", mittel: { art: "gegenstand", name: typ } });
+    effektAnwenden(spiel, effekt, { quelleId: akteur.id, zielId: akteur.id, ursache: "trinken", mittel: { art: "gegenstand", name: typ }, werte });
     return "trinken";
   },
 });

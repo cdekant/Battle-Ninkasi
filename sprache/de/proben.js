@@ -280,6 +280,70 @@ export default {
   },
   // Adjektive: fest am Hauptwort (leer) und als Affix aus einem Zustand (gereizt)
   "adjektiv.leer": { adjektiv: "leer" },
+  // Brauen: Zutaten, Kulturen, Zielgebiete und Kessel (datenproben/zutaten.js, kulturen.js, zielgebiete.js)
+  "gegenstand.gerstenmalz": {
+    geschlecht: "m",
+    einzahl: { nom: "Malzsack", gen: "Malzsacks", dat: "Malzsack", akk: "Malzsack" },
+    mehrzahl: { nom: "Malzsäcke", gen: "Malzsäcke", dat: "Malzsäcken", akk: "Malzsäcke" },
+  },
+  "gegenstand.emmer": {
+    geschlecht: "m",
+    einzahl: { nom: "Emmersack", gen: "Emmersacks", dat: "Emmersack", akk: "Emmersack" },
+    mehrzahl: { nom: "Emmersäcke", gen: "Emmersäcke", dat: "Emmersäcken", akk: "Emmersäcke" },
+  },
+  "gegenstand.bierbrot": {
+    geschlecht: "n",
+    einzahl: { nom: "Bierbrot", gen: "Bierbrots", dat: "Bierbrot", akk: "Bierbrot" },
+    mehrzahl: { nom: "Bierbrote", gen: "Bierbrote", dat: "Bierbroten", akk: "Bierbrote" },
+  },
+  "gegenstand.datteln": {
+    geschlecht: "m",
+    einzahl: { nom: "Dattelbeutel", gen: "Dattelbeutels", dat: "Dattelbeutel", akk: "Dattelbeutel" },
+    mehrzahl: { nom: "Dattelbeutel", gen: "Dattelbeutel", dat: "Dattelbeuteln", akk: "Dattelbeutel" },
+  },
+  "gegenstand.honig": {
+    geschlecht: "m",
+    einzahl: { nom: "Honigtopf", gen: "Honigtopfs", dat: "Honigtopf", akk: "Honigtopf" },
+    mehrzahl: { nom: "Honigtöpfe", gen: "Honigtöpfe", dat: "Honigtöpfen", akk: "Honigtöpfe" },
+  },
+  "gegenstand.wacholder": {
+    geschlecht: "m",
+    einzahl: { nom: "Wacholderzweig", gen: "Wacholderzweigs", dat: "Wacholderzweig", akk: "Wacholderzweig" },
+    mehrzahl: { nom: "Wacholderzweige", gen: "Wacholderzweige", dat: "Wacholderzweigen", akk: "Wacholderzweige" },
+  },
+  "zielgebiet.gefiltertes_bier": {
+    geschlecht: "n", adjektive: ["adjektiv.gefiltert"],
+    einzahl: { nom: "Bier", gen: "Biers", dat: "Bier", akk: "Bier" },
+    mehrzahl: { nom: "Biere", gen: "Biere", dat: "Bieren", akk: "Biere" },
+  },
+  "zielgebiet.dunkles_bier": {
+    geschlecht: "n", adjektive: ["adjektiv.dunkel"],
+    einzahl: { nom: "Bier", gen: "Biers", dat: "Bier", akk: "Bier" },
+    mehrzahl: { nom: "Biere", gen: "Biere", dat: "Bieren", akk: "Biere" },
+  },
+  "zielgebiet.suesses_dunkles_bier": {
+    geschlecht: "n", adjektive: ["adjektiv.suess", "adjektiv.dunkel"],
+    einzahl: { nom: "Bier", gen: "Biers", dat: "Bier", akk: "Bier" },
+    mehrzahl: { nom: "Biere", gen: "Biere", dat: "Bieren", akk: "Biere" },
+  },
+  "zielgebiet.roetliches_bier": {
+    geschlecht: "n", adjektive: ["adjektiv.roetlich"],
+    einzahl: { nom: "Bier", gen: "Biers", dat: "Bier", akk: "Bier" },
+    mehrzahl: { nom: "Biere", gen: "Biere", dat: "Bieren", akk: "Biere" },
+  },
+  "zielgebiet.starkes_bier": {
+    geschlecht: "n", adjektive: ["adjektiv.stark"],
+    einzahl: { nom: "Bier", gen: "Biers", dat: "Bier", akk: "Bier" },
+    mehrzahl: { nom: "Biere", gen: "Biere", dat: "Bieren", akk: "Biere" },
+  },
+  "adjektiv.gefiltert": { adjektiv: "gefiltert" },
+  "adjektiv.dunkel": { adjektiv: "dunkel", stamm: "dunkl" },
+  "adjektiv.suess": { adjektiv: "süß" },
+  "adjektiv.roetlich": { adjektiv: "rötlich" },
+  "adjektiv.stark": { adjektiv: "stark" },
+  "kultur.bierhefe": "Bierhefe",
+  "kultur.milchsaeure": "Milchsäurebakterien",
+  "gelaende.tonkessel": "Tonkessel",
   "adjektiv.gereizt": { adjektiv: "gereizt" },
   "adjektiv.betaeubt": { adjektiv: "betäubt" },
   "adjektiv.verwirrt": { adjektiv: "verwirrt" },

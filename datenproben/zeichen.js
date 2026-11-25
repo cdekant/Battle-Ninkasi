@@ -3,6 +3,7 @@ export default {
   gelaende: {
     gaerbottich: { zeichen: "O", farbe: "#c87533", hintergrund: "#2a221b" },
     wandfackel: { zeichen: "*", farbe: "#ffb347", hintergrund: "#2a221b" },
+    tonkessel: { zeichen: "u", farbe: "#b8734a", hintergrund: "#2a221b" },
   },
   wesen: {
     essigbakterium: { zeichen: "e", farbe: "#b4bd62" },
@@ -23,6 +24,12 @@ export default {
     lederfetzen: { zeichen: ",", farbe: "#8c5a33" },
     kupferschrott: { zeichen: ",", farbe: "#5f8f7a" },
     leere_flasche: { zeichen: "!", farbe: "#8c7a63" },
+    gerstenmalz: { zeichen: "%", farbe: "#d9b36a" },
+    emmer: { zeichen: "%", farbe: "#c9a45a" },
+    bierbrot: { zeichen: "%", farbe: "#8a5a2b" },
+    datteln: { zeichen: "%", farbe: "#a0522d" },
+    honig: { zeichen: "%", farbe: "#f2c14e" },
+    wacholder: { zeichen: "%", farbe: "#5f8a6a" },
     leeres_fass: { zeichen: "&", farbe: "#6b5a44" },
     brandflasche: { zeichen: "!", farbe: "#e5533d" },
     schoepfkelle: { zeichen: ")", farbe: "#b8b8b8" },

@@ -32,6 +32,7 @@ export default {
     KeyW: "werfen_waehlen", // Inventar, der Buchstabe wirft
     KeyS: "fernangriff", // schießt mit der angelegten Fernwaffe, sonst wirft die zuletzt geworfene Wurfwaffe (eingabe/fernangriff.js)
     KeyE: "nachladen", // lädt die angelegte Fernwaffe nach
+    KeyP: "brauen", // Braufenster am Kessel daneben (p wie Sudpfanne, eingabe/brauen.js)
     Space: "fortsetzen", // unterbrochene lange Aktion weiterführen
     KeyX: "untersuchen", // Untersuchen mit dem Cursor des Zielmodus (eingabe/zielmodus.js)
     Digit1: "schnellplatz_1",

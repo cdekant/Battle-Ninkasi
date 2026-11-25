@@ -51,7 +51,7 @@ Schnittstellen:
   + `src/systeme/kampf.js`: `trefferwurf`, `angreifen` (siehe [Wesen.md](Wesen.md), Kampfwerte); `src/systeme/verschieben.js`: `stossen`, `ziehen`, `tauschen`, `teleportieren` (siehe [Wesen.md](Wesen.md), Bewegung); `src/systeme/wahrnehmung.js`: `laerm`; `src/systeme/fraktionen.js`: `ruf_aendern` (siehe [Wesen.md](Wesen.md), Fraktionen); `src/systeme/skills.js`: `eigenschaft_aendern`, `skill_freischalten`
   + `src/systeme/gelaende.js`: `gelaende_setzen`, `gelaende_zerstoeren`; `src/systeme/schichten.js`: `oberflaeche_setzen`, `gas_setzen`, `entzuenden` (siehe [Welt.md](Welt.md))
   + `src/systeme/verschleiss.js`: `abnutzen`; `src/systeme/ausruestung.js`: `fluch_aufheben` (siehe [Gegenstaende.md](Gegenstaende.md))
-  + `src/systeme/faehigkeiten.js`: `faehigkeit_lehren` (siehe Fähigkeiten)
+  + `src/systeme/faehigkeiten.js`: `faehigkeit_lehren` (siehe Fähigkeiten); `src/systeme/brauen.js`: `sud_wirken` (siehe [Sude.md](Sude.md), Wirkung)
 + Baustein `zufall { chance, effekt, sonst? }`: mit `chance` Prozent wirkt `effekt`, sonst `sonst` (oder nichts), mit demselben Kontext und derselben Ablage; Wurf `zufall`, für eine Chance innerhalb eines Effekts (die Vorstufe einer Krankheit heilt von selbst aus, ein Treffer betäubt manchmal); Chancen an Ereignissen haben schon die Auslöser, Chancen über den Pegel die Risikotabellen
 + Baustein `angreifen { profil? }`: die Quelle greift das Ziel mit ihren Angriffsprofilen an wie bei einer Angriffsaktion, ohne Zeitkosten, mit `profil` nur dieses eine; nur gegen ein Ziel daneben; für Konter aus Auslösern, z.B. `{ bei: "verfehlt", rolle: "ziel", ziel: "quelle", effekt: "konter" }`; die Angriffe laufen auf der Kettentiefe des Effekts, gegenseitige Konter enden so an der Kettengrenze
 

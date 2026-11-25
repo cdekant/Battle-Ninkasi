@@ -15,6 +15,10 @@ export default {
   },
   // Filmriss im Vollrausch (src/systeme/stoffwechsel.js): die Karte der Ebene ist vergessen bis auf das Sichtbare, dann
   // eine Weile ohne eigenes Handeln (Zustand filmriss in daten/zustaende.js)
+  // ein gebrauter Sud: die Wirkung folgt aus seinem Profil (Baustein sud_wirken, src/systeme/brauen.js)
+  sud_trinken: {
+    schritte: [{ baustein: "sud_wirken" }],
+  },
   filmriss: {
     schritte: [{ baustein: "vergessen" }, { baustein: "zustand_setzen", zustand: "filmriss" }],
   },

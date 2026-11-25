@@ -49,9 +49,12 @@ import { erstellungOeffnen, erstellungTaste } from "../src/eingabe/erstellung.js
 import { fensterOeffnen, fensterTaste, fensterKlick } from "../src/eingabe/fenster.js";
 import "../src/eingabe/inventar.js";
 import "../src/eingabe/faehigkeiten.js";
+import { braufensterOeffnen, brauTaste } from "../src/eingabe/brauen.js";
+import { kesselBei } from "../src/systeme/brauen.js";
 import "../src/eingabe/hilfe.js";
 import { fensterHtml } from "../src/anzeige/fenster.js";
 import "../src/anzeige/charakterfenster.js";
+import "../src/anzeige/braufenster.js";
 import "../src/anzeige/systemfenster.js";
 import { erstelleTexte } from "../src/anzeige/texte.js";
 import { Log } from "../src/anzeige/log.js";
@@ -107,6 +110,8 @@ function attributwerte(html, name) {
 function fensterKlicksPruefen(spiel) {
   const umgebung = botUmgebung(spiel);
   const fenster = [["inventar", { gewaehlt: gesteuerteEntitaet(spiel.zustand).inventar?.[0] ?? null }], ["faehigkeiten", { gewaehlt: null }], ["charakter", charakterfensterOeffnen()], ["menue", menueOeffnen()], ["einstellungen", einstellungsfensterOeffnen()], ["laeufe", laeufeOeffnen("fortsetzen")], ["ende", endeOeffnen()]];
+  const brauen = braufensterOeffnen(spiel);
+  if (brauen.zustand) fenster.push(["brauen", brauen.zustand]);
   for (const [art, zustand] of fenster) {
     const stapel = fensterOeffnen([], art, zustand);
     let html = "";
@@ -283,6 +288,8 @@ function zufallsbefehl(botZufall, spiel) {
     return { art: "schiessen", ziel };
   }
   if (wurf === 24) return { art: "nachladen" };
+  // Brauen (src/systeme/brauen.js) über das Fenster: neben einem Kessel oft, sonst selten, dann ohne Kessel abgelehnt
+  if (wurf === 25 || (wurf > 25 && wurf <= 40 && kesselBei(spiel, gesteuerte))) return brauenUeberFenster(botZufall, spiel);
   if (wurf === 22 && gesteuerte.freieEp > 0) {
     const befehl = lernenUeberSkillfenster(botZufall, spiel);
     if (befehl) return befehl;
@@ -294,6 +301,24 @@ function zufallsbefehl(botZufall, spiel) {
     return { art: "lernen", skill: namen[zufallsGanzzahl(botZufall, 0, namen.length - 1)], ep: zufallsGanzzahl(botZufall, 1, gesteuerte.freieEp) };
   }
   return { art: "bewegen", dx: zufallsGanzzahl(botZufall, -1, 1), dy: zufallsGanzzahl(botZufall, -1, 1) };
+}
+
+// Braufenster wie im Browser (eingabe/brauen.js): ein paar zufällige Tasten, dann Enter; ohne Kessel ein Befehl, der
+// abgelehnt wird
+let anzahlBraubefehle = 0, anzahlSude = 0, anzahlSudeGetroffen = 0;
+function brauenUeberFenster(botZufall, spiel) {
+  anzahlBraubefehle++;
+  const offen = braufensterOeffnen(spiel);
+  if (offen.grund) return { art: "brauen", zutaten: [] };
+  let zustand = offen.zustand;
+  const tasten = zufallsGanzzahl(botZufall, 1, 10);
+  for (let i = 0; i < tasten; i++) {
+    const wahl = zufallsGanzzahl(botZufall, 0, 9);
+    const taste = wahl < 7 ? { code: `Key${"ABCDEFG"[wahl]}`, zeichen: "abcdefg"[wahl] } : { code: `Digit${wahl - 6}` };
+    zustand = brauTaste(zustand, taste, spiel).zustand;
+  }
+  fensterZeichnen(spiel, "brauen", zustand);
+  return brauTaste(zustand, { code: "Enter" }, spiel).befehl;
 }
 
 // Testkammer: meist etwas erzeugen (Wesen oder Gegenstand), sonst in eine zufällige Tiefe wechseln, auch eine, die es
@@ -508,6 +533,8 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
       const vonNinkasi = meldung.wer?.id === spiel.zustand.spielerinId;
       if (meldung.art === "getrunken" && vonNinkasi) getrunkeneBiere++;
       if (meldung.art === "geworfen" && vonNinkasi) anzahlWuerfe++;
+      if (meldung.art.startsWith("gebraut") && vonNinkasi) anzahlSude++;
+      if (meldung.art === "gebraut_getroffen" && vonNinkasi) anzahlSudeGetroffen++;
       if (meldung.art === "angelegt") anzahlAngelegt++;
       if (meldung.art === "allmacht_bewahrt") anzahlBewahrt++;
       if (meldung.art === "jaegerin_naht") anzahlJaegerinnen++;
@@ -611,6 +638,7 @@ const haltegruende = Object.entries(reisenNachHaltegrund).map(([grund, anzahl]) 
 console.log(`\nAbläufe nach Haltegrund: ${haltegruende}`);
 console.log(`Fähigkeiten der Gegner: ${gegnerfaehigkeiten.gewirkt} gewirkt, ${gegnerfaehigkeiten.begonnen} lange Aktionen begonnen, ${gegnerfaehigkeiten.abgebrochen} abgebrochen, ${gegnerfaehigkeiten.getrunken} Mal getrunken, ${gegnerfaehigkeiten.geworfen} Mal geworfen; ${anzahlAngelegt} Mal angelegt, ${anzahlWuerfe} Würfe Ninkasis, ${ninkasisFaehigkeiten} Fähigkeiten Ninkasis`);
 console.log(`Meldungen für Ninkasi: ${meldungenFuerNinkasi.gezeigt} gezeigt, ${meldungenFuerNinkasi.verborgen} verborgen, ${meldungenFuerNinkasi.gehoert} gehört`);
+console.log(`Brauen: ${anzahlBraubefehle} Braubefehle, ${anzahlSude} Sude, davon ${anzahlSudeGetroffen} im Zielgebiet`);
 console.log(`Lernen: ${anzahlLernbefehle} Lernbefehle (${anzahlUeberFenster} über das Skillfenster), ${anzahlGelernt} angenommen, ${anzahlSkillstufen} Skillstufen erreicht`);
 if (laeufeGezaehlt && !laeufeMitSichtung) {
   console.log("Chronik hat in keinem Lauf eine Wesenart gesehen");

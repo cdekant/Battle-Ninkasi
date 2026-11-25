@@ -21,6 +21,7 @@ import "./beschwoerung.js";
 import "./verschieben.js";
 import "./werfen.js";
 import "./fernkampf.js";
+import "./brauen.js";
 import "./gelaende.js";
 import "./fallen.js";
 import "./schichten.js";

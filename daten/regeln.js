@@ -209,4 +209,46 @@ export default {
     // Abzug je fehlendem Punkt einer Anforderung an angelegter Ausrüstung (ohne eigenes abzugJePunkt)
     anforderungAbzug: [{ ziel: "genauigkeit", art: "prozent", betrag: -5 }, { ziel: "schaden", art: "prozent", betrag: -5 }],
   },
+  // Brauen, siehe docs/Sude.md, src/systeme/sud.js und src/systeme/brauen.js; alle Zahlen vorläufig
+  brauen: {
+    // Achsen des Profils in fester Reihenfolge: Kennzahlen wie in daten/bierstile.js (Stammwürze und Alkohol in Zehnteln
+    // °Plato bzw. Vol.-%, Bittere in IBU, Farbe in EBC), Aromen in Anteilen bis 100; hoechstens begrenzt die Achse und
+    // gibt den Maßstab des Spinnennetzes, stufe rundet das fertige Profil, unschaerfe ist die halbe Breite der Vorschau
+    achsen: {
+      stammwuerze: { hoechstens: 250, stufe: 10, unschaerfe: 10 },
+      alkohol: { hoechstens: 150, stufe: 5, unschaerfe: 5 },
+      bittere: { hoechstens: 100, stufe: 5, unschaerfe: 5 },
+      farbe: { hoechstens: 150, stufe: 5, unschaerfe: 5 },
+      malz: { hoechstens: 100, stufe: 10, unschaerfe: 8 },
+      roest: { hoechstens: 100, stufe: 10, unschaerfe: 8 },
+      frucht: { hoechstens: 100, stufe: 10, unschaerfe: 8 },
+      kraeuter: { hoechstens: 100, stufe: 10, unschaerfe: 8 },
+      saeure: { hoechstens: 100, stufe: 10, unschaerfe: 8 },
+      suesse: { hoechstens: 100, stufe: 10, unschaerfe: 8 },
+    },
+    // kühl gemaischt vergärt stärker und wird trocken, warm gemaischt bleibt süß und vollmundig (Punkte der Vergärung)
+    maische: {
+      kuehl: { vergaerung: 10, aromen: { suesse: -10 } },
+      warm: { vergaerung: -10, aromen: { suesse: 10 } },
+    },
+    // Gewürz früh gekocht gibt Bittere, spät gegeben Aroma (Prozent der Beiträge eines Gewürzes)
+    gewuerz: {
+      frueh: { bitter: 100, aroma: 50 },
+      spaet: { bitter: 30, aroma: 100 },
+    },
+    verfahren: { maische: "warm", gewuerz: "frueh" }, // Vorgabe, wenn der Befehl nichts sagt
+    alkoholJeStammwuerze: 50, // Alkohol = Stammwürze x Vergärungsgrad x so viele Prozent
+    verderben: 10, // Chance in Prozent, dass ein Sud verdirbt, vor Kessel und Kultur
+    // ein verdorbener Sud: dieser Gegenstand, die Achse steigt um plus, feste Güte, kein Zielgebiet
+    verdorben: { getraenk: "sud_verdorben", achse: "saeure", plus: 40, guete: 30 },
+    getraenk: "sud", // Gegenstand eines gelungenen Suds
+    gueteAmRand: 70, // Güte am Rand eines Zielgebiets, in der Mitte 100
+    gueteStufe: 10, // die Güte wird darauf abgerundet
+    gueteFrei: 60, // Güte eines Suds ohne Zielgebiet
+    budgetProzent: 20, // Budget der Wirkung in Prozent der Stammwürze (Zehntel °Plato) bei Güte 100
+    wirkungen: { malz: "lp", suesse: "lp", frucht: "mp", saeure: "mp", kraeuter: "pp" }, // was die Aromen füllen
+    wirkungOhneAroma: "lp", // wohin das Budget eines Suds ohne Aroma geht
+    pegelProzent: 100, // Pegel in Promille-Hundertsteln je Zehntel Vol.-% Alkohol, wie das Bier des Probeinhalts
+    gewichtJePortion: 500, // Gramm Inhalt je Portion, dazu das Gewicht des Gefäßes
+  },
 };

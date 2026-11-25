@@ -16,10 +16,11 @@ import taktiken from "./taktiken.js";
 import glossar from "./glossar.js";
 import bierstile from "./bierstile.js";
 import zustaende from "./zustaende.js";
+import sude from "./sude.js";
 
 export default {
   wesen: { ...ninkasi },
-  gegenstaende: {},
+  gegenstaende: { ...sude },
   schichten,
   fallen: {},
   effekte,
@@ -39,6 +40,9 @@ export default {
   taktiken,
   glossar,
   bierstile,
+  // Brauen (siehe docs/Sude.md): Kulturen und Zielgebiete bringt der Inhalt mit
+  kulturen: {},
+  zielgebiete: {},
   // Tiefen von oben nach unten: 0 ist der Hub, das Spiel beginnt in starttiefe; der Plan des Laufs übernimmt sie (src/welt/plan.js)
   abfolge: ["hub"],
   starttiefe: 0,

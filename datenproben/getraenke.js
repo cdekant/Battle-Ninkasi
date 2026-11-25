@@ -22,7 +22,7 @@ export default {
     text: "gegenstand.riechwasser", aufhebbar: true, stapelbar: true, gewicht: 300,
     trinkbar: { effekt: "riechwasser_trinken" }, wirdZu: "leere_flasche",
   },
-  // Behälter, später für das Brauen; bis dahin Ballast oder etwas zum Werfen
-  leere_flasche: { text: "gegenstand.leere_flasche", aufhebbar: true, stapelbar: true, gewicht: 400 },
+  // Behälter: das Brauen füllt sie (gefaess, src/systeme/brauen.js), sonst Ballast oder etwas zum Werfen
+  leere_flasche: { text: "gegenstand.leere_flasche", aufhebbar: true, stapelbar: true, gewicht: 400, gefaess: true },
   leeres_fass: { text: "gegenstand.leeres_fass", aufhebbar: true, gewicht: 2000 },
 };

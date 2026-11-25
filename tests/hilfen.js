@@ -21,10 +21,11 @@ import { lernenEinrichten } from "../src/systeme/lernen.js";
 // optionen: { gelaende: zusätzliches Testgelände (z.B. Abgrund mit eigener kennung), schichten: { oberflaechen, gase },
 //            effekte: Testeffekte, zustaende: Testzustände, wesen: Testwesen (zum Beschwören), faehigkeiten, risiken,
 //            gegenstaende: Testgegenstände, etiketten: Etiketten unbekannter Gegenstände, skills: Testskills,
-//            regeln: Abweichungen der Regelwerte, startwert }; die Eigenschaften sind die aus daten/eigenschaften.js
+//            kulturen, zielgebiete: zum Brauen, regeln: Abweichungen der Regelwerte, startwert }; die Eigenschaften sind
+//            die aus daten/eigenschaften.js
 // Abweichend von daten/regeln.js ist die Grundverteidigung 0: Genauigkeit 100 gegen ein Wesen ohne Ausweichen trifft sicher,
 // Genauigkeit 0 verfehlt sicher, beides ohne zu würfeln.
-export function miniSpiel(kartenzeilen, { gelaende: testgelaende = {}, schichten = { oberflaechen: {}, gase: {} }, fraktionen: fraktionsdaten = fraktionen, effekte = {}, zustaende = {}, wesen: wesensdaten = {}, faehigkeiten = {}, risiken = {}, gegenstaende = {}, etiketten = {}, skills = {}, regeln: regelAbweichungen = {}, startwert = 1 } = {}) {
+export function miniSpiel(kartenzeilen, { gelaende: testgelaende = {}, schichten = { oberflaechen: {}, gase: {} }, fraktionen: fraktionsdaten = fraktionen, effekte = {}, zustaende = {}, wesen: wesensdaten = {}, faehigkeiten = {}, risiken = {}, gegenstaende = {}, etiketten = {}, skills = {}, kulturen = {}, zielgebiete = {}, regeln: regelAbweichungen = {}, startwert = 1 } = {}) {
   const zustand = neuerZustand(startwert);
   zustand.zufallszustand = zufallErzeugen(startwert);
   const breite = kartenzeilen[0].length, hoehe = kartenzeilen.length;
@@ -47,8 +48,9 @@ export function miniSpiel(kartenzeilen, { gelaende: testgelaende = {}, schichten
     lernen: { ...regeln.lernen, ...regelAbweichungen.lernen },
     licht: { ...regeln.licht, ...regelAbweichungen.licht },
     duft: { ...regeln.duft, ...regelAbweichungen.duft },
+    brauen: { ...regeln.brauen, ...regelAbweichungen.brauen },
   };
-  return { zustand, daten: { gelaende: { ...gelaende, ...testgelaende }, schichten, aktionen, fraktionen: fraktionsdaten, effekte, schadensarten, zustaende, wesen: wesensdaten, faehigkeiten, risiken, gegenstaende, etiketten, eigenschaften: eigenschaftsdaten, skills, regeln: testregeln }, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
+  return { zustand, daten: { gelaende: { ...gelaende, ...testgelaende }, schichten, aktionen, fraktionen: fraktionsdaten, effekte, schadensarten, zustaende, wesen: wesensdaten, faehigkeiten, risiken, gegenstaende, etiketten, eigenschaften: eigenschaftsdaten, skills, kulturen, zielgebiete, regeln: testregeln }, befehle: [], hoerer: [], zwischenspeicher: {}, anstehendeAusloeser: [] };
 }
 
 // Ninkasi, die lernt (skills, freieEp, freigeschaltet); eigenschaften ohne Prüfung der Erstellungsregeln, Vorgabe alle 10

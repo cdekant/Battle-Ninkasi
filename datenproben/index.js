@@ -23,11 +23,14 @@ import etiketten from "./etiketten.js";
 import skills from "./skills.js";
 import arenen from "./arenen.js";
 import zeichen from "./zeichen.js";
+import zutaten from "./zutaten.js";
+import kulturen from "./kulturen.js";
+import zielgebiete from "./zielgebiete.js";
 
 export default {
   eintraege: {
     wesen: gegner,
-    gegenstaende: { ...getraenke, ...wurfgegenstaende, ...fernwaffen, ...ausruestung },
+    gegenstaende: { ...getraenke, ...wurfgegenstaende, ...fernwaffen, ...ausruestung, ...zutaten },
     schichten,
     fallen,
     effekte,
@@ -42,14 +45,18 @@ export default {
     skills,
     arenen,
     zeichen,
+    kulturen,
+    zielgebiete,
   },
   // Ninkasi bekommt die vorläufige Fähigkeit für den Zielmodus, den Sprint und eine Psi-Fähigkeit, dazu die
-  // Grundausstattung (docs/Charakter.md, Startwerte): den Dolch angelegt und Wurfmesser im Gepäck
+  // Grundausstattung (docs/Charakter.md, Startwerte): den Dolch angelegt und Wurfmesser im Gepäck; als Göttin des Biers
+  // trägt sie Proben von Bierhefe und Milchsäure (docs/Sude.md, Profil)
   ergaenzen: {
     wesen: {
       ninkasi: {
         faehigkeiten: ["testfaehigkeit", "sprint", "gedankenstich"],
         ausstattung: [{ typ: "dolch", angelegt: true }, { typ: "wurfmesser", anzahl: 8 }],
+        kulturen: ["bierhefe", "milchsaeure"],
       },
     },
   },

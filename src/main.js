@@ -55,6 +55,7 @@ import korpuslisteEn from "../sprache/en/korpus/index.js";
 import { verlaufOeffnen } from "./eingabe/verlauf.js";
 import "./eingabe/inventar.js";
 import "./eingabe/faehigkeiten.js";
+import { braufensterOeffnen } from "./eingabe/brauen.js";
 import "./eingabe/hilfe.js";
 import { charakterfensterOeffnen } from "./eingabe/charakter.js";
 import { erstellungOeffnen } from "./eingabe/erstellung.js";
@@ -62,6 +63,7 @@ import { fensterOeffnen, fensterTaste, fensterKlick, oberstesFenster } from "./e
 import { AKTIONEN, aktionDerTaste } from "./eingabe/aktionskatalog.js";
 import { fensterHtml } from "./anzeige/fenster.js";
 import "./anzeige/charakterfenster.js";
+import "./anzeige/braufenster.js";
 import "./anzeige/systemfenster.js";
 import { Bedienzeile } from "./anzeige/bedienzeile.js";
 import { minikartenBild, zeichnen as minikarteZeichnen, feldgroesseFuer, feldAmPunkt } from "./anzeige/minikarte.js";
@@ -901,6 +903,15 @@ function aktionAusfuehren(ergebnis) {
   }
   if (aktion === "inventar") return fensterAuf("inventar", { gewaehlt: null });
   if (aktion === "faehigkeiten") return fensterAuf("faehigkeiten", {});
+  if (aktion === "brauen") {
+    if (spiel.zustand.vorbei) return;
+    const offen = braufensterOeffnen(spiel);
+    if (offen.grund) {
+      ablehnungMelden(offen.grund);
+      return zeichnen();
+    }
+    return fensterAuf("brauen", offen.zustand);
+  }
   if (aktion === "charakter") return fensterAuf("charakter", charakterfensterOeffnen());
   if (aktion === "verlauf") return fensterAuf("verlauf", verlaufOeffnen());
   if (aktion === "hilfe") return fensterAuf("hilfe", {});
@@ -1087,6 +1098,7 @@ kartenCanvas.addEventListener("mousedown", (mausereignis) => {
   const ergebnis = klickDeuten(spiel, feldAnPixel(mausereignis.offsetX, mausereignis.offsetY, kamera, einstellungen.zoom));
   if (!ergebnis) return;
   if (ergebnis.befehl) befehlGebenUndZeichnen(ergebnis.befehl);
+  else if (ergebnis.aktion) aktionAusfuehren({ aktion: ergebnis.aktion });
   else if (ergebnis.reise) ablaufStarten(reiseBeginnen(spiel, ergebnis.reise, einstellungen), naechsterReiseschritt);
 });
 

@@ -48,7 +48,7 @@ Taste → `eingabe/eingabe.js` (Belegung → Aktion aus dem Aktionskatalog) → 
 + Kampfwert, Angriffsprofil, Kampfzustand, Fraktion, Ruf, Beistand, Wahrnehmung, Sinn, Verhaltensmodul, Handlung, Vorrangbefehl, Bewegungsart, Skill, Lernpunkte: [docs/Wesen.md](docs/Wesen.md)
 + Gelände, Feldschicht, Licht, Lichtstufe, Duft, Plan des Laufs, Ebene, Ebenenschritt, Tiefe, Erinnerung der Karte: [docs/Welt.md](docs/Welt.md); Stapel, Ladung, Platz, Verschleiß, Etikett: [docs/Gegenstaende.md](docs/Gegenstaende.md)
 + Aktion, Belegung, Fensterart, Fensterstapel, Ablauf, Zielmodus, Schnellleiste: [docs/Bedienung.md](docs/Bedienung.md)
-+ Sud, Profil, Zielgebiet, Kultur, Absud, Kessel: [docs/Brauen.md](docs/Brauen.md)
++ Sud, Profil, Zielgebiet, Kultur, Absud, Kessel: [docs/Brauen.md](docs/Brauen.md), Umsetzung in [docs/Sude.md](docs/Sude.md)
 
 ## Dokumente
 
@@ -75,6 +75,7 @@ Technik:
 + [docs/Wesen.md](docs/Wesen.md): Kampfwerte, Fraktionen, Wahrnehmung, KI, Bewegung, Stoffwechsel, Skills und Lernen
 + [docs/Welt.md](docs/Welt.md): Gelände, Feldschichten, Ebenen, Wegfindung, Sicht, Licht, Gefahrenprüfung
 + [docs/Gegenstaende.md](docs/Gegenstaende.md): Inventar, Ausrüstung, Verschleiß, Unbekanntes
++ [docs/Sude.md](docs/Sude.md): Brausystem in der Logik (Profil, Zielgebiete, Befehl am Kessel, Wirkung)
 + [docs/Anzeige.md](docs/Anzeige.md): Renderer, Seitenleiste, Kamera, Log
 + [docs/Bedienung.md](docs/Bedienung.md): Eingabe, Maus und Abläufe, Fenster, Schnellleiste, Zielmodus, Untersuchen, Einstellungen
 + [docs/Entwicklung.md](docs/Entwicklung.md): Starten, Tests, Bot, Werkzeuge, Messwerte, Ablauf einer Version, Stolpersteine, Grundgerüst und Probeinhalt

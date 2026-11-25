@@ -207,19 +207,17 @@ Status: offen, ohne festen Platz; nach dem Umbaurisiko eingeordnet
 
 ## 23. Brausystem
 
-Status: offen, ein neues System von Grund auf; vor dem Inhalt, weil Getränke, Zutaten, Beute und Kessel daran hängen (Spieldesign in [Brauen.md](Brauen.md))
+Status: in Arbeit; der Kern steht in [Sude.md](Sude.md) (Profil, Zielgebiete, Befehl am Kessel, Wirkung, Braufenster als Prüfstand), Spieldesign in [Brauen.md](Brauen.md)
 
-+ Zuständiges technisches Dokument festlegen (eigenes Dokument für das Brauen oder ein Abschnitt in [Gegenstaende.md](Gegenstaende.md))
-+ Daten für Zutaten (Beiträge zu Kennzahlen und Aromen, Primär- und Sekundärwirkung), Kulturen, Zielgebiete und Rezepte; die Zielgebiete der modernen Stile aus `daten/bierstile.js`
-+ Rechnung des Profils als reine Logik, die auch in Node läuft: Kennzahlen nach vereinfachten Formeln der Brauwirklichkeit (Schüttung, Maischtemperatur, Gewürz früh oder spät, Vergärungsgrad), Potenzen und Exponenten als Kurven mit Stützstellen, nur ganze Zahlen; Vorschau und Befehl rechnen dasselbe
-+ Befehl `brauen { kesselId, zutaten, verfahren }` mit den Zeitkosten einer Aktion und der Bedingung außerhalb des Kampfes; der Wurf setzt den Punkt in der Vorschau und entscheidet Gelingen und Verderben, ein verdorbener Sud bringt mit einer Chance einen Verderber hervor
-+ Wirkung des Getränks als Effekt aus Budget, Achsen, Zielgebiet, Zusätzen, Kulturen und Fähigkeiten
-+ Absud ohne Kultur für Tränke und Gifte; Mälzen; Brennblase für Brand
-+ Kessel als Gelände und als Gegenstand, Tiers nach Material; ein Kessel im Hub
++ Fenster zum Brauen mit Spinnennetz statt der Balken, Umrisse der Zielgebiete, Reiter für Getränke und Kulturen im Inventar, das Profil eines Getränks in den Einzelheiten des Inventars
++ Nebel über den Zielgebieten (die Vorschau nennt heute alle erreichbaren), aufgedeckte Zielgebiete als Wissen über Läufe hinweg (Vorwissen, siehe [Architektur.md](Architektur.md), Speichern); dafür Zielgebiete und Kulturen ins Namensbuch (`NAMENSBUCH_ARTEN` in `werkzeuge/namensbuch.js`)
++ Rezeptbuch, Hausrezepte, Brauen nach Rezept (verteilt die Rohstoffe, enge Vorschau), Kniffe der gefundenen Rezepte; Wissens-EP für Zutaten und Kulturen
++ Zielgebiete der modernen Stile aus `daten/bierstile.js`, Hopfen
++ Wirkung: Röst, Rauch, Süße über die Zeit, Schutz durch Säure als Zustände; Zusätze, Kulturen und Fähigkeiten als weitere Quellen der Wirkung; Potenzen und Exponenten der Brauwirklichkeit als Kurven, wenn die linearen Formeln nicht tragen
++ Verderben in Stufen mit Reifen über die Kette `verdirbt`, Dauer nach Alkohol, Gewürzen, Säure und Güte; ein schwacher Wurf schiebt den Sud Richtung Säure; ein verdorbener Sud bringt mit einer Chance einen Verderber hervor
++ Absud ohne Kultur für Tränke und Gifte (heute gärt ein Sud ohne Kultur nur nicht); Mälzen; Brennblase für Brand
++ Kulturen gewinnen (Beute, aus einem gefundenen Bier, Fundorte), spontane Gärung mit der Flora der Ebene, unbekannte Zutaten
++ Kessel als Gegenstand, Tiers nach Material; ein Kessel im Hub
 + Trockenbier: Abfüllen eines Suds als Trockenbier, Anrühren mit Wasser, Gefäß und Kultur, im Kampf über den Schnellsud, Kveik und Hitze in der Nähe
-+ Nebel über den Zielgebieten, aufgedeckte Zielgebiete als Wissen über Läufe hinweg
-+ Verderben in Stufen mit Reifen über die Kette `verdirbt`, Dauer nach Alkohol, Gewürzen, Säure und Güte
-+ Rezeptbuch, Hausrezepte, Kulturen als Proben ohne Gewicht
-+ Stapeln nach Rezept, gerundeten Stufen, Güte und Stufe des Verderbens
-+ Fenster zum Brauen mit Spinnennetz und Vorschau, Reiter für Getränke und Kulturen im Inventar
-+ Tests der Rechnung und des Befehls, Bot mit Brauen
++ Stapeln nach Rezept und Stufe des Verderbens (heute nach gerundetem Profil, Zielgebiet und Güte)
++ Der Zufallsbot braut selten (er steht kaum mit Zutaten und Flaschen an einem Kessel); ein Bot, der Zutaten sammelt und zum Kessel geht, mit der eiligen Strategie (Punkt 10)
