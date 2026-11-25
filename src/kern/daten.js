@@ -912,7 +912,9 @@ function pruefeEigenschaften(daten, sprache, fehler) {
 function pruefeLernregeln(daten, lernen, fehler) {
   if (!istObjekt(lernen)) return fehler.push("regeln.lernen fehlt");
   const ort = "regeln.lernen";
-  pruefeParameter(daten, { eigenschaftStart: "ganzzahl", eigenschaftPunkte: "ganzzahl", eigenschaftHoechstens: "ganzzahl", startEp: "ganzzahl", epJeFeld: "ganzzahl", topfFaktor: "ganzzahl" }, lernen, ort, fehler);
+  pruefeParameter(daten, { eigenschaftStart: "ganzzahl", eigenschaftPunkte: "ganzzahl", eigenschaftHoechstens: "ganzzahl", startEp: "ganzzahl", topfFaktor: "ganzzahl", wissenWesenart: "ganzzahl", wissenGegenstand: "ganzzahl" }, lernen, ort, fehler);
+  if (!(istGanzzahl(lernen.anteilGebunden) && lernen.anteilGebunden >= 0 && lernen.anteilGebunden <= 100)) fehler.push(`${ort}.anteilGebunden muss eine ganze Zahl von 0 bis 100 sein`);
+  fehler.push(...kurvenfehler(lernen.tiefenEp, `${ort}.tiefenEp`));
   pruefeParameter(daten, { verrechnung: ["multiplizieren", "addieren"], gewichtung: ["erste"], ort: ["jederzeit"] }, lernen, ort, fehler);
   for (const feld of ["verrechnung", "gewichtung", "ort"]) if (lernen[feld] === undefined) fehler.push(`${ort}: ${feld} fehlt`);
   if (!(istGanzzahl(lernen.bezugswert) && lernen.bezugswert > 0)) fehler.push(`${ort}.bezugswert muss eine ganze Zahl > 0 sein`);

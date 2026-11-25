@@ -154,7 +154,7 @@ Regeln:
 
 Daten (an der Ebene):
 
-+ `erkundet`: je Feld 1, wenn Ninkasi es einmal wirklich gesehen hat; bringt die EP für Erkundung (siehe [Wesen.md](Wesen.md), Skills und Lernen) und wird nie zurückgesetzt
++ `erkundet`: je Feld 1, wenn Ninkasi es einmal wirklich gesehen hat; das Auto-Erkunden sucht seinen Rand (siehe [Bedienung.md](Bedienung.md), Maus, Reise, Laufen, Rasten und Erkunden), EP bringt es keine; wird nie zurückgesetzt
 + `erinnerung`: je Feld die Kennung des zuletzt gesehenen oder kartierten Geländes, `null` für unbekannt; ein Feld ist bekannt, wenn hier etwas steht
 + `erinnerteDinge`: `{ <feldindex>: { oberflaeche?: art, gegenstaende?: [{ typ, text, anzahl }], fallen?: [{ typ, text }] } }`, nur Felder mit etwas darauf; gespeichert wird das Aussehen, nie eine ID, damit nichts über die Erinnerung den heutigen Zustand nachschlägt; Wesen, Gas und Feuer sind flüchtig und werden nicht erinnert
 + Verlassene Ebenen tragen ihre Erinnerung in `abgelegteEbenen` mit; am Spielstand ändert sich nichts (er ist die Liste der Befehle)

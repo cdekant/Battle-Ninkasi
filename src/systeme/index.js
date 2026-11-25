@@ -33,5 +33,6 @@ import "./verschleiss.js";
 import "./kennen.js";
 import "./skills.js";
 import "./lernen.js";
+import "./wissen.js";
 import "./allmacht.js";
 import "./arena.js";

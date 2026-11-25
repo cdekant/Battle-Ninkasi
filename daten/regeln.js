@@ -188,7 +188,12 @@ export default {
     raengeNachTier: [1, 2, 4, 8], // Grund, Experte, Meister, göttlich
     tierVoraussetzungen: [[], [3], [4, 3], [5, 4, 3]], // je Tier die nötigen Stufen der Tiers darunter im selben Set
     startEp: 300, // Startguthaben freier EP statt Startskills
-    epJeFeld: 1, // freie EP je Feld, das zum ersten Mal gesehen wird
+    // freie EP beim ersten Betreten einer Tiefe (Kurve über der Tiefe, darüber gleich); vorläufig so hoch, weil der
+    // Probeinhalt wenig Wissen bietet (zwei Gegnerarten), siehe docs/Charakter.md, Anfangsbalance
+    tiefenEp: [[1, 0], [2, 1000], [5, 2500]],
+    wissenWesenart: 100, // freie EP beim ersten Sehen einer Wesenart, in Prozent ihrer EP (systeme/wissen.js)
+    wissenGegenstand: 50, // freie EP beim Erkennen eines unbekannten Gegenstandstyps (systeme/wissen.js)
+    anteilGebunden: 50, // Prozent der EP eines Bewältigten, die über das Beitragsbuch in Skills fließen, der Rest frei
     verrechnung: "multiplizieren", // Prozente verschiedener Skills: "multiplizieren" (ein mal je Eintrag) oder "addieren"
     gewichtung: "erste", // Beitragsbuch: jeder Lernanlass zählt je Gegner einmal ("anteil" folgt später)
     topfFaktor: 3, // ein Topf je Abstammungslinie fasst so viele Male die EP der Mutter

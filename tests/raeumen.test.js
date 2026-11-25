@@ -23,10 +23,11 @@ test("Räumen: die erste Ebene wird geräumt und erkundet, der Lauf lässt sich 
 test("Räumen: die EP nach Herkunft gehen in Lernstand und freie EP auf", () => {
   const lauf = laufRaeumen(daten, 2);
   const ninkasi = spielerin(lauf.spiel.zustand);
-  const { start, erkundung, gebunden, freiAusBeute, gesamt } = lauf.ep;
+  const { start, tiefe, wissen, gebunden, freiAusBeute, gesamt } = lauf.ep;
   assert.equal(start, daten.regeln.lernen.startEp);
-  assert.equal(gesamt, start + erkundung + gebunden + freiAusBeute);
-  assert.ok(erkundung > 0 && gebunden > 0);
+  assert.equal(gesamt, start + tiefe + wissen + gebunden + freiAusBeute);
+  assert.equal(tiefe, 0, "nur die erste Ebene, keine neue Tiefe");
+  assert.ok(wissen > 0 && gebunden > 0 && freiAusBeute > 0);
   // gebundene EP stecken in Skills, freie wurden nach der Lernreihenfolge verteilt oder liegen noch
   assert.ok(LERNREIHENFOLGE.some((skill) => lauf.skills[skill] > 0));
   assert.ok(ninkasi.freieEp >= 0);

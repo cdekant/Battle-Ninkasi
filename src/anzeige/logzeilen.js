@@ -171,6 +171,9 @@ export function zeilenAusMeldung(kontext, meldung) {
       return meldung.wer.id === spielerinId ? geschehen(text(`log.${meldung.art}`, { ...meldung, faehigkeit: hatSchluessel(meldung.text) ? text(meldung.text) : meldung.faehigkeit }), "lernen") : [];
     case "ep_erhalten":
       return meldung.ep > 0 ? geschehen(text("log.ep_erhalten", meldung), "lernen") : [];
+    // freie EP aus Tiefe und Wissen (systeme/lernen.js freieEpGeben), Text je Quelle
+    case "ep_frei":
+      return hatSchluessel(`log.ep_frei.${meldung.quelle}`) ? geschehen(text(`log.ep_frei.${meldung.quelle}`, meldung), "lernen") : [];
     case "eigenschaft_geaendert": {
       if (meldung.wer.id !== spielerinId) return [];
       const eigenschaft = text(spiel.daten.eigenschaften?.[meldung.eigenschaft]?.text ?? meldung.eigenschaft);

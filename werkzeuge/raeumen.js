@@ -88,15 +88,21 @@ export function laufRaeumen(daten, startwert, { ebenen = 1, rastenAb = 60, proto
   const spiel = neuesSpiel(daten, startwert);
   const ninkasi = spielerin(spiel.zustand);
   const taktik = daten.taktiken[TAKTIK];
-  // was zu Beginn schon gesehen ist, zählt zur Erkundung, das Startguthaben steht in den Regeln
-  const ep = { start: daten.regeln.lernen.startEp, erkundung: 0, gebunden: 0, freiAusBeute: 0 };
-  let erwarteteFreieEp = ep.start;
+  // freie EP nach Quelle (Meldung ep_frei: tiefe, wissen), dazu gebundene und der freie Teil aus Bewältigtem
+  const ep = { start: daten.regeln.lernen.startEp, tiefe: 0, wissen: 0, gebunden: 0, freiAusBeute: 0 };
+  // was Ninkasi beim Start schon sieht, bringt Wissens-EP, bevor der Hörer angemeldet ist
+  ep.wissen = ninkasi.freieEp - ep.start;
+  let erwarteteFreieEp = ninkasi.freieEp;
   const zaehler = { befehle: 0, getraenke: 0, wuerfe: 0, rastzeit: 0 };
   let phase = "erkunden", ebeneJetzt = null, letzteTodesursache = null;
   const ebenenListe = [];
 
   hoererAnmelden(spiel, (meldung) => {
     if (meldung.art === "gelernt") erwarteteFreieEp -= meldung.ep;
+    if (meldung.art === "ep_frei") {
+      ep[meldung.quelle] = (ep[meldung.quelle] ?? 0) + meldung.ep;
+      erwarteteFreieEp += meldung.ep;
+    }
     if (meldung.art === "ep_erhalten") {
       ep.gebunden += meldung.ep - meldung.frei;
       ep.freiAusBeute += meldung.frei;
@@ -107,10 +113,9 @@ export function laufRaeumen(daten, startwert, { ebenen = 1, rastenAb = 60, proto
       else if (phase === "jagd") ebeneJetzt.erjagt++;
     }
   });
-  // Erkundung: was an freien EP mehr da ist, als Lernen und Beute erklären
+  // jede Änderung der freien EP kommt mit einer Meldung; was sie nicht erklären, ist ein Fehler
   const erkundungBuchen = () => {
-    ep.erkundung += ninkasi.freieEp - erwarteteFreieEp;
-    erwarteteFreieEp = ninkasi.freieEp;
+    if (ninkasi.freieEp !== erwarteteFreieEp) throw new Error(`Startwert ${startwert}: ${ninkasi.freieEp - erwarteteFreieEp} freie EP ohne Meldung`);
   };
   const geben = (befehl) => {
     const antwort = befehlGeben(spiel, befehl);
@@ -229,7 +234,7 @@ export function laufRaeumen(daten, startwert, { ebenen = 1, rastenAb = 60, proto
   const todesursache = ergebnis === "tot" ? letzteTodesursache : null;
 
   const skills = Object.fromEntries(LERNREIHENFOLGE.map((skill) => [skill, stufeVon(spiel, ninkasi, skill)]));
-  const gesamt = ep.start + ep.erkundung + ep.gebunden + ep.freiAusBeute;
+  const gesamt = ep.start + ep.tiefe + ep.wissen + ep.gebunden + ep.freiAusBeute;
   return {
     startwert, ergebnis, todesursache, ebenen: ebenenListe, ep: { ...ep, gesamt },
     grundskillsAufFuenf: grundskillsAufFuenf(daten, gesamt), skills, lp: ninkasi.werte.lp.aktuell,
@@ -294,7 +299,7 @@ function hauptprogramm(argumente) {
   const daten = datenLaden(rohdaten, { texte });
   const ergebnisse = [];
   console.log(`Räumen: ${laeufe} Läufe ab Startwert ${ersterStartwert}, ${ebenen} Ebene(n), Rasten unter ${rastenAb} % LP`);
-  console.log("Start  Ergebnis  Tiefe  Feinde besiegt/erjagt/alle  erkundet  EP Start/Erkundung/gebunden/frei = gesamt  Grundskills auf 5  Skills  Befehle  Zeit  Getränke  Würfe  Rastzeit");
+  console.log("Start  Ergebnis  Tiefe  Feinde besiegt/erjagt/alle  erkundet  EP Start/Tiefe/Wissen/gebunden/frei = gesamt  Grundskills auf 5  Skills  Befehle  Zeit  Getränke  Würfe  Rastzeit");
   for (let startwert = ersterStartwert; startwert < ersterStartwert + laeufe; startwert++) {
     const lauf = laufRaeumen(daten, startwert, { ebenen, rastenAb });
     nachspielenPruefen(daten, lauf.spiel);
@@ -303,14 +308,14 @@ function hauptprogramm(argumente) {
     const letzte = lauf.ebenen.at(-1);
     const feinde = lauf.ebenen.map((ebene) => `${ebene.besiegt}/${ebene.erjagt}/${ebene.feinde}`).join(" ");
     const erkundet = lauf.ebenen.map((ebene) => `${Math.round((ebene.erkundet * 100) / Math.max(1, ebene.felder))} %`).join(" ");
-    const { start, erkundung, gebunden, freiAusBeute, gesamt } = lauf.ep;
-    console.log(`${String(startwert).padEnd(6)} ${(lauf.ergebnis + (lauf.todesursache ? ` (${lauf.todesursache})` : "")).padEnd(9)} ${String(letzte.tiefe).padEnd(6)} ${feinde.padEnd(27)} ${erkundet.padEnd(9)} ${`${start}/${erkundung}/${gebunden}/${freiAusBeute} = ${gesamt}`.padEnd(40)} ${String(lauf.grundskillsAufFuenf).padEnd(18)} ${Object.values(lauf.skills).join("/").padEnd(7)} ${String(lauf.befehle).padEnd(8)} ${String(lauf.zeit).padEnd(5)} ${String(lauf.getraenke).padEnd(9)} ${String(lauf.wuerfe).padEnd(6)} ${lauf.rastzeit}`);
+    const { start, tiefe, wissen, gebunden, freiAusBeute, gesamt } = lauf.ep;
+    console.log(`${String(startwert).padEnd(6)} ${(lauf.ergebnis + (lauf.todesursache ? ` (${lauf.todesursache})` : "")).padEnd(9)} ${String(letzte.tiefe).padEnd(6)} ${feinde.padEnd(27)} ${erkundet.padEnd(9)} ${`${start}/${tiefe}/${wissen}/${gebunden}/${freiAusBeute} = ${gesamt}`.padEnd(44)} ${String(lauf.grundskillsAufFuenf).padEnd(18)} ${Object.values(lauf.skills).join("/").padEnd(7)} ${String(lauf.befehle).padEnd(8)} ${String(lauf.zeit).padEnd(5)} ${String(lauf.getraenke).padEnd(9)} ${String(lauf.wuerfe).padEnd(6)} ${lauf.rastzeit}`);
   }
   const ueberlebt = ergebnisse.filter((lauf) => lauf.ergebnis !== "tot");
   console.log(`\n${ueberlebt.length} von ${ergebnisse.length} überlebt, ${ergebnisse.filter((lauf) => lauf.ergebnis === "geraeumt").length} geräumt; Median/P10/P90 über alle Läufe:`);
   const ersteEbene = ergebnisse.map((lauf) => lauf.ebenen[0]);
   console.log(`  erste Ebene: Feinde besiegt ${spanne(ersteEbene.map((ebene) => ebene.besiegt))} von ${spanne(ersteEbene.map((ebene) => ebene.feinde))}, erjagt ${spanne(ersteEbene.map((ebene) => ebene.erjagt))}, erkundet ${spanne(ersteEbene.map((ebene) => Math.round((ebene.erkundet * 100) / Math.max(1, ebene.felder))))} %`);
-  for (const feld of ["erkundung", "gebunden", "freiAusBeute", "gesamt"]) console.log(`  EP ${feld}: ${spanne(ergebnisse.map((lauf) => lauf.ep[feld]))}`);
+  for (const feld of ["tiefe", "wissen", "gebunden", "freiAusBeute", "gesamt"]) console.log(`  EP ${feld}: ${spanne(ergebnisse.map((lauf) => lauf.ep[feld]))}`);
   console.log(`  Grundskills auf Stufe 5: ${spanne(ergebnisse.map((lauf) => lauf.grundskillsAufFuenf))}; Zeit ${spanne(ergebnisse.map((lauf) => lauf.zeit))}, Rastzeit ${spanne(ergebnisse.map((lauf) => lauf.rastzeit))}, Getränke ${spanne(ergebnisse.map((lauf) => lauf.getraenke))}, Würfe ${spanne(ergebnisse.map((lauf) => lauf.wuerfe))}`);
   const tode = ergebnisse.filter((lauf) => lauf.ergebnis === "tot").map((lauf) => `${lauf.startwert} (Tiefe ${lauf.ebenen.at(-1).tiefe}, ${lauf.todesursache})`);
   if (tode.length) console.log(`  Tode: ${tode.join(", ")}`);

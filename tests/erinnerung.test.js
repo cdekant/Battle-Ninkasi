@@ -70,24 +70,20 @@ test("Reise plant nach dem bekannten Gelände: eine erinnerte Wand trennt weiter
   assert.ok(reiseBeginnen(spiel, { x: 1, y: 1 }, einstellungen).reise, "jetzt sieht sie die Lücke");
 });
 
-test("Kartieren macht bekannt ohne EP, erst das Sehen zählt; nach dem Vergessen bringt Wiedersehen keine EP", () => {
+test("Kartieren macht bekannt, nicht erkundet; erst das Sehen erkundet; nach dem Vergessen bleibt es erkundet", () => {
   const { spiel, ninkasi, ebene } = aufstellen();
   const indizes = RECHTS.map((x) => feldIndex(ebene, x, 1));
-  const epVorher = ninkasi.freieEp;
   kartieren(spiel, indizes);
   assert.equal(feldBekannt(ebene, 7, 1), true);
-  assert.equal(ebene.erkundet[feldIndex(ebene, 7, 1)], 0);
-  assert.equal(ninkasi.freieEp, epVorher, "Kartieren bringt keine EP");
+  assert.equal(ebene.erkundet[feldIndex(ebene, 7, 1)], 0, "kartiert ist nicht erkundet");
   gehenNach(spiel, ninkasi, 7, 1);
-  const epGesehen = ninkasi.freieEp;
-  assert.ok(epGesehen > epVorher, "das Sehen bringt sie");
+  assert.equal(ebene.erkundet[feldIndex(ebene, 7, 1)], 1, "das Sehen erkundet");
   gehenNach(spiel, ninkasi, 1, 1);
   vergessen(spiel, indizes);
   assert.equal(feldBekannt(ebene, 7, 1), false);
   assert.equal(ebene.erkundet[feldIndex(ebene, 7, 1)], 1, "einmal gesehen bleibt gesehen");
   gehenNach(spiel, ninkasi, 7, 1);
   assert.equal(feldBekannt(ebene, 7, 1), true);
-  assert.equal(ninkasi.freieEp, epGesehen, "Wiedersehen bringt keine EP");
 });
 
 test("Kartieren mit Dingen merkt auch, was darauf liegt; Wesen erinnert die Karte nie", () => {

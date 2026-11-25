@@ -12,7 +12,7 @@ import { sichtdurchlaessig } from "../welt/schichten.js";
 import { sichtlinieFrei } from "../welt/geometrie.js";
 import { modifiziert } from "../kern/werte.js";
 import { gesteuerteEntitaet, istGesteuert, sichtVon, entitaetenMitPosition, entitaetenImUmkreis } from "../kern/zustand.js";
-import { epFuerErkundung } from "./lernen.js";
+import { alle } from "../kern/register.js";
 import { erinnerungAuffrischen } from "./erinnerung.js";
 import { lichtWirkt, lichtstufeAuf, lichtVon } from "./licht.js";
 
@@ -63,14 +63,11 @@ export function sichtfeldAktualisieren(spiel) {
   zustand.sichtbareFelder = [...sichtbareFelder].sort((indexA, indexB) => indexA - indexB);
   erinnerungAuffrischen(spiel, bisher);
   erinnerungAuffrischen(spiel, zustand.sichtbareFelder);
-  // zum ersten Mal gesehene Felder bringen freie EP (systeme/lernen.js); ein kartiertes Feld (systeme/erinnerung.js)
-  // ist nur erinnert, nicht erkundet, und zählt hier erst beim wirklichen Sehen
-  let neuGesehen = 0;
-  for (const index of zustand.sichtbareFelder) {
-    if (ebene.erkundet[index] !== 1) neuGesehen++;
-    ebene.erkundet[index] = 1;
-  }
-  epFuerErkundung(spiel, neuGesehen);
+  // erkundet heißt einmal wirklich gesehen (für das Auto-Erkunden, eingabe/erkunden.js); ein kartiertes Feld
+  // (systeme/erinnerung.js) ist nur erinnert, nicht erkundet
+  for (const index of zustand.sichtbareFelder) ebene.erkundet[index] = 1;
+  // was nach dem Sehen geschieht, etwa die Wissens-EP für neu gesehene Wesenarten (systeme/wissen.js)
+  for (const [, handler] of alle("nachSicht")) handler(spiel);
 }
 
 // Menge zur Liste der sichtbaren Felder, neben dem Zustand gehalten; neu gebaut, wenn die Liste ersetzt wurde oder

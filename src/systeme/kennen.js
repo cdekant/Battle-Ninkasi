@@ -18,6 +18,7 @@ import { modifiziert } from "../kern/werte.js";
 import { zufallErzeugen, zufallsGanzzahl, startwertAbleiten } from "../kern/zufall.js";
 import { wurfAnteil } from "../kern/wurf.js";
 import { spielerin } from "../kern/zustand.js";
+import { erkanntGebucht } from "./wissen.js";
 
 // Ordnet den unbekannten Typen ihre Etiketten zu (vor dem Erzeugen der ersten Ebene, kern/spiel.js)
 export function etikettenZuordnen(spiel) {
@@ -53,6 +54,7 @@ export function erkennen(spiel, wesen, typ) {
     for (const entitaet of Object.values(entitaeten)) if (entitaet.typ === typ) delete entitaet.etikett;
   }
   melden(spiel, "erkannt", { wer: bezugAuf(wesen), vorher: { typ, text: zustand.wissen.etiketten[typ] }, was: { typ, text: spiel.daten.gegenstaende[typ].text } });
+  erkanntGebucht(spiel, typ); // Wissens-EP (systeme/wissen.js)
   return true;
 }
 

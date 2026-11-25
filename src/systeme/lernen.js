@@ -1,9 +1,12 @@
 // Erfahrungspunkte (siehe docs/Wesen.md, Skills und Lernen; Spieldesign in docs/Charakter.md).
 // Ninkasi lernt, sobald lernenEinrichten ihr skills, freieEp und freigeschaltet gegeben hat (kern/spiel.js neuesSpiel);
 //   ohne diese Komponenten (z.B. in Unittests mit eigener Ninkasi) bleibt alles hier still.
-// Freie EP: Startguthaben regeln.lernen.startEp, dazu epJeFeld je Feld, das zum ersten Mal gesehen wird (systeme/sicht.js);
-//   verteilt werden sie mit dem Befehl lernen (systeme/skills.js).
-// Gebundene EP: nur Wesen mit ep in den Daten bringen sie, und nur, wenn Ninkasi an ihnen etwas gelernt hat.
+// Freie EP: Startguthaben regeln.lernen.startEp, dazu die Tiefen-EP beim ersten Betreten einer Tiefe (Kurve
+//   regeln.lernen.tiefenEp über der Tiefe, je neu erreichter Tiefe, auch übersprungene; tiefsteTiefe an Ninkasi, nur in der
+//   Spielart normal), die Wissens-EP (systeme/wissen.js) und der freie Teil gebundener EP; Meldung "ep_frei"
+//   { wer, quelle, ep, was? } über freieEpGeben; verteilt werden sie mit dem Befehl lernen (systeme/skills.js).
+// Gebundene EP: nur Wesen mit ep in den Daten bringen sie, und nur, wenn Ninkasi an ihnen etwas gelernt hat; davon fließt
+//   nur regeln.lernen.anteilGebunden Prozent über das Beitragsbuch in Skills, der Rest kommt gleich frei.
 //   Beitragsbuch am Wesen: beitraege: [{ anlass, tags }], je Anlass und Tags ein Eintrag (Gewichtung "erste").
 //   Lernanlässe (Register "lernanlaesse"):
 //     wirkung           Ninkasi ist Urheberin eines Treffers, eines Schadens oder eines Zustands am Wesen; Tags des
@@ -23,6 +26,7 @@
 
 import { anmelden } from "../kern/register.js";
 import { spielerin } from "../kern/zustand.js";
+import { wertAufKurve } from "../kern/kurven.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { RANG_RUESTUNG } from "../kern/hakenkatalog.js";
 import { eigenschaftenPruefen, epAufSkill } from "./skills.js";
@@ -43,6 +47,7 @@ export function lernenEinrichten(spiel, ninkasi, eigenschaften) {
   ninkasi.skills = {};
   ninkasi.freieEp = lernregeln(spiel).startEp;
   ninkasi.freigeschaltet = [];
+  ninkasi.tiefsteTiefe = spiel.zustand.tiefe;
 }
 
 // Die lernende Ninkasi oder null
@@ -51,11 +56,23 @@ function lernende(spiel) {
   return ninkasi && ninkasi.freieEp !== undefined ? ninkasi : null;
 }
 
-// Freie EP für zum ersten Mal gesehene Felder (systeme/sicht.js)
-export function epFuerErkundung(spiel, anzahlFelder) {
+// Freie EP aus einer Quelle ("tiefe", "wissen"), nur im gewöhnlichen Lauf (nicht in Arena und Testkammer);
+// was: wofür, für die Meldung (z.B. { typ, text } einer Wesenart); gibt die vergebenen EP zurück
+export function freieEpGeben(spiel, quelle, ep, was = null) {
   const ninkasi = lernende(spiel);
-  if (ninkasi && anzahlFelder > 0) ninkasi.freieEp += anzahlFelder * lernregeln(spiel).epJeFeld;
+  if (!ninkasi || !(ep > 0) || (spiel.optionen?.spielart ?? "normal") !== "normal") return 0;
+  ninkasi.freieEp += ep;
+  melden(spiel, "ep_frei", { wer: bezugAuf(ninkasi), quelle, ep, was });
+  return ep;
 }
+
+// Tiefen-EP: je neu erreichter Tiefe einmal, auch für übersprungene (ein Sturz über zwei Ebenen bringt beide)
+anmelden("haken", "ebene_betreten", (spiel, kontext) => {
+  const ninkasi = lernende(spiel);
+  if (!ninkasi || kontext.tiefe <= (ninkasi.tiefsteTiefe ?? kontext.tiefe)) return;
+  for (let tiefe = ninkasi.tiefsteTiefe + 1; tiefe <= kontext.tiefe; tiefe++) freieEpGeben(spiel, "tiefe", wertAufKurve(lernregeln(spiel).tiefenEp, tiefe), { tiefe });
+  ninkasi.tiefsteTiefe = kontext.tiefe;
+});
 
 const gleicheListe = (links, rechts) => links.length === rechts.length && links.every((eintrag, nummer) => eintrag === rechts[nummer]);
 
@@ -164,8 +181,10 @@ anmelden("haken", "nach_tod", (spiel, kontext) => {
   if (!ninkasi || !opfer || opfer === ninkasi || !opfer.beitraege?.length || !(opfer.ep > 0)) return;
   const ep = epDesOpfers(spiel, opfer);
   if (ep <= 0) return;
-  const { zuteilung, frei: freiAusDerTeilung } = epAufteilen(spiel, opfer.beitraege, ep);
-  let frei = freiAusDerTeilung, gesamt = freiAusDerTeilung;
+  // nur der gebundene Anteil geht über das Beitragsbuch, der Rest gleich frei
+  const gebunden = Math.floor((ep * lernregeln(spiel).anteilGebunden) / 100);
+  const { zuteilung, frei: freiAusDerTeilung } = epAufteilen(spiel, opfer.beitraege, gebunden);
+  let frei = freiAusDerTeilung + ep - gebunden, gesamt = frei;
   const skills = [];
   for (const name of Object.keys(spiel.daten.skills || {})) {
     const menge = zuteilung[name];

@@ -1,4 +1,4 @@
-// Lernen: freie EP aus Erkundung, Beitragsbuch mit aktiven und passiven Anlässen, Verteilung beim Tod,
+// Lernen: freie EP aus Tiefe und Wissen, gebundener Anteil, Beitragsbuch mit aktiven und passiven Anlässen, Verteilung beim Tod,
 // Querlernen, Überlauf zu freien EP, Topf je Abstammungslinie, Tötungen durch Beschworene
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -10,6 +10,7 @@ import { nahkampf } from "../src/systeme/kampf.js";
 import { sichtfeldAktualisieren } from "../src/systeme/sicht.js";
 import { zustandSetzen } from "../src/systeme/zustaende.js";
 import { epAufteilen } from "../src/systeme/lernen.js";
+import { hakenAusloesen } from "../src/kern/ereignisse.js";
 
 const KARTE = [
   "#########",
@@ -40,8 +41,9 @@ const WESEN = { zelle: { text: "w.zelle", fraktion: "feinde", werte: { lp: { gru
 const ZUSTAENDE = { gift: { text: "z.gift", tags: ["gift"] } };
 const FAUST = [{ name: "faust", genauigkeit: 100, effekt: "stoss", tags: ["nahkampf"] }];
 
-function aufstellen({ skills = SKILLS, regeln } = {}) {
-  const spiel = miniSpiel(KARTE, { skills, effekte: EFFEKTE, wesen: WESEN, zustaende: ZUSTAENDE, regeln });
+// die Tests des Beitragsbuchs binden alle EP (anteilGebunden 100), der Anteil hat einen eigenen Test
+function aufstellen({ skills = SKILLS, regeln = {} } = {}) {
+  const spiel = miniSpiel(KARTE, { skills, effekte: EFFEKTE, wesen: WESEN, zustaende: ZUSTAENDE, regeln: { ...regeln, lernen: { anteilGebunden: 100, ...regeln.lernen } } });
   const ninkasi = lernendeSpielerin(spiel, 1, 2);
   ninkasi.angriffe = FAUST;
   return { spiel, ninkasi, meldungen: meldungenMitschneiden(spiel) };
@@ -54,22 +56,66 @@ const toeten = (spiel, opfer, quelleId = null) => {
 
 const epMeldungen = (meldungen) => meldungen.filter((meldung) => meldung.art === "ep_erhalten");
 
-test("Erkundung: jedes zum ersten Mal gesehene Feld bringt epJeFeld freie EP, nur einmal", () => {
-  const { spiel, ninkasi } = aufstellen({ regeln: { lernen: { epJeFeld: 2 } } });
+test("Erkunden bringt keine EP: neu gesehene Felder werden erkundet, die freien EP bleiben", () => {
+  const { spiel, ninkasi } = aufstellen();
   ninkasi.sicht = { reichweite: 8 };
   spiel.zustand.ebene.erkundet.fill(0);
   sichtfeldAktualisieren(spiel);
-  const gesehen = spiel.zustand.sichtbareFelder.length;
-  assert.ok(gesehen > 0);
-  assert.equal(ninkasi.freieEp, 300 + 2 * gesehen);
+  assert.ok(spiel.zustand.sichtbareFelder.length > 0);
+  assert.ok(spiel.zustand.sichtbareFelder.every((index) => spiel.zustand.ebene.erkundet[index] === 1));
+  assert.equal(ninkasi.freieEp, 300);
+});
+
+test("Tiefen-EP: je neu erreichter Tiefe einmal nach der Kurve, übersprungene zählen mit, nicht in der Arena", () => {
+  const { spiel, ninkasi, meldungen } = aufstellen({ regeln: { lernen: { tiefenEp: [[1, 0], [2, 100], [4, 300]] } } });
+  assert.equal(ninkasi.tiefsteTiefe, spiel.zustand.tiefe);
+  const betreten = (tiefe) => hakenAusloesen(spiel, "ebene_betreten", { quelleId: ninkasi.id, zielId: ninkasi.id, kettentiefe: 0, tiefe });
+  ninkasi.tiefsteTiefe = 1;
+  betreten(2);
+  assert.equal(ninkasi.freieEp, 400);
+  betreten(1);
+  betreten(2);
+  assert.equal(ninkasi.freieEp, 400, "zurück und wieder hinab bringt nichts");
+  betreten(4);
+  assert.equal(ninkasi.freieEp, 400 + 200 + 300, "Tiefe 3 und 4");
+  assert.deepEqual(meldungen.filter((meldung) => meldung.art === "ep_frei").map((meldung) => [meldung.quelle, meldung.ep, meldung.was.tiefe]), [["tiefe", 100, 2], ["tiefe", 200, 3], ["tiefe", 300, 4]]);
+  spiel.optionen = { spielart: "arena" };
+  betreten(5);
+  assert.equal(ninkasi.freieEp, 900, "in der Arena keine freien EP");
+});
+
+test("Wissens-EP: das erste Sehen einer Wesenart bringt ihre EP nach wissenWesenart, je Art einmal, nur gesehen", () => {
+  const { spiel, ninkasi, meldungen } = aufstellen({ regeln: { lernen: { wissenWesenart: 50 } } });
+  ninkasi.sicht = { reichweite: 8 };
+  wesen(spiel, 4, 2, "feinde", 10, { typ: "zelle", text: "w.zelle", ep: 10 });
+  wesen(spiel, 5, 2, "feinde", 10, { typ: "zelle", text: "w.zelle", ep: 10 });
+  wesen(spiel, 6, 2, "feinde", 10, { typ: "ohne_ep", text: "w.ohne" });
   sichtfeldAktualisieren(spiel);
-  assert.equal(ninkasi.freieEp, 300 + 2 * gesehen);
-  const ohneLernen = miniSpiel(KARTE);
-  const andere = spielerinSetzen(ohneLernen, 1, 2);
-  andere.sicht = { reichweite: 8 };
-  ohneLernen.zustand.ebene.erkundet.fill(0);
-  sichtfeldAktualisieren(ohneLernen);
-  assert.equal(andere.freieEp, undefined, "ohne Lernstand bleibt alles still");
+  assert.equal(ninkasi.freieEp, 305, "die Hälfte von 10, nur einmal für die Art");
+  sichtfeldAktualisieren(spiel);
+  assert.equal(ninkasi.freieEp, 305);
+  assert.deepEqual(spiel.zustand.wissen.gesehen, ["zelle"]);
+  const meldung = meldungen.find((eintrag) => eintrag.art === "ep_frei");
+  assert.deepEqual([meldung.quelle, meldung.ep, meldung.was.typ], ["wissen", 5, "zelle"]);
+  // außer Sicht (hinter der Reichweite) zählt nichts
+  const fern = aufstellen();
+  fern.ninkasi.sicht = { reichweite: 1 };
+  wesen(fern.spiel, 7, 2, "feinde", 10, { typ: "zelle", text: "w.zelle", ep: 10 });
+  sichtfeldAktualisieren(fern.spiel);
+  assert.equal(fern.ninkasi.freieEp, 300);
+});
+
+test("Gebundener Anteil: nur anteilGebunden Prozent fließen über das Buch, der Rest kommt gleich frei", () => {
+  const { spiel, ninkasi, meldungen } = aufstellen({ skills: { hauen: SKILLS.hauen }, regeln: { lernen: { anteilGebunden: 50 } } });
+  const feind = wesen(spiel, 2, 2, "feinde", 50, { ep: 11 });
+  nahkampf(spiel, ninkasi, feind);
+  toeten(spiel, feind);
+  const [meldung] = epMeldungen(meldungen);
+  const gebunden = meldung.skills.reduce((summe, eintrag) => summe + eintrag.ep, 0);
+  assert.ok(gebunden > 0 && gebunden <= 5, "höchstens die Hälfte von 11, abgerundet, geht in Skills");
+  assert.ok(meldung.frei >= 6, "mindestens der freie Rest");
+  assert.equal(gebunden + meldung.frei, 11);
+  assert.equal(ninkasi.freieEp, 300 + meldung.frei);
 });
 
 test("Beitragsbuch: Treffer, Schaden und Zustand Ninkasis, je Anlass und Tags nur das erste Mal", () => {

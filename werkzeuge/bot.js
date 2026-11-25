@@ -204,7 +204,7 @@ function invariantenPruefen(spiel) {
 }
 
 // Skills und EP (src/systeme/skills.js, src/systeme/lernen.js): ganzzahlig, Stufe höchstens 5, und die freien EP
-// ändern sich nur durch Erkundung (wächst), Lernbefehle und den freien Teil gebundener EP (beides aus den Meldungen)
+// ändern sich nur durch Meldungen: ep_frei (Tiefe, Wissen), den freien Teil gebundener EP und Lernbefehle
 let epBuch = null;
 const epJeTiefe = {};
 
@@ -218,23 +218,27 @@ function lernstandPruefen(spiel) {
     if (!(Number.isInteger(lernpunkte) && lernpunkte >= 0 && lernpunkte <= hoechst)) throw new Error(`${name}: Lernpunkte ${lernpunkte}`);
     if (!(Number.isInteger(rest) && rest >= 0 && rest < bezugswert)) throw new Error(`${name}: Rest ${rest}`);
   }
-  const erkundung = ninkasi.freieEp - epBuch.erwartet;
-  if (erkundung < 0) throw new Error(`${-erkundung} freie EP verloren`);
-  const tiefe = (epJeTiefe[spiel.zustand.tiefe] ??= { erkundung: 0, gebunden: 0, frei: 0 });
-  tiefe.erkundung += erkundung;
-  epBuch.erwartet = ninkasi.freieEp;
+  const unerklaert = ninkasi.freieEp - epBuch.erwartet;
+  if (unerklaert < 0) throw new Error(`${-unerklaert} freie EP verloren`);
+  if (unerklaert > 0) throw new Error(`${unerklaert} freie EP ohne Meldung`);
 }
+
+const epTopf = (spiel) => (epJeTiefe[spiel.zustand.tiefe] ??= { tiefe: 0, wissen: 0, gebunden: 0, frei: 0 });
 
 // Lernmeldungen ins Buch; eine Verteilung muss aufgehen
 function lernmeldungBuchen(spiel, meldung) {
   if (meldung.art === "gelernt") epBuch.erwartet -= meldung.ep;
+  if (meldung.art === "ep_frei") {
+    epBuch.erwartet += meldung.ep;
+    epTopf(spiel)[meldung.quelle] += meldung.ep;
+  }
   if (meldung.art !== "ep_erhalten") return;
   const verteilt = meldung.skills.reduce((summe, eintrag) => summe + eintrag.ep, 0) + meldung.frei;
   if (verteilt !== meldung.ep) throw new Error(`ep_erhalten: ${meldung.ep} EP, verteilt ${verteilt}`);
   epBuch.erwartet += meldung.frei;
-  const tiefe = (epJeTiefe[spiel.zustand.tiefe] ??= { erkundung: 0, gebunden: 0, frei: 0 });
-  tiefe.gebunden += meldung.ep - meldung.frei;
-  tiefe.frei += meldung.frei;
+  const topf = epTopf(spiel);
+  topf.gebunden += meldung.ep - meldung.frei;
+  topf.frei += meldung.frei;
 }
 
 // Eine zufällige gültige Verteilung der Eigenschaften wie bei der Erstellung
@@ -479,7 +483,9 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
     let geladeneKopie = null;
     botLog.leeren(spiel);
     hoererAnmelden(spiel, (meldung) => mitWarnungen(() => botLog.melden(meldung)));
-    epBuch = { erwartet: daten.regeln.lernen.startEp };
+    // was Ninkasi beim Start schon sieht, bringt Wissens-EP, bevor der Hörer angemeldet ist
+    epBuch = { erwartet: spielerin(spiel.zustand).freieEp };
+    epTopf(spiel).wissen += spielerin(spiel.zustand).freieEp - daten.regeln.lernen.startEp;
     // Chronik wie im Browser: Meldungen und Sichtungen zählen, am Ende ein Eintrag (eingabe/chronik.js)
     const botChronik = neueChronik();
     const gesehen = new Set();
@@ -609,7 +615,7 @@ if (fehlendeTexte.size) {
 }
 // Grundlage der Anfangsbalance: was eine Tiefe an EP hergibt, gemittelt über die Läufe (Zahlen der Daten vorläufig)
 const budget = Object.entries(epJeTiefe).sort(([links], [rechts]) => links - rechts)
-  .map(([tiefe, { erkundung, gebunden, frei }]) => `Tiefe ${tiefe}: Erkundung ${Math.round(erkundung / anzahlLaeufe)}, gebunden ${Math.round(gebunden / anzahlLaeufe)}, frei aus Beute ${Math.round(frei / anzahlLaeufe)}`)
+  .map(([stelle, { tiefe, wissen, gebunden, frei }]) => `Tiefe ${stelle}: Tiefen-EP ${Math.round(tiefe / anzahlLaeufe)}, Wissen ${Math.round(wissen / anzahlLaeufe)}, gebunden ${Math.round(gebunden / anzahlLaeufe)}, frei aus Beute ${Math.round(frei / anzahlLaeufe)}`)
   .join("; ");
 console.log(`EP je Lauf: ${budget}`);
 console.log(`Speichern: ${anzahlGeladen} Läufe mitten im Lauf gespeichert und geladen`);
