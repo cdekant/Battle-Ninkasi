@@ -67,6 +67,7 @@ export function lueckenFinden(quellen) {
     }
   }
   if (quellen.korpus) korpusLuecken(quellen.korpus, quellen.literatur ?? [], melden);
+  if (quellen.literatur) glossarQuellenLuecken(quellen.rohdaten.glossar ?? {}, quellen.literatur, melden);
   return luecken;
 }
 
@@ -139,6 +140,16 @@ function textLuecken(rohdaten, texte, melden, stufeFuer) {
 // Korpustexte brauchen einen vollständigen Kopf und eine Quelle aus dem Literaturverzeichnis (siehe docs/Texte.md, Korpus)
 export const KORPUSKOPF = ["titel", "art", "vorlage", "quelle", "lizenz"];
 export const KORPUSARTEN = ["nachdichtung", "gemeinfrei", "eigen"];
+
+// Quellen der Glossareinträge (siehe docs/Texte.md, Glossar) stehen im Literaturverzeichnis
+function glossarQuellenLuecken(glossar, literatur, melden) {
+  const schluessel = new Set(literatur.map((eintrag) => eintrag.id));
+  for (const [name, eintrag] of Object.entries(glossar)) {
+    for (const quelle of eintrag.quellen ?? []) {
+      if (!schluessel.has(quelle)) melden("verweise", "fehler", `glossar.${name}`, `Quelle "${quelle}" fehlt in sprache/literatur.json`);
+    }
+  }
+}
 
 function korpusLuecken(korpus, literatur, melden) {
   const schluessel = new Set(literatur.map((eintrag) => eintrag.id));

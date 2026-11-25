@@ -1,8 +1,8 @@
 # Battle Ninkasi - Skills
 
-Stand: 2026-11-24, Entwurf; alle Kategorien entworfen ([Systemausbau.md](Systemausbau.md), Punkt 20)
+Stand: 2026-11-25, Entwurf; alle Kategorien entworfen ([Systemausbau.md](Systemausbau.md), Punkt 20)
 
-Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Wesen.md](Wesen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md), [Wirkungen.md](Wirkungen.md)
+Mitprüfen bei Änderungen: [Charakter.md](Charakter.md), [Wesen.md](Wesen.md), [Welt.md](Welt.md), [Gegenstaende.md](Gegenstaende.md), [Wirkungen.md](Wirkungen.md), [Texte.md](Texte.md)
 
 Dieses Designdokument ist der Skillkatalog im Entwurf, die Vision eines tiefen Skillsystems für Ninkasi. Die Regeln des Systems (Aufbau, Kosten, Wirkung, Fähigkeiten) stehen in [Charakter.md](Charakter.md), Skills.
 
@@ -447,7 +447,7 @@ Muster der Tiers: Grund Gelingen, Experte Ausbeute, Meister Güte; einzelne Sets
 
 ### Rezepte
 
-+ Bierrezepte folgen den Stilvorgaben, ihre Kennzahlen (Stammwürze, Bittere, Farbe, Alkohol) sind die Ziele eines Suds (siehe [Systemausbau.md](Systemausbau.md), Punkt 17)
++ Bierrezepte folgen den Stilvorgaben, ihre Kennzahlen (Stammwürze, Bittere, Farbe, Alkohol) sind die Ziele eines Suds (siehe [Texte.md](Texte.md), Bierstile)
 + Andere Rezepte findet Ninkasi unterwegs: Kvas, Kefir, Kombucha, Weine, Met, Cider; ihre Wirkung folgt den Zutaten
 + Ein Rezept nennt die Arten seiner Zutaten, seine Kultur und seine Schule als Tags, über die die Sets wirken und lernen
 + Gebrautes stapelt sich nach Rezept und Güte
@@ -520,7 +520,7 @@ Je Schule ein Set nach dem Muster der Kategorie, wirksam nur für Rezepte mit ih
 + Experte: Rezepte abwandeln, eine Zutat gegen eine verwandte tauschen, ohne das Rezept zu verlassen
 + Meister: freie Sude gelingen verlässlicher und werden leichter zum Hausrezept
 
-Umsetzung: offen, braucht das Brausystem und die Bierstile ([Systemausbau.md](Systemausbau.md), Punkte 10 und 17), Arbeit in Punkt 20
+Umsetzung: offen, braucht das Brausystem ([Systemausbau.md](Systemausbau.md), Punkt 10) und die Bierstile ([Texte.md](Texte.md), Bierstile), Arbeit in Punkt 20
 
 ## Anlagen und Fallen
 

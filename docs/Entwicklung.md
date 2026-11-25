@@ -1,6 +1,6 @@
 # Battle Ninkasi - Entwicklung
 
-Stand: 2026-11-24
+Stand: 2026-11-25
 
 Zuständig für: `starten.py`, `starten.bat`, `tests/*`, `werkzeuge/bot.js`, `werkzeuge/messung.js`, `werkzeuge/arena.js`, `werkzeuge/normierung.js`, `werkzeuge/kompendium.js`, `werkzeuge/kompendium.html`, `werkzeuge/luecken.js`, `werkzeuge/namensbuch.js`, `datenproben/*`
 
@@ -125,6 +125,7 @@ Gemessene Zahlen an einer Stelle, je mit Stand; neue Messungen ersetzen alte.
 Was `daten/` heute hält: nur, was die Regeln selbst brauchen, dazu Ninkasi; echter Inhalt kommt hier hinzu (siehe [Architektur.md](Architektur.md), Inhalte als Daten). Alle Zahlen vorläufig.
 
 + Regeln, Aktionen, Schadensarten, Eigenschaften, Taktiken (`nahkampf`, `fernkampf`), die Fraktion `ninkasi`; Gelände Wand, Boden, Tür offen und zu, Treppe hinauf und hinab; Effekte `faustschlag`, `eingeklemmt`, `brennen`, `rauch_husten`, `filmriss`; der Zustand `filmriss`; das Gas `rauch`; Ebenen Hub (Tiefe 0, ein leerer Raum mit Treppe hinab), Testkammer (21x11 Felder, leer) und die Arenakarten; die Abfolge allein ist nur der Hub
++ Das Glossar der Fachbegriffe des Brauens und 80 Bierstile mit ihren Kennzahlen (siehe [Texte.md](Texte.md), Glossar und Bierstile)
 + Ninkasi: 100 LP, 100 MP, 0 von 100 PP, Pegel 0 (nach oben offen), Glimmer 0 (nach oben offen), Sichtweite 6 (im Finstern 2), Bewegen 120, Faust 1W6+2 stumpf mit Genauigkeit 80 (80 % gegen ein Wesen ohne Ausweichen) und Kosten 50, ohne Fähigkeiten
 + Stoffwechsel je Welttick (`daten/ninkasi.js`) auf Ninkasis Skala, viermal so hoch wie die der Sterblichen: LP 0,25 nüchtern, 0,67 bei 6 ‰, darüber abnehmend; MP 0,5 nüchtern, 0 ab 12 ‰; PP Schwund 0,3 nüchtern, kaum noch bei 6 ‰, Stillstand ab 16 ‰, im Kampf Gewinn je Treffer ab 2 ‰; danach Abbau des Pegels um 0,02 ‰; Stufen des Rauschs von angeheitert (2 ‰) bis Vollrausch (32 ‰) werden angezeigt und gemeldet; ab 8 ‰ sinkt die Genauigkeit, ab 12 ‰ torkelt Ninkasi und schlägt daneben, ab 32 ‰ droht der Filmriss (siehe [Wesen.md](Wesen.md), Stoffwechsel); die Leiste zeigt zusätzlich das Optimum der LP
 + Alle Aktionen kosten 100 (`daten/aktionen.js`), abweichend Ninkasis Bewegen und die Angriffsprofile von Faust und Waffen; Tempo in Worten nach `regeln.tempo`

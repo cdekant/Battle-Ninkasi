@@ -1,10 +1,10 @@
 # Battle Ninkasi - Texte und Textkorpus
 
-Stand: 2026-11-24
+Stand: 2026-11-25
 
-Zuständig für: `sprache/*`, `src/anzeige/texte.js`, `src/anzeige/grammatik.js`, `src/anzeige/korpus.js`, `src/anzeige/glossar.js`, `daten/glossar.js`
+Zuständig für: `sprache/*`, `src/anzeige/texte.js`, `src/anzeige/grammatik.js`, `src/anzeige/korpus.js`, `src/anzeige/glossar.js`, `daten/glossar.js`, `daten/bierstile.js`
 
-Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Architektur.md](Architektur.md), [Entwicklung.md](Entwicklung.md), [Fundus.md](Fundus.md)
+Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Architektur.md](Architektur.md), [Entwicklung.md](Entwicklung.md), [Fundus.md](Fundus.md), [Skills.md](Skills.md)
 
 Grobskizze, auszuarbeiten.
 
@@ -52,7 +52,8 @@ Regeln:
 
 Daten:
 
-+ `daten/glossar.js` im Grundgerüst: `{ <name>: { gebiet, text } }`, z.B. `malz: { gebiet: "maelzen", text: "glossar.malz" }`; Gebiete bisher Rohstoffe, Mälzen, Sudhaus, Gärung, Keller, Verderb und Hygiene, Bierarten, Geschichte
++ `daten/glossar.js` im Grundgerüst: `{ <name>: { gebiet, text, quellen? } }`, z.B. `malz: { gebiet: "maelzen", text: "glossar.malz" }`; Gebiete bisher Rohstoffe, Mälzen, Sudhaus, Gärung, Keller, Verderb und Hygiene, Bierstile, Geschichte
++ `quellen` (freiwillig): Schlüssel aus `sprache/literatur.json`, auf die sich der Eintrag stützt; bisher bei den Bierstilen
 + In beiden Sprachdateien: `glossar.<name>` (der Begriff, ein einfacher Text), `glossar.<name>.erklaerung` (ein Satz, enzyklopädisch, ernsthaft und informativ) und `glossargebiet.<gebiet>`
 
 Schnittstellen:
@@ -62,10 +63,31 @@ Schnittstellen:
 
 Regeln:
 
-+ Die Datenprüfung verlangt je Begriff `text`, `text.erklaerung` und den Text des Gebiets, andere Felder sind ein Fehler; die Erklärungen zählen im Kompendium als genannt
++ Die Datenprüfung verlangt je Begriff `text`, `text.erklaerung` und den Text des Gebiets, `quellen` als Liste verschiedener Schlüssel, andere Felder sind ein Fehler; ob es die Quellen im Literaturverzeichnis gibt, prüfen das Kompendium (`lueckenFinden` mit `literatur`) und `tests/bierstile.test.js`; die Erklärungen zählen im Kompendium als genannt
 + Ein Begriff entsteht in beiden Sprachen zugleich, die Erklärung frei in jeder Sprache geschrieben; die englischen Begriffe sind die der Brauer (wort, grist, liquor), wo es keinen gibt, bleibt der deutsche (krausen)
 + Die Begriffe sind Inhalt und kommen von der Nutzerin bzw. dem Nutzer; die vorhandenen sind ein Startbestand, ein Skill zum Anlegen folgt mit Punkt 11 (siehe [Systemausbau.md](Systemausbau.md))
 + Das Glossar im Spiel kommt später (siehe [Ausblick.md](Ausblick.md), Bestiarium, Glossar, Rezeptbuch)
+
+## Bierstile
+
+Die allgemein anerkannten Bierstile mit ihren Kennzahlen, zusammengefasst aus den Richtlinien für Bierwettbewerbe; Ziele für die Rezepte des Brausystems (siehe [Systemausbau.md](Systemausbau.md), Punkt 10).
+
+Daten:
+
++ `daten/bierstile.js` im Grundgerüst: `{ <name>: { familie, gaerung, stammwuerze, bittere, farbe, alkohol } }`, z.B. `pils: { familie: "lager_hell", gaerung: "untergaerig", stammwuerze: [110, 129], bittere: [25, 50], farbe: [5, 8], alkohol: [44, 53] }`
++ Kennzahlen als Spanne `[unten, oben]` in ganzen Zahlen: Stammwürze in Zehntel °Plato, Bittere in IBU, Farbe in EBC, Alkohol in Zehntel Vol.-%
++ `gaerung`: eine von `GAERUNGEN` in `src/kern/daten.js` (obergaerig, untergaerig, spontan, gemischt)
++ Familien: Helles Lager, Bernsteinfarbenes und dunkles Lager, Bock, Weizen, Deutsche obergärige Biere, Britische Ales, Porter und Stout, Amerikanische Ales, Belgische Ales, Sauer und wild, Historische Biere; Namen unter `bierfamilie.<familie>` in beiden Sprachdateien; weitere Familien (sumerisch, ägyptisch, mittelalterlich) kommen mit dem Brausystem
++ Begriff, Erklärung und Quellen jedes Stils stehen im Glossar unter demselben Namen im Gebiet `bierstile`; dort stehen auch die Oberbegriffe Ale, Lagerbier, Bockbier, Sauerbier und Kwass ohne Kennzahlen
+
+Regeln:
+
++ 80 Stile, aufgenommen, wenn mindestens zwei der Richtlinien `bjcp2021styleguidelines`, `ba2025styleguidelines` und `ebs2025kategorien` sie beschreiben; Spielarten (amerikanische Abwandlungen, Frucht, Holz, Kräuter, Honig, Rauch auf einem Grundstil) fallen unter den Grundstil oder sind Zusätze im Brausystem
++ Jede Grenze ist der Median dieser Grenze in den Richtlinien, die einen Wert nennen; offene Grenzen ("40+ SRM", "< 29 EBC") zählen nur auf ihrer Seite; so liegt die Spanne zwischen Schnittmenge und Gesamtspanne, und eine einzelne weite Auslegung zieht sie nicht auf
++ Umrechnung: SRM mal 1,97 ergibt EBC, das spezifische Gewicht geht über die übliche Näherung in °Plato; Kellerbier nimmt die untere Grenze der Farbe vom Helles, weil nur der EBS eine obere nennt
++ `quellen` eines Stils nennen nur die Richtlinien, deren Zahlen eingeflossen sind; `ba2016worldbeercup` ist die ältere Ausgabe der Brewers Association und zählt nicht mit, sonst hätte sie beim Median zwei Stimmen
++ Die Texte sind eigene Zusammenfassungen ohne Wortlaut der Richtlinien (siehe Korpus)
++ `tests/bierstile.test.js` prüft Zahl, Glossar, Familien, plausible Grenzen der Kennzahlen und dass der Alkohol zur Stammwürze passt
 
 ## Erzeugte Texte
 
@@ -151,7 +173,7 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 
 + Varianten desselben Originals tragen die Endung `-b`, `-c` usw.; sie folgen einer anderen Lesart oder anderen Bildern und erweitern so den Wortschatz der Markow-Ketten
 + Die englischen Korpustexte sind aus unseren deutschen Nachdichtungen übertragen, im selben altertümlichen Ton (thou, hath) und mit denselben Dateinamen; aus den modernen Übersetzungen der Fachquellen stammt kein Wortlaut
-+ Weitere Fachquellen ohne eigene Nachdichtung: `sallaberger2012bierbrauen` (auf ZORA nicht gefunden, keine freie Lizenz bekannt, daher keine wörtlichen Zitate); für die Bierstile `bjcp2021styleguidelines`, `ba2025styleguidelines`, `ba2016worldbeercup` und `ebs2025kategorien` (keine freie Lizenz, Merkmale und Kennzahlen nur eigenständig zusammengefasst)
++ Weitere Fachquellen ohne eigene Nachdichtung: `sallaberger2012bierbrauen` (auf ZORA nicht gefunden, keine freie Lizenz bekannt, daher keine wörtlichen Zitate); für die Bierstile `bjcp2021styleguidelines`, `ba2025styleguidelines`, `ba2016worldbeercup` und `ebs2025kategorien` (keine freie Lizenz, Merkmale und Kennzahlen nur eigenständig zusammengefasst, siehe Bierstile)
 
 ## Offen
 

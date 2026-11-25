@@ -14,6 +14,7 @@ import schichten from "./schichten.js";
 import eigenschaften from "./eigenschaften.js";
 import taktiken from "./taktiken.js";
 import glossar from "./glossar.js";
+import bierstile from "./bierstile.js";
 import zustaende from "./zustaende.js";
 
 export default {
@@ -37,6 +38,7 @@ export default {
   arenen: {},
   taktiken,
   glossar,
+  bierstile,
   // Tiefen von oben nach unten: 0 ist der Hub, das Spiel beginnt in starttiefe; der Plan des Laufs übernimmt sie (src/welt/plan.js)
   abfolge: ["hub"],
   starttiefe: 0,

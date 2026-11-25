@@ -1,6 +1,6 @@
 # Battle Ninkasi - Systemausbau
 
-Stand: 2026-11-24
+Stand: 2026-11-25
 
 Mitprüfen bei Änderungen: alle Dokumente, deren Punkte hier umgesetzt werden
 
@@ -10,18 +10,18 @@ Arbeitsliste der offenen Arbeit an Systemen, Werkzeugen und Doku, bevor und wäh
 
 + Jeder Punkt wird vor der Umsetzung als Vorschlag ausgearbeitet und freigegeben
 + Status je Punkt: offen oder in Arbeit
-+ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 8, 10, 11, 16, 17, 20 und 22 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
++ Konkreter Inhalt (Gegner, Gegenstände, Effekte, Skills, Fähigkeiten, Rituale, Quests, Raumstrukturen) entsteht erst, wenn die Punkte 8, 10, 11, 16, 20 und 22 erledigt sind; bis dahin gibt es nur Probeinhalt zum Ausprobieren der Systeme (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt)
 
 ## Reihenfolge
 
-Stand 2026-11-24, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer Wirkung auf den Inhalt, das Kleine und Breite zuerst:
+Stand 2026-11-25, vor dem Inhalt in dieser Folge, die Systemlücken nach ihrer Wirkung auf den Inhalt, das Kleine und Breite zuerst:
 
-1. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10): die Bierstile (Punkt 17) vor dem Brausystem, Machtkurve; die Fernwaffen (Punkt 22)
+1. Spieldesign vor dem Inhalt mit der Machtkurve (Punkt 10): Brausystem, Machtkurve; die Fernwaffen (Punkt 22)
 2. Ebenenbau: Ebenenbilder, Übergänge und feste Strukturen (Punkt 16)
 3. Anleitungen, Werkzeuge und Grundgerüst (Punkt 11)
 4. Danach der Inhalt (Punkt 14)
 
-Daneben, ohne festen Platz: Skills für Anhänger (Punkt 21, Umbaurisiko gering, umgesetzt mit den Begleitern bzw. den Geistern früherer Läufe), kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12), Korpustexte aus dem Gilgamesch-Epos (Punkt 18), Auszeichnung in Texten (Punkt 19, spätestens mit dem Fenster des Glossars); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 3 (Licht, Wahrnehmungsarten, Spüren und Duft), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen), Punkt 9 (Englisch, Mehrzahl und Glossar), Punkt 15 (Reste des Effektsystems) und der Entwurf des Skillkatalogs in [Skills.md](Skills.md) (Grundlage von Punkt 20), die Nummern der übrigen bleiben.
+Daneben, ohne festen Platz: Skills für Anhänger (Punkt 21, Umbaurisiko gering, umgesetzt mit den Begleitern bzw. den Geistern früherer Läufe), kleinere Reste der Systeme mit dem ersten Bedarf (Punkt 8), Oberfläche (Punkt 12), Korpustexte aus dem Gilgamesch-Epos (Punkt 18), Auszeichnung in Texten (Punkt 19, spätestens mit dem Fenster des Glossars); zurückgestellt: Darstellung (Punkt 13). Erledigt sind Punkt 1 (Probeinhalt auslagern), Punkt 2 (Probedurchstich), Punkt 3 (Licht, Wahrnehmungsarten, Spüren und Duft), Punkt 4 (Ersatzwirkungen), Punkt 5 (gewährte und gelehrte Fähigkeiten), Punkt 6 (Teilung und Wachstum), Punkt 7 (KI: Unterstützung und Umherziehen), Punkt 9 (Englisch, Mehrzahl und Glossar), Punkt 15 (Reste des Effektsystems), Punkt 17 (Bierstile) und der Entwurf des Skillkatalogs in [Skills.md](Skills.md) (Grundlage von Punkt 20), die Nummern der übrigen bleiben.
 
 Die Proben des Probedurchstichs stehen in `tests/probedurchstich.test.js`; jede Lücke dort ist ein Test mit `todo` und dem Punkt, der sie schließt, mit einem Entwurf der Daten (siehe [Entwicklung.md](Entwicklung.md), Tests und Balancing). Wer einen Punkt umsetzt, nimmt dort das `todo` weg.
 
@@ -60,6 +60,8 @@ Status: in Arbeit; jeweils zuerst in [Grundlagen.md](Grundlagen.md), [Charakter.
 
 + Brausystem: Kern des Spiels, bestimmt Zutaten, Gegenstände, Beute, Orte und Rezepte; Brauen danach als eigene Art langer Aktion (offen in [Grundlagen.md](Grundlagen.md), Spielkern); die Skills dazu stehen in [Skills.md](Skills.md), Brauen
   + Vorschlag: ein Sud, der verdirbt, bringt einen Verderber als Gegner hervor (Brettanomyces aus dem eigenen Kessel); das gibt der Hygiene Gewicht
+  + Die Kennzahlen der Bierstile als Ziele der Rezepte (siehe [Texte.md](Texte.md), Bierstile); Spielarten wie Frucht, Holz, Kräuter, Honig und Rauch als Zusätze auf einem Grundstil
+  + Weitere Familien von Bierstilen: sumerisch (die Biere nach `sallaberger2012bierbrauen`), ägyptisch, mittelalterlich; dazu die Zuordnung der Stile zu den Epochen (siehe [Spielverlauf.md](Spielverlauf.md), Epochen und Wertschöpfungskette)
 + Machtkurve: Budget je Tiefe für alle Arten von Inhalt als Regelwerte, ein Werkzeug warnt bei Ausreißern (Vorläufer `werkzeuge/normierung.js`, siehe [Wesen.md](Wesen.md), Normierung); braucht Pegel und Brausystem; darin:
   + Ziel der Anfangsbalance am Ende des ersten Kapitels für eine ausgewogene und eine spezialisierte Ninkasi (siehe [Charakter.md](Charakter.md), Skills)
   + Kernskills der Archetypen als Prüfsteine für Arena und Simulation (siehe [Spielverlauf.md](Spielverlauf.md), Was zwei Läufe unterscheidet)
@@ -143,14 +145,6 @@ Status: offen, in eigenen Sitzungen; das Spieldesign steht in [Spielverlauf.md](
 + Feste Strukturen und Raumstrukturen in den zufälligen Ebenen (siehe [Ausblick.md](Ausblick.md), Feste Strukturen)
 + Ebenen unter freiem Himmel
 + Hub zwischen den Kapiteln im Plan des Laufs: der Lauf beginnt im leeren Hub, nach dem Boss führt der Weg in den Hub der nächsten Stufe, Figuren aus den Leveln seit dem letzten Boss ziehen ein (siehe [Spielverlauf.md](Spielverlauf.md), Hub); heute steht der Hub im Probeinhalt als Tiefe 0 vor dem ersten Level
-
-## 17. Bierstile
-
-Status: offen, als eigene Sitzung vor dem Brausystem (Punkt 10)
-
-+ Die allgemein anerkannten Merkmale der Bierstile aus den vier Richtlinien zusammenfassen: `bjcp2021styleguidelines`, `ba2025styleguidelines`, `ba2016worldbeercup`, `ebs2025kategorien` in `sprache/literatur.json`; nur eigene Texte, kein Wortlaut (siehe [Texte.md](Texte.md), Korpus)
-+ Bierstile als Glossareinträge, jeder mit diesen Quellen; das Glossar braucht dafür ein Feld für Quellen, heute sind andere Felder als `gebiet` und `text` ein Fehler (siehe [Texte.md](Texte.md), Glossar)
-+ Kennzahlen der Stile (Stammwürze, Bittere, Farbe, Alkohol) als Ziele für die Rezepte des Brausystems
 
 ## 18. Korpustexte aus dem Gilgamesch-Epos
 

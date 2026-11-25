@@ -1154,19 +1154,49 @@ function pruefeZustand(daten, sprache, name, zustand, fehler) {
   if (zustand.faehigkeiten !== undefined) pruefeFaehigkeitsliste(daten, zustand.faehigkeiten, ort, fehler);
 }
 
-// Glossar (daten/glossar.js): je Begriff ein Gebiet und ein Text, dazu <text>.erklaerung und glossargebiet.<gebiet>
+// Glossar (daten/glossar.js): je Begriff ein Gebiet und ein Text, dazu <text>.erklaerung und glossargebiet.<gebiet>;
+// quellen (freiwillig) sind Schlüssel aus sprache/literatur.json, ob es sie gibt, prüfen Kompendium und Test des Glossars
 function pruefeGlossar(daten, sprache, fehler) {
   if (daten.glossar === undefined) return;
   if (!istObjekt(daten.glossar)) return fehler.push("glossar: muss ein Objekt sein");
   for (const [name, eintrag] of Object.entries(daten.glossar)) {
     const ort = `glossar.${name}`;
     if (!istObjekt(eintrag)) { fehler.push(`${ort}: muss ein Objekt sein`); continue; }
-    const fremd = Object.keys(eintrag).filter((feld) => !["gebiet", "text"].includes(feld));
+    const fremd = Object.keys(eintrag).filter((feld) => !["gebiet", "text", "quellen"].includes(feld));
     if (fremd.length) fehler.push(`${ort}: unbekannte Felder ${fremd.join(", ")}`);
     pruefeText(sprache.texte, eintrag.text, ort, fehler);
     if (typeof eintrag.text === "string") pruefeText(sprache.texte, `${eintrag.text}.erklaerung`, `${ort}.erklaerung`, fehler);
     if (typeof eintrag.gebiet !== "string") fehler.push(`${ort}: gebiet fehlt`);
     else pruefeText(sprache.texte, `glossargebiet.${eintrag.gebiet}`, `${ort}.gebiet`, fehler);
+    const { quellen } = eintrag;
+    if (quellen !== undefined && (!Array.isArray(quellen) || !quellen.length || !quellen.every((quelle) => typeof quelle === "string") || new Set(quellen).size !== quellen.length)) {
+      fehler.push(`${ort}: quellen muss eine Liste verschiedener Schlüssel sein`);
+    }
+  }
+}
+
+// Bierstile (daten/bierstile.js, siehe docs/Texte.md, Bierstile): Familie mit Text, Gärung, vier Kennzahlen als
+// ganzzahlige Spanne [unten, oben] mit unten < oben, dazu ein Eintrag gleichen Namens im Gebiet bierstile des Glossars
+export const GAERUNGEN = ["obergaerig", "untergaerig", "spontan", "gemischt"];
+export const KENNZAHLEN_DER_BIERSTILE = ["stammwuerze", "bittere", "farbe", "alkohol"];
+
+function pruefeBierstile(daten, sprache, fehler) {
+  if (daten.bierstile === undefined) return;
+  if (!istObjekt(daten.bierstile)) return fehler.push("bierstile: muss ein Objekt sein");
+  for (const [name, stil] of Object.entries(daten.bierstile)) {
+    const ort = `bierstile.${name}`;
+    if (!istObjekt(stil)) { fehler.push(`${ort}: muss ein Objekt sein`); continue; }
+    const fremd = Object.keys(stil).filter((feld) => !["familie", "gaerung", ...KENNZAHLEN_DER_BIERSTILE].includes(feld));
+    if (fremd.length) fehler.push(`${ort}: unbekannte Felder ${fremd.join(", ")}`);
+    if (typeof stil.familie !== "string") fehler.push(`${ort}: familie fehlt`);
+    else pruefeText(sprache.texte, `bierfamilie.${stil.familie}`, `${ort}.familie`, fehler);
+    if (!GAERUNGEN.includes(stil.gaerung)) fehler.push(`${ort}: gaerung muss eine von ${GAERUNGEN.join(", ")} sein`);
+    for (const kennzahl of KENNZAHLEN_DER_BIERSTILE) {
+      const spanne = stil[kennzahl];
+      const gueltig = Array.isArray(spanne) && spanne.length === 2 && spanne.every((wert) => istGanzzahl(wert) && wert >= 0) && spanne[0] < spanne[1];
+      if (!gueltig) fehler.push(`${ort}: ${kennzahl} muss eine Spanne [unten, oben] aus ganzen Zahlen ab 0 mit unten < oben sein`);
+    }
+    if (daten.glossar?.[name]?.gebiet !== "bierstile") fehler.push(`${ort}: braucht einen Eintrag ${name} im Gebiet bierstile des Glossars`);
   }
 }
 
@@ -1396,6 +1426,7 @@ export function vorbereiten(rohdaten, sprache = {}) {
   pruefeTaktiken(daten, sprache, fehler);
   pruefeArenen(daten, sprache, fehler);
   pruefeGlossar(daten, sprache, fehler);
+  pruefeBierstile(daten, sprache, fehler);
   for (const [name, gelaende] of Object.entries(daten.gelaende)) {
     pruefeText(sprache.texte, gelaende.text, `gelaende.${name}`, fehler);
     if (typeof gelaende.kennung !== "string" || gelaende.kennung.length !== 1) fehler.push(`gelaende.${name}: kennung muss genau ein Zeichen sein`);
