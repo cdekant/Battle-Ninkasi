@@ -211,7 +211,7 @@ test("Braufenster: öffnet nur am Kessel, Portionen nach Flaschen und Kessel, Bu
   tragen(spiel, ninkasi, "kraut", 1);
   tragen(spiel, ninkasi, "flasche", 1);
   let { zustand } = braufensterOeffnen(spiel);
-  assert.deepEqual(zustand, { kessel: { x: 3, y: 1 }, portionen: 1, mengen: {}, maische: "warm", gewuerz: "frueh", kultur: "hefe", liste: "zutaten" }, "so viele Portionen wie Flaschen");
+  assert.deepEqual(zustand, { kessel: { x: 3, y: 1 }, portionen: 1, mengen: {}, maische: "warm", gewuerz: "frueh", kultur: "hefe", absicht: "elixier", liste: "zutaten" }, "so viele Portionen wie Flaschen");
   const taste = (code, zusatz = {}) => (zustand = brauTaste(zustand, { code, ...zusatz }, spiel).zustand);
   for (let i = 0; i < 5; i++) taste("NumpadAdd");
   assert.equal(zustand.portionen, 4, "höchstens die Portionen des Kessels");
@@ -223,10 +223,13 @@ test("Braufenster: öffnet nur am Kessel, Portionen nach Flaschen und Kessel, Bu
   assert.equal(zustand.mengen[malz.id], 1);
   taste("Digit1"); taste("Digit2"); taste("Digit3");
   assert.deepEqual([zustand.maische, zustand.gewuerz, zustand.kultur], ["kuehl", "spaet", null]);
+  taste("Digit4");
+  assert.equal(zustand.absicht, "gift", "4 wechselt die Absicht");
+  taste("Digit4");
   taste("Digit3");
   const ende = brauTaste(zustand, { code: "Enter" }, spiel);
   assert.equal(ende.zustand, null);
-  assert.deepEqual(ende.befehl, { art: "brauen", kessel: { x: 3, y: 1 }, portionen: 1, zutaten: [{ gegenstandId: malz.id, menge: 1 }], verfahren: { maische: "kuehl", gewuerz: "spaet" }, kultur: "hefe" });
+  assert.deepEqual(ende.befehl, { art: "brauen", kessel: { x: 3, y: 1 }, portionen: 1, zutaten: [{ gegenstandId: malz.id, menge: 1 }], verfahren: { maische: "kuehl", gewuerz: "spaet" }, kultur: "hefe", absicht: "elixier" });
   assert.equal(befehlGeben(spiel, ende.befehl).ok, true);
   assert.deepEqual(klickDeuten(spiel, { x: 3, y: 1 }), { aktion: "brauen" }, "ein Klick auf den Kessel daneben öffnet das Fenster");
 

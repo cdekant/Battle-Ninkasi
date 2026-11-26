@@ -7,7 +7,8 @@
 //              Kessel und leere Gefäße erlauben; je Portion höchstens regeln.brauen.stueckeJePortion Stück Zutaten
 //   verfahren: Schlüssel aus regeln.brauen.maische und regeln.brauen.gewuerz, Vorgabe regeln.brauen.verfahren
 //   kultur:    eine Kultur der Brauerin (wesen.kulturen) oder "spontan" (die Flora der Ebene, systeme/flora.js); ohne
-//              Kultur gärt der Sud nicht (kein Alkohol)
+//              Kultur wird der Sud ein Absud (systeme/absud.js)
+//   absicht:   nur für den Absud: "elixier" (Vorgabe) oder "gift"
 //   Ablehnungen: im_kampf, kein_kessel, keine_zutaten, keine_zutat, zu_viel, kessel_voll, zu_viele_portionen,
 //                kultur_unbekannt, keine_flora (spontan auf einer Ebene ohne Flora), keine_gefaesse (weniger leere Gefäße
 //                als Portionen), ungueltig
@@ -16,6 +17,9 @@
 // regeln.brauen.schwach.chance sauer (die Säure steigt um schwach.plus), sonst gelungen; Zutaten und Gefäße sind
 // verbraucht, die Portionen kommen ins Gepäck und beginnen zu reifen (systeme/reifen.js).
 // Meldungen: gebraut (ohne Zielgebiet), gebraut_getroffen (mit zielgebiet), gebraut_verdorben, je mit wer, was, anzahl
+// Absud: der Wurf "absud" (1 bis 100) wählt zwischen misslungen, gelungen und umgeschlagen (systeme/absud.js); die Kräuter
+// darin lernt Ninkasi kennen, die Sorte erkennt sie; Meldungen absud_gelungen, absud_umgeschlagen, absud_misslungen mit
+// wer, was und anzahl. Ein Absud verdirbt nicht.
 // Baustein sud_wirken: wirkt beim Trinken den Sud aus der Ablage (kontext.werte.sud, gesetzt von trinken in
 // systeme/inventar.js): Heilung je Wert, Zustände über die Zeit, Pegel, Effekt des Zielgebiets.
 // Kulturen gewinnen (Haken aufgehoben): ein Gegenstand mit kultur: name gibt seine Kultur an das Wesen, das ihn aufhebt,
@@ -36,6 +40,8 @@ import { insInventar, anzahlVon } from "./inventar.js";
 import { kulturGebucht, zutatGebucht } from "./wissen.js";
 import { aufgedeckteZielgebiete, rezeptFinden, nachDemSud } from "./rezepte.js";
 import { stufenBeginnen, verderberWuerfeln } from "./reifen.js";
+import { POLE, gegenpol, absudregeln, absudVorbereiten, ausgangWuerfeln, getraenkFuer, krautKennenlernen } from "./absud.js";
+import { erkennen } from "./kennen.js";
 import {
   brauregeln, achsenVon, sudRechnen, unschaerfeBerechnen, kulturdatenVon, SPONTAN, bereichBerechnen, zielgebietFinden, erreichbareZielgebiete,
   profilRunden, gueteRunden, wirkungBerechnen,
@@ -68,7 +74,9 @@ const anzahlGefaesse = (spiel, wesen) => gefaesseIm(spiel, wesen).reduce((summe,
 // Prüft einen Befehl und rechnet seine Vorschau; { grund } oder { kessel, eingabe, mitte, gaerung, unschaerfe, bereich,
 // erreichbar, fuellung, fassen, portionen, gefaesse, rezept }; erreichbar nennt nur aufgedeckte Zielgebiete, rezept ist
 // der Schlüssel des Rezepts im Buch, nach dem gebraut wird (systeme/rezepte.js), oder null. Die Vorschau prüft weder den Kampf noch die Gefäße, damit das
-// Fenster auch dann rechnet; fassen ist die höchste Füllung für diese Portionen.
+// Fenster auch dann rechnet; fassen ist die höchste Füllung für diese Portionen. Ohne Kultur ein Absud: { art: "absud",
+// kessel, eingabe: { zutaten, portionen, absicht }, wahr, vermutet, unbekannt, fuellung, fassen, portionen, gefaesse,
+// rezept: null } (systeme/absud.js absudVorbereiten).
 export function sudVorbereiten(spiel, wesen, befehl) {
   const regeln = brauregeln(spiel.daten);
   const kessel = kesselBei(spiel, wesen, befehl.kessel ?? null);
@@ -76,6 +84,8 @@ export function sudVorbereiten(spiel, wesen, befehl) {
   const verfahren = { ...regeln.verfahren, ...befehl.verfahren };
   if (!regeln.maische[verfahren.maische] || !regeln.gewuerz[verfahren.gewuerz]) return { grund: "ungueltig" };
   const kultur = befehl.kultur ?? null;
+  const absicht = befehl.absicht ?? POLE[0];
+  if (kultur === null && !POLE.includes(absicht)) return { grund: "ungueltig" };
   const flora = spiel.zustand.ebene?.flora ?? null;
   if (kultur === SPONTAN && !flora) return { grund: "keine_flora" };
   if (kultur !== null && kultur !== SPONTAN && !(wesen.kulturen || []).includes(kultur)) return { grund: "kultur_unbekannt" };
@@ -97,6 +107,10 @@ export function sudVorbereiten(spiel, wesen, befehl) {
   if (portionen > kessel.kessel.portionen) return { grund: "zu_viele_portionen" };
   const fassen = portionen * regeln.stueckeJePortion;
   if (fuellung > fassen) return { grund: "kessel_voll" };
+  if (kultur === null) {
+    const eingabe = { zutaten, portionen, absicht };
+    return { art: "absud", kessel, eingabe, ...absudVorbereiten(spiel, wesen, eingabe), fuellung, fassen, portionen, gefaesse, rezept: null };
+  }
   const kulturdaten = kulturdatenVon(spiel.daten, kultur, flora);
   const vertraegt = kulturdaten ? modifiziert(spiel, wesen, "brauen.vertraegt", kulturdaten.vertraegt) : undefined;
   const eingabe = { zutaten, verfahren, kultur, portionen, vertraegt, ...(kultur === SPONTAN && { flora }) };
@@ -176,22 +190,14 @@ anmelden("befehle", "brauen", {
   },
   ausfuehren(spiel, akteur, befehl) {
     const vorbereitet = sudVorbereiten(spiel, akteur, befehl);
+    if (vorbereitet.art === "absud") return absudAbfuellen(spiel, akteur, befehl, vorbereitet);
     const ergebnis = ergebnisBestimmen(spiel, akteur, vorbereitet);
     for (const { gegenstandId, menge } of befehl.zutaten) mengeVerbrauchen(spiel, akteur, entitaetMitId(spiel.zustand, gegenstandId), menge);
-    // je Portion ein Gefäß in der Reihenfolge des Gepäcks; das Getränk wiegt sein Gefäß und wird nach dem Trinken wieder dazu
-    let portion = null;
-    for (let i = 0; i < vorbereitet.portionen; i++) {
-      const gefaess = gefaesseIm(spiel, akteur)[0];
-      const gefaessTyp = gefaess.typ, gefaessGewicht = gefaess.gewicht ?? 0;
-      mengeVerbrauchen(spiel, akteur, gefaess, 1);
-      const getraenk = ausDatenErzeugen(spiel, "gegenstaende", ergebnis.typ, null);
+    const portion = portionenAbfuellen(spiel, akteur, vorbereitet.portionen, ergebnis.typ, (getraenk) => {
       getraenk.sud = structuredClone(ergebnis.sud);
       if (ergebnis.text) getraenk.text = ergebnis.text;
-      getraenk.wirdZu = gefaessTyp;
-      getraenk.gewicht = gefaessGewicht + brauregeln(spiel.daten).gewichtJePortion;
       stufenBeginnen(spiel, akteur, getraenk, ergebnis.verdorben);
-      portion = insInventar(spiel, akteur, getraenk);
-    }
+    });
     const art = ergebnis.typ !== brauregeln(spiel.daten).getraenk ? "gebraut_verdorben" : ergebnis.sud.zielgebiet ? "gebraut_getroffen" : "gebraut";
     melden(spiel, art, { wer: bezugAuf(akteur), was: { ...bezugAuf(portion), anzahl: vorbereitet.portionen }, anzahl: vorbereitet.portionen, zielgebiet: ergebnis.sud.zielgebiet });
     if (art === "gebraut_getroffen") nachDemSud(spiel, akteur, vorbereitet, ergebnis.sud.zielgebiet);
@@ -199,6 +205,45 @@ anmelden("befehle", "brauen", {
     return "brauen";
   },
 });
+
+// Füllt so viele Portionen eines Gegenstands typ ab, je Portion ein Gefäß in der Reihenfolge des Gepäcks; das Getränk
+// wiegt sein Gefäß und wird nach dem Trinken wieder dazu; einrichten(getraenk) setzt vor dem Einsortieren, was es trägt.
+// Gibt die letzte Portion im Gepäck (für die Meldung)
+function portionenAbfuellen(spiel, akteur, portionen, typ, einrichten) {
+  let portion = null;
+  for (let i = 0; i < portionen; i++) {
+    const gefaess = gefaesseIm(spiel, akteur)[0];
+    const gefaessTyp = gefaess.typ, gefaessGewicht = gefaess.gewicht ?? 0;
+    mengeVerbrauchen(spiel, akteur, gefaess, 1);
+    const getraenk = ausDatenErzeugen(spiel, "gegenstaende", typ, null);
+    getraenk.wirdZu = gefaessTyp;
+    getraenk.gewicht = gefaessGewicht + brauregeln(spiel.daten).gewichtJePortion;
+    einrichten(getraenk);
+    portion = insInventar(spiel, akteur, getraenk);
+  }
+  return portion;
+}
+
+// Ein Absud am Kessel (siehe Kopf und systeme/absud.js), gewürfelt nach den wahren Chancen
+function absudAbfuellen(spiel, akteur, befehl, vorbereitet) {
+  const { wahr, eingabe } = vorbereitet;
+  const regeln = absudregeln(spiel.daten);
+  const ausgang = ausgangWuerfeln(wurfGanzzahl(spiel, "absud", 1, 100), wahr.chancen);
+  for (const { gegenstandId, menge } of befehl.zutaten) mengeVerbrauchen(spiel, akteur, entitaetMitId(spiel.zustand, gegenstandId), menge);
+  for (const typ of vorbereitet.unbekannt) krautKennenlernen(spiel, akteur, typ);
+  const pol = ausgang === "gelungen" ? eingabe.absicht : gegenpol(eingabe.absicht);
+  const typ = ausgang === "misslungen" ? regeln.misslungen : getraenkFuer(spiel.daten, wahr.fuehrend, pol);
+  // erkannt vor dem Erzeugen, damit die Portionen kein Etikett tragen (systeme/kennen.js)
+  erkennen(spiel, akteur, typ);
+  const portion = portionenAbfuellen(spiel, akteur, vorbereitet.portionen, typ, (getraenk) => {
+    if (ausgang === "misslungen") return;
+    getraenk.absud = { richtung: wahr.fuehrend, pol, staerke: wahr.staerke };
+    const adjektiv = regeln.adjektive?.[wahr.staerke];
+    if (adjektiv) getraenk.adjektive = [adjektiv];
+  });
+  melden(spiel, `absud_${ausgang}`, { wer: bezugAuf(akteur), was: { ...bezugAuf(portion), anzahl: vorbereitet.portionen }, anzahl: vorbereitet.portionen });
+  return "brauen";
+}
 
 // Wirkung eines getrunkenen Suds, siehe wirkungBerechnen in systeme/sud.js
 bausteinAnmelden("sud_wirken", {}, (spiel, kontext) => {

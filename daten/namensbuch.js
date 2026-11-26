@@ -10,7 +10,7 @@ export default {
   },
   gegenstaende: {
     fest: [],
-    vorlaeufig: ["sud", "sud_verdorben", "essig"],
+    vorlaeufig: ["sud", "sud_verdorben", "bruehe", "essig"],
   },
   eigenschaften: {
     fest: ["koerperlichkeit", "trinkfestigkeit", "gewandtheit", "sinnlichkeit", "klugheit", "braukunde"],
@@ -26,7 +26,7 @@ export default {
   },
   zustaende: {
     fest: [],
-    vorlaeufig: ["filmriss", "gestaerkt"],
+    vorlaeufig: ["filmriss", "unwohl", "gestaerkt"],
   },
   fallen: {
     fest: [],

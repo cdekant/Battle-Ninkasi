@@ -73,7 +73,7 @@ test("Nebel: Vorwissen aus den Startoptionen, nur vorhandene Zielgebiete; allmä
   meldungZaehlen(chronik, spiel, { art: "zielgebiet_entdeckt", zielgebiet: { name: "starkes_bier" } });
   meldungZaehlen(chronik, spiel, { art: "zielgebiet_entdeckt", zielgebiet: { name: "starkes_bier" } });
   assert.equal(chronik.zaehler["entdeckt.starkes_bier"], 2);
-  assert.deepEqual(vorwissenAusChronik(chronik), { zielgebiete: ["starkes_bier"] });
+  assert.deepEqual(vorwissenAusChronik(chronik), { zielgebiete: ["starkes_bier"], kraeuter: [] });
 });
 
 test("Rezept lernen: die Tontafel des Probeinhalts lehrt ein Rezept, deckt sein Zielgebiet auf, und es liegt darin", () => {

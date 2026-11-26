@@ -44,6 +44,8 @@ export default {
   kulturen: {},
   zielgebiete: {},
   rezepte: {},
+  // Absud (src/systeme/absud.js): Richtungen mit ihren Polen bringt der Inhalt mit
+  absudrichtungen: {},
   // Tiefen von oben nach unten: 0 ist der Hub, das Spiel beginnt in starttiefe; der Plan des Laufs übernimmt sie (src/welt/plan.js)
   abfolge: ["hub"],
   starttiefe: 0,

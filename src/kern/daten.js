@@ -1450,6 +1450,66 @@ function pruefeBrauen(daten, sprache, fehler) {
   }
 }
 
+// Absud (src/systeme/absud.js, siehe docs/Sude.md, Absud): Regeln, Richtungen mit Polen und Stufen, Getränke je Pol
+// und die Beiträge der Zutaten
+const POLE = ["elixier", "gift"];
+function pruefeAbsud(daten, sprache, fehler) {
+  const regeln = daten.regeln?.brauen?.absud;
+  if (!istObjekt(regeln)) return fehler.push("regeln.brauen.absud fehlt");
+  for (const feld of ["maechtigkeitProzent", "dauer"]) if (!istZahlAbNull(regeln[feld])) fehler.push(`regeln.brauen.absud.${feld} muss eine ganze Zahl >= 0 sein`);
+  for (const feld of ["staerkeJe", "hoechstStaerke"]) if (!istGanzzahl(regeln[feld]) || regeln[feld] < 1) fehler.push(`regeln.brauen.absud.${feld} muss eine ganze Zahl >= 1 sein`);
+  const absicht = regeln.absicht;
+  if (!istObjekt(absicht) || !istProzent(absicht.grund) || !istProzent(absicht.mindestens) || !istProzent(absicht.hoechstens) || absicht.mindestens > absicht.hoechstens) {
+    fehler.push("regeln.brauen.absud.absicht muss { grund, mindestens <= hoechstens } in Prozent sein");
+  }
+  if (!istProzent(regeln.misslingen)) fehler.push("regeln.brauen.absud.misslingen muss eine ganze Zahl von 0 bis 100 sein");
+  if (!daten.gegenstaende[regeln.misslungen]?.trinkbar) fehler.push(`regeln.brauen.absud.misslungen: "${regeln.misslungen}" muss ein trinkbarer Gegenstand sein`);
+  if (!istObjekt(regeln.vermutung) || !istZahlAbNull(regeln.vermutung.grund)) fehler.push("regeln.brauen.absud.vermutung muss { grund >= 0 } sein");
+  for (const [staerke, adjektiv] of Object.entries(istObjekt(regeln.adjektive) ? regeln.adjektive : {})) {
+    if (!istGanzzahl(Number(staerke)) || Number(staerke) < 1) fehler.push(`regeln.brauen.absud.adjektive: Stärke "${staerke}" muss eine ganze Zahl >= 1 sein`);
+    pruefeText(sprache.texte, adjektiv, `regeln.brauen.absud.adjektive.${staerke}`, fehler);
+  }
+  const richtungen = daten.absudrichtungen ?? {};
+  for (const [name, richtung] of Object.entries(richtungen)) {
+    const ort = `absudrichtungen.${name}`;
+    if (!istObjekt(richtung)) { fehler.push(`${ort}: muss ein Objekt sein`); continue; }
+    pruefeText(sprache.texte, richtung.text, ort, fehler);
+    for (const pol of POLE) {
+      const stufen = richtung[pol]?.stufen;
+      if (!Array.isArray(stufen) || !stufen.length) { fehler.push(`${ort}.${pol}: stufen muss mindestens eine Stufe nennen`); continue; }
+      let vorher = 0;
+      for (const [stelle, stufe] of stufen.entries()) {
+        const stufenort = `${ort}.${pol}.stufen[${stelle}]`;
+        if (!istObjekt(stufe) || !istGanzzahl(stufe.ab) || stufe.ab <= vorher) fehler.push(`${stufenort}: ab muss eine ganze Zahl über der vorigen Stufe sein`);
+        else vorher = stufe.ab;
+        if (stelle === 0 && stufe?.ab !== 1) fehler.push(`${stufenort}: die erste Stufe gilt ab Stärke 1`);
+        if (!daten.zustaende?.[stufe?.zustand]) fehler.push(`${stufenort}: Zustand "${stufe?.zustand}" gibt es nicht`);
+        if (stufe?.misslingen !== undefined && !istZahlAbNull(stufe.misslingen)) fehler.push(`${stufenort}: misslingen muss eine ganze Zahl >= 0 sein`);
+      }
+      const getraenke = Object.entries(daten.gegenstaende).filter(([, gegenstand]) => !gegenstand.abstrakt && gegenstand.absud?.richtung === name && gegenstand.absud?.pol === pol);
+      if (getraenke.length !== 1) fehler.push(`${ort}.${pol}: genau ein Gegenstand muss absud: { richtung: "${name}", pol: "${pol}" } tragen, es sind ${getraenke.length}`);
+    }
+  }
+  for (const [name, gegenstand] of Object.entries(daten.gegenstaende)) {
+    const ort = `gegenstaende.${name}`;
+    const absud = gegenstand.absud;
+    if (absud !== undefined) {
+      if (!istObjekt(absud) || !richtungen[absud.richtung] || !POLE.includes(absud.pol)) fehler.push(`${ort}: absud muss { richtung, pol: ${POLE.join(" | ")}, staerke } mit einer Richtung der Daten sein`);
+      else if (!istGanzzahl(absud.staerke) || absud.staerke < 1) fehler.push(`${ort}.absud: staerke muss eine ganze Zahl >= 1 sein`);
+      if (!gegenstand.trinkbar) fehler.push(`${ort}: ein Absud muss trinkbar sein`);
+    }
+    const zutat = gegenstand.zutat;
+    if (!istObjekt(zutat)) continue;
+    for (const [richtung, punkte] of Object.entries(zutat.richtungen ?? {})) {
+      if (!richtungen[richtung]) fehler.push(`${ort}.zutat.richtungen: Richtung "${richtung}" gibt es nicht`);
+      if (!istGanzzahl(punkte) || punkte < 1) fehler.push(`${ort}.zutat.richtungen.${richtung} muss eine ganze Zahl >= 1 sein`);
+    }
+    if (zutat.richtungen !== undefined && !istObjekt(zutat.richtungen)) fehler.push(`${ort}.zutat.richtungen muss { <richtung>: punkte } sein`);
+    if (zutat.neigung !== undefined && !istGanzzahl(zutat.neigung)) fehler.push(`${ort}.zutat.neigung muss eine ganze Zahl sein`);
+    for (const feld of ["misslingen", "schwierigkeit"]) if (zutat[feld] !== undefined && !istZahlAbNull(zutat[feld])) fehler.push(`${ort}.zutat.${feld} muss eine ganze Zahl >= 0 sein`);
+  }
+}
+
 // Feste Karte: gleich lange Zeilen aus Kennungen bekannter Gelände
 function pruefeKarte(daten, karte, ort, fehler) {
   if (!Array.isArray(karte) || !karte.length || !karte.every((zeile) => typeof zeile === "string" && zeile.length === karte[0].length)) {
@@ -1683,6 +1743,7 @@ export function vorbereiten(rohdaten, sprache = {}) {
   pruefeGlossar(daten, sprache, fehler);
   pruefeBierstile(daten, sprache, fehler);
   pruefeBrauen(daten, sprache, fehler);
+  pruefeAbsud(daten, sprache, fehler);
   for (const [name, gelaende] of Object.entries(daten.gelaende)) {
     pruefeText(sprache.texte, gelaende.text, `gelaende.${name}`, fehler);
     if (typeof gelaende.kennung !== "string" || gelaende.kennung.length !== 1) fehler.push(`gelaende.${name}: kennung muss genau ein Zeichen sein`);

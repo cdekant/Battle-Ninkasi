@@ -13,5 +13,13 @@ export default {
   betaeubt: { text: "zustand.betaeubt", adjektiv: "adjektiv.betaeubt", tags: ["kontrolle", "wehrlos"] },
   // Vorläufig: Kontrollverlust der Psi (datenproben/risiken.js), Schritte weichen ab und treffen auch Verbündete
   verwirrt: { text: "zustand.verwirrt", adjektiv: "adjektiv.verwirrt", tags: ["kontrolle"], dauer: 300, befehl: { veraenderer: "abweichen", chance: 50, freundeAngreifen: true } },
+  // Absud (datenproben/absudrichtungen.js): Dauer und Stärke setzt der Absud; Beträge je Stärke 1
+  feuerschutz: { text: "zustand.feuerschutz", modifikatoren: [{ ziel: "widerstand", tag: "feuer", art: "plus", betrag: 10 }, { ziel: "schaden", tag: "feuer", art: "prozent", betrag: 10 }] },
+  feuerfest: { text: "zustand.feuerfest", modifikatoren: [{ ziel: "immunitaet", tag: "feuer", art: "plus", betrag: 1 }] },
+  brennend: { text: "zustand.brennend", adjektiv: "adjektiv.brennend", jeTick: "absud_brennen", modifikatoren: [{ ziel: "widerstand", tag: "feuer", art: "plus", betrag: -10 }] },
+  saeureschutz: { text: "zustand.saeureschutz", modifikatoren: [{ ziel: "widerstand", tag: "saeure", art: "plus", betrag: 10 }, { ziel: "schaden", tag: "saeure", art: "prozent", betrag: 10 }] },
+  veraetzt: { text: "zustand.veraetzt", adjektiv: "adjektiv.veraetzt", jeTick: "absud_aetzen", modifikatoren: [{ ziel: "widerstand", tag: "saeure", art: "plus", betrag: -10 }] },
+  hellsicht: { text: "zustand.hellsicht", modifikatoren: [{ ziel: "reichweiteSicht", art: "plus", betrag: 1 }, { ziel: "sichtImFinstern", art: "plus", betrag: 1 }] },
+  trugbilder: { text: "zustand.trugbilder", adjektiv: "adjektiv.verwirrt", modifikatoren: [{ ziel: "genauigkeit", art: "plus", betrag: -5 }, { ziel: "reichweiteSicht", art: "plus", betrag: -1 }] },
   gereizt: { text: "zustand.gereizt", adjektiv: "adjektiv.gereizt", modifikatoren: [{ ziel: "ausweichen", art: "plus", betrag: -1 }] },
 };

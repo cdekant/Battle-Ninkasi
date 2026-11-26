@@ -73,6 +73,8 @@ export function zaehlerErhoehen(chronik, name, um = 1) {
 export const ZAEHLREGELN = {
   // aufgedeckte Zielgebiete: Wissen über Läufe hinweg (siehe vorwissenAusChronik)
   zielgebiet_entdeckt: (meldung) => `entdeckt.${meldung.zielgebiet.name}`,
+  // erkannte Kräuter des Absuds: ebenso Wissen über Läufe hinweg (systeme/absud.js)
+  kraut_erkannt: (meldung) => `kraut.${meldung.was.typ}`,
   tod: (meldung, spiel) => {
     const ninkasiId = spiel.zustand.spielerinId;
     if (meldung.opfer.id === ninkasiId) return "tode";
@@ -82,10 +84,11 @@ export const ZAEHLREGELN = {
 };
 
 // Vorwissen für einen neuen Lauf (Startoption optionen.vorwissen, siehe docs/Architektur.md, Speichern): die
-// Zielgebiete, die je ein Lauf aufgedeckt hat; die Logik liest es nur aus den Optionen (systeme/rezepte.js)
+// Zielgebiete, die je ein Lauf aufgedeckt hat, und die Kräuter, die je ein Lauf erkannt hat; die Logik liest es nur aus
+// den Optionen (systeme/rezepte.js, systeme/absud.js)
 export function vorwissenAusChronik(chronik) {
-  const zielgebiete = Object.keys(chronik.zaehler).filter((name) => name.startsWith("entdeckt.") && chronik.zaehler[name] > 0).map((name) => name.slice("entdeckt.".length));
-  return { zielgebiete };
+  const mit = (vorsilbe) => Object.keys(chronik.zaehler).filter((name) => name.startsWith(vorsilbe) && chronik.zaehler[name] > 0).map((name) => name.slice(vorsilbe.length));
+  return { zielgebiete: mit("entdeckt."), kraeuter: mit("kraut.") };
 }
 
 // Eine Meldung der Logik zählen (als Hörer angemeldet in src/main.js)

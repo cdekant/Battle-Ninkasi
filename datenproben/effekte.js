@@ -104,6 +104,9 @@ export default {
   rezept_dunkles_bier: {
     schritte: [{ baustein: "rezept_lernen", rezept: "dunkles_bier" }],
   },
+  // Gifte des Absuds (datenproben/zustaende.js): je Welttick 1 Schaden je Stärke
+  absud_brennen: { schritte: [{ baustein: "schaden", art: "feuer", menge: 1, mitStaerke: true }] },
+  absud_aetzen: { schritte: [{ baustein: "schaden", art: "saeure", menge: 1, mitStaerke: true }] },
   riechwasser_trinken: {
     schritte: [{ baustein: "zustand_setzen", zustand: "witterung" }],
   },

@@ -27,11 +27,13 @@ import zutaten from "./zutaten.js";
 import kulturen from "./kulturen.js";
 import zielgebiete from "./zielgebiete.js";
 import rezepte from "./rezepte.js";
+import absudrichtungen from "./absudrichtungen.js";
+import absude from "./absude.js";
 
 export default {
   eintraege: {
     wesen: gegner,
-    gegenstaende: { ...getraenke, ...wurfgegenstaende, ...fernwaffen, ...ausruestung, ...zutaten },
+    gegenstaende: { ...getraenke, ...wurfgegenstaende, ...fernwaffen, ...ausruestung, ...zutaten, ...absude },
     schichten,
     fallen,
     effekte,
@@ -49,6 +51,7 @@ export default {
     kulturen,
     zielgebiete,
     rezepte,
+    absudrichtungen,
   },
   // Ninkasi bekommt die vorläufige Fähigkeit für den Zielmodus, den Sprint und eine Psi-Fähigkeit, dazu die
   // Grundausstattung (docs/Charakter.md, Startwerte): den Dolch angelegt und Wurfmesser im Gepäck; als Göttin des Biers
@@ -56,6 +59,8 @@ export default {
   ergaenzen: {
     // Verderber aus dem Kessel (src/systeme/reifen.js): das Essigbakterium
     regeln: { brauen: { verderber: { chance: 30, wesen: "essigbakterium" } } },
+    // Essig führt im Absud zur Säure (datenproben/absudrichtungen.js)
+    gegenstaende: { essig: { zutat: { art: "grundstoff", aromen: { saeure: 100 }, richtungen: { saeure: 40 } } } },
     wesen: {
       ninkasi: {
         faehigkeiten: ["testfaehigkeit", "sprint", "gedankenstich"],

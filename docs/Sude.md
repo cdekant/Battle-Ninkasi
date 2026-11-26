@@ -2,13 +2,13 @@
 
 Stand: 2026-11-26
 
-Zuständig für: `src/systeme/sud.js`, `src/systeme/brauen.js`, `src/systeme/rezepte.js`, `src/systeme/reifen.js`, `src/systeme/flora.js`, `daten/sude.js`
+Zuständig für: `src/systeme/sud.js`, `src/systeme/brauen.js`, `src/systeme/absud.js`, `src/systeme/rezepte.js`, `src/systeme/reifen.js`, `src/systeme/flora.js`, `daten/sude.js`
 
 Mitprüfen bei Änderungen: [Brauen.md](Brauen.md), [Gegenstaende.md](Gegenstaende.md), [Bedienung.md](Bedienung.md), [Wesen.md](Wesen.md), [Architektur.md](Architektur.md), [Welt.md](Welt.md)
 
 ## Zweck
 
-Das Brausystem in der Logik: wie aus Zutaten, Verfahren und Kultur das Profil eines Suds wird, wann er ein Zielgebiet trifft, wie der Befehl am Kessel abläuft, was das Getränk beim Trinken wirkt, wie es im Gepäck reift und verdirbt, wie die wilde Flora spontan gärt und wie Nebel und Rezeptbuch das Wissen Ninkasis halten. Das Spieldesign steht in [Brauen.md](Brauen.md), das Fenster zum Brauen in [Bedienung.md](Bedienung.md), Fenster. Jeder Abschnitt nennt Daten, Schnittstellen und Regeln.
+Das Brausystem in der Logik: wie aus Zutaten, Verfahren und Kultur das Profil eines Suds wird, wann er ein Zielgebiet trifft, wie der Befehl am Kessel abläuft, was das Getränk beim Trinken wirkt, wie es im Gepäck reift und verdirbt, wie die wilde Flora spontan gärt, wie Nebel und Rezeptbuch das Wissen Ninkasis halten und wie ein Sud ohne Kultur zum Absud wird. Das Spieldesign steht in [Brauen.md](Brauen.md), das Fenster zum Brauen in [Bedienung.md](Bedienung.md), Fenster. Jeder Abschnitt nennt Daten, Schnittstellen und Regeln.
 
 ## Profil
 
@@ -33,7 +33,7 @@ Regeln:
 + Stammwürze, Farbe und Bittere sind die Summe der Beiträge mal Menge, geteilt durch die Portionen: dieselben Zutaten auf halb so viele Portionen geben einen doppelt so starken Sud
 + Ein Gewürz trägt seine Bittere mit `gewuerz.<gabe>.bitter` Prozent bei und seine Aromen mit `aroma` Prozent: früh gekocht bitter, spät gegeben aromatisch
 + Gärung nach Balling, vereinfacht: die Vergärung ist die der Kultur plus die der Maische (kühl mehr, warm weniger), zwischen 0 und 100; vergärbar ist Stammwürze x Vergärung; vergoren wird davon höchstens so viel, wie für `vertraegt` der Kultur nötig ist (`vertraegt` x 100 / `alkoholJeStammwuerze`); Alkohol = vergoren x `alkoholJeStammwuerze` Prozent
-+ Restzucker ist, was vergärbar wäre, aber die Kultur nicht mehr verträgt; er hebt die Süße um Restzucker x `suesseJeRestzucker` Prozent; so werden starke Sude mit einer schwachen Kultur süß; ohne Kultur gärt nichts, Alkohol und Restzucker bleiben 0
++ Restzucker ist, was vergärbar wäre, aber die Kultur nicht mehr verträgt; er hebt die Süße um Restzucker x `suesseJeRestzucker` Prozent; so werden starke Sude mit einer schwachen Kultur süß; ohne Kultur gärt nichts, Alkohol und Restzucker bleiben 0 (der Befehl macht daraus einen Absud, siehe Absud)
 + Aromen sind das nach Menge gewichtete Mittel der Zutaten, dazu die Aromen der Kultur und der Maische und die Süße aus dem Restzucker; jede Achse bleibt zwischen 0 und `hoechstens`
 + Alles in ganzen Zahlen, abgerundet; gerundet wird kaufmännisch auf `stufe`
 
@@ -64,7 +64,7 @@ Daten:
 
 Schnittstellen (`src/systeme/brauen.js`):
 
-+ Befehl `brauen { kessel?: { x, y }, portionen?, zutaten: [{ gegenstandId, menge }], verfahren?: { maische, gewuerz }, kultur? }`; ohne `kessel` der erste Kessel neben oder unter der Brauerin (eigenes Feld, dann die Nachbarn zeilenweise); ohne `portionen` so viele, wie Kessel und leere Gefäße erlauben, mindestens 1
++ Befehl `brauen { kessel?: { x, y }, portionen?, zutaten: [{ gegenstandId, menge }], verfahren?: { maische, gewuerz }, kultur?, absicht? }`; ohne Kultur ein Absud (siehe Absud); ohne `kessel` der erste Kessel neben oder unter der Brauerin (eigenes Feld, dann die Nachbarn zeilenweise); ohne `portionen` so viele, wie Kessel und leere Gefäße erlauben, mindestens 1
 + Ablehnungen: `im_kampf`, `kein_kessel`, `keine_zutaten`, `keine_zutat`, `zu_viel` (mehr, als der Stapel hat), `kessel_voll` (mehr Stück als Portionen x `stueckeJePortion`), `zu_viele_portionen` (mehr, als der Kessel hergibt), `kultur_unbekannt`, `keine_flora` (spontan auf einer Ebene ohne Flora), `keine_gefaesse` (weniger leere Gefäße als Portionen), `ungueltig` (Menge oder Portionen unter 1, dieselbe Zutat zweimal, unbekanntes Verfahren)
 + Meldungen: `gebraut`, `gebraut_getroffen` (mit `zielgebiet`), `gebraut_verdorben`, je mit `wer`, `was` und `anzahl`; `kultur_gewonnen` und `kultur_bekannt` mit `wer` und `kultur`; `verderber_entsteht` mit `was` und `kessel` (dazu `beschworen` ohne `wer`)
 + `sudVorbereiten(spiel, wesen, befehl)` prüft und rechnet die Vorschau (`{ grund }` oder `{ kessel, eingabe, mitte, gaerung, unschaerfe, bereich, erreichbar, fuellung, fassen, portionen, gefaesse }`), ohne Kampf und Gefäße zu prüfen; `fassen` ist die höchste Füllung für diese Portionen, `erreichbar` nennt nur aufgedeckte Zielgebiete, `rezept` den Schlüssel des Rezepts, nach dem gebraut wird, oder null; `verderbenChance`, `sauerChance`, `kesselBei`, `zutatenIm`, `gefaesseIm`
@@ -149,10 +149,41 @@ Regeln:
 + Hausrezept: ein Treffer ohne Rezept, nicht verdorben, dessen Mitte im Zielgebiet liegt, wird Hausrezept seines Zielgebiets, wenn es dort keines gibt oder die Güte seiner Mitte höher ist; verglichen wird die Mitte, nicht der Wurf; Hausrezepte haben keinen Kniff und bringen keine EP
 + Das Rezeptbuch gilt nur im Lauf; über Läufe hinweg bleiben nur die aufgedeckten Zielgebiete (Zähler `entdeckt.<name>` der Chronik, siehe [Architektur.md](Architektur.md), Speichern)
 
+## Absud
+
+Daten:
+
++ `absudrichtungen`: `{ text, elixier: { stufen }, gift: { stufen } }`, `stufen: [{ ab, zustand, misslingen? }]` mit steigendem `ab`, die erste ab 1; die Reihenfolge der Daten entscheidet bei Gleichstand; alle Richtungen gleich, ob Schadensart oder anderes Feld der Wirkung (Spieldesign in [Brauen.md](Brauen.md), Absud)
++ Zutat: `zutat.richtungen: { <richtung>: punkte }` je Stück, `neigung` (Punkte je Stück, plus zum Elixier, minus zum Gift), `misslingen` (Punkte, je Zutatenart einmal), `schwierigkeit` (das Kraut ist zu Beginn unbekannt)
++ Getränk: `absud: { richtung, pol, staerke }` am Gegenstand, je Richtung und Pol genau ein Typ (gefundene mit Stärke 1), trinkbar mit dem Effekt `absud_trinken`, geworfen `absud_zerspringt` (Kreis mit Radius 1, `daten/effekte.js`); die trübe Brühe `bruehe` (`regeln.brauen.absud.misslungen`, `daten/sude.js`) setzt getrunken oder geworfen den Zustand `unwohl`
++ `regeln.brauen.absud: { maechtigkeitProzent, staerkeJe, hoechstStaerke, dauer, absicht: { grund, mindestens, hoechstens }, misslingen, misslungen, adjektive: { <stärke>: adjektiv }, vermutung: { grund } }`
++ Kampfwert `kraeuterkunde` (siehe [Wesen.md](Wesen.md), Kampfwerte); im Zustand `zustand.wissen.kraeuter: [typ]`; Startoption `optionen.vorwissen.kraeuter` (siehe [Architektur.md](Architektur.md), Speichern)
+
+Schnittstellen (`src/systeme/absud.js`):
+
++ `absudVorbereiten(spiel, wesen, { zutaten, portionen, absicht })` gibt `{ wahr, vermutet, unbekannt }`, je Rechnung (`absudRechnen`) `{ punkte, fuehrend, maechtigkeit, staerke, absicht, stufe, chancen: { gelungen, umgeschlagen, misslungen } }`; `sudVorbereiten` gibt ohne Kultur `{ art: "absud", kessel, eingabe, wahr, vermutet, unbekannt, fuellung, fassen, portionen, gefaesse, rezept: null }` (siehe Befehl)
++ `zutatImAbsud(spiel, wesen, typ)` (die Beiträge, wie Ninkasi sie sieht, mit `vermutet`), `krautUnbekannt`, `krautKennenlernen` (Meldung `kraut_erkannt` mit `wer` und `was`), `stufeDesPols`, `getraenkFuer`, `ausgangWuerfeln`, `POLE`, `gegenpol`, `kraeuterkundeVon`
++ Befehl `brauen` mit `kultur: null` und `absicht` (`"elixier"`, Vorgabe, oder `"gift"`, sonst `ungueltig`); Meldungen `absud_gelungen`, `absud_umgeschlagen`, `absud_misslungen` mit `wer`, `was` und `anzahl`
++ Baustein `absud_wirken` (ohne Parameter) liest `kontext.werte.absud`, die Trinken und Werfen setzen (siehe [Gegenstaende.md](Gegenstaende.md), Inventar); Haken `gegenstand_benutzt`: wer einen Absud wirft, erkennt die Sorte; Register `laufbeginn`: das Vorwissen der Kräuter
+
+Regeln:
+
++ Punkte je Richtung = Punkte der Zutat mal Menge, zusammengezählt; es führt die Richtung mit den meisten, bei Gleichstand die erste der Daten
++ Mächtigkeit = Extrakt aller Zutaten durch die Portionen mal `maechtigkeitProzent`, mit Modifikatoren auf `brauen.maechtigkeit`; Stärke = Mächtigkeit durch `staerkeJe`, zwischen 1 und `hoechstStaerke`
++ Chance der Absicht = `absicht.grund` plus die mittlere Neigung je Stück (beim Gift minus), mit Modifikatoren auf `brauen.absicht`, zwischen `mindestens` und `hoechstens`
++ Misslingen = `misslingen` plus `misslingen` jeder Zutatenart plus das der erreichten Stufe des gewählten Pols, mit Modifikatoren auf `brauen.misslingen`, zwischen 0 und 100; ohne Richtung 100
++ Der Wurf `absud` (1 bis 100): bis zum Misslingen misslungen, bis dazu plus (100 - Misslingen) x Absicht / 100 gelungen, sonst umgeschlagen ins Gegenteil derselben Richtung und Stärke
++ Kein Wurf auf Verderben, kein Reifen, kein Verderber; Zutaten und je Portion ein Gefäß sind verbraucht wie beim Sud; die Portionen tragen `absud` und das Adjektiv ihrer Stärke aus `adjektive`
++ Wirkung: der Zustand der höchsten Stufe des Pols, deren `ab` die Stärke erreicht, mit der Stärke als Stärke des Zustands und `dauer` als Dauer; geworfen auf jedes Wesen im Kreis um den Aufschlag, auch auf die Werferin; kein Pegel
++ Wissen: eine Zutat mit `schwierigkeit` ist unbekannt, bis Ninkasi mit ihr einen Absud braut; zu Beginn das Vorwissen, in der Spielart "allmaechtig" alle; die Chronik zählt `kraut.<typ>`
++ Vermutung: für ein unbekanntes Kraut ein fester Wurf von 1 bis 100 je Lauf und Kraut (Zufall `vermutung:<typ>` aus dem Startwert, nicht der Spielzufall); ist er höchstens 100 x (`vermutung.grund` + Kräuterkunde) / (`vermutung.grund` + Kräuterkunde + Schwierigkeit), zeigt die Vorschau die wahren Beiträge, sonst liegen die Punkte auf je einer anderen Richtung (ebenso fest gewürfelt), die Neigung ist umgekehrt und das Misslingen 0; die Vorschau rechnet mit der Vermutung, der Befehl mit der Wahrheit
++ Ninkasi erkennt die gebraute Sorte vor dem Abfüllen; gefundene Absude sind unbekannt mit einem Etikett der Gruppe `absude`, bis sie die Sorte braut, trinkt oder wirft (siehe [Gegenstaende.md](Gegenstaende.md), Unbekanntes)
+
 ## Tests
 
 + `tests/brauen.test.js` (Profil je Portion, Gärung und Restzucker, Zielgebiete, Güte, Runden, Wirkung sofort und über die Zeit, Befehl, Wurf und Verderben, Ablehnungen, Kulturen und Zutaten aufheben, Braufenster mit Portionen und Klickregel, Spinnennetz, Datenprüfung)
 + `tests/reifen.test.js` (Dauer der Stufen, Stufen bis zum Essig, Reife nur für starke Sude, Stapeln je Stufe, Wirkung je Stufe, die drei Ausgänge des Wurfs, Verderber neben dem Kessel, Flora je Ebene, spontane Gärung im Befehl und im Fenster, Datenprüfung)
++ `tests/absud.test.js` (Richtung, Mächtigkeit, Absicht und Misslingen, die drei Ausgänge, Trinken und Werfen, Stufen, Vermutung und Wissen über Kräuter samt Vorwissen, Braufenster mit Balken, Datenprüfung)
 + `tests/rezepte.test.js` (Vorwissen und Nebel, Zählregel, Rezept lernen über die Tontafel, Erkennen nach dem Verhältnis, enge Vorschau, Kniff nur beim Treffer, EP beim ersten Gelingen, Hausrezepte, Rezeptliste im Braufenster, Datenprüfung)
 
 ## Verweise

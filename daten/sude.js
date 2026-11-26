@@ -10,6 +10,11 @@ export default {
     text: "gegenstand.sud_verdorben", aufhebbar: true, stapelbar: true, gewicht: 900,
     trinkbar: { effekt: "sud_trinken" },
   },
+  // ein misslungener Absud (regeln.brauen.absud.misslungen, src/systeme/absud.js): getrunken oder geworfen unwohl
+  bruehe: {
+    text: "gegenstand.bruehe", aufhebbar: true, stapelbar: true, gewicht: 900,
+    trinkbar: { effekt: "bruehe_trinken" }, wurf: { effekt: "bruehe_zerspringt", zweck: ["angriff"] },
+  },
   // nach der letzten Stufe des Verderbens (regeln.brauen.essig, src/systeme/reifen.js): eine Zutat, vor allem Säure
   essig: {
     text: "gegenstand.essig", aufhebbar: true, stapelbar: true, gewicht: 900,

@@ -23,6 +23,7 @@ import "./werfen.js";
 import "./fernkampf.js";
 import "./rezepte.js";
 import "./reifen.js";
+import "./absud.js";
 import "./flora.js";
 import "./brauen.js";
 import "./gelaende.js";

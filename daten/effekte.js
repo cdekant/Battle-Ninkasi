@@ -19,6 +19,20 @@ export default {
   sud_trinken: {
     schritte: [{ baustein: "sud_wirken" }],
   },
+  // ein Absud (src/systeme/absud.js): getrunken auf die Trinkende, geworfen auf alle Wesen um den Aufschlag
+  absud_trinken: {
+    schritte: [{ baustein: "absud_wirken" }],
+  },
+  absud_zerspringt: {
+    schritte: [{ baustein: "fuer_jedes_ziel", muster: { art: "kreis", radius: 1 }, effekt: "absud_trinken" }],
+  },
+  // die trübe Brühe eines misslungenen Absuds (daten/sude.js): eine milde Krankheit
+  bruehe_trinken: {
+    schritte: [{ baustein: "zustand_setzen", zustand: "unwohl" }],
+  },
+  bruehe_zerspringt: {
+    schritte: [{ baustein: "fuer_jedes_ziel", muster: { art: "kreis", radius: 1 }, effekt: "bruehe_trinken" }],
+  },
   // je Welttick des Zustands gestaerkt (daten/zustaende.js)
   gestaerkt_heilen: {
     schritte: [{ baustein: "heilen", wertName: "lp", menge: 1, mitStaerke: true }],

@@ -219,6 +219,12 @@ html, body {
 .brau-vorschau { border-collapse: collapse; width: 100%; }
 .brau-vorschau td { padding: 1px 6px 1px 0; white-space: nowrap; }
 .brau-vorschau tr.kennzahl td:first-child { color: var(--gut); }
+.brau-absud { border-collapse: collapse; width: 100%; }
+.brau-absud td { padding: 1px 6px 1px 0; white-space: nowrap; }
+.brau-absud td:nth-child(2) { width: 100%; }
+.brau-absud tr.fuehrend td { color: var(--gut); }
+.brau-balken { display: block; }
+.brau-balken .fuellung { display: block; background: var(--kupfer); }
 /* Spinnennetz (anzeige/spinnennetz.js): Ringe und Speichen leise, das Band der Vorschau grün, das Profil in Bierfarbe,
    Umrisse der Zielgebiete in Kupfer, das hervorgehobene hell */
 .spinnennetz { display: block; width: 100%; max-width: 35rem; margin: 0 auto 0.4rem; }

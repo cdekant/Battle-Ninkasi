@@ -23,7 +23,7 @@
 
 import { anmelden } from "../kern/register.js";
 import { entitaetMitId, entitaetEntfernen, positionSetzen } from "../kern/zustand.js";
-import { einenAbnehmen, einzelgewicht } from "./inventar.js";
+import { einenAbnehmen, einzelgewicht, ablageDesGetraenks } from "./inventar.js";
 import { fluchHindert } from "./ausruestung.js";
 import { effektAnwenden, kontextVervollstaendigen } from "../kern/effekte.js";
 import { trefferwurfMitFolgen } from "./kampf.js";
@@ -163,7 +163,7 @@ anmelden("befehle", "werfen", {
       melden(spiel, "zerbrochen", { was: bezugAuf(gegenstand), feld: aufschlag });
       effektAnwenden(spiel, wurf.effekt, {
         quelleId: akteur.id, zielId: getroffenId, ursprung: aufschlag, zielfeld: aufschlag,
-        ursache: "wurf", mittel: { art: "gegenstand", name: gegenstand.typ },
+        ursache: "wurf", mittel: { art: "gegenstand", name: gegenstand.typ }, werte: ablageDesGetraenks(gegenstand),
       });
     } else {
       landenOderBrechen(spiel, akteur, gegenstand, bahn, 0);

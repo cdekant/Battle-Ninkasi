@@ -280,5 +280,19 @@ export default {
     wirkungOhneAroma: "lp", // wohin das Budget eines Suds ohne Aroma geht
     pegelProzent: 100, // Pegel in Promille-Hundertsteln je Zehntel Vol.-% Alkohol, wie das Bier des Probeinhalts
     gewichtJePortion: 500, // Gramm Inhalt je Portion, dazu das Gewicht des Gefäßes
+    // Absud: ein Sud ohne Kultur (src/systeme/absud.js); Richtungen und ihre Getränke bringt der Inhalt mit
+    absud: {
+      maechtigkeitProzent: 100, // Mächtigkeit = Extrakt je Portion (Zehntel °Plato) mal so viele Prozent
+      staerkeJe: 60, // so viel Mächtigkeit gibt eine Stärke, mindestens 1, höchstens hoechstStaerke
+      hoechstStaerke: 5,
+      dauer: 3000, // Zeiteinheiten des Zustands, etwa 24 Züge Ninkasis
+      // Chance der Absicht in Prozent: grund plus die mittlere Neigung der Zutaten (beim Gift minus), begrenzt
+      absicht: { grund: 70, mindestens: 10, hoechstens: 95 },
+      misslingen: 10, // Chance in Prozent, dass der Absud ganz misslingt, vor Kräutern und Stufe
+      misslungen: "bruehe", // der Gegenstand eines misslungenen Absuds
+      adjektive: { 1: "adjektiv.duenn", 4: "adjektiv.konzentriert", 5: "adjektiv.konzentriert" }, // Adjektiv je Stärke
+      // Vermutung über unbekannte Kräuter: richtig mit (grund + Kräuterkunde) / (grund + Kräuterkunde + Schwierigkeit)
+      vermutung: { grund: 20 },
+    },
   },
 };

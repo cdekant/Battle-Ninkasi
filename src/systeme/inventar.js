@@ -186,6 +186,12 @@ anmelden("befehle", "aufheben", {
   },
 });
 
+// Ablage des Effekts für ein Getränk, getrunken oder geworfen: ein gebrauter Sud bringt sein Profil (Baustein sud_wirken,
+// systeme/brauen.js), ein Absud Richtung, Pol und Stärke (Baustein absud_wirken, systeme/absud.js)
+export function ablageDesGetraenks(gegenstand) {
+  return { ...(gegenstand.sud && { sud: structuredClone(gegenstand.sud) }), ...(gegenstand.absud && { absud: structuredClone(gegenstand.absud) }) };
+}
+
 anmelden("befehle", "trinken", {
   pruefen(spiel, akteur, befehl) {
     if (!imGepaeck(akteur, befehl.gegenstandId)) return "nichts_zu_trinken";
@@ -197,8 +203,7 @@ anmelden("befehle", "trinken", {
     melden(spiel, "getrunken", { wer: bezugAuf(akteur), was: bezugAuf(gegenstand) });
     benutzt(spiel, akteur, gegenstand, "trinken");
     const effekt = gegenstand.trinkbar.effekt, typ = gegenstand.typ;
-    // ein gebrauter Sud bringt sein Profil in die Ablage des Effekts (Baustein sud_wirken, systeme/brauen.js)
-    const werte = gegenstand.sud ? { sud: structuredClone(gegenstand.sud) } : {};
+    const werte = ablageDesGetraenks(gegenstand);
     einStueckVerbrauchen(spiel, akteur, gegenstand);
     // wer trinkt, merkt, was es war (Vorbild Brogue); erkannt vor der Wirkung, damit deren Meldungen den Namen tragen
     erkennen(spiel, akteur, typ);

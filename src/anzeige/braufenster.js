@@ -3,12 +3,16 @@
 // oder die Rezepte im Buch (Tab), rechts die Vorschau als Spinnennetz (anzeige/spinnennetz.js) mit den Umrissen der
 // aufgedeckten Zielgebiete, darunter je Achse der Bereich als Zahl, der Restzucker, die Chance des Verderbens und die
 // erreichbaren Zielgebiete; kann noch nicht gebraut werden, steht das Netz ohne Vorschau da, darunter der Grund.
+// Ohne Kultur ein Absud (systeme/absud.js): rechts Balken je Richtung mit der führenden hervorgehoben, die Mächtigkeit
+// mit der Stärke, die Wirkung des gewählten Pols und die Chancen der drei Ausgänge, alles nach der Vermutung über
+// unbekannte Kräuter (in der Liste mit "?"), oben die Absicht.
 // Liest den Zustand nur; die Vorschau ist dieselbe Rechnung wie der Befehl (sudVorbereiten, systeme/brauen.js).
 
 import { gesteuerteEntitaet } from "../kern/zustand.js";
 import { zutatenIm, sudVorbereiten, verderbenChance, sauerChance } from "../systeme/brauen.js";
 import { KENNZAHLEN, zielgebietFinden, SPONTAN } from "../systeme/sud.js";
 import { aufgedeckteZielgebiete } from "../systeme/rezepte.js";
+import { absudregeln, krautUnbekannt, POLE } from "../systeme/absud.js";
 import { braubefehl, rezepteImBuch } from "../eingabe/brauen.js";
 import { fensterinhaltAnmelden, buchstabeHtml, zielAttribut } from "./fenster.js";
 import { spinnennetzSvg, achsenBeschriftungen } from "./spinnennetz.js";
@@ -56,6 +60,33 @@ function vorschauHtml(spiel, texte, ninkasi, vorbereitet) {
   </ul>`;
 }
 
+const balkenHtml = (wert, hoechstens) => `<span class="balken brau-balken"><span class="fuellung" style="width:${Math.min(100, Math.floor((wert * 100) / Math.max(1, hoechstens)))}%"></span></span>`;
+
+// Vorschau des Absuds nach der Vermutung (vorbereitet.vermutet)
+function absudHtml(spiel, texte, vorbereitet) {
+  const { text } = texte;
+  const titel = `<h2>${text("ui.brauen.absud")}</h2>`;
+  if (vorbereitet.grund) return `${titel}<p class="leise">${text(`log.abgelehnt.${vorbereitet.grund}`)}</p>`;
+  const { vermutet } = vorbereitet;
+  const regeln = absudregeln(spiel.daten);
+  const groesste = Math.max(...Object.values(vermutet.punkte), 1);
+  const zeilen = Object.entries(vermutet.punkte).map(([richtung, punkte]) =>
+    `<tr${richtung === vermutet.fuehrend ? ' class="fuehrend"' : ""}><td>${text(spiel.daten.absudrichtungen[richtung].text)}</td><td>${balkenHtml(punkte, groesste)}</td><td>${punkte}</td></tr>`);
+  const richtungen = zeilen.length ? `<table class="brau-absud">${zeilen.join("")}</table>` : `<p class="schlimm">${text("ui.brauen.keine_richtung")}</p>`;
+  const maechtigkeit = `<p>${text("ui.brauen.maechtigkeit", { wert: vermutet.maechtigkeit, staerke: vermutet.staerke })}${balkenHtml(vermutet.maechtigkeit, regeln.staerkeJe * regeln.hoechstStaerke)}</p>`;
+  const wirkung = vermutet.stufe ? `<li>${text("ui.brauen.wirkung", { zustand: text(spiel.daten.zustaende[vermutet.stufe.zustand].text) })}</li>` : "";
+  const gefaesse = vorbereitet.gefaesse >= vorbereitet.portionen ? "" : `<li class="schlimm">${text("log.abgelehnt.keine_gefaesse")}</li>`;
+  const vermutung = vorbereitet.unbekannt.length ? `<li class="leise">${text("ui.brauen.vermutung")}</li>` : "";
+  const { gelungen, umgeschlagen, misslungen } = vermutet.chancen;
+  return `${titel}<h3>${text("ui.brauen.richtungen")}</h3>${richtungen}${maechtigkeit}<ul>
+    ${gefaesse}${wirkung}
+    <li>${text("ui.brauen.gelingt", { prozent: gelungen })}</li>
+    <li>${text("ui.brauen.schlaegt_um", { prozent: umgeschlagen })}</li>
+    <li>${text("ui.brauen.misslingt", { prozent: misslungen })}</li>
+    ${vermutung}
+  </ul>`;
+}
+
 // Linke Liste: Zutaten mit der Menge im Kessel oder Rezepte mit Portionen und Güte
 function listeHtml(spiel, texte, ninkasi, zustand) {
   const { text, nomenForm } = texte;
@@ -73,7 +104,8 @@ function listeHtml(spiel, texte, ninkasi, zustand) {
   const zeilen = zutaten.map((zutat, stelle) => {
     const menge = zustand.mengen[zutat.id] ?? 0;
     const imKessel = menge ? ` <span class="gut">→ ${menge}</span>` : "";
-    return `<li${zielAttribut({ stelle })}>${buchstabeHtml(stelle)}${nomenForm(zutat, "nom", "zahl")}${imKessel}</li>`;
+    const unbekannt = krautUnbekannt(spiel, zutat.typ) ? ' <span class="leise">?</span>' : "";
+    return `<li${zielAttribut({ stelle })}>${buchstabeHtml(stelle)}${nomenForm(zutat, "nom", "zahl")}${unbekannt}${imKessel}</li>`;
   });
   return `<h2>${text("ui.brauen.zutaten")}</h2><ul>${zeilen.join("")}</ul>`;
 }
@@ -92,13 +124,14 @@ fensterinhaltAnmelden("brauen", ({ spiel, texte }, zustand) => {
     `${text("ui.brauen.maische")}: ${text(`maische.${zustand.maische}`)}`,
     `${text("ui.brauen.gewuerz")}: ${text(`gewuerz.${zustand.gewuerz}`)}`,
     `${text("ui.brauen.kultur")}: ${kultur}`,
+    ...(zustand.kultur === null ? [`${text("ui.brauen.absicht")}: ${text(`pol.${zustand.absicht ?? POLE[0]}`)}`] : []),
     rezept ? `<span class="gut">${text("ui.brauen.nach_rezept", { rezept: rezeptName(spiel, texte, vorbereitet.rezept, rezept) })}</span>` : text("ui.brauen.frei"),
   ].join(" · ");
   return {
     titel: text("ui.brauen"),
     kopf,
     liste: listeHtml(spiel, texte, ninkasi, zustand),
-    details: vorschauHtml(spiel, texte, ninkasi, vorbereitet),
+    details: zustand.kultur === null ? absudHtml(spiel, texte, vorbereitet) : vorschauHtml(spiel, texte, ninkasi, vorbereitet),
     knoepfe: [
       { taste: { code: "Enter" }, text: text("ui.knopf.brauen") },
       { taste: { code: "Tab" }, text: text(zustand.liste === "rezepte" ? "ui.brauen.zutaten" : "ui.brauen.rezepte") },
@@ -107,6 +140,7 @@ fensterinhaltAnmelden("brauen", ({ spiel, texte }, zustand) => {
       { taste: { code: "Digit1" }, text: text("ui.brauen.maische") },
       { taste: { code: "Digit2" }, text: text("ui.brauen.gewuerz") },
       { taste: { code: "Digit3" }, text: text("ui.brauen.kultur") },
+      { taste: { code: "Digit4" }, text: text("ui.brauen.absicht") },
       { taste: { code: "Backspace" }, text: text("ui.knopf.leeren") },
     ],
     fuss: text("ui.brauen.hinweis"),

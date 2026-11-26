@@ -1,6 +1,6 @@
 # Battle Ninkasi - Gegenstände
 
-Stand: 2026-11-25
+Stand: 2026-11-26
 
 Zuständig für: `src/systeme/inventar.js`, `src/systeme/ausruestung.js`, `src/systeme/verschleiss.js`, `src/systeme/kennen.js`
 
@@ -35,7 +35,7 @@ Regeln:
 
 + Beim Aufheben fließt ein Gegenstand in einen Stapel, der in allen übrigen Komponenten gleich ist, so stapeln sich z.B. Sauerbier und Bier nicht; nur der Zeitpunkt des Verderbens zählt nicht, er wird gemittelt (siehe Verschleiß); auf dem Boden fließt nichts zusammen
 + Lesen wendet `lesbar.effekt` auf die Leserin an (Ursache `lesen`) und erkennt den Gegenstand vorher wie das Trinken; ohne `bleibt` ist ein Stück verbraucht, mit `bleibt: true` bleibt er; was er tut, sagt allein der Effekt: lehren mit `faehigkeit_lehren` (siehe [Wirkungen.md](Wirkungen.md), Fähigkeiten) oder einmal wirken wie ein Verbrauchsgegenstand
-+ Trinken wendet `trinkbar.effekt` auf die Trinkerin an (Ursache `trinken`); ein gebrautes Getränk gibt dabei sein Profil in die Ablage des Effekts (`werte.sud`, siehe [Sude.md](Sude.md), Wirkung)
++ Trinken wendet `trinkbar.effekt` auf die Trinkerin an (Ursache `trinken`); ein gebrautes Getränk gibt dabei sein Profil in die Ablage des Effekts (`werte.sud`, siehe [Sude.md](Sude.md), Wirkung), ein Absud Richtung, Pol und Stärke (`werte.absud`, siehe [Sude.md](Sude.md), Absud); `ablageDesGetraenks(gegenstand)` baut die Ablage, auch für den Wurf
 + Trinken, Lesen, Werfen, Schießen ohne Magazin und Material für Fähigkeiten nehmen ein Stück, Nachladen so viele, wie ins Magazin passen, Fallenlassen den ganzen Stapel; Trinken nimmt bei Ladungen eine Ladung; ein Gegenstand mit Ladungen stapelt sich nicht
 + Ausstattung geht über `insInventar`, stapelbare fließen also zu einem Stapel zusammen; ein Wesen lässt sie beim Tod fallen wie alles im Gepäck (siehe [Wirkungen.md](Wirkungen.md), Tod und Zustandsprüfung)
 + Nach dem letzten Gebrauch kommt `wirdZu` ins Gepäck (Bier zu leerer Flasche, Bierfass zu Fass), Grundlage für das Brauen; der Ballast ist gewollt
