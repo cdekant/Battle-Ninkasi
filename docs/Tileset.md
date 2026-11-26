@@ -1,6 +1,6 @@
 # Battle Ninkasi - Tileset
 
-Stand: 2026-11-23
+Stand: 2026-11-26
 
 Zuständig für: `grafik/*`, `src/anzeige/tilebilder.js`, `daten/zeichen.js`, `werkzeuge/tiles-ableiten.js`
 
@@ -88,7 +88,7 @@ Verbindliche Regeln für jedes Tile, damit das Tileset wie aus einem Guss wirkt;
 + Ohne Warnung genügt ein kurzer Blick in die Tilewerkstatt; was kein Werkzeug beurteilen kann, ist die Wirkung, etwa ob ein Gesicht klein noch stimmt
 + Ohne `--ueberschreiben` bleiben vorhandene Dateien unberührt, damit Handnacharbeit erhalten bleibt; nachgearbeitete Dateien tragen im Kopfkommentar "nicht überschreiben"
 + Bisher von Hand: nur die Augen des Essigbakteriums in 48, 32 und 16 px getrennt (die Vorrangregel ließ die eng stehenden Augen zu einem Fleck verschmelzen); Gelände braucht seit der Fugenregel keine Nacharbeit mehr
-+ Ablauf für ein neues Tile: in 64 px zeichnen, `node werkzeuge/tiles-ableiten.js <tilename>` aufrufen, Warnungen nacharbeiten, in der Tilewerkstatt ansehen
++ Ablauf für ein neues Tile: in 64 px zeichnen, `node werkzeuge/tiles-ableiten.js <tilename>` aufrufen, Warnungen nacharbeiten, in der Tilewerkstatt ansehen; stammt es nicht von Claude, bekommt die Vorlage ihre eigene Quellenangabe (siehe Ablage und Lizenz), die das Werkzeug in die abgeleiteten Sätze übernimmt
 + Warum nicht zur Laufzeit verkleinern: ohne Glättung verschwinden einzelne Pixel (Umriss, Augen) und bei 48 px werden Pixel ungleich breit; mit Glättung wird alles weich und verlässt die Palette
 
 ## Pixeldaten
@@ -148,6 +148,7 @@ Entwurf, zurückgestellt (Stand 2026-11-20); entschieden sind nur die zwei Stufe
 
 + Tiles und Palette liegen in `grafik/`, getrennt von `daten/`, weil für sie die Grafiklizenz gilt (CC BY-NC-SA 4.0) und nicht die Codelizenz; siehe [LIZENZEN.md](../LIZENZEN.md)
 + `grafik/palette.js`: Palette
-+ `grafik/tileset.js`: Palette und Tiles je Satz (`saetze: { 64: { bier, boden, ... }, 48: { ... }, 32: { ... }, 16: { ... } }`), Einstieg für Renderer und Vorschau; erzeugt vom Werkzeug, nicht von Hand ändern
++ `grafik/tileset.js`: Palette, Quellenangabe und Tiles je Satz (`saetze: { 64: { bier, boden, ... }, 48: { ... }, 32: { ... }, 16: { ... } }`), Einstieg für Renderer und Vorschau; erzeugt vom Werkzeug, nicht von Hand ändern
 + `grafik/tiles/<Satz>/<name>.js`: ein Tile je Datei, Dateinamen klein mit Bindestrichen (z. B. `ninkasi.js`)
++ Quellenangabe der Tiles (Format in [Texte.md](Texte.md), Quellenangabe): `grafik/quellenangabe.js` hält von Hand `{ vorgabe, saetze }`, die Vorgabe gilt für alle Tiles, ein Eintrag unter `saetze` statt ihrer für einen ganzen Satz; ein Tile mit eigenem Feld `quellenangabe` geht beidem vor; `tileQuellenangabe` in `src/anzeige/tilebilder.js` sucht die geltende, `tilesetPruefen` verlangt für jedes Tile eine gültige; das Werkzeug zum Ableiten wird nie genannt; die Tilewerkstatt zeigt die Angabe unter dem Namen; heute gilt für alle Tiles die Vorgabe `generiert` mit Claude
 + `grafik/vorschau.html`: Vorschauseite; sie ist Code und steht unter der Codelizenz

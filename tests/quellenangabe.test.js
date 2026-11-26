@@ -8,7 +8,7 @@ import korpuslisteDe from "../sprache/de/korpus/index.js";
 import korpuslisteEn from "../sprache/en/korpus/index.js";
 import { korpustextZerlegen } from "../src/anzeige/korpus.js";
 import { TITELBILDER } from "../src/anzeige/titelbilder.js";
-import { QUELLENANGABE_ARTEN, quellenangabeAusKopf, quellenangabeFehler, quellenangabeText, kurzbeleg } from "../src/anzeige/quellenangabe.js";
+import { QUELLENANGABE_ARTEN, quellenangabeAusKopf, quellenangabeFehler, quellenangabeText, kurzbeleg, literaturangabe } from "../src/anzeige/quellenangabe.js";
 import { erstelleTexte } from "../src/anzeige/texte.js";
 import { erstelleGrammatik } from "../src/anzeige/grammatik.js";
 
@@ -53,6 +53,16 @@ test("Quellenangabe als Zeile: Vorlage, vgl. und KI je nach Angabe; Anteile je W
   assert.equal(quellenangabeText(texte, omen), "frei nach der akkadischen Omenserie Šumma ālu · mit KI erstellt: Claude", "ohne Literatur kein vgl.");
   assert.equal(quellenangabeText(texte, TITELBILDER[0].quellenangabe), "mit KI erstellt: ChatGPT (Motiv), Grok (Dampf, Masken, Format), Claude (Animation)");
   assert.equal(quellenangabeText(texte, TITELBILDER[0].quellenangabe, literatur, { was: "Titelbild" }), "Titelbild mit KI erstellt: ChatGPT (Motiv), Grok (Dampf, Masken, Format), Claude (Animation)");
-  assert.equal(quellenangabeText(texte, { art: "chd" }), "", "selbst gemacht ohne Vorlage: keine Zeile");
+  assert.equal(quellenangabeText(texte, { art: "chd" }), "chd", "selbst gemacht");
+  assert.equal(quellenangabeText(texte, { art: "chd", beteiligt: [{ wer: "Claude", anteil: "ausarbeitung" }] }), "chd · mit KI: Claude (Ausarbeitung)", "selbst gemacht mit KI");
   assert.equal(quellenangabeText(texte, undefined), "");
+});
+
+test("Literaturangabe: Autorschaft, Jahr, Titel, Sammelwerk mit Herausgebern, Ort und Verlag", () => {
+  const eintrag = (id) => literatur.find((kandidat) => kandidat.id === id);
+  assert.equal(literaturangabe(texte, eintrag("sallaberger2020ninkasi")),
+    "Sallaberger, Walther (2020): Die Hymne auf die Biergöttin Ninkasi. In: Janowski, Bernd; Schwemer, Daniel (Hrsg.): Texte zur Wissenskultur. Gütersloh: Gütersloher Verlagshaus.");
+  assert.equal(literaturangabe(texte, { editor: [{ family: "A", given: "B" }], title: "T", issued: { "date-parts": [[1999]] } }), "A, B (Hrsg.) (1999): T.", "ohne Autorschaft die Herausgeber vorn");
+  assert.equal(literaturangabe(texte, { author: [{ literal: "Verein" }], title: "T" }), "Verein: T.", "Körperschaft, ohne Jahr");
+  for (const kandidat of literatur) assert.doesNotMatch(literaturangabe(texte, kandidat), /undefined|\[|\.\./, kandidat.id);
 });

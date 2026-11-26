@@ -1,8 +1,8 @@
 # Battle Ninkasi - Titelbildschirm
 
-Stand: 2026-11-25
+Stand: 2026-11-26
 
-Zuständig für: `src/eingabe/titel.js`, `src/eingabe/arenawahl.js`, `src/eingabe/chronik.js`, `src/anzeige/titel.js`, `src/anzeige/titelbilder.js`, `src/anzeige/titeleffekte.js`
+Zuständig für: `src/eingabe/titel.js`, `src/eingabe/arenawahl.js`, `src/eingabe/chronik.js`, `src/eingabe/mitwirkende.js`, `src/anzeige/titel.js`, `src/anzeige/titelbilder.js`, `src/anzeige/titeleffekte.js`, `src/anzeige/mitwirkende.js`
 
 Mitprüfen bei Änderungen: [Oberflaeche.md](Oberflaeche.md), [Bedienung.md](Bedienung.md), [Architektur.md](Architektur.md)
 
@@ -42,6 +42,8 @@ Was ein Titel in anderen Spielen leistet (aus Kenntnis der Spiele, nicht im Einz
 + Ein wechselnder Spruch aus allen Korpustexten, ohne gepflegte Liste der Sprüche; darunter der Titel des Korpustexts und seine Quellenangabe: wonach er gedichtet ist, wo man nachlesen kann und dass KI beteiligt war
 + Das Titelbild nennt seine Entstehung offen als Bildunterschrift: "Titelbild mit KI erstellt" und welche KI was beigetragen hat
 + Einstellungen und Hilfe sind schon im Titel erreichbar (vorhandene Fenster)
++ Mitwirkende im Titel: wer das Spiel macht, welche Rollen dabei auf wen fallen, welche Spiele Vorbild waren und wer an welchem Inhalt beteiligt war, gesammelt aus denselben Quellenangaben, die Spruch und Bildunterschrift zeigen; dazu das Literaturverzeichnis und die Bibliotheken; so ist offen, was von wem stammt und wo KI beteiligt war
++ Das Impressum im Spiel nennt Namen und Repo, keine Anschrift: Abspänne nennen keine, und im öffentlichen Repo bliebe sie in der Historie; wird das Spiel verkauft, gehört die Anschrift auf die Verkaufsseite
 + Neues Spiel fragt nach, wenn noch ein Lauf gespeichert ist
 + Nach dem Lauf (Tod oder Sieg) ein eigener Bildschirm: neuer Lauf, zum Titel, Aufzeichnung sichern, gleich abspielen, Laufbericht, Ruhmeshalle
 + Bestenliste der eigenen Läufe ja, als Ruhmeshalle
@@ -59,7 +61,7 @@ Was ein Titel in anderen Spielen leistet (aus Kenntnis der Spiele, nicht im Einz
 + Rücksicht auf Lichtempfindliche: nur die dünnen Blitze flackern, Aura und Lichthöfe schwellen weich, kein Aufblitzen des ganzen Bildes, höchstens etwa ein Einschlag alle zwei Sekunden; Bewegung reduzieren (Einstellung oder System) lässt nur die ruhende Aura
 + Mehrere Titelbilder: je Start eines aus den freigeschalteten (ein neues zuerst, siehe Entscheidungen), keine Bildfolge während des Menüs
 
-Menü der ersten Version: Fortsetzen, Neues Spiel, Läufe (ab zwei belegten Plätzen), Einstellungen, Hilfe, Beenden; keine ausgegrauten Platzhalter für Kommendes.
+Menü der ersten Version: Fortsetzen, Neues Spiel, Läufe (ab zwei belegten Plätzen), Einstellungen, Hilfe, Mitwirkende, Beenden; keine ausgegrauten Platzhalter für Kommendes.
 
 ## Speicherplätze
 
@@ -99,7 +101,7 @@ Damit die Ideen später ohne Umbau dazukommen:
 ## Titel und Plätze
 
 + Titel als unterste Fensterart `titel` (`src/eingabe/titel.js`, Anzeige `src/anzeige/titel.js`) in der eigenen Ebene `#titel`; Esc und ein Klick daneben schließen ihn nicht; Fenster darüber stehen mittig im ganzen Fenster
-+ Menü: Fortsetzen (zuletzt gespielter Lauf, nur mit spielbarem Platz), Neues Spiel, Läufe (ab zwei belegten Plätzen), Einstellungen, Hilfe, Beenden; Pfeile, j/k, Enter, Klick; die Buchstaben stehen nicht davor, wirken aber weiter, weil der Klick über sie läuft ("Klick ist Taste"); unten links nur die Version, den Bedienhinweis nennt die Hilfe in ihrer Fußzeile
++ Menü: Fortsetzen (zuletzt gespielter Lauf, nur mit spielbarem Platz), Neues Spiel, Testkammer, Arena, Läufe (ab zwei belegten Plätzen), Einstellungen, Hilfe, Mitwirkende, Beenden; Pfeile, j/k, Enter, Klick; die Buchstaben stehen nicht davor, wirken aber weiter, weil der Klick über sie läuft ("Klick ist Taste"); unten links nur die Version, den Bedienhinweis nennt die Hilfe in ihrer Fußzeile
 + Rechte Spalte: die drei Plätze ("Platz 1: Tiefe 2, Zug 340, 21.11.2026", frei, veraltet), ein Klick setzt fort oder beginnt auf einem freien Platz; darunter der Spruch
 + Neues Spiel nimmt den ersten leeren Platz, sonst einen veralteten; sind alle spielbar belegt, öffnet sich `laeufe` zum Ersetzen mit Nachfrage; `laeufe` setzt fort, beginnt auf freien Plätzen neu, fragt bei veralteten nach und löscht mit Entf nach Nachfrage
 + Spielmenü mit Zum Titel; nach dem Tod öffnet sich `ende` (Neuer Lauf auf demselben Platz, Zum Titel, Verlauf)
@@ -115,6 +117,20 @@ Damit die Ideen später ohne Umbau dazukommen:
 + Chronik, letzter Lauf und Spielart wie unter "Was schon jetzt zu beachten ist", Einzelheiten unter Speichern in [Architektur.md](Architektur.md)
 + Vollbild ist ein Knopf, keine Einstellung; `?seed=` gilt nur mit einem leeren Platz
 + Die Gestaltung (Breite der Spalten, Verlauf, Schriftgrößen) steht in CSS-Variablen und wird nach der Prüfung im Browser nachgestellt
+
+## Mitwirkende
+
++ Menü: nach Hilfe der Eintrag Mitwirkende; er öffnet die Fensterart `mitwirkende` (`src/eingabe/mitwirkende.js`), nur zum Lesen, Esc schließt; den Inhalt baut `src/anzeige/mitwirkende.js`, gesammelt von `mitwirkendeSammeln` ohne DOM
++ Abschnitte in fester Folge, je Zeile was und leise dahinter die Quellenangabe (siehe [Texte.md](Texte.md), Quellenangabe); ein Abschnitt ohne Daten fällt weg:
+  + Impressum: Name mit Link zum Repo und die Auflösung des Kürzels "chd" (`IMPRESSUM`)
+  + Spiel: die Rollen am Spiel selbst (`ROLLEN`), je mit Quellenangabe: Idee und Spieldesign `chd`, Ausarbeitung von Design und Regeln `chd` mit Claude (Ausarbeitung), Code `generiert` mit Claude
+  + Vorbilder: die Spiele, von denen Ideen kommen, nur die Titel (`VORBILDER`)
+  + Titelbilder: alle, auch nicht freigeschaltete, nur als "Titelbild 1" usw., damit kein Motiv verraten wird
+  + Tiles: nach gleicher Quellenangabe gruppiert, mit den Namen aus den Texten von Gelände, Wesen und Gegenständen gleichen Schlüssels; weicht die Angabe eines Tiles zwischen den Sätzen ab, steht es je Satz mit Größe da (siehe [Tileset.md](Tileset.md), Ablage und Lizenz)
+  + Texte: jeder Korpustext der gewählten Sprache mit Titel und Quellenangabe aus dem Kopf
+  + Literatur: das ganze Verzeichnis `sprache/literatur.json` als volle Angabe (`literaturangabe`), alphabetisch
+  + Bibliotheken und Lizenzen: die Bibliotheken in `lib/` mit Urheber und Lizenz (`BIBLIOTHEKEN`), dazu der Verweis auf `LIZENZEN.md`
++ `src/main.js` gibt dem Fenster Tileset, Korpustexte und Literatur mit; Korpus und Literatur kommen nach, fehlen sie, entfallen nur ihre Abschnitte
 
 ## Testkammer
 

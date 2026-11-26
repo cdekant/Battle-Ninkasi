@@ -132,7 +132,7 @@ test("Titel: jedes data-taste und data-ziel der Titelebene lässt sich auslösen
   const html = titelHtml(umgebung, stapel);
   const tasten = attributwerte(html, "taste");
   const ziele = attributwerte(html, "ziel");
-  assert.equal(tasten.length, 8, "acht Einträge mit zwei belegten Plätzen");
+  assert.equal(tasten.length, 9, "neun Einträge mit zwei belegten Plätzen");
   assert.equal(ziele.length, 3, "drei Plätze");
   assert.ok(!tasten.some((taste) => taste.code === "Escape"));
   for (const taste of tasten) assert.ok(fensterTaste(stapel, taste, umgebung).stapel, JSON.stringify(taste));

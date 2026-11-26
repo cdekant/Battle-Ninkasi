@@ -65,16 +65,17 @@ test("Speicherplätze: neues Spiel nimmt den ersten leeren, dann einen veraltete
 });
 
 test("Titel: Einträge nach den Plätzen, Fortsetzen nimmt den letzten Lauf, Esc schließt nicht", () => {
-  assert.deepEqual(titelEintraege([null, null, null]), ["neues_spiel", "testkammer", "arena", "einstellungen", "hilfe", "beenden"]);
-  assert.deepEqual(titelEintraege([spielbar(1), null, null]), ["fortsetzen", "neues_spiel", "testkammer", "arena", "einstellungen", "hilfe", "beenden"]);
-  assert.deepEqual(titelEintraege([veraltet, spielbar(1), null]), ["fortsetzen", "neues_spiel", "testkammer", "arena", "laeufe", "einstellungen", "hilfe", "beenden"], "Läufe ab zwei belegten Plätzen");
+  assert.deepEqual(titelEintraege([null, null, null]), ["neues_spiel", "testkammer", "arena", "einstellungen", "hilfe", "mitwirkende", "beenden"]);
+  assert.deepEqual(titelEintraege([spielbar(1), null, null]), ["fortsetzen", "neues_spiel", "testkammer", "arena", "einstellungen", "hilfe", "mitwirkende", "beenden"]);
+  assert.deepEqual(titelEintraege([veraltet, spielbar(1), null]), ["fortsetzen", "neues_spiel", "testkammer", "arena", "laeufe", "einstellungen", "hilfe", "mitwirkende", "beenden"], "Läufe ab zwei belegten Plätzen");
   const plaetze = [spielbar(1), null, spielbar(8)];
   assert.deepEqual(titelTaste(titelOeffnen(), { code: "Enter" }, { plaetze }).aktion, { art: "fortsetzen", stelle: 2 }, "Fortsetzen ist vorgewählt");
   assert.deepEqual(titelTaste(titelOeffnen(), { code: "KeyB", zeichen: "b" }, { plaetze }).aktion, { art: "neuesSpiel", stelle: 1 });
   assert.deepEqual(titelTaste(titelOeffnen(), { code: "Escape" }, { plaetze }).zustand, titelOeffnen());
   assert.deepEqual(titelTaste(titelOeffnen(), { code: "KeyC", zeichen: "c" }, { plaetze }).aktion, { art: "neuesSpiel", stelle: 1, spielart: "allmaechtig" }, "Testkammer");
   assert.equal(titelTaste(titelOeffnen(), { code: "KeyD", zeichen: "d" }, { plaetze }).oeffnen.art, "arenawahl");
-  assert.equal(titelTaste(titelOeffnen(), { code: "KeyH", zeichen: "h" }, { plaetze }).aktion, "beenden");
+  assert.equal(titelTaste(titelOeffnen(), { code: "KeyH", zeichen: "h" }, { plaetze }).oeffnen.art, "mitwirkende");
+  assert.equal(titelTaste(titelOeffnen(), { code: "KeyI", zeichen: "i" }, { plaetze }).aktion, "beenden");
   assert.equal(titelTaste(titelOeffnen(), { code: "KeyF", zeichen: "f" }, { plaetze }).oeffnen.art, "einstellungen");
   assert.deepEqual(titelKlick(titelOeffnen(), { stelle: 0 }, { plaetze }).aktion, { art: "fortsetzen", stelle: 0 }, "Klick auf einen Platz");
   assert.deepEqual(titelKlick(titelOeffnen(), { stelle: 1 }, { plaetze }).aktion, { art: "neuesSpiel", stelle: 1 }, "Klick auf einen freien Platz");

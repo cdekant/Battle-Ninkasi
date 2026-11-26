@@ -13,6 +13,7 @@ import { quellenangabeText } from "./quellenangabe.js";
 import { titelEintraege } from "../eingabe/titel.js";
 import { ANZAHL_PLAETZE } from "../eingabe/speicherstand.js";
 import { arenenListe, taktikDerWahl } from "../eingabe/arenawahl.js";
+import "./mitwirkende.js";
 
 const escapeHtml = (text) => String(text).replace(/[&<>"]/g, (zeichen) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[zeichen]);
 

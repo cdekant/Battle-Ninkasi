@@ -2,7 +2,8 @@
 //   titel:  unterste Fensterart im Stapel; Esc und ein Klick daneben schließen ihn nicht. Zustand { gewaehlt, hinweis? }.
 //           Einträge je nach Speicherplätzen: Fortsetzen (zuletzt gespielter Lauf, vorgewählt), Neues Spiel, Testkammer
 //           (neues Spiel der Spielart "allmaechtig"), Arena (öffnet die Wahl der Arena, eingabe/arenawahl.js), Läufe (ab zwei
-//           belegten Plätzen), Einstellungen, Hilfe, Beenden. Ein Klick auf einen Platz der rechten Spalte trägt
+//           belegten Plätzen), Einstellungen, Hilfe, Mitwirkende (eingabe/mitwirkende.js), Beenden. Ein Klick auf einen
+//           Platz der rechten Spalte trägt
 //           data-ziel { stelle } und setzt diesen Lauf fort.
 //   laeufe: die drei Speicherplätze; Zustand { gewaehlt, zweck }; zweck "fortsetzen" (Lauf wählen) oder "ersetzen"
 //           (alle Plätze belegt, ein neues Spiel verdrängt einen Lauf, mit Nachfrage); Entf löscht mit Nachfrage;
@@ -17,11 +18,12 @@ import { listeBedienen } from "./menue.js";
 import { einstellungsfensterOeffnen } from "./einstellungsfenster.js";
 import { platzSpielbar, platzFuerNeuesSpiel, zuletztGespielt } from "./speicherstand.js";
 import { arenawahlOeffnen } from "./arenawahl.js";
+import "./mitwirkende.js";
 
 export function titelEintraege(plaetze) {
   const spielbar = plaetze.some(platzSpielbar);
   const belegt = plaetze.filter(Boolean).length;
-  return [...(spielbar ? ["fortsetzen"] : []), "neues_spiel", "testkammer", "arena", ...(belegt >= 2 ? ["laeufe"] : []), "einstellungen", "hilfe", "beenden"];
+  return [...(spielbar ? ["fortsetzen"] : []), "neues_spiel", "testkammer", "arena", ...(belegt >= 2 ? ["laeufe"] : []), "einstellungen", "hilfe", "mitwirkende", "beenden"];
 }
 
 export function titelOeffnen() {
@@ -47,6 +49,7 @@ function titelEintragWaehlen(zustand, eintrag, plaetze) {
   if (eintrag === "laeufe") return { zustand, oeffnen: { art: "laeufe", zustand: laeufeOeffnen("fortsetzen", plaetze) } };
   if (eintrag === "einstellungen") return { zustand, oeffnen: { art: "einstellungen", zustand: einstellungsfensterOeffnen() } };
   if (eintrag === "hilfe") return { zustand, oeffnen: { art: "hilfe", zustand: {} } };
+  if (eintrag === "mitwirkende") return { zustand, oeffnen: { art: "mitwirkende", zustand: {} } };
   return { zustand, aktion: eintrag };
 }
 

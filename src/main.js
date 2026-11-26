@@ -295,11 +295,13 @@ let speicherZeitgeber = null;
 const animation = neueAnimation();
 let animationsZeitgeber = null;
 // Titel und Speicherplätze: Stelle des laufenden Spiels (0 bis ANZAHL_PLAETZE - 1), was der Titel über die Plätze
-// zeigt, das Titelbild dieses Starts und der Spruch aus dem Korpus (kommt nach, sobald die Texte geladen sind)
+// zeigt, das Titelbild dieses Starts und der Spruch aus dem Korpus (kommt nach, sobald die Texte geladen sind; die
+// Korpustexte bleiben für die Mitwirkenden)
 let aktuelleStelle = null;
 let plaetze = plaetzeLesen();
 const titelbild = titelbildWaehlen(chronik, Math.random());
 let spruch = null;
+let korpustexte = [];
 let literatur = [];
 // Bewegte Effekte über dem Titelbild (anzeige/titeleffekte.js); Bewegung reduzieren gilt aus den Einstellungen oder vom System
 const titeleffekte = titeleffekteAnlegen({
@@ -362,7 +364,7 @@ function spielZeichnen() {
 
 // Was Fenster zum Zeichnen und für ihre Tasten bekommen (anzeige/fenster.js, eingabe/fenster.js)
 function fensterumgebung() {
-  return { spiel, daten, texte, belegung, belegungsVorgabe, abweichungen: belegungsabweichungen, leisten, logzeilen: log.zeilen, einstellungen, vorgaben, version: VERSION, plaetze, titelbild, spruch, literatur };
+  return { spiel, daten, texte, belegung, belegungsVorgabe, abweichungen: belegungsabweichungen, leisten, logzeilen: log.zeilen, einstellungen, vorgaben, version: VERSION, plaetze, titelbild, spruch, literatur, korpustexte, tileset };
 }
 
 // ID des sichtbaren Wesens auf einem Feld oder null
@@ -1150,7 +1152,8 @@ titelElement.addEventListener("contextmenu", (mausereignis) => {
 const KORPUSLISTEN = { de: korpuslisteDe, en: korpuslisteEn };
 Promise.all(KORPUSLISTEN[sprache].map((name) => fetch(`sprache/${sprache}/korpus/${name}`).then((antwort) => (antwort.ok ? antwort.text() : Promise.reject(new Error(name))))
   .then((text) => korpustextZerlegen(name, text))))
-  .then((korpustexte) => {
+  .then((geladen) => {
+    korpustexte = geladen;
     spruch = spruchWaehlen(korpustexte, Math.random());
     if (fensterStapel[0]?.art === "titel") zeichnen();
   })

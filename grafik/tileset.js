@@ -1,7 +1,8 @@
 // Tileset: Palette und Tiles je Satz (Kantenlänge in Pixeln).
 // Erzeugt von werkzeuge/tiles-ableiten.js aus den Dateien in tiles/, nicht von Hand ändern.
-// Schlüssel der Tiles folgen daten/zeichen.js.
+// Schlüssel der Tiles folgen daten/zeichen.js; wer die Tiles gemacht hat, steht in quellenangabe.js.
 import palette from "./palette.js";
+import quellenangabe from "./quellenangabe.js";
 import bier64 from "./tiles/64/bier.js";
 import boden64 from "./tiles/64/boden.js";
 import essigbakterium64 from "./tiles/64/essigbakterium.js";
@@ -25,6 +26,7 @@ import wand16 from "./tiles/16/wand.js";
 
 export default {
   palette,
+  quellenangabe,
   saetze: {
     64: { bier: bier64, boden: boden64, essigbakterium: essigbakterium64, ninkasi: ninkasi64, wand: wand64 },
     48: { bier: bier48, boden: boden48, essigbakterium: essigbakterium48, ninkasi: ninkasi48, wand: wand48 },

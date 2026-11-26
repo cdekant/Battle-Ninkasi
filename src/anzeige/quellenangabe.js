@@ -62,14 +62,38 @@ function beteiligteText(texte, beteiligt) {
 
 // Quellenangabe als eine Zeile: "frei nach … · vgl. Name Jahr · mit KI erstellt: …"; was fehlt, fällt weg, auch das
 // "vgl.", wenn das Literaturverzeichnis die Quelle nicht kennt; was (wahlweise) benennt den Inhalt vor der KI-Angabe,
-// z.B. "Titelbild mit KI erstellt: …", wo die Zeile ohne Zusammenhang steht
+// z.B. "Titelbild mit KI erstellt: …", wo die Zeile ohne Zusammenhang steht. Selbst Gemachtes beginnt mit "chd"; ist
+// dabei eine KI beteiligt, heißt es "mit KI:" statt "mit KI erstellt:", denn gemacht hat es dann chd
 export function quellenangabeText(texte, angabe, literatur = [], { was = null } = {}) {
   if (!angabe) return "";
   const teile = [];
+  if (angabe.art === "chd") teile.push("chd");
   if (angabe.nach && angabe.art) teile.push(texte.text(`quellenangabe.nach.${angabe.art}`, { nach: angabe.nach }));
   const eintrag = angabe.quelle ? literatur.find((kandidat) => kandidat.id === angabe.quelle) : null;
   if (eintrag) teile.push(texte.text("quellenangabe.vgl", { beleg: kurzbeleg(eintrag, texte.text("quellenangabe.und_andere")) }));
   const beteiligte = angabe.beteiligt?.length ? beteiligteText(texte, angabe.beteiligt) : null;
-  if (beteiligte) teile.push(was ? texte.text("quellenangabe.mit_ki_was", { was, beteiligte }) : texte.text("quellenangabe.mit_ki", { beteiligte }));
+  if (beteiligte && angabe.art === "chd") teile.push(texte.text("quellenangabe.mit_ki_beteiligt", { beteiligte }));
+  else if (beteiligte) teile.push(was ? texte.text("quellenangabe.mit_ki_was", { was, beteiligte }) : texte.text("quellenangabe.mit_ki", { beteiligte }));
   return teile.join(" · ");
+}
+
+// Volle Angabe eines Eintrags aus sprache/literatur.json für das Verzeichnis:
+// "Familienname, Vorname; … (Jahr): Titel. In: Herausgeber (Hrsg.): Sammelwerk. Ort: Verlag."
+// Ohne Autorschaft stehen die Herausgeber vorn; was fehlt, fällt weg
+export function literaturangabe(texte, eintrag) {
+  const personen = (liste) => (liste ?? []).map((person) => person.literal ?? [person.family, person.given].filter(Boolean).join(", ")).join("; ");
+  const hrsg = texte.text("literatur.hrsg");
+  const autoren = personen(eintrag.author);
+  const herausgeber = personen(eintrag.editor);
+  const wer = autoren || (herausgeber && `${herausgeber} (${hrsg})`);
+  const jahr = eintrag.issued?.["date-parts"]?.[0]?.[0];
+  const kopf = [wer, jahr && `(${jahr})`].filter(Boolean).join(" ");
+  const teile = [[kopf, eintrag.title].filter(Boolean).join(": ")];
+  if (eintrag["container-title"]) {
+    const imWerk = autoren && herausgeber ? `${herausgeber} (${hrsg}): ${eintrag["container-title"]}` : eintrag["container-title"];
+    teile.push(texte.text("literatur.in", { werk: imWerk }));
+  }
+  const verlag = [eintrag["publisher-place"], eintrag.publisher].filter(Boolean).join(": ");
+  if (verlag) teile.push(verlag);
+  return `${teile.join(". ")}.`;
 }

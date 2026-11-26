@@ -82,7 +82,7 @@
 
   <section aria-labelledby="titel-tiles">
     <h2 id="titel-tiles">Tiles</h2>
-    <p>Jedes Tile in den Sätzen 64, 48, 32 und 16 px, jeweils in Originalgröße und auf 128 px vergrößert, dazu der Satz 64 als 3x3-Kachelung, um Nahtstellen zu prüfen.</p>
+    <p>Jedes Tile in den Sätzen 64, 48, 32 und 16 px, jeweils in Originalgröße und auf 128 px vergrößert, dazu der Satz 64 als 3x3-Kachelung, um Nahtstellen zu prüfen. Unter dem Namen die Quellenangabe, getrennt mit "/", wenn sie zwischen den Sätzen abweicht.</p>
     <div class="tiles" id="tiles"></div>
   </section>
 
@@ -97,6 +97,12 @@
 
 <script type="module">
   import tileset from "./tileset.js";
+  import { tileQuellenangabe } from "../src/anzeige/tilebilder.js";
+
+  // Quellenangabe roh, ohne Texte der Sprache: "generiert · Claude (anteil)"; je Satz, wenn sie abweicht
+  const angabeRoh = (angabe) => angabe
+    ? [angabe.art, ...(angabe.beteiligt ?? []).map(({ wer, anteil }) => (anteil ? `${wer} (${anteil})` : wer))].join(" · ")
+    : "ohne Quellenangabe";
 
   const palette = tileset.palette;
   const farbeNachZeichen = new Map(palette.farben.map((farbe) => [farbe.zeichen, farbe.hex]));
@@ -172,7 +178,9 @@
     const karte = document.createElement("figure");
     karte.className = "tile";
     karte.style.margin = "0";
-    karte.innerHTML = `<figcaption class="name">${name}</figcaption><div class="ansichten"></div>`;
+    const angaben = [...new Set(satzGroessen.filter((satzGroesse) => tileset.saetze[satzGroesse][name])
+      .map((satzGroesse) => angabeRoh(tileQuellenangabe(tileset, satzGroesse, name))))];
+    karte.innerHTML = `<figcaption class="name">${name}</figcaption><span class="etikett">${angaben.join(" / ")}</span><div class="ansichten"></div>`;
     const ansichten = karte.querySelector(".ansichten");
     // jeder Satz in Originalgröße, dazu auf 128 px vergrößert zum Vergleich; der größte Satz zusätzlich als 3x3-Kachelung
     for (const satzGroesse of satzGroessen) {

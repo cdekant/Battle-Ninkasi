@@ -245,6 +245,10 @@ html, body {
 .fenster-rahmen ul.eigenschaften li { display: flex; justify-content: space-between; }
 .fenster-rahmen ul.hilfe li { display: flex; gap: 12px; }
 .fenster-rahmen ul.hilfe .tasten { min-width: 9em; color: var(--kupfer); font-family: monospace; }
+/* Mitwirkende (anzeige/mitwirkende.js): je Zeile was, dahinter leise die Quellenangabe */
+.fenster-rahmen ul.mitwirkende { margin-bottom: 12px; }
+.fenster-rahmen ul.mitwirkende li { margin: 4px 0; line-height: 1.4; }
+.fenster-rahmen ul.mitwirkende a { color: var(--kupfer); }
 .fenster-rahmen ul.erstellung li { display: grid; grid-template-columns: 10em 1fr 2.5em; gap: 12px; align-items: center; padding: 2px 4px; }
 .fenster-rahmen ul.erstellung .balken { height: 8px; margin: 0; }
 .fenster-rahmen ul.erstellung .balken .fuellung { display: block; background: var(--kupfer); }

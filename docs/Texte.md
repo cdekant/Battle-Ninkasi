@@ -1,6 +1,6 @@
 # Battle Ninkasi - Texte und Textkorpus
 
-Stand: 2026-11-25
+Stand: 2026-11-26
 
 Zuständig für: `sprache/*`, `src/anzeige/texte.js`, `src/anzeige/grammatik.js`, `src/anzeige/korpus.js`, `src/anzeige/quellenangabe.js`, `src/anzeige/glossar.js`, `daten/glossar.js`, `daten/bierstile.js`
 
@@ -177,16 +177,17 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 
 ## Quellenangabe
 
-Jeder Inhalt sagt, wer ihn gemacht hat, wonach, wo man nachlesen kann und welche KI beteiligt war; Korpustexte und Titelbilder tun das schon, Tiles, Fundtexte und das Fenster der Mitwirkenden folgen demselben Format. Aus der Git-Historie lässt sich das nicht ablesen, es steht deshalb ausdrücklich in den Daten.
+Jeder Inhalt sagt, wer ihn gemacht hat, wonach, wo man nachlesen kann und welche KI beteiligt war; Korpustexte, Titelbilder und Tiles tun das schon, Fundtexte folgen demselben Format; das Fenster der Mitwirkenden sammelt alle Angaben (siehe [Titelbildschirm.md](Titelbildschirm.md), Mitwirkende). Aus der Git-Historie lässt sich das nicht ablesen, es steht deshalb ausdrücklich in den Daten.
 
 + Format (`src/anzeige/quellenangabe.js`): `{ art, nach?, quelle?, beteiligt? }`
 + `art`: `chd` (selbst gemacht; auch eine eigene Vorlage, die nur digitalisiert wurde), `generiert` (von einer KI erstellt, ausgewählt und abgenommen), `nachdichtung`, `frei` (frei nach einer Vorlage), `gemeinfrei`; bei Texten sagt `art` das Verhältnis zur Vorlage, wer geschrieben hat, sagt `beteiligt`
 + `nach`: die Vorlage kurz, im Dativ mit Artikel, so dass sie hinter "nach" passt, z.B. `der akkadischen Beschwörungsserie Maqlû`
 + `quelle`: Schlüssel im Literaturverzeichnis, angezeigt als Kurzbeleg "Name Jahr" (Familiennamen der Autorschaft, sonst der Herausgeberschaft, sonst die Körperschaft; ab drei Namen der erste mit "u. a.", zwei mit "/")
-+ `beteiligt`: `[{ wer, anteil? }]`, die beteiligte KI mit ihrem Anteil (Schlüssel unter `quellenangabe.anteil.` in den Texten, z.B. `motiv`, `dampf`, `masken`, `format`, `animation`); Werkzeuge ohne eigenen Beitrag (Editor, eine reine Digitalisierung) werden nicht genannt
-+ Zeile (`quellenangabeText`): je nach `art` "nachgedichtet nach", "frei nach" oder "nach" mit `nach`, dann "vgl." mit dem Kurzbeleg, dann "mit KI erstellt:" mit den Beteiligten, je Werkzeug einmal mit seinen Anteilen; was fehlt, fällt weg; wo die Zeile ohne Zusammenhang steht, benennt `was` den Inhalt ("Titelbild mit KI erstellt: …")
-+ Prüfung (`quellenangabeFehler`): bekannte `art`, `generiert` nur mit `beteiligt`, `quelle` im Literaturverzeichnis, Anteile mit Text; für Korpustexte und Titelbilder in `tests/quellenangabe.test.js`, für den Korpus auch im Kompendium
-+ Stand: alle Korpustexte sind mit Claude geschrieben (`beteiligt: Claude`), die bestehenden Tiles von Claude gezeichnet (Angabe folgt mit den Tiles), das Titelbild siehe [Titelbildschirm.md](Titelbildschirm.md)
++ `beteiligt`: `[{ wer, anteil? }]`, die beteiligte KI mit ihrem Anteil (Schlüssel unter `quellenangabe.anteil.` in den Texten, z.B. `motiv`, `dampf`, `masken`, `format`, `animation`, `ausarbeitung`); ein Anteil lässt sich jederzeit nachtragen; Werkzeuge ohne eigenen Beitrag (Editor, eine reine Digitalisierung) werden nicht genannt
++ Zeile (`quellenangabeText`): bei `chd` zuerst "chd", dann je nach `art` "nachgedichtet nach", "frei nach" oder "nach" mit `nach`, dann "vgl." mit dem Kurzbeleg, dann "mit KI erstellt:" mit den Beteiligten, je Werkzeug einmal mit seinen Anteilen; bei `chd` heißt es "mit KI:", denn gemacht hat es dann chd ("chd · mit KI: Claude (Ausarbeitung)"); was fehlt, fällt weg; wo die Zeile ohne Zusammenhang steht, benennt `was` den Inhalt ("Titelbild mit KI erstellt: …")
++ Volle Literaturangabe (`literaturangabe`) für das Verzeichnis der Mitwirkenden: "Familienname, Vorname; … (Jahr): Titel. In: Herausgeber (Hrsg.): Sammelwerk. Ort: Verlag."; ohne Autorschaft stehen die Herausgeber vorn, was fehlt, fällt weg
++ Prüfung (`quellenangabeFehler`): bekannte `art`, `generiert` nur mit `beteiligt`, `quelle` im Literaturverzeichnis, Anteile mit Text; für Korpustexte und Titelbilder in `tests/quellenangabe.test.js`, für den Korpus auch im Kompendium, für Tiles in `tilesetPruefen` (siehe [Tileset.md](Tileset.md), Ablage und Lizenz), für die Rollen der Mitwirkenden in `tests/mitwirkende.test.js`
++ Stand: alle Korpustexte sind mit Claude geschrieben (`beteiligt: Claude`), die bestehenden Tiles von Claude gezeichnet (`generiert` mit Claude, als Vorgabe in `grafik/quellenangabe.js`), das Titelbild siehe [Titelbildschirm.md](Titelbildschirm.md)
 
 ## Offen
 

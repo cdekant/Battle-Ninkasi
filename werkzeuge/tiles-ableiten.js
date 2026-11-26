@@ -11,6 +11,7 @@
 //   6. Umriss in Schwarz neu setzen, wenn die Vorlage einen hatte
 // Danach prüft das Werkzeug jedes abgeleitete Tile gegen die Vorlage und meldet Verdachtsfälle für die Nacharbeit:
 // verschwundene Signalfarben, zerfallene Figuren, ausgedünnte Fugen.
+// Eine eigene Quellenangabe der Vorlage geht in die abgeleiteten Tiles über; das Werkzeug selbst wird nie genannt.
 
 import { readdirSync, existsSync, writeFileSync, mkdirSync } from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -211,11 +212,13 @@ function schluesselAusDateiname(dateiname) {
   return dateiname.replace(/\.js$/, "").replace(/-([a-z])/g, (_, buchstabe) => buchstabe.toUpperCase());
 }
 
-export function tileDateiText(kommentar, groesse, zeilen) {
+// quellenangabe (wahlweise): die eigene Angabe der Vorlage, sonst gilt grafik/quellenangabe.js
+export function tileDateiText(kommentar, groesse, zeilen, quellenangabe = null) {
   return [
     `// ${kommentar}`,
     `// Pixelmatrix ${groesse}x${groesse}, ein Zeichen je Pixel, Schlüssel in ../../palette.js, "." durchsichtig`,
     "export default {",
+    ...(quellenangabe ? [`  quellenangabe: ${JSON.stringify(quellenangabe)},`] : []),
     `  groesse: ${groesse},`,
     "  pixel: [",
     ...zeilen.map((zeile) => `    "${zeile}",`),
@@ -241,12 +244,14 @@ function tilesetDateiText(tilesOrdner) {
   return [
     "// Tileset: Palette und Tiles je Satz (Kantenlänge in Pixeln).",
     "// Erzeugt von werkzeuge/tiles-ableiten.js aus den Dateien in tiles/, nicht von Hand ändern.",
-    "// Schlüssel der Tiles folgen daten/zeichen.js.",
+    "// Schlüssel der Tiles folgen daten/zeichen.js; wer die Tiles gemacht hat, steht in quellenangabe.js.",
     'import palette from "./palette.js";',
+    'import quellenangabe from "./quellenangabe.js";',
     ...importe,
     "",
     "export default {",
     "  palette,",
+    "  quellenangabe,",
     "  saetze: {",
     ...saetze,
     "  },",
@@ -281,7 +286,7 @@ async function hauptprogramm() {
         mkdirSync(zielOrdner, { recursive: true });
         zeilen = tileAbleiten(vorlage.pixel, zielGroesse, palette);
         const kommentar = `${datei.replace(/\.js$/, "")} ${zielGroesse} px: abgeleitet aus 64 px mit werkzeuge/tiles-ableiten.js`;
-        writeFileSync(zielDatei, tileDateiText(kommentar, zielGroesse, zeilen));
+        writeFileSync(zielDatei, tileDateiText(kommentar, zielGroesse, zeilen, vorlage.quellenangabe));
         console.log(`geschrieben: ${ort}`);
       }
       for (const warnung of ableitungPruefen(vorlage.pixel, zeilen, palette)) {

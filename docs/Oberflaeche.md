@@ -60,7 +60,7 @@ Umsetzung: siehe [Anzeige.md](Anzeige.md), Oberfläche
 
 ## Bildschirme
 
-+ Titel: Hauptmenü mit Titelbild ohne "Drücke eine Taste", Fortsetzen mit Vorschau, Neues Spiel, Einstellungen, Hilfe, Beenden; der erste Klick ist die Geste, die der Browser für Ton und Vollbild verlangt; Entwurf, Entscheidungen und Ideen in [Titelbildschirm.md](Titelbildschirm.md)
++ Titel: Hauptmenü mit Titelbild ohne "Drücke eine Taste", Fortsetzen mit Vorschau, Neues Spiel, Einstellungen, Hilfe, Mitwirkende, Beenden; der erste Klick ist die Geste, die der Browser für Ton und Vollbild verlangt; Entwurf, Entscheidungen und Ideen in [Titelbildschirm.md](Titelbildschirm.md)
 + Idee: Intro-Film mit Lore und Vorgeschichte als Bildfolge in Pixelart (klein, im Stil) statt Video, jede Taste überspringt, eine Einstellung zeigt ihn nur beim ersten Start oder nie; mit der Darstellung (Punkt 13); Bild und Ton unter CC BY-NC-SA 4.0 in `LIZENZEN.md`
 + Charaktererstellung: Eigenschaften verteilen (die Logik nimmt die Verteilung als Startoption)
 + Spiel: das Layout unten
