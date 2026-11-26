@@ -1,7 +1,8 @@
 // Verschleiß der Gegenstände (siehe docs/Gegenstaende.md, Verschleiß).
 // Verderben: verdirbt: { nach, wird } am Gegenstand; beim Erzeugen bekommt er den Zeitpunkt verdirbtUm und ein
 //   gebundenes Zeitereignis (systeme/inventar.js verderbenEinplanen). Ist es so weit, wird er zum Typ wird, am selben
-//   Ort oder im selben Gepäck, mit derselben Anzahl (Meldung verdorben). Auf verlassenen Ebenen ruht das Verderben
+//   Ort oder im selben Gepäck, mit derselben Anzahl (Meldung verdorben); mit wird: null vergeht er (Meldung vergangen,
+//   mit traegerin nur, wenn er getragen wurde). Auf verlassenen Ebenen ruht das Verderben
 //   mit (systeme/ebenen.js), was Ninkasi trägt, verdirbt weiter. Eigene Arten des Verderbens melden sich im Register
 //   "verderben" an und haben Vorrang (ein Sud rückt eine Stufe weiter, systeme/reifen.js); verdirbt braucht dann kein wird.
 // Haltbarkeit: haltbarkeit: { hoechstens, wirdZu, unempfindlich?: { <schadensart>: prozent } } am Gegenstand, der Stand
@@ -42,6 +43,13 @@ anmelden("zeitereignisse", "verderben", (spiel, { gegenstandId }) => {
   if (!gegenstand?.verdirbt) return;
   for (const [, behandeln] of alle("verderben")) if (behandeln(spiel, gegenstand)) return;
   const vorher = bezugAuf(gegenstand), anzahl = anzahlVon(gegenstand);
+  if (gegenstand.verdirbt.wird === null) {
+    const traegerin = gegenstand.getragenVon !== undefined ? entitaetMitId(spiel.zustand, gegenstand.getragenVon) : null;
+    if (traegerin) ausDemInventarNehmen(traegerin, gegenstand.id);
+    entitaetEntfernen(spiel.zustand, gegenstand.id);
+    melden(spiel, "vergangen", { was: { ...vorher, anzahl }, traegerin: traegerin ? bezugAuf(traegerin) : null, anzahl });
+    return;
+  }
   const { neu, traegerin } = gegenstandErsetzen(spiel, gegenstand, gegenstand.verdirbt.wird);
   melden(spiel, "verdorben", { was: vorher, wird: bezugAuf(neu), traegerin: traegerin ? bezugAuf(traegerin) : null, anzahl });
 });

@@ -2,13 +2,13 @@
 
 Stand: 2026-11-26
 
-Zuständig für: `src/systeme/sud.js`, `src/systeme/brauen.js`, `src/systeme/absud.js`, `src/systeme/rezepte.js`, `src/systeme/reifen.js`, `src/systeme/flora.js`, `daten/sude.js`
+Zuständig für: `src/systeme/sud.js`, `src/systeme/brauen.js`, `src/systeme/kulturen.js`, `src/systeme/absud.js`, `src/systeme/rezepte.js`, `src/systeme/reifen.js`, `src/systeme/flora.js`, `daten/sude.js`
 
 Mitprüfen bei Änderungen: [Brauen.md](Brauen.md), [Gegenstaende.md](Gegenstaende.md), [Bedienung.md](Bedienung.md), [Wesen.md](Wesen.md), [Architektur.md](Architektur.md), [Welt.md](Welt.md)
 
 ## Zweck
 
-Das Brausystem in der Logik: wie aus Zutaten, Verfahren und Kultur das Profil eines Suds wird, wann er ein Zielgebiet trifft, wie der Befehl am Kessel abläuft, was das Getränk beim Trinken wirkt, wie es im Gepäck reift und verdirbt, wie die wilde Flora spontan gärt, wie Nebel und Rezeptbuch das Wissen Ninkasis halten und wie ein Sud ohne Kultur zum Absud wird. Das Spieldesign steht in [Brauen.md](Brauen.md), das Fenster zum Brauen in [Bedienung.md](Bedienung.md), Fenster. Jeder Abschnitt nennt Daten, Schnittstellen und Regeln.
+Das Brausystem in der Logik: wie aus Zutaten, Verfahren und Kultur das Profil eines Suds wird, wann er ein Zielgebiet trifft, wie der Befehl am Kessel abläuft, was das Getränk beim Trinken wirkt, wie es im Gepäck reift und verdirbt, wie die wilde Flora spontan gärt, wie Ninkasi Kulturen und ihre Formen gewinnt, wie Nebel und Rezeptbuch das Wissen Ninkasis halten und wie ein Sud ohne Kultur zum Absud wird. Das Spieldesign steht in [Brauen.md](Brauen.md), das Fenster zum Brauen in [Bedienung.md](Bedienung.md), Fenster. Jeder Abschnitt nennt Daten, Schnittstellen und Regeln.
 
 ## Profil
 
@@ -18,9 +18,9 @@ Daten:
 + Zutat am Gegenstand: `zutat: { art: "grundstoff" | "gewuerz", extrakt?, farbe?, bitter?, aromen? }`; `extrakt`, `farbe` und `bitter` gelten für ein Stück auf eine Portion, `aromen` sind Anteile bis 100
 + Verfahren: `regeln.brauen.maische` (je Art `{ vergaerung, aromen? }`, Punkte der Vergärung und Zuschläge auf Aromen), `regeln.brauen.gewuerz` (je Gabe `{ bitter, aroma }` in Prozent der Beiträge eines Gewürzes), Vorgabe `regeln.brauen.verfahren`
 + Gärung: `regeln.brauen.alkoholJeStammwuerze` (Prozent der vergorenen Stammwürze, die Alkohol werden), `suesseJeRestzucker` (Punkte der Süße je Zehntel °Plato Restzucker, in Prozent)
-+ Kultur in `kulturen`: `{ text, vergaerung, vertraegt, aromen?, verderben? }`; `vergaerung` in Prozent, `vertraegt` ist der höchste Alkohol in Zehnteln Vol.-%, `aromen` kommen zum Profil dazu, `verderben` sind Punkte auf die Chance des Verderbens; die Kulturen eines Wesens stehen in `kulturen: [name]` (Proben ohne Gewicht, siehe [Brauen.md](Brauen.md), Kulturen)
++ Kultur in `kulturen`: `{ text, vergaerung, vertraegt, aromen?, verderben? }`; `vergaerung` in Prozent, `vertraegt` ist der höchste Alkohol in Zehnteln Vol.-%, `aromen` kommen zum Profil dazu, `verderben` sind Punkte auf die Chance des Verderbens; die Kulturen eines Wesens stehen in `kulturen: [Schlüssel]` (Proben ohne Gewicht, Schlüssel einer Form, siehe Kulturen)
 + Probe einer Kultur am Gegenstand: `kultur: name`; wer ihn aufhebt, gewinnt die Kultur (siehe Befehl)
-+ Die Kultur `spontan` (`SPONTAN` in `src/systeme/sud.js`) ist keine Kultur der Daten, sondern die wilde Flora der Ebene (siehe Spontane Gärung); `kulturdatenVon(daten, kultur, flora)` gibt die Daten der einen oder der anderen; eine Kultur der Daten darf nicht so heißen
++ Die Kultur `spontan` (`SPONTAN` in `src/systeme/sud.js`) ist keine Kultur der Daten, sondern die wilde Flora der Ebene (siehe Spontane Gärung); `kulturdatenVon(daten, kultur, flora)` gibt die Daten der einen (einer Form, siehe Kulturen) oder der anderen; eine Kultur der Daten darf nicht so heißen
 
 Schnittstellen (`src/systeme/sud.js`, reine Rechnung ohne Zustand):
 
@@ -66,9 +66,9 @@ Schnittstellen (`src/systeme/brauen.js`):
 
 + Befehl `brauen { kessel?: { x, y }, portionen?, zutaten: [{ gegenstandId, menge }], verfahren?: { maische, gewuerz }, kultur?, absicht? }`; ohne Kultur ein Absud (siehe Absud); ohne `kessel` der erste Kessel neben oder unter der Brauerin (eigenes Feld, dann die Nachbarn zeilenweise); ohne `portionen` so viele, wie Kessel und leere Gefäße erlauben, mindestens 1
 + Ablehnungen: `im_kampf`, `kein_kessel`, `keine_zutaten`, `keine_zutat`, `zu_viel` (mehr, als der Stapel hat), `kessel_voll` (mehr Stück als Portionen x `stueckeJePortion`), `zu_viele_portionen` (mehr, als der Kessel hergibt), `kultur_unbekannt`, `keine_flora` (spontan auf einer Ebene ohne Flora), `keine_gefaesse` (weniger leere Gefäße als Portionen), `ungueltig` (Menge oder Portionen unter 1, dieselbe Zutat zweimal, unbekanntes Verfahren)
-+ Meldungen: `gebraut`, `gebraut_getroffen` (mit `zielgebiet`), `gebraut_verdorben`, je mit `wer`, `was` und `anzahl`; `kultur_gewonnen` und `kultur_bekannt` mit `wer` und `kultur`; `verderber_entsteht` mit `was` und `kessel` (dazu `beschworen` ohne `wer`)
++ Meldungen: `gebraut`, `gebraut_getroffen` (mit `zielgebiet`), `gebraut_verdorben`, je mit `wer`, `was` und `anzahl`; `verderber_entsteht` mit `was` und `kessel` (dazu `beschworen` ohne `wer`)
 + `sudVorbereiten(spiel, wesen, befehl)` prüft und rechnet die Vorschau (`{ grund }` oder `{ kessel, eingabe, mitte, gaerung, unschaerfe, bereich, erreichbar, fuellung, fassen, portionen, gefaesse }`), ohne Kampf und Gefäße zu prüfen; `fassen` ist die höchste Füllung für diese Portionen, `erreichbar` nennt nur aufgedeckte Zielgebiete, `rezept` den Schlüssel des Rezepts, nach dem gebraut wird, oder null; `verderbenChance`, `sauerChance`, `kesselBei`, `zutatenIm`, `gefaesseIm`
-+ Haken `aufgehoben` (siehe [Gegenstaende.md](Gegenstaende.md), Inventar): ein Gegenstand mit `kultur` gibt seine Kultur an das Wesen, das ihn aufhebt, und vergeht; die Wissens-EP für Zutaten und Kulturen bucht `src/systeme/wissen.js` (siehe [Wesen.md](Wesen.md), Skills und Lernen)
++ Haken `aufgehoben` (siehe [Gegenstaende.md](Gegenstaende.md), Inventar): beim ersten Aufheben einer Zutatenart Wissens-EP über `src/systeme/wissen.js` (siehe [Wesen.md](Wesen.md), Skills und Lernen); Proben von Kulturen siehe Kulturen
 
 Regeln:
 
@@ -110,6 +110,32 @@ Regeln:
 + Ein gelungener Sud beginnt bei der ersten Stufe, ein verdorbener bei `verdorben.stufe`; zur Zeit `verdirbtUm` rückt er zur nächsten Stufe, die er erreicht (eine Stufe mit `abStammwuerze` überspringt ein schwächerer Sud), bekommt deren Säure und Adjektiv und eine neue Dauer; im Gepäck wird er neu einsortiert und fließt in einen gleichen Stapel
 + Nach der letzten Stufe wird er zu `essig`, mit derselben Anzahl
 + Stapeln, Abspalten und das Ruhen auf verlassenen Ebenen folgen dem Verderben der Gegenstände; Portionen stapeln nur in derselben Stufe
+
+## Kulturen
+
+Daten:
+
++ Quelle: ein Wesen mit `kultur: name` (eine Kultur der Daten); seine Form folgt aus seinen Merkmalen
++ Merkmal: ein Zustand mit `kulturmerkmal: [{ art, ... }]` (siehe [Wirkungen.md](Wirkungen.md), Zustände), meist als Affix der Population (siehe [Welt.md](Welt.md), Ebenen); er verändert das Wesen mit seinen Modifikatoren wie jeder Zustand und die Kultur mit seinen Änderungen, sein Adjektiv steht vor ihrem Namen
++ Änderungsarten im Register `kulturaenderungen` als `{ anwenden(kultur, aenderung), pruefen(aenderung, { aromaachsen }) }`: `plus` (`{ feld: "vergaerung" | "vertraegt" | "verderben", wert }`, `vergaerung` bleibt 0 bis 100, `vertraegt` ab 0) und `aroma` (`{ achse, wert }` auf eine Aromaachse, ab 0)
++ `regeln.brauen.rest`: der Gegenstand, den eine gestorbene Quelle hinterlässt, oder null (Grundgerüst); er bekommt beim Tod `kultur` mit ihrer Form
++ Sammlerin: ein Wesen mit `kulturen: [Schlüssel]`; Ninkasi beginnt mit `kulturen: []` (`daten/ninkasi.js`)
++ Texte der Kulturen sind Hauptwörter, damit die Adjektive der Merkmale davor stehen (siehe [Texte.md](Texte.md), Grammatik)
+
+Schnittstellen:
+
++ In `src/systeme/sud.js` (reine Rechnung): `FORMTRENNER` (`~`), `formSchluessel(kultur, merkmale)`, `formTeile(schluessel)`, `kulturdatenAufloesen(daten, schluessel)`, `kulturBezug(daten, schluessel)` (`{ name, text, adjektive? }` für Meldungen und Anzeige)
++ In `src/systeme/kulturen.js`: `kulturformVon(spiel, wesen)` (Form einer Quelle oder null), `kulturGewinnen(spiel, wesen, schluessel, { still })` (true, wenn neu); Haken `zug_ende`, `nach_tod` und `aufgehoben`
++ Meldungen `kultur_gewonnen` und `kultur_bekannt` mit `wer` und `kultur` (Bezug); Wissens-EP über `kulturGebucht` in `src/systeme/wissen.js`
+
+Regeln:
+
++ Schlüssel einer Form: die Kultur, dann ihre Merkmale sortiert und ohne doppelte, mit `~` verbunden (`wilde_hefe~sauer~uebervergaerend`); ohne Merkmale nur der Name der Kultur; Namen von Kulturen und Merkmalen dürfen `~` nicht enthalten
++ Die Daten einer Form sind die der Kultur mit den Änderungen aller Merkmale in der Reihenfolge des Schlüssels; jede Form ist eine eigene Kultur, im Befehl, in Rezepten und im Wissen
++ Neben dem Wesen: am Ende jedes Zugs der Sammlerin gewinnt sie die Formen aller Quellen auf den acht Nachbarfeldern, am Ende jedes Zugs einer Quelle gewinnt jede Sammlerin daneben ihre Form; ohne Wahrnehmung; eine schon bekannte Form bleibt still
++ Rest: stirbt eine Quelle und gibt es `regeln.brauen.rest`, entsteht auf ihrem letzten Feld der Rest mit ihrer Form
++ Probe aufheben: ein Gegenstand mit `kultur` gibt sie jedem Wesen, das ihn aufhebt, und vergeht; eine bekannte gibt `kultur_bekannt`
++ Wissens-EP: je Form einmal im Lauf (siehe [Wesen.md](Wesen.md), Skills und Lernen)
 
 ## Spontane Gärung
 
@@ -184,6 +210,7 @@ Regeln:
 + `tests/brauen.test.js` (Profil je Portion, Gärung und Restzucker, Zielgebiete, Güte, Runden, Wirkung sofort und über die Zeit, Befehl, Wurf und Verderben, Ablehnungen, Kulturen und Zutaten aufheben, Braufenster mit Portionen und Klickregel, Spinnennetz, Datenprüfung)
 + `tests/reifen.test.js` (Dauer der Stufen, Stufen bis zum Essig, Reife nur für starke Sude, Stapeln je Stufe, Wirkung je Stufe, die drei Ausgänge des Wurfs, Verderber neben dem Kessel, Flora je Ebene, spontane Gärung im Befehl und im Fenster, Datenprüfung)
 + `tests/absud.test.js` (Richtung, Mächtigkeit, Absicht und Misslingen, die drei Ausgänge, Trinken und Werfen, Stufen, Vermutung und Wissen über Kräuter samt Vorwissen, Braufenster mit Balken, Datenprüfung)
++ `tests/kulturen.test.js` (Formen mit Merkmalen, Gewinnen neben dem Wesen in beide Richtungen, Rest nach dem Tod und sein Vergehen, Platztausch und Vorsatz angreifen, Datenprüfung, Start ohne Kultur)
 + `tests/rezepte.test.js` (Vorwissen und Nebel, Zählregel, Rezept lernen über die Tontafel, Erkennen nach dem Verhältnis, enge Vorschau, Kniff nur beim Treffer, EP beim ersten Gelingen, Hausrezepte, Rezeptliste im Braufenster, Datenprüfung)
 
 ## Verweise

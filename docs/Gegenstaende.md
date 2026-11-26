@@ -84,7 +84,7 @@ Vorbilder: NetHack (Säure frisst in Stufen, angefressen schützt weniger), Brog
 
 Daten:
 
-+ Verderben: `verdirbt: { nach, wird }` am Gegenstand; an der Entität `verdirbtUm`; eine eigene Art des Verderbens (Register `verderben`) braucht kein `wird`, etwa die Stufen eines Suds (siehe [Sude.md](Sude.md), Reifen und Verderben)
++ Verderben: `verdirbt: { nach, wird }` am Gegenstand, `wird` ein Gegenstand oder null (vergeht); an der Entität `verdirbtUm`; eine eigene Art des Verderbens (Register `verderben`) braucht kein `wird`, etwa die Stufen eines Suds (siehe [Sude.md](Sude.md), Reifen und Verderben)
 + Komponente `adjektive: [Textschlüssel]` am Gegenstand: Adjektive vor dem Namen (die Stufe eines Suds), mit denen der Zustände (`adjektiveVon` in `src/kern/ereignisse.js`)
 + Haltbarkeit: `haltbarkeit: { hoechstens, wirdZu, unempfindlich? }` an Ausrüstung (`hoechstens` und `wirdZu` Pflicht, nicht stapelbar), der Stand in `haltbarkeit.aktuell` (Vorgabe `hoechstens`); `unempfindlich: { <schadensart>: prozent }` (1 bis 100) ist die Chance, dass ein Abnutzen dieser Art dem Stück nichts tut
 
@@ -96,7 +96,7 @@ Schnittstellen (`src/systeme/verschleiss.js`):
 
 Regeln:
 
-+ Zur Zeit `verdirbtUm` wird der Gegenstand zum Typ `wird`, am selben Ort oder im selben Gepäck, mit derselben Anzahl
++ Zur Zeit `verdirbtUm` wird der Gegenstand zum Typ `wird`, am selben Ort oder im selben Gepäck, mit derselben Anzahl (Meldung `verdorben`); mit `wird: null` vergeht er (Meldung `vergangen` mit `was`, `anzahl` und `traegerin`, null auf dem Boden), etwa der Rest einer Kultur
 + Stapel: fließen zwei zusammen, gilt der nach Anzahl gewichtete Durchschnitt beider Zeitpunkte, abgerundet; die Restzeit aller Stücke bleibt so in Summe gleich, dafür verdirbt der Stapel auf einmal; ein abgespaltenes Stück behält den Zeitpunkt und bekommt sein eigenes Zeitereignis; die Datenprüfung verlangt, dass ein stapelbarer Gegenstand zu einem stapelbaren verdirbt
 + Auf verlassenen Ebenen ruht das Verderben mit (`verdirbtUm` rückt wie die Zeitereignisse nach), was Ninkasi trägt, verdirbt weiter
 + Abgenutzt wird nur über den Baustein `abnutzen`, nicht durch Gebrauch (Zuschlagen, Getroffenwerden)

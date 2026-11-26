@@ -5,8 +5,8 @@
 //   Gegenstand: Ninkasi erkennt einen unbekannten Typ (Meldung "erkannt", systeme/kennen.js), regeln.lernen.wissenGegenstand
 //   Zutat: Ninkasi hebt zum ersten Mal im Lauf eine Zutat dieser Art auf, regeln.lernen.wissenZutat; gemerkt in
 //     zustand.wissen.zutaten (Aufruf aus systeme/brauen.js, Haken aufgehoben)
-//   Kultur: Ninkasi gewinnt eine Kultur, die sie noch nicht hatte, regeln.lernen.wissenKultur; die Kulturen vom Start
-//     zählen nicht (gemerkt in zustand.wissen.kulturen)
+//   Kultur: Ninkasi gewinnt eine Kultur, die sie noch nicht hatte, regeln.lernen.wissenKultur; jede Form zählt für
+//     sich (systeme/kulturen.js), die Kulturen vom Start zählen nicht (gemerkt in zustand.wissen.kulturen)
 // Später melden sich hier besondere Orte an.
 
 import { anmelden } from "../kern/register.js";
@@ -46,8 +46,9 @@ export function zutatGebucht(spiel, wesen, typ) {
   einmalBuchen(spiel, wesen, "zutaten", typ, spiel.daten.regeln.lernen.wissenZutat, { typ, text: spiel.daten.gegenstaende[typ]?.text });
 }
 
-export function kulturGebucht(spiel, wesen, kultur) {
-  einmalBuchen(spiel, wesen, "kulturen", kultur, spiel.daten.regeln.lernen.wissenKultur, { typ: kultur, text: spiel.daten.kulturen[kultur]?.text });
+// kultur ist der Schlüssel der Form, bezug ihr Bezug für die Meldung (systeme/kulturen.js kulturBezug)
+export function kulturGebucht(spiel, wesen, kultur, bezug) {
+  einmalBuchen(spiel, wesen, "kulturen", kultur, spiel.daten.regeln.lernen.wissenKultur, { ...bezug, typ: kultur });
 }
 
 // Ein erkannter Gegenstandstyp; die Meldung "erkannt" kommt nur einmal je Typ (systeme/kennen.js erkennen)

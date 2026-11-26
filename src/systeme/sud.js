@@ -8,6 +8,8 @@
 //   flora:     die wilde Flora der Ebene für die Kultur "spontan" (systeme/flora.js), wie eine Kultur aufgebaut
 // Profil: { <achse>: wert } in der Reihenfolge von regeln.brauen.achsen, je Achse zwischen 0 und ihrem hoechstens
 
+import { holen } from "../kern/register.js";
+
 const begrenzt = (wert, unten, oben) => Math.max(unten, Math.min(oben, wert));
 
 export const brauregeln = (daten) => daten.regeln.brauen;
@@ -17,8 +19,42 @@ export const aromaachsenVon = (daten) => achsenVon(daten).filter((achse) => !KEN
 
 // Die Kultur "spontan" gärt mit der wilden Flora der Ebene (systeme/flora.js)
 export const SPONTAN = "spontan";
-// Daten der Kultur eines Suds: eine Kultur der Daten, bei "spontan" die Flora, ohne Kultur null
-export const kulturdatenVon = (daten, kultur, flora = null) => (kultur === SPONTAN ? flora : kultur ? daten.kulturen[kultur] : null);
+// Formen der Kulturen (siehe docs/Sude.md, Kulturen): eine Kultur der Daten mit Merkmalen, die Änderungsarten im
+// Register "kulturaenderungen" (systeme/kulturen.js)
+export const FORMTRENNER = "~";
+
+// Schlüssel einer Form aus Kultur und Merkmalen (doppelte zählen einmal)
+export const formSchluessel = (kultur, merkmale = []) => [kultur, ...[...new Set(merkmale)].sort()].join(FORMTRENNER);
+
+export function formTeile(schluessel) {
+  const [kultur, ...merkmale] = String(schluessel).split(FORMTRENNER);
+  return { kultur, merkmale };
+}
+
+// Daten einer Form: die Kultur mit den Änderungen ihrer Merkmale in der Reihenfolge des Schlüssels; null, wenn es die
+// Kultur nicht gibt; ohne Merkmale die Kultur selbst
+export function kulturdatenAufloesen(daten, schluessel) {
+  const { kultur, merkmale } = formTeile(schluessel);
+  const grund = daten.kulturen?.[kultur];
+  if (!grund) return null;
+  if (!merkmale.length) return grund;
+  const form = structuredClone(grund);
+  for (const merkmal of merkmale) {
+    for (const aenderung of daten.zustaende?.[merkmal]?.kulturmerkmal ?? []) holen("kulturaenderungen", aenderung.art).anwenden(form, aenderung);
+  }
+  return form;
+}
+
+// Bezug einer Form für Meldungen und Anzeige: Hauptwort der Kultur, die Adjektive der Merkmale davor
+export function kulturBezug(daten, schluessel) {
+  const { kultur, merkmale } = formTeile(schluessel);
+  const adjektive = merkmale.map((merkmal) => daten.zustaende?.[merkmal]?.adjektiv).filter(Boolean);
+  return { name: schluessel, text: daten.kulturen[kultur].text, ...(adjektive.length && { adjektive }) };
+}
+
+// Daten der Kultur eines Suds: eine Form aus den Kulturen der Daten (siehe oben), bei "spontan" die Flora,
+// ohne Kultur null
+export const kulturdatenVon = (daten, kultur, flora = null) => (kultur === SPONTAN ? flora : kultur ? kulturdatenAufloesen(daten, kultur) : null);
 
 // Gärung nach Balling, vereinfacht: die Kultur vergärt ihren Anteil der Stammwürze, höchstens bis sie vertraegt; was
 // sie vergären könnte, aber nicht mehr verträgt, bleibt als Restzucker (Zehntel °Plato). Ohne Kultur gärt nichts.

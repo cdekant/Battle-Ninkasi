@@ -19,7 +19,7 @@ import { UNTERBRECHUNGSGRUENDE } from "../systeme/laufendeAktionen.js";
 import { BEWEGUNGSARTEN } from "../welt/karte.js";
 import { ERSATZ_ZIELE } from "../systeme/ersatz.js";
 import { HOECHSTE_STUFE, ANZAHL_TIERS, eigenschaftenPruefen } from "../systeme/skills.js";
-import { KENNZAHLEN } from "../systeme/sud.js";
+import { KENNZAHLEN, FORMTRENNER } from "../systeme/sud.js";
 
 // Vorbelegung des Cursors im Zielmodus (eingabe/zielmodus.js)
 const ZIELVORGABEN = ["feind", "gefaehrte", "selbst"];
@@ -675,9 +675,9 @@ function pruefeFernkampf(daten, gegenstand, ort, fehler) {
 function pruefeVerschleiss(daten, gegenstand, ort, fehler) {
   const verdirbt = gegenstand.verdirbt;
   if (verdirbt !== undefined) {
-    if (!istObjekt(verdirbt) || !(istGanzzahl(verdirbt.nach) && verdirbt.nach > 0) || !daten.gegenstaende[verdirbt.wird]) {
-      fehler.push(`${ort}: verdirbt muss { nach > 0, wird: Gegenstand } sein`);
-    } else if (gegenstand.stapelbar && !daten.gegenstaende[verdirbt.wird].stapelbar) {
+    if (!istObjekt(verdirbt) || !(istGanzzahl(verdirbt.nach) && verdirbt.nach > 0) || !(verdirbt.wird === null || daten.gegenstaende[verdirbt.wird])) {
+      fehler.push(`${ort}: verdirbt muss { nach > 0, wird: Gegenstand | null } sein`);
+    } else if (verdirbt.wird !== null && gegenstand.stapelbar && !daten.gegenstaende[verdirbt.wird].stapelbar) {
       fehler.push(`${ort}.verdirbt: ein Stapel verdirbt als Ganzes, "${verdirbt.wird}" muss darum stapelbar sein`);
     }
   }
@@ -1404,6 +1404,8 @@ function pruefeBrauen(daten, sprache, fehler) {
   for (const [name, kultur] of Object.entries(daten.kulturen ?? {})) {
     const ort = `kulturen.${name}`;
     pruefeText(sprache.texte, kultur.text, ort, fehler);
+    pruefeNomen(sprache, kultur.text, fehler);
+    if (name.includes(FORMTRENNER)) fehler.push(`${ort}: "${FORMTRENNER}" trennt im Schlüssel einer Form die Merkmale`);
     if (!istProzent(kultur.vergaerung) || !istZahlAbNull(kultur.vertraegt)) fehler.push(`${ort}: vergaerung (0 bis 100) und vertraegt (>= 0) müssen ganze Zahlen sein`);
     if (kultur.verderben !== undefined && !istGanzzahl(kultur.verderben)) fehler.push(`${ort}: verderben muss eine ganze Zahl sein`);
     if (name === "spontan") fehler.push(`${ort}: der Name "spontan" steht für die wilde Flora der Ebene`);
@@ -1443,7 +1445,21 @@ function pruefeBrauen(daten, sprache, fehler) {
       && (kessel.verderben === undefined || istGanzzahl(kessel.verderben)) && (kessel.unschaerfe === undefined || istZahlAbNull(kessel.unschaerfe));
     if (!gueltig) fehler.push(`gelaende.${name}: kessel muss { portionen > 0, verderben?, unschaerfe? } sein`);
   }
+  // Merkmale der Formen (systeme/kulturen.js): Zustände mit kulturmerkmal, die Änderungsarten aus dem Register
+  for (const [name, zustand] of Object.entries(daten.zustaende ?? {})) {
+    if (zustand.kulturmerkmal === undefined) continue;
+    const ort = `zustaende.${name}.kulturmerkmal`;
+    if (name.includes(FORMTRENNER)) fehler.push(`zustaende.${name}: "${FORMTRENNER}" trennt im Schlüssel einer Form die Merkmale`);
+    if (!Array.isArray(zustand.kulturmerkmal) || !zustand.kulturmerkmal.length) { fehler.push(`${ort} muss eine Liste von Änderungen { art, ... } sein`); continue; }
+    for (const aenderung of zustand.kulturmerkmal) {
+      if (!hat("kulturaenderungen", aenderung?.art)) { fehler.push(`${ort}: Änderungsart "${aenderung?.art}" ist nicht angemeldet`); continue; }
+      const grund = holen("kulturaenderungen", aenderung.art).pruefen(aenderung, { aromaachsen });
+      if (grund) fehler.push(`${ort}.${aenderung.art}: ${grund}`);
+    }
+  }
+  if (regeln.rest !== undefined && regeln.rest !== null && !daten.gegenstaende[regeln.rest]) fehler.push(`regeln.brauen.rest: Gegenstand "${regeln.rest}" gibt es nicht`);
   for (const [name, wesen] of Object.entries(daten.wesen)) {
+    if (wesen.kultur !== undefined && !daten.kulturen?.[wesen.kultur]) fehler.push(`wesen.${name}: Kultur "${wesen.kultur}" gibt es nicht`);
     if (wesen.kulturen === undefined) continue;
     if (!istTextliste(wesen.kulturen)) fehler.push(`wesen.${name}: kulturen muss eine Liste von Kulturen sein`);
     else for (const kultur of wesen.kulturen) if (!daten.kulturen?.[kultur]) fehler.push(`wesen.${name}.kulturen: Kultur "${kultur}" gibt es nicht`);

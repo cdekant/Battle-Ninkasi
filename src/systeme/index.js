@@ -26,6 +26,7 @@ import "./reifen.js";
 import "./absud.js";
 import "./flora.js";
 import "./brauen.js";
+import "./kulturen.js";
 import "./gelaende.js";
 import "./fallen.js";
 import "./schichten.js";

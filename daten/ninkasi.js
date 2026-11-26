@@ -18,6 +18,8 @@ export default {
     // gegen Ausweichen 0 und Grundverteidigung 20: 80 %; Tag für den Skill nahkampf_grund; Fäuste in der halben Zeit der Norm
     angriffe: [{ name: "faust", genauigkeit: 80, effekt: "faustschlag", kosten: 50, tags: ["nahkampf"] }],
     inventar: [],
+    // Proben der Kulturen (src/systeme/kulturen.js): Ninkasi beginnt ohne und sammelt sie im Lauf
+    kulturen: [],
     faehigkeiten: [], // eigene Fähigkeiten folgen mit dem Inhalt; der Probeinhalt ergänzt die testfaehigkeit (datenproben/index.js)
     // Plätze für Ausrüstung (src/systeme/ausruestung.js): Waffen in den Händen, Rüstung und Schmuck am Körper
     plaetze: { hand: 2, kopf: 1, brust: 1, beine: 1, hals: 1, finger: 2 },

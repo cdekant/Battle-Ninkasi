@@ -1,6 +1,9 @@
 // Befehle "bewegen" (mit Angriff durch Hineinlaufen) und "warten"; versetzen für alles, was Wesen bewegt.
 // Befehle: { art: "bewegen", dx: -1..1, dy: -1..1, angreifen?, insLeere? }, { art: "warten" }
 // Hineinlaufen greift Feinde an; mit angreifen: true jedes Wesen (Rausch, Verwirrung, gezielter Angriff auf Freunde).
+// Platztausch: die gesteuerte Entität tauscht beim Schritt ohne angreifen den Platz mit einem Wesen, das ihr nicht
+// feind ist, wenn beide beweglich sind und jedes das Feld des anderen betreten kann (Versetzart "tausch", Meldung
+// getauscht); sonst ist das Feld besetzt.
 // insLeere: true ist ein Schlag auf ein Feld ohne Wesen (Fehlschlag im Rausch, systeme/befehlsveraenderer.js): kostet
 // einen Angriff, bewegt nicht und trifft nichts; steht doch ein Wesen dort, gilt es als Angriff mit angreifen: true.
 // Bewegungsarten siehe welt/karte.js: betretbar ist, was die wirksame Bewegungsart des Wesens zulässt;
@@ -29,10 +32,33 @@ export function istUnbeweglich(wesen) {
 // Wesen bewegt (optionen.urheberId, Vorgabe das Wesen selbst). Wird ein Wesen von einer anderen Urheberin versetzt,
 // bricht eine lange Aktion ab, die "versetzt" in unterbrechbar nennt (systeme/laufendeAktionen.js).
 // Prüft nichts: ob das Feld frei und betretbar ist, entscheidet die Aufruferin.
-export function versetzen(spiel, wesen, feld, art, { urheberId = wesen.id, kettentiefe = 0 } = {}) {
-  const beteiligte = { quelleId: urheberId, urheberId, zielId: wesen.id, ursache: "bewegung", kettentiefe, art };
+export function versetzen(spiel, wesen, feld, art, optionen = {}) {
+  const beteiligte = beteiligteDesVersetzens(wesen, art, optionen);
   hakenAusloesen(spiel, "verlaesst_feld", { ...beteiligte, position: { x: wesen.position.x, y: wesen.position.y } });
   positionSetzen(spiel.zustand, wesen, feld);
+  angekommen(spiel, wesen, feld, beteiligte);
+}
+
+// Zwei Wesen tauschen die Plätze (Versetzart "tausch"): erst beide Positionen, dann die Haken, so ist keines der beiden
+// Felder dazwischen leer (eine offene Tür bleibt offen, systeme/gelaende.js). Prüft nichts, wie versetzen.
+export function plaetzeTauschen(spiel, erstes, zweites, optionen = {}) {
+  const feldErstes = { x: erstes.position.x, y: erstes.position.y }, feldZweites = { x: zweites.position.x, y: zweites.position.y };
+  const beteiligteErstes = beteiligteDesVersetzens(erstes, "tausch", optionen), beteiligteZweites = beteiligteDesVersetzens(zweites, "tausch", optionen);
+  positionSetzen(spiel.zustand, erstes, feldZweites);
+  positionSetzen(spiel.zustand, zweites, feldErstes);
+  hakenAusloesen(spiel, "verlaesst_feld", { ...beteiligteErstes, position: feldErstes });
+  hakenAusloesen(spiel, "verlaesst_feld", { ...beteiligteZweites, position: feldZweites });
+  angekommen(spiel, erstes, feldZweites, beteiligteErstes);
+  angekommen(spiel, zweites, feldErstes, beteiligteZweites);
+}
+
+function beteiligteDesVersetzens(wesen, art, { urheberId = wesen.id, kettentiefe = 0 } = {}) {
+  return { quelleId: urheberId, urheberId, zielId: wesen.id, ursache: "bewegung", kettentiefe, art };
+}
+
+// Was nach dem Setzen der Position folgt: Sicht, Gegenstände auf dem Feld, Haken betritt_feld, Abbruch langer Aktionen
+function angekommen(spiel, wesen, feld, beteiligte) {
+  const urheberId = beteiligte.urheberId;
   // eine bewegte Lichtquelle ändert, was Ninkasi sieht (systeme/licht.js)
   if (!istGesteuert(spiel.zustand, wesen) && lichtWirkt(spiel) && traegtLicht(spiel, wesen) && gesteuerteEntitaet(spiel.zustand)?.position) sichtfeldAktualisieren(spiel);
   if (istGesteuert(spiel.zustand, wesen)) {
@@ -53,6 +79,16 @@ function wesenAuf(spiel, x, y) {
   return entitaetenAuf(spiel.zustand, x, y).find(istWesen) || null;
 }
 
+// Kann die Akteurin beim Schritt mit dem anderen Wesen den Platz tauschen? (siehe Kopf)
+export function platztauschMoeglich(spiel, akteur, anderesWesen) {
+  return istGesteuert(spiel.zustand, akteur) && !feindlich(spiel, akteur, anderesWesen) && !istUnbeweglich(akteur) && !istUnbeweglich(anderesWesen)
+    && betretbar(spiel, akteur, anderesWesen.position) && betretbar(spiel, anderesWesen, akteur.position);
+}
+
+// Greift der Schritt das Wesen auf dem Zielfeld an?
+const greiftAn = (spiel, akteur, anderesWesen, befehl) => kannAngreifen(spiel, akteur)
+  && (feindlich(spiel, akteur, anderesWesen) || befehl.angreifen === true || befehl.insLeere === true);
+
 const istEinzelschritt = (versatz) => Number.isInteger(versatz) && versatz >= -1 && versatz <= 1;
 
 anmelden("befehle", "bewegen", {
@@ -62,7 +98,7 @@ anmelden("befehle", "bewegen", {
     if (befehl.insLeere !== undefined && typeof befehl.insLeere !== "boolean") return "ungueltig";
     const feld = zielfeld(akteur, befehl);
     const anderesWesen = wesenAuf(spiel, feld.x, feld.y);
-    if (anderesWesen) return kannAngreifen(spiel, akteur) && (feindlich(spiel, akteur, anderesWesen) || befehl.angreifen === true || befehl.insLeere === true) ? null : "besetzt";
+    if (anderesWesen) return greiftAn(spiel, akteur, anderesWesen, befehl) || (befehl.angreifen !== true && platztauschMoeglich(spiel, akteur, anderesWesen)) ? null : "besetzt";
     if (befehl.insLeere === true) return kannAngreifen(spiel, akteur) ? null : "ungueltig";
     if (istUnbeweglich(akteur)) return "unbeweglich";
     if (!betretbar(spiel, akteur, feld)) return "wand";
@@ -71,8 +107,13 @@ anmelden("befehle", "bewegen", {
   ausfuehren(spiel, akteur, befehl) {
     const feld = zielfeld(akteur, befehl);
     const anderesWesen = wesenAuf(spiel, feld.x, feld.y);
-    if (anderesWesen) {
+    if (anderesWesen && greiftAn(spiel, akteur, anderesWesen, befehl)) {
       return { aktion: "nahkampf", grundkosten: nahkampf(spiel, akteur, anderesWesen) };
+    }
+    if (anderesWesen) {
+      plaetzeTauschen(spiel, akteur, anderesWesen, { urheberId: akteur.id });
+      melden(spiel, "getauscht", { wer: bezugAuf(akteur), mit: bezugAuf(anderesWesen) });
+      return "bewegen";
     }
     if (befehl.insLeere === true) {
       melden(spiel, "ins_leere", { wer: bezugAuf(akteur), felder: [feld] });

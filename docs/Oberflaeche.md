@@ -1,6 +1,6 @@
 # Battle Ninkasi - Oberfläche
 
-Stand: 2026-11-25, teilweise umgesetzt (siehe die Zeilen "Umsetzung")
+Stand: 2026-11-26, teilweise umgesetzt (siehe die Zeilen "Umsetzung")
 
 Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Bedienung.md](Bedienung.md), [Animationen.md](Animationen.md), [Titelbildschirm.md](Titelbildschirm.md)
 
@@ -233,6 +233,7 @@ Vorgabe, Buchstaben nach der deutschen Aufschrift:
 | d | Fallenlassen | umgesetzt |
 | t | Trinken (wählt im Zweifel) | umgesetzt |
 | w | Werfen (fragt nach dem Gegenstand) | umgesetzt |
+| v + Richtung | Angreifen, auch Neutrale und Verbündete (sonst tauscht Ninkasi mit ihnen den Platz) | umgesetzt |
 | i | Inventar | umgesetzt |
 | f | Fähigkeiten | umgesetzt |
 | c | Charakter und Skills | umgesetzt |

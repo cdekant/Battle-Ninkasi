@@ -7,6 +7,7 @@ export default {
   },
   wesen: {
     essigbakterium: { zeichen: "e", farbe: "#b4bd62" },
+    wilde_hefe: { zeichen: "h", farbe: "#e0c890" },
     fernkaempfer_test: { zeichen: "F", farbe: "#d2763a" },
     schuetzin_test: { zeichen: "S", farbe: "#c8a070" },
     psi_jaegerin: { zeichen: "J", farbe: "#b07ad8" },
@@ -43,6 +44,7 @@ export default {
     sichtgift: { zeichen: "!", farbe: "#9a5ac8" },
     hefekrug: { zeichen: "!", farbe: "#e8d9a0" },
     sauerkrug: { zeichen: "!", farbe: "#c8d07a" },
+    hefeschleim: { zeichen: ",", farbe: "#e0c890" },
     tontafel_dunkles_bier: { zeichen: "?", farbe: "#c9a27a" },
     leeres_fass: { zeichen: "&", farbe: "#6b5a44" },
     brandflasche: { zeichen: "!", farbe: "#e5533d" },

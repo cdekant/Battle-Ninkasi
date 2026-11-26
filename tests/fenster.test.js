@@ -201,6 +201,7 @@ test("Anzeige: jedes Fenster entsteht mit dem Spielinhalt ohne fehlende Texte", 
   let kessel = null;
   for (let y = 0; y < ebene.hoehe && !kessel; y++) for (let x = 0; x < ebene.breite && !kessel; x++) if (gelaendeAuf(spiel, x, y)?.kessel) kessel = { x, y };
   positionSetzen(spiel.zustand, ninkasi, kessel);
+  ninkasi.kulturen = ["wilde_hefe"]; // Ninkasi beginnt ohne Kultur (src/systeme/kulturen.js)
   const malz = gegenstandTragen(spiel, ninkasi, { typ: "gerstenmalz", ...structuredClone(daten.gegenstaende.gerstenmalz), anzahl: 2 });
   gegenstandTragen(spiel, ninkasi, { typ: "leere_flasche", ...structuredClone(daten.gegenstaende.leere_flasche) });
   assert.doesNotMatch(zeigen("brauen", { ...braufensterOeffnen(spiel).zustand, mengen: { [malz.id]: 2 } }), /netz-umriss/, "im Nebel keine Umrisse");

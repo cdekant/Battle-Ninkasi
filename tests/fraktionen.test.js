@@ -50,11 +50,19 @@ test("Beziehungen: gleiche Fraktion verbündet, Vorgabe feind, in beide Richtung
   assert.equal(beziehung(freundlich, "ninkasi", "verderber"), "neutral");
 });
 
-test("Neutrale: kein Angriff durch Hineinlaufen, keine Ziele für feinde oder verbuendete", () => {
+test("Neutrale: kein Angriff durch Hineinlaufen, sondern Platztausch; keine Ziele für feinde oder verbuendete", () => {
   const { spiel, ninkasi } = aufstellen();
+  const meldungen = meldungenMitschneiden(spiel);
   const haendlerin = wesen(spiel, 2, 1, "haendler", 10);
   assert.equal(feindlich(spiel, ninkasi, haendlerin), false);
-  assert.equal(befehlGeben(spiel, { art: "bewegen", dx: 1, dy: 0 }).grund, "besetzt");
+  assert.equal(befehlGeben(spiel, { art: "bewegen", dx: 1, dy: 0 }).ok, true);
+  assert.deepEqual([ninkasi.position, haendlerin.position, haendlerin.werte.lp.aktuell], [{ x: 2, y: 1 }, { x: 1, y: 1 }, 10], "getauscht, nicht angegriffen");
+  assert.ok(meldungen.some((meldung) => meldung.art === "getauscht"));
+  befehlGeben(spiel, { art: "bewegen", dx: -1, dy: 0 });
+  assert.deepEqual(ninkasi.position, { x: 1, y: 1 }, "und zurück");
+  haendlerin.bewegung = "unbeweglich";
+  assert.equal(befehlGeben(spiel, { art: "bewegen", dx: 1, dy: 0 }).grund, "besetzt", "ein unbewegliches Wesen tauscht nicht");
+  delete haendlerin.bewegung;
   const felder = [{ x: 2, y: 1 }];
   assert.deepEqual(entitaetenAufFeldern(spiel, felder, { trifft: "feinde", urheberId: ninkasi.id }), []);
   assert.deepEqual(entitaetenAufFeldern(spiel, felder, { trifft: "verbuendete", urheberId: ninkasi.id }), []);

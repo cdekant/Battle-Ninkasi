@@ -38,6 +38,7 @@ export const AKTIONEN = {
   untersuchen: { text: "aktion.untersuchen", gruppe: "handeln" },
   fallenlassen_waehlen: { text: "aktion.fallenlassen_waehlen", gruppe: "handeln" }, // Inventar mit Absicht (eingabe/inventar.js)
   werfen_waehlen: { text: "aktion.werfen_waehlen", gruppe: "handeln" },
+  angreifen: { text: "aktion.angreifen", gruppe: "handeln" }, // Vorsatz: die nächste Richtung greift jedes Wesen an (eingabe/eingabe.js)
   fernangriff: { text: "aktion.fernangriff", gruppe: "handeln" }, // Zielmodus zum Schießen oder Werfen (eingabe/fernangriff.js)
   nachladen: { text: "aktion.nachladen", gruppe: "handeln", befehl: { art: "nachladen" } },
   brauen: { text: "aktion.brauen", gruppe: "handeln" }, // Braufenster am Kessel (eingabe/brauen.js)

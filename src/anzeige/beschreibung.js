@@ -137,7 +137,7 @@ function gegenstandMerkmale(daten, name, gegenstand) {
     ladungen: gegenstand.ladungen?.hoechstens,
     haltbarkeit: gegenstand.haltbarkeit ? `${gegenstand.haltbarkeit.hoechstens} → ${gegenstand.haltbarkeit.wirdZu ?? "nichts"}` : undefined,
     wirdZu: gegenstand.wirdZu,
-    verdirbt: gegenstand.verdirbt ? `nach ${gegenstand.verdirbt.nach} → ${gegenstand.verdirbt.wird}` : undefined,
+    verdirbt: gegenstand.verdirbt ? `nach ${gegenstand.verdirbt.nach} → ${gegenstand.verdirbt.wird ?? "-"}` : undefined,
     tags: gegenstand.tags ?? [],
   });
 }

@@ -14,11 +14,14 @@ import { warteschlangeGueltig } from "../src/kern/zeit.js";
 import { betretbar, abstand, passierbar } from "../src/welt/karte.js";
 import { zustandSetzen } from "../src/systeme/zustaende.js";
 import { ebeneWechseln, verfolgt } from "../src/systeme/ebenen.js";
+import { beziehungZwischen, urheberVon } from "../src/systeme/fraktionen.js";
 
 const DATEN = datenLaden(rohdaten, { texte });
 const ACHT = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
 
-const gegner = (spiel) => alleEntitaeten(spiel.zustand).filter((entitaet) => istWesen(entitaet) && entitaet.id !== spiel.zustand.spielerinId && entitaet.ki);
+// Feinde Ninkasis mit KI (neutrale Wesen wie die wilde Hefe jagen sie nicht)
+const gegner = (spiel) => alleEntitaeten(spiel.zustand).filter((entitaet) => istWesen(entitaet) && entitaet.id !== spiel.zustand.spielerinId && entitaet.ki
+  && beziehungZwischen(spiel, urheberVon(spielerin(spiel.zustand)), entitaet) === "feind");
 const hatAkteur = (zustand, id) => zustand.warteschlange.some((eintrag) => eintrag.art === "akteur" && eintrag.akteurId === id);
 
 // Freie Felder rund um Ninkasi (für das Wesen betretbar, ohne anderes Wesen), im Abstand weite

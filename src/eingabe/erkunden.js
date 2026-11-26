@@ -11,6 +11,7 @@ import { lageErfassen, wahrgenommeneFeinde } from "../systeme/gefahr.js";
 import { istHandlungsunfaehig } from "../systeme/zustaende.js";
 import { unterwegsPruefen } from "./reise.js";
 import { fallenMeiden } from "../systeme/fallen.js";
+import { platztauschMoeglich } from "../systeme/bewegung.js";
 import { gefahrenMeiden, meidenZusammen } from "../systeme/schichten.js";
 
 // Wege nur über Bekanntes und nach dem bekannten Gelände, nach der wirksamen Bewegungsart der gesteuerten Entität;
@@ -58,7 +59,8 @@ export function naechsterErkundungsschritt(spiel, ablauf, einstellungen) {
   const position = gesteuerteEntitaet(zustand).position;
   const naechstesFeld = naechstesWegfeld(spiel, position, wahl.ziel, wegOptionen(spiel, wahl.ohneMeiden));
   if (!naechstesFeld) return { halt: "kein_weg" };
-  if (entitaetenAuf(zustand, naechstesFeld.x, naechstesFeld.y).some(istWesen)) return { halt: "versperrt" };
+  // ein Wesen im Weg versperrt, außer Ninkasi kann mit ihm den Platz tauschen (systeme/bewegung.js)
+  if (entitaetenAuf(zustand, naechstesFeld.x, naechstesFeld.y).some((wesen) => istWesen(wesen) && !platztauschMoeglich(spiel, gesteuerteEntitaet(zustand), wesen))) return { halt: "versperrt" };
   ablauf.schrittzahl++;
   return { befehl: { art: "bewegen", dx: naechstesFeld.x - position.x, dy: naechstesFeld.y - position.y } };
 }

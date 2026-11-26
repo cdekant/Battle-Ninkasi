@@ -30,7 +30,7 @@ import { lebenswertName } from "../kern/werte.js";
 import { aufDerKarte, betretbar, betretbarFuer, fest, gelaendeAuf, gelaendeName } from "../welt/karte.js";
 import { gleichesFeld, linie, verlaengerung, wesenAufFeld } from "../welt/geometrie.js";
 import { naechstesFeldMit } from "../welt/wege.js";
-import { versetzen, istUnbeweglich } from "./bewegung.js";
+import { versetzen, plaetzeTauschen, istUnbeweglich } from "./bewegung.js";
 import { musterFelder } from "./zielauswahl.js";
 
 const feldKopie = (feld) => ({ x: feld.x, y: feld.y });
@@ -113,8 +113,7 @@ bausteinAnmelden("tauschen", {}, (spiel, kontext) => {
   if (!ziel || !quelle?.position || quelle.id === ziel.id || istUnbeweglich(quelle)) return;
   const feldDerQuelle = feldKopie(quelle.position), feldDesZiels = feldKopie(ziel.position);
   if (!betretbar(spiel, quelle, feldDesZiels) || !betretbar(spiel, ziel, feldDerQuelle)) return;
-  versetzen(spiel, quelle, feldDesZiels, "tausch", versetzoptionen(kontext));
-  versetzen(spiel, ziel, feldDerQuelle, "tausch", versetzoptionen(kontext));
+  plaetzeTauschen(spiel, quelle, ziel, versetzoptionen(kontext));
   melden(spiel, "getauscht", { wer: bezugAuf(quelle), mit: bezugAuf(ziel) });
 }, { brauchtZiel: true });
 

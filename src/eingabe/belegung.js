@@ -30,6 +30,7 @@ export default {
     KeyT: "trinken", // Gegenstand wählt die Eingabe: erstes Getränk im Gepäck
     KeyD: "fallenlassen_waehlen", // Inventar, der Buchstabe lässt fallen
     KeyW: "werfen_waehlen", // Inventar, der Buchstabe wirft
+    KeyV: "angreifen", // Vorsatz: die nächste Richtung greift an, auch Neutrale und Verbündete (eingabe/eingabe.js)
     KeyS: "fernangriff", // schießt mit der angelegten Fernwaffe, sonst wirft die zuletzt geworfene Wurfwaffe (eingabe/fernangriff.js)
     KeyE: "nachladen", // lädt die angelegte Fernwaffe nach
     KeyP: "brauen", // Braufenster am Kessel daneben (p wie Sudpfanne, eingabe/brauen.js)

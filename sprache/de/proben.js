@@ -357,9 +357,38 @@ export default {
   "adjektiv.suess": { adjektiv: "süß" },
   "adjektiv.roetlich": { adjektiv: "rötlich" },
   "adjektiv.stark": { adjektiv: "stark" },
-  "kultur.wilde_hefe": "wilde Hefe",
-  "kultur.bierhefe": "Bierhefe",
-  "kultur.milchsaeure": "Milchsäurebakterien",
+  // Kulturen sind Hauptwörter, damit die Adjektive ihrer Merkmale davor stehen (alkoholtolerante wilde Hefe)
+  "kultur.wilde_hefe": {
+    geschlecht: "f", adjektive: ["adjektiv.wild"],
+    einzahl: { nom: "Hefe", gen: "Hefe", dat: "Hefe", akk: "Hefe" },
+    mehrzahl: { nom: "Hefen", gen: "Hefen", dat: "Hefen", akk: "Hefen" },
+  },
+  "kultur.bierhefe": {
+    geschlecht: "f",
+    einzahl: { nom: "Bierhefe", gen: "Bierhefe", dat: "Bierhefe", akk: "Bierhefe" },
+    mehrzahl: { nom: "Bierhefen", gen: "Bierhefen", dat: "Bierhefen", akk: "Bierhefen" },
+  },
+  "kultur.milchsaeure": {
+    geschlecht: "f",
+    einzahl: { nom: "Milchsäurekultur", gen: "Milchsäurekultur", dat: "Milchsäurekultur", akk: "Milchsäurekultur" },
+    mehrzahl: { nom: "Milchsäurekulturen", gen: "Milchsäurekulturen", dat: "Milchsäurekulturen", akk: "Milchsäurekulturen" },
+  },
+  "adjektiv.wild": { adjektiv: "wild" },
+  // Wilde Hefe als Wesen und ihr Rest, Merkmale der Formen (datenproben/gegner.js, zutaten.js, zustaende.js)
+  "wesen.wilde_hefe": {
+    geschlecht: "f", adjektive: ["adjektiv.wild"],
+    einzahl: { nom: "Hefe", gen: "Hefe", dat: "Hefe", akk: "Hefe" },
+    mehrzahl: { nom: "Hefen", gen: "Hefen", dat: "Hefen", akk: "Hefen" },
+  },
+  "gegenstand.hefeschleim": {
+    geschlecht: "m",
+    einzahl: { nom: "Hefeschleim", gen: "Hefeschleims", dat: "Hefeschleim", akk: "Hefeschleim" },
+    mehrzahl: { nom: "Hefeschleime", gen: "Hefeschleime", dat: "Hefeschleimen", akk: "Hefeschleime" },
+  },
+  "zustand.uebervergaerend": "Übervergärend",
+  "zustand.sauer": "Sauer",
+  "adjektiv.uebervergaerend": { adjektiv: "übervergärend" },
+  "fraktion.mikroben": "Mikroben",
   "gelaende.tonkessel": "Tonkessel",
   "adjektiv.gereizt": { adjektiv: "gereizt" },
   "adjektiv.betaeubt": { adjektiv: "betäubt" },

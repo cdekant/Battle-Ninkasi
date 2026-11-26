@@ -251,6 +251,9 @@ export default {
     // verdirbt ein Sud, entsteht mit chance Prozent neben dem Kessel ein Verderber (verderber der Kultur, sonst wesen;
     // null: keiner); das Grundgerüst hat keine Wesen, der Inhalt setzt sie (datenproben/index.js)
     verderber: { chance: 30, wesen: null },
+    // Rest eines gestorbenen Wesens mit Kultur (src/systeme/kulturen.js): dieser Gegenstand trägt seine Kultur; null:
+    // kein Rest; das Grundgerüst hat keine Gegenstände dafür, der Inhalt setzt ihn (datenproben/index.js)
+    rest: null,
     // Stufen des Reifens und Verderbens im Gepäck (src/systeme/reifen.js): wirkung in Prozent des Budgets; reif nur für
     // Sude ab abStammwuerze; saeure kommt beim Erreichen dazu; adjektiv steht am Getränk; danach wird es zu essig
     stufen: [

@@ -118,7 +118,7 @@ Regeln:
 
 + Die Datenprüfung verlangt, dass jedes Wesen eine bekannte Fraktion trägt
 + Eine Beziehung gilt in beide Richtungen; sagen beide Seiten etwas anderes, gewinnt die strengere (feind vor neutral vor verbuendet); gleiche Fraktion ist verbündet, `eigene:<nummer>` (Zwietracht) mit allen verfeindet
-+ Neutrale greift man nicht durch Hineinlaufen an, nur ausdrücklich (`angreifen: true`)
++ Neutrale greift man nicht durch Hineinlaufen an, nur ausdrücklich (`angreifen: true`, im Browser die Vorsatztaste v, siehe [Bedienung.md](Bedienung.md), Eingabe); die gesteuerte Entität tauscht stattdessen den Platz (siehe Bewegung)
 + Zorn: Trifft oder verfehlt eine Urheberin ein neutrales Wesen oder schadet ihm, werden es und alle Wesen seiner Fraktion, die die Urheberin gerade sehen, ihr gegenüber feindlich; jedes merkt sich das einzeln (`zornAuf`, gilt in beide Richtungen und vor Tabelle, Ruf und Beistand); wer nichts mitbekommt, bleibt neutral; das gilt auch für ein Wesen, das ihr beisteht, sein Beistand endet damit
 + Ruf: gehört der Fraktion `rufTraeger` und gilt für jedes Wesen, dessen wirksame Fraktion sie gerade ist (Ninkasi, später Begleiter); Ansehen = Grundwert der Beziehung aus der Tabelle + Ruf bei der anderen Fraktion, bis zur Schwelle feind feind, ab der Schwelle verbündet verbündet, dazwischen neutral; bei Ruf 0 gilt die Tabelle; zwischen zwei anderen Fraktionen zählt kein Ruf; trägt Ninkasi eine fremde Fraktion (Verkleidung, Besessenheit), gelten deren Beziehungen
 + Ruf durch Tötung: tötet ein Wesen der Fraktion `rufTraeger` (bei Beschworenen zählt die Beschwörerin) ein Wesen einer anderen Fraktion, ändert sich der Ruf bei jeder Fraktion, die das Opfer ausdrücklich in der Tabelle als Feind führt, um `rufToetungFeind` (die Vorgabe feind zählt nicht, sonst stiege er bei allen), und bei der Fraktion des Opfers um `rufToetungEigene`; mit `rufNurMitZeugen` nur, wenn ein Wesen der jeweiligen Fraktion Täterin oder Opfer sieht (ein Zeuge reicht); unter fremder Fraktion ändert sich nichts
@@ -227,7 +227,7 @@ Schnittstellen:
 + Bausteine (`src/systeme/verschieben.js`):
   + `stossen { weite, wuerfel|menge, art? }`: weg vom Ursprung entlang der verlängerten Linie durch das Ziel (Schlag: die Angreiferin, Explosion: die Mitte; liegt der Ursprung auf dem Ziel, zählt die Quelle); Meldung `gestossen`
   + `ziehen { weite }`: zum Ursprung hin, höchstens bis daneben, Hindernisse halten ohne Schaden auf; Meldung `gezogen`
-  + `tauschen`: Quelle und Ziel tauschen die Plätze, wenn jedes das Feld des anderen betreten kann; Meldung `getauscht`
+  + `tauschen`: Quelle und Ziel tauschen die Plätze, wenn jedes das Feld des anderen betreten kann; Meldung `getauscht`; wie der Platztausch beim Schritt über `plaetzeTauschen` (erst beide Positionen, dann die Haken, so wird keines der Felder dazwischen leer und eine offene Tür bleibt offen)
   + `teleportieren { wer?, muster?, zufaellig? }`: das Ziel (mit `wer: "quelle"` die Quelle, z.B. Blinzeln) aufs Zielfeld, mit `muster` auf ein zufälliges freies Feld des Musters, mit `zufaellig` auf ein zufälliges freies Feld der Ebene; Meldung `teleportiert`
 + Zustandsprüfung `lage` (Register `zustandspruefungen`, nach dem Tod), Meldungen `festgesessen` und `herausgedrueckt`
 + Werfen (`src/systeme/werfen.js`): Meldungen `geworfen`, `streut`, `geschoss`, `zerbrochen` bzw. `gelandet`; Gründe der Ablehnung `nichts_zu_werfen` und die der Zielauswahl; `wurfReichweite`, `wurfbahn`, `streufelder` (für die Vorschau), `landenOderBrechen` (auch für Schüsse, siehe Fernkampf)
@@ -235,6 +235,7 @@ Schnittstellen:
 Regeln:
 
 + `bewegen` greift durch Hineinlaufen Feinde an, mit `angreifen: true` jedes Wesen (gezielter Angriff, Rausch, Verwirrung); mit `insLeere: true` ist es ein Schlag auf ein Feld ohne Wesen (Danebenschlagen im Rausch, siehe Stoffwechsel): er kostet einen Angriff (`angriffskosten`), bewegt nicht und trifft nichts, Meldung `ins_leere`; steht doch ein Wesen dort, wird es angegriffen; gültig nur mit Angriffsprofilen; `warten` wartet eine Aktion
++ Platztausch (`platztauschMoeglich(spiel, akteur, anderesWesen)`): die gesteuerte Entität tauscht beim Schritt ohne `angreifen` den Platz mit einem Wesen, das ihr nicht feind ist, wenn beide beweglich sind und jedes das Feld des anderen betreten kann (`plaetzeTauschen`, Versetzart `tausch`, Meldung `getauscht`, Zeitkosten eines Schritts); sonst ist das Feld `besetzt`; Reise und Erkunden halten an einem solchen Wesen nicht (siehe [Bedienung.md](Bedienung.md), Maus, Reise, Laufen, Rasten und Erkunden)
 + Jedes Wesen belegt genau ein Feld, auch ein Boss; Bossphasen laufen über Auslöser mit Bedingungen (siehe [Wirkungen.md](Wirkungen.md), Auslöser)
 + Was eine Bewegungsart kann, sagen die Daten des Geländes; `phasend` betritt jedes Gelände außer `undurchdringlich`; `unbeweglich` steht, wo `laufend` steht; Sicht und Lärm hängen weiter am Gelände selbst
 + Unbeweglich: der Schritt auf ein freies Feld wird mit `unbeweglich` abgelehnt, Angreifen durch Hineinlaufen geht; `jagen` setzt Fähigkeiten ein, greift an, was daneben steht, und wartet sonst; Stoßen, Ziehen, Tauschen und Teleportieren wirken nicht

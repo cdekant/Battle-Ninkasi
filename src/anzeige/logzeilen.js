@@ -135,6 +135,7 @@ export function zeilenAusMeldung(kontext, meldung) {
     }
     // Verschleiß und Flüche nur an Ninkasis Sachen; was anderswo verdirbt, bleibt still
     case "verdorben":
+    case "vergangen":
     case "kaputt":
       return meldung.traegerin?.id === spielerinId ? geschehen(text(`log.${meldung.art}`, meldung), "gefahr") : [];
     case "abgenutzt":

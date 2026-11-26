@@ -29,7 +29,7 @@ import { neueKamera, folgen } from "./anzeige/kamera.js";
 import { Oberflaeche } from "./anzeige/oberflaeche.js";
 import { Log } from "./anzeige/log.js";
 import { angekuendigteFelder } from "./anzeige/ankuendigungen.js";
-import { uebersetzen, aktionsergebnis } from "./eingabe/eingabe.js";
+import { uebersetzen, aktionsergebnis, angriffInRichtung } from "./eingabe/eingabe.js";
 import { feldAnPixel, klickDeuten } from "./eingabe/maus.js";
 import { reiseBeginnen, naechsterReiseschritt } from "./eingabe/reise.js";
 import { rastenBeginnen, naechsterRastschritt } from "./eingabe/rasten.js";
@@ -268,6 +268,8 @@ let feldUnterZeiger = null;
 // Laufender Ablauf aus Einzelbefehlen (Reise, Rasten, Erkunden): { zustand, naechsterSchritt }
 let laufenderAblauf = null;
 let ablaufZeitgeber = null;
+// Vorsatz "angreifen": die nächste Taste gibt die Richtung des Angriffs (eingabe/eingabe.js angriffInRichtung)
+let angriffVorgemerkt = false;
 // hielt das letzte Erkunden wegen einer bekannten Gefahr, geht das nächste über sie hinweg (eingabe/erkunden.js)
 let gefahrGemeldet = false;
 // Geführte Züge (Filmriss, Furcht, Kontrolle): die Logik hält davor an (kern/spiel.js gefuehrterZugSteht), die Anzeige
@@ -869,6 +871,14 @@ window.addEventListener("keydown", (tastenereignis) => {
     return zielergebnisAnwenden(zielmodusTaste(spiel, zielModus, tastenereignis.code, belegung));
   }
   const ergebnis = uebersetzen(tastenereignis, belegung, spiel);
+  if (angriffVorgemerkt) {
+    tastenereignis.preventDefault();
+    angriffVorgemerkt = false;
+    const angriff = angriffInRichtung(ergebnis);
+    if (angriff) return befehlGebenUndZeichnen(angriff.befehl);
+    log.zeile(texte.text("ui.angreifen_abgebrochen"), "hinweis");
+    return zeichnen();
+  }
   if (!ergebnis) return;
   tastenereignis.preventDefault();
   aktionAusfuehren(ergebnis);
@@ -893,6 +903,12 @@ function aktionAusfuehren(ergebnis) {
       return zeichnen();
     }
     return auswahlStarten(fernangriff.auswahl);
+  }
+  if (aktion === "angreifen") {
+    if (spiel.zustand.vorbei) return;
+    angriffVorgemerkt = true;
+    log.zeile(texte.text("ui.angreifen_richtung"), "hinweis");
+    return zeichnen();
   }
   if (aktion === "karte") return fensterAuf("karte", {});
   if (aktion === "befehlszeile") return fensterAuf("befehlszeile", befehlszeileOeffnen());

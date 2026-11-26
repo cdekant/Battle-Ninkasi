@@ -22,9 +22,8 @@
 // wer, was und anzahl. Ein Absud verdirbt nicht.
 // Baustein sud_wirken: wirkt beim Trinken den Sud aus der Ablage (kontext.werte.sud, gesetzt von trinken in
 // systeme/inventar.js): Heilung je Wert, Zustände über die Zeit, Pegel, Effekt des Zielgebiets.
-// Kulturen gewinnen (Haken aufgehoben): ein Gegenstand mit kultur: name gibt seine Kultur an das Wesen, das ihn aufhebt,
-// und vergeht (Meldung kultur_gewonnen, schon gehabt kultur_bekannt); Ninkasi bekommt beim ersten Gewinn einer Kultur und beim ersten
-// Aufheben einer Zutatenart im Lauf Wissens-EP (systeme/wissen.js).
+// Zutaten aufheben (Haken aufgehoben): beim ersten Aufheben einer Zutatenart im Lauf bekommt Ninkasi Wissens-EP
+// (systeme/wissen.js); Kulturen gewinnen steht in systeme/kulturen.js.
 
 import { anmelden, holen } from "../kern/register.js";
 import { entitaetMitId, entitaetEntfernen, ausDatenErzeugen, ausDemInventarNehmen } from "../kern/zustand.js";
@@ -37,7 +36,7 @@ import { wurfGanzzahl } from "../kern/wurf.js";
 import { gelaendeAuf } from "../welt/karte.js";
 import { imKampf } from "./kampfzustand.js";
 import { insInventar, anzahlVon } from "./inventar.js";
-import { kulturGebucht, zutatGebucht } from "./wissen.js";
+import { zutatGebucht } from "./wissen.js";
 import { aufgedeckteZielgebiete, rezeptFinden, nachDemSud } from "./rezepte.js";
 import { stufenBeginnen, verderberWuerfeln } from "./reifen.js";
 import { POLE, gegenpol, absudregeln, absudVorbereiten, ausgangWuerfeln, getraenkFuer, krautKennenlernen } from "./absud.js";
@@ -258,17 +257,8 @@ bausteinAnmelden("sud_wirken", {}, (spiel, kontext) => {
   for (const effekt of wirkung.effekte) effektAnwenden(spiel, effekt, kontext);
 }, { brauchtZiel: true });
 
-// Aufgehobenes: Kulturen gewinnen, Wissens-EP für Zutaten (siehe Kopf)
+// Aufgehobene Zutaten: Wissens-EP (siehe Kopf)
 anmelden("haken", "aufgehoben", (spiel, kontext) => {
   const wesen = entitaetMitId(spiel.zustand, kontext.quelleId), gegenstand = entitaetMitId(spiel.zustand, kontext.gegenstandId);
-  if (!wesen || !gegenstand) return;
-  if (gegenstand.zutat) zutatGebucht(spiel, wesen, gegenstand.typ);
-  const kultur = gegenstand.kultur;
-  if (!kultur) return;
-  const neu = !(wesen.kulturen || []).includes(kultur);
-  if (neu) wesen.kulturen = [...(wesen.kulturen || []), kultur];
-  ausDemInventarNehmen(wesen, gegenstand.id);
-  entitaetEntfernen(spiel.zustand, gegenstand.id);
-  melden(spiel, neu ? "kultur_gewonnen" : "kultur_bekannt", { wer: bezugAuf(wesen), kultur: { name: kultur, text: spiel.daten.kulturen[kultur].text } });
-  if (neu) kulturGebucht(spiel, wesen, kultur);
+  if (wesen && gegenstand?.zutat) zutatGebucht(spiel, wesen, gegenstand.typ);
 });

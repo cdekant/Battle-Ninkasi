@@ -1,6 +1,6 @@
 # Battle Ninkasi - Wirkungen
 
-Stand: 2026-11-25
+Stand: 2026-11-26
 
 Zuständig für: `src/kern/effekte.js`, `src/kern/bausteine.js`, `src/kern/ausloeser.js`, `src/kern/vorgang.js`, `src/kern/werte.js`, `src/systeme/modifikatoren.js`, `src/systeme/zustaende.js`, `src/systeme/betaeubung.js`, `src/systeme/befehlsveraenderer.js`, `src/systeme/beschwoerung.js`, `src/systeme/zielauswahl.js`, `src/systeme/zielbausteine.js`, `src/systeme/faehigkeiten.js`, `src/systeme/laufendeAktionen.js`, `src/systeme/tod.js`, `src/systeme/ersatz.js`, `src/welt/geometrie.js`, `daten/effekte.js`, `daten/zustaende.js`
 
@@ -158,6 +158,7 @@ Daten:
   + `unterhalt: { mp: 2 }` kostet die Trägerin je Welttick (aufrechterhaltene Zauber); `gebundenAnQuelle: true` endet mit dem Tod oder Verschwinden der Quelle
   + `faehigkeiten: [name]` gewährt der Trägerin diese Fähigkeiten, solange der Zustand wirkt (siehe Fähigkeiten)
   + `adjektiv`: Textschlüssel eines Adjektivs, das vor dem Namen der Trägerin steht, solange der Zustand wirkt (Affix, siehe [Texte.md](Texte.md), Grammatik); die Instanz trägt es mit, wie Fraktion und KI
+  + `kulturmerkmal`: macht den Zustand zum Merkmal der Kultur seiner Trägerin (siehe [Sude.md](Sude.md), Kulturen)
   + `tags` mit Mechanik: `kontrolle` (abnehmende Kontrolle) und `wehrlos` (sicher getroffen), siehe Kontrolle
   + `handlungsunfaehig: true` (Lähmung, Filmriss; die Betäubung schiebt stattdessen den Zug hinaus, siehe Kontrolle); `befehl: { veraenderer, ...parameter }`; `ki: { modul, ...parameter }`; `fraktion`: `"urheber"` (Psi-Kontrolle), `"eigene"` (Zwietracht, mit allen verfeindet) oder ein Fraktionsname
 + Instanzen an der Entität: `zustaende: [{ nummer, name, quelleId, urheberId, urheberFraktion, beginn, ende, staerke, stapel, ausFaehigkeit? }]` (`ausFaehigkeit`: gesetzt von einer aufrechten Fähigkeit); die Nummer zählt `naechsteZustandsnummer` im Zustand des Spiels hoch; `staerke` Vorgabe 1; Fraktion und KI werden beim Beginn in die Instanz geschrieben

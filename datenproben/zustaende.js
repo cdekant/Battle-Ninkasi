@@ -22,4 +22,16 @@ export default {
   hellsicht: { text: "zustand.hellsicht", modifikatoren: [{ ziel: "reichweiteSicht", art: "plus", betrag: 1 }, { ziel: "sichtImFinstern", art: "plus", betrag: 1 }] },
   trugbilder: { text: "zustand.trugbilder", adjektiv: "adjektiv.verwirrt", modifikatoren: [{ ziel: "genauigkeit", art: "plus", betrag: -5 }, { ziel: "reichweiteSicht", art: "plus", betrag: -1 }] },
   gereizt: { text: "zustand.gereizt", adjektiv: "adjektiv.gereizt", modifikatoren: [{ ziel: "ausweichen", art: "plus", betrag: -1 }] },
+  // Merkmale der Kulturen (src/systeme/kulturen.js) als Affixe der wilden Hefe: verändern das Wesen über modifikatoren
+  // und seine Kultur über kulturmerkmal; vorläufig
+  uebervergaerend: {
+    text: "zustand.uebervergaerend", adjektiv: "adjektiv.uebervergaerend",
+    modifikatoren: [{ ziel: "kosten.bewegen", art: "prozent", betrag: -40 }, { ziel: "lp", art: "plus", betrag: 4 }],
+    kulturmerkmal: [{ art: "plus", feld: "vergaerung", wert: 20 }, { art: "plus", feld: "vertraegt", wert: 40 }],
+  },
+  sauer: {
+    text: "zustand.sauer", adjektiv: "adjektiv.sauer",
+    modifikatoren: [{ ziel: "schaden", art: "plus", betrag: 1 }],
+    kulturmerkmal: [{ art: "aroma", achse: "saeure", wert: 25 }, { art: "plus", feld: "verderben", wert: 5 }],
+  },
 };

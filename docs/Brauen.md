@@ -105,7 +105,7 @@ Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil und Absud; offen: Primär
 + Kulturen verbessern sich durch Gebrauch (siehe [Skills.md](Skills.md), Brauen)
 + Ideen für die Rollen: übervergärende Hefe (trocken, viel Alkohol, für den Pegel), Brettanomyces (weniger Alkohol, verstärkt die MP), untergärige Hefe (sauber, enge Vorschau), Kveik (gärt heiß und schnell, der Weg zum Sud im Kampf), Milchsäurebakterien (Säure ohne Alkohol), Essigbakterien (Essig), Koji (verzuckert Reis ohne Mälzen), Kefirknollen und Teepilz (Säure, wenig Alkohol, Kombucha senkt den Pegel), wilde Hefe
 
-Umsetzung: teilweise, siehe [Sude.md](Sude.md), Profil (Proben zum Aufheben) und Spontane Gärung; offen: Kulturen gewinnen (Erkennen, Fundorte), mutierte Formen, Verbessern durch Gebrauch, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Kulturen (Gewinn neben dem Wesen und am Rest, Formen mit Merkmalen, Proben zum Aufheben) und Spontane Gärung; offen: Fundorte (Punkt 16), Verbessern durch Gebrauch (Punkt 20), Arbeit in [Systemausbau.md](Systemausbau.md)
 
 ## Absud
 

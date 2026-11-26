@@ -18,6 +18,13 @@ export function uebersetzen(tastenereignis, belegung, spiel) {
   return aktionsergebnis(aktion, spiel);
 }
 
+// Vorsatz "angreifen": aus dem Ergebnis der nächsten Taste wird ein Angriff in ihre Richtung auf jedes Wesen dort
+// (bewegen mit angreifen: true, systeme/bewegung.js); jede andere Taste bricht ab (null)
+export function angriffInRichtung(ergebnis) {
+  if (ergebnis?.befehl?.art !== "bewegen") return null;
+  return { aktion: "angreifen", befehl: { ...ergebnis.befehl, angreifen: true } };
+}
+
 // { aktion, befehl? } zu einer Aktion, der Befehl vervollständigt (z.B. welches Getränk); auch für die Befehlszeile
 export function aktionsergebnis(aktion, spiel) {
   const befehl = befehlDerAktion(aktion);

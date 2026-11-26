@@ -10,7 +10,7 @@
 
 import { gesteuerteEntitaet } from "../kern/zustand.js";
 import { zutatenIm, sudVorbereiten, verderbenChance, sauerChance } from "../systeme/brauen.js";
-import { KENNZAHLEN, zielgebietFinden, SPONTAN } from "../systeme/sud.js";
+import { KENNZAHLEN, zielgebietFinden, SPONTAN, kulturBezug } from "../systeme/sud.js";
 import { aufgedeckteZielgebiete } from "../systeme/rezepte.js";
 import { absudregeln, krautUnbekannt, POLE } from "../systeme/absud.js";
 import { braubefehl, rezepteImBuch } from "../eingabe/brauen.js";
@@ -116,7 +116,7 @@ fensterinhaltAnmelden("brauen", ({ spiel, texte }, zustand) => {
   const fassen = zustand.portionen * spiel.daten.regeln.brauen.stueckeJePortion;
   const fuellung = zutatenIm(spiel, ninkasi).reduce((summe, zutat) => summe + (zustand.mengen[zutat.id] ?? 0), 0);
   const vorbereitet = sudVorbereiten(spiel, ninkasi, braubefehl(spiel, zustand));
-  const kultur = zustand.kultur === SPONTAN ? text("ui.brauen.spontan") : zustand.kultur ? text(spiel.daten.kulturen[zustand.kultur].text) : text("ui.brauen.ohne_kultur");
+  const kultur = zustand.kultur === SPONTAN ? text("ui.brauen.spontan") : zustand.kultur ? texte.nomenForm(kulturBezug(spiel.daten, zustand.kultur), "nom", "ohne") : text("ui.brauen.ohne_kultur");
   const rezept = vorbereitet.rezept ? spiel.zustand.rezepte[vorbereitet.rezept] : null;
   const kopf = [
     textNachZahl("ui.brauen.portionen", zustand.portionen, { anzahl: zustand.portionen }),

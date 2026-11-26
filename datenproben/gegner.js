@@ -9,6 +9,27 @@ export default {
     spueren: { reichweite: 3 }, // spüren Beute ohne Licht entlang offener Felder (src/systeme/sinne.js), vorläufig
   },
 
+  // Mikroorganismen mit Kultur (src/systeme/kulturen.js): neutral, langsam; wer neben ihnen steht, gewinnt die Kultur
+  mikrobe: {
+    abstrakt: true,
+    fraktion: "mikroben",
+    tueren: "nicht",
+    ki: { modul: "jagen", letzteBekanntePosition: null },
+    sicht: { reichweite: 5 },
+    spueren: { reichweite: 3 },
+  },
+  // Wilde Hefe der ersten Ebenen: gibt die Kultur wilde_hefe, bewegt sich halb so schnell wie die Norm; tiefer mit
+  // Merkmalen (datenproben/zustaende.js, populationen.js); vorläufig
+  wilde_hefe: {
+    vorlage: "mikrobe",
+    text: "wesen.wilde_hefe",
+    kultur: "wilde_hefe",
+    werte: { lp: { grundwert: 8 } },
+    ep: 15,
+    kosten: { bewegen: 200 },
+    angriffe: [{ name: "biss", genauigkeit: 40, effekt: "biss_klein" }],
+  },
+
   // Stärke 1 der Normierung (daten/regeln.js normierung, werkzeuge/normierung.js)
   essigbakterium: {
     vorlage: "bakterium",

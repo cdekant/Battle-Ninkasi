@@ -54,18 +54,18 @@ export default {
     absudrichtungen,
   },
   // Ninkasi bekommt die vorläufige Fähigkeit für den Zielmodus, den Sprint und eine Psi-Fähigkeit, dazu die
-  // Grundausstattung (docs/Charakter.md, Startwerte): den Dolch angelegt und Wurfmesser im Gepäck; als Göttin des Biers
-  // trägt sie wilde Hefe (docs/Sude.md, Profil), Bierhefe und Milchsäure liegen als Krüge im Keller
+  // Grundausstattung (docs/Charakter.md, Startwerte): den Dolch angelegt und Wurfmesser im Gepäck; Kulturen gewinnt sie
+  // im Lauf (docs/Sude.md, Kulturen): wilde Hefe lebt im Keller, Bierhefe und Milchsäure liegen dort als Krüge
   ergaenzen: {
     // Verderber aus dem Kessel (src/systeme/reifen.js): das Essigbakterium
-    regeln: { brauen: { verderber: { chance: 30, wesen: "essigbakterium" } } },
+    // Rest einer gestorbenen Kulturquelle (src/systeme/kulturen.js): Hefeschleim
+    regeln: { brauen: { verderber: { chance: 30, wesen: "essigbakterium" }, rest: "hefeschleim" } },
     // Essig führt im Absud zur Säure (datenproben/absudrichtungen.js)
     gegenstaende: { essig: { zutat: { art: "grundstoff", aromen: { saeure: 100 }, richtungen: { saeure: 40 } } } },
     wesen: {
       ninkasi: {
         faehigkeiten: ["testfaehigkeit", "sprint", "gedankenstich"],
         ausstattung: [{ typ: "dolch", angelegt: true }, { typ: "wurfmesser", anzahl: 8 }],
-        kulturen: ["wilde_hefe"],
       },
     },
   },

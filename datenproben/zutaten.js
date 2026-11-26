@@ -27,5 +27,8 @@ export default {
   // Proben von Kulturen, bis Kulturen auf anderen Wegen zu gewinnen sind (docs/Systemausbau.md, Punkt 23)
   hefekrug: kulturprobe("gegenstand.hefekrug", "bierhefe"),
   sauerkrug: kulturprobe("gegenstand.sauerkrug", "milchsaeure"),
+  // Rest einer gestorbenen Kulturquelle (regeln.brauen.rest, src/systeme/kulturen.js): die Kultur setzt der Tod, nach
+  // 300 Weltticks vergeht er
+  hefeschleim: { text: "gegenstand.hefeschleim", aufhebbar: true, gewicht: 0, verdirbt: { nach: 30000, wird: null } },
   tontafel_dunkles_bier: { text: "gegenstand.tontafel", aufhebbar: true, gewicht: 300, lesbar: { effekt: "rezept_dunkles_bier" } },
 };
