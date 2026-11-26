@@ -505,7 +505,7 @@ Ein Set je Art von Rohstoffen mit zwei Tiers: Ohne Skill gibt eine Art weniger A
 + Getreide: Gerste, Emmer, Weizen, Brot (Kvas, Bappir); Braukunde, sekundär Klugheit; die Grundlage, schon ohne Skill brauchbar; drei Tiers, Meister holt mehr Stärke aus unvermälztem Getreide
 + Früchte: Datteln, Feigen, Trauben, Granatäpfel, Äpfel; Braukunde, sekundär Sinnlichkeit
 + Honig und Zucker: Braukunde, sekundär Trinkfestigkeit
-+ Kräuter und Würze: Gruit, die Würze vor dem Hopfen, mit Primär- und Sekundärwirkungen (siehe [Brauen.md](Brauen.md), Zutaten); Braukunde, sekundär Sinnlichkeit
++ Kräuter und Würze: Gruit, die Würze vor dem Hopfen, mit Primär- und Sekundärwirkungen (siehe [Brauen.md](Brauen.md), Zutaten); Braukunde, sekundär Sinnlichkeit; die Kräuterkunde macht die Vermutung über unbekannte Kräuter genauer (siehe [Brauen.md](Brauen.md), Absud)
 + Milch: Braukunde, sekundär Trinkfestigkeit
 + Tee: Braukunde, sekundär Klugheit
 + Hopfen: Bittere und Haltbarkeit; Braukunde, sekundär Sinnlichkeit; erst mit dem ersten Hopfenfund lernbar (`freischaltung`); das Aroma gehört der Schule Hopfenstopfen
@@ -724,7 +724,7 @@ Muster: Grund Wirkung, Experte geringere Kosten, Meister Fläche und Reichweite,
 ### Wege
 
 + Formel: Zauber aus Schriftrollen, Keilschrifttafeln und HACCP-Aushängen; Klugheit, sekundär Braukunde; Experte Schriftrollen schreiben gelingt (nur nüchtern), Meister eine gelesene Rolle bleibt mit einer Chance erhalten
-+ Alchemie: Braukunde, sekundär Klugheit; lernt aus den Tags `trank` und `gift`; Gebrautes wirkt stärker und länger, getrunken, geworfen und in Fallen gleich (siehe Anlagen und Fallen); sie stellt nichts her, das tut allein das Brauen; Tiers: Grund stärker, Experte länger, Meister größere Fläche des Gebrauten
++ Alchemie: Braukunde, sekundär Klugheit; lernt aus den Tags `trank` und `gift`; Gebrautes wirkt stärker und länger, getrunken, geworfen und in Fallen gleich (siehe Anlagen und Fallen); sie stellt nichts her, das tut allein das Brauen; Tiers: Grund stärker, Experte länger, Meister größere Fläche des Gebrauten; dazu verschiebt sie die Chance der Absicht im Absud und senkt sein Misslingen (siehe [Brauen.md](Brauen.md), Absud)
 + Göttliche Gabe: Gaben von Altären und Nebengottheiten wirken stärker; Braukunde, sekundär Sinnlichkeit; hängt an der Gunst (Idee in [Ausblick.md](Ausblick.md), Gunst der Nebengottheiten); Tiers: Grund stärkere Gaben, Experte die Gunst wächst schneller, Meister der Zorn der Gottheit fällt milder aus
 + Braupaddel: die Zauberstäbe der Welt sind verzauberte Braupaddel, in der Hand eine Wuchtwaffe, als Stab ein Zauber mit eigenen Ladungen; Klugheit, sekundär Gewandtheit; Grund Wirkung, Experte sparsamer mit Ladungen, Meister laden sich schneller wieder auf; schlägt Ninkasi mit dem Paddel, lernt sie Wuchtwaffen und die Spezialisierung Braupaddel (siehe Kampf, Nahkampf mit Waffen), zaubert sie damit, diesen Weg
 
