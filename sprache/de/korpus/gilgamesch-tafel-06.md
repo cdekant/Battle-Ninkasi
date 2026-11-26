@@ -2,7 +2,9 @@
 titel: Gilgamesch, Tafel VI - Ištar und der Himmelsstier
 art: nachdichtung
 vorlage: akkadisches Gilgamesch-Epos, jungbabylonische Fassung, Tafel VI, zerstörte Stellen ausgelassen, gemeinfrei
+nach: dem akkadischen Gilgamesch-Epos
 quelle: george2022gilgamesch
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

@@ -2,7 +2,9 @@
 titel: Maqlû 11 - Scherbe der Gassen
 art: nachdichtung
 vorlage: akkadische Beschwörungsserie Maqlû, jungbabylonisch, Tafel III, Beschwörung "Scherbe der Gassen", gemeinfrei
+nach: der akkadischen Beschwörungsserie Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

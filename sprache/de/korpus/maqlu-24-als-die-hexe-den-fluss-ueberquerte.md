@@ -2,7 +2,9 @@
 titel: Maqlû 24 - Als die Hexe den Fluss überquerte
 art: nachdichtung
 vorlage: akkadische Beschwörungsserie Maqlû, jungbabylonisch, Tafel VIII, Beschwörung "Als die Hexe den Fluss überquerte", gemeinfrei
+nach: der akkadischen Beschwörungsserie Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

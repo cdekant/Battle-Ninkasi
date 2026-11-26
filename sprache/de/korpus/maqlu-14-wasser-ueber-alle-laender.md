@@ -2,7 +2,9 @@
 titel: Maqlû 14 - Ihr Wasser, die ihr über alle Länder geht
 art: nachdichtung
 vorlage: akkadische Beschwörungsserie Maqlû, jungbabylonisch, Tafel V, Beschwörung "Ihr Wasser, die ihr über alle Länder geht", gemeinfrei
+nach: der akkadischen Beschwörungsserie Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

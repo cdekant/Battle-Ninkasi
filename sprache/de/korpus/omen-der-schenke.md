@@ -1,8 +1,10 @@
 ---
 titel: Omen der Schenke
-art: eigen
+art: frei
 vorlage: Bau und Ton der akkadischen Omenserie Šumma ālu, jungbabylonisch, gemeinfrei; zwei Omen (verschüttetes Bier, Hochwasser mit Bier) nachgedichtet, die übrigen eigen
+nach: der akkadischen Omenserie Šumma ālu
 quelle: mittermayer2021summaalu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

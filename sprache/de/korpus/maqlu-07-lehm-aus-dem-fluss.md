@@ -2,7 +2,9 @@
 titel: Maqlû 7 - Wer du auch bist, Hexe
 art: nachdichtung
 vorlage: akkadische Beschwörungsserie Maqlû, jungbabylonisch, Tafel II, Beschwörung "Wer du auch bist, Hexe", gemeinfrei
+nach: der akkadischen Beschwörungsserie Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

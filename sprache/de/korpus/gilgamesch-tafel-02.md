@@ -2,7 +2,9 @@
 titel: Gilgamesch, Tafel II - Brot und Bier
 art: nachdichtung
 vorlage: akkadisches Gilgamesch-Epos, jungbabylonische Fassung, Tafel II, Lücken ergänzt aus der altbabylonischen Pennsylvania-Tafel, gemeinfrei
+nach: dem akkadischen Gilgamesch-Epos
 quelle: george2022gilgamesch
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

@@ -2,7 +2,9 @@
 titel: Maqlû 20 - Du, Salz
 art: nachdichtung
 vorlage: akkadische Beschwörungsserie Maqlû, jungbabylonisch, Tafel VI, Beschwörung "Du, Salz", gemeinfrei
+nach: der akkadischen Beschwörungsserie Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

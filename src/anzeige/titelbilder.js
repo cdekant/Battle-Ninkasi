@@ -7,6 +7,8 @@
 //     (anzeige/titeleffekte.js)
 //   freischaltung: null (immer) oder eine Bedingung der Chronik { zaehler, mindestens } (eingabe/chronik.js),
 //     z.B. { zaehler: "besiegt.abstinenzler", mindestens: 1 } für Ninkasi im Kampf mit einem Abstinenzler
+//   quellenangabe: wer das Bild samt Masken und Sprites gemacht hat (anzeige/quellenangabe.js), als Bildunterschrift im
+//     Titel; Pflicht, ein Test prüft sie
 //   effekte (wahlweise): bewegte Effekte über dem Bild (anzeige/titeleffekte.js), nur für dieses Bild; ein anderes Bild
 //     bringt eigene Masken, Sprites und Punkte mit oder lässt Arten weg; alle Punkte in Prozent des Bildes
 //     masken: { name: Datei } Schwarzweiß-PNG in Bildgröße, weiß ist die Figur bzw. die Anlage
@@ -34,6 +36,16 @@ export const TITELBILDER = [
     datei: `${BILD_03}.jpg`,
     schutzbereich: { links: 27, oben: 31, rechts: 72, unten: 85 },   // Ninkasi vom Weizen bis zu den Stiefeln
     freischaltung: null,
+    quellenangabe: {
+      art: "generiert",
+      beteiligt: [
+        { wer: "ChatGPT", anteil: "motiv" },
+        { wer: "Grok", anteil: "dampf" },
+        { wer: "Grok", anteil: "masken" },
+        { wer: "Grok", anteil: "format" },
+        { wer: "Claude", anteil: "animation" },
+      ],
+    },
     effekte: {
       masken: { frau: `${BILD_03}-maske-frau.png`, gegner: `${BILD_03}-maske-gegner.png`, anlagen: `${BILD_03}-maske-anlagen.png` },
       vordergrund: ["frau", "gegner"],

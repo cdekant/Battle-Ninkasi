@@ -2,7 +2,9 @@
 titel: Maqlû 13 - Chaff and Barley
 art: nachdichtung
 vorlage: Akkadian incantation series Maqlû, Standard Babylonian, Tablet V, incantation "Chaff and Barley", public domain
+nach: the Akkadian incantation series Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

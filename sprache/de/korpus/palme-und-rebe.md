@@ -2,7 +2,9 @@
 titel: Dattelpalme und Weinstock
 art: nachdichtung
 vorlage: akkadisches Streitgespräch "Dattelpalme und Weinstock", jungbabylonisch, Bruchstück ohne Anfang und Ende, gemeinfrei
+nach: dem akkadischen Streitgespräch
 quelle: jimenez2021palmeundrebe
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

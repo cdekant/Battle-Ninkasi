@@ -3,11 +3,13 @@
 // seitlich und in der Höhe beschnitten werden (object-fit: cover, den Ausschnitt setzt anzeige/titeleffekte.js nach dem
 // Schutzbereich je Bild aus anzeige/titelbilder.js);
 // links Name und Menü, rechts die Speicherplätze und ein Spruch aus dem Korpus, beide Spalten nur als weicher Verlauf
-// ins Dunkle. Der Hintergrund ist ein eigenes Element, das später statt des Bildes auch eine laufende Karte zeigen kann
+// ins Dunkle; unten in der Mitte die Quellenangabe des Bildes. Der Hintergrund ist ein eigenes Element, das später statt des Bildes auch eine laufende Karte zeigen kann
 // (Vorführmodus). Fenster wie Einstellungen und Hilfe legen sich darüber (#fenster).
-// umgebung zusätzlich: { plaetze, titelbild, spruch, version } (src/main.js)
+// Das Menü zeigt keine Buchstaben (Pfeile und Klick genügen), die Tasten wirken trotzdem, weil der Klick über sie läuft.
+// umgebung zusätzlich: { plaetze, titelbild, spruch, literatur, version } (src/main.js); literatur ist sprache/literatur.json
 
 import { fensterinhaltAnmelden, buchstabeHtml, buchstabeAttribut, zielAttribut } from "./fenster.js";
+import { quellenangabeText } from "./quellenangabe.js";
 import { titelEintraege } from "../eingabe/titel.js";
 import { ANZAHL_PLAETZE } from "../eingabe/speicherstand.js";
 import { arenenListe, taktikDerWahl } from "../eingabe/arenawahl.js";
@@ -32,7 +34,7 @@ export function speicherplatzText(texte, platz, stelle) {
 function menueHtml(texte, plaetze, zustand) {
   const eintraege = titelEintraege(plaetze);
   const gewaehlt = Math.min(zustand.gewaehlt, eintraege.length - 1);
-  return `<ul class="titel-menue">${eintraege.map((eintrag, stelle) => `<li${stelle === gewaehlt ? ' class="gewaehlt"' : ""}${buchstabeAttribut(stelle)}>${buchstabeHtml(stelle)}${texte.text(`titel.${eintrag}`)}</li>`).join("")}</ul>`;
+  return `<ul class="titel-menue">${eintraege.map((eintrag, stelle) => `<li${stelle === gewaehlt ? ' class="gewaehlt"' : ""}${buchstabeAttribut(stelle)}>${texte.text(`titel.${eintrag}`)}</li>`).join("")}</ul>`;
 }
 
 function plaetzeHtml(texte, plaetze) {
@@ -43,9 +45,18 @@ function plaetzeHtml(texte, plaetze) {
   }).join("");
 }
 
-function spruchHtml(spruch) {
+// Spruch mit Titel, darunter leiser seine Quellenangabe (anzeige/quellenangabe.js)
+function spruchHtml(texte, spruch, literatur) {
   if (!spruch) return "";
-  return `<blockquote class="titel-spruch">${spruch.verse.map(escapeHtml).join("<br>")}<cite>${escapeHtml(spruch.titel)}</cite></blockquote>`;
+  const angabe = quellenangabeText(texte, spruch.quellenangabe, literatur);
+  const angabeHtml = angabe ? `<span class="titel-spruch-angabe">${escapeHtml(angabe)}</span>` : "";
+  return `<blockquote class="titel-spruch">${spruch.verse.map(escapeHtml).join("<br>")}<cite>${escapeHtml(spruch.titel)}${angabeHtml}</cite></blockquote>`;
+}
+
+// Quellenangabe des Titelbilds als Bildunterschrift unten in der freien Mitte; ohne Angabe nichts
+function bildangabeHtml(texte, titelbild, literatur) {
+  const angabe = titelbild ? quellenangabeText(texte, titelbild.quellenangabe, literatur, { was: texte.text("titel.bild") }) : "";
+  return angabe ? `<div class="titel-bildangabe">${escapeHtml(angabe)}</div>` : "";
 }
 
 // Als Fensterinhalt nur für den Stapel (Hilfe darüber nennt die Tasten); gezeichnet wird er von titelHtml
@@ -55,7 +66,7 @@ fensterinhaltAnmelden("titel", ({ texte }) => ({ ebene: true, titel: texte.text(
 export function titelHtml(umgebung, stapel) {
   const unten = stapel[0];
   if (unten?.art !== "titel") return "";
-  const { texte, plaetze = [], titelbild, spruch, version } = umgebung;
+  const { texte, plaetze = [], titelbild, spruch, literatur, version } = umgebung;
   const { text } = texte;
   const bild = titelbild ? `<img class="titel-bild" src="${escapeHtml(titelbild.datei)}" alt="">` : "";
   const hinweis = unten.zustand.hinweis ? `<p class="titel-hinweis">${text(unten.zustand.hinweis)}</p>` : "";
@@ -65,13 +76,14 @@ export function titelHtml(umgebung, stapel) {
       <div class="titel-untertitel">${text("titel.untertitel")}</div>
       ${menueHtml(texte, plaetze, unten.zustand)}
       ${hinweis}
-      <div class="titel-fuss">${text("titel.fuss")}<br>${text("ui.version")}: ${escapeHtml(version)}</div>
+      <div class="titel-fuss">${text("ui.version")}: ${escapeHtml(version)}</div>
     </div>
     <div class="titel-spalte titel-rechts">
       <h2>${text("titel.plaetze")}</h2>
       <ul class="titel-plaetze">${plaetzeHtml(texte, plaetze)}</ul>
-      ${spruchHtml(spruch)}
-    </div>`;
+      ${spruchHtml(texte, spruch, literatur)}
+    </div>
+    ${bildangabeHtml(texte, titelbild, literatur)}`;
 }
 
 fensterinhaltAnmelden("laeufe", ({ texte, plaetze = [] }, zustand) => {

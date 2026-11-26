@@ -2,7 +2,9 @@
 titel: Maqlû 16 - May the Mountain Cover You
 art: nachdichtung
 vorlage: Akkadian incantation series Maqlû, Standard Babylonian, Tablet V, incantation "May the Mountain Cover You", public domain
+nach: the Akkadian incantation series Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

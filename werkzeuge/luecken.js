@@ -11,6 +11,7 @@
 
 import "../src/kern/spiel.js"; // meldet Bausteine, Systeme und KI-Module an, die die Datenprüfung kennen muss
 import { vorbereiten } from "../src/kern/daten.js";
+import { quellenangabeAusKopf, quellenangabeFehler } from "../src/anzeige/quellenangabe.js";
 
 // Bereiche in daten/zeichen.js, die der Renderer als Tile zeichnen kann (Name des Tiles = Name des Eintrags)
 export const TILEBEREICHE = ["gelaende", "wesen", "gegenstaende", "fallen", "schichten"];
@@ -66,7 +67,7 @@ export function lueckenFinden(quellen) {
       }
     }
   }
-  if (quellen.korpus) korpusLuecken(quellen.korpus, quellen.literatur ?? [], melden);
+  if (quellen.korpus) korpusLuecken(quellen.korpus, quellen.literatur ?? [], quellen.sprache?.texte ?? null, melden);
   if (quellen.literatur) glossarQuellenLuecken(quellen.rohdaten.glossar ?? {}, quellen.literatur, melden);
   return luecken;
 }
@@ -137,9 +138,9 @@ function textLuecken(rohdaten, texte, melden, stufeFuer) {
   }
 }
 
-// Korpustexte brauchen einen vollständigen Kopf und eine Quelle aus dem Literaturverzeichnis (siehe docs/Texte.md, Korpus)
-export const KORPUSKOPF = ["titel", "art", "vorlage", "quelle", "lizenz"];
-export const KORPUSARTEN = ["nachdichtung", "gemeinfrei", "eigen"];
+// Korpustexte brauchen einen vollständigen Kopf und eine gültige Quellenangabe (siehe docs/Texte.md, Korpus und
+// Quellenangabe); beteiligt ist freiwillig, ohne KI fehlt es
+export const KORPUSKOPF = ["titel", "art", "vorlage", "nach", "quelle", "lizenz"];
 
 // Quellen der Glossareinträge (siehe docs/Texte.md, Glossar) stehen im Literaturverzeichnis
 function glossarQuellenLuecken(glossar, literatur, melden) {
@@ -151,12 +152,11 @@ function glossarQuellenLuecken(glossar, literatur, melden) {
   }
 }
 
-function korpusLuecken(korpus, literatur, melden) {
-  const schluessel = new Set(literatur.map((eintrag) => eintrag.id));
+function korpusLuecken(korpus, literatur, texte, melden) {
   for (const { name, kopf } of korpus) {
     const ort = `korpus.${name}`;
     for (const feld of KORPUSKOPF) if (!kopf[feld]) melden("korpus", "fehler", ort, `Kopf ohne ${feld}`);
-    if (kopf.art && !KORPUSARTEN.includes(kopf.art)) melden("korpus", "fehler", ort, `art "${kopf.art}" ist keine von ${KORPUSARTEN.join(", ")}`);
-    if (kopf.quelle && !schluessel.has(kopf.quelle)) melden("korpus", "fehler", ort, `Quelle "${kopf.quelle}" fehlt in sprache/literatur.json`);
+    if (!kopf.art) continue;
+    for (const fehler of quellenangabeFehler(quellenangabeAusKopf(kopf), { literatur, texte })) melden("korpus", "fehler", ort, fehler);
   }
 }

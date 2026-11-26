@@ -8,7 +8,7 @@ import { akteurEinreihen } from "../src/kern/zeit.js";
 import { entitaetErzeugen, entitaetenAuf, alleEntitaeten } from "../src/kern/zustand.js";
 import { modifikatorHinzufuegen } from "../src/kern/werte.js";
 import { lastVon, lastZuschlag, einzelgewicht } from "../src/systeme/inventar.js";
-import { inventarTaste } from "../src/eingabe/inventar.js";
+import { inventarTaste, gewaehlterGegenstand } from "../src/eingabe/inventar.js";
 import { vorbereiten } from "../src/kern/daten.js";
 
 const RAUM = ["#######", "#.....#", "#.....#", "#######"];
@@ -149,8 +149,22 @@ test("Lesen: eine Rolle vom Stapel ist verbraucht, ein Buch bleibt; der Effekt t
   befehlGeben(spiel, { art: "aufheben" });
   assert.equal(befehlGeben(spiel, { art: "lesen", gegenstandId: ninkasi.inventar.at(-1) }).grund, "nicht_lesbar");
   assert.equal(befehlGeben(spiel, { art: "lesen", gegenstandId: 999 }).grund, "nicht_im_gepaeck");
-  assert.deepEqual(inventarTaste({ gewaehlt: buch }, "KeyL", spiel).befehl, { art: "lesen", gegenstandId: buch });
+  assert.deepEqual(inventarTaste({ gewaehlt: buch }, "KeyL", spiel), { fenster: { gewaehlt: buch }, befehl: { art: "lesen", gegenstandId: buch } }, "bleibt offen und gewählt");
   assert.deepEqual(inventarTaste({ gewaehlt: buch }, "Enter", spiel).befehl, { art: "lesen", gegenstandId: buch });
+});
+
+test("Inventarfenster: ist die letzte Rolle gelesen, gilt nichts mehr als gewählt", () => {
+  const { spiel, ninkasi } = aufstellen();
+  hinlegen(spiel, 1, 1, "testrolle");
+  befehlGeben(spiel, { art: "aufheben" });
+  hinlegen(spiel, 1, 1, "testbuch");
+  befehlGeben(spiel, { art: "aufheben" });
+  const [rolle, buch] = ninkasi.inventar;
+  const { fenster, befehl } = inventarTaste({ gewaehlt: rolle }, "KeyL", spiel);
+  assert.equal(befehlGeben(spiel, befehl).ok, true);
+  assert.equal(gewaehlterGegenstand(fenster, spiel), null);
+  assert.deepEqual(inventarTaste(fenster, "KeyL", spiel), { fenster: { gewaehlt: null } }, "l wählt jetzt, was an der Stelle liegt: nichts");
+  assert.deepEqual(inventarTaste(fenster, "KeyA", spiel), { fenster: { gewaehlt: buch } }, "a wählt den ersten Gegenstand");
 });
 
 test("Inventarfenster: F lässt fallen", () => {

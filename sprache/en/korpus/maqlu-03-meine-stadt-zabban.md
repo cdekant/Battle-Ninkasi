@@ -2,7 +2,9 @@
 titel: Maqlû 3 - My City Is Zabban
 art: nachdichtung
 vorlage: Akkadian incantation series Maqlû, Standard Babylonian, Tablet I, incantation "My City Is Zabban", public domain
+nach: the Akkadian incantation series Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

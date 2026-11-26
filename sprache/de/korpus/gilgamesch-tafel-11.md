@@ -2,7 +2,9 @@
 titel: Gilgamesch, Tafel XI - Die Flut
 art: nachdichtung
 vorlage: akkadisches Gilgamesch-Epos, jungbabylonische Fassung, Tafel XI, zerstörte Stellen ausgelassen, Wiederholungen gekürzt, gemeinfrei
+nach: dem akkadischen Gilgamesch-Epos
 quelle: george2022gilgamesch
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

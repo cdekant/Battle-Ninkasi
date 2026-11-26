@@ -2,7 +2,9 @@
 titel: Gilgamesh, Tablet XII - Enkidu in the Netherworld
 art: nachdichtung
 vorlage: Akkadian Epic of Gilgamesh, Standard Babylonian version, Tablet XII (rendered from the Sumerian), broken passages left out, repetitions shortened, public domain
+nach: the Akkadian Epic of Gilgamesh
 quelle: george2022gilgamesch
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

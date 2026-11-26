@@ -2,7 +2,9 @@
 titel: Maqlû 3 - Meine Stadt ist Zabban
 art: nachdichtung
 vorlage: akkadische Beschwörungsserie Maqlû, jungbabylonisch, Tafel I, Beschwörung "Meine Stadt ist Zabban", gemeinfrei
+nach: der akkadischen Beschwörungsserie Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

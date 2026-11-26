@@ -2,7 +2,9 @@
 titel: Maqlû 5 - Ich hebe die Fackel
 art: nachdichtung
 vorlage: akkadische Beschwörungsserie Maqlû, jungbabylonisch, Tafel I, Beschwörung "Ich hebe die Fackel", gemeinfrei
+nach: der akkadischen Beschwörungsserie Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

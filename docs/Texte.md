@@ -2,7 +2,7 @@
 
 Stand: 2026-11-25
 
-Zuständig für: `sprache/*`, `src/anzeige/texte.js`, `src/anzeige/grammatik.js`, `src/anzeige/korpus.js`, `src/anzeige/glossar.js`, `daten/glossar.js`, `daten/bierstile.js`
+Zuständig für: `sprache/*`, `src/anzeige/texte.js`, `src/anzeige/grammatik.js`, `src/anzeige/korpus.js`, `src/anzeige/quellenangabe.js`, `src/anzeige/glossar.js`, `daten/glossar.js`, `daten/bierstile.js`
 
 Mitprüfen bei Änderungen: [Anzeige.md](Anzeige.md), [Architektur.md](Architektur.md), [Entwicklung.md](Entwicklung.md), [Fundus.md](Fundus.md), [Skills.md](Skills.md), [Brauen.md](Brauen.md)
 
@@ -120,8 +120,8 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 ### Ablage und Format
 
 + Korpustexte: `sprache/<sprache>/korpus/<name>.md`, eine Datei pro Text, Zeile = Vers, Leerzeile = Strophe, Sprecherrollen als `(Hausherr:)` am Zeilenanfang
-+ YAML-Kopf im Pandoc-Stil mit `titel`, `art` (`nachdichtung`, `gemeinfrei`, `eigen`), `vorlage` (gemeinfreies Original), `quelle` (Schlüssel im Literaturverzeichnis), `lizenz`
-+ Literaturverzeichnis: `sprache/literatur.json` im Format CSL-JSON, für alle Sprachen gemeinsam; liest das Spiel direkt, Pandoc mit `--citeproc --bibliography`, für biber per `pandoc sprache/literatur.json -t biblatex` umwandeln
++ YAML-Kopf im Pandoc-Stil mit `titel`, `art`, `vorlage` (gemeinfreies Original, ausführlich mit allen Abweichungen), `nach`, `quelle`, `beteiligt` (fehlt, wenn keine KI beteiligt war) und `lizenz`; `art`, `nach`, `quelle` und `beteiligt` sind die Quellenangabe des Texts (siehe Quellenangabe), `beteiligt` als Text `Wer (anteil, anteil); Wer`; den Kopf prüft das Kompendium (siehe [Entwicklung.md](Entwicklung.md), Kompendium), für die Korpustexte im Repo auch `tests/quellenangabe.test.js`
++ Literaturverzeichnis: `sprache/literatur.json` im Format CSL-JSON, für alle Sprachen gemeinsam; das Spiel lädt es beim Start für die Herkunft des Spruchs im Titel (siehe [Titelbildschirm.md](Titelbildschirm.md)), Pandoc mit `--citeproc --bibliography`, für biber per `pandoc sprache/literatur.json -t biblatex` umwandeln
 + Schlüssel (`id`) nach dem Schema `autorJahrKurztitel`: klein, ohne Umlaute und Leerzeichen, z.B. `sallaberger2020ninkasi`; ein "siehe auch" im Spiel verweist nur über diesen Schlüssel, die Anzeige liefert die Sprachdatei
 + Originale und Rohtexte liegen in `sprache/Literatur/` (in `.gitignore`, nicht im Repo), benannt nach dem Schlüssel: `<schluessel>.pdf`, `<schluessel>-rohtext.txt`
 + Hinweise zur Nutzung einer Quelle (etwa "nur Fachquelle") stehen im CSL-Feld `note`
@@ -175,10 +175,22 @@ Vorbild: Caves of Qud füllt Bücher aus einem Textkorpus.
 + Die englischen Korpustexte sind aus unseren deutschen Nachdichtungen übertragen, im selben altertümlichen Ton (thou, hath) und mit denselben Dateinamen; aus den modernen Übersetzungen der Fachquellen stammt kein Wortlaut
 + Weitere Fachquellen ohne eigene Nachdichtung: `sallaberger2012bierbrauen` (lokal als PDF, frei auf der Seite des Autors, aber ohne freie Lizenz, daher keine wörtlichen Zitate); für die Bierstile `bjcp2021styleguidelines`, `ba2025styleguidelines`, `ba2016worldbeercup` und `ebs2025kategorien` (keine freie Lizenz, Merkmale und Kennzahlen nur eigenständig zusammengefasst, siehe Bierstile)
 
+## Quellenangabe
+
+Jeder Inhalt sagt, wer ihn gemacht hat, wonach, wo man nachlesen kann und welche KI beteiligt war; Korpustexte und Titelbilder tun das schon, Tiles, Fundtexte und das Fenster der Mitwirkenden folgen demselben Format. Aus der Git-Historie lässt sich das nicht ablesen, es steht deshalb ausdrücklich in den Daten.
+
++ Format (`src/anzeige/quellenangabe.js`): `{ art, nach?, quelle?, beteiligt? }`
++ `art`: `chd` (selbst gemacht; auch eine eigene Vorlage, die nur digitalisiert wurde), `generiert` (von einer KI erstellt, ausgewählt und abgenommen), `nachdichtung`, `frei` (frei nach einer Vorlage), `gemeinfrei`; bei Texten sagt `art` das Verhältnis zur Vorlage, wer geschrieben hat, sagt `beteiligt`
++ `nach`: die Vorlage kurz, im Dativ mit Artikel, so dass sie hinter "nach" passt, z.B. `der akkadischen Beschwörungsserie Maqlû`
++ `quelle`: Schlüssel im Literaturverzeichnis, angezeigt als Kurzbeleg "Name Jahr" (Familiennamen der Autorschaft, sonst der Herausgeberschaft, sonst die Körperschaft; ab drei Namen der erste mit "u. a.", zwei mit "/")
++ `beteiligt`: `[{ wer, anteil? }]`, die beteiligte KI mit ihrem Anteil (Schlüssel unter `quellenangabe.anteil.` in den Texten, z.B. `motiv`, `dampf`, `masken`, `format`, `animation`); Werkzeuge ohne eigenen Beitrag (Editor, eine reine Digitalisierung) werden nicht genannt
++ Zeile (`quellenangabeText`): je nach `art` "nachgedichtet nach", "frei nach" oder "nach" mit `nach`, dann "vgl." mit dem Kurzbeleg, dann "mit KI erstellt:" mit den Beteiligten, je Werkzeug einmal mit seinen Anteilen; was fehlt, fällt weg; wo die Zeile ohne Zusammenhang steht, benennt `was` den Inhalt ("Titelbild mit KI erstellt: …")
++ Prüfung (`quellenangabeFehler`): bekannte `art`, `generiert` nur mit `beteiligt`, `quelle` im Literaturverzeichnis, Anteile mit Text; für Korpustexte und Titelbilder in `tests/quellenangabe.test.js`, für den Korpus auch im Kompendium
++ Stand: alle Korpustexte sind mit Claude geschrieben (`beteiligt: Claude`), die bestehenden Tiles von Claude gezeichnet (Angabe folgt mit den Tiles), das Titelbild siehe [Titelbildschirm.md](Titelbildschirm.md)
+
 ## Offen
 
 + Korpustexte noch nicht an Spielinhalte gekoppelt (Brauschritte, Fundstücke); das Spiel liest die der gewählten Sprache zur Laufzeit (`sprache/<sprache>/korpus/index.js` als Liste der Dateien, `src/anzeige/korpus.js` zerlegt in Kopf, Strophen und Sätze) und zeigt einen Satz als Spruch im Titel; ein neuer Korpustext braucht seine Zeile in der Liste
-+ Laden von `sprache/literatur.json` im Spiel (`fetch` oder `import … with { type: "json" }`); den Kopf der Korpustexte und ihre Quellenschlüssel prüft das Kompendium (siehe [Entwicklung.md](Entwicklung.md), Kompendium)
 + Abdeckung der Texte je Eintrag (welcher Gegner, welches Getränk hat Beschreibung, Fundtext, Zitat), sobald Korpus und Inhalte gekoppelt sind; als Reiter des Kompendiums
 + Wo erzeugte Texte vorkommen: Bücher, Schriftrollen, Inschriften, HACCP-Aushänge, Händlergerede
 + Platzhalter in Hilfetexten: ein Fenster gibt seiner Hilfe Werte mit (`hilfewerte`, z.B. `{punkte}` in `hilfe.thema.erstellung`), damit Zahlen aus den Regeln nicht fest im Text stehen

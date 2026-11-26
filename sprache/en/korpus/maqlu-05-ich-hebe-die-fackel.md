@@ -2,7 +2,9 @@
 titel: Maqlû 5 - I Lift the Torch
 art: nachdichtung
 vorlage: Akkadian incantation series Maqlû, Standard Babylonian, Tablet I, incantation "I Lift the Torch", public domain
+nach: the Akkadian incantation series Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

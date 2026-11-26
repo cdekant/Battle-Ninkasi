@@ -2,7 +2,9 @@
 titel: Maqlû 24 - When the Witch Crossed the River
 art: nachdichtung
 vorlage: Akkadian incantation series Maqlû, Standard Babylonian, Tablet VIII, incantation "When the Witch Crossed the River", public domain
+nach: the Akkadian incantation series Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

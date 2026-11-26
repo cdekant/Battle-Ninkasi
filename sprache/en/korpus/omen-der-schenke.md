@@ -1,8 +1,10 @@
 ---
 titel: Omens of the Tavern
-art: eigen
+art: frei
 vorlage: build and tone of the Akkadian omen series Šumma ālu, Standard Babylonian, public domain; two omens (spilled beer, flood with beer) rendered freely, the rest our own
+nach: the Akkadian omen series Šumma ālu
 quelle: mittermayer2021summaalu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

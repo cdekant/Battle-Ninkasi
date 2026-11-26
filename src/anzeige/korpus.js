@@ -3,7 +3,9 @@
 // Texte holt src/main.js mit fetch nach der Liste in sprache/<sprache>/korpus/index.js.
 // Erster Nutzer ist der wechselnde Spruch im Titel; Bücher und Markow-Ketten können später dieselbe Zerlegung nehmen.
 
-// Text einer Korpusdatei: { name, kopf: { titel, art, vorlage, quelle, lizenz }, strophen: [[vers]] }
+import { quellenangabeAusKopf } from "./quellenangabe.js";
+
+// Text einer Korpusdatei: { name, kopf: { titel, art, vorlage, nach, quelle, beteiligt, lizenz }, strophen: [[vers]] }
 export function korpustextZerlegen(name, text) {
   const zeilen = text.replace(/\r/g, "").split("\n");
   const kopf = {};
@@ -31,24 +33,30 @@ export function korpustextZerlegen(name, text) {
   return { name, kopf, strophen };
 }
 
-// Sätze eines Korpustexts: [{ verse, titel }]; ein Satz endet mit einem Vers auf . ! ? oder mit der Strophe. Längere
-// Sätze gehen als Ausschnitt ihrer ersten zwei Verse ein (Hymnen wiederholen ihr erstes Verspaar), ein Komma am Ende
-// wird dann zu "…"; Sätze mit Lücken der Überlieferung ("...") fallen weg
+// Titel und Quellenangabe aus dem Kopf (anzeige/quellenangabe.js); ohne Angaben im Kopf keine Quellenangabe
+function herkunftAus(korpustext) {
+  const quellenangabe = quellenangabeAusKopf(korpustext.kopf);
+  return { titel: korpustext.kopf.titel ?? korpustext.name, ...(Object.keys(quellenangabe).length && { quellenangabe }) };
+}
+
+// Sätze eines Korpustexts: [{ verse, titel, quellenangabe? }]; ein Satz endet mit einem Vers auf . ! ? oder mit der
+// Strophe. Längere Sätze gehen als Ausschnitt ihrer ersten zwei Verse ein (Hymnen wiederholen ihr erstes Verspaar), ein
+// Komma am Ende wird dann zu "…"; Sätze mit Lücken der Überlieferung ("...") fallen weg
 export const AUSSCHNITT_VERSE = 2;
 export function saetzeAus(korpustext, hoechstensVerse = 3) {
   const saetze = [];
-  const titel = korpustext.kopf.titel ?? korpustext.name;
+  const herkunft = herkunftAus(korpustext);
   for (const strophe of korpustext.strophen) {
     let satz = [];
     for (const [nummer, vers] of strophe.entries()) {
       satz.push(vers);
       if (!/[.!?]$/.test(vers) && nummer < strophe.length - 1) continue;
       if (!satz.some((teil) => teil.includes("..."))) {
-        if (satz.length <= hoechstensVerse) saetze.push({ verse: satz, titel });
+        if (satz.length <= hoechstensVerse) saetze.push({ verse: satz, ...herkunft });
         else {
           const ausschnitt = satz.slice(0, AUSSCHNITT_VERSE);
           ausschnitt[ausschnitt.length - 1] = ausschnitt.at(-1).replace(/[,;:]$/, "…");
-          saetze.push({ verse: ausschnitt, titel });
+          saetze.push({ verse: ausschnitt, ...herkunft });
         }
       }
       satz = [];

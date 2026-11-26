@@ -300,6 +300,7 @@ let aktuelleStelle = null;
 let plaetze = plaetzeLesen();
 const titelbild = titelbildWaehlen(chronik, Math.random());
 let spruch = null;
+let literatur = [];
 // Bewegte Effekte über dem Titelbild (anzeige/titeleffekte.js); Bewegung reduzieren gilt aus den Einstellungen oder vom System
 const titeleffekte = titeleffekteAnlegen({
   zufall: Math.random,
@@ -361,7 +362,7 @@ function spielZeichnen() {
 
 // Was Fenster zum Zeichnen und für ihre Tasten bekommen (anzeige/fenster.js, eingabe/fenster.js)
 function fensterumgebung() {
-  return { spiel, daten, texte, belegung, belegungsVorgabe, abweichungen: belegungsabweichungen, leisten, logzeilen: log.zeilen, einstellungen, vorgaben, version: VERSION, plaetze, titelbild, spruch };
+  return { spiel, daten, texte, belegung, belegungsVorgabe, abweichungen: belegungsabweichungen, leisten, logzeilen: log.zeilen, einstellungen, vorgaben, version: VERSION, plaetze, titelbild, spruch, literatur };
 }
 
 // ID des sichtbaren Wesens auf einem Feld oder null
@@ -1154,6 +1155,13 @@ Promise.all(KORPUSLISTEN[sprache].map((name) => fetch(`sprache/${sprache}/korpus
     if (fensterStapel[0]?.art === "titel") zeichnen();
   })
   .catch(() => { /* ohne Spruch */ });
+// Literaturverzeichnis für die Herkunft des Spruchs; fehlt es, steht dort nur, wonach der Text gedichtet ist
+fetch("sprache/literatur.json").then((antwort) => (antwort.ok ? antwort.json() : Promise.reject(new Error("literatur.json"))))
+  .then((eintraege) => {
+    literatur = eintraege;
+    if (fensterStapel[0]?.art === "titel") zeichnen();
+  })
+  .catch(() => { /* ohne Literatur */ });
 
 // Start: mit ?seed= oder ?spielart= gleich ein Lauf auf dem ersten freien Platz, sonst (oder ohne freien Platz) der Titel
 const startDerAdresse = startAusUrl();

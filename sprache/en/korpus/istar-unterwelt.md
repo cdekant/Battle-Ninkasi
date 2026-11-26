@@ -2,7 +2,9 @@
 titel: Ištar's Going Down to the Netherworld
 art: nachdichtung
 vorlage: Akkadian poem "Descent of Ištar", Standard Babylonian version, public domain
+nach: the Akkadian poem
 quelle: setaelae2022istar
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

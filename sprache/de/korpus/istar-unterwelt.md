@@ -2,7 +2,9 @@
 titel: Ištars Gang in die Unterwelt
 art: nachdichtung
 vorlage: akkadische Dichtung "Ištars Gang in die Unterwelt", jungbabylonische Fassung, gemeinfrei
+nach: der akkadischen Dichtung
 quelle: setaelae2022istar
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

@@ -2,7 +2,9 @@
 titel: Gilgamesch, Tafel VII - Enkidus Fluch und Segen
 art: nachdichtung
 vorlage: akkadisches Gilgamesch-Epos, jungbabylonische Fassung, Tafel VII, zerstörte Stellen ausgelassen, gemeinfrei
+nach: dem akkadischen Gilgamesch-Epos
 quelle: george2022gilgamesch
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

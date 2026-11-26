@@ -2,7 +2,9 @@
 titel: Maqlû 9 - Die Töchter des Anu
 art: nachdichtung
 vorlage: akkadische Beschwörungsserie Maqlû, jungbabylonisch, Tafel III, Beschwörung "Die Töchter des Anu", gemeinfrei
+nach: der akkadischen Beschwörungsserie Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

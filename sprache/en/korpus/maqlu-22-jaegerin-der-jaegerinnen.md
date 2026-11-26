@@ -2,7 +2,9 @@
 titel: Maqlû 22 - Huntress of Huntresses
 art: nachdichtung
 vorlage: Akkadian incantation series Maqlû, Standard Babylonian, Tablet VII, incantation "Huntress of Huntresses", public domain
+nach: the Akkadian incantation series Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

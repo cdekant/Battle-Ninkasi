@@ -2,7 +2,9 @@
 titel: Maqlû 12 - I Am a Looser of Spells
 art: nachdichtung
 vorlage: Akkadian incantation series Maqlû, Standard Babylonian, Tablet IV, incantation "I Am a Looser of Spells", public domain
+nach: the Akkadian incantation series Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

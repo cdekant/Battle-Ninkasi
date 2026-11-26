@@ -2,7 +2,9 @@
 titel: Gilgamesch, Tafel X - Die Schankwirtin am Meer
 art: nachdichtung
 vorlage: akkadisches Gilgamesch-Epos, jungbabylonische Fassung, Tafel X, Šiduris Rat aus der altbabylonischen Tafel VA+BM ergänzt, zerstörte Stellen ausgelassen, Wiederholungen gekürzt, gemeinfrei
+nach: dem akkadischen Gilgamesch-Epos
 quelle: george2022gilgamesch
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

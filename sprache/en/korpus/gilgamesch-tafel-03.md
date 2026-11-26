@@ -2,7 +2,9 @@
 titel: Gilgamesh, Tablet III - The Prayer of Ninsun
 art: nachdichtung
 vorlage: Akkadian Epic of Gilgamesh, Standard Babylonian version, Tablet III, broken passages left out, public domain
+nach: the Akkadian Epic of Gilgamesh
 quelle: george2022gilgamesch
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

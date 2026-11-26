@@ -7,7 +7,10 @@
 //                       w werfen (schließt und gibt die Auswahl für den Zielmodus zurück, eingabe/zielmodus.js),
 //                       eine Ziffer legt die Art auf diesen Platz der aktiven Leiste, Entf nimmt sie von allen Leisten
 //                       (ergebnis.leiste, eingabe/schnellleiste.js), Enter die Standardhandlung (trinken, wenn trinkbar,
-//                       lesen, wenn lesbar, sonst anlegen oder ablegen, wenn ausrüstbar), Esc zurück zur Auswahl
+//                       lesen, wenn lesbar, sonst anlegen oder ablegen, wenn ausrüstbar), Esc zurück zur Auswahl;
+//                       lesen, anlegen und ablegen lassen das Fenster offen und den Gegenstand gewählt, trinken und
+//                       fallen lassen schließen es; liegt der gewählte Gegenstand nicht mehr im Gepäck (die letzte
+//                       Rolle ist gelesen), gilt nichts als gewählt
 // Maus (klick mit { stelle }): wählt die Zeile; mit Absicht wirkt sie gleich; die schon gewählte Zeile wirkt wie Enter
 // Buchstaben gelten nach dem Zeichen der Taste (KeyboardEvent.key), so passen sie zu jeder Tastaturbelegung;
 // ohne Zeichen (Tests, Bot) nach dem Tastencode der US-Belegung.
@@ -37,9 +40,22 @@ export function gegenstandAnStelle(spiel, stelle) {
   return id === undefined ? null : entitaetMitId(spiel.zustand, id);
 }
 
+// Der gewählte Gegenstand, solange er im Gepäck der gesteuerten Entität liegt, sonst null
+export function gewaehlterGegenstand(fenster, spiel) {
+  if (fenster.gewaehlt === null) return null;
+  const imGepaeck = (gesteuerteEntitaet(spiel.zustand).inventar || []).includes(fenster.gewaehlt);
+  return imGepaeck ? entitaetMitId(spiel.zustand, fenster.gewaehlt) : null;
+}
+
+// Fensterzustand ohne Auswahl, die nicht mehr im Gepäck liegt
+function auswahlBereinigt(fenster, spiel) {
+  return fenster.gewaehlt !== null && !gewaehlterGegenstand(fenster, spiel) ? { ...fenster, gewaehlt: null } : fenster;
+}
+
 // Verarbeitet eine Taste (KeyboardEvent.code, dazu KeyboardEvent.key) bei offenem Fenster;
 // gibt { fenster, befehl?, auswahl?, leiste? } zurück
-export function inventarTaste(fenster, tastencode, spiel, zeichen, belegung) {
+export function inventarTaste(fensterVorher, tastencode, spiel, zeichen, belegung) {
+  const fenster = auswahlBereinigt(fensterVorher, spiel);
   if (tastencode === "Escape" || tastencode === "KeyI") return { fenster: fenster.gewaehlt !== null ? { gewaehlt: null } : null };
   if (fenster.gewaehlt !== null && (tastencode === "Enter" || tastencode === "NumpadEnter")) return standardhandlung(fenster, spiel);
   if (fenster.gewaehlt !== null) {
@@ -59,31 +75,32 @@ export function inventarTaste(fenster, tastencode, spiel, zeichen, belegung) {
   }
   const gesteuerte = gesteuerteEntitaet(spiel.zustand);
   if (buchstabe === "t") return { fenster: null, befehl: { art: "trinken", gegenstandId: fenster.gewaehlt } };
-  if (buchstabe === "l") return { fenster: null, befehl: { art: "lesen", gegenstandId: fenster.gewaehlt } };
+  if (buchstabe === "l") return { fenster, befehl: { art: "lesen", gegenstandId: fenster.gewaehlt } };
   if (buchstabe === "w") return { fenster: null, auswahl: { zweck: "werfen", gegenstandId: fenster.gewaehlt } };
   if (buchstabe === "f") return { fenster: null, befehl: { art: "fallenlassen", gegenstandId: fenster.gewaehlt } };
   if (buchstabe === "a") {
     const art = istAngelegt(gesteuerte, fenster.gewaehlt) ? "ablegen" : "anlegen";
-    return { fenster: null, befehl: { art, gegenstandId: fenster.gewaehlt } };
+    return { fenster, befehl: { art, gegenstandId: fenster.gewaehlt } };
   }
   return { fenster };
 }
 
 // Enter auf einem gewählten Gegenstand: trinken, wenn trinkbar, lesen, wenn lesbar, sonst anlegen oder ablegen
 function standardhandlung(fenster, spiel) {
-  const gegenstand = entitaetMitId(spiel.zustand, fenster.gewaehlt);
+  const gegenstand = gewaehlterGegenstand(fenster, spiel);
   if (!gegenstand) return { fenster };
   if (gegenstand.trinkbar) return { fenster: null, befehl: { art: "trinken", gegenstandId: gegenstand.id } };
-  if (gegenstand.lesbar) return { fenster: null, befehl: { art: "lesen", gegenstandId: gegenstand.id } };
+  if (gegenstand.lesbar) return { fenster, befehl: { art: "lesen", gegenstandId: gegenstand.id } };
   if (gegenstand.ausruestung) {
     const art = istAngelegt(gesteuerteEntitaet(spiel.zustand), gegenstand.id) ? "ablegen" : "anlegen";
-    return { fenster: null, befehl: { art, gegenstandId: gegenstand.id } };
+    return { fenster, befehl: { art, gegenstandId: gegenstand.id } };
   }
   return { fenster };
 }
 
 // Klick auf eine Zeile des Gepäcks; gibt dasselbe zurück wie inventarTaste
-export function inventarKlick(fenster, ziel, spiel, belegung) {
+export function inventarKlick(fensterVorher, ziel, spiel, belegung) {
+  const fenster = auswahlBereinigt(fensterVorher, spiel);
   const gegenstand = gegenstandAnStelle(spiel, ziel.stelle);
   if (!gegenstand) return { fenster };
   if (fenster.gewaehlt === gegenstand.id) return standardhandlung(fenster, spiel);

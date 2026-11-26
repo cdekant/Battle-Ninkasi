@@ -2,7 +2,9 @@
 titel: Drinking Song
 art: nachdichtung
 vorlage: Sumerian drinking song following the Hymn to Ninkasi, Old Babylonian, public domain
+nach: the Sumerian drinking song
 quelle: sallaberger2020ninkasi
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

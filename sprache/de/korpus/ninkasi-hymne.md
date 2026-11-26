@@ -2,7 +2,9 @@
 titel: Hymne an Ninkasi
 art: nachdichtung
 vorlage: sumerische Ninkasi-Hymne (Ninkasi A), altbabylonisch, gemeinfrei
+nach: der sumerischen Ninkasi-Hymne
 quelle: sallaberger2020ninkasi
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

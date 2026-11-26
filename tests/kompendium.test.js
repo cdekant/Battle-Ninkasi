@@ -59,7 +59,7 @@ test("Kompendium: Lücken in Daten, Tiles, Verweisen, Texten und Korpus werden g
     rohdaten: roh,
     sprache: { texte: { ...texte, "wesen.alt": "Alt" } },
     tileset,
-    korpus: [{ name: "a.md", kopf: { titel: "A", art: "falsch", vorlage: "v", lizenz: "l", quelle: "unbekannt" } }],
+    korpus: [{ name: "a.md", kopf: { titel: "A", art: "falsch", vorlage: "v", nach: "n", lizenz: "l", quelle: "unbekannt" } }],
     literatur: [{ id: "bekannt" }],
   });
   const gefunden = (gruppe, ort) => luecken.find((luecke) => luecke.gruppe === gruppe && luecke.ort === ort);

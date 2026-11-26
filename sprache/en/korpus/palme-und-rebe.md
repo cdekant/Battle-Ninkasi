@@ -2,7 +2,9 @@
 titel: The Date Palm and the Vine
 art: nachdichtung
 vorlage: Akkadian disputation "Palm and Vine", Standard Babylonian, fragment without beginning and end, public domain
+nach: the Akkadian debate poem
 quelle: jimenez2021palmeundrebe
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

@@ -96,7 +96,7 @@ test("Inventar: Klick wählt, der zweite Klick handelt; Enter trinkt bzw. legt a
   const gewaehlt = inventarKlick({ gewaehlt: null }, { stelle: stelleVon(helm.id) }, spiel, belegung).fenster;
   assert.deepEqual(gewaehlt, { gewaehlt: helm.id });
   assert.deepEqual(inventarKlick(gewaehlt, { stelle: stelleVon(bier.id) }, spiel, belegung).fenster, { gewaehlt: bier.id }, "andere Zeile wechselt die Auswahl");
-  assert.deepEqual(inventarKlick(gewaehlt, { stelle: stelleVon(helm.id) }, spiel, belegung).befehl, { art: "anlegen", gegenstandId: helm.id });
+  assert.deepEqual(inventarKlick(gewaehlt, { stelle: stelleVon(helm.id) }, spiel, belegung), { fenster: gewaehlt, befehl: { art: "anlegen", gegenstandId: helm.id } }, "legt an, das Fenster bleibt offen");
   assert.deepEqual(inventarTaste({ gewaehlt: bier.id }, "Enter", spiel).befehl, { art: "trinken", gegenstandId: bier.id });
   const html = fensterHtml(umgebung, fensterOeffnen([], "inventar", { gewaehlt: bier.id }));
   assert.match(html, /trinken/);

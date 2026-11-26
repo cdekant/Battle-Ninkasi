@@ -2,7 +2,9 @@
 titel: Maqlû 8 - Die Hexe, die durch die Gassen streift
 art: nachdichtung
 vorlage: akkadische Beschwörungsserie Maqlû, jungbabylonisch, Tafel III, Beschwörung "Die Hexe, die durch die Gassen streift", gemeinfrei
+nach: der akkadischen Beschwörungsserie Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

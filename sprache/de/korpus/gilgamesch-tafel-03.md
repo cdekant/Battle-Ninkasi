@@ -2,7 +2,9 @@
 titel: Gilgamesch, Tafel III - Ninsuns Gebet
 art: nachdichtung
 vorlage: akkadisches Gilgamesch-Epos, jungbabylonische Fassung, Tafel III, zerstörte Stellen ausgelassen, gemeinfrei
+nach: dem akkadischen Gilgamesch-Epos
 quelle: george2022gilgamesch
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

@@ -2,7 +2,9 @@
 titel: Maqlû 1 - I Call upon You, Gods of the Night
 art: nachdichtung
 vorlage: Akkadian incantation series Maqlû, Standard Babylonian, Tablet I, incantation "I Call upon You, Gods of the Night", public domain
+nach: the Akkadian incantation series Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

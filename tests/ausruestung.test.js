@@ -137,9 +137,10 @@ test("Inventarfenster: wählen, handeln, zurück und schließen", () => {
   assert.deepEqual(inventarTaste(fenster, "KeyZ", spiel), { fenster }, "an Z liegt nichts");
   fenster = inventarTaste(fenster, "KeyA", spiel).fenster;
   assert.deepEqual(fenster, { gewaehlt: schuerze.id });
-  assert.deepEqual(inventarTaste(fenster, "KeyA", spiel), { fenster: null, befehl: { art: "anlegen", gegenstandId: schuerze.id } });
+  assert.deepEqual(inventarTaste(fenster, "KeyA", spiel), { fenster, befehl: { art: "anlegen", gegenstandId: schuerze.id } }, "bleibt offen und gewählt");
   ninkasi.ausgeruestet = [schuerze.id];
-  assert.equal(inventarTaste(fenster, "KeyA", spiel).befehl.art, "ablegen");
+  assert.deepEqual(inventarTaste(fenster, "KeyA", spiel), { fenster, befehl: { art: "ablegen", gegenstandId: schuerze.id } });
+  assert.deepEqual(inventarTaste(fenster, "Enter", spiel).fenster, fenster, "Enter legt ebenfalls bei offenem Fenster ab");
   assert.deepEqual(inventarTaste(fenster, "Escape", spiel), { fenster: { gewaehlt: null } });
   assert.deepEqual(inventarTaste({ gewaehlt: null }, "Escape", spiel), { fenster: null });
   assert.deepEqual(inventarTaste({ gewaehlt: bier.id }, "KeyT", spiel).befehl, { art: "trinken", gegenstandId: bier.id });

@@ -2,7 +2,9 @@
 titel: Gilgamesch, Tafel V - Der Zedernwald
 art: nachdichtung
 vorlage: akkadisches Gilgamesch-Epos, jungbabylonische Fassung, Tafel V, zerstörte Stellen ausgelassen, Wiederholungen gekürzt, gemeinfrei
+nach: dem akkadischen Gilgamesch-Epos
 quelle: george2022gilgamesch
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

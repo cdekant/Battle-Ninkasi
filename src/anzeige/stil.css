@@ -438,8 +438,11 @@ html, body {
 .titel-plaetze li.leer, .titel-plaetze li.veraltet { color: var(--leise); }
 .titel-spruch { margin: auto 0 0; font-style: italic; line-height: 1.5; text-shadow: 0 1px 4px #000; }
 .titel-spruch cite { display: block; margin-top: 0.5rem; font-style: normal; color: var(--leise); font-size: 0.85em; }
+.titel-spruch-angabe { display: block; margin-top: 0.15rem; font-size: 0.9em; opacity: 0.8; }
+.titel-bildangabe { position: relative; grid-column: 2; grid-row: 1; align-self: end; justify-self: center; margin: 0 1rem 1rem; color: var(--leise); font-size: 0.8em; text-align: center; text-shadow: 0 1px 4px #000; pointer-events: none; }
 /* schmale Fenster: die Spalten rücken übereinander und über das Bild, der Verlauf wird dichter */
 @media (max-width: 900px) {
   #titel { grid-template-columns: 1fr; grid-template-rows: auto auto; overflow: auto; }
   .titel-links, .titel-rechts { grid-column: 1; background: var(--titel-verlauf); }
+  .titel-bildangabe { grid-column: 1; grid-row: auto; justify-self: stretch; margin: 0; padding: 0 2.2rem 1rem; background: var(--titel-verlauf); }
 }

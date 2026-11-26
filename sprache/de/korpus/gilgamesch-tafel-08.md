@@ -2,7 +2,9 @@
 titel: Gilgamesch, Tafel VIII - Die Klage um Enkidu
 art: nachdichtung
 vorlage: akkadisches Gilgamesch-Epos, jungbabylonische Fassung, Tafel VIII, zerstörte Stellen ausgelassen, Wiederholungen gekürzt, gemeinfrei
+nach: dem akkadischen Gilgamesch-Epos
 quelle: george2022gilgamesch
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

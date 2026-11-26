@@ -2,7 +2,9 @@
 titel: Hymn to Ninkasi
 art: nachdichtung
 vorlage: Sumerian Hymn to Ninkasi (Ninkasi A), Old Babylonian, public domain
+nach: the Sumerian Hymn to Ninkasi
 quelle: sallaberger2020ninkasi
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

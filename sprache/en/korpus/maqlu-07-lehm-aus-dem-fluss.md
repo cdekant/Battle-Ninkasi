@@ -2,7 +2,9 @@
 titel: Maqlû 7 - Whoever Thou Art, O Witch
 art: nachdichtung
 vorlage: Akkadian incantation series Maqlû, Standard Babylonian, Tablet II, incantation "Whoever Thou Art, O Witch", public domain
+nach: the Akkadian incantation series Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

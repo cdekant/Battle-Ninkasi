@@ -2,7 +2,9 @@
 titel: Maqlû 1 - Ich rufe euch an, Götter der Nacht
 art: nachdichtung
 vorlage: akkadische Beschwörungsserie Maqlû, jungbabylonisch, Tafel I, Beschwörung "Ich rufe euch an, Götter der Nacht", gemeinfrei
+nach: der akkadischen Beschwörungsserie Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

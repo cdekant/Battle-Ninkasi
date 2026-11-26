@@ -2,7 +2,9 @@
 titel: Trinklied, andere Lesart
 art: nachdichtung
 vorlage: sumerisches Trinklied im Anschluss an die Ninkasi-Hymne, altbabylonisch, gemeinfrei
+nach: dem sumerischen Trinklied
 quelle: sallaberger2020ninkasi
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

@@ -118,6 +118,9 @@ test("Titel: eigene Ebene mit Bild, Menü, Plätzen und Spruch; Fenster darüber
   const stapel = fensterOeffnen([], "titel", titelOeffnen());
   const html = titelHtml(umgebung, stapel);
   for (const erwartet of [TITELBILDER[0].datei, "Battle Ninkasi", "Die Rückkehr der Bierschlächterin", "Fortsetzen", "Erster Vers,<br>zweiter Vers.", "Hymne", "aus Version 0.31.0", "Platz 3: frei"]) assert.ok(html.includes(erwartet), erwartet);
+  assert.doesNotMatch(html, /class="buchstabe"/, "das Menü zeigt keine Buchstaben");
+  assert.ok(!html.includes(texte.text("titel.fuss")), "unten links steht nur die Version");
+  assert.match(html, /<div class="titel-fuss">Version: test<\/div>/);
   assert.equal(fensterHtml(umgebung, stapel), "", "der Titel ist kein Fenster");
   assert.equal(titelHtml(umgebung, fensterOeffnen([], "menue", {})), "");
   const mitHilfe = fensterOeffnen(stapel, "hilfe", { thema: "titel" });
@@ -199,6 +202,18 @@ test("Korpus je Sprache: Liste passt zum Ordner, Kopf und Verse ohne Sprecher, S
   assert.deepEqual(saetzeAus(zerlegt).map(({ verse }) => verse), [["Eins, zwei,", "drei."], ["Vier", "fünf…"]], "langer Satz als Ausschnitt");
   assert.deepEqual(spruchWaehlen([zerlegt], 0), { verse: ["Eins, zwei,", "drei."], titel: "Probe" });
   assert.equal(spruchWaehlen([], 0.5), null);
+});
+
+test("Titel: Quellenangabe unter dem Spruch und als Bildunterschrift; ohne Angabe keine Zeile", () => {
+  const literatur = JSON.parse(readFileSync("sprache/literatur.json", "utf8"));
+  const korpustext = (korpustextZerlegen("omen-der-schenke.md", readFileSync("sprache/de/korpus/omen-der-schenke.md", "utf8")));
+  const spruch = spruchWaehlen([korpustext], 0);
+  const stapel = fensterOeffnen([], "titel", titelOeffnen());
+  const html = titelHtml({ texte, plaetze: [], titelbild: TITELBILDER[0], spruch, literatur, version: "test" }, stapel);
+  assert.match(html, /<cite>Omen der Schenke<span class="titel-spruch-angabe">frei nach der akkadischen Omenserie Šumma ālu · vgl\. Mittermayer 2021 · mit KI erstellt: Claude<\/span><\/cite>/);
+  assert.match(html, /<div class="titel-bildangabe">Titelbild mit KI erstellt: ChatGPT \(Motiv\), Grok \(Dampf, Masken, Format\), Claude \(Animation\)<\/div>/);
+  const ohne = titelHtml({ texte, plaetze: [], titelbild: { datei: "x.jpg" }, spruch: { verse: ["Vers."], titel: "Probe" }, version: "test" }, stapel);
+  assert.doesNotMatch(ohne, /titel-bildangabe|titel-spruch-angabe/);
 });
 
 test("Titelbilder: jede Datei existiert, Schutzbereich in Prozent, Wahl nur unter freigeschalteten", () => {

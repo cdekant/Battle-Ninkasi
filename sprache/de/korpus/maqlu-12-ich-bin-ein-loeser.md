@@ -2,7 +2,9 @@
 titel: Maqlû 12 - Ich bin ein Löser
 art: nachdichtung
 vorlage: akkadische Beschwörungsserie Maqlû, jungbabylonisch, Tafel IV, Beschwörung "Ich bin ein Löser", gemeinfrei
+nach: der akkadischen Beschwörungsserie Maqlû
 quelle: abusch2024maqlu
+beteiligt: Claude
 lizenz: CC BY-NC-SA 4.0
 ---
 

@@ -22,7 +22,7 @@ import { istAngelegt, haltbarkeitProzent, wechselzeit, verlangsamungDes } from "
 import { zeitkosten } from "../kern/spiel.js";
 import { anzahlVon, ladungenVon, lastVon, tragkraftVon, lastZuschlag } from "../systeme/inventar.js";
 import { faehigkeitFuer, faehigkeitenVon, herkunftDer, verbrauchVon, zeitBisBereit } from "../systeme/faehigkeiten.js";
-import { BUCHSTABEN } from "../eingabe/inventar.js";
+import { BUCHSTABEN, gewaehlterGegenstand } from "../eingabe/inventar.js";
 import { hilfeGruppen } from "../eingabe/hilfe.js";
 import { stellenVon } from "../eingabe/schnellleiste.js";
 import { spinnennetzSvg, achsenBeschriftungen } from "./spinnennetz.js";
@@ -116,7 +116,7 @@ fensterinhaltAnmelden("inventar", ({ spiel, texte, leisten }, zustand) => {
     const ladungen = gegenstand.ladungen ? ` (${ladungenVon(gegenstand)}/${gegenstand.ladungen.hoechstens})` : "";
     return `<li${gewaehlt}${zielAttribut({ stelle })}${ziehbar(`gegenstand:${gegenstand.typ}`)}>${buchstabeHtml(stelle)}${nomenForm(gegenstand, "nom", "zahl")}${ladungen}${verschleissText(texte, gegenstand)}${angelegt}</li>`;
   });
-  const gewaehlt = zustand.gewaehlt !== null ? entitaetMitId(spiel.zustand, zustand.gewaehlt) : null;
+  const gewaehlt = gewaehlterGegenstand(zustand, spiel);
   const details = gewaehlt
     ? `<h2>${nomenForm({ ...gewaehlt, anzahl: 1 }, "nom", "ohne")}</h2>${gewaehlt.sud ? sudNetzHtml(spiel, text, gewaehlt.sud) : ""}<ul>
         ${gewaehlt.sud ? `<li>${text("ui.guete")}: ${gewaehlt.sud.guete} %</li>` : ""}
@@ -131,7 +131,7 @@ fensterinhaltAnmelden("inventar", ({ spiel, texte, leisten }, zustand) => {
         <li class="leise">${platzText(texte, leisten, `gegenstand:${gewaehlt.typ}`)}</li>
       </ul>`
     : "";
-  const hinweis = !gegenstaende.length ? "ui.inventar_leer" : zustand.gewaehlt !== null ? "ui.inventar_handeln"
+  const hinweis = !gegenstaende.length ? "ui.inventar_leer" : gewaehlt ? "ui.inventar_handeln"
     : zustand.absicht ? `ui.inventar_absicht.${zustand.absicht}` : "ui.inventar_waehlen";
   const knoepfe = [];
   if (gewaehlt) {
