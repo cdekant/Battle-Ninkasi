@@ -17,6 +17,7 @@ Firefox an anderem Ort: Umgebungsvariable FIREFOX auf den Programmpfad setzen.
 
 import functools
 import http.server
+import json
 import os
 import shutil
 import subprocess
@@ -127,6 +128,23 @@ def profilVorbereiten(mitLeisten):
     (chromeVerzeichnis / "userChrome.css").write_text(stylesheet, encoding="utf-8")
     zeilen = [f'user_pref("{name}", {wertAlsJs(wert)});' for name, wert in firefoxEinstellungen.items()]
     (profilverzeichnis / "user.js").write_text("\n".join(zeilen) + "\n", encoding="utf-8")
+    fensterNichtMaximieren()
+
+
+def fensterNichtMaximieren():
+    """Firefox merkt sich in xulstore.json, ob das Fenster maximiert war; ohne Leisten wirkt das wie
+    Vollbild. Jeder Start öffnet daher ein gewöhnliches Fenster in der zuletzt gemerkten Größe."""
+    fensterzustand = profilverzeichnis / "xulstore.json"
+    if not fensterzustand.is_file():
+        return
+    try:
+        inhalt = json.loads(fensterzustand.read_text(encoding="utf-8"))
+        hauptfenster = inhalt["chrome://browser/content/browser.xhtml"]["main-window"]
+    except (ValueError, KeyError, TypeError):
+        return
+    if hauptfenster.get("sizemode") in ("maximized", "fullscreen"):
+        hauptfenster["sizemode"] = "normal"
+        fensterzustand.write_text(json.dumps(inhalt), encoding="utf-8")
 
 
 def wertAlsJs(wert):

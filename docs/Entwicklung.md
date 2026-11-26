@@ -1,6 +1,6 @@
 # Battle Ninkasi - Entwicklung
 
-Stand: 2026-11-25
+Stand: 2026-11-26
 
 Zuständig für: `starten.py`, `starten.bat`, `tests/*`, `werkzeuge/bot.js`, `werkzeuge/messung.js`, `werkzeuge/arena.js`, `werkzeuge/normierung.js`, `werkzeuge/raeumen.js`, `werkzeuge/kompendium.js`, `werkzeuge/kompendium.html`, `werkzeuge/luecken.js`, `werkzeuge/namensbuch.js`, `datenproben/*`
 
@@ -20,6 +20,7 @@ Schnittstellen:
 Regeln:
 
 + Fenster ohne Tabs, Adressleiste und Titelleiste über `chrome/userChrome.css` im Profil (dazu `toolkit.legacyUserProfileCustomizations.stylesheets` und `browser.tabs.inTitlebar` = 1); mit `--mit-leisten` bleibt `userChrome.css` leer; `dom.allow_scripts_to_close_windows` erlaubt "Beenden" im Spielmenü
++ Kein Vollbild und kein maximiertes Fenster beim Start: vor jedem Start setzt das Skript `sizemode` des Hauptfensters in `xulstore.json` des Profils auf `normal`, die zuletzt gemerkte Größe bleibt; so lässt sich die Oberfläche in verschiedenen Größen prüfen
 + Endet Firefox, endet der Server; unter Windows mit `-wait-for-browser`, da `firefox.exe` sonst nur einen sofort endenden Startprozess ist; endet Firefox ohne Fehler binnen 5 Sekunden, läuft der Server bis Strg+C weiter
 + Fester Port, weil Einstellungen und Speicherplätze im `localStorage` je Ursprung (Host und Port) liegen
 + Module laden nicht über `file://`, deshalb immer über einen Webserver
