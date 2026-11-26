@@ -44,6 +44,7 @@ export default {
     sichtgift: { zeichen: "!", farbe: "#9a5ac8" },
     hefekrug: { zeichen: "!", farbe: "#e8d9a0" },
     sauerkrug: { zeichen: "!", farbe: "#c8d07a" },
+    kveikring: { zeichen: "o", farbe: "#d8b070" },
     hefeschleim: { zeichen: ",", farbe: "#e0c890" },
     tontafel_dunkles_bier: { zeichen: "?", farbe: "#c9a27a" },
     leeres_fass: { zeichen: "&", farbe: "#6b5a44" },

@@ -110,6 +110,26 @@ export function sudRechnen(daten, eingabe) {
   return { profil, gaerung };
 }
 
+// Vergärt eine Würze (Profil ohne Gärung, das Trockenbier, systeme/trockenbier.js) mit einer Kultur, ohne Wurf: Alkohol
+// und Restzucker nach gaerungBerechnen, dazu die Aromen der Kultur und die Süße aus dem Restzucker; die Aromen der
+// Maische stecken schon in der Würze. Gibt { profil, gaerung }
+export function wuerzeVergaeren(daten, wuerze, { maische, kultur, vertraegt, flora }) {
+  const regeln = brauregeln(daten);
+  const kulturdaten = kulturdatenVon(daten, kultur, flora);
+  const gaerung = gaerungBerechnen(daten, { stammwuerze: wuerze.stammwuerze, verfahren: { maische }, kultur, vertraegt, flora });
+  const profil = {};
+  for (const [achse, beschreibung] of Object.entries(regeln.achsen)) {
+    let wert = wuerze[achse] ?? 0;
+    if (achse === "alkohol") wert = gaerung.alkohol;
+    else if (!KENNZAHLEN.includes(achse)) {
+      wert += kulturdaten?.aromen?.[achse] ?? 0;
+      if (achse === "suesse") wert += Math.floor((gaerung.restzucker * regeln.suesseJeRestzucker) / 100);
+    }
+    profil[achse] = begrenzt(wert, 0, beschreibung.hoechstens);
+  }
+  return { profil, gaerung };
+}
+
 // Halbe Breite des Bereichs je Achse: regeln.brauen.achsen.<achse>.unschaerfe mal prozent (Skills, Rezept, Kessel)
 export function unschaerfeBerechnen(daten, prozent) {
   const unschaerfe = {};

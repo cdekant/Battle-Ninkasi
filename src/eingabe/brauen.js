@@ -1,20 +1,21 @@
 // Braufenster (siehe docs/Bedienung.md, Fenster, und docs/Sude.md, Befehl): reine Tastenlogik ohne DOM, wie
 // eingabe/inventar.js. Fenster-Zustand der Anzeige (nicht im Spielzustand):
 //   { kessel: { x, y }, portionen, mengen: { <gegenstandId>: menge }, maische, gewuerz, kultur: name | null,
-//     absicht: "elixier" | "gift", liste: "zutaten" | "rezepte" }
+//     absicht: "elixier" | "gift", abfuellen: "gefaesse" | "trocken", liste: "zutaten" | "rezepte" }
 //   Taste p öffnet am Kessel neben oder unter Ninkasi (braufensterOeffnen), ein Klick auf den Kessel ebenso; die
 //   Portionen stehen zu Beginn auf so vielen, wie Kessel und leere Gefäße erlauben (mindestens 1)
 //   + und - ändern die Portionen zwischen 1 und dem, was der Kessel hergibt
 //   a bis z gibt ein Stück der Zutat an dieser Stelle in den Kessel, mit Umschalt nimmt sie eines heraus
 //   1 wechselt die Maische, 2 die Gabe des Gewürzes, 3 die Kultur (ohne, spontan, wo die Ebene eine Flora hat, dann die
-//   Kulturen Ninkasis), 4 die Absicht des Absuds (Elixier oder Gift, nur ohne Kultur von Belang)
+//   Kulturen Ninkasis), 4 die Absicht des Absuds (Elixier oder Gift, nur ohne Kultur von Belang), 5 das Abfüllen (in
+//   Gefäße oder als Trockenbier, systeme/trockenbier.js; als Trockenbier zählt die Kultur nicht, sie kommt beim Anrühren)
 //   Tab wechselt die Liste zwischen Zutaten und Rezepten (rezepteImBuch); in den Rezepten wählt a bis z ein Rezept:
 //   es setzt Verfahren und Kultur und verteilt die Zutaten aus dem Gepäck (rezeptVerteilen), dann zurück zu den Zutaten
 //   Rücktaste leert den Kessel, Enter braut (schließt und gibt den Befehl brauen), Esc schließt
 // Die Vorschau rechnet die Anzeige mit sudVorbereiten (systeme/brauen.js), dieselbe Rechnung wie der Befehl.
 
 import { gesteuerteEntitaet } from "../kern/zustand.js";
-import { kesselBei, zutatenIm, gefaesseIm } from "../systeme/brauen.js";
+import { kesselBei, zutatenIm, gefaesseIm, ABFUELLEN } from "../systeme/brauen.js";
 import { SPONTAN } from "../systeme/sud.js";
 import { POLE } from "../systeme/absud.js";
 import { anzahlVon } from "../systeme/inventar.js";
@@ -33,7 +34,7 @@ export function braufensterOeffnen(spiel) {
   const { maische, gewuerz } = spiel.daten.regeln.brauen.verfahren;
   const gefaesse = gefaesseIm(spiel, ninkasi).reduce((summe, gefaess) => summe + anzahlVon(gefaess), 0);
   const portionen = Math.max(1, Math.min(kessel.kessel.portionen, gefaesse));
-  return { zustand: { kessel: { x: kessel.x, y: kessel.y }, portionen, mengen: {}, maische, gewuerz, kultur: (ninkasi.kulturen || [])[0] ?? null, absicht: POLE[0], liste: "zutaten" } };
+  return { zustand: { kessel: { x: kessel.x, y: kessel.y }, portionen, mengen: {}, maische, gewuerz, kultur: (ninkasi.kulturen || [])[0] ?? null, absicht: POLE[0], abfuellen: ABFUELLEN[0], liste: "zutaten" } };
 }
 
 // Rezepte im Buch des Laufs als [schluessel, rezept], gefundene vor den Hausrezepten (systeme/rezepte.js)
@@ -51,7 +52,8 @@ function portionenFuer(rezept, gewaehlt, hoechstens) {
   return gewaehlt;
 }
 
-// Zustand nach der Wahl eines Rezepts: Verfahren, Kultur, Portionen und die Zutaten aus dem Gepäck, so weit sie reichen
+// Zustand nach der Wahl eines Rezepts: Verfahren, Kultur, Portionen und die Zutaten aus dem Gepäck, so weit sie reichen;
+// das Abfüllen bleibt, ein Rezept lässt sich auch als Trockenbier abfüllen
 export function rezeptVerteilen(spiel, zustand, rezept) {
   const ninkasi = gesteuerteEntitaet(spiel.zustand);
   const hoechstens = kesselBei(spiel, ninkasi, zustand.kessel)?.kessel.portionen ?? zustand.portionen;
@@ -73,7 +75,9 @@ export function braubefehl(spiel, zustand) {
   const zutaten = zutatenIm(spiel, gesteuerteEntitaet(spiel.zustand))
     .filter((zutat) => (zustand.mengen[zutat.id] ?? 0) > 0)
     .map((zutat) => ({ gegenstandId: zutat.id, menge: zustand.mengen[zutat.id] }));
-  return { art: "brauen", kessel: zustand.kessel, portionen: zustand.portionen, zutaten, verfahren: { maische: zustand.maische, gewuerz: zustand.gewuerz }, kultur: zustand.kultur, absicht: zustand.absicht ?? POLE[0] };
+  const verfahren = { maische: zustand.maische, gewuerz: zustand.gewuerz };
+  if (zustand.abfuellen === "trocken") return { art: "brauen", kessel: zustand.kessel, portionen: zustand.portionen, zutaten, verfahren, kultur: null, abfuellen: "trocken" };
+  return { art: "brauen", kessel: zustand.kessel, portionen: zustand.portionen, zutaten, verfahren, kultur: zustand.kultur, absicht: zustand.absicht ?? POLE[0] };
 }
 
 // Nächster Eintrag einer Liste nach dem jetzigen, am Ende wieder der erste
@@ -98,6 +102,7 @@ export function brauTaste(zustand, taste, spiel) {
     return { zustand: { ...zustand, kultur: naechster(kulturen, zustand.kultur) } };
   }
   if (taste.code === "Digit4") return { zustand: { ...zustand, absicht: naechster(POLE, zustand.absicht ?? POLE[0]) } };
+  if (taste.code === "Digit5") return { zustand: { ...zustand, abfuellen: naechster(ABFUELLEN, zustand.abfuellen ?? ABFUELLEN[0]) } };
   const buchstabe = buchstabeDerTaste(taste.code, taste.zeichen);
   if (!buchstabe) return { zustand };
   if (zustand.liste === "rezepte") {

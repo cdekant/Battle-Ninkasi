@@ -1408,6 +1408,7 @@ function pruefeBrauen(daten, sprache, fehler) {
     if (name.includes(FORMTRENNER)) fehler.push(`${ort}: "${FORMTRENNER}" trennt im Schlüssel einer Form die Merkmale`);
     if (!istProzent(kultur.vergaerung) || !istZahlAbNull(kultur.vertraegt)) fehler.push(`${ort}: vergaerung (0 bis 100) und vertraegt (>= 0) müssen ganze Zahlen sein`);
     if (kultur.verderben !== undefined && !istGanzzahl(kultur.verderben)) fehler.push(`${ort}: verderben muss eine ganze Zahl sein`);
+    if (kultur.schnellsud !== undefined && !istZahlAbNull(kultur.schnellsud)) fehler.push(`${ort}: schnellsud muss eine ganze Zahl >= 0 sein`);
     if (name === "spontan") fehler.push(`${ort}: der Name "spontan" steht für die wilde Flora der Ebene`);
     if (kultur.verderber !== undefined && (!daten.wesen?.[kultur.verderber] || daten.wesen[kultur.verderber].abstrakt)) fehler.push(`${ort}: Verderber "${kultur.verderber}" gibt es nicht`);
     pruefeAromen(kultur.aromen, aromaachsen, ort, fehler, false);
@@ -1439,6 +1440,7 @@ function pruefeBrauen(daten, sprache, fehler) {
   }
   for (const [name, rezept] of Object.entries(daten.rezepte ?? {})) pruefeRezept(daten, regeln, sprache, name, rezept, fehler);
   for (const [name, gelaende] of Object.entries(daten.gelaende)) {
+    if (gelaende.hitze !== undefined && gelaende.hitze !== true) fehler.push(`gelaende.${name}: hitze muss true sein`);
     const kessel = gelaende.kessel;
     if (kessel === undefined) continue;
     const gueltig = istObjekt(kessel) && istGanzzahl(kessel.portionen) && kessel.portionen > 0
@@ -1458,12 +1460,32 @@ function pruefeBrauen(daten, sprache, fehler) {
     }
   }
   if (regeln.rest !== undefined && regeln.rest !== null && !daten.gegenstaende[regeln.rest]) fehler.push(`regeln.brauen.rest: Gegenstand "${regeln.rest}" gibt es nicht`);
+  pruefeTrockenbier(daten, regeln.trockenbier, sprache, fehler);
   for (const [name, wesen] of Object.entries(daten.wesen)) {
     if (wesen.kultur !== undefined && !daten.kulturen?.[wesen.kultur]) fehler.push(`wesen.${name}: Kultur "${wesen.kultur}" gibt es nicht`);
     if (wesen.kulturen === undefined) continue;
     if (!istTextliste(wesen.kulturen)) fehler.push(`wesen.${name}: kulturen muss eine Liste von Kulturen sein`);
     else for (const kultur of wesen.kulturen) if (!daten.kulturen?.[kultur]) fehler.push(`wesen.${name}.kulturen: Kultur "${kultur}" gibt es nicht`);
   }
+}
+
+// Trockenbier (src/systeme/trockenbier.js, siehe docs/Sude.md, Trockenbier): Gegenstand, Haltbarkeit, Adjektiv und
+// die Zeiten des Anrührens
+function pruefeTrockenbier(daten, regeln, sprache, fehler) {
+  const ort = "regeln.brauen.trockenbier";
+  if (!istObjekt(regeln)) return fehler.push(`${ort} fehlt`);
+  const gegenstand = daten.gegenstaende[regeln.gegenstand];
+  if (!gegenstand?.stapelbar || gegenstand.trinkbar || gegenstand.verdirbt) fehler.push(`${ort}.gegenstand: "${regeln.gegenstand}" muss ein stapelbarer Gegenstand sein, nicht trinkbar und ohne verdirbt`);
+  if (!istGanzzahl(regeln.haltbarkeit) || regeln.haltbarkeit < 1) fehler.push(`${ort}.haltbarkeit muss eine ganze Zahl >= 1 sein`);
+  pruefeText(sprache.texte, regeln.muffig, `${ort}.muffig`, fehler);
+  const anruehren = regeln.anruehren;
+  if (!istObjekt(anruehren) || !istZahlAbNull(anruehren.imKampfAb) || !istProzent(anruehren.hitzeProzent) || !istObjekt(anruehren.imKampf)) {
+    return fehler.push(`${ort}.anruehren muss { imKampfAb >= 0, imKampf: { <schnellsud>: prozent }, hitzeProzent (0 bis 100) } sein`);
+  }
+  for (const [stufe, prozent] of Object.entries(anruehren.imKampf)) {
+    if (!istGanzzahl(Number(stufe)) || Number(stufe) < anruehren.imKampfAb || !istGanzzahl(prozent) || prozent < 1) fehler.push(`${ort}.anruehren.imKampf.${stufe}: Schnellsud ab imKampfAb, Prozent >= 1`);
+  }
+  if (!anruehren.imKampf[anruehren.imKampfAb]) fehler.push(`${ort}.anruehren.imKampf braucht einen Eintrag für imKampfAb`);
 }
 
 // Absud (src/systeme/absud.js, siehe docs/Sude.md, Absud): Regeln, Richtungen mit Polen und Stufen, Getränke je Pol

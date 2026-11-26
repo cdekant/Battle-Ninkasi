@@ -174,9 +174,10 @@ test("Datenprüfung: Abfolge, Starttiefe, feste Karte, Population und Tabellen",
 // sie blieben die Werte gleich); neu mit 0.75.0 für die wilde Flora jeder Ebene (ohne den Ebenenschritt flora blieben die
 // Werte gleich); neu mit 0.76.0 für den Absud (Malzsorten, Kräuter und zwei Absude im Keller, Etiketten der Absude; ohne
 // diese blieben die Werte gleich); neu mit 0.77.0 für die wilde Hefe im Keller und den Start ohne Kultur (ohne die
-// Hefe in der Population und mit kulturen: ["wilde_hefe"] als letztem Feld an Ninkasi blieben die Werte gleich).
+// Hefe in der Population und mit kulturen: ["wilde_hefe"] als letztem Feld an Ninkasi blieben die Werte gleich); neu mit
+// 0.80.0 für den Kveikring im Keller (ohne ihn blieben die Werte gleich).
 test("Erzeugung in Schritten: dieselben Ebenen wie vorher", () => {
-  const erwartet = { 1: "7c562fe8c77895ed", 2: "45b6ee23948e5088", 3: "44090b337a20d122", 42: "d36246c82cae181e", 4711: "9142e807dff3ed4f" };
+  const erwartet = { 1: "2583fa7f38dc49d5", 2: "0fe2dfbbed426929", 3: "9a3742634415c67f", 42: "c31cf6cc4f885167", 4711: "87b4f890b4f976f7" };
   for (const [startwert, fingerabdruck] of Object.entries(erwartet)) {
     const spiel = neuesSpiel(DATEN, Number(startwert));
     for (const tiefe of [2, 3, 0]) ebeneWechseln(spiel, tiefe);

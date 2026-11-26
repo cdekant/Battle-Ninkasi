@@ -16,7 +16,7 @@ const keller = {
     { typ: "roestmalz", anzahl: 1, stapel: 2 }, { typ: "gerste", anzahl: 1, stapel: 3 },
     { typ: "senfsaat", anzahl: 2, stapel: 2 }, { typ: "bilsenkraut", anzahl: 1, stapel: 2 }, { typ: "kamille", anzahl: 1, stapel: 2 },
     { typ: "feuerelixier", anzahl: 1 }, { typ: "sichtgift", anzahl: 1 },
-    { typ: "hefekrug", anzahl: 1 }, { typ: "sauerkrug", anzahl: 1 }, { typ: "tontafel_dunkles_bier", anzahl: 1 },
+    { typ: "hefekrug", anzahl: 1 }, { typ: "sauerkrug", anzahl: 1 }, { typ: "kveikring", anzahl: 1 }, { typ: "tontafel_dunkles_bier", anzahl: 1 },
   ],
   fallen: [{ typ: "saeureduese", anzahl: 6 }, { typ: "klappergeschirr", anzahl: 6 }],
   tuerChance: 50, // Prozent der Raumzugänge mit Tür

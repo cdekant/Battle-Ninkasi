@@ -211,7 +211,7 @@ test("Braufenster: öffnet nur am Kessel, Portionen nach Flaschen und Kessel, Bu
   tragen(spiel, ninkasi, "kraut", 1);
   tragen(spiel, ninkasi, "flasche", 1);
   let { zustand } = braufensterOeffnen(spiel);
-  assert.deepEqual(zustand, { kessel: { x: 3, y: 1 }, portionen: 1, mengen: {}, maische: "warm", gewuerz: "frueh", kultur: "hefe", absicht: "elixier", liste: "zutaten" }, "so viele Portionen wie Flaschen");
+  assert.deepEqual(zustand, { kessel: { x: 3, y: 1 }, portionen: 1, mengen: {}, maische: "warm", gewuerz: "frueh", kultur: "hefe", absicht: "elixier", abfuellen: "gefaesse", liste: "zutaten" }, "so viele Portionen wie Flaschen");
   const taste = (code, zusatz = {}) => (zustand = brauTaste(zustand, { code, ...zusatz }, spiel).zustand);
   for (let i = 0; i < 5; i++) taste("NumpadAdd");
   assert.equal(zustand.portionen, 4, "höchstens die Portionen des Kessels");

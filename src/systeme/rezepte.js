@@ -70,6 +70,13 @@ export function rezeptFinden(spiel, eingabe) {
   return null;
 }
 
+// Schlüssel des gefundenen Rezepts, nach dem ein Trockenbier abgefüllt wird (alles wie im Rezept bis auf die Kultur,
+// die erst beim Anrühren dazukommt, systeme/trockenbier.js), oder null; Hausrezepte zählen nicht
+export function rezeptFuerTrockenbier(spiel, eingabe) {
+  const treffer = Object.entries(spiel.zustand.rezepte ?? {}).find(([, rezept]) => rezept.art === "gefunden" && nachRezept(rezept, { ...eingabe, kultur: rezept.kultur }));
+  return treffer ? treffer[0] : null;
+}
+
 // Punkt und Güte eines Rezepts: die gerundete Mitte und ihre Güte im Zielgebiet (0, wenn sie nicht darin liegt)
 function punktUndGuete(spiel, rezept, vertraegt) {
   const mitte = profilBerechnen(spiel.daten, { ...rezept, vertraegt });

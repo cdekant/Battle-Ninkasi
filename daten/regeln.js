@@ -283,6 +283,17 @@ export default {
     wirkungOhneAroma: "lp", // wohin das Budget eines Suds ohne Aroma geht
     pegelProzent: 100, // Pegel in Promille-Hundertsteln je Zehntel Vol.-% Alkohol, wie das Bier des Probeinhalts
     gewichtJePortion: 500, // Gramm Inhalt je Portion, dazu das Gewicht des Gefäßes
+    // Trockenbier (src/systeme/trockenbier.js): die Würze eines Suds ohne Gärung, je Portion ein Stück dieses
+    // Gegenstands; nach haltbarkeit Zeiteinheiten wird es muffig (Adjektiv muffig) und gibt angerührt einen verdorbenen
+    // Sud. Anrühren: außerhalb des Kampfes aktionen.anruehren, im Kampf erst ab dem Schnellsud imKampfAb, dann so viele
+    // Prozent davon je Schnellsud (der höchste Eintrag bis zum eigenen gilt); Hitze daneben senkt die Zeit auf
+    // hitzeProzent
+    trockenbier: {
+      gegenstand: "trockenbier",
+      haltbarkeit: 120000,
+      muffig: "adjektiv.muffig",
+      anruehren: { imKampfAb: 2, imKampf: { 2: 200, 3: 100 }, hitzeProzent: 75 },
+    },
     // Absud: ein Sud ohne Kultur (src/systeme/absud.js); Richtungen und ihre Getränke bringt der Inhalt mit
     absud: {
       maechtigkeitProzent: 100, // Mächtigkeit = Extrakt je Portion (Zehntel °Plato) mal so viele Prozent

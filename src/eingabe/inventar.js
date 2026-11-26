@@ -4,10 +4,12 @@
 //   offen, nichts gewählt: a bis z wählt den Gegenstand an dieser Stelle des Gepäcks, Esc oder i schließt;
 //                       mit absicht lässt der Buchstabe den Gegenstand gleich fallen bzw. wirft ihn
 //   offen, gewählt:     t trinken, l lesen, a anlegen oder ablegen (je nachdem), f fallen lassen (der ganze Stapel),
+//                       r anrühren (Trockenbier: öffnet die Wahl der Kultur darüber, eingabe/anruehren.js),
 //                       w werfen (schließt und gibt die Auswahl für den Zielmodus zurück, eingabe/zielmodus.js),
 //                       eine Ziffer legt die Art auf diesen Platz der aktiven Leiste, Entf nimmt sie von allen Leisten
 //                       (ergebnis.leiste, eingabe/schnellleiste.js), Enter die Standardhandlung (trinken, wenn trinkbar,
-//                       lesen, wenn lesbar, sonst anlegen oder ablegen, wenn ausrüstbar), Esc zurück zur Auswahl;
+//                       lesen, wenn lesbar, anrühren, wenn Trockenbier, sonst anlegen oder ablegen, wenn ausrüstbar),
+//                       Esc zurück zur Auswahl;
 //                       lesen, anlegen und ablegen lassen das Fenster offen und den Gegenstand gewählt, trinken und
 //                       fallen lassen schließen es; liegt der gewählte Gegenstand nicht mehr im Gepäck (die letzte
 //                       Rolle ist gelesen), gilt nichts als gewählt
@@ -19,6 +21,7 @@ import { gesteuerteEntitaet, entitaetMitId } from "../kern/zustand.js";
 import { istAngelegt } from "../systeme/ausruestung.js";
 import { fensterartAnmelden } from "./fenster.js";
 import { platzDerTaste } from "./aktionskatalog.js";
+import { anruehrenOeffnen } from "./anruehren.js";
 
 export const ABSICHTEN = ["fallenlassen", "werfen"];
 
@@ -78,6 +81,7 @@ export function inventarTaste(fensterVorher, tastencode, spiel, zeichen, belegun
   if (buchstabe === "l") return { fenster, befehl: { art: "lesen", gegenstandId: fenster.gewaehlt } };
   if (buchstabe === "w") return { fenster: null, auswahl: { zweck: "werfen", gegenstandId: fenster.gewaehlt } };
   if (buchstabe === "f") return { fenster: null, befehl: { art: "fallenlassen", gegenstandId: fenster.gewaehlt } };
+  if (buchstabe === "r") return { fenster, oeffnen: anruehrenOeffnen(fenster.gewaehlt) };
   if (buchstabe === "a") {
     const art = istAngelegt(gesteuerte, fenster.gewaehlt) ? "ablegen" : "anlegen";
     return { fenster, befehl: { art, gegenstandId: fenster.gewaehlt } };
@@ -91,6 +95,7 @@ function standardhandlung(fenster, spiel) {
   if (!gegenstand) return { fenster };
   if (gegenstand.trinkbar) return { fenster: null, befehl: { art: "trinken", gegenstandId: gegenstand.id } };
   if (gegenstand.lesbar) return { fenster, befehl: { art: "lesen", gegenstandId: gegenstand.id } };
+  if (gegenstand.trockenbier) return { fenster, oeffnen: anruehrenOeffnen(gegenstand.id) };
   if (gegenstand.ausruestung) {
     const art = istAngelegt(gesteuerteEntitaet(spiel.zustand), gegenstand.id) ? "ablegen" : "anlegen";
     return { fenster, befehl: { art, gegenstandId: gegenstand.id } };
@@ -112,11 +117,11 @@ export function inventarKlick(fensterVorher, ziel, spiel, belegung) {
 // Als Fensterart im Fensterstapel (eingabe/fenster.js); Zustand { gewaehlt }
 fensterartAnmelden("inventar", {
   taste(zustand, taste, { spiel, belegung }) {
-    const { fenster, befehl, auswahl, leiste } = inventarTaste(zustand, taste.code, spiel, taste.zeichen, belegung);
-    return { zustand: fenster, ...(befehl && { befehl }), ...(auswahl && { auswahl }), ...(leiste && { leiste }) };
+    const { fenster, befehl, auswahl, leiste, oeffnen } = inventarTaste(zustand, taste.code, spiel, taste.zeichen, belegung);
+    return { zustand: fenster, ...(befehl && { befehl }), ...(auswahl && { auswahl }), ...(leiste && { leiste }), ...(oeffnen && { oeffnen }) };
   },
   klick(zustand, ziel, { spiel, belegung }) {
-    const { fenster, befehl, auswahl, leiste } = inventarKlick(zustand, ziel, spiel, belegung);
-    return { zustand: fenster, ...(befehl && { befehl }), ...(auswahl && { auswahl }), ...(leiste && { leiste }) };
+    const { fenster, befehl, auswahl, leiste, oeffnen } = inventarKlick(zustand, ziel, spiel, belegung);
+    return { zustand: fenster, ...(befehl && { befehl }), ...(auswahl && { auswahl }), ...(leiste && { leiste }), ...(oeffnen && { oeffnen }) };
   },
 });

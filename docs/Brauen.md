@@ -24,7 +24,7 @@ Das Brausystem ist der Kern des Spiels: Es bestimmt Zutaten, Gegenstände, Beute
 + Durchschaubar: die Vorschau zeigt, wohin ein Sud geht, nicht wie gerechnet wird
 + Geschichte und Brauwirklichkeit sind Vorbild, nicht Vorschrift: das Spiel ist trashig, und längst nicht jedes alte Rezept und jede alte Praktik ist überliefert; Zutaten und Verfahren dürfen frei erfunden oder versetzt werden, wenn es dem Spiel dient
 
-Umsetzung: teilweise, siehe [Sude.md](Sude.md), Befehl; offen: Trockenbier, Sud im Kampf, Flüssigkeiten, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Befehl und Trockenbier; offen: Sud im Kampf, Flüssigkeiten, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Ablauf
 
@@ -141,12 +141,14 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 8
 Vorbild ist das sumerische Trockenbier (dida): ein krümeliger Extrakt aus dem Treber einer ersten Gärung, der gelagert und auf Reisen mitgenommen wurde und sich jederzeit zu frischem Bier anrühren ließ (nach `sallaberger2012bierbrauen`).
 
 + Ein Sud lässt sich statt in Gefäße als Trockenbier abfüllen: leicht, ohne Gefäß, verdirbt langsam, aber noch nicht trinkbar
-+ Anrühren macht daraus ein Getränk mit dem Profil seines Suds: Wasser, ein leeres Gefäß und eine Kultur, kein Kessel
++ Anrühren macht daraus ein Getränk mit dem Profil seines Suds: ein leeres Gefäß und eine Kultur, kein Kessel; Wasser zählt nicht als Zutat, so wenig wie am Kessel
++ Erst beim Anrühren gärt das Trockenbier, mit der gewählten Kultur; Zielgebiet und Verderben entscheiden sich dann, die Mischung der Zutaten stand schon am Kessel fest
++ Mit der Zeit wird Trockenbier muffig und gibt dann nur noch einen umgeschlagenen Sud
 + Außerhalb des Kampfes kostet das Anrühren eine gewöhnliche Aktion, im Kampf erst mit dem Schnellsud (siehe [Skills.md](Skills.md), Brauen); das Rätsel des Suds bleibt so außerhalb des Kampfes, im Kampf fällt nur die Wahl, welches Trockenbier mit welcher Kultur
 + Kveik gärt heiß und schnell: mit Kveik zählt der Schnellsud einen Tier höher; Hitze in der Nähe (Feuer, Glut, Fackel) beschleunigt das Anrühren
 + Idee, noch nicht bestätigt: ein frisch angerührtes Trockenbier geworfen schäumt auf dem Feld, verlangsamt, berauscht oder lockt Mikroorganismen an
 
-Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Trockenbier; offen: die Tiers des Schnellsuds als Skill (Punkt 20), der Feldsud, das geworfene Trockenbier, Arbeit in [Systemausbau.md](Systemausbau.md)
 
 ## Gelingen und Verderben
 

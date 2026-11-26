@@ -47,10 +47,12 @@ import { meldungWahrnehmbar, geraeuschGehoert } from "../src/systeme/wahrnehmbar
 import { charakterfensterOeffnen, charakterTaste } from "../src/eingabe/charakter.js";
 import { erstellungOeffnen, erstellungTaste } from "../src/eingabe/erstellung.js";
 import { fensterOeffnen, fensterTaste, fensterKlick } from "../src/eingabe/fenster.js";
-import "../src/eingabe/inventar.js";
+import { inventarTaste } from "../src/eingabe/inventar.js";
 import "../src/eingabe/faehigkeiten.js";
 import { braufensterOeffnen, brauTaste } from "../src/eingabe/brauen.js";
 import { kesselBei } from "../src/systeme/brauen.js";
+import { trockenbierIm } from "../src/systeme/trockenbier.js";
+import { anruehrenTaste, kulturenZumAnruehren } from "../src/eingabe/anruehren.js";
 import "../src/eingabe/hilfe.js";
 import { fensterHtml } from "../src/anzeige/fenster.js";
 import "../src/anzeige/charakterfenster.js";
@@ -111,7 +113,9 @@ function fensterKlicksPruefen(spiel) {
   const umgebung = botUmgebung(spiel);
   const fenster = [["inventar", { gewaehlt: gesteuerteEntitaet(spiel.zustand).inventar?.[0] ?? null }], ["faehigkeiten", { gewaehlt: null }], ["charakter", charakterfensterOeffnen()], ["menue", menueOeffnen()], ["einstellungen", einstellungsfensterOeffnen()], ["laeufe", laeufeOeffnen("fortsetzen")], ["ende", endeOeffnen()]];
   const brauen = braufensterOeffnen(spiel);
-  if (brauen.zustand) fenster.push(["brauen", brauen.zustand]);
+  if (brauen.zustand) fenster.push(["brauen", brauen.zustand], ["brauen", { ...brauen.zustand, abfuellen: "trocken" }]);
+  const trockenbier = trockenbierIm(spiel, gesteuerteEntitaet(spiel.zustand))[0];
+  if (trockenbier) fenster.push(["anruehren", { gegenstandId: trockenbier.id }]);
   for (const [art, zustand] of fenster) {
     const stapel = fensterOeffnen([], art, zustand);
     let html = "";
@@ -290,6 +294,9 @@ function zufallsbefehl(botZufall, spiel) {
   if (wurf === 24) return { art: "nachladen" };
   // Brauen (src/systeme/brauen.js) über das Fenster: neben einem Kessel oft, sonst selten, dann ohne Kessel abgelehnt
   if (wurf === 25 || (wurf > 25 && wurf <= 40 && kesselBei(spiel, gesteuerte))) return brauenUeberFenster(botZufall, spiel);
+  // Trockenbier anrühren (src/systeme/trockenbier.js) über das Fenster, auch im Kampf, so werden die Ablehnungen mitgeprüft
+  const trockenbier = trockenbierIm(spiel, gesteuerte)[0];
+  if (wurf >= 41 && wurf <= 45 && trockenbier) return anruehrenUeberFenster(botZufall, spiel, trockenbier);
   if (wurf === 22 && gesteuerte.freieEp > 0) {
     const befehl = lernenUeberSkillfenster(botZufall, spiel);
     if (befehl) return befehl;
@@ -313,12 +320,26 @@ function brauenUeberFenster(botZufall, spiel) {
   let zustand = offen.zustand;
   const tasten = zufallsGanzzahl(botZufall, 1, 10);
   for (let i = 0; i < tasten; i++) {
-    const wahl = zufallsGanzzahl(botZufall, 0, 9);
+    // Buchstaben für Zutaten, Ziffern 1 bis 5 für Maische, Gewürz, Kultur, Absicht und Abfüllen (5: Trockenbier)
+    const wahl = zufallsGanzzahl(botZufall, 0, 11);
     const taste = wahl < 7 ? { code: `Key${"ABCDEFG"[wahl]}`, zeichen: "abcdefg"[wahl] } : { code: `Digit${wahl - 6}` };
     zustand = brauTaste(zustand, taste, spiel).zustand;
   }
   fensterZeichnen(spiel, "brauen", zustand);
   return brauTaste(zustand, { code: "Enter" }, spiel).befehl;
+}
+
+// Anrühren wie im Browser (eingabe/anruehren.js): r im Inventar, dann ein Buchstabe für die Kultur; ohne Kultur ein
+// Befehl mit "spontan", der dort ohne Flora abgelehnt wird
+let anzahlAnruehrbefehle = 0, anzahlTrockenbier = 0, anzahlAngeruehrt = 0;
+function anruehrenUeberFenster(botZufall, spiel, trockenbier) {
+  anzahlAnruehrbefehle++;
+  const { oeffnen } = inventarTaste({ gewaehlt: trockenbier.id }, "KeyR", spiel, "r");
+  fensterZeichnen(spiel, "anruehren", oeffnen.zustand);
+  const anzahl = kulturenZumAnruehren(spiel).length;
+  if (!anzahl) return { art: "anruehren", gegenstandId: trockenbier.id, kultur: "spontan" };
+  const buchstabe = "abcdefghijklmnopqrstuvwxyz"[zufallsGanzzahl(botZufall, 0, anzahl - 1)];
+  return anruehrenTaste(oeffnen.zustand, { code: `Key${buchstabe.toUpperCase()}`, zeichen: buchstabe }, spiel).befehl;
 }
 
 // Testkammer: meist etwas erzeugen (Wesen oder Gegenstand), sonst in eine zufällige Tiefe wechseln, auch eine, die es
@@ -535,6 +556,8 @@ for (let startwert = ersterStartwert; startwert < ersterStartwert + anzahlLaeufe
       if (meldung.art === "geworfen" && vonNinkasi) anzahlWuerfe++;
       if (meldung.art.startsWith("gebraut") && vonNinkasi) anzahlSude++;
       if (meldung.art === "gebraut_getroffen" && vonNinkasi) anzahlSudeGetroffen++;
+      if (meldung.art === "abgefuellt_trocken" && vonNinkasi) anzahlTrockenbier++;
+      if (meldung.art.startsWith("angeruehrt") && vonNinkasi) anzahlAngeruehrt++;
       if (meldung.art === "angelegt") anzahlAngelegt++;
       if (meldung.art === "allmacht_bewahrt") anzahlBewahrt++;
       if (meldung.art === "jaegerin_naht") anzahlJaegerinnen++;
@@ -639,6 +662,7 @@ console.log(`\nAbläufe nach Haltegrund: ${haltegruende}`);
 console.log(`Fähigkeiten der Gegner: ${gegnerfaehigkeiten.gewirkt} gewirkt, ${gegnerfaehigkeiten.begonnen} lange Aktionen begonnen, ${gegnerfaehigkeiten.abgebrochen} abgebrochen, ${gegnerfaehigkeiten.getrunken} Mal getrunken, ${gegnerfaehigkeiten.geworfen} Mal geworfen; ${anzahlAngelegt} Mal angelegt, ${anzahlWuerfe} Würfe Ninkasis, ${ninkasisFaehigkeiten} Fähigkeiten Ninkasis`);
 console.log(`Meldungen für Ninkasi: ${meldungenFuerNinkasi.gezeigt} gezeigt, ${meldungenFuerNinkasi.verborgen} verborgen, ${meldungenFuerNinkasi.gehoert} gehört`);
 console.log(`Brauen: ${anzahlBraubefehle} Braubefehle, ${anzahlSude} Sude, davon ${anzahlSudeGetroffen} im Zielgebiet`);
+console.log(`Trockenbier: ${anzahlTrockenbier} Mal abgefüllt, ${anzahlAnruehrbefehle} Anrührbefehle, ${anzahlAngeruehrt} angerührt`);
 console.log(`Lernen: ${anzahlLernbefehle} Lernbefehle (${anzahlUeberFenster} über das Skillfenster), ${anzahlGelernt} angenommen, ${anzahlSkillstufen} Skillstufen erreicht`);
 if (laeufeGezaehlt && !laeufeMitSichtung) {
   console.log("Chronik hat in keinem Lauf eine Wesenart gesehen");

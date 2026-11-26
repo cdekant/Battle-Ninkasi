@@ -37,7 +37,8 @@ import { gelaendeAuf } from "../welt/karte.js";
 import { imKampf } from "./kampfzustand.js";
 import { insInventar, anzahlVon } from "./inventar.js";
 import { zutatGebucht } from "./wissen.js";
-import { aufgedeckteZielgebiete, rezeptFinden, nachDemSud } from "./rezepte.js";
+import { aufgedeckteZielgebiete, rezeptFinden, rezeptFuerTrockenbier, nachDemSud } from "./rezepte.js";
+import { trockenbierAbfuellen } from "./trockenbier.js";
 import { stufenBeginnen, verderberWuerfeln } from "./reifen.js";
 import { POLE, gegenpol, absudregeln, absudVorbereiten, ausgangWuerfeln, getraenkFuer, krautKennenlernen } from "./absud.js";
 import { erkennen } from "./kennen.js";
@@ -83,6 +84,8 @@ export function sudVorbereiten(spiel, wesen, befehl) {
   const verfahren = { ...regeln.verfahren, ...befehl.verfahren };
   if (!regeln.maische[verfahren.maische] || !regeln.gewuerz[verfahren.gewuerz]) return { grund: "ungueltig" };
   const kultur = befehl.kultur ?? null;
+  const trocken = befehl.abfuellen === "trocken";
+  if ((befehl.abfuellen !== undefined && !ABFUELLEN.includes(befehl.abfuellen)) || (trocken && kultur !== null)) return { grund: "ungueltig" };
   const absicht = befehl.absicht ?? POLE[0];
   if (kultur === null && !POLE.includes(absicht)) return { grund: "ungueltig" };
   const flora = spiel.zustand.ebene?.flora ?? null;
@@ -106,6 +109,7 @@ export function sudVorbereiten(spiel, wesen, befehl) {
   if (portionen > kessel.kessel.portionen) return { grund: "zu_viele_portionen" };
   const fassen = portionen * regeln.stueckeJePortion;
   if (fuellung > fassen) return { grund: "kessel_voll" };
+  if (trocken) return trockenbierVorbereiten(spiel, wesen, { kessel, zutaten, verfahren, portionen, fuellung, fassen, gefaesse });
   if (kultur === null) {
     const eingabe = { zutaten, portionen, absicht };
     return { art: "absud", kessel, eingabe, ...absudVorbereiten(spiel, wesen, eingabe), fuellung, fassen, portionen, gefaesse, rezept: null };
@@ -114,14 +118,35 @@ export function sudVorbereiten(spiel, wesen, befehl) {
   const vertraegt = kulturdaten ? modifiziert(spiel, wesen, "brauen.vertraegt", kulturdaten.vertraegt) : undefined;
   const eingabe = { zutaten, verfahren, kultur, portionen, vertraegt, ...(kultur === SPONTAN && { flora }) };
   const { profil: mitte, gaerung } = sudRechnen(spiel.daten, eingabe);
-  // nach Rezept wird die Vorschau eng (regeln.brauen.rezeptUnschaerfe Prozent)
   const rezept = rezeptFinden(spiel, eingabe);
-  const spontan = kultur === SPONTAN ? regeln.spontan.unschaerfe : 100;
-  const grundUnschaerfe = Math.floor(((kessel.kessel.unschaerfe ?? 100) * (rezept ? regeln.rezeptUnschaerfe : 100) * spontan) / 10000);
-  const unschaerfe = unschaerfeBerechnen(spiel.daten, modifiziert(spiel, wesen, "brauen.unschaerfe", grundUnschaerfe));
-  const bereich = bereichBerechnen(spiel.daten, mitte, unschaerfe);
+  const { unschaerfe, bereich } = streuungAmKessel(spiel, wesen, kessel, mitte, Boolean(rezept), kultur === SPONTAN);
   const erreichbar = erreichbareZielgebiete(spiel.daten, bereich, aufgedeckteZielgebiete(spiel));
   return { kessel, eingabe, mitte, gaerung, unschaerfe, bereich, erreichbar, fuellung, fassen, portionen, gefaesse, rezept };
+}
+
+// Unschärfe und Bereich am Kessel: die Achsen mal Kessel, nach Rezept mal regeln.brauen.rezeptUnschaerfe Prozent,
+// spontan mal regeln.brauen.spontan.unschaerfe Prozent, mit Modifikatoren auf brauen.unschaerfe
+function streuungAmKessel(spiel, wesen, kessel, mitte, nachRezept, spontan) {
+  const regeln = brauregeln(spiel.daten);
+  const grundUnschaerfe = Math.floor(((kessel.kessel.unschaerfe ?? 100) * (nachRezept ? regeln.rezeptUnschaerfe : 100) * (spontan ? regeln.spontan.unschaerfe : 100)) / 10000);
+  const unschaerfe = unschaerfeBerechnen(spiel.daten, modifiziert(spiel, wesen, "brauen.unschaerfe", grundUnschaerfe));
+  return { unschaerfe, bereich: bereichBerechnen(spiel.daten, mitte, unschaerfe) };
+}
+
+// Wie abgefüllt wird: in Gefäße (Vorgabe) oder als Trockenbier (systeme/trockenbier.js)
+export const ABFUELLEN = ["gefaesse", "trocken"];
+
+// Vorschau eines Trockenbiers: die Würze ohne Gärung, ohne Alkohol; { art: "trockenbier", kessel, eingabe, mitte,
+// unschaerfe, bereich, fuellung, fassen, portionen, gefaesse, rezept }; rezept ist ein gefundenes Rezept, dem nur die
+// Kultur fehlt (systeme/rezepte.js rezeptFuerTrockenbier), es macht die Vorschau eng wie am Kessel
+function trockenbierVorbereiten(spiel, wesen, { kessel, zutaten, verfahren, portionen, fuellung, fassen, gefaesse }) {
+  const eingabe = { zutaten, verfahren, kultur: null, portionen };
+  const { profil: mitte } = sudRechnen(spiel.daten, eingabe);
+  const rezept = rezeptFuerTrockenbier(spiel, eingabe);
+  const { unschaerfe, bereich } = streuungAmKessel(spiel, wesen, kessel, mitte, Boolean(rezept), false);
+  // ohne Gärung kein Alkohol, auch nicht im Bereich
+  bereich.alkohol = [0, 0];
+  return { art: "trockenbier", kessel, eingabe, mitte, unschaerfe, bereich, fuellung, fassen, portionen, gefaesse, rezept };
 }
 
 // Chance in Prozent, dass ein Sud verdirbt: Regelwert plus Kessel plus Kultur (oder Flora), mit Modifikatoren auf
@@ -133,7 +158,7 @@ export function verderbenChance(spiel, wesen, vorbereitet) {
 }
 
 // Nimmt menge Stück von einem Stapel im Gepäck, ohne neue Entitäten
-function mengeVerbrauchen(spiel, wesen, gegenstand, menge) {
+export function mengeVerbrauchen(spiel, wesen, gegenstand, menge) {
   if (anzahlVon(gegenstand) > menge) {
     gegenstand.anzahl = anzahlVon(gegenstand) - menge;
     return;
@@ -159,24 +184,32 @@ export function sauerChance(spiel, wesen, vorbereitet) {
 
 // Ergebnis eines Suds: { typ, sud, text?, verdorben } für die Portionen
 function ergebnisBestimmen(spiel, wesen, vorbereitet) {
-  const daten = spiel.daten, regeln = brauregeln(daten);
   const punkt = punktWuerfeln(spiel, vorbereitet);
-  const wurf = wurfGanzzahl(spiel, "verderben", 1, 100), verderben = verderbenChance(spiel, wesen, vorbereitet);
-  if (wurf <= verderben) {
+  return ergebnisAusPunkt(spiel, punkt, { verderben: verderbenChance(spiel, wesen, vorbereitet), sauer: sauerChance(spiel, wesen, vorbereitet), rezept: vorbereitet.rezept });
+}
+
+// Ergebnis aus dem Punkt eines Suds, gemeinsam für Kessel und Anrühren (systeme/trockenbier.js): der Wurf "verderben"
+// (1 bis 100) bis zur Chance verderben verdirbt (oder mit verdorben: true ohne Wurf), bis dazu plus sauer hebt die
+// Säure, sonst gelingt er; rezept ist der Schlüssel eines Rezepts im Buch, dessen Kniff wirkt, wenn es ein gefundenes
+// ist und sein Zielgebiet trifft. Gibt { typ, sud, text?, verdorben }
+export function ergebnisAusPunkt(spiel, punkt, { verderben, sauer, rezept: rezeptSchluessel = null, verdorben = false }) {
+  const daten = spiel.daten, regeln = brauregeln(daten);
+  const wurf = verdorben ? 0 : wurfGanzzahl(spiel, "verderben", 1, 100);
+  if (verdorben || wurf <= verderben) {
     const { achse, plus, guete, getraenk } = regeln.verdorben;
     punkt[achse] = Math.min(regeln.achsen[achse].hoechstens, punkt[achse] + plus);
     return { typ: getraenk, sud: { profil: profilRunden(daten, punkt), zielgebiet: null, guete }, verdorben: true };
   }
   // ein schwacher Wurf schiebt den Sud Richtung Säure, vor der Suche nach dem Zielgebiet
-  if (wurf <= verderben + sauerChance(spiel, wesen, vorbereitet)) {
+  if (wurf <= verderben + sauer) {
     const achse = regeln.verdorben.achse;
     punkt[achse] = Math.min(regeln.achsen[achse].hoechstens, punkt[achse] + regeln.schwach.plus);
   }
   const treffer = zielgebietFinden(daten, punkt);
   const sud = { profil: profilRunden(daten, punkt), zielgebiet: treffer?.name ?? null, guete: treffer ? gueteRunden(daten, treffer.guete) : regeln.gueteFrei };
   // nach einem gefundenen Rezept, das sein Zielgebiet trifft: der Kniff wirkt (systeme/sud.js wirkungBerechnen)
-  const rezept = vorbereitet.rezept ? spiel.zustand.rezepte[vorbereitet.rezept] : null;
-  if (rezept?.art === "gefunden" && rezept.zielgebiet === treffer?.name) sud.rezept = vorbereitet.rezept;
+  const rezept = rezeptSchluessel ? spiel.zustand.rezepte?.[rezeptSchluessel] : null;
+  if (rezept?.art === "gefunden" && rezept.zielgebiet === treffer?.name) sud.rezept = rezeptSchluessel;
   return { typ: regeln.getraenk, sud, ...(treffer && { text: daten.zielgebiete[treffer.name].text }) };
 }
 
@@ -185,11 +218,17 @@ anmelden("befehle", "brauen", {
     if (imKampf(spiel, akteur)) return "im_kampf";
     const vorbereitet = sudVorbereiten(spiel, akteur, befehl);
     if (vorbereitet.grund) return vorbereitet.grund;
-    return vorbereitet.gefaesse >= vorbereitet.portionen ? null : "keine_gefaesse";
+    return vorbereitet.art === "trockenbier" || vorbereitet.gefaesse >= vorbereitet.portionen ? null : "keine_gefaesse";
   },
   ausfuehren(spiel, akteur, befehl) {
     const vorbereitet = sudVorbereiten(spiel, akteur, befehl);
     if (vorbereitet.art === "absud") return absudAbfuellen(spiel, akteur, befehl, vorbereitet);
+    if (vorbereitet.art === "trockenbier") {
+      const wuerze = punktWuerfeln(spiel, vorbereitet);
+      for (const { gegenstandId, menge } of befehl.zutaten) mengeVerbrauchen(spiel, akteur, entitaetMitId(spiel.zustand, gegenstandId), menge);
+      trockenbierAbfuellen(spiel, akteur, vorbereitet, wuerze);
+      return "brauen";
+    }
     const ergebnis = ergebnisBestimmen(spiel, akteur, vorbereitet);
     for (const { gegenstandId, menge } of befehl.zutaten) mengeVerbrauchen(spiel, akteur, entitaetMitId(spiel.zustand, gegenstandId), menge);
     const portion = portionenAbfuellen(spiel, akteur, vorbereitet.portionen, ergebnis.typ, (getraenk) => {
@@ -208,7 +247,7 @@ anmelden("befehle", "brauen", {
 // Füllt so viele Portionen eines Gegenstands typ ab, je Portion ein Gefäß in der Reihenfolge des Gepäcks; das Getränk
 // wiegt sein Gefäß und wird nach dem Trinken wieder dazu; einrichten(getraenk) setzt vor dem Einsortieren, was es trägt.
 // Gibt die letzte Portion im Gepäck (für die Meldung)
-function portionenAbfuellen(spiel, akteur, portionen, typ, einrichten) {
+export function portionenAbfuellen(spiel, akteur, portionen, typ, einrichten) {
   let portion = null;
   for (let i = 0; i < portionen; i++) {
     const gefaess = gefaesseIm(spiel, akteur)[0];

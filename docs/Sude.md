@@ -2,13 +2,13 @@
 
 Stand: 2026-11-26
 
-Zuständig für: `src/systeme/sud.js`, `src/systeme/brauen.js`, `src/systeme/kulturen.js`, `src/systeme/absud.js`, `src/systeme/rezepte.js`, `src/systeme/reifen.js`, `src/systeme/flora.js`, `daten/sude.js`
+Zuständig für: `src/systeme/sud.js`, `src/systeme/brauen.js`, `src/systeme/trockenbier.js`, `src/systeme/kulturen.js`, `src/systeme/absud.js`, `src/systeme/rezepte.js`, `src/systeme/reifen.js`, `src/systeme/flora.js`, `daten/sude.js`
 
 Mitprüfen bei Änderungen: [Brauen.md](Brauen.md), [Gegenstaende.md](Gegenstaende.md), [Bedienung.md](Bedienung.md), [Wesen.md](Wesen.md), [Architektur.md](Architektur.md), [Welt.md](Welt.md)
 
 ## Zweck
 
-Das Brausystem in der Logik: wie aus Zutaten, Verfahren und Kultur das Profil eines Suds wird, wann er ein Zielgebiet trifft, wie der Befehl am Kessel abläuft, was das Getränk beim Trinken wirkt, wie es im Gepäck reift und verdirbt, wie die wilde Flora spontan gärt, wie Ninkasi Kulturen und ihre Formen gewinnt, wie Nebel und Rezeptbuch das Wissen Ninkasis halten und wie ein Sud ohne Kultur zum Absud wird. Das Spieldesign steht in [Brauen.md](Brauen.md), das Fenster zum Brauen in [Bedienung.md](Bedienung.md), Fenster. Jeder Abschnitt nennt Daten, Schnittstellen und Regeln.
+Das Brausystem in der Logik: wie aus Zutaten, Verfahren und Kultur das Profil eines Suds wird, wann er ein Zielgebiet trifft, wie der Befehl am Kessel abläuft, wie ein Sud als Trockenbier abgefüllt und angerührt wird, was das Getränk beim Trinken wirkt, wie es im Gepäck reift und verdirbt, wie die wilde Flora spontan gärt, wie Ninkasi Kulturen und ihre Formen gewinnt, wie Nebel und Rezeptbuch das Wissen Ninkasis halten und wie ein Sud ohne Kultur zum Absud wird. Das Spieldesign steht in [Brauen.md](Brauen.md), das Fenster zum Brauen in [Bedienung.md](Bedienung.md), Fenster. Jeder Abschnitt nennt Daten, Schnittstellen und Regeln.
 
 ## Profil
 
@@ -18,7 +18,7 @@ Daten:
 + Zutat am Gegenstand: `zutat: { art: "grundstoff" | "gewuerz", extrakt?, farbe?, bitter?, aromen? }`; `extrakt`, `farbe` und `bitter` gelten für ein Stück auf eine Portion, `aromen` sind Anteile bis 100
 + Verfahren: `regeln.brauen.maische` (je Art `{ vergaerung, aromen? }`, Punkte der Vergärung und Zuschläge auf Aromen), `regeln.brauen.gewuerz` (je Gabe `{ bitter, aroma }` in Prozent der Beiträge eines Gewürzes), Vorgabe `regeln.brauen.verfahren`
 + Gärung: `regeln.brauen.alkoholJeStammwuerze` (Prozent der vergorenen Stammwürze, die Alkohol werden), `suesseJeRestzucker` (Punkte der Süße je Zehntel °Plato Restzucker, in Prozent)
-+ Kultur in `kulturen`: `{ text, vergaerung, vertraegt, aromen?, verderben? }`; `vergaerung` in Prozent, `vertraegt` ist der höchste Alkohol in Zehnteln Vol.-%, `aromen` kommen zum Profil dazu, `verderben` sind Punkte auf die Chance des Verderbens; die Kulturen eines Wesens stehen in `kulturen: [Schlüssel]` (Proben ohne Gewicht, Schlüssel einer Form, siehe Kulturen)
++ Kultur in `kulturen`: `{ text, vergaerung, vertraegt, aromen?, verderben?, schnellsud? }` (`schnellsud` siehe Trockenbier); `vergaerung` in Prozent, `vertraegt` ist der höchste Alkohol in Zehnteln Vol.-%, `aromen` kommen zum Profil dazu, `verderben` sind Punkte auf die Chance des Verderbens; die Kulturen eines Wesens stehen in `kulturen: [Schlüssel]` (Proben ohne Gewicht, Schlüssel einer Form, siehe Kulturen)
 + Probe einer Kultur am Gegenstand: `kultur: name`; wer ihn aufhebt, gewinnt die Kultur (siehe Befehl)
 + Die Kultur `spontan` (`SPONTAN` in `src/systeme/sud.js`) ist keine Kultur der Daten, sondern die wilde Flora der Ebene (siehe Spontane Gärung); `kulturdatenVon(daten, kultur, flora)` gibt die Daten der einen (einer Form, siehe Kulturen) oder der anderen; eine Kultur der Daten darf nicht so heißen
 
@@ -64,7 +64,7 @@ Daten:
 
 Schnittstellen (`src/systeme/brauen.js`):
 
-+ Befehl `brauen { kessel?: { x, y }, portionen?, zutaten: [{ gegenstandId, menge }], verfahren?: { maische, gewuerz }, kultur?, absicht? }`; ohne Kultur ein Absud (siehe Absud); ohne `kessel` der erste Kessel neben oder unter der Brauerin (eigenes Feld, dann die Nachbarn zeilenweise); ohne `portionen` so viele, wie Kessel und leere Gefäße erlauben, mindestens 1
++ Befehl `brauen { kessel?: { x, y }, portionen?, zutaten: [{ gegenstandId, menge }], verfahren?: { maische, gewuerz }, kultur?, absicht?, abfuellen? }`; ohne Kultur ein Absud (siehe Absud), mit `abfuellen: "trocken"` ein Trockenbier (siehe Trockenbier); ohne `kessel` der erste Kessel neben oder unter der Brauerin (eigenes Feld, dann die Nachbarn zeilenweise); ohne `portionen` so viele, wie Kessel und leere Gefäße erlauben, mindestens 1
 + Ablehnungen: `im_kampf`, `kein_kessel`, `keine_zutaten`, `keine_zutat`, `zu_viel` (mehr, als der Stapel hat), `kessel_voll` (mehr Stück als Portionen x `stueckeJePortion`), `zu_viele_portionen` (mehr, als der Kessel hergibt), `kultur_unbekannt`, `keine_flora` (spontan auf einer Ebene ohne Flora), `keine_gefaesse` (weniger leere Gefäße als Portionen), `ungueltig` (Menge oder Portionen unter 1, dieselbe Zutat zweimal, unbekanntes Verfahren)
 + Meldungen: `gebraut`, `gebraut_getroffen` (mit `zielgebiet`), `gebraut_verdorben`, je mit `wer`, `was` und `anzahl`; `verderber_entsteht` mit `was` und `kessel` (dazu `beschworen` ohne `wer`)
 + `sudVorbereiten(spiel, wesen, befehl)` prüft und rechnet die Vorschau (`{ grund }` oder `{ kessel, eingabe, mitte, gaerung, unschaerfe, bereich, erreichbar, fuellung, fassen, portionen, gefaesse }`), ohne Kampf und Gefäße zu prüfen; `fassen` ist die höchste Füllung für diese Portionen, `erreichbar` nennt nur aufgedeckte Zielgebiete, `rezept` den Schlüssel des Rezepts, nach dem gebraut wird, oder null; `verderbenChance`, `sauerChance`, `kesselBei`, `zutatenIm`, `gefaesseIm`
@@ -111,13 +111,37 @@ Regeln:
 + Nach der letzten Stufe wird er zu `essig`, mit derselben Anzahl
 + Stapeln, Abspalten und das Ruhen auf verlassenen Ebenen folgen dem Verderben der Gegenstände; Portionen stapeln nur in derselben Stufe
 
+## Trockenbier
+
+Daten:
+
++ `regeln.brauen.trockenbier: { gegenstand, haltbarkeit, muffig, anruehren: { imKampfAb, imKampf: { <schnellsud>: prozent }, hitzeProzent } }`; `gegenstand` ist stapelbar, nicht trinkbar und ohne `verdirbt` (Grundgerüst `trockenbier` in `daten/sude.js`), `muffig` ein Adjektiv; Zeitkosten `aktionen.anruehren`
++ Am Stück: `trockenbier: { wuerze, maische, kessel?, rezept?, muffig? }`; `wuerze` ist das gerundete Profil ohne Gärung (Alkohol 0), `maische` die Maische des Suds, `kessel` die Punkte des Kessels auf das Verderben, `rezept` ein gefundenes Rezept, dem nur die Kultur fehlt
++ Kultur mit `schnellsud` (ganze Zahl ab 0, Kveik 1); Kampfwert `schnellsud` (siehe [Wesen.md](Wesen.md), Kampfwerte); Gelände mit `hitze: true` (im Probeinhalt die Wandfackel)
+
+Schnittstellen (`src/systeme/trockenbier.js`):
+
++ Befehl `brauen` mit `abfuellen: "trocken"` und ohne Kultur (`ABFUELLEN` in `src/systeme/brauen.js`, Vorgabe `gefaesse`; mit Kultur `ungueltig`); `sudVorbereiten` gibt dann `{ art: "trockenbier", kessel, eingabe, mitte, unschaerfe, bereich, fuellung, fassen, portionen, gefaesse, rezept }`, `rezept` aus `rezeptFuerTrockenbier` (`src/systeme/rezepte.js`); Meldung `abgefuellt_trocken` mit `wer`, `was` und `anzahl`
++ Befehl `anruehren { gegenstandId, kultur }`; Ablehnungen `kein_trockenbier`, `kultur_unbekannt`, `keine_flora`, `keine_gefaesse`, `im_kampf_anruehren`, `ungueltig`; Meldungen `angeruehrt`, `angeruehrt_getroffen` (mit `zielgebiet`), `angeruehrt_verdorben`, je mit `wer` und `was`
++ `anruehrenVorbereiten(spiel, wesen, befehl)` (`{ grund }` oder `{ trockenbier, kultur, kulturdaten, flora, zeit }`), `anruehrenZeit`, `schnellsudVon(spiel, wesen, kulturdaten?)`, `hitzeNahe`, `verderbenBeimAnruehren`, `trockenbierIm`, `trockenbierAbfuellen`; Eintrag `trockenbier` im Register `verderben`
++ In `src/systeme/sud.js`: `wuerzeVergaeren(daten, wuerze, { maische, kultur, vertraegt, flora })` gibt `{ profil, gaerung }`; in `src/systeme/brauen.js`: `ergebnisAusPunkt(spiel, punkt, { verderben, sauer, rezept?, verdorben? })`, gemeinsam für Kessel und Anrühren
+
+Regeln:
+
++ Abfüllen: gebraut wird am Kessel wie ein Sud, nur außerhalb des Kampfes, mit derselben Unschärfe (nach Rezept eng); der Wurf `brauen` setzt den Punkt, Alkohol bleibt 0; Zutaten sind verbraucht, Gefäße nicht; je Portion ein Stück, gleiche stapeln; kein Wurf auf Verderben, kein Verderber, kein Hausrezept, keine EP
++ Haltbarkeit: nach `haltbarkeit` Zeiteinheiten wird ein Stück einmal muffig (`trockenbier.muffig`, Adjektiv `muffig`, Meldung `verdorben`) und verdirbt danach nicht weiter; Stapel und das Ruhen auf verlassenen Ebenen folgen dem Verderben der Gegenstände
++ Anrühren: verbraucht ein Stück und ein leeres Gefäß, ohne Kessel; die Kultur vergärt die Würze ohne Wurf (`gaerungBerechnen` mit der gespeicherten Maische, dazu die Aromen der Kultur und die Süße aus dem Restzucker), `vertraegt` mit Modifikatoren auf `brauen.vertraegt`; dann der Wurf `verderben` wie am Kessel mit der Chance `regeln.brauen.verderben` plus `kessel` plus Kultur (Modifikatoren auf `brauen.verderben`), ohne Verderber; muffiges Trockenbier gibt ohne Wurf einen verdorbenen Sud
++ Ein Treffer deckt sein Zielgebiet auf; der Kniff des Rezepts wirkt, wenn mit dessen Kultur angerührt wird und das Zielgebiet trifft; das Getränk reift und verdirbt wie jeder Sud (siehe Reifen und Verderben)
++ Zeit: außerhalb des Kampfes `aktionen.anruehren`; im Kampf erst, wenn der Schnellsud `imKampfAb` erreicht, dann `imKampf` des höchsten Eintrags bis zum Schnellsud Prozent davon (Probe: ab 2 doppelte Zeit, ab 3 die gewöhnliche); Hitze (ein brennendes Feld oder Gelände mit `hitze` auf dem eigenen Feld oder daneben) mal `hitzeProzent`
++ Schnellsud = Kampfwert `schnellsud` mit Modifikatoren (die Brauskills setzen ihn später, Punkt 20) plus `schnellsud` der Kultur
+
 ## Kulturen
 
 Daten:
 
 + Quelle: ein Wesen mit `kultur: name` (eine Kultur der Daten); seine Form folgt aus seinen Merkmalen
 + Merkmal: ein Zustand mit `kulturmerkmal: [{ art, ... }]` (siehe [Wirkungen.md](Wirkungen.md), Zustände), meist als Affix der Population (siehe [Welt.md](Welt.md), Ebenen); er verändert das Wesen mit seinen Modifikatoren wie jeder Zustand und die Kultur mit seinen Änderungen, sein Adjektiv steht vor ihrem Namen
-+ Änderungsarten im Register `kulturaenderungen` als `{ anwenden(kultur, aenderung), pruefen(aenderung, { aromaachsen }) }`: `plus` (`{ feld: "vergaerung" | "vertraegt" | "verderben", wert }`, `vergaerung` bleibt 0 bis 100, `vertraegt` ab 0) und `aroma` (`{ achse, wert }` auf eine Aromaachse, ab 0)
++ Änderungsarten im Register `kulturaenderungen` als `{ anwenden(kultur, aenderung), pruefen(aenderung, { aromaachsen }) }`: `plus` (`{ feld: "vergaerung" | "vertraegt" | "verderben" | "schnellsud", wert }`, `vergaerung` bleibt 0 bis 100, `vertraegt` und `schnellsud` ab 0) und `aroma` (`{ achse, wert }` auf eine Aromaachse, ab 0)
 + `regeln.brauen.rest`: der Gegenstand, den eine gestorbene Quelle hinterlässt, oder null (Grundgerüst); er bekommt beim Tod `kultur` mit ihrer Form
 + Sammlerin: ein Wesen mit `kulturen: [Schlüssel]`; Ninkasi beginnt mit `kulturen: []` (`daten/ninkasi.js`)
 + Texte der Kulturen sind Hauptwörter, damit die Adjektive der Merkmale davor stehen (siehe [Texte.md](Texte.md), Grammatik)
@@ -210,6 +234,7 @@ Regeln:
 + `tests/brauen.test.js` (Profil je Portion, Gärung und Restzucker, Zielgebiete, Güte, Runden, Wirkung sofort und über die Zeit, Befehl, Wurf und Verderben, Ablehnungen, Kulturen und Zutaten aufheben, Braufenster mit Portionen und Klickregel, Spinnennetz, Datenprüfung)
 + `tests/reifen.test.js` (Dauer der Stufen, Stufen bis zum Essig, Reife nur für starke Sude, Stapeln je Stufe, Wirkung je Stufe, die drei Ausgänge des Wurfs, Verderber neben dem Kessel, Flora je Ebene, spontane Gärung im Befehl und im Fenster, Datenprüfung)
 + `tests/absud.test.js` (Richtung, Mächtigkeit, Absicht und Misslingen, die drei Ausgänge, Trinken und Werfen, Stufen, Vermutung und Wissen über Kräuter samt Vorwissen, Braufenster mit Balken, Datenprüfung)
++ `tests/trockenbier.test.js` (Abfüllen mit Würze ohne Alkohol, Anrühren mit Kultur wie ein Sud, Ablehnungen, Muffigwerden, Kniff nur mit der Kultur des Rezepts, Zeit im Kampf mit Schnellsud, Kveik und Hitze, Fenster zum Anrühren und Taste im Braufenster, Datenprüfung)
 + `tests/kulturen.test.js` (Formen mit Merkmalen, Gewinnen neben dem Wesen in beide Richtungen, Rest nach dem Tod und sein Vergehen, Platztausch und Vorsatz angreifen, Datenprüfung, Start ohne Kultur)
 + `tests/rezepte.test.js` (Vorwissen und Nebel, Zählregel, Rezept lernen über die Tontafel, Erkennen nach dem Verhältnis, enge Vorschau, Kniff nur beim Treffer, EP beim ersten Gelingen, Hausrezepte, Rezeptliste im Braufenster, Datenprüfung)
 

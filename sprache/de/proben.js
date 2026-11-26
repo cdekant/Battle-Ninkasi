@@ -316,6 +316,16 @@ export default {
     einzahl: { nom: "Hefekrug", gen: "Hefekrugs", dat: "Hefekrug", akk: "Hefekrug" },
     mehrzahl: { nom: "Hefekrüge", gen: "Hefekrüge", dat: "Hefekrügen", akk: "Hefekrüge" },
   },
+  "gegenstand.kveikring": {
+    geschlecht: "m",
+    einzahl: { nom: "Kveikring", gen: "Kveikrings", dat: "Kveikring", akk: "Kveikring" },
+    mehrzahl: { nom: "Kveikringe", gen: "Kveikringe", dat: "Kveikringen", akk: "Kveikringe" },
+  },
+  "kultur.kveik": {
+    geschlecht: "m",
+    einzahl: { nom: "Kveik", gen: "Kveiks", dat: "Kveik", akk: "Kveik" },
+    mehrzahl: { nom: "Kveiks", gen: "Kveiks", dat: "Kveiks", akk: "Kveiks" },
+  },
   "gegenstand.sauerkrug": {
     geschlecht: "m",
     einzahl: { nom: "Sauerkrug", gen: "Sauerkrugs", dat: "Sauerkrug", akk: "Sauerkrug" },

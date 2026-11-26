@@ -10,7 +10,7 @@ export default {
   },
   gegenstaende: {
     fest: [],
-    vorlaeufig: ["sud", "sud_verdorben", "bruehe", "essig"],
+    vorlaeufig: ["sud", "sud_verdorben", "bruehe", "trockenbier", "essig"],
   },
   eigenschaften: {
     fest: ["koerperlichkeit", "trinkfestigkeit", "gewandtheit", "sinnlichkeit", "klugheit", "braukunde"],

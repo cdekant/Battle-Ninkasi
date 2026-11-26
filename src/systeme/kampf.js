@@ -15,7 +15,7 @@
 // Zugriff auf die Profile nur über angriffeVon: angelegte Waffen ersetzen die eigenen Profile (systeme/ausruestung.js).
 // Kampfwerte am Wesen: kampfwerte: { ausweichen?, willenskraft?, blocken?, ruestung?, kritchance?, heimlichkeit? } als Punkte
 //   (Vorgabe 0, heimlichkeit siehe systeme/wahrnehmung.js, entdecken siehe systeme/fallen.js, kennerschaft siehe systeme/kennen.js,
-//   kraeuterkunde siehe systeme/absud.js),
+//   kraeuterkunde siehe systeme/absud.js, schnellsud siehe systeme/trockenbier.js),
 //   abgefragt über Modifikatoren mit gleichnamigem Ziel; widerstaende: { saeure: 100, feuer: -50 }; immun: ["psi"]
 // Punkte werden über einen Halbwert zu Anteilen, die sich 100 % nur annähern: punkte / (punkte + halbwert).
 //   Trefferchance: genauigkeit / (genauigkeit + verteidigung + grundverteidigung)
@@ -39,7 +39,7 @@ import { istWehrlos } from "./zustaende.js";
 import { abstand } from "../welt/karte.js";
 import { waffenprofile } from "./ausruestung.js";
 
-export const KAMPFWERTE = ["ausweichen", "willenskraft", "blocken", "ruestung", "kritchance", "heimlichkeit", "entdecken", "kennerschaft", "kraeuterkunde"];
+export const KAMPFWERTE = ["ausweichen", "willenskraft", "blocken", "ruestung", "kritchance", "heimlichkeit", "entdecken", "kennerschaft", "kraeuterkunde", "schnellsud"];
 export const VERTEIDIGUNGEN = ["ausweichen", "willenskraft"];
 export const MARKER = ["verfehlt_nie", "unblockbar", "ignoriert_ruestung"];
 

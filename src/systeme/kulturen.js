@@ -5,8 +5,8 @@
 //   Modifikatoren wie jeder Zustand und die Kultur mit seinen Änderungen, sein Adjektiv steht vor ihrem Namen.
 // Änderungsarten im Register "kulturaenderungen": { anwenden(kultur, aenderung), pruefen(aenderung, { aromaachsen }) },
 //   pruefen (für die Datenprüfung) gibt einen Fehlertext oder null:
-//   plus:  { feld: "vergaerung" | "vertraegt" | "verderben", wert } zählt wert dazu (vergaerung bleibt 0 bis 100,
-//          vertraegt ab 0)
+//   plus:  { feld: "vergaerung" | "vertraegt" | "verderben" | "schnellsud", wert } zählt wert dazu (vergaerung bleibt
+//          0 bis 100, vertraegt und schnellsud ab 0)
 //   aroma: { achse, wert } zählt wert zum Aroma der Kultur dazu (ab 0)
 // Quelle: ein Wesen mit kultur: name (Daten); seine Form folgt aus den Merkmalen unter seinen Zuständen.
 // Gewinnen (Sammlerin ist ein Wesen mit kulturen: [Schlüssel], im Spiel Ninkasi):
@@ -25,7 +25,7 @@ import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { kulturGebucht } from "./wissen.js";
 import { formSchluessel, kulturBezug } from "./sud.js";
 
-const FELDER_PLUS = { vergaerung: [0, 100], vertraegt: [0, Infinity], verderben: [-Infinity, Infinity] };
+const FELDER_PLUS = { vergaerung: [0, 100], vertraegt: [0, Infinity], verderben: [-Infinity, Infinity], schnellsud: [0, Infinity] };
 const begrenzt = (wert, [unten, oben]) => Math.max(unten, Math.min(oben, wert));
 
 anmelden("kulturaenderungen", "plus", {

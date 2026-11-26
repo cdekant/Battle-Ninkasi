@@ -16,5 +16,6 @@ export default {
   ablegen: 100,
   fallenlassen: 100,
   brauen: 100, // ein Sud am Kessel (src/systeme/brauen.js)
+  anruehren: 100, // Trockenbier anrühren außerhalb des Kampfes (src/systeme/trockenbier.js)
   faehigkeit: 100, // Vorgabe, wenn eine Fähigkeit keine eigene zeit nennt
 };
