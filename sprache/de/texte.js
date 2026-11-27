@@ -222,6 +222,7 @@ export default {
   "gelaende.tuer_offen": "offene Tür",
   "gelaende.treppe_ab": "Treppe hinab",
   "gelaende.treppe_auf": "Treppe hinauf",
+  "gelaende.braukessel": "Braukessel",
   // Getränke aus dem Brauen (daten/sude.js)
   "gegenstand.sud": {
     geschlecht: "n", adjektive: ["adjektiv.selbstgebraut"],
@@ -329,7 +330,12 @@ export default {
   "ui.brauen.gewuerz": "Gewürz",
   "ui.brauen.kultur": "Kultur",
   "ui.brauen.ohne_kultur": "ohne (Absud)",
-  "ui.brauen.fuellung": "Kessel {menge}/{fassen}",
+  "ui.brauen.fuellung": "{kessel} {menge}/{fassen}",
+  "ui.kessel": "Kessel",
+  "ui.kessel_fasst": "Kessel: {portionen} Portionen zu je {stuecke} Stück",
+  "ui.kessel_verderben": "Verderben {punkte}",
+  "ui.kessel_streuung": "Streuung {prozent} %",
+  "ui.kessel_abstellen": "Zum Brauen auf den Boden stellen",
   "ui.brauen.vorschau": "Vorschau",
   "ui.brauen.portionen": "{anzahl} Portion",
   "ui.brauen.portionen.mehrzahl": "{anzahl} Portionen",

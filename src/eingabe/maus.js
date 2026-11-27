@@ -7,7 +7,7 @@ import { gesteuerteEntitaet, entitaetenAuf } from "../kern/zustand.js";
 import { abstand, aufDerKarte } from "../welt/karte.js";
 import { feindlich } from "../systeme/kampf.js";
 import { istSichtbar } from "../systeme/sicht.js";
-import { gelaendeAuf } from "../welt/karte.js";
+import { kesselBei } from "../systeme/brauen.js";
 
 export function feldAnPixel(pixelX, pixelY, kamera, zoom) {
   return { x: kamera.x + Math.floor(pixelX / zoom), y: kamera.y + Math.floor(pixelY / zoom) };
@@ -30,7 +30,7 @@ export const KLICKREGELN = [
   },
   {
     name: "brauen",
-    passt: (spiel, feld, gesteuerte) => abstand(feld, gesteuerte.position) <= 1 && Boolean(gelaendeAuf(spiel, feld.x, feld.y)?.kessel),
+    passt: (spiel, feld, gesteuerte) => abstand(feld, gesteuerte.position) <= 1 && Boolean(kesselBei(spiel, gesteuerte, feld)),
     aktion: () => ({ aktion: "brauen" }),
   },
   {

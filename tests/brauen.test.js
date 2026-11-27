@@ -17,7 +17,7 @@ import effekte from "../daten/effekte.js";
 import zustaende from "../daten/zustaende.js";
 import { profilBerechnen, gaerungBerechnen, zielgebietFinden, profilRunden, wirkungBerechnen } from "../src/systeme/sud.js";
 import { spinnennetzSvg } from "../src/anzeige/spinnennetz.js";
-import { sudVorbereiten } from "../src/systeme/brauen.js";
+import { sudVorbereiten, kesselBei } from "../src/systeme/brauen.js";
 import { braufensterOeffnen, brauTaste } from "../src/eingabe/brauen.js";
 import { klickDeuten } from "../src/eingabe/maus.js";
 
@@ -34,6 +34,8 @@ const GEGENSTAENDE = {
   kraut: { text: "g.kraut", aufhebbar: true, stapelbar: true, gewicht: 100, zutat: { art: "gewuerz", bitter: 20, aromen: { kraeuter: 100 } } },
   flasche: { text: "g.flasche", aufhebbar: true, stapelbar: true, gewicht: 400, gefaess: true },
   krug: { text: "g.krug", aufhebbar: true, gewicht: 0, kultur: "schwach" },
+  // Kessel als Gegenstand: braut nur am Boden, fasst zwei Portionen zu je zwei Stück
+  topf: { text: "g.topf", aufhebbar: true, gewicht: 3000, kessel: { portionen: 2, stueckeJePortion: 2, unschaerfe: 0 } },
 };
 const KULTUREN = {
   hefe: { text: "k.hefe", vergaerung: 75, vertraegt: 90, aromen: { frucht: 10 } },
@@ -46,8 +48,8 @@ const ZIELGEBIETE = {
 // Kessel ohne Unschärfe: der Sud landet genau in der Mitte der Vorschau
 const KESSEL = { kessel: { text: "g.kessel", kennung: "u", passierbar: false, durchsichtig: true, kessel: { portionen: 4, unschaerfe: 0 } } };
 
-function spielBauen({ regeln = {}, kessel = KESSEL, x = 2, y = 1 } = {}) {
-  const spiel = miniSpiel(RAUM, { gelaende: kessel, effekte, zustaende, gegenstaende: GEGENSTAENDE, kulturen: KULTUREN, zielgebiete: ZIELGEBIETE, regeln: { brauen: { verderben: 0, schwach: { chance: 0, plus: 20 }, ...regeln } } });
+function spielBauen({ regeln = {}, kessel = KESSEL, x = 2, y = 1, karte = RAUM } = {}) {
+  const spiel = miniSpiel(karte, { gelaende: kessel, effekte, zustaende, gegenstaende: GEGENSTAENDE, kulturen: KULTUREN, zielgebiete: ZIELGEBIETE, regeln: { brauen: { verderben: 0, schwach: { chance: 0, plus: 20 }, ...regeln } } });
   const ninkasi = wesen(spiel, x, y, "ninkasi", 100, {
     werte: werteAusDaten({ lp: { grundwert: 100, anfangswert: 50 }, mp: { grundwert: 100, anfangswert: 50 }, pegel: { anfangswert: 0 } }),
     kulturen: ["hefe"], inventar: [],
@@ -182,7 +184,7 @@ test("Brauen: Ablehnungen", () => {
   assert.equal(brauen(fern.spiel, [{ gegenstandId: malz3.id, menge: 2 }]).grund, "kein_kessel");
 });
 
-test("Datenprüfung: Regeln, Kulturen, Zielgebiete, Zutaten, Kessel und Kulturen der Wesen", () => {
+test("Datenprüfung: Regeln, Kulturen, Zielgebiete, Zutaten, Kessel an Gelände und Gegenstand, Kessel im Hub und Kulturen der Wesen", () => {
   const fehlerMit = (aendern, teil) => {
     const roh = structuredClone(rohdaten);
     aendern(roh);
@@ -199,10 +201,38 @@ test("Datenprüfung: Regeln, Kulturen, Zielgebiete, Zutaten, Kessel und Kulturen
   assert.ok(fehlerMit((roh) => { roh.gegenstaende.honig.zutat.art = "zucker"; }, "gegenstaende.honig: zutat muss"));
   assert.ok(fehlerMit((roh) => { roh.gegenstaende.honig.zutat.aromen.umami = 5; }, "Aromaachse \"umami\""));
   assert.ok(fehlerMit((roh) => { roh.gelaende.tonkessel.kessel.portionen = 0; }, "gelaende.tonkessel: kessel muss"));
+  assert.ok(fehlerMit((roh) => { roh.gegenstaende.kupferkessel.kessel.stueckeJePortion = 0; }, "gegenstaende.kupferkessel: kessel muss"));
+  const hubkessel = rohdaten.gelaende.braukessel;
+  assert.ok(hubkessel.kessel && rohdaten.ebenen.hub.karte.some((zeile) => zeile.includes(hubkessel.kennung)), "im Hub steht ein Kessel");
   assert.ok(fehlerMit((roh) => { roh.wesen.ninkasi.kulturen = ["kefir"]; }, "Kultur \"kefir\""));
   assert.ok(fehlerMit((roh) => { roh.gegenstaende.hefekrug.kultur = "kefir"; }, "gegenstaende.hefekrug: Kultur \"kefir\""));
   assert.ok(fehlerMit((roh) => { roh.regeln.brauen.wirkungen.suesse = { zustand: "fremd", prozent: 100 }; }, "regeln.brauen.wirkungen.suesse"));
   assert.ok(fehlerMit((roh) => { roh.regeln.brauen.stueckeJePortion = 0; }, "regeln.brauen.stueckeJePortion"));
+});
+
+test("Kessel als Gegenstand: braut am Boden, nicht im Gepäck, mit eigenen Stück je Portion; Gelände geht auf seinem Feld vor", () => {
+  const { spiel, ninkasi } = spielBauen();
+  const topf = tragen(spiel, ninkasi, "topf");
+  const malz = tragen(spiel, ninkasi, "malz", 5);
+  tragen(spiel, ninkasi, "flasche", 2);
+  assert.deepEqual(kesselBei(spiel, ninkasi), { x: 3, y: 1, kessel: KESSEL.kessel.kessel, gelaende: spiel.daten.gelaende.kessel }, "im Gepäck zählt er nicht");
+  assert.equal(befehlGeben(spiel, { art: "fallenlassen", gegenstandId: topf.id }).ok, true);
+  assert.deepEqual(kesselBei(spiel, ninkasi), { x: 2, y: 1, kessel: topf.kessel, gegenstandId: topf.id }, "das eigene Feld zuerst");
+  assert.equal(kesselBei(spiel, ninkasi, { x: 3, y: 1 }).gelaende, spiel.daten.gelaende.kessel, "mit Feld der Kessel dort");
+  assert.equal(braufensterOeffnen(spiel).zustand.portionen, 2, "so viele Portionen, wie der Topf hergibt");
+  const amTopf = { kessel: { x: 2, y: 1 } };
+  assert.equal(brauen(spiel, [{ gegenstandId: malz.id, menge: 2 }], { ...amTopf, portionen: 3 }).grund, "zu_viele_portionen");
+  assert.equal(brauen(spiel, [{ gegenstandId: malz.id, menge: 5 }], amTopf).grund, "kessel_voll", "zwei Portionen zu je zwei Stück");
+  assert.equal(sudVorbereiten(spiel, ninkasi, { zutaten: [{ gegenstandId: malz.id, menge: 4 }], kultur: "hefe", ...amTopf }).fassen, 4);
+  assert.equal(brauen(spiel, [{ gegenstandId: malz.id, menge: 4 }], amTopf).ok, true);
+
+  const ohneGelaende = spielBauen({ karte: ["######", "#....#", "#....#", "######"] });
+  const topf2 = tragen(ohneGelaende.spiel, ohneGelaende.ninkasi, "topf");
+  befehlGeben(ohneGelaende.spiel, { art: "fallenlassen", gegenstandId: topf2.id });
+  befehlGeben(ohneGelaende.spiel, { art: "bewegen", dx: 1, dy: 0 });
+  assert.deepEqual(klickDeuten(ohneGelaende.spiel, { x: 2, y: 1 }), { aktion: "brauen" }, "ein Klick auf den Kessel daneben öffnet das Fenster");
+  befehlGeben(ohneGelaende.spiel, { art: "bewegen", dx: 1, dy: 0 });
+  assert.equal(kesselBei(ohneGelaende.spiel, ohneGelaende.ninkasi), null, "zu weit weg");
 });
 
 test("Braufenster: öffnet nur am Kessel, Portionen nach Flaschen und Kessel, Buchstaben füllen, Ziffern wechseln, Enter gibt den Befehl", () => {

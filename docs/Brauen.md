@@ -1,6 +1,6 @@
 # Battle Ninkasi - Brauen
 
-Stand: 2026-11-26
+Stand: 2026-11-27
 
 Mitprüfen bei Änderungen: [Grundlagen.md](Grundlagen.md), [Skills.md](Skills.md), [Spielverlauf.md](Spielverlauf.md), [Ausblick.md](Ausblick.md), [Texte.md](Texte.md), [Gegenstaende.md](Gegenstaende.md), [Sude.md](Sude.md), [Bedienung.md](Bedienung.md)
 
@@ -178,10 +178,11 @@ Umsetzung: teilweise, siehe [Sude.md](Sude.md), Nebel und Rezepte; offen: gebund
 
 + Kessel sind Orte und Gegenstände: im Hub steht immer einer, auf den Ebenen häufig feste Kessel (etwa in Brauräumen), aber nicht garantiert; ein mobiler Kessel ist früh verlässlich zu finden, aber schwer, das ist eine Abwägung zwischen Last und Freiheit
 + Tiers nach Material: Holz mit heißen Steinen (Steinbier), Ton (sumerische Tradition, kalt gemaischt und im offenen Gefäß vergoren, ohne Feuer), Kupfer, Bronze, Eisen, Edelstahl; darüber offen
++ Ein mobiler Kessel braut nur, wenn er am Boden steht, nicht im Gepäck: Abstellen und Einpacken kosten je einen Zug, das Gewicht trägt Ninkasi dazwischen
 + Ein besserer Kessel fasst mehr Zutaten und gibt mehr Portionen, verdirbt seltener und erreicht so fernere Zielgebiete
 + Brand entsteht nicht im Kessel, sondern aus einem fertigen Getränk an der Brennblase, einem eigenen Gegenstand
 
-Umsetzung: teilweise, siehe [Sude.md](Sude.md), Befehl; offen: Kessel als Gegenstand, Tiers nach Material, Kessel im Hub, Brennblase, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
+Umsetzung: teilweise, siehe [Sude.md](Sude.md), Befehl (Kessel als Gelände und als Gegenstand, der am Boden steht, mit eigenem Fassungsvermögen; der Braukessel im Hub); offen: Eigenheiten der Materialien (Steinbier im Holzkessel), Brennblase, Arbeit in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 ## Getränke
 
@@ -237,7 +238,7 @@ Umsetzung: offen, Arbeit in [Systemausbau.md](Systemausbau.md), Punkte 20 und 23
 
 ## Offen
 
-+ Kessel als Gegenstände: Aufstellen, Tragen, Bauen und Pflege (Anlagen und Fallen), Tiers über Edelstahl hinaus
++ Kessel: Bauen und Pflege (Anlagen und Fallen), Tiers über Edelstahl hinaus
 + Ob der Absud MP kostet und wie die Magie seine Mächtigkeit hebt
 + Welche Richtungen der Absud kennt und welche Zustände ihre Pole und Stufen ergeben
 + Ob Ninkasi eine Kultur von selbst neben dem Wesen gewinnt oder über einen Befehl "Probe nehmen" mit Zeitkosten, was spannender ist; im Spiel zu prüfen

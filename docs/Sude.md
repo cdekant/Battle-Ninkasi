@@ -1,6 +1,6 @@
 # Battle Ninkasi - Sude
 
-Stand: 2026-11-26
+Stand: 2026-11-27
 
 Zuständig für: `src/systeme/sud.js`, `src/systeme/brauen.js`, `src/systeme/trockenbier.js`, `src/systeme/kulturen.js`, `src/systeme/absud.js`, `src/systeme/rezepte.js`, `src/systeme/reifen.js`, `src/systeme/flora.js`, `daten/sude.js`
 
@@ -56,17 +56,18 @@ Regeln:
 
 Daten:
 
-+ Kessel am Gelände: `kessel: { portionen, verderben?, unschaerfe? }`; `portionen` gibt der Kessel höchstens her, `verderben` sind Punkte auf die Chance, `unschaerfe` Prozent der Unschärfe (Vorgabe 100)
-+ `regeln.brauen.stueckeJePortion`: so viele Stück Zutaten nimmt der Kessel je Portion höchstens
++ Kessel am Gelände oder am Gegenstand: `kessel: { portionen, verderben?, unschaerfe?, stueckeJePortion? }`; `portionen` gibt der Kessel höchstens her, `verderben` sind Punkte auf die Chance, `unschaerfe` Prozent der Unschärfe (Vorgabe 100), `stueckeJePortion` so viele Stück Zutaten nimmt er je Portion höchstens (Vorgabe `regeln.brauen.stueckeJePortion`)
++ `regeln.brauen.stueckeJePortion`: so viele Stück Zutaten nimmt ein Kessel ohne eigene Angabe je Portion höchstens
 + Gefäß am Gegenstand: `gefaess: true` (die leere Flasche)
 + `regeln.brauen.verderben` (Chance vor Kessel und Kultur), `schwach: { chance, plus }`, `verderber: { chance, wesen }` (`wesen` null: keiner; das Grundgerüst hat keine Wesen, der Probeinhalt setzt das Essigbakterium über `ergaenzen`), `regeln.brauen.getraenk` und `regeln.brauen.verdorben: { getraenk, achse, plus, guete, stufe }`, `gewichtJePortion`; Zeitkosten `aktionen.brauen`
 + Kultur mit `verderber: name`: dieses Wesen entsteht statt `regeln.brauen.verderber.wesen`
 
 Schnittstellen (`src/systeme/brauen.js`):
 
-+ Befehl `brauen { kessel?: { x, y }, portionen?, zutaten: [{ gegenstandId, menge }], verfahren?: { maische, gewuerz }, kultur?, absicht?, abfuellen? }`; ohne Kultur ein Absud (siehe Absud), mit `abfuellen: "trocken"` ein Trockenbier (siehe Trockenbier); ohne `kessel` der erste Kessel neben oder unter der Brauerin (eigenes Feld, dann die Nachbarn zeilenweise); ohne `portionen` so viele, wie Kessel und leere Gefäße erlauben, mindestens 1
-+ Ablehnungen: `im_kampf`, `kein_kessel`, `keine_zutaten`, `keine_zutat`, `zu_viel` (mehr, als der Stapel hat), `kessel_voll` (mehr Stück als Portionen x `stueckeJePortion`), `zu_viele_portionen` (mehr, als der Kessel hergibt), `kultur_unbekannt`, `keine_flora` (spontan auf einer Ebene ohne Flora), `keine_gefaesse` (weniger leere Gefäße als Portionen), `ungueltig` (Menge oder Portionen unter 1, dieselbe Zutat zweimal, unbekanntes Verfahren)
++ Befehl `brauen { kessel?: { x, y }, portionen?, zutaten: [{ gegenstandId, menge }], verfahren?: { maische, gewuerz }, kultur?, absicht?, abfuellen? }`; ohne Kultur ein Absud (siehe Absud), mit `abfuellen: "trocken"` ein Trockenbier (siehe Trockenbier); ohne `kessel` der erste Kessel neben oder unter der Brauerin (eigenes Feld, dann die Nachbarn zeilenweise; auf einem Feld zuerst das Gelände, dann ein Kessel am Boden, einer im Gepäck zählt nicht); ohne `portionen` so viele, wie Kessel und leere Gefäße erlauben, mindestens 1
++ Ablehnungen: `im_kampf`, `kein_kessel`, `keine_zutaten`, `keine_zutat`, `zu_viel` (mehr, als der Stapel hat), `kessel_voll` (mehr Stück als Portionen x `stueckeJePortion` des Kessels), `zu_viele_portionen` (mehr, als der Kessel hergibt), `kultur_unbekannt`, `keine_flora` (spontan auf einer Ebene ohne Flora), `keine_gefaesse` (weniger leere Gefäße als Portionen), `ungueltig` (Menge oder Portionen unter 1, dieselbe Zutat zweimal, unbekanntes Verfahren)
 + Meldungen: `gebraut`, `gebraut_getroffen` (mit `zielgebiet`), `gebraut_verdorben`, je mit `wer`, `was` und `anzahl`; `verderber_entsteht` mit `was` und `kessel` (dazu `beschworen` ohne `wer`)
++ `kesselBei(spiel, wesen, feld?)` gibt `{ x, y, kessel, gelaende }` oder `{ x, y, kessel, gegenstandId }` oder null, `stueckeJePortionIm(daten, kessel)`
 + `sudVorbereiten(spiel, wesen, befehl)` prüft und rechnet die Vorschau (`{ grund }` oder `{ kessel, eingabe, mitte, gaerung, unschaerfe, bereich, erreichbar, fuellung, fassen, portionen, gefaesse }`), ohne Kampf und Gefäße zu prüfen; `fassen` ist die höchste Füllung für diese Portionen, `erreichbar` nennt nur aufgedeckte Zielgebiete, `rezept` den Schlüssel des Rezepts, nach dem gebraut wird, oder null; `verderbenChance`, `sauerChance`, `kesselBei`, `zutatenIm`, `gefaesseIm`
 + Haken `aufgehoben` (siehe [Gegenstaende.md](Gegenstaende.md), Inventar): beim ersten Aufheben einer Zutatenart Wissens-EP über `src/systeme/wissen.js` (siehe [Wesen.md](Wesen.md), Skills und Lernen); Proben von Kulturen siehe Kulturen
 
@@ -241,7 +242,7 @@ Regeln:
 ## Verweise
 
 + Spieldesign: [Brauen.md](Brauen.md); Skills des Brauens: [Skills.md](Skills.md), Brauen
-+ Probeinhalt (Zutaten, Kulturen, Zielgebiete, Tonkessel): [Entwicklung.md](Entwicklung.md), Probeinhalt
++ Probeinhalt (Zutaten, Kulturen, Zielgebiete, Tonkessel, Holz- und Kupferkessel): [Entwicklung.md](Entwicklung.md), Probeinhalt
 + Offene Reste in [Systemausbau.md](Systemausbau.md), Punkt 23
 
 Pflege: Dieses Dokument folgt [Dokumentation.md](Dokumentation.md), Pflichten bei jeder Änderung.

@@ -1,6 +1,6 @@
 # Battle Ninkasi - Tileset
 
-Stand: 2026-11-26
+Stand: 2026-11-27
 
 Zuständig für: `grafik/*`, `src/anzeige/tilebilder.js`, `daten/zeichen.js`, `werkzeuge/tiles-ableiten.js`
 
@@ -136,7 +136,7 @@ Entwurf, zurückgestellt (Stand 2026-11-20); entschieden sind nur die zwei Stufe
 ## Ablauf
 
 + Keine Zeichen als Platzhalter: jede neue Entität des echten Inhalts kommt direkt als Tile ins Spiel; der Probeinhalt (siehe [Entwicklung.md](Entwicklung.md), Probeinhalt) darf Zeichen tragen; sonst ist das Zeichen nur Absicherung, falls ein Tile fehlt
-+ Als Nächstes das Grundgerüst in 64 px: Tür offen und zu, Treppe hinauf und hinab, Feuer; kleine Sätze per Werkzeug; bis dahin stehen sie in `TILES_AUSSTEHEND` (siehe [Entwicklung.md](Entwicklung.md), Kompendium)
++ Als Nächstes das Grundgerüst in 64 px: Tür offen und zu, Treppe hinauf und hinab, Feuer, Braukessel; kleine Sätze per Werkzeug; bis dahin stehen sie in `TILES_AUSSTEHEND` (siehe [Entwicklung.md](Entwicklung.md), Kompendium)
 + Danach Tile für Tile mit dem echten Inhalt
 
 ## Offene Fragen

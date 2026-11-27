@@ -9,6 +9,7 @@ export default {
     tuer_offen: { zeichen: "'", farbe: "#c87533", hintergrund: "#14110e" },
     treppe_ab: { zeichen: ">", farbe: "#f2c14e", hintergrund: "#14110e" },
     treppe_auf: { zeichen: "<", farbe: "#f2c14e", hintergrund: "#14110e" },
+    braukessel: { zeichen: "U", farbe: "#c8955a", hintergrund: "#2a221b" },
   },
   wesen: {
     ninkasi: { zeichen: "@", farbe: "#f2c14e" },

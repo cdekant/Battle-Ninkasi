@@ -10,7 +10,7 @@ const keller = {
     { typ: "schoepfkelle", anzahl: 1 }, { typ: "fasshammer", anzahl: 1 }, { typ: "lederschuerze", anzahl: 1 },
     { typ: "kupferhelm", anzahl: 1 }, { typ: "lederhose", anzahl: 1 }, { typ: "hopfenkette", anzahl: 1 }, { typ: "kupferring", anzahl: 2 },
     { typ: "schleuder", anzahl: 1 }, { typ: "kurzbogen", anzahl: 1 }, { typ: "schleuderstein", anzahl: 4, stapel: 5 }, { typ: "pfeil", anzahl: 2, stapel: 10 },
-    { typ: "laterne", anzahl: 1 },
+    { typ: "laterne", anzahl: 1 }, { typ: "holzkessel", anzahl: 1 }, { typ: "kupferkessel", anzahl: 1 },
     { typ: "gerstenmalz", anzahl: 3, stapel: 4 }, { typ: "emmer", anzahl: 2, stapel: 3 }, { typ: "bierbrot", anzahl: 2, stapel: 2 },
     { typ: "datteln", anzahl: 2, stapel: 3 }, { typ: "honig", anzahl: 1, stapel: 2 }, { typ: "wacholder", anzahl: 2, stapel: 2 },
     { typ: "roestmalz", anzahl: 1, stapel: 2 }, { typ: "gerste", anzahl: 1, stapel: 3 },

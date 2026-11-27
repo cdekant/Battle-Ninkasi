@@ -1,6 +1,6 @@
 # Battle Ninkasi - Gegenstände
 
-Stand: 2026-11-26
+Stand: 2026-11-27
 
 Zuständig für: `src/systeme/inventar.js`, `src/systeme/ausruestung.js`, `src/systeme/verschleiss.js`, `src/systeme/kennen.js`
 
@@ -16,7 +16,7 @@ Vorbilder: NetHack (Last in Stufen, jede bremst mehr), Brogue und DCSS (Stapel g
 
 Daten:
 
-+ Am Gegenstand: `stapelbar: true`, `ladungen: { hoechstens, gewichtJe? }` (Stand in `ladungen.aktuell`, Vorgabe `hoechstens`), `wirdZu: Typ` (Behälter nach dem letzten Gebrauch), `gewicht` in Gramm, `lesbar: { effekt, bleibt? }` (Schriftrolle, Braubuch), `ersatz` (passive Ersatzwirkung aus dem Gepäck, siehe [Wirkungen.md](Wirkungen.md), Ersatzwirkungen), `gefaess: true` (leeres Gefäß zum Abfüllen) und `zutat` (siehe [Sude.md](Sude.md), Profil); an der Entität `anzahl` (Vorgabe 1) und `getragenVon`, an einem gebrauten Getränk `sud` (siehe [Sude.md](Sude.md), Befehl)
++ Am Gegenstand: `stapelbar: true`, `ladungen: { hoechstens, gewichtJe? }` (Stand in `ladungen.aktuell`, Vorgabe `hoechstens`), `wirdZu: Typ` (Behälter nach dem letzten Gebrauch), `gewicht` in Gramm, `lesbar: { effekt, bleibt? }` (Schriftrolle, Braubuch), `ersatz` (passive Ersatzwirkung aus dem Gepäck, siehe [Wirkungen.md](Wirkungen.md), Ersatzwirkungen), `gefaess: true` (leeres Gefäß zum Abfüllen), `zutat` (siehe [Sude.md](Sude.md), Profil) und `kessel` (braut, wenn er am Boden steht, siehe [Sude.md](Sude.md), Befehl); an der Entität `anzahl` (Vorgabe 1) und `getragenVon`, an einem gebrauten Getränk `sud` (siehe [Sude.md](Sude.md), Befehl)
 + Am Wesen: `inventar: [IDs]`, `tragkraft` (sonst `regeln.tragen.tragkraft`, 20000 g)
 + Ausstattung in den Daten eines Wesens: `ausstattung: [{ typ, anzahl?, angelegt?, geladen? }]` (Vorgabe `anzahl` 1), keine Komponente; beim Erzeugen aus Daten liegt sie im Gepäck, mit `angelegt: true` ist das Stück schon angelegt (ohne Zeit, Meldung und Haken, `anlegenOhneZeit` in `src/systeme/ausruestung.js`); die Datenprüfung verlangt dafür Ausrüstung, `anzahl` 1 und genug freie Stellen am Platz des Wesens, ohne etwas zu verdrängen; mit `geladen: munitionstyp` hat eine angelegte Fernwaffe mit Magazin ein volles Magazin dieser Munition, ohne sie aus dem Gepäck zu nehmen (Handler `ausstattung_geladen` in `src/systeme/fernkampf.js`, siehe [Wesen.md](Wesen.md), Fernkampf)
 + Munition: `geschoss: { sorte, bruchchance?, effekt?, genauigkeit?, kritchance? }` an einem stapelbaren Gegenstand; an einer Fernwaffe mit Magazin der Inhalt `geladen: { typ, anzahl, gewichtJe }` (siehe [Wesen.md](Wesen.md), Fernkampf)
@@ -41,7 +41,7 @@ Regeln:
 + Nach dem letzten Gebrauch kommt `wirdZu` ins Gepäck (Bier zu leerer Flasche, Bierfass zu Fass), Grundlage für das Brauen; der Ballast ist gewollt
 + Gewicht mit Ladungen zuzüglich `gewichtJe` je Ladung, eine Fernwaffe zuzüglich `geladen.gewichtJe` je Schuss im Magazin; die Last ist die Summe über das Gepäck, Angelegtes eingeschlossen, dieses mit seinem gefühlten Gewicht (siehe Ausrüstung)
 + Tragkraft mit Modifikatoren auf `tragkraft` (Skills folgen); verboten ist nichts, Überladung verteuert nur das Bewegen, nach allen Modifikatoren
-+ Anzeige: das Inventarfenster zeigt Stapel (x 3), Ladungen (19/20), Angelegtes und die Last (Last 3,2 / 20 kg, rot "überladen"), die Seitenleiste nur die Last
++ Anzeige: das Inventarfenster zeigt Stapel (x 3), Ladungen (19/20), Angelegtes und die Last (Last 3,2 / 20 kg, rot "überladen"), die Seitenleiste nur die Last; an einem Kessel seine Portionen, Stück je Portion, Punkte aufs Verderben, Streuung und den Hinweis, ihn zum Brauen abzustellen
 
 ## Ausrüstung
 

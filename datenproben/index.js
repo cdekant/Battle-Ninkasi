@@ -29,11 +29,12 @@ import zielgebiete from "./zielgebiete.js";
 import rezepte from "./rezepte.js";
 import absudrichtungen from "./absudrichtungen.js";
 import absude from "./absude.js";
+import kessel from "./kessel.js";
 
 export default {
   eintraege: {
     wesen: gegner,
-    gegenstaende: { ...getraenke, ...wurfgegenstaende, ...fernwaffen, ...ausruestung, ...zutaten, ...absude },
+    gegenstaende: { ...getraenke, ...wurfgegenstaende, ...fernwaffen, ...ausruestung, ...zutaten, ...absude, ...kessel },
     schichten,
     fallen,
     effekte,

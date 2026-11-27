@@ -142,6 +142,16 @@ export default {
     einzahl: { nom: "Laterne", gen: "Laterne", dat: "Laterne", akk: "Laterne" },
     mehrzahl: { nom: "Laternen", gen: "Laternen", dat: "Laternen", akk: "Laternen" },
   },
+  "gegenstand.holzkessel": {
+    geschlecht: "m",
+    einzahl: { nom: "Holzkessel", gen: "Holzkessels", dat: "Holzkessel", akk: "Holzkessel" },
+    mehrzahl: { nom: "Holzkessel", gen: "Holzkessel", dat: "Holzkesseln", akk: "Holzkessel" },
+  },
+  "gegenstand.kupferkessel": {
+    geschlecht: "m",
+    einzahl: { nom: "Kupferkessel", gen: "Kupferkessels", dat: "Kupferkessel", akk: "Kupferkessel" },
+    mehrzahl: { nom: "Kupferkessel", gen: "Kupferkessel", dat: "Kupferkesseln", akk: "Kupferkessel" },
+  },
   "gegenstand.kupferhelm": {
     geschlecht: "m",
     einzahl: { nom: "Kupferhelm", gen: "Kupferhelms", dat: "Kupferhelm", akk: "Kupferhelm" },

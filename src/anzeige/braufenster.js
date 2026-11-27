@@ -10,8 +10,8 @@
 // Dazu das Fenster zum Anrühren von Trockenbier (eingabe/anruehren.js): Kulturen mit der Zeit oder dem Grund dagegen.
 // Liest den Zustand nur; die Vorschau ist dieselbe Rechnung wie der Befehl (sudVorbereiten, systeme/brauen.js).
 
-import { gesteuerteEntitaet } from "../kern/zustand.js";
-import { zutatenIm, sudVorbereiten, verderbenChance, sauerChance } from "../systeme/brauen.js";
+import { gesteuerteEntitaet, entitaetMitId } from "../kern/zustand.js";
+import { zutatenIm, sudVorbereiten, verderbenChance, sauerChance, kesselBei, stueckeJePortionIm } from "../systeme/brauen.js";
 import { KENNZAHLEN, zielgebietFinden, SPONTAN, kulturBezug } from "../systeme/sud.js";
 import { aufgedeckteZielgebiete } from "../systeme/rezepte.js";
 import { absudregeln, krautUnbekannt, POLE } from "../systeme/absud.js";
@@ -152,10 +152,18 @@ fensterinhaltAnmelden("anruehren", ({ spiel, texte }, zustand) => {
   };
 });
 
+// Name des Kessels: das Gelände oder der Gegenstand am Boden; ohne Kessel das Wort "Kessel"
+function kesselName(spiel, texte, kessel) {
+  if (kessel?.gelaende) return texte.text(kessel.gelaende.text);
+  const gegenstand = kessel?.gegenstandId !== undefined ? entitaetMitId(spiel.zustand, kessel.gegenstandId) : null;
+  return gegenstand ? texte.nomenForm({ ...gegenstand, anzahl: 1 }, "nom", "ohne") : texte.text("ui.kessel");
+}
+
 fensterinhaltAnmelden("brauen", ({ spiel, texte }, zustand) => {
   const { text, textNachZahl } = texte;
   const ninkasi = gesteuerteEntitaet(spiel.zustand);
-  const fassen = zustand.portionen * spiel.daten.regeln.brauen.stueckeJePortion;
+  const kessel = kesselBei(spiel, ninkasi, zustand.kessel);
+  const fassen = zustand.portionen * (kessel ? stueckeJePortionIm(spiel.daten, kessel.kessel) : spiel.daten.regeln.brauen.stueckeJePortion);
   const fuellung = zutatenIm(spiel, ninkasi).reduce((summe, zutat) => summe + (zustand.mengen[zutat.id] ?? 0), 0);
   const vorbereitet = sudVorbereiten(spiel, ninkasi, braubefehl(spiel, zustand));
   const kultur = zustand.kultur === SPONTAN ? text("ui.brauen.spontan") : zustand.kultur ? texte.nomenForm(kulturBezug(spiel.daten, zustand.kultur), "nom", "ohne") : text("ui.brauen.ohne_kultur");
@@ -163,7 +171,7 @@ fensterinhaltAnmelden("brauen", ({ spiel, texte }, zustand) => {
   const trocken = zustand.abfuellen === "trocken";
   const kopf = [
     textNachZahl("ui.brauen.portionen", zustand.portionen, { anzahl: zustand.portionen }),
-    text("ui.brauen.fuellung", { menge: fuellung, fassen }),
+    text("ui.brauen.fuellung", { kessel: kesselName(spiel, texte, kessel), menge: fuellung, fassen }),
     `${text("ui.brauen.maische")}: ${text(`maische.${zustand.maische}`)}`,
     `${text("ui.brauen.gewuerz")}: ${text(`gewuerz.${zustand.gewuerz}`)}`,
     ...(trocken ? [] : [`${text("ui.brauen.kultur")}: ${kultur}`]),

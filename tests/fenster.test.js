@@ -175,6 +175,9 @@ test("Anzeige: jedes Fenster entsteht mit dem Spielinhalt ohne fehlende Texte", 
   assert.equal(fensterHtml(umgebung, []), "");
   assert.match(zeigen("inventar", { gewaehlt: null }), /Inventar/);
   assert.match(zeigen("inventar", { gewaehlt: kelle.id }), /Haltbarkeit/);
+  const kupferkessel = gegenstandTragen(spiel, ninkasi, { typ: "kupferkessel", ...structuredClone(daten.gegenstaende.kupferkessel) });
+  const amKessel = zeigen("inventar", { gewaehlt: kupferkessel.id });
+  for (const zeile of [/Kessel: 6 Portionen zu je 5 Stück/, /Verderben -10/, /Streuung 80 %/, /Zum Brauen auf den Boden stellen/]) assert.match(amKessel, zeile);
   assert.match(zeigen("faehigkeiten", {}), /Fähigkeiten/);
   assert.match(zeigen("hilfe", {}), /Charakter und Skills/);
   const erstellung = zeigen("erstellung", erstellungOeffnen(daten, null));
@@ -217,7 +220,7 @@ test("Anzeige: jedes Fenster entsteht mit dem Spielinhalt ohne fehlende Texte", 
   assert.match(braufenster, /frei gebraut/);
   assert.match(zeigen("brauen", { ...braufensterOeffnen(spiel).zustand, liste: "rezepte" }), /Noch keine Rezepte im Buch/);
   assert.match(braufenster, /Restzucker/);
-  assert.match(braufenster, /1 Portion · Kessel 2\/4/);
+  assert.match(braufenster, /1 Portion · Tonkessel 2\/4/);
   befehlGeben(spiel, { art: "brauen", zutaten: [{ gegenstandId: malz.id, menge: 2 }], kultur: "wilde_hefe" });
   const sud = ninkasi.inventar.map((id) => spiel.zustand.entitaeten[id]).find((gegenstand) => gegenstand.sud);
   const imInventar = zeigen("inventar", { gewaehlt: sud.id });

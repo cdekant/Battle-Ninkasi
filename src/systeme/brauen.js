@@ -2,9 +2,11 @@
 // Gepäck, abgefüllt in leere Gefäße; die Rechnung steht in systeme/sud.js.
 // Befehl: { art: "brauen", kessel?: { x, y }, portionen?, zutaten: [{ gegenstandId, menge }], verfahren?: { maische, gewuerz },
 //           kultur? }
-//   kessel:    ein Feld mit Kessel neben oder unter der Brauerin; ohne Angabe der erste in fester Reihenfolge
+//   kessel:    ein Feld mit Kessel neben oder unter der Brauerin, als Gelände oder als Gegenstand am Boden (nicht im
+//              Gepäck); ohne Angabe der erste in fester Reihenfolge
 //   portionen: wie viele Gefäße der Sud füllt, sein Volumen; höchstens portionen des Kessels, Vorgabe so viele, wie
-//              Kessel und leere Gefäße erlauben; je Portion höchstens regeln.brauen.stueckeJePortion Stück Zutaten
+//              Kessel und leere Gefäße erlauben; je Portion höchstens stueckeJePortion des Kessels Stück Zutaten
+//              (Vorgabe regeln.brauen.stueckeJePortion)
 //   verfahren: Schlüssel aus regeln.brauen.maische und regeln.brauen.gewuerz, Vorgabe regeln.brauen.verfahren
 //   kultur:    eine Kultur der Brauerin (wesen.kulturen) oder "spontan" (die Flora der Ebene, systeme/flora.js); ohne
 //              Kultur wird der Sud ein Absud (systeme/absud.js)
@@ -26,7 +28,7 @@
 // (systeme/wissen.js); Kulturen gewinnen steht in systeme/kulturen.js.
 
 import { anmelden, holen } from "../kern/register.js";
-import { entitaetMitId, entitaetEntfernen, ausDatenErzeugen, ausDemInventarNehmen } from "../kern/zustand.js";
+import { entitaetMitId, entitaetEntfernen, ausDatenErzeugen, ausDemInventarNehmen, entitaetenAuf } from "../kern/zustand.js";
 import { melden, bezugAuf } from "../kern/ereignisse.js";
 import { effektAnwenden } from "../kern/effekte.js";
 import { bausteinAnmelden } from "../kern/bausteine.js";
@@ -50,17 +52,23 @@ import {
 // Felder um die Brauerin in fester Reihenfolge, das eigene zuerst
 const NACHBARN = [[0, 0], [-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
 
-// Kessel { x, y, kessel } neben oder unter dem Wesen; mit feld nur dort, sonst der erste; null ohne
+// Kessel { x, y, kessel, gelaende? | gegenstandId? } neben oder unter dem Wesen; mit feld nur dort, sonst der erste; null
+// ohne. Auf einem Feld zählt zuerst das Gelände, dann ein Kessel am Boden; einer im Gepäck hat keine Position und zählt nicht.
 export function kesselBei(spiel, wesen, feld = null) {
   if (!wesen?.position) return null;
   for (const [dx, dy] of NACHBARN) {
     const x = wesen.position.x + dx, y = wesen.position.y + dy;
     if (feld && (feld.x !== x || feld.y !== y)) continue;
-    const kessel = gelaendeAuf(spiel, x, y)?.kessel;
-    if (kessel) return { x, y, kessel };
+    const gelaende = gelaendeAuf(spiel, x, y);
+    if (gelaende?.kessel) return { x, y, kessel: gelaende.kessel, gelaende };
+    const amBoden = entitaetenAuf(spiel.zustand, x, y).find((entitaet) => entitaet.kessel);
+    if (amBoden) return { x, y, kessel: amBoden.kessel, gegenstandId: amBoden.id };
   }
   return null;
 }
+
+// Stück Zutaten, die ein Kessel je Portion höchstens nimmt: seine stueckeJePortion, sonst regeln.brauen.stueckeJePortion
+export const stueckeJePortionIm = (daten, kessel) => kessel.stueckeJePortion ?? brauregeln(daten).stueckeJePortion;
 
 const imGepaeck = (wesen, id) => Boolean(wesen.inventar) && wesen.inventar.includes(id);
 const gegenstaendeIm = (spiel, wesen) => (wesen.inventar || []).map((id) => entitaetMitId(spiel.zustand, id)).filter(Boolean);
@@ -107,7 +115,7 @@ export function sudVorbereiten(spiel, wesen, befehl) {
   const portionen = befehl.portionen ?? Math.max(1, Math.min(kessel.kessel.portionen, gefaesse));
   if (!Number.isInteger(portionen) || portionen < 1) return { grund: "ungueltig" };
   if (portionen > kessel.kessel.portionen) return { grund: "zu_viele_portionen" };
-  const fassen = portionen * regeln.stueckeJePortion;
+  const fassen = portionen * stueckeJePortionIm(spiel.daten, kessel.kessel);
   if (fuellung > fassen) return { grund: "kessel_voll" };
   if (trocken) return trockenbierVorbereiten(spiel, wesen, { kessel, zutaten, verfahren, portionen, fuellung, fassen, gefaesse });
   if (kultur === null) {

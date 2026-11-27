@@ -1,6 +1,6 @@
 # Battle Ninkasi - Welt
 
-Stand: 2026-11-26
+Stand: 2026-11-27
 
 Zuständig für: `src/welt/ebene.js`, `src/welt/ebenenschritte.js`, `src/welt/plan.js`, `src/welt/population.js`, `src/welt/karte.js`, `src/welt/schichten.js`, `src/welt/wege.js`, `src/systeme/gelaende.js`, `src/systeme/fallen.js`, `src/systeme/schichten.js`, `src/systeme/ebenen.js`, `src/systeme/sicht.js`, `src/systeme/licht.js`, `src/systeme/duft.js`, `src/systeme/erinnerung.js`, `src/systeme/gefahr.js`, `daten/gelaende.js`, `daten/schichten.js`, `daten/ebenen.js`
 
@@ -16,7 +16,7 @@ Vorbild Brogue: Türen öffnen sich beim Hindurchgehen und schließen sich von s
 
 Daten:
 
-+ Gelände (`daten/gelaende.js`): `kennung` (ein Zeichen, so steht das Feld in `zustand.ebene.felder`, einer Liste von Zeichenketten), `text` (Name für Untersuchen und Tooltip, Pflicht), `passierbar`, `passierbarFuer`, `undurchdringlich`, `durchsichtig`, `geschossdurchlaessig` (Vorgabe wie `durchsichtig`), `gasdurchlaessig` (Vorgabe wie passierbar), `laermdaempfung`, `treppe` ("ab" oder "auf"), `tuer` (`{ offen, aufschlag? }` an der geschlossenen, `{ zu }` an der offenen Tür; `aufschlag` in Prozent, `tuer_zu` 50), `zerstoerbar: { wird }`, `beimBenutzen` (Effekt), `beimFestsitzen` (Effekt), `brennbar`, `brenndauer`, `verbrenntZu`, `quelle: { gas, menge }`, `hitze` (`true`: wärmt das Anrühren von Trockenbier daneben, siehe [Sude.md](Sude.md), Trockenbier), `kessel` (siehe [Sude.md](Sude.md), Befehl); jede Art braucht ein Zeichen in `daten/zeichen.js`
++ Gelände (`daten/gelaende.js`): `kennung` (ein Zeichen, so steht das Feld in `zustand.ebene.felder`, einer Liste von Zeichenketten), `text` (Name für Untersuchen und Tooltip, Pflicht), `passierbar`, `passierbarFuer`, `undurchdringlich`, `durchsichtig`, `geschossdurchlaessig` (Vorgabe wie `durchsichtig`), `gasdurchlaessig` (Vorgabe wie passierbar), `laermdaempfung`, `treppe` ("ab" oder "auf"), `tuer` (`{ offen, aufschlag? }` an der geschlossenen, `{ zu }` an der offenen Tür; `aufschlag` in Prozent, `tuer_zu` 50), `zerstoerbar: { wird }`, `beimBenutzen` (Effekt), `beimFestsitzen` (Effekt), `brennbar`, `brenndauer`, `verbrenntZu`, `quelle: { gas, menge }`, `hitze` (`true`: wärmt das Anrühren von Trockenbier daneben, siehe [Sude.md](Sude.md), Trockenbier), `kessel` (siehe [Sude.md](Sude.md), Befehl; im Grundgerüst der Braukessel des Hubs, Kennung K); jede Art braucht ein Zeichen in `daten/zeichen.js`
 + Am Wesen `tueren`: `"oeffnen"` (Vorgabe) oder `"nicht"`
 + Fallen (`datenproben/fallen.js`): Entitäten auf einem Feld mit `falle: { tarnung, effekt, ausloesenFuer? }` und `verborgen` (Vorgabe ja), nach dem Auslösen oder Entdecken `entdeckt`; die Ebene legt sie nach `fallen: [{ typ, anzahl }]`
 + Regelwerte `regeln.fallen`: `entdeckenVorgabe` 30, `reichweite` 5; an der Ebene `tuerChance`

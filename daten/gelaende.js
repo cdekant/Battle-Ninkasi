@@ -8,6 +8,8 @@
 // beimBenutzen: Effekt (Hebel), geschossdurchlaessig: abweichend von durchsichtig (Gitter).
 // Feldschichten (src/systeme/schichten.js): gasdurchlaessig (Vorgabe wie passierbar), quelle: { gas, menge } je Welttick,
 // brennbar in Prozent, brenndauer, verbrenntZu: Gelände nach dem Feuer.
+// Brauen: kessel: { portionen, verderben?, unschaerfe?, stueckeJePortion? } (src/systeme/brauen.js, docs/Sude.md, Befehl),
+// hitze: true wärmt das Anrühren von Trockenbier (src/systeme/trockenbier.js).
 // text: Name für Untersuchen und Tooltip (sprache/de/texte.js, gelaende.<name>).
 export default {
   wand: { text: "gelaende.wand", kennung: "#", passierbar: false, durchsichtig: false, laermdaempfung: 8 }, // Kosten für Lärm, ohne Angabe undurchlässig
@@ -18,4 +20,6 @@ export default {
   // Treppen zwischen den Tiefen (src/systeme/ebenen.js)
   treppe_ab: { text: "gelaende.treppe_ab", kennung: ">", passierbar: true, durchsichtig: true, treppe: "ab" },
   treppe_auf: { text: "gelaende.treppe_auf", kennung: "<", passierbar: true, durchsichtig: true, treppe: "auf" },
+  // Kessel des Hubs (docs/Brauen.md, Kessel): hier wird immer gebraut (src/systeme/brauen.js, docs/Sude.md, Befehl)
+  braukessel: { text: "gelaende.braukessel", kennung: "K", passierbar: false, durchsichtig: true, laermdaempfung: 4, kessel: { portionen: 4 } },
 };

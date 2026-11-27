@@ -25,6 +25,8 @@ export default {
     lederfetzen: { zeichen: ",", farbe: "#8c5a33" },
     kupferschrott: { zeichen: ",", farbe: "#5f8f7a" },
     leere_flasche: { zeichen: "!", farbe: "#8c7a63" },
+    holzkessel: { zeichen: "u", farbe: "#9a6b3f" },
+    kupferkessel: { zeichen: "u", farbe: "#d0814a" },
     gerstenmalz: { zeichen: "%", farbe: "#d9b36a" },
     emmer: { zeichen: "%", farbe: "#c9a45a" },
     bierbrot: { zeichen: "%", farbe: "#8a5a2b" },

@@ -21,6 +21,7 @@ import { gesteuerteEntitaet, entitaetMitId } from "../kern/zustand.js";
 import { istAngelegt, haltbarkeitProzent, wechselzeit, verlangsamungDes } from "../systeme/ausruestung.js";
 import { zeitkosten } from "../kern/spiel.js";
 import { anzahlVon, ladungenVon, lastVon, tragkraftVon, lastZuschlag } from "../systeme/inventar.js";
+import { stueckeJePortionIm } from "../systeme/brauen.js";
 import { faehigkeitFuer, faehigkeitenVon, herkunftDer, verbrauchVon, zeitBisBereit } from "../systeme/faehigkeiten.js";
 import { BUCHSTABEN, gewaehlterGegenstand } from "../eingabe/inventar.js";
 import { hilfeGruppen } from "../eingabe/hilfe.js";
@@ -106,6 +107,13 @@ export function platzText(texte, leisten, schluessel) {
 
 const ziehbar = (schluessel) => ` draggable="true" data-ziehen="${schluessel}"`;
 
+// Werte eines Kessels im Gepäck (systeme/brauen.js): Portionen und Stück je Portion, Punkte aufs Verderben, Streuung
+function kesselZeilen(spiel, text, kessel) {
+  const verderben = kessel.verderben ? `<li>${text("ui.kessel_verderben", { punkte: `${kessel.verderben > 0 ? "+" : ""}${kessel.verderben}` })}</li>` : "";
+  const streuung = kessel.unschaerfe !== undefined && kessel.unschaerfe !== 100 ? `<li>${text("ui.kessel_streuung", { prozent: kessel.unschaerfe })}</li>` : "";
+  return `<li>${text("ui.kessel_fasst", { portionen: kessel.portionen, stuecke: stueckeJePortionIm(spiel.daten, kessel) })}</li>${verderben}${streuung}<li class="leise">${text("ui.kessel_abstellen")}</li>`;
+}
+
 fensterinhaltAnmelden("inventar", ({ spiel, texte, leisten }, zustand) => {
   const { text, nomenForm } = texte;
   const gesteuerte = gesteuerteEntitaet(spiel.zustand);
@@ -124,6 +132,7 @@ fensterinhaltAnmelden("inventar", ({ spiel, texte, leisten }, zustand) => {
         ${anzahlVon(gewaehlt) > 1 ? `<li>${text("ui.anzahl")}: ${anzahlVon(gewaehlt)}</li>` : ""}
         ${gewaehlt.ladungen ? `<li>${text("ui.ladungen")}: ${ladungenVon(gewaehlt)} / ${gewaehlt.ladungen.hoechstens}</li>` : ""}
         ${gewaehlt.haltbarkeit ? `<li>${text("ui.haltbarkeit")}: ${haltbarkeitProzent(gewaehlt)} %</li>` : ""}
+        ${gewaehlt.kessel ? kesselZeilen(spiel, text, gewaehlt.kessel) : ""}
         ${istAngelegt(gesteuerte, gewaehlt.id) ? `<li>${text("ui.angelegt")}</li>` : ""}
         ${gewaehlt.ausruestung ? `<li>${text("ui.wechselzeit", { zeit: zeitkosten(spiel, gesteuerte, "anlegen", {}, wechselzeit(spiel, gesteuerte, gewaehlt, "anlegen")) })}</li>` : ""}
         ${verlangsamungDes(spiel, gesteuerte, gewaehlt) ? `<li>${text("ui.verlangsamung", { prozent: verlangsamungDes(spiel, gesteuerte, gewaehlt) })}</li>` : ""}

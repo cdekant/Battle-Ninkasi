@@ -1370,6 +1370,15 @@ function pruefeReifen(daten, regeln, achsen, aromaachsen, fehler) {
   }
 }
 
+// Kessel am Gelände oder am Gegenstand (systeme/brauen.js): { portionen > 0, verderben?, unschaerfe?, stueckeJePortion? }
+function pruefeKessel(kessel, ort, fehler) {
+  if (kessel === undefined) return;
+  const gueltig = istObjekt(kessel) && istGanzzahl(kessel.portionen) && kessel.portionen > 0
+    && (kessel.verderben === undefined || istGanzzahl(kessel.verderben)) && (kessel.unschaerfe === undefined || istZahlAbNull(kessel.unschaerfe))
+    && (kessel.stueckeJePortion === undefined || (istGanzzahl(kessel.stueckeJePortion) && kessel.stueckeJePortion > 0));
+  if (!gueltig) fehler.push(`${ort}: kessel muss { portionen > 0, verderben?, unschaerfe?, stueckeJePortion? > 0 } sein`);
+}
+
 // Gefundenes Rezept: { text, zielgebiet, portionen, zutaten: [{ typ, menge }], verfahren, kultur, kniff?, ep }
 function pruefeRezept(daten, regeln, sprache, name, rezept, fehler) {
   const ort = `rezepte.${name}`;
@@ -1441,12 +1450,9 @@ function pruefeBrauen(daten, sprache, fehler) {
   for (const [name, rezept] of Object.entries(daten.rezepte ?? {})) pruefeRezept(daten, regeln, sprache, name, rezept, fehler);
   for (const [name, gelaende] of Object.entries(daten.gelaende)) {
     if (gelaende.hitze !== undefined && gelaende.hitze !== true) fehler.push(`gelaende.${name}: hitze muss true sein`);
-    const kessel = gelaende.kessel;
-    if (kessel === undefined) continue;
-    const gueltig = istObjekt(kessel) && istGanzzahl(kessel.portionen) && kessel.portionen > 0
-      && (kessel.verderben === undefined || istGanzzahl(kessel.verderben)) && (kessel.unschaerfe === undefined || istZahlAbNull(kessel.unschaerfe));
-    if (!gueltig) fehler.push(`gelaende.${name}: kessel muss { portionen > 0, verderben?, unschaerfe? } sein`);
+    pruefeKessel(gelaende.kessel, `gelaende.${name}`, fehler);
   }
+  for (const [name, gegenstand] of Object.entries(daten.gegenstaende)) pruefeKessel(gegenstand.kessel, `gegenstaende.${name}`, fehler);
   // Merkmale der Formen (systeme/kulturen.js): Zustände mit kulturmerkmal, die Änderungsarten aus dem Register
   for (const [name, zustand] of Object.entries(daten.zustaende ?? {})) {
     if (zustand.kulturmerkmal === undefined) continue;

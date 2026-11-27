@@ -1,11 +1,11 @@
 // Ebenen (Aufbau siehe src/welt/ebene.js). Die Abfolge der Tiefen steht in daten/index.js (abfolge, starttiefe);
 // mehrere Tiefen dürfen dieselbe Vorlage nutzen. digger: Optionen für den Digger von rot.js. Zahlen vorläufig.
 export default {
-  // fester Ort zwischen den Ebenen; Dienste (Händler u.a.) folgen, siehe docs/Grundlagen.md
+  // fester Ort zwischen den Ebenen mit einem Braukessel (K); Dienste (Händler u.a.) folgen, siehe docs/Spielverlauf.md, Hub
   hub: {
     karte: [
       "###########",
-      "#.........#",
+      "#K........#",
       "#.........#",
       "#....>....#",
       "#.........#",
@@ -17,7 +17,7 @@ export default {
   testkammer: {
     karte: [
       "#####################",
-      "#...................#",
+      "#K..................#",
       "#...................#",
       "#...................#",
       "#...................#",
